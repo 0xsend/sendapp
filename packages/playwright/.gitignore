@@ -1,0 +1,4 @@
+/test-results/
+/playwright-report/
+.cache/
+.auth/

@@ -1,0 +1,32 @@
+{
+  "name": "@my/supabase",
+  "version": "0.0.0",
+  "files": [
+    "./database.types.ts",
+    "./database-generated.types.ts"
+  ],
+  "scripts": {
+    "_with-env": "dotenv -e ../.env -c -- ",
+    "_link-project": "npx supabase link --project-ref $NEXT_PUBLIC_SUPABASE_PROJECT_ID --workdir ../",
+    "link-project": "yarn _with-env yarn _link-project",
+    "_generate:remote": "npx supabase gen types typescript --project-id $NEXT_PUBLIC_SUPABASE_PROJECT_ID --schema public > ./database-generated.types.ts",
+    "generate:remote": "yarn _with-env yarn _generate:remote",
+    "generate": "npx supabase gen types typescript --local --schema public > ./database-generated.types.ts",
+    "g": "yarn generate",
+    "migration:diff": "npx supabase db diff -f ",
+    "start": "npx supabase start",
+    "stop": "npx supabase stop",
+    "reset": "npx supabase db reset && npx snaplet snapshot restore --latest --no-reset && npx supabase start",
+    "status": "npx supabase status",
+    "_deploy": "yarn link-project && npx supabase db push",
+    "deploy": "yarn _with-env yarn _deploy",
+    "test": "npx supabase test db"
+  },
+  "devDependencies": {
+    "@snaplet/copycat": "^0.17.3",
+    "dotenv-cli": "^6.0.0",
+    "snaplet": "^0.74.2",
+    "supabase": "^1.99.0",
+    "type-fest": "^4.3.1"
+  }
+}

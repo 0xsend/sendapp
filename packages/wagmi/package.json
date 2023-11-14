@@ -1,0 +1,29 @@
+{
+  "name": "@my/wagmi",
+  "version": "0.0.0",
+  "sideEffects": [],
+  "private": true,
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    "import": "./src/index.ts",
+    "require": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "wagmi generate"
+  },
+  "devDependencies": {
+    "@safe-global/safe-deployments": "^1.26.0",
+    "@wagmi/cli": "^1.5.2",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "@my/contracts": "workspace:*",
+    "@wagmi/core": "^1.4.3",
+    "viem": "^1.15.1",
+    "wagmi": "^1.4.6"
+  }
+}

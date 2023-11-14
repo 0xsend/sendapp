@@ -1,0 +1,5 @@
+ds-test/=packages/contracts/lib/forge-std/lib/ds-test/src/
+forge-std/=packages/contracts/lib/forge-std/src/
+@openzeppelin/=node_modules/@openzeppelin/
+eth-gas-reporter/=node_modules/eth-gas-reporter/
+p256-verifier/=packages/contracts/lib/p256-verifier/src/

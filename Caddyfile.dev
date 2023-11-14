@@ -1,0 +1,15 @@
+sendapp.localhost {
+	reverse_proxy http://localhost:3000
+}
+
+distributor.localhost {
+	reverse_proxy http://localhost:3050
+}
+
+eth.rpc.localhost {
+	reverse_proxy http://localhost:8545
+}
+
+base.rpc.localhost {
+	reverse_proxy http://127.0.0.1:8546
+}

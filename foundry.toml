@@ -1,0 +1,27 @@
+[profile.default]
+src = "packages/contracts/src"
+test = "packages/contracts/test"
+out = "packages/contracts/out"
+libs = ["node_modules", "packages/contracts/lib"]
+ffi = true
+evm_version = "shanghai"
+solc_version = "0.8.21"
+via_ir = true
+
+[profile.mainnet]
+# should be updated after releases
+fork_block_number = 18537716
+
+[profile.base]
+# should be updated after releases
+fork_block_number = 6427975
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+[rpc_endpoints]
+mainnet = "${MAINNET_RPC_URL}"
+base = "${BASE_RPC_URL}"
+
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+base = { key = "${ETHERSCAN_API_KEY}" }

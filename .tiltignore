@@ -1,0 +1,3 @@
+**/.auth
+packages/playwright/test-results
+packages/playwright/playwright-report

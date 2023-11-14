@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    // "noErrorTruncation": true, // uncomment if you want to see full error messages
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "jsx": "preserve",
+    "paths": {
+      "app/*": ["./packages/app/*"],
+      "@my/ui/*": ["./packages/ui/src/*"],
+      "@my/wagmi/*": ["./packages/wagmi/src/*"]
+    },
+    "plugins": [
+      {
+        // docs: https://github.com/nderscore/tamagui-typescript-plugin#readme
+        "name": "@nderscore/tamagui-typescript-plugin",
+        "pathToApp": "apps/next"
+      }
+    ]
+  },
+  "extends": "expo/tsconfig.base",
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "**/types",
+    "apps/next/out",
+    "apps/next/.next",
+    "apps/next/.tamagui"
+  ]
+}

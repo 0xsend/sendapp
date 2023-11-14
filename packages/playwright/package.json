@@ -1,0 +1,23 @@
+{
+  "name": "@my/playwright",
+  "devDependencies": {
+    "@faker-js/faker": "^8.1.0",
+    "@my/supabase": "workspace:*",
+    "@playwright/test": "^1.37.1",
+    "@supabase/supabase-js": "^2.33.1",
+    "@types/dotenv-flow": "^3.3.1",
+    "@types/jsonwebtoken": "^9.0.2",
+    "app": "workspace:*",
+    "debug": "^4.3.4",
+    "dotenv": "^16.3.1",
+    "dotenv-flow": "^3.3.0",
+    "extract-zip": "^2.0.1",
+    "headless-web3-provider": "^0.2.2",
+    "jsonwebtoken": "^9.0.2",
+    "viem": "^1.15.1"
+  },
+  "scripts": {
+    "codegen": "npx ts-node ./bin/codegen.ts",
+    "test": "playwright test"
+  }
+}
