@@ -18,9 +18,8 @@ import {
   yellowDark,
   gold,
   goldDark,
+  brandColors,
 } from './colors'
-
-import { brandColors } from './colors'
 
 export {
   darkColor,
