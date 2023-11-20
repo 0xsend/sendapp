@@ -12,6 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@daimo/expo-passkeys": "workspace:*",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
     "@my/wagmi": "workspace:*",
@@ -19,7 +20,7 @@
     "@react-native-async-storage/async-storage": "1.18.2",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/auth-helpers-react": "^0.4.2",
-    "@supabase/supabase-js": "^2.33.1",
+    "@supabase/supabase-js": "^2.38.5",
     "@tamagui/animations-react-native": "^1.74.8",
     "@tamagui/colors": "^1.74.8",
     "@tamagui/font-inter": "^1.74.8",
@@ -48,7 +49,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@types/react": "^18.0.27",
+    "@types/react": "^18.2.15",
     "debug": "^4.3.4",
     "eslint": "^8.46.0",
     "eslint-config-custom": "workspace:*",

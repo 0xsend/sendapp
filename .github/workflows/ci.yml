@@ -17,25 +17,18 @@ jobs:
         node-version: [18.16.1]
 
     env:
-      ANVIL_FORK_URL: ${{ secrets.CI_ANVIL_FORK_URL }}
+      ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
+      ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: oven-sh/setup-bun@v1
+      - uses: pkgxdev/dev@v0
       - name: Setup Tilt
         shell: bash
         run: |
           curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
       - name: Tilt CI
         shell: bash
         run: tilt ci app:test contracts:test distributor:test supabase:test next:web

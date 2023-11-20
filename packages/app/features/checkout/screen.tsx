@@ -172,7 +172,7 @@ export const CheckoutScreen = () => {
         behavior: 'smooth',
       })
     }
-  }, [pendingTags, hasPendingTags])
+  }, [hasPendingTags])
 
   if (confirmedTags?.length === 5) {
     return (

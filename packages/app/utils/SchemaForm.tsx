@@ -1,11 +1,10 @@
 import { createTsForm, createUniqueFieldSchema } from '@ts-react/form'
 
 import {
-  AddressField,
-  AddressSchema,
   BooleanCheckboxField,
   BooleanField,
   BooleanSwitchField,
+  CountryCodeField,
   FieldError,
   Form,
   FormProps,
@@ -14,6 +13,7 @@ import {
   SelectField,
   TextAreaField,
   TextField,
+  OTPField,
   Theme,
 } from '@my/ui'
 import { ComponentProps } from 'react'
@@ -44,14 +44,11 @@ export const formFields = {
    */
   select: createUniqueFieldSchema(z.string(), 'select'),
   /**
-   * example of how to handle more complex fields
+   * country code field
    */
-  address: createUniqueFieldSchema(AddressSchema, 'address'),
+  countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
+  otp: createUniqueFieldSchema(z.string(), 'otp'),
 }
-
-// function createFormSchema<T extends ZodRawShape>(getData: (fields: typeof formFields) => T) {
-//   return z.object(getData(formFields))
-// }
 
 const mapping = [
   [formFields.text, TextField] as const,
@@ -61,7 +58,8 @@ const mapping = [
   [formFields.boolean_switch, BooleanSwitchField] as const,
   [formFields.boolean_checkbox, BooleanCheckboxField] as const,
   [formFields.select, SelectField] as const,
-  [formFields.address, AddressField] as const,
+  [formFields.countrycode, CountryCodeField] as const,
+  [formFields.otp, OTPField] as const,
 ] as const
 
 const FormComponent = (props: FormProps) => {
@@ -83,9 +81,9 @@ export const SchemaForm: typeof _SchemaForm = ({ ...props }) => {
 
   return (
     <_SchemaForm {...props} renderAfter={renderAfter}>
-      {(fields, context) => (
+      {(fields) => (
         <FormWrapper.Body>
-          {props.children ? props.children(fields, context) : Object.values(fields)}
+          {props.children ? props.children(fields) : Object.values(fields)}
         </FormWrapper.Body>
       )}
     </_SchemaForm>

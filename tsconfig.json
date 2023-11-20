@@ -8,7 +8,8 @@
     "paths": {
       "app/*": ["./packages/app/*"],
       "@my/ui/*": ["./packages/ui/src/*"],
-      "@my/wagmi/*": ["./packages/wagmi/src/*"]
+      "@my/wagmi/*": ["./packages/wagmi/src/*"],
+      "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"]
     },
     "plugins": [
       {
