@@ -6,7 +6,7 @@ export type ContainerProps = {
 
 export const Container: React.FC<ContainerProps> = (props) => {
   return (
-    <XStack maw={1480} als="center" f={1}>
+    <XStack maw={1480} als="center" f={1} pt="$14">
       {props.children}
     </XStack>
   )

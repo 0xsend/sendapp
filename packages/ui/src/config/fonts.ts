@@ -3,6 +3,7 @@ import { createInterFont } from '@tamagui/font-inter'
 export const headingFont = createInterFont({
   size: {
     6: 15,
+    15: 101,
   },
   transform: {
     6: 'uppercase',
