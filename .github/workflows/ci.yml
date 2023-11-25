@@ -25,10 +25,6 @@ jobs:
         with:
           submodules: recursive
       - uses: pkgxdev/dev@v0
-      - name: Setup Tilt
-        shell: bash
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
       - name: Tilt CI
         shell: bash
         run: tilt ci app:test contracts:test distributor:test supabase:test next:web
