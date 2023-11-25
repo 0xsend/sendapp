@@ -24,25 +24,23 @@ type SelectItem = {
 
 export const CountryCodeField = ({
   options,
-  native = true,
+  native = false,
   ...props
 }: {
   options: SelectItem[]
 } & Pick<SelectProps, 'size' | 'native'>) => {
-  const [val, setVal] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const { data: geoData, isLoading } = useGeoIp()
-  const {
-    field,
-    error,
-    formState: { isSubmitting },
-  } = useTsController<string>()
+  const { field, error } = useTsController<string>()
   const themeName = useThemeName()
+
+  // set the country code based on geoip
   useEffect(() => {
     if (isLoading) return
     const country = countries.find((country) => country.code === geoData?.country_code)
-    if (country) {
-      setVal(country.dialCode)
+    console.log('country', country)
+    if (country && !field.value) {
+      console.log('setting country code')
       field.onChange(country.dialCode)
     }
   }, [geoData, isLoading, field])
@@ -58,6 +56,7 @@ export const CountryCodeField = ({
           autoComplete="tel-country-code"
           value={field.value}
           onValueChange={(text) => {
+            console.log('text', text)
             field.onChange(text)
           }}
           {...props}
@@ -110,7 +109,7 @@ export const CountryCodeField = ({
             <Select.Viewport>
               <XStack>
                 <Select.Group space="$0">
-                  <Select.Label>Your Country</Select.Label>
+                  <Select.Label>Country</Select.Label>
                   {countries.map((country, i) => {
                     return (
                       <Select.Item

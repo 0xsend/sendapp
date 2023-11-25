@@ -27,7 +27,7 @@ labels = ["deps"]
 
 local_resource(
     "yarn:install",
-    "yarn install" if not CI else "yarn install --frozen-lockfile",
+    "yarn install" if not CI else "yarn install --immutable",
     labels = labels,
     deps = [
         "package.json",

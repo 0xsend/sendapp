@@ -15,7 +15,7 @@
   "dependencies": {
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
-    "@supabase/supabase-js": "^2.33.1",
+    "@supabase/supabase-js": "^2.38.5",
     "@tamagui/next-theme": "^1.74.8",
     "@tanstack/react-query": "4.18.0",
     "@trpc/client": "^10.38.2",
@@ -32,7 +32,7 @@
     "react-native-web": "~0.19.6",
     "react-native-web-lite": "^1.74.8",
     "vercel": "latest",
-    "zod": "^3.22.2"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",

@@ -106,7 +106,7 @@ export const SignInScreen = () => {
             form={form}
             schema={SignInSchema}
             onSubmit={signInWithPhone}
-            defaultValues={{ phone: '', countrycode: '1' }}
+            defaultValues={{ phone: '', countrycode: '' }}
             props={{
               countrycode: {
                 // @ts-expect-error unsure how to get web props to work with tamagui
