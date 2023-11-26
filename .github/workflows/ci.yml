@@ -33,7 +33,9 @@ jobs:
           yarn playwright playwright install --with-deps
           # start mainnet anvil
           nohup tilt up anvil:mainnet &
-          tilt wait anvil:mainnet
+          # wait for tilt and anvil to be ready
+          curl -s --retry 10 --retry-delay 1 --retry-max-time 10 http://localhost:10350 > /dev/null
+          tilt wait --for=condition=Ready "uiresource/anvil:mainnet"
           yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
