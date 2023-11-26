@@ -46,7 +46,7 @@ export const SelectField = ({
       <Fieldset>
         {!!label && (
           <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
-            {label} {isOptional && `(Optional)`}
+            {label} {isOptional && '(Optional)'}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>

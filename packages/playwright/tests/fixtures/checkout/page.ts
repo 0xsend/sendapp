@@ -1,4 +1,4 @@
-import { Expect, Locator, Page } from '@playwright/test'
+import type { Expect, Locator, Page } from '@playwright/test'
 import { Web3ProviderBackend, Web3RequestKind } from 'headless-web3-provider'
 import debug from 'debug'
 import path from 'path'
@@ -9,10 +9,7 @@ export class CheckoutPage {
   public readonly pricingDialog: Locator
   public readonly confirmDialog: Locator
   public readonly submitTagButton: Locator
-  constructor(
-    public readonly page: Page,
-    public readonly wallet: Web3ProviderBackend
-  ) {
+  constructor(public readonly page: Page, public readonly wallet: Web3ProviderBackend) {
     this.pricingDialog = page.getByLabel('Send Tag Pricing')
     this.confirmDialog = page.getByLabel('Confirming Send Tags')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
@@ -48,9 +45,10 @@ export class CheckoutPage {
 
   async openPricingDialog() {
     await this.page.getByRole('button', { name: 'Pricing' }).click()
+    await this.pricingDialog.isVisible()
   }
 
-  async confirmTags(expect: Expect) {
+  async confirmTags(expect: Expect<CheckoutPage>) {
     log('confirmTags')
     const confirmButton = this.page.getByRole('button', { name: 'Confirm' })
     expect?.(confirmButton).toBeEnabled()

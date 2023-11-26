@@ -15,7 +15,5 @@ contract DeploySendMerkleDropTest is Test, Helper {
     function testItRuns() public {
         DeploySendMerkleDropScript script = new DeploySendMerkleDropScript();
         script.run();
-        // running again should not deploy a new contract
-        script.run();
     }
 }

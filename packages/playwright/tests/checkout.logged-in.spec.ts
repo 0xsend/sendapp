@@ -8,7 +8,7 @@ let log: debug.Debugger | undefined
 
 const debugAuthSession = async (page: Page) => {
   const { decoded } = await getAuthSessionFromContext(page.context())
-  log!('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
+  log?.('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
 const pricingText = [
@@ -71,7 +71,7 @@ test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) =
     receipt_hash: '0x',
     referral_code_input: '',
   })
-  log!('cannot confirm a tag without paying', data, error)
+  log?.('cannot confirm a tag without paying', data, error)
   expect(error).toBeTruthy()
   expect(error?.code).toBe('42501')
   expect(error?.message).toBe('permission denied for function confirm_tags')

@@ -172,7 +172,7 @@ export const CheckoutScreen = () => {
         behavior: 'smooth',
       })
     }
-  }, [pendingTags, hasPendingTags])
+  }, [hasPendingTags])
 
   if (confirmedTags?.length === 5) {
     return (
@@ -493,43 +493,40 @@ function SendTagPricingDialog() {
           <ScrollView>
             <Section>
               <KVTable>
-                <AnimatePresence>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText fontWeight="900">6+ characters</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        First one {(0.005).toLocaleString()} ETH, {(0.01).toLocaleString()} ETH
-                        after
-                      </SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText fontWeight="900">5 characters</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>{(0.01).toLocaleString()} ETH</SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText fontWeight="900">4 characters</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>{(0.03).toLocaleString()} ETH</SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText fontWeight="900">1-3 characters</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>{(0.05).toLocaleString()} ETH</SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                </AnimatePresence>
+                <KVTable.Row>
+                  <KVTable.Key>
+                    <SizableText fontWeight="900">6+ characters</SizableText>
+                  </KVTable.Key>
+                  <KVTable.Value>
+                    <SizableText>
+                      First one {(0.005).toLocaleString()} ETH, {(0.01).toLocaleString()} ETH after
+                    </SizableText>
+                  </KVTable.Value>
+                </KVTable.Row>
+                <KVTable.Row>
+                  <KVTable.Key>
+                    <SizableText fontWeight="900">5 characters</SizableText>
+                  </KVTable.Key>
+                  <KVTable.Value>
+                    <SizableText>{(0.01).toLocaleString()} ETH</SizableText>
+                  </KVTable.Value>
+                </KVTable.Row>
+                <KVTable.Row>
+                  <KVTable.Key>
+                    <SizableText fontWeight="900">4 characters</SizableText>
+                  </KVTable.Key>
+                  <KVTable.Value>
+                    <SizableText>{(0.03).toLocaleString()} ETH</SizableText>
+                  </KVTable.Value>
+                </KVTable.Row>
+                <KVTable.Row>
+                  <KVTable.Key>
+                    <SizableText fontWeight="900">1-3 characters</SizableText>
+                  </KVTable.Key>
+                  <KVTable.Value>
+                    <SizableText>{(0.05).toLocaleString()} ETH</SizableText>
+                  </KVTable.Value>
+                </KVTable.Row>
               </KVTable>
             </Section>
           </ScrollView>

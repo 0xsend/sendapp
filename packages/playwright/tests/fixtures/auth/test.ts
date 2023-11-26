@@ -1,11 +1,15 @@
 import type { BrowserContext } from '@playwright/test'
 import { test as base } from '../ethereum/test'
 import debug from 'debug'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import { Database } from '@my/supabase/database.types'
 import config from '../../../playwright.config'
+import { countries } from 'app/utils/country'
+
+const randomCountry = () =>
+  countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
 const log = debug('test:fixtures:auth:test')
 
@@ -39,8 +43,9 @@ export const test = base.extend<{
   context: async ({ context }, use) => {
     const { parallelIndex } = test.info()
     const randomNumber = Math.floor(Math.random() * 1e9)
+    const country = randomCountry()
     const { data, error } = await supabaseAdmin.auth.signUp({
-      phone: `+1${randomNumber}`,
+      phone: `+${country.dialCode}${randomNumber}`,
       password: 'changeme',
     })
 
@@ -62,12 +67,16 @@ export const test = base.extend<{
 
     log('created user', `id=${parallelIndex}`, `user=${user.id}`)
 
+    if (!config?.use?.baseURL) {
+      throw new Error('config.use.baseURL not defined')
+    }
+
     // set auth session cookie
     await context.addCookies([
       {
         name: SB_AUTH_COOKIE,
         value: encodeURIComponent(JSON.stringify([access_token, refresh_token, null, null, null])),
-        domain: new URL(config.use!.baseURL!).hostname,
+        domain: new URL(config.use.baseURL).hostname,
         path: '/',
       },
     ])
@@ -89,17 +98,20 @@ export const test = base.extend<{
   supabase: async ({ authSession, context }, use) => {
     const { token } = authSession
     use(
-      createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, token, {
+      createClient(SUPABASE_URL, token, {
         auth: { persistSession: false },
         global: {
-          fetch: async (url: string, init: RequestInit) => {
-            // @ts-expect-error - supabase-js uses node-fetch and it is incompatible with playwright fetch types
-            const headersObject = Object.fromEntries(init.headers!.entries())
+          fetch: async (url: URL | RequestInfo, init?: RequestInit) => {
+            const headersObject = init?.headers
+              ? init?.headers.entries instanceof Function
+                ? Object.fromEntries(init?.headers.entries())
+                : init?.headers
+              : {}
 
             // Fetch using Playwright's context
-            const response = await context.request.fetch(url, {
-              method: init.method,
-              data: init.body,
+            const response = await context.request.fetch(url.toString(), {
+              method: init?.method,
+              data: init?.body,
               headers: headersObject,
             })
 
