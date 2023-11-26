@@ -12,10 +12,6 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.16.1]
-
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -35,7 +31,9 @@ jobs:
           DEBUG: test:*,app:*
         run: |
           yarn playwright playwright install --with-deps
-          nohup tilt up anvil &
+          # start mainnet anvil
+          nohup tilt up anvil:mainnet &
+          tilt wait anvil:mainnet
           yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
