@@ -289,13 +289,13 @@ local_resource(
 
 local_resource(
     "contracts:test",
+    "yarn contracts test -vvv",
     allow_parallel = True,
     labels = ["test"],
     resource_deps = [
         "yarn:install",
         "contracts:build",
     ],
-    serve_cmd = "yarn contracts test -vvv -w",
     deps =
         files_matching(
             os.path.join("packages", "contracts"),
