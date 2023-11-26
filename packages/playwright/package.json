@@ -3,7 +3,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.1.0",
     "@my/supabase": "workspace:*",
-    "@playwright/test": "^1.37.1",
+    "@playwright/test": "^1.40.0",
     "@supabase/supabase-js": "^2.38.5",
     "@types/dotenv-flow": "^3.3.1",
     "@types/jsonwebtoken": "^9.0.2",

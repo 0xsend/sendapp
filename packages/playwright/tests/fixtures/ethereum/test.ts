@@ -17,6 +17,7 @@ export const test = base.extend<{
   injectWeb3Provider: InjectWeb3Provider
 }>({
   // eslint-disable-next-line no-empty-pattern
+  // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
   signers: async ({}, use) => {
     const privateKey = generatePrivateKey()
     await use([privateKey])
