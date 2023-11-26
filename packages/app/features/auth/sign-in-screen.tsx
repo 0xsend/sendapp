@@ -103,6 +103,7 @@ export const SignInScreen = () => {
           />
         ) : (
           <SchemaForm
+            flex={1}
             form={form}
             schema={SignInSchema}
             onSubmit={signInWithPhone}
@@ -111,7 +112,6 @@ export const SignInScreen = () => {
               countrycode: {
                 // @ts-expect-error unsure how to get web props to work with tamagui
                 'aria-label': 'Country Code',
-                width: '35%',
                 height: '$3',
               },
               phone: {
@@ -119,6 +119,7 @@ export const SignInScreen = () => {
                 borderColor: 'rgba(195, 171, 142, 0.6)',
                 borderWidth: 1,
                 placeholder: 'Phone Number',
+                width: '100%',
               },
             }}
             renderAfter={({ submit }) => (
@@ -173,9 +174,7 @@ export const SignInScreen = () => {
                 <Paragraph size={'$1'} fontWeight={'500'}>
                   Your Phone
                 </Paragraph>
-                <XStack gap="$2" flex={1} display={'flex'}>
-                  {Object.values(fields)}
-                </XStack>
+                <XStack gap="$2">{Object.values(fields)}</XStack>
               </>
             )}
           </SchemaForm>

@@ -55,45 +55,22 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    /* Test against desktop viewports. */
     {
-      name: 'setup',
-      testMatch: /global.setup\.ts/,
-      teardown: 'teardown',
-    },
-    // only support desktop chrome for now since we're dependent on metamask extension
-    {
-      name: 'logged in chromium',
-      testMatch: '**/*.logged-in.spec.ts',
-      dependencies: ['setup'],
+      name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
     {
-      name: 'logged in firefox',
-      testMatch: '**/*.logged-in.spec.ts',
-      dependencies: ['setup'],
+      name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-    // {
-    //   name: 'logged in webkit',
-    //   testMatch: '**/*.logged-in.spec.ts',
-    //   dependencies: ['setup'],
-    //   use: { ...devices['Desktop Safari'] },
-    // },
     {
-      name: 'teardown',
-      testMatch: /global.teardown\.ts/,
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
     },
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
 
     /* Test against mobile viewports. */
+    // FIXME: introduce these once tamagui adapt sheets correctly include dialog aria attributes
     // {
     //   name: 'Mobile Chrome',
     //   use: { ...devices['Pixel 5'] },
@@ -117,7 +94,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? `yarn workspace next-app run serve`
+      ? 'yarn workspace next-app run serve'
       : `yarn workspace next-app run dev --port ${port}`,
     url: `http://127.0.0.1:${port}`,
     reuseExistingServer: !process.env.CI,

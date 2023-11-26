@@ -9,6 +9,7 @@ import {
   Theme,
   Text,
   SelectProps,
+  Spinner,
 } from 'tamagui'
 import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { useGeoIp } from 'app/utils/useGeoIp'
@@ -29,6 +30,7 @@ export const CountryCodeField = ({
 }: {
   options: SelectItem[]
 } & Pick<SelectProps, 'size' | 'native'>) => {
+  const [country, setCountry] = useState<(typeof countries)[number] | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false)
   const { data: geoData, isLoading } = useGeoIp()
   const { field, error } = useTsController<string>()
@@ -37,28 +39,31 @@ export const CountryCodeField = ({
   // set the country code based on geoip
   useEffect(() => {
     if (isLoading) return
-    const country = countries.find((country) => country.code === geoData?.country_code)
-    console.log('country', country)
-    if (country && !field.value) {
-      console.log('setting country code')
-      field.onChange(country.dialCode)
+    const _country = countries.find((country) => country.code === geoData?.country_code)
+    if (!country) {
+      setCountry(_country)
     }
-  }, [geoData, isLoading, field])
+  }, [geoData, isLoading, country])
+
+  // set the field.value based on the country code
+  useEffect(() => {
+    if (!country) return
+    field.onChange(country.dialCode)
+  }, [country, field])
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
         <Select
           native={native}
-          onOpenChange={(open) => {
-            setIsOpen(open)
-          }}
           autoComplete="tel-country-code"
-          value={field.value}
-          onValueChange={(text) => {
-            console.log('text', text)
-            field.onChange(text)
+          onOpenChange={setIsOpen}
+          onValueChange={(val) => {
+            const _country = countries.find((country) => country.name === val)
+            if (!_country) throw new Error('Country not found')
+            setCountry(_country)
           }}
+          value={country ? country.name : undefined}
           {...props}
         >
           <Select.Trigger
@@ -73,7 +78,22 @@ export const CountryCodeField = ({
             borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
           >
-            <Select.Value placeholder="Country" />
+            {isLoading ? (
+              <Spinner color="$color" size="small" />
+            ) : country ? (
+              <Text
+                fontSize="$1"
+                fontWeight="bold"
+                color="$text"
+                style={{
+                  textTransform: 'uppercase',
+                }}
+              >
+                {country?.dialCode} {country?.flag}
+              </Text>
+            ) : (
+              'Country'
+            )}
           </Select.Trigger>
 
           <Adapt platform="web" when="sm">
@@ -116,12 +136,11 @@ export const CountryCodeField = ({
                         id={`dialCode-${country.code}`}
                         index={i}
                         key={country.name}
-                        value={country.dialCode}
+                        value={country.name}
                         cursor="pointer"
                       >
                         <Select.ItemText>
-                          {country.flag}&nbsp;{country.dialCode}{' '}
-                          <Text $sm={{ display: 'none' }}>&nbsp;{country.name}</Text>
+                          {country.flag}&nbsp;{country.dialCode} {isOpen && country.name}
                         </Select.ItemText>
                         <Select.ItemIndicator marginLeft="auto">
                           <Check size={16} />
