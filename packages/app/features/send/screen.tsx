@@ -3,6 +3,11 @@ import {
   Container,
   H1,
   Paragraph,
+  Separator,
+  SizableText,
+  Tabs,
+  TabsContentProps,
+  Text,
   Theme,
   XStack,
   YStack,
@@ -11,6 +16,7 @@ import {
 import { IconEthereum } from 'app/components/icons/IconEthereum'
 import { NumPadButton } from './components/numpad-button'
 import { Select } from './components/select'
+import { MainLayout } from 'app/components/layout'
 
 const items = [
   { name: 'ETH' },
@@ -23,7 +29,7 @@ export function SendScreen() {
 
   return (
     <Theme name={themeName}>
-      <Container>
+      <MainLayout>
         <YStack>
           <XStack space="$1.5">
             <Paragraph opacity={0}>Bal1.25</Paragraph>
@@ -55,7 +61,7 @@ export function SendScreen() {
               <NumPadButton>&lt;</NumPadButton>
             </XStack>
           </YStack>
-          <XStack jc="center" mt="$6">
+          <XStack jc="center" my="$6">
             <Button
               fullscreen
               py="$6"
@@ -68,7 +74,7 @@ export function SendScreen() {
             </Button>
           </XStack>
         </YStack>
-      </Container>
+      </MainLayout>
     </Theme>
   )
 }

@@ -9,8 +9,8 @@ const Ethereum = (props: IconProps) => {
     <Svg
       viewBox="0 0 24 24"
       color={color as ColorTokens | undefined}
-      width={size}
-      height={size}
+      width={size ?? 24}
+      height={size ?? 24}
       {...rest}
     >
       <Path
