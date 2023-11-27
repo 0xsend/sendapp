@@ -25,7 +25,7 @@ export function SendScreen() {
   return (
     <MainLayout>
       <Container>
-        <YStack maw={316}>
+        <YStack maw={316} pt={'$13'}>
           <XStack jc={'center'}>
             <H1 size={value.length > 4 ? value.length > 8 ? '$9' : '$12' : '$15'}>
               {Number(value).toLocaleString()}
