@@ -12,30 +12,15 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.16.1]
-
     env:
-      ANVIL_FORK_URL: ${{ secrets.CI_ANVIL_FORK_URL }}
+      ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
+      ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: oven-sh/setup-bun@v1
-      - name: Setup Tilt
-        shell: bash
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
+      - uses: pkgxdev/dev@v0
       - name: Tilt CI
         shell: bash
         run: tilt ci app:test contracts:test distributor:test supabase:test next:web
@@ -46,7 +31,16 @@ jobs:
           DEBUG: test:*,app:*
         run: |
           yarn playwright playwright install --with-deps
-          nohup tilt up anvil &
+          # start mainnet anvil
+          nohup tilt up anvil:mainnet &
+          echo waiting for tilt and anvil to be ready
+          for i in {1..10}; do
+            curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i failed, trying again..."
+            sleep 1
+          done
+          echo tilt is ready
+          tilt wait --for=condition=Ready "uiresource/anvil:mainnet"
+          echo anvil is ready
           yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
@@ -55,42 +49,43 @@ jobs:
           path: packages/playwright/playwright-report/
           retention-days: 30
 
-  vercel-deploy-preview:
-    # skip if on develop since it will be deployed with another workflow
-    if: github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: ci
+  # TODO: add back when we decide where to deploy
+  # vercel-deploy-preview:
+  #   # skip if on develop since it will be deployed with another workflow
+  #   if: github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   needs: ci
 
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  #   env:
+  #     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  #     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-      - name: Switch to Vercel Send team
-        run: vercel team switch 0xsend --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        id: deploy
-        run: |
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt && echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
-          echo ::notice::Deployment URL: $(cat deployment-url.txt)
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - name: Install Vercel CLI
+  #       run: npm install --global vercel@latest
+  #     - name: Install Foundry
+  #       uses: foundry-rs/foundry-toolchain@v1
+  #       with:
+  #         version: nightly
+  #     - name: Switch to Vercel Send team
+  #       run: vercel team switch 0xsend --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Pull Vercel Environment Information
+  #       run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Build Project Artifacts
+  #       run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+  #     - name: Deploy Project Artifacts to Vercel
+  #       id: deploy
+  #       run: |
+  #         vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt && echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+  #         echo ::notice::Deployment URL: $(cat deployment-url.txt)
 
-      # does not work unless you do it with a full access token
-      # - name: Extract branch name
-      #   shell: bash
-      #   run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-      #   id: extract_branch
-      # - name: Set Vercel alias
-      #   run: vercel alias --token=${{ secrets.VERCEL_TOKEN }} set ${{ steps.deploy.outputs.deployment_url }} sendstack-${{ steps.extract_branch.outputs.branch }}-0xsend.vercel.app
+  # does not work unless you do it with a full access token
+  # - name: Extract branch name
+  #   shell: bash
+  #   run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+  #   id: extract_branch
+  # - name: Set Vercel alias
+  #   run: vercel alias --token=${{ secrets.VERCEL_TOKEN }} set ${{ steps.deploy.outputs.deployment_url }} sendstack-${{ steps.extract_branch.outputs.branch }}-0xsend.vercel.app
