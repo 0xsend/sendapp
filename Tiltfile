@@ -96,6 +96,28 @@ local_resource(
     ),
 )
 
+local_resource(
+    "daimo-expo-passkeys:build",
+    "yarn workspace @daimo/expo-passkeys build",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+    deps = files_matching(
+               os.path.join("packages", "daimo-expo-passkeys", "src"),
+               lambda f: f.endswith(".tsx") or f.endswith(".ts"),
+           ) +
+           files_matching(
+               os.path.join("packages", "daimo-expo-passkeys", "ios"),
+               lambda f: f.endswith(".swift"),
+           ) +
+           files_matching(
+               os.path.join("packages", "daimo-expo-passkeys", "android"),
+               lambda f: f.endswith(".kt"),
+           ),
+)
+
 # INFRA
 labels = ["infra"]
 

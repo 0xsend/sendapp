@@ -27,6 +27,7 @@ export default class Document extends NextDocument {
       getStyleElement(),
       <style
         key="tamagui-css"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: tamagui is a trusted source
         dangerouslySetInnerHTML={{
           __html: Tamagui.getCSS({
             exclude: process.env.NODE_ENV === 'development' ? null : 'design-system',

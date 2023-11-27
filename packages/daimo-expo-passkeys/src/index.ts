@@ -13,6 +13,7 @@ import {
   toAndroidSignRequest,
   toBase64,
 } from './utils'
+import type ExpoPasskeysModuleWeb from './ExpoPasskeysModule.web'
 
 export { CreateRequest, CreateResult, SignRequest, SignResult }
 
@@ -29,7 +30,7 @@ export { CreateRequest, CreateResult, SignRequest, SignResult }
  */
 export async function createPasskey(request: CreateRequest): Promise<CreateResult> {
   const userIDB64 = base64.encode(new TextEncoder().encode(request.passkeyName))
-
+  console.log('createPasskey', { request, userIDB64 })
   switch (Platform.OS) {
     case 'ios': {
       const ret = await ExpoPasskeysModule.createPasskey(
@@ -52,16 +53,14 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
       }
     }
     case 'web': {
-      const ret = await ExpoPasskeysModule.createPasskey(
+      const ret = await (ExpoPasskeysModule as typeof ExpoPasskeysModuleWeb).createPasskey(
         request.domain,
         request.passkeyDisplayTitle,
         userIDB64,
         request.challengeB64
       )
-      return {
-        rawClientDataJSONB64: ret.rawClientDataJSON,
-        rawAttestationObjectB64: ret.rawAttestationObject,
-      }
+      // @ts-expect-error FIXME: this is a hack
+      return ret
     }
     default: {
       throw new Error(`Unsupported platform: ${Platform.OS}`)
