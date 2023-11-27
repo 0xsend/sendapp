@@ -32,7 +32,7 @@ export function SendScreen() {
             </H1>
             <XStack pos={'absolute'} r={0} space={'$1.5'}>
               <Paragraph theme={'alt2'}>Bal</Paragraph>
-              <Paragraph>1.25</Paragraph>
+              <Paragraph fontWeight={'700'}>1.25</Paragraph>
             </XStack>
           </XStack>
           <XStack jc={'center'} mt={'$6'}>
