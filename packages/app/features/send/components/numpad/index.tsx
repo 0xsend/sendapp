@@ -21,7 +21,7 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
     } else {
       if (value === '0') {
         setValue(val)
-      } else {
+      } else if ((value.split('.')?.at(1)?.length ?? 0) < 3) {
         setValue(value + val)
       }
     }

@@ -8,7 +8,6 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { MainLayout } from 'app/components/layout'
 import { IconEthereum } from 'app/components/icons/IconEthereum'
 import { Select } from './components/select'
@@ -28,7 +27,9 @@ export function SendScreen() {
       <Container>
         <YStack maw={316}>
           <XStack jc={'center'}>
-            <H1 size={value.length > 4 ? value.length > 8 ? '$9' : '$12' : '$15'}>{value}</H1>
+            <H1 size={value.length > 4 ? value.length > 8 ? '$9' : '$12' : '$15'}>
+              {Number(value).toLocaleString()}
+            </H1>
             <XStack pos={'absolute'} r={0} space={'$1.5'}>
               <Paragraph theme={'alt2'}>Bal</Paragraph>
               <Paragraph>1.25</Paragraph>
