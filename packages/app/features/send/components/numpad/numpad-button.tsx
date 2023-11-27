@@ -16,13 +16,15 @@ const CustomButton = styled(Button, {
 })
 
 interface INumPadButtonProps extends ButtonProps {
+  value: string,
   num?: boolean,
+  pressHandler: (val: string) => void
 }
 
 export function NumPadButton(props: INumPadButtonProps) {
   return (
-    <CustomButton {...props}>
-      {props.children}
+    <CustomButton {...props} onPress={(e: any) => props.pressHandler(props.value)}>
+      {props.value}
     </CustomButton>
   )
 }

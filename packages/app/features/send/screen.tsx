@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Button,
   Container,
@@ -6,12 +7,12 @@ import {
   Theme,
   XStack,
   YStack,
-  useThemeName
 } from '@my/ui'
-import { IconEthereum } from 'app/components/icons/IconEthereum'
-import { NumPadButton } from './components/numpad-button'
-import { Select } from './components/select'
+import { useThemeSetting } from '@tamagui/next-theme'
 import { MainLayout } from 'app/components/layout'
+import { IconEthereum } from 'app/components/icons/IconEthereum'
+import { Select } from './components/select'
+import { NumPad } from './components/numpad'
 
 const items = [
   { name: 'ETH' },
@@ -20,58 +21,36 @@ const items = [
 ]
 
 export function SendScreen() {
-  const themeName = useThemeName()
+  const [value, setValue] = useState('0.25')
 
   return (
-    <Theme name={themeName}>
-      <MainLayout>
-        <Container>
-          <YStack>
-            <XStack jc={'center'}>
-              <H1 size={'$15'}>0.25</H1>
-              <XStack pos={'absolute'} r={0} space={'$1.5'}>
-                <Paragraph opacity={0.42}>Bal</Paragraph>
-                <Paragraph>1.25</Paragraph>
-              </XStack>
+    <MainLayout>
+      <Container>
+        <YStack maw={316}>
+          <XStack jc={'center'}>
+            <H1 size={value.length > 4 ? value.length > 8 ? '$9' : '$12' : '$15'}>{value}</H1>
+            <XStack pos={'absolute'} r={0} space={'$1.5'}>
+              <Paragraph theme={'alt2'}>Bal</Paragraph>
+              <Paragraph>1.25</Paragraph>
             </XStack>
-            <XStack jc={'center'} mt={'$6'}>
-              <Select items={items} />
-            </XStack>
-            <YStack space={'$5'} mt={'$9'}>
-              <XStack jc={'center'} space={'$6'}>
-                <NumPadButton num>1</NumPadButton>
-                <NumPadButton num>2</NumPadButton>
-                <NumPadButton num>3</NumPadButton>
-              </XStack>
-              <XStack jc={'center'} space={'$6'}>
-                <NumPadButton num>4</NumPadButton>
-                <NumPadButton num>5</NumPadButton>
-                <NumPadButton num>6</NumPadButton>
-              </XStack>
-              <XStack jc={'center'} space={'$6'}>
-                <NumPadButton num>7</NumPadButton>
-                <NumPadButton num>8</NumPadButton>
-                <NumPadButton num>9</NumPadButton>
-              </XStack>
-              <XStack jc={'center'} space={'$6'}>
-                <NumPadButton>.</NumPadButton>
-                <NumPadButton num>0</NumPadButton>
-                <NumPadButton>&lt;</NumPadButton>
-              </XStack>
-            </YStack>
-            <Button
-              my={'$6'}
-              py={'$6'}
-              borderRadius={'$9'}
-              bc={'$backgroundTransparent'}
-              boc={'$borderColorFocus'}
-              size={'$6'}
-            >
+          </XStack>
+          <XStack jc={'center'} mt={'$6'}>
+            <Select items={items} />
+          </XStack>
+          <NumPad value={value} setValue={setValue} />
+          <Button
+            my={'$6'}
+            py={'$6'}
+            borderRadius={'$9'}
+            bc={'$backgroundTransparent'}
+            boc={'$borderColorFocus'}
+          >
+            <Paragraph size={'$6'} fontWeight={'700'}>
               Continue
-            </Button>
-          </YStack>
-        </Container>
-      </MainLayout>
-    </Theme>
+            </Paragraph>
+          </Button>
+        </YStack>
+      </Container>
+    </MainLayout>
   )
 }
