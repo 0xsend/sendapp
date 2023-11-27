@@ -5493,6 +5493,7 @@ __metadata:
     "@types/dotenv-flow": "npm:^3.3.1"
     "@types/jsonwebtoken": "npm:^9.0.2"
     app: "workspace:*"
+    cbor: "npm:^9.0.1"
     debug: "npm:^4.3.4"
     dotenv: "npm:^16.3.1"
     dotenv-flow: "npm:^3.3.0"
@@ -12682,6 +12683,15 @@ __metadata:
   version: 1.0.0
   resolution: "catch-unknown@npm:1.0.0"
   checksum: a1883713eb25093aa7a33b4191f6266d7f3aba5e4095030105d7661c59b2723cc19c73ff37d9c8cbe6efe83a5495352fae7ce63a6aca0d9b207897212992dbca
+  languageName: node
+  linkType: hard
+
+"cbor@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "cbor@npm:9.0.1"
+  dependencies:
+    nofilter: "npm:^3.1.0"
+  checksum: fa1bdf233b7d8b95b991c7d3861b6bf300b0d62fcebda34e4cca53605d32585021e80ee00b52378f492da011ebde6b21d704ac5117c2c6cce30de0b6419d2372
   languageName: node
   linkType: hard
 
@@ -23153,6 +23163,13 @@ __metadata:
   version: 1.15.0
   resolution: "node-stream-zip@npm:1.15.0"
   checksum: 3fb56144d23456e1b42fe9d24656999e4ef6aeccce3cae43fc97ba6c341ee448aeceb4dc8fb57ee78eab1a6da49dd46c9650fdb2f16b137630a335df9560c647
+  languageName: node
+  linkType: hard
+
+"nofilter@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "nofilter@npm:3.1.0"
+  checksum: f63d87231dfda4b783db17d75b15aac948f78e65f4f1043096ef441147f6667ff74cd4b3f57ada5dbe240be282d3e9838558ac863a66cb04ef25fff7b2b4be4e
   languageName: node
   linkType: hard
 

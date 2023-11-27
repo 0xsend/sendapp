@@ -1,5 +1,7 @@
-import type { BrowserContext } from '@playwright/test'
-import { test as base } from '../ethereum/test'
+import { type BrowserContext, mergeTests, test as base } from '@playwright/test'
+import { test as ethereumTest } from '../ethereum'
+import { test as webauthnTest } from '../webauthn'
+
 import debug from 'debug'
 import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
@@ -35,7 +37,7 @@ export const getAuthSessionFromContext = async (context: BrowserContext) => {
   return { token, decoded }
 }
 
-export const test = base.extend<{
+const authTest = base.extend<{
   context: BrowserContext
   supabase: SupabaseClient<Database>
   authSession: { token: string; decoded: JwtPayload }
@@ -130,5 +132,6 @@ export const test = base.extend<{
     )
   },
 })
+export const test = mergeTests(webauthnTest, ethereumTest, authTest)
 
 export const expect = test.expect

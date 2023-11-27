@@ -7,6 +7,17 @@ import type {
 } from '@simplewebauthn/typescript-types'
 import { base64 } from '@scure/base'
 
+/**
+ * Check if WebAuthn is available.
+ * @see https://www.w3.org/TR/webauthn-2/#sctn-sample-registration
+ */
+function checkPasskeyAvailableOrThrow() {
+  if (!window.PublicKeyCredential) {
+    throw new Error('WebAuthn is not available')
+  }
+  return true
+}
+
 const ExpoPasskeysModuleWeb = {
   async createPasskey(
     domain: string,
@@ -17,6 +28,8 @@ const ExpoPasskeysModuleWeb = {
     rawClientDataJSON: string
     rawAttestationObject: string
   }> {
+    checkPasskeyAvailableOrThrow()
+
     const userId = base64.decode(userIdBase64)
     const challenge = base64.decode(challengeBase64)
 
@@ -74,6 +87,8 @@ const ExpoPasskeysModuleWeb = {
     rawAuthenticatorData: string
     rawClientDataJSON: string
   }> {
+    checkPasskeyAvailableOrThrow()
+
     const challenge = base64.decode(challengeBase64)
 
     // Prepare PublicKeyCredentialRequestOptions for WebAuthn
