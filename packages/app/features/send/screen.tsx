@@ -3,11 +3,6 @@ import {
   Container,
   H1,
   Paragraph,
-  Separator,
-  SizableText,
-  Tabs,
-  TabsContentProps,
-  Text,
   Theme,
   XStack,
   YStack,
@@ -30,50 +25,52 @@ export function SendScreen() {
   return (
     <Theme name={themeName}>
       <MainLayout>
-        <YStack>
-          <XStack space="$1.5">
-            <Paragraph opacity={0}>Bal1.25</Paragraph>
-            <H1 fontSize="$15">0.25</H1>
-            <Paragraph>Bal1.25</Paragraph>
-          </XStack>
-          <XStack jc="center" mt="$6">
-            <Select items={items} />
-          </XStack>
-          <YStack space="$5" mt="$9">
-            <XStack jc="center" space="$6">
-              <NumPadButton num>1</NumPadButton>
-              <NumPadButton num>2</NumPadButton>
-              <NumPadButton num>3</NumPadButton>
+        <Container>
+          <YStack>
+            <XStack jc={'center'}>
+              <H1 size={'$15'}>0.25</H1>
+              <XStack pos={'absolute'} r={0} space={'$1.5'}>
+                <Paragraph opacity={0.42}>Bal</Paragraph>
+                <Paragraph>1.25</Paragraph>
+              </XStack>
             </XStack>
-            <XStack jc="center" space="$6">
-              <NumPadButton num>4</NumPadButton>
-              <NumPadButton num>5</NumPadButton>
-              <NumPadButton num>6</NumPadButton>
+            <XStack jc={'center'} mt={'$6'}>
+              <Select items={items} />
             </XStack>
-            <XStack jc="center" space="$6">
-              <NumPadButton num>7</NumPadButton>
-              <NumPadButton num>8</NumPadButton>
-              <NumPadButton num>9</NumPadButton>
-            </XStack>
-            <XStack jc="center" space="$6">
-              <NumPadButton>.</NumPadButton>
-              <NumPadButton num>0</NumPadButton>
-              <NumPadButton>&lt;</NumPadButton>
-            </XStack>
-          </YStack>
-          <XStack jc="center" my="$6">
+            <YStack space={'$5'} mt={'$9'}>
+              <XStack jc={'center'} space={'$6'}>
+                <NumPadButton num>1</NumPadButton>
+                <NumPadButton num>2</NumPadButton>
+                <NumPadButton num>3</NumPadButton>
+              </XStack>
+              <XStack jc={'center'} space={'$6'}>
+                <NumPadButton num>4</NumPadButton>
+                <NumPadButton num>5</NumPadButton>
+                <NumPadButton num>6</NumPadButton>
+              </XStack>
+              <XStack jc={'center'} space={'$6'}>
+                <NumPadButton num>7</NumPadButton>
+                <NumPadButton num>8</NumPadButton>
+                <NumPadButton num>9</NumPadButton>
+              </XStack>
+              <XStack jc={'center'} space={'$6'}>
+                <NumPadButton>.</NumPadButton>
+                <NumPadButton num>0</NumPadButton>
+                <NumPadButton>&lt;</NumPadButton>
+              </XStack>
+            </YStack>
             <Button
-              fullscreen
-              py="$6"
-              borderRadius="$9"
-              bc="$backgroundTransparent"
-              boc="$borderColorFocus"
-              fontSize="$6"
+              my={'$6'}
+              py={'$6'}
+              borderRadius={'$9'}
+              bc={'$backgroundTransparent'}
+              boc={'$borderColorFocus'}
+              size={'$6'}
             >
               Continue
             </Button>
-          </XStack>
-        </YStack>
+          </YStack>
+        </Container>
       </MainLayout>
     </Theme>
   )

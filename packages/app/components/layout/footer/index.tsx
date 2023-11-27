@@ -2,26 +2,17 @@ import { Footer, Tabs, Text, XStack, YStack } from "@my/ui"
 import { IconHome } from "app/components/icons"
 import { IconSettings } from "app/components/icons/IconSettings"
 import { SendButton } from "./components/SendButton"
-import { LinearGradient } from '@tamagui/linear-gradient'
 
 const MainFooter = () => {
   return (
-    <Footer pos={'absolute'} bottom={0} width="100%">
-      <YStack height={'$11'}>
-        <LinearGradient
-          start={[0, 1]}
-          end={[0, 0]}
-          height={'$3.5'}
-          fullscreen
-          pos={'relative'}
-          colors={['$background', '$backgroundTransparent']}
-        />
+    <Footer pos={'absolute'} b={0} px={36} width="100%" height={'$10'}>
+      <YStack height={'100%'}>
         <XStack pos="relative" fg={1} space="$3" bg="$background">
           <Tabs
             defaultValue="tab1"
             orientation="horizontal"
             fd={'column'}
-            fullscreen
+            width={'100%'}
             overflow={'hidden'}
             space={'$10'}
           >
