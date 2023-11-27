@@ -1,10 +1,11 @@
-import { Adapt, Select as TamaguiSelect, SelectProps, Sheet, YStack, getFontSize } from "@my/ui"
+import { Adapt, Select as TamaguiSelect, SelectProps, Sheet, YStack, getFontSize, XStack } from "@my/ui"
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons"
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
 import { useMemo, useState } from "react"
+import { IconProps } from "@tamagui/helpers-icon"
 
-export function Select({ items, ...props }: SelectProps & { items: Array<{ name: string }> }) {
+export function Select({ items, ...props }: SelectProps & { items: Array<{ icon?: React.ReactNode, name: string }> }) {
   const [val, setVal] = useState(items[0]?.name.toLowerCase())
 
   return (
@@ -15,8 +16,11 @@ export function Select({ items, ...props }: SelectProps & { items: Array<{ name:
       disablePreventBodyScroll
       {...props}
     >
-      <TamaguiSelect.Trigger width={220} iconAfter={<IconTriangleDown width={12} height={'$0.75'} />}>
-        <TamaguiSelect.Value placeholder="Something" />
+      <TamaguiSelect.Trigger w="auto" px={'$3.5'} bg={'$backgroundPress'} iconAfter={<IconTriangleDown width={12} height={'$0.75'} />}>
+        <XStack space={'$1.5'}>
+          {items.filter((item) => item.name.toLowerCase() === val)[0]?.icon}
+          <TamaguiSelect.Value placeholder="Something" fow={'700'} />
+        </XStack>
       </TamaguiSelect.Trigger>
 
       <Adapt when="sm" platform="touch">
@@ -85,7 +89,14 @@ export function Select({ items, ...props }: SelectProps & { items: Array<{ name:
                       key={item.name}
                       value={item.name.toLowerCase()}
                     >
-                      <TamaguiSelect.ItemText>{item.name}</TamaguiSelect.ItemText>
+                      <XStack space={'$2'}>
+                        <TamaguiSelect.Icon>
+                          {item.icon}
+                        </TamaguiSelect.Icon>
+                        <TamaguiSelect.ItemText>
+                          {item.name}
+                        </TamaguiSelect.ItemText>
+                      </XStack>
                       <TamaguiSelect.ItemIndicator marginLeft="auto">
                         <Check size={16} />
                       </TamaguiSelect.ItemIndicator>

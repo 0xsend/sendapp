@@ -14,7 +14,7 @@ import { Select } from './components/select'
 import { NumPad } from './components/numpad'
 
 const items = [
-  { name: 'ETH' },
+  { icon: <IconEthereum />, name: 'ETH' },
   { name: 'BSC' },
   { name: 'TRON' },
 ]
