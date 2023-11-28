@@ -1,5 +1,6 @@
 import { XStack, YStack } from "@my/ui"
 import { NumpadButton } from "./numpad-button"
+import formatNumpadInput from "app/utils/formatNumpadInput"
 
 interface INumPadProps {
   value: string
@@ -7,24 +8,8 @@ interface INumPadProps {
 }
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {
-  const numpadpressHandler = (val: string) => {
-    if (val === '.') {
-      if (!value.includes('.')) {
-        setValue(value + '.')
-      }
-    } else if (val === '<') {
-      if (value.length === 1) {
-        setValue('0')
-      } else {
-        setValue(value.slice(0, -1))
-      }
-    } else {
-      if (value === '0') {
-        setValue(val)
-      } else if ((value.split('.')?.at(1)?.length ?? 0) < 3) {
-        setValue(value + val)
-      }
-    }
+  const numpadpressHandler = (input: string) => {
+    setValue(formatNumpadInput(value, input));
   }
 
   return (
