@@ -1,7 +1,5 @@
 import { Button, Image, YStack } from "@my/ui"
-import SendLogo from "app/assets/img/logos/send-app-logo.svg"
-import { LinearGradient } from "@tamagui/linear-gradient"
-import { Stop } from "react-native-svg"
+import { IconSendLogo } from "app/components/icons"
 
 export const SendButton = () => {
   return (
@@ -14,7 +12,7 @@ export const SendButton = () => {
         boxShadow: "0px 9px 8px 0px rgba(167, 139, 114, 0.10)"
       }}
     >
-      <Image source={{ uri: SendLogo.src }} width={'$9'} height={16} />
+      <IconSendLogo />
     </YStack>
   )
 }

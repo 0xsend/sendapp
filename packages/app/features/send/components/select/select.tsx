@@ -10,7 +10,6 @@ export function Select({ items, ...props }: SelectProps & { items: Array<{ icon?
 
   return (
     <TamaguiSelect
-      id="food"
       value={val}
       onValueChange={setVal}
       disablePreventBodyScroll
