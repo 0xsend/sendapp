@@ -1,7 +1,7 @@
 import { test as base } from '@playwright/test'
 import crypto from 'crypto'
 import cbor from 'cbor'
-import { base64url } from '@scure/base'
+import { base64 } from '@scure/base'
 
 /**
  * AAGUID is a 128-bit identifier indicating the type (e.g. make and model) of the authenticator.
@@ -11,7 +11,7 @@ const AAGUID = Buffer.from('00000000-0000-0000-0000-000000000000', 'hex')
 type WebauthnCredential = {
   id: Buffer
   /**
-   * The public key of the credential in base64url format.
+   * The public key of the credential in DER format.
    */
   publicKey: Buffer
   /**
@@ -30,7 +30,7 @@ type WebauthnCredential = {
   /**
    * The user handle is specified by a Relying Party, as the value of user.id, and used to map a specific public key credential to a specific user account with the Relying Party. Authenticators in turn map RP IDs and user handle pairs to public key credential sources.
    * A user handle is an opaque byte sequence with a maximum size of 64 bytes, and is not meant to be displayed to the user.
-   * Here it is stored as a string in base64url format.
+   * Here it is stored as a string in base64 format.
    * @see https://www.w3.org/TR/webauthn-2/#user-handle
    */
   userHandle: string | null
@@ -116,7 +116,7 @@ function createWebauthnCredential({
     rpId,
     userHandle,
   }
-  CredentialsStore[id.toString('base64url')] = cred
+  CredentialsStore[id.toString('base64')] = cred
   return cred
 }
 
@@ -150,11 +150,11 @@ export async function createPublicKeyCredential(
   credentialOptions: CredentialCreationOptionsSerialized
 ): Promise<PublicKeyCredentialAttestationSerialized> {
   const credOptsPubKey = credentialOptions.publicKey
-  const challenge = base64url.decode(credOptsPubKey.challenge)
-  const clientDataJSON = base64url.encode(
+  const challenge = base64.decode(credOptsPubKey.challenge)
+  const clientDataJSON = base64.encode(
     new TextEncoder().encode(
       JSON.stringify({
-        challenge: base64url.encode(challenge),
+        challenge: base64.encode(challenge),
         origin: credOptsPubKey.rp.name,
         type: 'webauthn.create',
       })
@@ -174,11 +174,11 @@ export async function createPublicKeyCredential(
   const attestationObject = generateAttestionObject(authData, clientDataJSON, privateKey)
 
   return {
-    id: credentialId.toString('base64url'),
-    rawId: credentialId.toString('base64url'),
+    id: credentialId.toString('base64'),
+    rawId: credentialId.toString('base64'),
     authenticatorAttachment: 'platform',
     response: {
-      attestationObject: attestationObject.toString('base64url'),
+      attestationObject: attestationObject.toString('base64'),
       clientDataJSON,
     },
     type: 'public-key',
@@ -197,11 +197,11 @@ export async function getPublicKeyCredential(
   credentialRequestOptions: CredentialRequestOptionsSerialized
 ) {
   const credReqOptsPubKey = credentialRequestOptions.publicKey
-  const challenge = base64url.decode(credentialRequestOptions.publicKey.challenge)
+  const challenge = base64.decode(credentialRequestOptions.publicKey.challenge)
   const clientDataBuffer = Buffer.from(
     new TextEncoder().encode(
       JSON.stringify({
-        challenge: base64url.encode(challenge),
+        challenge: base64.encode(challenge),
         origin: credentialRequestOptions.publicKey.rpId,
         type: 'webauthn.get',
       })
@@ -223,12 +223,12 @@ export async function getPublicKeyCredential(
   cred.signCounter++ // increment counter on each "access" to the authenticator
   const assertionObject = generateAssertionObject(authData, clientDataBuffer, privateKey)
   return {
-    id: credentialId.toString('base64url'),
-    rawId: credentialId.toString('base64url'),
+    id: credentialId.toString('base64'),
+    rawId: credentialId.toString('base64'),
     response: {
-      authenticatorData: authData.toString('base64url'),
-      clientDataJSON: clientDataBuffer.toString('base64url'),
-      signature: assertionObject.toString('base64url'),
+      authenticatorData: authData.toString('base64'),
+      clientDataJSON: clientDataBuffer.toString('base64'),
+      signature: assertionObject.toString('base64'),
       userHandle: null,
     },
     type: 'public-key',

@@ -2,8 +2,6 @@ import { test as base } from '@playwright/test'
 import {
   type CredentialCreationOptionsSerialized,
   type CredentialRequestOptionsSerialized,
-  type PublicKeyCredentialAssertionSerialized,
-  type PublicKeyCredentialAttestationSerialized,
   createPublicKeyCredential,
   getPublicKeyCredential,
 } from '@0xsend/webauthn-authenticator'
@@ -15,8 +13,8 @@ let log: debug.Debugger
  * Install the WebAuthn authenticator mock in the browser. This is a helper function to be used in Playwright tests.
  */
 function installWebAuthnMock({
-  createCredFuncName = createPublicKeyCredential.name,
-  getCredFuncName = getPublicKeyCredential.name,
+  exposedCreateCredFuncName = createPublicKeyCredential.name,
+  exposedGetCredFuncName = getPublicKeyCredential.name,
 }) {
   console.log('webauthn mock init script')
 
@@ -69,12 +67,14 @@ function installWebAuthnMock({
     console.log('webauthn mock create credentialSerialized', credOptSer)
 
     // biome-ignore lint/suspicious/noExplicitAny: explicit any is needed here
-    const createCredFunc: typeof createPublicKeyCredential = (window as any)[createCredFuncName]
+    const createCredFunc: typeof createPublicKeyCredential = (window as any)[
+      exposedCreateCredFuncName
+    ]
     if (!createCredFunc || typeof createCredFunc !== 'function') {
-      throw new Error(`Missing ${createCredFuncName} function. Did you forget to expose it?`)
+      throw new Error(`Missing ${exposedCreateCredFuncName} function. Did you forget to expose it?`)
     }
 
-    const credSer: PublicKeyCredentialAttestationSerialized = await createCredFunc(credOptSer)
+    const credSer = await createCredFunc(credOptSer)
 
     console.log('webauthn mock create credSer', credSer)
 
@@ -113,15 +113,30 @@ function installWebAuthnMock({
     } as CredentialRequestOptionsSerialized
 
     // biome-ignore lint/suspicious/noExplicitAny: explicit any is needed here
-    const getCredFunc: typeof getPublicKeyCredential = (window as any)[getCredFuncName]
+    const getCredFunc: typeof getPublicKeyCredential = (window as any)[exposedGetCredFuncName]
     if (!getCredFunc || typeof getCredFunc !== 'function') {
-      throw new Error(`Missing ${getCredFuncName} function. Did you forget to expose it?`)
+      throw new Error(`Missing ${exposedGetCredFuncName} function. Did you forget to expose it?`)
     }
 
     const assertion = await getCredFunc(credOpts)
 
     console.debug('[webauthn mock] assertion', assertion)
-    return assertion
+
+    const assertionSer = {
+      ...assertion,
+      rawId: base64ToArrayBuffer(assertion.rawId),
+      response: {
+        ...assertion.response,
+        clientDataJSON: base64ToArrayBuffer(assertion.response.clientDataJSON),
+        authenticatorData: base64ToArrayBuffer(assertion.response.authenticatorData),
+        signature: base64ToArrayBuffer(assertion.response.signature),
+        userHandle: assertion.response.userHandle
+          ? base64ToArrayBuffer(assertion.response.userHandle)
+          : null,
+      },
+    }
+
+    return assertionSer
   }
 }
 
@@ -135,12 +150,10 @@ export const test = base.extend({
     await context.exposeFunction(exposedCreateCredFuncName, createPublicKeyCredential)
     await context.exposeFunction(exposedGetCredFuncName, getPublicKeyCredential)
 
-    await context.addInitScript(
-      installWebAuthnMock.bind(null, {
-        createCredFuncName: exposedCreateCredFuncName,
-        getCredFuncName: exposedGetCredFuncName,
-      })
-    )
+    await context.addInitScript(installWebAuthnMock, {
+      exposedCreateCredFuncName,
+      exposedGetCredFuncName,
+    })
 
     await use(context)
   },
