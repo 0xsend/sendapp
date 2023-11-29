@@ -48,7 +48,7 @@ export const palettes = (() => {
   const darkPalette = [
     darkTransparent,
     '#050505',
-    '#151515',
+    '#161619',
     '#191919',
     '#232323',
     '#282828',
