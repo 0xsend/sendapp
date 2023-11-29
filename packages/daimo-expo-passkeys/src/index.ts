@@ -107,7 +107,7 @@ export async function signWithPasskey(request: SignRequest): Promise<SignResult>
     }
     case 'web': {
       const ret = await ExpoPasskeysModule.signWithPasskey(request.domain, request.challengeB64)
-      console.log(ret)
+      console.log('[daimo-expo-passkeys] ret', ret)
       // const userIDstr = new TextDecoder('utf-8').decode(base64.decode(ret.userID))
       return {
         passkeyName: 'TODO: userIdStr', // userIDstr,
