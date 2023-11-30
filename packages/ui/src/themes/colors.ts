@@ -43,10 +43,10 @@ export const lightPalette = [
 export const darkColor = '#fff'
 export const darkPalette = [
   darkTransparent,
-  '#050505',
+  '#101010',
   '#161619',
   '#191919',
-  '#232323',
+  '#212121',
   '#282828',
   '#323232',
   '#424242',

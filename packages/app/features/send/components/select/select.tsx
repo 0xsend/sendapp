@@ -5,7 +5,7 @@ import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
 import { useMemo, useState } from "react"
 import { IconProps } from "@tamagui/helpers-icon"
 
-export function Select({ items, ...props }: SelectProps & { items: Array<{ icon?: React.ReactNode, name: string }> }) {
+export function Select({ items, ...props }: SelectProps & { items: Array<IAsset> }) {
   const [val, setVal] = useState(items[0]?.name.toLowerCase())
 
   return (
