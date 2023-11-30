@@ -1,12 +1,19 @@
-import { test as base } from '@playwright/test'
+/**
+ * WebAuthn Authenticator: An API for accessing Public Key Credentials
+ * @see https://www.w3.org/TR/webauthn-2/
+ *
+ * This is a mock implementation of the WebAuthn API for use in Playwright tests. It only supports ES256 and P-256.
+ */
 import crypto from 'crypto'
 import cbor from 'cbor'
 import { base64 } from '@scure/base'
 
+export const COSE_PUB_KEY_ALG = -7 // ECDSA w/ SHA-256
+
 /**
  * AAGUID is a 128-bit identifier indicating the type (e.g. make and model) of the authenticator.
  */
-const AAGUID = Buffer.from('00000000-0000-0000-0000-000000000000', 'hex')
+export const AAGUID = crypto.randomBytes(16)
 
 type WebauthnCredential = {
   id: Buffer
@@ -150,24 +157,30 @@ export async function createPublicKeyCredential(
   credentialOptions: CredentialCreationOptionsSerialized
 ): Promise<PublicKeyCredentialAttestationSerialized> {
   const credOptsPubKey = credentialOptions.publicKey
+  if (
+    !credOptsPubKey ||
+    credOptsPubKey.pubKeyCredParams.length === 0 ||
+    credOptsPubKey.pubKeyCredParams.some((p) => p.alg !== COSE_PUB_KEY_ALG)
+  ) {
+    throw new Error('Unsupported algorithm')
+  }
   const challenge = base64.decode(credOptsPubKey.challenge)
   const clientDataJSON = base64.encode(
     new TextEncoder().encode(
       JSON.stringify({
         challenge: base64.encode(challenge),
-        origin: credOptsPubKey.rp.name,
+        origin: `https://${credOptsPubKey.rp.id}`,
         type: 'webauthn.create',
       })
     )
   )
-  const rpId = credOptsPubKey.rp.id || credOptsPubKey.rp.name || 'localhost'
+  const rpId = credOptsPubKey.rp.id || 'localhost'
   const userHandle = credOptsPubKey.user.id || null
   const cred = createWebauthnCredential({
     rpId,
     userHandle,
   })
   const { id: credentialId, publicKey, privateKey, signCounter } = cred
-
   const attestedCredentialData = generateAttestedCredentialData(credentialId, publicKey)
   const authData = generateAuthenticatorData(rpId, signCounter, attestedCredentialData)
   cred.signCounter++ // increment counter on each "access" to the authenticator
@@ -275,7 +288,7 @@ function generateAttestedCredentialData(credentialId: Buffer, publicKey: Buffer)
   // COSE_Key format for ES256
   const coseKey = new Map()
   coseKey.set(1, 2) // kty: EC2 key type
-  coseKey.set(3, -7) // alg: ES256 signature algorithm
+  coseKey.set(3, COSE_PUB_KEY_ALG) // alg: ES256 signature algorithm
   coseKey.set(-1, 1) // crv: P-256 curve
   coseKey.set(-2, publicKey.subarray(27, 27 + 32)) // x-coordinate as byte string 32 bytes in length
   coseKey.set(-3, publicKey.subarray(27 + 32, 27 + 32 + 32)) // y-coordinate as byte string 32 bytes in length
@@ -284,10 +297,19 @@ function generateAttestedCredentialData(credentialId: Buffer, publicKey: Buffer)
     aaguid,
     credentialIdLength,
     credentialId,
-    Buffer.from(cbor.encode(coseKey)),
+    cbor.encode(coseKey),
   ])
 
   return attestedCredentialData
+}
+
+type Attestation = {
+  fmt: string
+  attStmt: {
+    alg: number
+    sig: Buffer
+  }
+  authData: Buffer
 }
 
 /**
@@ -306,16 +328,18 @@ function generateAttestionObject(
   sign.end()
   const sig = sign.sign(privateKey)
   const attStmt = {
-    alg: -7, // ES256 COSEAlgorithmIdentifier
+    alg: COSE_PUB_KEY_ALG, // ES256 COSEAlgorithmIdentifier
     sig,
   }
   const fmt = 'packed'
 
-  return cbor.encode({
+  const attestation: Attestation = {
     fmt,
     attStmt,
     authData,
-  })
+  }
+
+  return cbor.encode(attestation)
 }
 
 /**
@@ -329,4 +353,70 @@ function generateAssertionObject(
 ): Buffer {
   const assertion = Buffer.concat([authData, clientDataJSON])
   return crypto.createSign('sha256').update(assertion).sign(privateKey)
+}
+
+/**
+ * Deserialize a serialized public key credential attestation into a PublicKeyCredential.
+ *
+ * TODO: export to a preload.js file and expose via context.exposeFunction or page.exposeFunction
+ */
+export function deserializePublicKeyCredentialAttestion(
+  credential: PublicKeyCredentialAttestationSerialized
+) {
+  const credentialId = Buffer.from(credential.id, 'base64')
+  const clientDataJSON = Buffer.from(credential.response.clientDataJSON, 'base64')
+  const attestationObject = Buffer.from(credential.response.attestationObject, 'base64')
+  const attestation = cbor.decodeAllSync(attestationObject)[0] as Attestation
+
+  if (!attestation) {
+    throw new Error('Invalid attestation object')
+  }
+
+  const { attStmt, authData } = attestation
+
+  // so weird, but decoder is not decoding to Map so we have to do it manually
+  const coseKeyElems = cbor.decodeAllSync(
+    authData.subarray(37 + AAGUID.byteLength + 2 + credentialId.byteLength)
+  )
+  const publicCoseKey = new Map()
+  for (let i = 0; i < coseKeyElems.length; i += 2) {
+    publicCoseKey.set(coseKeyElems[i], coseKeyElems[i + 1])
+  }
+
+  const response: AuthenticatorAttestationResponse = {
+    attestationObject,
+    clientDataJSON,
+    getAuthenticatorData() {
+      return authData
+    },
+    // returns an array buffer containing the DER SubjectPublicKeyInfo of the new credential
+    getPublicKey() {
+      return Buffer.concat([
+        // ASN.1 SubjectPublicKeyInfo structure for EC public keys
+        Buffer.from('3059301306072a8648ce3d020106082a8648ce3d03010703420004', 'hex'),
+        publicCoseKey.get(-2),
+        publicCoseKey.get(-3),
+      ])
+    },
+    getPublicKeyAlgorithm() {
+      return attStmt.alg
+    },
+    getTransports() {
+      return ['internal']
+    },
+  }
+  return {
+    id: credentialId.toString('base64'),
+    rawId: credentialId,
+    authenticatorAttachment: 'platform',
+    attestationObject,
+    clientDataJSON,
+    getClientExtensionResults() {
+      return {}
+    },
+    response,
+    type: 'public-key',
+  } as PublicKeyCredential & {
+    response: AuthenticatorAttestationResponse
+  }
 }

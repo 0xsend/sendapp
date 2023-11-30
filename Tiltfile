@@ -130,6 +130,7 @@ supabase_exclude = [
 
 local_resource(
     "supabase",
+    # "echo FIXME: drop after supafly testing"
     [
         "yarn",
         "supabase",
@@ -239,6 +240,15 @@ local_resource(
     labels = ["test"],
     resource_deps = ["yarn:install"],
     serve_cmd = "yarn workspace app test" if not CI else "",
+)
+
+local_resource(
+    "webauthn-authenticator:test",
+    "yarn workspace @0xsend/webauthn-authenticator test --coverage" if CI else "",
+    allow_parallel = True,
+    labels = ["test"],
+    resource_deps = ["yarn:install"],
+    serve_cmd = "yarn workspace @0xsend/webauthn-authenticator test --coverage" if not CI else "",
 )
 
 local_resource(
