@@ -35,8 +35,13 @@ export function installWebAuthnMock({
 
     if (!credOpt.publicKey) throw new Error('Missing publicKey in credentialOptions')
     if (!credOpt.publicKey.challenge) throw new Error('Missing challenge in publicKey')
-    if (!credOpt.publicKey.rp) throw new Error('Missing rp in publicKey')
-    if (!credOpt.publicKey.rp.id) throw new Error('Missing rp.id in publicKey')
+    if (!credOpt.publicKey.rp || !credOpt.publicKey.rp.id) {
+      credOpt.publicKey.rp = {
+        ...credOpt.publicKey.rp,
+        id: window.location.hostname,
+      }
+    }
+
     if (!credOpt.publicKey.user) throw new Error('Missing user in publicKey')
 
     const credOptSer = {

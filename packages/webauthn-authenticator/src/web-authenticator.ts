@@ -22,7 +22,8 @@ import { AAGUID } from './aaguid'
 
 export const COSE_PUB_KEY_ALG = -7 // ECDSA w/ SHA-256
 
-const CredentialsStore: {
+// TODO: encapsulate this in a class and add a method to reset the store, optionally allow to pass a store
+export const CredentialsStore: {
   [key: string]: WebauthnCredential
 } = {}
 

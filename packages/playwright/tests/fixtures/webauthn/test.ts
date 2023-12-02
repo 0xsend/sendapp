@@ -1,5 +1,9 @@
-import { test as base } from '@playwright/test'
-import { createPublicKeyCredential, getPublicKeyCredential } from '@0xsend/webauthn-authenticator'
+import { type BrowserContext, test as base } from '@playwright/test'
+import {
+  CredentialsStore,
+  createPublicKeyCredential,
+  getPublicKeyCredential,
+} from '@0xsend/webauthn-authenticator'
 import { type WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
 import debug from 'debug'
 
@@ -9,7 +13,10 @@ interface WebAuthnAuthenticatorWindow {
   WebAuthnAuthenticator?: typeof WebAuthnAuthenticator
 }
 
-export const test = base.extend({
+export const test = base.extend<{
+  context: BrowserContext
+  credentialsStore: typeof CredentialsStore
+}>({
   context: async ({ context }, use) => {
     log = debug(`test:fixtures:webauthn:${test.info().parallelIndex}`)
 
@@ -54,5 +61,9 @@ export const test = base.extend({
     )
 
     await use(context)
+  },
+  // biome-ignore lint/correctness/noEmptyPattern: empty pattern is needed here
+  credentialsStore: async ({}, use) => {
+    await use(CredentialsStore)
   },
 })

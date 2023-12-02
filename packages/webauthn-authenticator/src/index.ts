@@ -16,6 +16,7 @@ export type {
   PublicKeyCredentialUserEntitySerialized,
 } from './types'
 export {
+  CredentialsStore,
   createPublicKeyCredential,
   getPublicKeyCredential,
   COSE_PUB_KEY_ALG,
