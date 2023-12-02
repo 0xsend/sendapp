@@ -1,5 +1,8 @@
 export { AAGUID } from './aaguid'
-export { deserializePublicKeyCredentialAttestion } from './utils'
+export {
+  deserializePublicKeyCredentialAttestion,
+  deserializePublicKeyCredentialAssertion,
+} from './utils'
 export type {
   AuthenticatorAssertionResponseSerialized,
   AuthenticatorAttestationResponseSerialized,

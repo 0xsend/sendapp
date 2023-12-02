@@ -1,4 +1,8 @@
-import { COSE_PUB_KEY_ALG, type CredentialCreationOptionsSerialized } from '../src'
+import {
+  COSE_PUB_KEY_ALG,
+  CredentialRequestOptionsSerialized,
+  type CredentialCreationOptionsSerialized,
+} from '../src'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import * as cbor from 'cbor'
 import * as crypto from 'crypto'
@@ -42,9 +46,13 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         vi.resetAllMocks()
       })
 
-      it('should create a credential with mock', async () => {
-        const { createPublicKeyCredential } = await import('../src')
-        const { deserializePublicKeyCredentialAttestion } = await import('../src/utils')
+      it('should create and get a credential with mock', async () => {
+        const {
+          createPublicKeyCredential,
+          getPublicKeyCredential,
+          deserializePublicKeyCredentialAttestion,
+          deserializePublicKeyCredentialAssertion,
+        } = await import('../src')
 
         const attestationChallenge = Buffer.from('test challenge').toString('base64')
 
@@ -78,6 +86,39 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         expect(cred.id).toEqual(testBytes.toString('base64'))
 
         verifyCredChallenge({ cred, attestationChallenge, publicKey: keyPair.publicKey })
+
+        const credReqOptsSer = {
+          publicKey: {
+            challenge: attestationChallenge,
+            allowCredentials: [
+              {
+                id: cred.id,
+                type: 'public-key',
+              },
+            ],
+            timeout: 60000,
+          },
+        } as CredentialRequestOptionsSerialized
+
+        const credSer2 = await getPublicKeyCredential(credReqOptsSer)
+        const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
+
+        expect(cred2.rawId).toEqual(testBytes)
+        expect(cred2.id).toEqual(testBytes.toString('base64'))
+        const verified = crypto.verify(
+          'sha256',
+          Buffer.concat([
+            Buffer.from(cred2.response.authenticatorData),
+            Buffer.from(cred2.response.clientDataJSON),
+          ]),
+          crypto.createPublicKey({
+            key: keyPair.publicKey,
+            format: 'der',
+            type: 'spki',
+          }),
+          Buffer.from(cred2.response.signature)
+        )
+        expect(verified).toBeTruthy()
       })
     })
 
@@ -113,11 +154,9 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         vi.resetAllMocks()
       })
       it('should create a credential', async () => {
-        const {
-          createPublicKeyCredential,
-          getPublicKeyCredential,
-          deserializePublicKeyCredentialAttestion,
-        } = await import('../src')
+        const { createPublicKeyCredential, deserializePublicKeyCredentialAttestion } = await import(
+          '../src'
+        )
 
         const attestationChallenge = Buffer.from('test challenge').toString('base64')
 
