@@ -43,9 +43,8 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
       })
 
       it('should create a credential with mock', async () => {
-        const { createPublicKeyCredential, deserializePublicKeyCredentialAttestion } = await import(
-          '../src'
-        )
+        const { createPublicKeyCredential } = await import('../src')
+        const { deserializePublicKeyCredentialAttestion } = await import('../src/utils')
 
         const attestationChallenge = Buffer.from('test challenge').toString('base64')
 
