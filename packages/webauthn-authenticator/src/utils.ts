@@ -8,10 +8,7 @@ import type {
 
 /**
  * Deserialize a serialized public key credential attestation into a PublicKeyCredential.
- *
- * TODO: export to a preload.js file and expose via context.exposeFunction or page.exposeFunction
  */
-
 export function deserializePublicKeyCredentialAttestion(
   credential: PublicKeyCredentialAttestationSerialized
 ) {

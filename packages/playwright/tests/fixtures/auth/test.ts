@@ -52,6 +52,7 @@ const authTest = base.extend<{
     })
 
     if (error) {
+      log('error creating user', `id=${parallelIndex}`, error)
       throw error
     }
 
