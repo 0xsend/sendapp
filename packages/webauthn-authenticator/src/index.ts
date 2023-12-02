@@ -20,3 +20,5 @@ export {
   getPublicKeyCredential,
   COSE_PUB_KEY_ALG,
 } from './web-authenticator'
+
+export type * as WebAuthnAuthenticator from './preload'

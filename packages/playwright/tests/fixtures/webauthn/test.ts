@@ -1,11 +1,12 @@
 import { test as base } from '@playwright/test'
 import { createPublicKeyCredential, getPublicKeyCredential } from '@0xsend/webauthn-authenticator'
+import { type WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
 import debug from 'debug'
 
 let log: debug.Debugger
 
 interface WebAuthnAuthenticatorWindow {
-  WebAuthnAuthenticator?: typeof import('@0xsend/webauthn-authenticator/preload')
+  WebAuthnAuthenticator?: typeof WebAuthnAuthenticator
 }
 
 export const test = base.extend({
@@ -25,9 +26,11 @@ export const test = base.extend({
     await context.exposeFunction(exposedCreateCredFuncName, createPublicKeyCredential)
     await context.exposeFunction(exposedGetCredFuncName, getPublicKeyCredential)
 
-    log('adding init script: preload.js')
+    log('adding init script: preload.js', {
+      path: require.resolve('@0xsend/webauthn-authenticator/dist/preload.js'),
+    })
     await context.addInitScript({
-      path: '/Users/allen/0xbigboss/0xsend/sendapp/packages/webauthn-authenticator/dist/preload.js',
+      path: require.resolve('@0xsend/webauthn-authenticator/dist/preload.js'),
     })
 
     log('adding init script: installWebAuthnMock')

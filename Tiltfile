@@ -239,6 +239,11 @@ local_resource(
     allow_parallel = True,
     labels = ["test"],
     resource_deps = ["yarn:install"],
+    deps =
+        files_matching(
+            os.path.join("packages", "app"),
+            lambda f: f.endswith(".ts"),
+        ),
 )
 
 local_resource(

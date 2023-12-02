@@ -1,12 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "rootDir": "./src",
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "allowImportingTsExtensions": false,
-    "noEmit": true,
+    "noEmit": false,
     "composite": true,
     "strict": true,
     "downlevelIteration": true,
@@ -17,5 +18,5 @@
     "allowJs": true,
     "outDir": "./dist"
   },
-  "include": ["./src", "./test"]
+  "include": ["./**/*.ts", "./**/*.tsx"]
 }

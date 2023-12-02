@@ -1,12 +1,12 @@
+/**
+ * This file is loaded in the browser before the tests are run. It mocks the WebAuthn API and exposes a WebAuthnAuthenticator object on the window.
+ */
 import * as utils from './utils'
-import {
-  type CredentialCreationOptionsSerialized,
-  type CredentialRequestOptionsSerialized,
-  type createPublicKeyCredential,
-  type getPublicKeyCredential,
-} from './index'
-
-console.log('preload loaded again')
+import type {
+  CredentialCreationOptionsSerialized,
+  CredentialRequestOptionsSerialized,
+} from './types'
+import { type createPublicKeyCredential, type getPublicKeyCredential } from './web-authenticator'
 
 export { utils }
 

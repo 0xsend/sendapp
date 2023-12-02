@@ -144,7 +144,6 @@ export async function getPublicKeyCredential(
   const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
   const credQuery: GetWebAuthnCredentialQuery = {
     credentialId: credReqOptsPubKey?.allowCredentials?.[0]?.id,
-  } || {
     rpId,
   }
   const cred = getWebauthnCredential(credQuery)
