@@ -130,7 +130,6 @@ supabase_exclude = [
 
 local_resource(
     "supabase",
-    # "echo FIXME: drop after supafly testing"
     [
         "yarn",
         "supabase",

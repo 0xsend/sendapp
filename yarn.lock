@@ -27116,7 +27116,6 @@ __metadata:
     "@biomejs/biome": "npm:1.4.0"
     "@manypkg/cli": "npm:^0.19.1"
     "@nderscore/tamagui-typescript-plugin": "npm:^0.6.0"
-    cbor: "npm:^9.0.1"
     check-dependency-version-consistency: "npm:^3.0.3"
     eslint: "npm:^8.46.0"
     node-gyp: "npm:^9.3.1"
