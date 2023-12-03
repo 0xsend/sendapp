@@ -11,9 +11,6 @@ export default {
     dir: 'dist',
     format: 'umd',
     intro: 'const global = window;',
-    globals: {
-      buffer: 'Buffer',
-    },
   },
   plugins: [
     typescript({

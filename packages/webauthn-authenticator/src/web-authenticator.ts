@@ -66,6 +66,7 @@ function getWebauthnCredential({
   // find by rpId, multiple credentials can be registered for the same rpId and would require a user to select
   return Object.values(CredentialsStore).find((c) => c.rpId === rpId) || null
 }
+
 /**
  * Creates a new public key credential for WebAuthn compatible with navigator.credentials.create.
  * This version returns a serialized version of the credential instead of array buffers.
@@ -74,7 +75,6 @@ function getWebauthnCredential({
  * @see https://www.w3.org/TR/webauthn-2/#sctn-createCredential
  * @see https://www.w3.org/TR/webauthn-2/#sctn-generating-an-attestation-object
  */
-
 export async function createPublicKeyCredential(
   credentialOptions: CredentialCreationOptionsSerialized
 ): Promise<PublicKeyCredentialAttestationSerialized> {
@@ -119,6 +119,7 @@ export async function createPublicKeyCredential(
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
 }
+
 /**
  * Gets a public key credential for WebAuthn compatible with navigator.credentials.get.
  * This version returns a serialized version of the credential instead of array buffers.
@@ -127,7 +128,6 @@ export async function createPublicKeyCredential(
  * @see https://www.w3.org/TR/webauthn-2/#sctn-getCredential
  * @see https://www.w3.org/TR/webauthn-2/#sctn-verifying-assertion
  */
-
 export async function getPublicKeyCredential(
   credentialRequestOptions: CredentialRequestOptionsSerialized
 ) {
@@ -169,6 +169,7 @@ export async function getPublicKeyCredential(
     type: 'public-key',
   } as PublicKeyCredentialAssertionSerialized
 }
+
 /**
  * Generate authenticator data is a variable-length byte array added to the authenticator data when generating an
  * attestation object for a given credential.
@@ -196,6 +197,7 @@ function generateAuthenticatorData(
   ])
   return authenticatorData
 }
+
 /**
  * Generate attested credential data is a variable-length byte array added to the authenticator data when generating an
  * attestation object for a given credential.

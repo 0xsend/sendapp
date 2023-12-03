@@ -118,6 +118,19 @@ local_resource(
            ),
 )
 
+local_resource(
+    "webauthn-authenticator:build",
+    "yarn workspace @0xsend/webauthn-authenticator build",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = ["yarn:install"],
+    deps =
+        files_matching(
+            os.path.join("packages", "webauthn-authenticator", "src"),
+            lambda f: f.endswith(".ts"),
+        ),
+)
+
 # INFRA
 labels = ["infra"]
 
@@ -241,19 +254,6 @@ local_resource(
     deps =
         files_matching(
             os.path.join("packages", "app"),
-            lambda f: f.endswith(".ts"),
-        ),
-)
-
-local_resource(
-    "webauthn-authenticator:build",
-    "yarn workspace @0xsend/webauthn-authenticator build",
-    allow_parallel = True,
-    labels = ["test"],
-    resource_deps = ["yarn:install"],
-    deps =
-        files_matching(
-            os.path.join("packages", "webauthn-authenticator", "src"),
             lambda f: f.endswith(".ts"),
         ),
 )
