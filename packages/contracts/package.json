@@ -14,7 +14,6 @@
   },
   "devDependencies": {
     "@my/supabase": "workspace:*",
-    "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/merkle-tree": "^1.0.5",
     "@supabase/supabase-js": "^2.38.5",
     "bun-types": "^1.0.11",

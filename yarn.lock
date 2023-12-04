@@ -5471,7 +5471,6 @@ __metadata:
   resolution: "@my/contracts@workspace:packages/contracts"
   dependencies:
     "@my/supabase": "workspace:*"
-    "@openzeppelin/contracts": "npm:^4.9.3"
     "@openzeppelin/merkle-tree": "npm:^1.0.5"
     "@supabase/supabase-js": "npm:^2.38.5"
     bun-types: "npm:^1.0.11"
@@ -5771,13 +5770,6 @@ __metadata:
   dependencies:
     json-parse-even-better-errors: "npm:^2.3.1"
   checksum: 9fbff70603b8bdc40fda2675271bce4237fab48c51e58f8704218c9e2f291be454c13b5f37c8d325e23c4736b372cd6ecf34819fe2ced124ac06740fae8dd378
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts@npm:^4.9.3":
-  version: 4.9.3
-  resolution: "@openzeppelin/contracts@npm:4.9.3"
-  checksum: ce0a16a56a39b62d72370ac702bce1917096492442ff05de88521beda2c3f3935b93ee2b9a184614dd543a6181f2f0be10243f5a629be87aab284ade68c18320
   languageName: node
   linkType: hard
 
