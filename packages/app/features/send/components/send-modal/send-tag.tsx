@@ -10,6 +10,7 @@ import {
   Sheet,
   SizableText,
   Theme,
+  ThemeName,
   XStack,
   YStack,
   styled
@@ -18,6 +19,7 @@ import { IconClose } from "app/components/icons/IconClose"
 import { IconSearch } from "app/components/icons/IconSearch"
 import { SendItButton } from "./SendItButton"
 import { SendTagModalProps } from "../../types"
+import { useThemeSetting } from "@tamagui/next-theme"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -31,8 +33,10 @@ const CustomInput = styled(Input, {
 })
 
 export const SendTagModal = ({ sendAmount, asset, tags, showModal, setCurrentModal }: SendTagModalProps) => {
+  const { resolvedTheme } = useThemeSetting()
+
   return (
-    <Theme name={'dark'}>
+    <Theme name={resolvedTheme as ThemeName}>
       <Dialog
         modal
         onOpenChange={(open) => {
