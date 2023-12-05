@@ -3,6 +3,7 @@ import { useId } from 'react'
 import { Fieldset, Input, InputProps, Label, Theme, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export const TextField = (props: InputProps) => {
   const {
@@ -14,6 +15,7 @@ export const TextField = (props: InputProps) => {
   const themeName = useThemeName()
   const id = useId()
   const disabled = isSubmitting
+
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -38,6 +40,7 @@ export const TextField = (props: InputProps) => {
             ref={field.ref}
             placeholder={placeholder}
             id={id}
+            theme={themeName.startsWith("dark") ? "light" : "gold"}
             {...props}
           />
         </Shake>

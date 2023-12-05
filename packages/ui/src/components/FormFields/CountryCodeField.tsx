@@ -78,9 +78,7 @@ export const CountryCodeField = ({
             borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
           >
-            {isLoading ? (
-              <Spinner color="$color" size="small" />
-            ) : country ? (
+            {country ? (
               <Text
                 fontSize="$1"
                 fontWeight="bold"
