@@ -14,8 +14,8 @@ contract SendMerkleDropTest is Test, Helper {
     uint256 constant INITIAL_MAX_BUY = 8000000;
 
     uint256 constant TRANCHE_ID = 0;
-    uint256 constant TRANCHE_AMOUNT = 717100769;
-    bytes32 constant TRANCHE_MERKLE_ROOT = 0x83c580aeb9546d9144688a39f479473fd7917b708b113bfbd4d62947d62cddff;
+    uint256 constant TRANCHE_AMOUNT = 653359200;
+    bytes32 constant TRANCHE_MERKLE_ROOT = 0x8f9787b27bc7ebe82a8ba2ebe0bd7a85a941c1ff90f1969e0d9ce7125b0cfbf8;
 
     Send private send;
     SendMerkleDrop private sendMerkleDrop;
@@ -42,16 +42,17 @@ contract SendMerkleDropTest is Test, Helper {
         address bigboss = address(0x0030788CA58a0a5daC70941e76bA4ee604931bF1);
         uint256 bigbossBalance = send.balanceOf(bigboss);
         uint256 index = 0;
-        uint256 amount = 11421439;
+        uint256 amount = 10102861;
         // generate the proofs using the gen-dist-merkle-tree script
-        bytes32[] memory proof = new bytes32[](7);
-        proof[0] = 0x8e4ea2465c15936de72810a89c9825477ddbb9b93565873b6afc87a2a94e0fe6;
-        proof[1] = 0x45d342c1ee8f321942beff416c0945379f4ae7fb64c1fb5645c90c0ae4322224;
-        proof[2] = 0x1c9fb1a853cfa93da25a6980945ff521d40e865f342b5df5021ef65b66672b4c;
-        proof[3] = 0x1eada9fa1540ef5d2dfbba4e94e8882bcac13123d2516852ae6a1a99ce5ff84c;
-        proof[4] = 0x79ff636addc41224348bae38436b7b484b8dcfe54b3ae865c601999cc3b188d5;
-        proof[5] = 0xea66a672c773444a372fb9b89a6a256b31fb0d7dc271e6cb594c195888e6cd6b;
-        proof[6] = 0x4aef939204c522684697c0317ca1e827e1bddf5ad4cffa13b6eedb7e55148143;
+        bytes32[] memory proof = new bytes32[](8);
+        proof[0] = 0x003bcfb8884c6c8990f5b085f8bf440d9c0967b9f0a29f20da524af5f69d7d33;
+        proof[1] = 0xfd50dacfd6b6eace3aa0ccc823ca3cdf4c7132ca93d677006de0c4c32e962917;
+        proof[2] = 0xd8f1e18632df7acafcf711be752c49aa69ae3e8c70fd1fc7491af39593436c7f;
+        proof[3] = 0xfc1df6463d5c4a081561bef68b4382af3667b61e12038957c82931ac7a09cb88;
+        proof[4] = 0x1ee368f234902c55c5283a88b3c50a81e9d26f00a16d1ea4d07f3df77a86dcb9;
+        proof[5] = 0x2c61a6d55e8c4312e200117f41b56518aa610691ebae575c63c968e9dbc18bd3;
+        proof[6] = 0x68081526bcb95947a2ba9602dc549045ab06d44d7d3bcf9b86e3837e1eb605c7;
+        proof[7] = 0x2b32968084bfa8fd05ac4b031bed577a33272cce7cd7c611efb36ca9ad09761e;
         sendMerkleDrop.claimTranche(bigboss, TRANCHE_ID, index, amount, proof);
 
         // Assertions
@@ -62,26 +63,26 @@ contract SendMerkleDropTest is Test, Helper {
 
     // test that another address cannot claim the same index
     function test_DenyDoubleClaim() public {
-        address bigboss = address(0x0030788CA58a0a5daC70941e76bA4ee604931bF1);
-        uint256 bigbossBalance = send.balanceOf(bigboss);
-        uint256 index = 1;
-        uint256 amount = 14972584;
+        address bob = address(0xb0b);
+        uint256 bobBalance = send.balanceOf(bob);
+        uint256 index = 0;
+        uint256 amount = 10102861;
         // generate the proofs using the gen-dist-merkle-tree script
         bytes32[] memory proof = new bytes32[](8);
-        proof[0] = 0x03d88fec8b1056fd4eb1384ae5505e73250bddecc9a9dbd61f5b2cf9ac42c049;
-        proof[1] = 0xfd2424551414aeb865e85349361abf14f16fbec611eed747359631b5f42edb69;
-        proof[2] = 0x0391fe8fd2534af68338b5af7b7f8e03fb7be94627d31e7f69dac7c1d5b45621;
-        proof[3] = 0xad2be0620d1c680bd92208c46cb0875b3d080575e19b17c6370b2727920cb13b;
-        proof[4] = 0x9e5340ffe5feecf4d86d0b204f19dd8a261c763d7f3509a241fdee00dd49dc30;
-        proof[5] = 0x57a52ff0954d0cc012de51afeb58dce9c110ed6ff29f59048442c6e272912517;
-        proof[6] = 0x544f9a0045fc5c8375d40ef6669f1ae2304e37c9e9c757c8c27894bc64eb6f1e;
-        proof[7] = 0x4a783893acb72cf2b44688b04943edfc0d4c24d42335bad39828b1ac982c57ab;
+        proof[0] = 0x003bcfb8884c6c8990f5b085f8bf440d9c0967b9f0a29f20da524af5f69d7d33;
+        proof[1] = 0xfd50dacfd6b6eace3aa0ccc823ca3cdf4c7132ca93d677006de0c4c32e962917;
+        proof[2] = 0xd8f1e18632df7acafcf711be752c49aa69ae3e8c70fd1fc7491af39593436c7f;
+        proof[3] = 0xfc1df6463d5c4a081561bef68b4382af3667b61e12038957c82931ac7a09cb88;
+        proof[4] = 0x1ee368f234902c55c5283a88b3c50a81e9d26f00a16d1ea4d07f3df77a86dcb9;
+        proof[5] = 0x2c61a6d55e8c4312e200117f41b56518aa610691ebae575c63c968e9dbc18bd3;
+        proof[6] = 0x68081526bcb95947a2ba9602dc549045ab06d44d7d3bcf9b86e3837e1eb605c7;
+        proof[7] = 0x2b32968084bfa8fd05ac4b031bed577a33272cce7cd7c611efb36ca9ad09761e;
 
         vm.expectRevert("Incorrect merkle proof");
-        sendMerkleDrop.claimTranche(bigboss, TRANCHE_ID, index, amount, proof);
+        sendMerkleDrop.claimTranche(bob, TRANCHE_ID, index, amount, proof);
 
         // Assertions
-        assertEq(send.balanceOf(bigboss), bigbossBalance);
+        assertEq(send.balanceOf(bob), bobBalance);
         assertEq(sendMerkleDrop.trancheAmountsClaimed(TRANCHE_ID), 0);
         assertFalse(sendMerkleDrop.isClaimed(TRANCHE_ID, index));
     }

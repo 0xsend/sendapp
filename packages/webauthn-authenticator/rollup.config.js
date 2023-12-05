@@ -13,14 +13,11 @@ export default {
     intro: 'const global = window;',
   },
   plugins: [
-    typescript({
-      noForceEmit: false,
-      outputToFilesystem: true,
-    }),
+    typescript(),
+    nodeResolve(),
+    commonjs(),
     nodePolyfills({
       include: null, // polyfills all files
     }),
-    nodeResolve(),
-    commonjs(),
   ],
 }
