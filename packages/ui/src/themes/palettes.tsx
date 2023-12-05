@@ -47,10 +47,10 @@ export const palettes = (() => {
   const darkColor = '#fff'
   const darkPalette = [
     darkTransparent,
-    '#050505',
-    '#151515',
+    '#101010',
+    '#161619',
     '#191919',
-    '#232323',
+    '#212121',
     '#282828',
     '#323232',
     '#424242',
