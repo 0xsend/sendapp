@@ -97,7 +97,7 @@ export const RootError = () => {
   const errorMessage = context?.formState?.errors?.root?.message
 
   return (
-    <Theme name="gold">
+    <Theme name="red">
       <FieldError message={errorMessage} />
     </Theme>
   )
