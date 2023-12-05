@@ -99,7 +99,6 @@ export const { templates, maskOptions } = (() => {
         ...overrideWithColors,
         borderColor: 'transparent',
         borderColorHover: 'transparent',
-        backgroundColor: "$red"
       },
       skip: skipShadowsAndColors,
     },
