@@ -7,6 +7,7 @@ import {
   Sheet,
   SizableText,
   Theme,
+  ThemeName,
   XStack,
   YStack,
   styled,
@@ -14,6 +15,7 @@ import {
 import { IconClose } from "app/components/icons/IconClose"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { SendItModalProps } from "../../types"
+import { useThemeSetting } from "@tamagui/next-theme"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -28,8 +30,10 @@ const CustomInput = styled(Input, {
 })
 
 export const SendItModal = ({ sendAmount, asset, tag, showModal, setCurrentModal }: SendItModalProps) => {
+  const { resolvedTheme } = useThemeSetting()
+
   return (
-    <Theme name={'dark'}>
+    <Theme name={resolvedTheme as ThemeName}>
       <Dialog
         modal
         onOpenChange={(open) => {
