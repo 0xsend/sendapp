@@ -17,6 +17,7 @@ const MainLayout = ({ children }: { children?: React.ReactNode }) => {
           colors={['$background', '$backgroundTransparent']}
           pos={'absolute'}
           b={'$13'}
+          pointerEvents={'none'}
         />
       </YStack>
       <MainFooter />
