@@ -96,6 +96,41 @@ local_resource(
     ),
 )
 
+local_resource(
+    "daimo-expo-passkeys:build",
+    "yarn workspace @daimo/expo-passkeys build",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+    deps = files_matching(
+               os.path.join("packages", "daimo-expo-passkeys", "src"),
+               lambda f: f.endswith(".tsx") or f.endswith(".ts"),
+           ) +
+           files_matching(
+               os.path.join("packages", "daimo-expo-passkeys", "ios"),
+               lambda f: f.endswith(".swift"),
+           ) +
+           files_matching(
+               os.path.join("packages", "daimo-expo-passkeys", "android"),
+               lambda f: f.endswith(".kt"),
+           ),
+)
+
+local_resource(
+    "webauthn-authenticator:build",
+    "yarn workspace @0xsend/webauthn-authenticator build",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = ["yarn:install"],
+    deps =
+        files_matching(
+            os.path.join("packages", "webauthn-authenticator", "src"),
+            lambda f: f.endswith(".ts"),
+        ),
+)
+
 # INFRA
 labels = ["infra"]
 
@@ -212,18 +247,29 @@ local_resource(
 
 local_resource(
     "app:test",
-    "yarn workspace app test" if CI else "",
+    "yarn workspace app test --run",
     allow_parallel = True,
     labels = ["test"],
     resource_deps = ["yarn:install"],
-    serve_cmd = "yarn workspace app test" if not CI else "",
+    deps =
+        files_matching(
+            os.path.join("packages", "app"),
+            lambda f: f.endswith(".ts"),
+        ),
+)
+
+local_resource(
+    "webauthn-authenticator:test",
+    "yarn workspace @0xsend/webauthn-authenticator test:coverage --run",
+    allow_parallel = True,
+    labels = ["test"],
+    resource_deps = ["yarn:install"],
 )
 
 local_resource(
     "playwright:test",
     "yarn playwright test",
     allow_parallel = True,
-    auto_init = not CI,  # TODO: re-enable for CI
     labels = ["test"],
     resource_deps = ["next:web"],
     deps = files_matching(
@@ -257,7 +303,7 @@ local_resource(
 
 local_resource(
     "distributor:test",
-    "yarn workspace app test" if CI else "",
+    "yarn workspace distributor test --run",
     allow_parallel = True,
     labels = ["test"],
     resource_deps = [
@@ -267,7 +313,6 @@ local_resource(
         "supabase:generate",
         "wagmi:generate",
     ],
-    serve_cmd = "yarn workspace app test" if not CI else "",
     deps =
         files_matching(
             os.path.join("apps", "distributor", "test"),

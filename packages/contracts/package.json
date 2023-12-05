@@ -17,7 +17,7 @@
     "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/merkle-tree": "^1.0.5",
     "@supabase/supabase-js": "^2.38.5",
-    "bun-types": "^1.0.11",
+    "bun-types": "latest",
     "debug": "^4.3.4",
     "solhint": "^3.6.2",
     "zx": "^7.2.3"
