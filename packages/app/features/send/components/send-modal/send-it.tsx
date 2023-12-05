@@ -42,7 +42,7 @@ export const SendItModal = ({ sendAmount, asset, tag, showModal, setCurrentModal
         open={showModal}
       >
         <Adapt when="sm" platform="touch">
-          <Sheet animation="medium" zIndex={200000} modal dismissOnSnapToBottom snapPoints={[100]}>
+          <Sheet animation="medium" zIndex={200000} modal snapPoints={[100]}>
             <Sheet.Frame
               px={'$6'}
               pt={'$size.8'}
