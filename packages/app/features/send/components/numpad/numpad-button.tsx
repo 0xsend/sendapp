@@ -1,4 +1,5 @@
-import { Button, ButtonProps, styled } from "@my/ui"
+import { Button, styled } from "@my/ui"
+import { NumpadButtonProps } from "../../types"
 
 const CustomButton = styled(Button, {
   name: "CustomButton",
@@ -15,13 +16,7 @@ const CustomButton = styled(Button, {
   }
 })
 
-interface INumpadButtonProps extends ButtonProps {
-  value: string,
-  num?: boolean,
-  pressHandler: (val: string) => void
-}
-
-export function NumpadButton({ value, num, pressHandler, ...otherProps }: INumpadButtonProps) {
+export function NumpadButton({ value, num, pressHandler, ...otherProps }: NumpadButtonProps) {
   return (
     <CustomButton num={num} onPress={(e: any) => pressHandler(value)} {...otherProps}>
       {value}

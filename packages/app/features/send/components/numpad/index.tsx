@@ -1,13 +1,9 @@
 import { XStack, YStack } from "@my/ui"
 import { NumpadButton } from "./numpad-button"
 import formatNumpadInput from "app/utils/formatNumpadInput"
+import { NumPadProps } from "../../types"
 
-interface INumPadProps {
-  value: string
-  setValue: (val: string) => void
-}
-
-export const NumPad = ({ value, setValue }: INumPadProps) => {
+export const NumPad = ({ value, setValue }: NumPadProps) => {
   const numpadpressHandler = (input: string) => {
     setValue(formatNumpadInput(value, input));
   }

@@ -12,14 +12,13 @@ import { IconEthereum } from 'app/components/icons/IconEthereum'
 import { Select } from './components/select'
 import { NumPad } from './components/numpad'
 import { SendTagModal, SendItModal } from './components/send-modal'
+import { Coin, ModalType } from './types'
 
-const assets: IAsset[] = [
+const assets: Coin[] = [
   { icon: <IconEthereum />, name: 'ETH' },
-  { icon: <IconEthereum />, name: 'BSC' },
-  { icon: <IconEthereum />, name: 'TRON' },
+  { icon: <IconEthereum />, name: 'USDC' },
+  { icon: <IconEthereum />, name: 'SEND' },
 ]
-
-type ModalType = '' | 'send_tag' | 'send_it'
 
 // mock data
 const tags = [
@@ -92,8 +91,20 @@ export const SendScreen = () => {
           </YStack>
         </Container>
       </MainLayout>
-      <SendTagModal sendAmount={sendAmount} asset={assets[0]} tags={tags} showModal={currentModal === 'send_tag'} setCurrentModal={setCurrentModal} />
-      <SendItModal sendAmount={sendAmount} asset={assets[0]} tag={tags[6]} showModal={currentModal === 'send_it'} setCurrentModal={setCurrentModal} />
+      <SendTagModal
+        sendAmount={sendAmount}
+        asset={assets[0]}
+        tags={tags}
+        showModal={currentModal === 'send_tag'}
+        setCurrentModal={setCurrentModal}
+      />
+      <SendItModal
+        sendAmount={sendAmount}
+        asset={assets[0]}
+        tag={tags[6]}
+        showModal={currentModal === 'send_it'}
+        setCurrentModal={setCurrentModal}
+      />
     </>
   )
 }

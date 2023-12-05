@@ -13,6 +13,7 @@ import {
 } from "@my/ui"
 import { IconClose } from "app/components/icons/IconClose"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
+import { SendItModalProps } from "../../types"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -26,20 +27,7 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-type Tag = {
-  name: string,
-  avatar: string
-}
-
-interface ISendItModalProps {
-  sendAmount: string
-  asset?: IAsset
-  tag?: Tag
-  showModal: boolean
-  setCurrentModal: (currentModal: '' | 'send_tag' | 'send_it') => void
-}
-
-export const SendItModal = ({ sendAmount, asset, tag, showModal, setCurrentModal }: ISendItModalProps) => {
+export const SendItModal = ({ sendAmount, asset, tag, showModal, setCurrentModal }: SendItModalProps) => {
   return (
     <Theme name={'dark'}>
       <Dialog
