@@ -1,9 +1,7 @@
 import {
   Adapt,
-  AnimatePresence,
   Button,
   Dialog,
-  H5,
   Image,
   Input,
   Label,
@@ -11,10 +9,6 @@ import {
   Separator,
   Sheet,
   SizableText,
-  StackProps,
-  TabLayout,
-  Tabs,
-  TabsTabProps,
   Theme,
   XStack,
   YStack,
@@ -23,7 +17,7 @@ import {
 import { IconClose } from "app/components/icons/IconClose"
 import { IconSearch } from "app/components/icons/IconSearch"
 import { SendItButton } from "./SendItButton"
-import { useState } from "react"
+import { SendTagModalProps } from "../../types"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -36,20 +30,7 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-type Tag = {
-  name: string,
-  avatar: string
-}
-
-interface ISendTagModalProps {
-  sendAmount: string
-  asset?: IAsset
-  tags: Tag[]
-  showModal: boolean
-  setCurrentModal: (currentModal: '' | 'send_tag' | 'send_it') => void
-}
-
-export const SendTagModal = ({ sendAmount, asset, tags, showModal, setCurrentModal }: ISendTagModalProps) => {
+export const SendTagModal = ({ sendAmount, asset, tags, showModal, setCurrentModal }: SendTagModalProps) => {
   return (
     <Theme name={'dark'}>
       <Dialog

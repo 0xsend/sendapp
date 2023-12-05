@@ -3,9 +3,9 @@ import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons"
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
 import { useMemo, useState } from "react"
-import { IconProps } from "@tamagui/helpers-icon"
+import { Coin } from "../../types"
 
-export function Select({ items, ...props }: SelectProps & { items: Array<IAsset> }) {
+export function Select({ items, ...props }: SelectProps & { items: Array<Coin> }) {
   const [val, setVal] = useState(items[0]?.name.toLowerCase())
 
   return (

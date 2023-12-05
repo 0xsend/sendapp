@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Paragraph, SizableText } from "@my/ui"
+import { Button, ButtonProps, Paragraph } from "@my/ui"
 
 export const SendItButton = (props: ButtonProps) => {
   return (
