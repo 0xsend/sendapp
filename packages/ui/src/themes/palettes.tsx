@@ -2,8 +2,8 @@ import { objectFromEntries, objectKeys } from './helpers'
 import { colorTokens } from './token-colors'
 
 export const palettes = (() => {
-  const lightTransparent = 'rgba(255,255,255,0)'
-  const darkTransparent = 'rgba(10,10,10,0)'
+  const lightTransparent = 'rgba(22, 22, 25, 0)'
+  const darkTransparent = 'rgba(241, 241, 238, 0)'
 
   const transparent = (hsl: string, opacity = 0) =>
     hsl.replace(`%)`, `%, ${opacity})`).replace(`hsl(`, `hsla(`)
@@ -26,7 +26,7 @@ export const palettes = (() => {
     ]
   }
 
-  const lightColor = 'hsl(0, 0%, 9.0%)'
+  const lightColor = 'rgba(22, 22, 25, 1)'
   const lightPalette = [
     lightTransparent,
     '#fff',
@@ -44,7 +44,7 @@ export const palettes = (() => {
     darkTransparent,
   ]
 
-  const darkColor = '#fff'
+  const darkColor = 'rgba(241, 241, 238, 1)'
   const darkPalette = [
     darkTransparent,
     '#050505',

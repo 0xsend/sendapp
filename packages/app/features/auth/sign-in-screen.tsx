@@ -134,7 +134,7 @@ export const SignInScreen = () => {
                     <SubmitButton
                       onPress={() => submit()}
                       borderRadius="$4"
-                      backgroundColor={'#C3AB8E'}
+                      backgroundColor={"$primary"}
                       width={'$12'}
                       $sm={{ width: '$10' }}
                     >
@@ -144,6 +144,7 @@ export const SignInScreen = () => {
                         fontWeight={'700'}
                         padding={'unset'}
                         margin={'unset'}
+                        theme={resolvedTheme?.startsWith('dark') ? 'light' : 'dark'}
                       >
                         {'SEND IT!'}
                       </Paragraph>
@@ -151,7 +152,7 @@ export const SignInScreen = () => {
                     <Anchor href={'https://send.it'} target={'_blank'}>
                       <Paragraph
                         textAlign="center"
-                        color={'#C3AB8E'}
+                        color={"$primary"}
                         size={'$1'}
                         fontWeight={'700'}
                       >

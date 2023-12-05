@@ -19,10 +19,11 @@ export {
   goldDark,
 } from '@tamagui/themes'
 
-export const lightTransparent = 'rgba(255,255,255,0)'
-export const darkTransparent = 'rgba(10,10,10,0)'
+export const lightColor = 'rgba(241, 241, 238, 1)'
+export const darkColor = 'rgba(22, 22, 25, 1)'
+export const lightTransparent = 'rgba(22, 22, 25, 0)'
+export const darkTransparent = 'rgba(241, 241, 238, 0)'
 
-export const lightColor = 'hsl(0, 0%, 9.0%)'
 export const lightPalette = [
   lightTransparent,
   '#fff',
@@ -40,7 +41,6 @@ export const lightPalette = [
   darkTransparent,
 ]
 
-export const darkColor = '#fff'
 export const darkPalette = [
   darkTransparent,
   '#050505',
@@ -220,4 +220,21 @@ export const brandColors = {
   networkBase: '#2151F5',
   networkBnb: '#F0B90B',
   fiatOnRampBanner: '#FB36D0',
+  khaki900: "#9f7750",
+  khaki: "#C3B29E",
+  cinereous: "#1D1D20",
+}
+export const sendDark = {
+  red1: 'hsl(353, 23.0%, 9.8%)',
+  red2: 'hsl(357, 34.4%, 12.0%)',
+  red3: 'hsl(356, 43.4%, 16.4%)',
+  red4: 'hsl(356, 47.6%, 19.2%)',
+  red5: 'hsl(356, 51.1%, 21.9%)',
+  red6: 'hsl(356, 55.2%, 25.9%)',
+  red7: 'hsl(357, 60.2%, 31.8%)',
+  red8: 'hsl(358, 65.0%, 40.4%)',
+  red9: 'hsl(358, 75.0%, 59.0%)',
+  red10: 'hsl(358, 85.3%, 64.0%)',
+  red11: 'hsl(358, 100%, 69.5%)',
+  red12: 'hsl(351, 89.0%, 96.0%)',
 }

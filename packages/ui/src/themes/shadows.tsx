@@ -1,7 +1,7 @@
-const lightShadowColor = 'rgba(0,0,0,0.02)'
-const lightShadowColorStrong = 'rgba(0,0,0,0.066)'
-const darkShadowColor = 'rgba(0,0,0,0.2)'
-const darkShadowColorStrong = 'rgba(0,0,0,0.3)'
+const lightShadowColor = 'rgba(0,0,0,0.1)'
+const lightShadowColorStrong = 'rgba(0,0,0,0.2)'
+const darkShadowColor = 'rgba(0,0,0,0.1)'
+const darkShadowColorStrong = 'rgba(0,0,0,0.2)'
 
 export const shadows = {
   light: {

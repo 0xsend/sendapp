@@ -5,7 +5,7 @@ import { MainFooter } from "./footer";
 const MainLayout = ({ children }: { children?: React.ReactNode }) => {
   return (
     <YStack>
-      <YStack height={'100vh'} pb={'$13'}>
+      <YStack height={'100vh'} pb={'$13'} >
         <ScrollView>
           {children}
         </ScrollView>
