@@ -183,9 +183,9 @@ function generateAuthenticatorData(
   const rpIdHash = crypto.createHash('sha256').update(rpId).digest()
   const flags = new Uint8Array() // 1 byte Flags (bit 0 is the least significant bit): User Present (UP) flag (bit 0) set
   if (attestedCredentialData) {
-    flags[0] = 69 // bit 6, 1 means user is present, 0 means user is not present
+    flags[0] = 0b01000101 // bit 6, 1 means user is present, 0 means user is not present
   } else {
-    flags[0] = 5
+    flags[0] = 0b00000101
   }
   const signCount = Buffer.alloc(4)
   signCount.writeUInt32BE(counter, 0) // 4 bytes Signature counter (32-bit unsigned big-endian integer).
