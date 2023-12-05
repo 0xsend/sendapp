@@ -2,7 +2,6 @@ import { Anchor, Avatar, Button, Card, Container, H1, Paragraph, XStack, YStack,
 import { useThemeSetting } from '@tamagui/next-theme'
 import { Image } from '@my/ui'
 import { MainLayout } from '../../components/layout';
-import { BalanceCard } from './components/balanceExpanded';
 import { useState } from 'react';
 
 export function HomeScreen() {
