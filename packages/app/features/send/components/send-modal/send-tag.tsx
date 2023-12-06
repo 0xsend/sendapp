@@ -45,7 +45,7 @@ export const SendTagModal = ({ sendAmount, asset, tags, showModal, setCurrentMod
         open={showModal}
       >
         <Adapt when="sm" platform="touch">
-          <Sheet animation="medium" zIndex={200000} modal snapPoints={[100]}>
+          <Sheet animation="medium" animationConfig={{ type: 'direct' }} zIndex={200000} modal snapPoints={[100]}>
             <Sheet.Frame
               gap={'$5'}
               px={'$6'}
