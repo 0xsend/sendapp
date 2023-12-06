@@ -5,7 +5,16 @@ import { SendButton } from "./components/SendButton"
 
 const MainFooter = () => {
   return (
-    <Footer pos={'absolute'} b={0} px={36} width="100%" height={'$10'}>
+    <Footer
+      pos={'absolute'}
+      b={0}
+      px={36}
+      width="100%"
+      height={'$10'}
+      $shorter={{
+        height: '$8'
+      }}
+    >
       <YStack height={'100%'}>
         <XStack pos="relative" fg={1} space="$3" bg="$background">
           <Tabs
