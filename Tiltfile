@@ -59,7 +59,7 @@ local_resource(
     labels = labels,
     resource_deps = [
         "yarn:install",
-        "contracts:test",
+        "contracts:build",
     ],
     deps = [os.path.join("packages", "wagmi", "wagmi.config.ts")] + files_matching(
         os.path.join("packages", "wagmi", "src"),

@@ -12,12 +12,5 @@ export default {
     format: 'umd',
     intro: 'const global = window;',
   },
-  plugins: [
-    typescript(),
-    nodeResolve(),
-    commonjs(),
-    nodePolyfills({
-      include: null, // polyfills all files
-    }),
-  ],
+  plugins: [typescript(), nodeResolve(), commonjs(), nodePolyfills()],
 }
