@@ -4,6 +4,7 @@ import {
   Container,
   H1,
   Paragraph,
+  SizableText,
   XStack,
   YStack,
 } from '@my/ui'
@@ -60,26 +61,50 @@ export const SendScreen = () => {
     <>
       <MainLayout>
         <Container>
-          <YStack maw={316} pt={'$13'}>
+          <YStack maw={314} pt={'$10'} $shorter={{ maw: '$18', pt: '$8' }}>
             <XStack jc={'center'}>
-              <H1 size={sendAmount.length > 4 ? sendAmount.length > 8 ? '$9' : '$12' : '$15'}>
+              <H1
+                size={sendAmount.length > 4 ? sendAmount.length > 8 ? '$10' : '$12' : '$14'}
+                minHeight={'$10'}
+                $shorter={{
+                  size: sendAmount.length > 4 ? sendAmount.length > 8 ? '$10' : '$11' : '$12',
+                  minHeight: '$7'
+                }}
+              >
                 {Number(sendAmount).toLocaleString()}
               </H1>
-              <XStack pos={'absolute'} r={0} space={'$1.5'}>
+            </XStack>
+            <XStack jc={'space-between'} mt={'$2'}>
+              <Select items={assets} />
+              <XStack
+                px={'$5'}
+                py={'$2.5'}
+                space={'$1.5'}
+                br={'$6'}
+                borderWidth={1}
+                borderColor={'$backgroundFocus'}
+                $shorter={{
+                  px: '$4',
+                  py: '$2'
+                }}
+              >
                 <Paragraph theme={'alt2'}>Bal</Paragraph>
                 <Paragraph fontWeight={'700'}>1.25</Paragraph>
               </XStack>
             </XStack>
-            <XStack jc={'center'} mt={'$6'}>
-              <Select items={assets} />
-            </XStack>
             <NumPad value={sendAmount} setValue={setSendAmount} />
             <Button
-              my={'$6'}
+              my={'$5'}
               py={'$6'}
-              borderRadius={'$9'}
+              br={'$9'}
               bc={'$backgroundTransparent'}
               boc={'$borderColorFocus'}
+              maw={314}
+              $shorter={{
+                maw: '18',
+                py: '$4',
+                br: '$7'
+              }}
               onPress={() => {
                 setCurrentModal('send_tag')
               }}
@@ -89,8 +114,8 @@ export const SendScreen = () => {
               </Paragraph>
             </Button>
           </YStack>
-        </Container>
-      </MainLayout>
+        </Container >
+      </MainLayout >
       <SendTagModal
         sendAmount={sendAmount}
         asset={assets[0]}

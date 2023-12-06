@@ -15,7 +15,17 @@ export function Select({ items, ...props }: SelectProps & { items: Array<Coin> }
       disablePreventBodyScroll
       {...props}
     >
-      <TamaguiSelect.Trigger w="auto" px={'$3.5'} bg={'$backgroundPress'} iconAfter={<IconTriangleDown width={12} height={'$0.75'} />}>
+      <TamaguiSelect.Trigger
+        w="auto"
+        px={'$3.5'}
+        bg={'$backgroundPress'}
+        iconAfter={<IconTriangleDown width={12} height={'$0.75'} />}
+        $shorter={{
+          minHeight: '$3.5',
+          px: '$2.5',
+          py: '$2'
+        }}
+      >
         <XStack space={'$1.5'}>
           {items.filter((item) => item.name.toLowerCase() === val)[0]?.icon}
           <TamaguiSelect.Value placeholder="Something" fow={'700'} />

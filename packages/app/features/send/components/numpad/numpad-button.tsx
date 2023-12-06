@@ -13,12 +13,16 @@ const CustomButton = styled(Button, {
         backgroundColor: "$backgroundHover",
       },
     }
+  },
+  $shorter: {
+    width: "$6",
+    height: "$6"
   }
 })
 
 export function NumpadButton({ value, num, pressHandler, ...otherProps }: NumpadButtonProps) {
   return (
-    <CustomButton num={num} onPress={(e: any) => pressHandler(value)} {...otherProps}>
+    <CustomButton num={num} onPress={() => pressHandler(value)} {...otherProps}>
       {value}
     </CustomButton>
   )

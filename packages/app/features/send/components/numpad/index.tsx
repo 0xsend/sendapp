@@ -9,23 +9,23 @@ export const NumPad = ({ value, setValue }: NumPadProps) => {
   }
 
   return (
-    <YStack space={'$5'} mt={'$9'}>
-      <XStack jc={'center'} space={'$6'}>
+    <YStack space={'$5'} mt={'$6'} $shorter={{ space: '$3', mt: '$6' }}>
+      <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
         <NumpadButton pressHandler={numpadpressHandler} value={'1'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'2'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'3'} num />
       </XStack>
-      <XStack jc={'center'} space={'$6'}>
+      <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
         <NumpadButton pressHandler={numpadpressHandler} value={'4'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'5'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'6'} num />
       </XStack>
-      <XStack jc={'center'} space={'$6'}>
+      <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
         <NumpadButton pressHandler={numpadpressHandler} value={'7'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'8'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'9'} num />
       </XStack>
-      <XStack jc={'center'} space={'$6'}>
+      <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
         <NumpadButton pressHandler={numpadpressHandler} value={'.'} />
         <NumpadButton pressHandler={numpadpressHandler} value={'0'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'<'} />
