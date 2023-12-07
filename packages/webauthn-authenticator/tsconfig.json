@@ -18,5 +18,5 @@
     "allowJs": true,
     "outDir": "./dist"
   },
-  "include": ["./**/*.ts", "./**/*.tsx"]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx", "./test/**/*.ts", "./test/**/*.tsx"]
 }

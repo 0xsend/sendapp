@@ -1,4 +1,4 @@
-import { type BrowserContext, test as base } from '@playwright/test'
+import { type BrowserContext, test as base, Page } from '@playwright/test'
 import {
   CredentialsStore,
   createPublicKeyCredential,
@@ -15,6 +15,7 @@ interface WebAuthnAuthenticatorWindow {
 
 export const test = base.extend<{
   context: BrowserContext
+  page: Page
   credentialsStore: typeof CredentialsStore
 }>({
   context: async ({ context }, use) => {
@@ -61,6 +62,26 @@ export const test = base.extend<{
     )
 
     await use(context)
+  },
+  page: async ({ context }, use) => {
+    const page = await context.newPage()
+
+    log('page created')
+
+    // ensure WebAuthnAuthenticator is available
+    await page.waitForFunction(
+      () => {
+        return (
+          (window as WebAuthnAuthenticatorWindow).WebAuthnAuthenticator?.installWebAuthnMock !==
+          undefined
+        )
+      },
+      {
+        timeout: 1000,
+      }
+    )
+
+    await use(page)
   },
   // biome-ignore lint/correctness/noEmptyPattern: empty pattern is needed here
   credentialsStore: async ({}, use) => {
