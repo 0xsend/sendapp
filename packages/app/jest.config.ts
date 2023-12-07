@@ -162,12 +162,12 @@ const config: Config = {
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|@tamagui/.*|tamagui|moti|sentry-expo|native-base|react-native-svg|solito)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|moti|sentry-expo|native-base|react-native-svg|solito)',
   ],
 
   moduleNameMapper: {
-    // '@tamagui/core': '@tamagui/core/native-test',
-    // '@tamagui/web': '@tamagui/core/native-test',
+    '@tamagui/core': '@tamagui/core/native-test',
+    '@tamagui/web': '@tamagui/core/native-test',
   },
 
   // The regexp pattern or array of patterns that Jest uses to detect test files

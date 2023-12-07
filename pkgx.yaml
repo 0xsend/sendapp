@@ -1,1 +1,1 @@
-dependencies: npm node@20 forge bun jq yj tilt
+dependencies: yarnpkg.com node@20 forge bun jq yj tilt

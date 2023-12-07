@@ -247,7 +247,7 @@ local_resource(
 
 local_resource(
     "app:test",
-    "yarn workspace app test --run",
+    "yarn workspace app test",
     allow_parallel = True,
     labels = ["test"],
     resource_deps = ["yarn:install"],
