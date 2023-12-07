@@ -7,8 +7,8 @@
 import { test, expect } from './fixtures/auth'
 
 test('can visit onboarding page', async ({ page, credentialsStore }) => {
-  await page.goto('/')
-  expect(page).toHaveURL('/')
+  await page.goto('/onboarding')
+  expect(page).toHaveURL('/onboarding')
   await page.getByRole('button', { name: 'Create' }).click()
 
   // assert passkey was created

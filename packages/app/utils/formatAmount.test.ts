@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'vitest'
+import { describe, expect, it } from '@jest/globals'
 
 import formatAmount from './formatAmount' // Adjust the import path
 
