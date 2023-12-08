@@ -184,6 +184,7 @@ local_resource(
     labels = labels,
     serve_cmd = [
         "anvil",
+        "--host=0.0.0.0",
         "--chain-id=1337",
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
         "--fork-block-number=" + mainnet_fork_block_number,
@@ -203,6 +204,7 @@ local_resource(
     labels = labels,
     serve_cmd = [
         "anvil",
+        "--host=0.0.0.0",
         "--port=8546",
         "--chain-id=845337",
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
@@ -254,7 +256,7 @@ local_resource(
     deps =
         files_matching(
             os.path.join("packages", "app"),
-            lambda f: f.endswith(".ts"),
+            lambda f: f.endswith(".ts") or f.endswith(".tsx"),
         ),
 )
 
