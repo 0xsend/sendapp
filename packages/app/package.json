@@ -16,6 +16,7 @@
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
     "@my/wagmi": "workspace:*",
+    "@noble/curves": "^1.2.0",
     "@openzeppelin/merkle-tree": "^1.0.5",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@supabase/auth-helpers-nextjs": "^0.8.7",

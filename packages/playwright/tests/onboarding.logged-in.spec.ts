@@ -18,4 +18,7 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
   await page.getByRole('button', { name: 'Sign' }).click()
 
   // verify signature
+
+  // TODO: remove me
+  await page.pause()
 })
