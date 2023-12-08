@@ -68,22 +68,23 @@ export function parseAuthDataFromAttestationObject(attestationObject: Uint8Array
 // Parses authenticatorData buffer to struct
 // https://www.w3.org/TR/webauthn-2/#sctn-authenticator-data
 function parseMakeCredAuthData(buffer: Uint8Array) {
-  const rpIdHash = buffer.slice(0, 32)
-  buffer = buffer.slice(32)
-  const flagsBuf = buffer.slice(0, 1)
-  buffer = buffer.slice(1)
+  let buf = buffer
+  const rpIdHash = buf.slice(0, 32)
+  buf = buf.slice(32)
+  const flagsBuf = buf.slice(0, 1)
+  buf = buf.slice(1)
   const flags = flagsBuf[0]
-  const counterBuf = buffer.slice(0, 4)
-  buffer = buffer.slice(4)
+  const counterBuf = buf.slice(0, 4)
+  buf = buf.slice(4)
   const counter = Buffer.from(counterBuf).readUInt32BE(0)
-  const aaguid = buffer.slice(0, 16)
-  buffer = buffer.slice(16)
-  const credIDLenBuf = buffer.slice(0, 2)
-  buffer = buffer.slice(2)
+  const aaguid = buf.slice(0, 16)
+  buf = buf.slice(16)
+  const credIDLenBuf = buf.slice(0, 2)
+  buf = buf.slice(2)
   const credIDLen = Buffer.from(credIDLenBuf).readUInt16BE(0)
-  const credID = buffer.slice(0, credIDLen)
-  buffer = buffer.slice(credIDLen)
-  const COSEPublicKey = buffer
+  const credID = buf.slice(0, credIDLen)
+  buf = buf.slice(credIDLen)
+  const COSEPublicKey = buf
 
   return {
     rpIdHash,
@@ -110,7 +111,7 @@ function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
   ])
 }
 
-// Parses Webauthn MakeCredential response
+// Parses DER public key from Webauthn MakeCredential response
 // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred
 export function parseCreateResponse(result: CreateResult) {
   const rawAttestationObject = base64.decode(result.rawAttestationObjectB64)
@@ -127,6 +128,7 @@ export function parseSignResponse(result: SignResult) {
   const rawAuthenticatorData = base64.decode(result.rawAuthenticatorDataB64)
   const passkeyName = result.passkeyName
   const [accountName, keySlotStr] = passkeyName.split('.') // Assumes account name does not have periods (.) in it.
+  assert(!!accountName && !!keySlotStr, 'Invalid passkey name')
   const keySlot = parseInt(keySlotStr, 10)
 
   const clientDataJSON = Buffer.from(base64.decode(result.rawClientDataJSONB64)).toString('utf-8')
