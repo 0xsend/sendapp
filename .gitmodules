@@ -7,3 +7,6 @@
 [submodule "packages/contracts/lib/account-abstraction"]
 	path = packages/contracts/lib/account-abstraction
 	url = https://github.com/eth-infinitism/account-abstraction
+[submodule "packages/contracts/lib/openzeppelin-contracts-upgradeable"]
+	path = packages/contracts/lib/openzeppelin-contracts-upgradeable
+	url = https://github.com/Openzeppelin/openzeppelin-contracts-upgradeable
