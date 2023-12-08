@@ -10,3 +10,6 @@
 [submodule "packages/contracts/lib/openzeppelin-contracts-upgradeable"]
 	path = packages/contracts/lib/openzeppelin-contracts-upgradeable
 	url = https://github.com/Openzeppelin/openzeppelin-contracts-upgradeable
+[submodule "packages/contracts/lib/p256-verifier"]
+	path = packages/contracts/lib/p256-verifier
+	url = https://github.com/daimo-eth/p256-verifier
