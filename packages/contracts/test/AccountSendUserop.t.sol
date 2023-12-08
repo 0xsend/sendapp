@@ -25,7 +25,8 @@ contract AccountSendUseropTest is Test {
         console.log("factory address:", address(factory));
     }
 
-    /***
+    /**
+     *
      * An event emitted after each successful request
      * @param userOpHash - unique identifier for the request (hash its entire content, except signature).
      * @param sender - the account that generates this request.
@@ -56,11 +57,7 @@ contract AccountSendUseropTest is Test {
         uint8 version = 1;
         uint48 validUntil = 0;
         bytes32 expectedUserOpHash = hex"cef2863e6be232ac99eef76f754acda25d51cec80009102e0df7af9f9078cd61";
-        bytes memory challengeToSign = abi.encodePacked(
-            version,
-            validUntil,
-            expectedUserOpHash
-        );
+        bytes memory challengeToSign = abi.encodePacked(version, validUntil, expectedUserOpHash);
 
         bytes memory ownerSig = abi.encodePacked(
             version,
@@ -144,11 +141,7 @@ contract AccountSendUseropTest is Test {
         uint8 version = 1;
         uint48 validUntil = 1e9; // validUntil unix timestamp 1e9
         bytes32 expectedUserOpHash = hex"cef2863e6be232ac99eef76f754acda25d51cec80009102e0df7af9f9078cd61";
-        bytes memory challengeToSign = abi.encodePacked(
-            version,
-            validUntil,
-            expectedUserOpHash
-        );
+        bytes memory challengeToSign = abi.encodePacked(version, validUntil, expectedUserOpHash);
 
         bytes memory ownerSig = abi.encodePacked(
             version,
@@ -192,13 +185,7 @@ contract AccountSendUseropTest is Test {
         vm.warp(1e9 + 1);
         UserOperation[] memory ops = new UserOperation[](1);
         ops[0] = op;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IEntryPoint.FailedOp.selector,
-                0,
-                "AA22 expired or not due"
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IEntryPoint.FailedOp.selector, 0, "AA22 expired or not due"));
         entryPoint.handleOps(ops, payable(address(acc)));
 
         // just early enough: can execute at timestamp 1e9
