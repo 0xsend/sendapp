@@ -11546,6 +11546,7 @@ __metadata:
     babel-preset-expo: "npm:9.5.2"
     base64-arraybuffer: "npm:^1.0.2"
     burnt: "npm:^0.11.7"
+    cbor: "npm:^9.0.1"
     debug: "npm:^4.3.4"
     dnum: "npm:^2.9.0"
     eslint: "npm:^8.46.0"
