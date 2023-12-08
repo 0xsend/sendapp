@@ -1,6 +1,6 @@
-import { SendScreen } from 'app/features/send/screen'
+import { SendItScreen } from 'app/features/send/screens/send'
 import Head from 'next/head'
-import { NextPageWithLayout } from './_app'
+import { NextPageWithLayout } from '../_app'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
 
 export const Page: NextPageWithLayout = () => {
@@ -14,7 +14,7 @@ export const Page: NextPageWithLayout = () => {
           key="desc"
         />
       </Head>
-      <SendScreen />
+      <SendItScreen />
     </>
   )
 }

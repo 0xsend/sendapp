@@ -11,20 +11,9 @@ export interface NumpadButtonProps extends ButtonProps {
   pressHandler: (val: string) => void
 }
 
-export type SendTagModalProps = {
-  sendAmount: string
-  asset?: Coin
-  tags: Tag[]
+export type ConfirmModalProps = {
   showModal: boolean
-  setCurrentModal: (currentModal: ModalType) => void
-}
-
-export type SendItModalProps = {
-  sendAmount: string
-  asset?: Coin
-  tag?: Tag
-  showModal: boolean
-  setCurrentModal: (currentModal: ModalType) => void
+  setShowModal: (showModal: boolean) => void
 }
 
 export type Coin = {
