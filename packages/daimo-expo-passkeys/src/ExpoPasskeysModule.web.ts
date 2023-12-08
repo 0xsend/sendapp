@@ -1,10 +1,5 @@
 /// <reference lib="dom" />
 
-import type {
-  PublicKeyCredential,
-  PublicKeyCredentialCreationOptions,
-  PublicKeyCredentialRequestOptions,
-} from '@simplewebauthn/typescript-types'
 import { base64 } from '@scure/base'
 
 /**
@@ -84,8 +79,8 @@ const ExpoPasskeysModuleWeb = {
   ): Promise<{
     passkeyName: string
     signature: string
-    rawAuthenticatorData: string
-    rawClientDataJSON: string
+    rawAuthenticatorDataB64: string
+    rawClientDataJSONB64: string
   }> {
     checkPasskeyAvailableOrThrow()
 
@@ -108,15 +103,17 @@ const ExpoPasskeysModuleWeb = {
     // Extracting various parts of the assertion
     const decoder = new TextDecoder('utf-8')
     const signature = base64.encode(new Uint8Array(assertion.response.signature))
-    const rawAuthenticatorData = base64.encode(new Uint8Array(assertion.response.authenticatorData))
-    const rawClientDataJSON = base64.encode(new Uint8Array(assertion.response.clientDataJSON))
+    const rawAuthenticatorDataB64 = base64.encode(
+      new Uint8Array(assertion.response.authenticatorData)
+    )
+    const rawClientDataJSONB64 = base64.encode(new Uint8Array(assertion.response.clientDataJSON))
     const passkeyName = decoder.decode(assertion.response.userHandle as ArrayBuffer)
 
     return {
       passkeyName,
       signature,
-      rawAuthenticatorData,
-      rawClientDataJSON,
+      rawAuthenticatorDataB64,
+      rawClientDataJSONB64,
     }
   },
 }

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`HomeScreen 1`] = `
+exports[`OnboardingScreen 1`] = `
 <View
   style={
     {
@@ -12,32 +12,12 @@ exports[`HomeScreen 1`] = `
     }
   }
 >
-  <Text
-    accessibilityRole="header"
-    selectable={true}
-    style={
-      {
-        "color": "#fff",
-        "fontFamily": "System",
-        "fontSize": 46,
-        "fontWeight": "700",
-        "lineHeight": 50,
-        "marginBottom": 0,
-        "marginLeft": 0,
-        "marginRight": 0,
-        "marginTop": 0,
-        "textTransform": "none",
-      }
-    }
-    suppressHighlighting={true}
-  >
-    Home
-  </Text>
   <View
     style={
       {
         "alignItems": "stretch",
         "flexDirection": "column",
+        "maxWidth": 600,
       }
     }
   >
@@ -60,7 +40,40 @@ exports[`HomeScreen 1`] = `
       }
       suppressHighlighting={true}
     >
-      Sign In
+      Welcome to Send
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "700",
+          "lineHeight": 34,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Start by creating a Passkey below
     </Text>
     <View
       pointerEvents="none"
@@ -146,6 +159,89 @@ exports[`HomeScreen 1`] = `
         }
       }
     />
+    <TextInput
+      editable={true}
+      focusable={true}
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 224,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "700",
+          "lineHeight": 34,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Then sign a message with it
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
     <View
       accessibilityRole="button"
       cancelable={true}
@@ -206,6 +302,56 @@ exports[`HomeScreen 1`] = `
         Sign
       </Text>
     </View>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 224,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
   </View>
 </View>
 `;
