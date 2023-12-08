@@ -4,3 +4,6 @@
 [submodule "packages/contracts/lib/openzeppelin-contracts"]
 	path = packages/contracts/lib/openzeppelin-contracts
 	url = https://github.com/Openzeppelin/openzeppelin-contracts
+[submodule "packages/contracts/lib/account-abstraction"]
+	path = packages/contracts/lib/account-abstraction
+	url = https://github.com/eth-infinitism/account-abstraction
