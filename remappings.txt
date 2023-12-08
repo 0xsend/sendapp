@@ -1,7 +1,0 @@
-account-abstraction/=packages/contracts/lib/account-abstraction/contracts/
-ds-test/=packages/contracts/lib/forge-std/lib/ds-test/src/
-forge-std/=packages/contracts/lib/forge-std/src/
-openzeppelin-contracts/=packages/contracts/lib/openzeppelin-contracts/
-@openzeppelin/contracts/=packages/contracts/lib/openzeppelin-contracts/contracts/
-openzeppelin-contracts-upgradeable/=packages/contracts/lib/openzeppelin-contracts-upgradeable/
-p256-verifier/=packages/contracts/lib/p256-verifier/src/

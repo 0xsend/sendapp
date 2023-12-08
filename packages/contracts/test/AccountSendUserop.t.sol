@@ -10,6 +10,8 @@ import "./Utils.sol";
 import "account-abstraction/core/EntryPoint.sol";
 import "account-abstraction/interfaces/IEntryPoint.sol";
 
+import "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+
 contract AccountSendUseropTest is Test {
     using UserOperationLib for UserOperation;
 
