@@ -1,6 +1,6 @@
 import { p256 } from '@noble/curves/p256'
 import { Hex, bytesToBigInt, hexToBytes, bytesToHex } from 'viem'
-import { base64, base16 } from '@scure/base'
+import { base64 } from '@scure/base'
 import cbor from 'cbor'
 import { CreateResult, SignResult } from '@daimo/expo-passkeys'
 
@@ -35,18 +35,16 @@ export function contractFriendlyKeyToDER(accountPubkey: readonly [Hex, Hex]): He
 // and normalize it so the signature is not malleable.
 export function parseAndNormalizeSig(derSig: Hex): { r: bigint; s: bigint } {
   const parsedSignature = p256.Signature.fromDER(derSig.slice(2))
+  // Avoid malleability. Ensure low S (<= N/2 where N is the curve order)
+  if (parsedSignature.hasHighS()) {
+    parsedSignature.normalizeS()
+  }
   const bSig = hexToBytes(`0x${parsedSignature.toCompactHex()}`)
   assert(bSig.length === 64, 'signature is not 64 bytes')
   const bR = bSig.slice(0, 32)
   const bS = bSig.slice(32)
-
-  // Avoid malleability. Ensure low S (<= N/2 where N is the curve order)
   const r = bytesToBigInt(bR)
-  let s = bytesToBigInt(bS)
-  const n = BigInt('0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551')
-  if (s > n / 2n) {
-    s = n - s
-  }
+  const s = bytesToBigInt(bS)
   return { r, s }
 }
 
