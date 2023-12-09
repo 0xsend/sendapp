@@ -34,11 +34,7 @@ export function contractFriendlyKeyToDER(accountPubkey: readonly [Hex, Hex]): He
 // Parse DER-encoded P256-SHA256 signature to contract-friendly signature
 // and normalize it so the signature is not malleable.
 export function parseAndNormalizeSig(derSig: Hex): { r: bigint; s: bigint } {
-  const parsedSignature = p256.Signature.fromDER(derSig.slice(2))
-  // Avoid malleability. Ensure low S (<= N/2 where N is the curve order)
-  if (parsedSignature.hasHighS()) {
-    parsedSignature.normalizeS()
-  }
+  const parsedSignature = p256.Signature.fromDER(derSig.slice(2)).normalizeS()
   const bSig = hexToBytes(`0x${parsedSignature.toCompactHex()}`)
   assert(bSig.length === 64, 'signature is not 64 bytes')
   const bR = bSig.slice(0, 32)

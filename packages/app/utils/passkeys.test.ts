@@ -117,7 +117,7 @@ describe('parseAndNormalizeSig', () => {
     expect(parsedSig.hasHighS()).toBe(true)
     const normalizedSig = parseAndNormalizeSig(derSigWithHighS)
     expect(normalizedSig.r.toString(16)).toBe(parsedSig.r.toString(16))
-    expect(normalizedSig.s.toString(16)).toBe(parsedSig.s.toString(16))
+    expect(normalizedSig.s.toString(16)).toBe(parsedSig.normalizeS().s.toString(16))
   })
 })
 
