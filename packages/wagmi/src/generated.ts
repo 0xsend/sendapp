@@ -139,11 +139,9 @@ export const contextUpgradeableABI = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
     name: 'Initialized',
   },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,7 +370,7 @@ export const daimoAccountABI = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
     name: 'Initialized',
   },
   {
@@ -401,8 +399,6 @@ export const daimoAccountABI = [
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
   },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -694,7 +690,7 @@ export const daimoNameRegistryABI = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
     name: 'Initialized',
   },
   {
@@ -720,18 +716,6 @@ export const daimoNameRegistryABI = [
     anonymous: false,
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
-  },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-  {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
   },
 ] as const
 
@@ -784,6 +768,7 @@ export const daimoPaymasterABI = [
     inputs: [
       { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
       { name: '_owner', internalType: 'address', type: 'address' },
+      { name: '_metaPaymaster', internalType: 'contract IMetaPaymaster', type: 'address' },
     ],
   },
   {
@@ -814,6 +799,13 @@ export const daimoPaymasterABI = [
     inputs: [],
     name: 'getDeposit',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'metaPaymaster',
+    outputs: [{ name: '', internalType: 'contract IMetaPaymaster', type: 'address' }],
   },
   {
     stateMutability: 'view',
@@ -1035,7 +1027,7 @@ export const daimoVerifierABI = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
     name: 'Initialized',
   },
   {
@@ -1052,18 +1044,6 @@ export const daimoVerifierABI = [
     anonymous: false,
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
-  },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-  {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
   },
 ] as const
 
@@ -2377,25 +2357,6 @@ export const ierc20PermitABI = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IERC721TokenReceiver
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const ierc721TokenReceiverABI = [
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'uint256', type: 'uint256' },
-      { name: '', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'onERC721Received',
-    outputs: [{ name: '', internalType: 'bytes4', type: 'bytes4' }],
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IEntryPoint
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2859,6 +2820,23 @@ export const iEntryPointABI = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IMetaPaymaster
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iMetaPaymasterABI = [
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'fund',
+    outputs: [],
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IMulticall3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3294,313 +3272,8 @@ export const initializableABI = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
     name: 'Initialized',
-  },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MockERC20
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const mockErc20ABI = [
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'DOMAIN_SEPARATOR',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'address', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: '_name', internalType: 'string', type: 'string' },
-      { name: '_symbol', internalType: 'string', type: 'string' },
-      { name: '_decimals', internalType: 'uint8', type: 'uint8' },
-    ],
-    name: 'initialize',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'nonces',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'deadline', internalType: 'uint256', type: 'uint256' },
-      { name: 'v', internalType: 'uint8', type: 'uint8' },
-      { name: 'r', internalType: 'bytes32', type: 'bytes32' },
-      { name: 's', internalType: 'bytes32', type: 'bytes32' },
-    ],
-    name: 'permit',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Approval',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Transfer',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MockERC721
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const mockErc721ABI = [
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'id', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    name: 'getApproved',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: '_name', internalType: 'string', type: 'string' },
-      { name: '_symbol', internalType: 'string', type: 'string' },
-    ],
-    name: 'initialize',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'address', type: 'address' },
-    ],
-    name: 'isApprovedForAll',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'id', internalType: 'uint256', type: 'uint256' }],
-    name: 'ownerOf',
-    outputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'id', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'safeTransferFrom',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'id', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'safeTransferFrom',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'operator', internalType: 'address', type: 'address' },
-      { name: 'approved', internalType: 'bool', type: 'bool' },
-    ],
-    name: 'setApprovalForAll',
-    outputs: [],
-  },
-  {
-    stateMutability: 'pure',
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'id', internalType: 'uint256', type: 'uint256' }],
-    name: 'tokenURI',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'id', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [],
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'id', internalType: 'uint256', type: 'uint256', indexed: true },
-    ],
-    name: 'Approval',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'operator', internalType: 'address', type: 'address', indexed: true },
-      { name: 'approved', internalType: 'bool', type: 'bool', indexed: false },
-    ],
-    name: 'ApprovalForAll',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'id', internalType: 'uint256', type: 'uint256', indexed: true },
-    ],
-    name: 'Transfer',
   },
 ] as const
 
@@ -3704,7 +3377,7 @@ export const ownableUpgradeableABI = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
     name: 'Initialized',
   },
   {
@@ -3715,18 +3388,6 @@ export const ownableUpgradeableABI = [
       { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
     ],
     name: 'OwnershipTransferred',
-  },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-  {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
   },
 ] as const
 
@@ -5942,40 +5603,6 @@ export function prepareWriteIerc20Permit<
 }
 
 /**
- * Wraps __{@link getContract}__ with `abi` set to __{@link ierc721TokenReceiverABI}__.
- */
-export function getIerc721TokenReceiver(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: ierc721TokenReceiverABI, ...config })
-}
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc721TokenReceiverABI}__.
- */
-export function writeIerc721TokenReceiver<TFunctionName extends string>(
-  config:
-    | Omit<WriteContractPreparedArgs<typeof ierc721TokenReceiverABI, TFunctionName>, 'abi'>
-    | Omit<WriteContractUnpreparedArgs<typeof ierc721TokenReceiverABI, TFunctionName>, 'abi'>
-) {
-  return writeContract({ abi: ierc721TokenReceiverABI, ...config } as unknown as WriteContractArgs<
-    typeof ierc721TokenReceiverABI,
-    TFunctionName
-  >)
-}
-
-/**
- * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link ierc721TokenReceiverABI}__.
- */
-export function prepareWriteIerc721TokenReceiver<
-  TAbi extends readonly unknown[] = typeof ierc721TokenReceiverABI,
-  TFunctionName extends string = string
->(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return prepareWriteContract({
-    abi: ierc721TokenReceiverABI,
-    ...config,
-  } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
-}
-
-/**
  * Wraps __{@link getContract}__ with `abi` set to __{@link iEntryPointABI}__.
  */
 export function getIEntryPoint(config: Omit<GetContractArgs, 'abi'>) {
@@ -6018,6 +5645,40 @@ export function prepareWriteIEntryPoint<
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: iEntryPointABI,
+    ...config,
+  } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
+}
+
+/**
+ * Wraps __{@link getContract}__ with `abi` set to __{@link iMetaPaymasterABI}__.
+ */
+export function getIMetaPaymaster(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: iMetaPaymasterABI, ...config })
+}
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iMetaPaymasterABI}__.
+ */
+export function writeIMetaPaymaster<TFunctionName extends string>(
+  config:
+    | Omit<WriteContractPreparedArgs<typeof iMetaPaymasterABI, TFunctionName>, 'abi'>
+    | Omit<WriteContractUnpreparedArgs<typeof iMetaPaymasterABI, TFunctionName>, 'abi'>
+) {
+  return writeContract({ abi: iMetaPaymasterABI, ...config } as unknown as WriteContractArgs<
+    typeof iMetaPaymasterABI,
+    TFunctionName
+  >)
+}
+
+/**
+ * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link iMetaPaymasterABI}__.
+ */
+export function prepareWriteIMetaPaymaster<
+  TAbi extends readonly unknown[] = typeof iMetaPaymasterABI,
+  TFunctionName extends string = string
+>(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return prepareWriteContract({
+    abi: iMetaPaymasterABI,
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
@@ -6202,100 +5863,6 @@ export function prepareWriteIStakeManager<
  */
 export function getInitializable(config: Omit<GetContractArgs, 'abi'>) {
   return getContract({ abi: initializableABI, ...config })
-}
-
-/**
- * Wraps __{@link getContract}__ with `abi` set to __{@link mockErc20ABI}__.
- */
-export function getMockErc20(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: mockErc20ABI, ...config })
-}
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link mockErc20ABI}__.
- */
-export function readMockErc20<
-  TAbi extends readonly unknown[] = typeof mockErc20ABI,
-  TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return readContract({ abi: mockErc20ABI, ...config } as unknown as ReadContractConfig<
-    TAbi,
-    TFunctionName
-  >)
-}
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link mockErc20ABI}__.
- */
-export function writeMockErc20<TFunctionName extends string>(
-  config:
-    | Omit<WriteContractPreparedArgs<typeof mockErc20ABI, TFunctionName>, 'abi'>
-    | Omit<WriteContractUnpreparedArgs<typeof mockErc20ABI, TFunctionName>, 'abi'>
-) {
-  return writeContract({ abi: mockErc20ABI, ...config } as unknown as WriteContractArgs<
-    typeof mockErc20ABI,
-    TFunctionName
-  >)
-}
-
-/**
- * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link mockErc20ABI}__.
- */
-export function prepareWriteMockErc20<
-  TAbi extends readonly unknown[] = typeof mockErc20ABI,
-  TFunctionName extends string = string
->(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return prepareWriteContract({
-    abi: mockErc20ABI,
-    ...config,
-  } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
-}
-
-/**
- * Wraps __{@link getContract}__ with `abi` set to __{@link mockErc721ABI}__.
- */
-export function getMockErc721(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: mockErc721ABI, ...config })
-}
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link mockErc721ABI}__.
- */
-export function readMockErc721<
-  TAbi extends readonly unknown[] = typeof mockErc721ABI,
-  TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return readContract({ abi: mockErc721ABI, ...config } as unknown as ReadContractConfig<
-    TAbi,
-    TFunctionName
-  >)
-}
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link mockErc721ABI}__.
- */
-export function writeMockErc721<TFunctionName extends string>(
-  config:
-    | Omit<WriteContractPreparedArgs<typeof mockErc721ABI, TFunctionName>, 'abi'>
-    | Omit<WriteContractUnpreparedArgs<typeof mockErc721ABI, TFunctionName>, 'abi'>
-) {
-  return writeContract({ abi: mockErc721ABI, ...config } as unknown as WriteContractArgs<
-    typeof mockErc721ABI,
-    TFunctionName
-  >)
-}
-
-/**
- * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link mockErc721ABI}__.
- */
-export function prepareWriteMockErc721<
-  TAbi extends readonly unknown[] = typeof mockErc721ABI,
-  TFunctionName extends string = string
->(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return prepareWriteContract({
-    abi: mockErc721ABI,
-    ...config,
-  } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
 
 /**
