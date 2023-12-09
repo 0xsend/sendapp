@@ -48,21 +48,6 @@ export function parseAndNormalizeSig(derSig: Hex): { r: bigint; s: bigint } {
   return { r, s }
 }
 
-export function parseAuthDataFromAttestationObject(attestationObject: Uint8Array) {
-  const attestation = cbor.decodeAllSync(attestationObject)[0] as {
-    fmt: string
-    attStmt: {
-      alg: number
-      sig: Buffer
-    }
-    authData: Buffer
-  }
-  console.log('attestation', attestation)
-  assert(!!attestation, 'Invalid attestation object')
-  assert(attestation.authData.length >= 37, 'Invalid authData length')
-  return attestation
-}
-
 // Parses authenticatorData buffer to struct
 // https://www.w3.org/TR/webauthn-2/#sctn-authenticator-data
 function parseMakeCredAuthData(buffer: Uint8Array) {
