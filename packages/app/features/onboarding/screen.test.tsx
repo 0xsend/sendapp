@@ -1,12 +1,18 @@
 import { expect, test } from '@jest/globals'
 import { render } from '@testing-library/react-native'
-import { HomeScreen } from './screen'
+import { OnboardingScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
+import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
 
-test('HomeScreen', () => {
+jest.mock('@daimo/expo-passkeys', () => ({
+  createPasskey: jest.fn(),
+  signWithPasskey: jest.fn(),
+}))
+
+test(OnboardingScreen.name, () => {
   const tree = render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <HomeScreen />
+      <OnboardingScreen />
     </TamaguiProvider>
   ).toJSON()
   expect(tree).toMatchSnapshot()

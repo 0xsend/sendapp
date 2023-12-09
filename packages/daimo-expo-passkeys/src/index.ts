@@ -59,8 +59,11 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
         userIDB64,
         request.challengeB64
       )
-      // @ts-expect-error FIXME: this is a hack
-      return ret
+
+      return {
+        rawClientDataJSONB64: ret.rawClientDataJSON,
+        rawAttestationObjectB64: ret.rawAttestationObject,
+      }
     }
     default: {
       throw new Error(`Unsupported platform: ${Platform.OS}`)
@@ -106,13 +109,14 @@ export async function signWithPasskey(request: SignRequest): Promise<SignResult>
       }
     }
     case 'web': {
-      const ret = await ExpoPasskeysModule.signWithPasskey(request.domain, request.challengeB64)
-      console.log('[daimo-expo-passkeys] ret', ret)
-      // const userIDstr = new TextDecoder('utf-8').decode(base64.decode(ret.userID))
+      const ret = await (ExpoPasskeysModule as typeof ExpoPasskeysModuleWeb).signWithPasskey(
+        request.domain,
+        request.challengeB64
+      )
       return {
-        passkeyName: 'TODO: userIdStr', // userIDstr,
-        rawClientDataJSONB64: ret.rawClientDataJSON,
-        rawAuthenticatorDataB64: ret.rawAuthenticatorData,
+        passkeyName: ret.passkeyName,
+        rawClientDataJSONB64: ret.rawClientDataJSONB64,
+        rawAuthenticatorDataB64: ret.rawAuthenticatorDataB64,
         signatureB64: ret.signature,
       }
     }
