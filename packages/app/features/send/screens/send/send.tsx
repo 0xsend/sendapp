@@ -7,7 +7,6 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { Link } from '@my/ui/src/components'
 import { MainLayout } from 'app/components/layout'
 import { IconEthereum } from 'app/components/icons/IconEthereum'
 import { Select } from '../../components/select'
@@ -20,7 +19,7 @@ const assets: Coin[] = [
   { icon: <IconEthereum />, name: 'SEND' },
 ]
 
-export const SendScreen = ({ setCurrentScreen }: SendScreenProps) => {
+export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
   const [sendAmount, setSendAmount] = useState('0.25')
 
   return (

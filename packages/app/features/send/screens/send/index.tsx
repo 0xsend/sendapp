@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { SendScreen } from './send';
+import { MainScreen } from './send';
 import { SendTagScreen } from './send-tag';
 import { SendItScreen } from './send-it';
 import { SendScreenType } from '../../types';
 import { AnimationLayout } from '../../../../components/layout/animation-layout';
 
 const screens = {
-  send: SendScreen,
+  send: MainScreen,
   sendtag: SendTagScreen,
   sendit: SendItScreen,
 };
 
-export const SendPage = () => {
+export const SendScreen = () => {
   const [[currentScreen, direction], setCurrentScreen] = useState<[SendScreenType, number]>(['send', -1]);
 
   const ScreenComponent = screens[currentScreen];
