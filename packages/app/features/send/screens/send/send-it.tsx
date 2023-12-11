@@ -97,7 +97,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentScreen('sendtag')}
+          onPress={() => setCurrentScreen(['sendtag', -1])}
         >
           <IconBack />
         </Button>

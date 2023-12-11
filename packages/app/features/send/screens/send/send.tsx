@@ -72,7 +72,7 @@ export const SendScreen = ({ setCurrentScreen }: SendScreenProps) => {
                 py: '$4',
                 br: '$7'
               }}
-              onPress={() => setCurrentScreen('sendtag')}
+              onPress={() => setCurrentScreen(['sendtag', 1])}
             >
               <Paragraph size={'$6'} fontWeight={'700'}>
                 Continue

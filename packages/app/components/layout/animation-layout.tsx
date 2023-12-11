@@ -1,55 +1,28 @@
-import { useEffect, useState } from 'react';
-
-import { motion } from 'framer-motion';
+import { AnimatePresence } from '@tamagui/animate-presence'
+import { YStack, styled } from '@my/ui';
 
 type AnimationLayoutProps = {
   children: React.ReactNode;
   currentKey: string; // Unique identifier for the current screen or content
-  screenOrder: string[];
+  direction: number;
 };
 
-const screenVariants = {
-  initial: (direction: number) => ({
-    x: direction > 0 ? '100vw' : '-100vw',
-  }),
-  in: {
-    x: 0,
-  },
-  out: (direction: number) => ({
-    x: direction > 0 ? '-100vw' : '100vw',
-  }),
-};
+const YStackEnterable = styled(YStack, {
+  variants: {
+    isLeft: { true: { x: -300, opacity: 0 } },
+    isRight: { true: { x: 300, opacity: 0 } },
+  } as const,
+})
 
-const screenTransition = {
-  type: 'tween',
-  ease: 'anticipate',
-  duration: 0.3,
-};
-
-export const AnimationLayout = ({ children, currentKey, screenOrder }: AnimationLayoutProps) => {
-  const [direction, setDirection] = useState(1);
-  const [prevKey, setPrevKey] = useState(currentKey);
-
-  useEffect(() => {
-    // Determine the direction of the animation based on the keys
-    const currentIndex = screenOrder.indexOf(currentKey);
-    const prevIndex = screenOrder.indexOf(prevKey);
-    setDirection(currentIndex >= prevIndex ? 1 : -1);
-    setPrevKey(currentKey);
-  }, [currentKey]);
+export const AnimationLayout = ({ children, currentKey, direction }: AnimationLayoutProps) => {
+  const enterVariant = direction === 1 || direction === 0 ? 'isRight' : 'isLeft'
+  const exitVariant = direction === 1 ? 'isLeft' : 'isRight'
 
   return (
-    <motion.div
-      key={currentKey}
-      custom={direction}
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={screenVariants}
-      transition={screenTransition}
-      style={{ height: '100vh' }}
-    >
-      {children}
-    </motion.div>
+    <AnimatePresence enterVariant={enterVariant} exitVariant={exitVariant}>
+      <YStackEnterable key={currentKey} animation="quick" fullscreen x={0} opacity={1}>
+        {children}
+      </YStackEnterable>
+    </AnimatePresence>
   );
 };

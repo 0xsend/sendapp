@@ -130,7 +130,7 @@ export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
           <Label theme={'alt1'} fontSize={'$5'}>For</Label>
           <CustomInput placeholder="Add a note (optional)" />
         </XStack>
-        <SendItButton width={'100%'} onPress={() => setCurrentScreen('sendit')} />
+        <SendItButton width={'100%'} onPress={() => setCurrentScreen(['sendit', 1])} />
       </YStack>
       <Button
         pos={'absolute'}

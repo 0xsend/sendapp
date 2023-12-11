@@ -11,15 +11,13 @@ const screens = {
   sendit: SendItScreen,
 };
 
-const screenOrder = ['send', 'sendtag', 'sendit'];
-
 export const SendPage = () => {
-  const [currentScreen, setCurrentScreen] = useState<SendScreenType>('send');
+  const [[currentScreen, direction], setCurrentScreen] = useState<[SendScreenType, number]>(['send', -1]);
 
   const ScreenComponent = screens[currentScreen];
 
   return (
-    <AnimationLayout currentKey={currentScreen} screenOrder={screenOrder}>
+    <AnimationLayout currentKey={currentScreen} direction={direction}>
       <ScreenComponent setCurrentScreen={setCurrentScreen} />
     </AnimationLayout>
   );

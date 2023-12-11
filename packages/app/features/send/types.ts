@@ -29,5 +29,5 @@ export type Tag = {
 export type SendScreenType = 'send' | 'sendtag' | 'sendit'
 
 export type SendScreenProps = {
-  setCurrentScreen: (currentScreen: SendScreenType) => void
+  setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void
 }
