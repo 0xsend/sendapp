@@ -20,7 +20,7 @@ export const AnimationLayout = ({ children, currentKey, direction }: AnimationLa
 
   return (
     <AnimatePresence enterVariant={enterVariant} exitVariant={exitVariant}>
-      <YStackEnterable key={currentKey} animation="quick" fullscreen x={0} opacity={1}>
+      <YStackEnterable key={currentKey} animation="200ms" fullscreen x={0} opacity={1}>
         {children}
       </YStackEnterable>
     </AnimatePresence>
