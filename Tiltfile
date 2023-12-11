@@ -173,7 +173,7 @@ cmd_button(
 )
 
 mainnet_fork_block_number = str(local(
-    "cat foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
+    "cat packages/contracts/foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
     echo_off = True,
     quiet = True,
 )).strip()
@@ -193,7 +193,7 @@ local_resource(
 )
 
 base_fork_block_number = str(local(
-    "cat foundry.toml | yj -tj | jq .profile.base.fork_block_number",
+    "cat packages/contracts/foundry.toml | yj -tj | jq .profile.base.fork_block_number",
     echo_off = True,
     quiet = True,
 )).strip()
@@ -336,7 +336,7 @@ local_resource(
 
 local_resource(
     "contracts:test",
-    "yarn contracts test -vvv",
+    "yarn contracts test -vvv --fork-url https://base-goerli.publicnode.com",
     allow_parallel = True,
     labels = ["test"],
     resource_deps = [

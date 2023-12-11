@@ -5557,8 +5557,7 @@ __metadata:
   resolution: "@my/contracts@workspace:packages/contracts"
   dependencies:
     "@my/supabase": "workspace:*"
-    "@openzeppelin/contracts": "npm:^4.9.3"
-    "@openzeppelin/merkle-tree": "npm:^1.0.5"
+    "@openzeppelin/merkle-tree": "npm:1.0.5"
     "@supabase/supabase-js": "npm:^2.38.5"
     bun-types: "npm:latest"
     debug: "npm:^4.3.4"
@@ -5861,14 +5860,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:^4.9.3":
-  version: 4.9.3
-  resolution: "@openzeppelin/contracts@npm:4.9.3"
-  checksum: ce0a16a56a39b62d72370ac702bce1917096492442ff05de88521beda2c3f3935b93ee2b9a184614dd543a6181f2f0be10243f5a629be87aab284ade68c18320
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/merkle-tree@npm:^1.0.5":
+"@openzeppelin/merkle-tree@npm:1.0.5":
   version: 1.0.5
   resolution: "@openzeppelin/merkle-tree@npm:1.0.5"
   dependencies:
@@ -11524,7 +11516,7 @@ __metadata:
     "@my/ui": "workspace:*"
     "@my/wagmi": "workspace:*"
     "@noble/curves": "npm:^1.2.0"
-    "@openzeppelin/merkle-tree": "npm:^1.0.5"
+    "@openzeppelin/merkle-tree": "npm:1.0.5"
     "@react-native-async-storage/async-storage": "npm:1.18.2"
     "@supabase/auth-helpers-nextjs": "npm:^0.8.7"
     "@supabase/auth-helpers-react": "npm:^0.4.2"
