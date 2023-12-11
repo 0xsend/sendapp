@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 type AnimationLayoutProps = {
   children: React.ReactNode;
@@ -39,18 +39,17 @@ export const AnimationLayout = ({ children, currentKey, screenOrder }: Animation
   }, [currentKey]);
 
   return (
-    <AnimatePresence exitBeforeEnter>
-      <motion.div
-        key={currentKey}
-        custom={direction}
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={screenVariants}
-        transition={screenTransition}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={currentKey}
+      custom={direction}
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={screenVariants}
+      transition={screenTransition}
+      style={{ height: '100vh' }}
+    >
+      {children}
+    </motion.div>
   );
 };
