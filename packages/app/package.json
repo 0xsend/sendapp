@@ -35,6 +35,7 @@
     "@wagmi/chains": "^1.7.0",
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.11.7",
+    "cbor": "^9.0.1",
     "dnum": "^2.9.0",
     "expo-constants": "~14.4.2",
     "expo-image-picker": "~14.3.1",

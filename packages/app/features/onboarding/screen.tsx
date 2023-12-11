@@ -30,7 +30,7 @@ export function OnboardingScreen() {
             const result = await createPasskey({
               domain: 'sendapp.localhost',
               challengeB64: window.btoa('some challenge'),
-              passkeyName: 'sendappuser',
+              passkeyName: 'sendappuser.1',
               passkeyDisplayTitle: 'SendAppUser',
             })
             console.log(result)
