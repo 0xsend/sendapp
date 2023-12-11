@@ -14,6 +14,7 @@ import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { IconEthereum } from "app/components/icons"
 import { ConfirmModal } from "../../components/send"
 import { IconBack } from "app/components/icons/IconBack"
+import { SendScreenProps } from "../../types"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -34,7 +35,7 @@ const tag = {
 const sendAmount = 0.25
 const asset = { icon: <IconEthereum />, name: 'ETH' }
 
-export const SendItScreen = () => {
+export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
   const [showModal, setShowModal] = useState(false)
 
   return (
@@ -96,10 +97,9 @@ export const SendItScreen = () => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
+          onPress={() => setCurrentScreen('sendtag')}
         >
-          <Link href={'/send/tag'} display={'flex'}>
-            <IconBack />
-          </Link>
+          <IconBack />
         </Button>
         <Button
           pos={'absolute'}

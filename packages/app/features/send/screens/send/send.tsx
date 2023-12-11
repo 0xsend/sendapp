@@ -12,7 +12,7 @@ import { MainLayout } from 'app/components/layout'
 import { IconEthereum } from 'app/components/icons/IconEthereum'
 import { Select } from '../../components/select'
 import { NumPad } from '../../components/numpad'
-import { Coin } from '../../types'
+import { Coin, SendScreenProps } from '../../types'
 
 const assets: Coin[] = [
   { icon: <IconEthereum />, name: 'ETH' },
@@ -20,7 +20,7 @@ const assets: Coin[] = [
   { icon: <IconEthereum />, name: 'SEND' },
 ]
 
-export const SendScreen = () => {
+export const SendScreen = ({ setCurrentScreen }: SendScreenProps) => {
   const [sendAmount, setSendAmount] = useState('0.25')
 
   return (
@@ -59,26 +59,25 @@ export const SendScreen = () => {
               </XStack>
             </XStack>
             <NumPad value={sendAmount} setValue={setSendAmount} />
-            <Link href={'/send/tag'}>
-              <Button
-                my={'$5'}
-                py={'$6'}
-                br={'$9'}
-                bc={'$backgroundTransparent'}
-                boc={'$borderColorFocus'}
-                width={'100%'}
-                maw={314}
-                $shorter={{
-                  maw: '18',
-                  py: '$4',
-                  br: '$7'
-                }}
-              >
-                <Paragraph size={'$6'} fontWeight={'700'}>
-                  Continue
-                </Paragraph>
-              </Button>
-            </Link>
+            <Button
+              my={'$5'}
+              py={'$6'}
+              br={'$9'}
+              bc={'$backgroundTransparent'}
+              boc={'$borderColorFocus'}
+              width={'100%'}
+              maw={314}
+              $shorter={{
+                maw: '18',
+                py: '$4',
+                br: '$7'
+              }}
+              onPress={() => setCurrentScreen('sendtag')}
+            >
+              <Paragraph size={'$6'} fontWeight={'700'}>
+                Continue
+              </Paragraph>
+            </Button>
           </YStack>
         </Container>
       </MainLayout>

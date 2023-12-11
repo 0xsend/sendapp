@@ -26,4 +26,8 @@ export type Tag = {
   avatar: string
 }
 
-export type ModalType = '' | 'send_tag' | 'send_it'
+export type SendScreenType = 'send' | 'sendtag' | 'sendit'
+
+export type SendScreenProps = {
+  setCurrentScreen: (currentScreen: SendScreenType) => void
+}

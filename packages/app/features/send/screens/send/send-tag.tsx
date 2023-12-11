@@ -15,6 +15,7 @@ import { IconClose } from "app/components/icons/IconClose"
 import { IconSearch } from "app/components/icons/IconSearch"
 import { SendItButton } from "../../components/send"
 import { IconEthereum } from "app/components/icons"
+import { SendScreenProps } from "../../types"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -61,7 +62,7 @@ const tags = [
 const sendAmount = 0.25
 const asset = { icon: <IconEthereum />, name: 'ETH' }
 
-export const SendTagScreen = () => {
+export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
   return (
     <YStack
       gap={'$5'}
@@ -129,9 +130,7 @@ export const SendTagScreen = () => {
           <Label theme={'alt1'} fontSize={'$5'}>For</Label>
           <CustomInput placeholder="Add a note (optional)" />
         </XStack>
-        <Link href={'/send/confirm'} >
-          <SendItButton width={'100%'} />
-        </Link>
+        <SendItButton width={'100%'} onPress={() => setCurrentScreen('sendit')} />
       </YStack>
       <Button
         pos={'absolute'}
