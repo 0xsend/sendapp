@@ -44,7 +44,6 @@ local_resource(
     allow_parallel = True,
     labels = labels,
     resource_deps = ["yarn:install"],
-    trigger_mode = TRIGGER_MODE_MANUAL,
     deps =
         files_matching(
             os.path.join("packages", "contracts"),

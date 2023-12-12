@@ -48,12 +48,23 @@ abstract contract Helper is Script {
      *
      */
     address constant SEND_MULTISIG_SIGNER_PAYOUTS_SAFE = 0x5355c409fa3D0901292231Ddb953C949C2211D96;
-
     /**
      * Send Merkle Drop for Send token distributions on mainnet.
      * @notice Not deployed yet.
      */
     address constant SEND_MERKLE_DROP = 0xB9310daE45E71c7a160A13D64204623071a8E347;
+    /**
+     * Send Account Verifier
+     */
+    address constant SEND_VERIFIER = 0x90ebcFFfc78297a5039491CFCb7B1675a4618BAc;
+    /**
+     * Send Account Verifier Proxy
+     */
+    address constant SEND_VERIFIER_PROXY = 0x39206172cf5FaB686740E39FfaB81abD5Dc9b93a;
+    /**
+     * [Account-Abstraction (EIP-4337) singleton EntryPoint implementation.](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+     */
+    address constant AA_ENTRY_POINT = 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789;
 
     function labels() public {
         vm.label(SEND_TOKEN, "SEND_TOKEN");
@@ -65,5 +76,8 @@ abstract contract Helper is Script {
         vm.label(SEND_CONTRIBUTOR_INCENTIVES_SAFE, "SEND_CONTRIBUTOR_INCENTIVES_SAFE");
         vm.label(SEND_MULTISIG_SIGNER_PAYOUTS_SAFE, "SEND_MULTISIG_SIGNER_PAYOUTS_SAFE");
         vm.label(SEND_MERKLE_DROP, "SEND_MERKLE_DROP");
+        vm.label(AA_ENTRY_POINT, "AA_ENTRY_POINT");
+        vm.label(SEND_VERIFIER, "SEND_VERIFIER");
+        vm.label(SEND_VERIFIER_PROXY, "SEND_VERIFIER_PROXY");
     }
 }
