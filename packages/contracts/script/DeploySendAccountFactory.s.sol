@@ -16,16 +16,21 @@ contract DeploySendAccountFactoryScript is Script, Helper {
         address verifier = computeCreate2Address(0, hashInitCode(type(DaimoVerifier).creationCode));
         address owner = SEND_DEPLOYER; // FIXME: pick a multisig
         bytes memory args = abi.encode(verifier, abi.encodeWithSelector(DaimoVerifier.init.selector, owner));
-        address verifierProxy =
-            computeCreate2Address(0, hashInitCode(type(DaimoVerifierProxy).creationCode, args), owner);
+        address verifierProxy = computeCreate2Address(0, hashInitCode(type(DaimoVerifierProxy).creationCode, args));
 
         vm.startBroadcast();
 
         DaimoAccountFactory factory = new DaimoAccountFactory(IEntryPoint(AA_ENTRY_POINT), DaimoVerifier(verifierProxy));
 
-        require(address(verifier) == SEND_VERIFIER, "DeploySendAccountFactoryScript: address mismatch");
-        require(address(verifierProxy) == SEND_VERIFIER_PROXY, "DeploySendAccountFactoryScript: address mismatch");
-        require(address(factory) == SEND_ACCOUNT_FACTORY, "DeploySendAccountFactoryScript: address mismatch");
+        require(address(verifier) == SEND_VERIFIER, "DeploySendAccountFactoryScript: SEND_VERIFIER address mismatch");
+        require(
+            address(verifierProxy) == SEND_VERIFIER_PROXY,
+            "DeploySendAccountFactoryScript: SEND_VERIFIER_PROXY address mismatch"
+        );
+        require(
+            address(factory) == SEND_ACCOUNT_FACTORY,
+            "DeploySendAccountFactoryScript: SEND_ACCOUNT_FACTORY address mismatch"
+        );
 
         vm.stopBroadcast();
     }

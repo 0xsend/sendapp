@@ -55,14 +55,17 @@ abstract contract Helper is Script {
     address constant SEND_MERKLE_DROP = 0xB9310daE45E71c7a160A13D64204623071a8E347;
     /**
      * Send Account Verifier
+     * @notice Not deployed yet. TODO: update this address when deployed.
      */
     address constant SEND_VERIFIER = 0x90ebcFFfc78297a5039491CFCb7B1675a4618BAc;
     /**
      * Send Account Verifier Proxy
+     * @notice Not deployed yet. TODO: update this address when deployed.
      */
     address constant SEND_VERIFIER_PROXY = 0x5ccF3633f2018D836db449071262B57e3882A762;
     /**
      * Send Account Factory
+     * @notice Not deployed yet. TODO: update this address when deployed.
      */
     address constant SEND_ACCOUNT_FACTORY = 0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496;
     /**
