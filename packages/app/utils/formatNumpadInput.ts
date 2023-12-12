@@ -1,18 +1,18 @@
-export default function formatNumpadInput(value: string, input: string) {
+export default function formatNumpadInput(value: string, input: string, maxValue?: number) {
+  let newValue;
   if (input === '.') {
-    if (!value.includes('.')) {
-      return value + '.'
-    }
+    newValue = value.includes('.') ? value : value + '.'
   } else if (input === '<') {
-    if (value.length === 1) {
-      return '0'
-    }
-    return value.slice(0, -1)
+    newValue = value.length === 1 ? '0' : value.slice(0, -1)
   } else if (value === '0') {
-    return input
-  } else if ((value.split('.')?.at(1)?.length ?? 0) < 3) {
-    return value + input
+    newValue = input
+  } else {
+    newValue = value + input
   }
 
-  return value
+  if (maxValue !== undefined && Number(newValue) >= maxValue) {
+    return maxValue.toString()
+  }
+
+  return newValue
 }

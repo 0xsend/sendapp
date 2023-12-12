@@ -3,9 +3,9 @@ import { NumpadButton } from "./numpad-button"
 import formatNumpadInput from "app/utils/formatNumpadInput"
 import { NumPadProps } from "../../types"
 
-export const NumPad = ({ value, setValue }: NumPadProps) => {
+export const NumPad = ({ value, setValue, maxValue }: NumPadProps) => {
   const numpadpressHandler = (input: string) => {
-    setValue(formatNumpadInput(value, input));
+    setValue(formatNumpadInput(value, input, maxValue))
   }
 
   return (

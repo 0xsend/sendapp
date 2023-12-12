@@ -21,6 +21,7 @@ const assets: Coin[] = [
 
 export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
   const [sendAmount, setSendAmount] = useState('0.25')
+  const balance = 1.25;
 
   return (
     <>
@@ -36,7 +37,7 @@ export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
                   minHeight: '$7'
                 }}
               >
-                {Number(sendAmount).toLocaleString()}
+                {Number(sendAmount).toLocaleString('en-US', { maximumFractionDigits: 20 })}
               </H1>
             </XStack>
             <XStack jc={'space-between'} mt={'$2'}>
@@ -54,10 +55,10 @@ export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
                 }}
               >
                 <Paragraph theme={'alt2'}>Bal</Paragraph>
-                <Paragraph fontWeight={'700'}>1.25</Paragraph>
+                <Paragraph fontWeight={'700'}>{balance}</Paragraph>
               </XStack>
             </XStack>
-            <NumPad value={sendAmount} setValue={setSendAmount} />
+            <NumPad value={sendAmount} setValue={setSendAmount} maxValue={balance} />
             <Button
               my={'$5'}
               py={'$6'}

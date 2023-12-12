@@ -3,6 +3,7 @@ import { ButtonProps } from "@my/ui"
 export type NumPadProps = {
   value: string
   setValue: (val: string) => void
+  maxValue: number
 }
 
 export interface NumpadButtonProps extends ButtonProps {
