@@ -212,6 +212,19 @@ local_resource(
     ],
 )
 
+local_resource(
+    "anvil:send-account-fixtures",
+    "yarn contracts dev:anvil-add-send-account-factory-fixtures",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
 # APPS
 labels = ["apps"]
 
