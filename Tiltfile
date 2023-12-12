@@ -44,7 +44,6 @@ local_resource(
     allow_parallel = True,
     labels = labels,
     resource_deps = ["yarn:install"],
-    trigger_mode = TRIGGER_MODE_MANUAL,
     deps =
         files_matching(
             os.path.join("packages", "contracts"),
@@ -211,6 +210,19 @@ local_resource(
         "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
     ],
+)
+
+local_resource(
+    "anvil:send-account-fixtures",
+    "yarn contracts dev:anvil-add-send-account-factory-fixtures",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
 )
 
 # APPS
