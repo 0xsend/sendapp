@@ -3,15 +3,15 @@ pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
 import {Helper} from "../src/Helper.sol";
-import {DeploySendVerifierScript} from "../script/DeploySendVerifier.s.sol";
+import {DeploySendAccountFactoryScript} from "../script/DeploySendAccountFactory.s.sol";
 
-contract DeploySendVerifierTest is Test, Helper {
+contract DeploySendAccountFactoryTest is Test, Helper {
     function setUp() public {
         this.labels();
     }
 
     function testItRuns() public {
-        DeploySendVerifierScript script = new DeploySendVerifierScript();
+        DeploySendAccountFactoryScript script = new DeploySendAccountFactoryScript();
         script.run();
     }
 }

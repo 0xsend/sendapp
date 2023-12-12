@@ -16,9 +16,14 @@ contract DeploySendVerifierScript is Script, Helper {
 
         // use daimo verifier implementation for now
         address verifier = address(new DaimoVerifier{salt: 0}());
-        address owner = msg.sender; // TODO: pick a multisig
+        address owner = SEND_DEPLOYER; // FIXME: pick a multisig
 
-        new DaimoVerifierProxy{salt: 0}(verifier, abi.encodeWithSelector(DaimoVerifier.init.selector, owner));
+        require(address(verifier) == SEND_VERIFIER, "DeploySendVerifierScript: address mismatch");
+
+        DaimoVerifierProxy dvp =
+            new DaimoVerifierProxy{salt: 0}(verifier, abi.encodeWithSelector(DaimoVerifier.init.selector, owner));
+
+        require(address(dvp) == SEND_VERIFIER_PROXY, "DeploySendVerifierScript: address mismatch");
 
         vm.stopBroadcast();
     }

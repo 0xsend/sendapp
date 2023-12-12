@@ -60,7 +60,11 @@ abstract contract Helper is Script {
     /**
      * Send Account Verifier Proxy
      */
-    address constant SEND_VERIFIER_PROXY = 0x39206172cf5FaB686740E39FfaB81abD5Dc9b93a;
+    address constant SEND_VERIFIER_PROXY = 0x5ccF3633f2018D836db449071262B57e3882A762;
+    /**
+     * Send Account Factory
+     */
+    address constant SEND_ACCOUNT_FACTORY = 0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496;
     /**
      * [Account-Abstraction (EIP-4337) singleton EntryPoint implementation.](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
      */
@@ -79,5 +83,6 @@ abstract contract Helper is Script {
         vm.label(AA_ENTRY_POINT, "AA_ENTRY_POINT");
         vm.label(SEND_VERIFIER, "SEND_VERIFIER");
         vm.label(SEND_VERIFIER_PROXY, "SEND_VERIFIER_PROXY");
+        vm.label(SEND_ACCOUNT_FACTORY, "SEND_ACCOUNT_FACTORY");
     }
 }
