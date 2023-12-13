@@ -26,7 +26,7 @@ export const NumPad = ({ value, setValue, maxValue }: NumPadProps) => {
         <NumpadButton pressHandler={numpadpressHandler} value={'9'} num />
       </XStack>
       <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
-        <NumpadButton pressHandler={numpadpressHandler} value={'.'} />
+        <NumpadButton pressHandler={numpadpressHandler} value={'.'} disabled={value.includes('.')} />
         <NumpadButton pressHandler={numpadpressHandler} value={'0'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'<'} />
       </XStack>
