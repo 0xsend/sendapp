@@ -3,7 +3,7 @@ import { ButtonProps } from "@my/ui"
 export type NumPadProps = {
   value: string
   setValue: (val: string) => void
-  maxValue: number
+  balance: number
 }
 
 export interface NumpadButtonProps extends ButtonProps {
@@ -27,8 +27,14 @@ export type Tag = {
   avatar: string
 }
 
-export type SendScreenType = 'send' | 'sendtag' | 'sendit'
+export type SendScreenType = 'send' | 'send-tag' | 'send-it'
+
+export type ReceiveScreenType = 'receive-tag' | 'receive-amount'
 
 export type SendScreenProps = {
   setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void
+}
+
+export type ReceiveScreenProps = {
+  setCurrentScreen: ([currentScreen, direction]: [currentScreen: ReceiveScreenType, direction: number]) => void
 }

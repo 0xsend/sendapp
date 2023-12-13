@@ -1,6 +1,5 @@
-import { Footer, Tabs, Text, XStack, YStack } from "@my/ui"
-import { IconHome } from "app/components/icons"
-import { IconSettings } from "app/components/icons/IconSettings"
+import { Footer, Tabs, XStack, YStack } from "@my/ui"
+import { IconHome, IconSettings } from "app/components/icons"
 import { SendButton } from "./components/SendButton"
 
 const MainFooter = () => {

@@ -7,8 +7,8 @@ import { AnimationLayout } from '../../../../components/layout/animation-layout'
 
 const screens = {
   send: MainScreen,
-  sendtag: SendTagScreen,
-  sendit: SendItScreen,
+  'send-tag': SendTagScreen,
+  'send-it': SendItScreen,
 };
 
 export const SendScreen = () => {

@@ -12,8 +12,8 @@ import {
   styled
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
-import { IconClose, IconEthereum, IconSearch } from "app/components/icons"
-import { SendScreenProps } from "../../types"
+import { ReceiveScreenProps } from "../../types"
+import { IconArrowLeft, IconClose, IconEthereum, IconSearch } from "app/components/icons"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -60,7 +60,7 @@ const tags = [
 const sendAmount = 0.25
 const asset = { icon: <IconEthereum />, name: 'ETH' }
 
-export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
+export const ReceiveTagScreen = ({ setCurrentScreen }: ReceiveScreenProps) => {
   return (
     <YStack
       gap={'$5'}
@@ -73,22 +73,14 @@ export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
         pb: '$6'
       }}
     >
-      <XStack>
-        <SizableText
-          fontSize={'$9'}
-          mr={'$2.5'}
-          $shorter={{ fontSize: '$8' }}
-        >
-          Send
-        </SizableText>
-        {asset?.icon}
+      <XStack jc={'center'}>
         <SizableText
           fontSize={'$9'}
           fontWeight={'700'}
-          ml={'$1.5'}
+          mr={'$2.5'}
           $shorter={{ fontSize: '$8' }}
         >
-          {sendAmount}
+          Request
         </SizableText>
       </XStack>
       <XStack ai={'center'}>
@@ -135,7 +127,7 @@ export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
           bc={'$backgroundTransparent'}
           boc={'$borderColorFocus'}
           width={'100%'}
-          onPress={() => setCurrentScreen(['send-it', 1])}
+          onPress={() => setCurrentScreen(['receive-amount', 1])}
         >
           <Paragraph size={'$6'} fontWeight={'700'}>
             Continue
@@ -145,14 +137,14 @@ export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
       <Button
         pos={'absolute'}
         top={'$size.8'}
-        right={'$6'}
+        left={'$6'}
         size="$2.5"
         circular
         bg={'$backgroundTransparent'}
         $shorter={{ top: '$size.4' }}
       >
         <Link href={'/'} display={'flex'}>
-          <IconClose />
+          <IconArrowLeft />
         </Link>
       </Button>
     </YStack>

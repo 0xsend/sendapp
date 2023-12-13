@@ -26,7 +26,7 @@ export function Select({ items, ...props }: SelectProps & { items: Array<Coin> }
           py: '$2'
         }}
       >
-        <XStack space={'$1.5'}>
+        <XStack space={'$1.5'} ai={'center'}>
           {items.filter((item) => item.name.toLowerCase() === val)[0]?.icon}
           <TamaguiSelect.Value placeholder="Something" fow={'700'} />
         </XStack>
@@ -98,7 +98,7 @@ export function Select({ items, ...props }: SelectProps & { items: Array<Coin> }
                       key={item.name}
                       value={item.name.toLowerCase()}
                     >
-                      <XStack space={'$2'}>
+                      <XStack space={'$2'} ai={'center'}>
                         <TamaguiSelect.Icon>
                           {item.icon}
                         </TamaguiSelect.Icon>

@@ -9,11 +9,9 @@ import {
 } from "@my/ui"
 import { useState } from "react"
 import { Link } from '@my/ui/src/components'
-import { IconClose } from "app/components/icons/IconClose"
+import { IconBack, IconClose, IconEthereum } from "app/components/icons"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { IconEthereum } from "app/components/icons"
-import { ConfirmModal } from "../../components/send"
-import { IconBack } from "app/components/icons/IconBack"
+import { SendConfirmModal } from "../../components/modal"
 import { SendScreenProps } from "../../types"
 
 const CustomInput = styled(Input, {
@@ -97,7 +95,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentScreen(['sendtag', -1])}
+          onPress={() => setCurrentScreen(['send-tag', -1])}
         >
           <IconBack />
         </Button>
@@ -115,7 +113,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
           </Link>
         </Button>
       </YStack>
-      <ConfirmModal showModal={showModal} setShowModal={setShowModal} />
+      <SendConfirmModal showModal={showModal} setShowModal={setShowModal} />
     </>
   )
 }

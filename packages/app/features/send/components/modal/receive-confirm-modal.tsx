@@ -12,11 +12,10 @@ import {
   YStack,
   styled,
 } from "@my/ui"
-import { IconClose } from "app/components/icons/IconClose"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { ConfirmModalProps } from "../../types"
 import { useThemeSetting } from "@tamagui/next-theme"
-import { IconEthereum } from "app/components/icons"
+import { IconClose, IconUSDC } from "app/components/icons"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -37,9 +36,9 @@ const tag = {
 const sendAmount = 150
 const USDAmount = 149.99
 const fees = 0.1
-const asset = { icon: <IconEthereum />, name: 'USDC' }
+const asset = { icon: <IconUSDC />, name: 'USDC' }
 
-export const ConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => {
+export const ReceiveConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => {
   const { resolvedTheme } = useThemeSetting()
 
   return (
