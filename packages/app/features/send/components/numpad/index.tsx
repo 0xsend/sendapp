@@ -3,9 +3,9 @@ import { NumpadButton } from "./numpad-button"
 import formatNumpadInput from "app/utils/formatNumpadInput"
 import { NumPadProps } from "../../types"
 
-export const NumPad = ({ value, setValue }: NumPadProps) => {
+export const NumPad = ({ value, setValue, maxValue }: NumPadProps) => {
   const numpadpressHandler = (input: string) => {
-    setValue(formatNumpadInput(value, input));
+    setValue(formatNumpadInput(value, input, maxValue))
   }
 
   return (
@@ -26,7 +26,7 @@ export const NumPad = ({ value, setValue }: NumPadProps) => {
         <NumpadButton pressHandler={numpadpressHandler} value={'9'} num />
       </XStack>
       <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
-        <NumpadButton pressHandler={numpadpressHandler} value={'.'} />
+        <NumpadButton pressHandler={numpadpressHandler} value={'.'} disabled={value.includes('.')} />
         <NumpadButton pressHandler={numpadpressHandler} value={'0'} num />
         <NumpadButton pressHandler={numpadpressHandler} value={'<'} />
       </XStack>
