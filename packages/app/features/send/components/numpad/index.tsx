@@ -1,19 +1,22 @@
 import { H1, SizableText, XStack, YStack } from "@my/ui"
 import { NumpadButton } from "./numpad-button"
 import { Select } from '../../components/select'
-import { IconEthereum, IconUSDC } from 'app/components/icons'
-import { Coin, NumPadProps } from "../../types"
+import { INumPadProps } from "../../types"
+import { useSharedState } from "../../providers/transfer-provider"
 import formatNumpadInput from "app/utils/formatNumpadInput"
 
-const assets: Coin[] = [
-  { icon: <IconEthereum />, name: 'ETH' },
-  { icon: <IconUSDC />, name: 'USDC' },
-  { icon: <IconEthereum />, name: 'SEND' },
-]
+export const NumPad = ({ value, setValue }: INumPadProps) => {
+  const { sharedState, updateSharedState } = useSharedState()
 
-export const NumPad = ({ value, setValue, balance }: NumPadProps) => {
+  const { balance, tokens, currentToken } = sharedState
+
   const numpadpressHandler = (input: string) => {
     setValue(formatNumpadInput(value, input, balance))
+  }
+
+  const setCurrentToken = (value: string) => {
+    const token = tokens.filter((tok) => tok.name.toLowerCase() === value)[0]
+    updateSharedState({ currentToken: token })
   }
 
   return (
@@ -31,7 +34,7 @@ export const NumPad = ({ value, setValue, balance }: NumPadProps) => {
         </H1>
       </XStack>
       <XStack jc={'space-between'} mt={'$2'}>
-        <Select items={assets} />
+        <Select items={tokens} currentItem={currentToken} onValueChange={setCurrentToken} />
         <XStack
           px={'$5'}
           py={'$2.5'}

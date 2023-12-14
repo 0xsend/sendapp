@@ -2,16 +2,14 @@ import { Adapt, Select as TamaguiSelect, SelectProps, Sheet, YStack, getFontSize
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons"
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
-import { useMemo, useState } from "react"
-import { Coin } from "../../types"
+import { useMemo } from "react"
+import { IToken } from "../../types"
 
-export function Select({ items, ...props }: SelectProps & { items: Array<Coin> }) {
-  const [val, setVal] = useState(items[0]?.name.toLowerCase())
+export function Select({ items, currentItem, ...props }: SelectProps & { items: Array<IToken>, currentItem: IToken }) {
 
   return (
     <TamaguiSelect
-      value={val}
-      onValueChange={setVal}
+      value={currentItem.name.toLowerCase()}
       disablePreventBodyScroll
       {...props}
     >
@@ -27,7 +25,7 @@ export function Select({ items, ...props }: SelectProps & { items: Array<Coin> }
         }}
       >
         <XStack space={'$1.5'} ai={'center'}>
-          {items.filter((item) => item.name.toLowerCase() === val)[0]?.icon}
+          {currentItem.icon}
           <TamaguiSelect.Value placeholder="Something" fow={'700'} />
         </XStack>
       </TamaguiSelect.Trigger>

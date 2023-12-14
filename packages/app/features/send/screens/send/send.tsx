@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   Button,
   Container,
@@ -6,26 +5,25 @@ import {
   YStack,
 } from '@my/ui'
 import { MainLayout } from 'app/components/layout'
-import { IconEthereum, IconUSDC } from 'app/components/icons'
 import { NumPad } from '../../components/numpad'
-import { Coin, SendScreenProps } from '../../types'
+import { ISendScreenProps } from '../../types'
+import { useSharedState } from '../../providers/transfer-provider'
 
-const assets: Coin[] = [
-  { icon: <IconEthereum />, name: 'ETH' },
-  { icon: <IconUSDC />, name: 'USDC' },
-  { icon: <IconEthereum />, name: 'SEND' },
-]
+export const MainScreen = ({ setCurrentScreen }: ISendScreenProps) => {
+  const { sharedState, updateSharedState } = useSharedState()
 
-export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
-  const [sendAmount, setSendAmount] = useState('0.25')
-  const balance = 1.25;
+  const { sendAmount } = sharedState
+
+  const setSendAmount = (val: string) => {
+    updateSharedState({ sendAmount: val })
+  }
 
   return (
     <>
       <MainLayout>
         <Container>
           <YStack maw={304} pt={'$10'} $shorter={{ maw: '$18', pt: '$8' }}>
-            <NumPad value={sendAmount} setValue={setSendAmount} balance={balance} />
+            <NumPad value={sendAmount} setValue={setSendAmount} />
             <Button
               my={'$5'}
               py={'$6'}

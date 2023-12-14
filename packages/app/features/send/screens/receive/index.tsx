@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { ReceiveQRCodeScreen } from './receive-qrcode';
 import { ReceiveTagScreen } from './receive-tag';
 import { ReceiveAmountScreen } from './receive-amount';
-import { ReceiveScreenType } from '../../types';
+import { IReceiveScreenType } from '../../types';
 import { AnimationLayout } from '../../../../components/layout/animation-layout';
+import { TransferProvider } from '../../providers';
 
 const screens = {
   'receive-qrcode': ReceiveQRCodeScreen,
@@ -12,13 +13,15 @@ const screens = {
 };
 
 export const ReceiveScreen = () => {
-  const [[currentScreen, direction], setCurrentScreen] = useState<[ReceiveScreenType, number]>(['receive-qrcode', -1]);
+  const [[currentScreen, direction], setCurrentScreen] = useState<[IReceiveScreenType, number]>(['receive-qrcode', -1]);
 
   const ScreenComponent = screens[currentScreen];
 
   return (
-    <AnimationLayout currentKey={currentScreen} direction={direction}>
-      <ScreenComponent setCurrentScreen={setCurrentScreen} />
-    </AnimationLayout>
+    <TransferProvider>
+      <AnimationLayout currentKey={currentScreen} direction={direction}>
+        <ScreenComponent setCurrentScreen={setCurrentScreen} />
+      </AnimationLayout>
+    </TransferProvider>
   );
 };

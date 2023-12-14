@@ -7,12 +7,12 @@ import {
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
 import { useThemeSetting } from "@tamagui/next-theme"
-import { ReceiveScreenProps } from "../../types"
+import { IReceiveScreenProps } from "../../types"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
 
 import qrcode from "app/assets/img/qr.png"
 
-export const ReceiveQRCodeScreen = ({ setCurrentScreen }: ReceiveScreenProps) => {
+export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
   const { resolvedTheme } = useThemeSetting()
 
   const share_link = 'send.app/brother'
