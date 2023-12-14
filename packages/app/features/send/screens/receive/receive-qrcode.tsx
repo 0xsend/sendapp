@@ -22,7 +22,7 @@ export const ReceiveQRCodeScreen = ({ setCurrentScreen }: ReceiveScreenProps) =>
   return (
     <YStack
       gap={'$5'}
-      px={'$6'}
+      px={'$5'}
       pt={'$size.8'}
       pb={'$7'}
       jc={'space-between'}
@@ -81,7 +81,7 @@ export const ReceiveQRCodeScreen = ({ setCurrentScreen }: ReceiveScreenProps) =>
       <Button
         pos={'absolute'}
         top={'$size.8'}
-        left={'$6'}
+        left={'$5'}
         size="$2.5"
         circular
         bg={'$backgroundTransparent'}

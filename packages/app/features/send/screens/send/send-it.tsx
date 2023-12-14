@@ -39,7 +39,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
   return (
     <>
       <YStack
-        px={'$6'}
+        px={'$5'}
         pt={'$size.8'}
         pb={'$9'}
         fullscreen
@@ -90,7 +90,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
         <Button
           pos={'absolute'}
           top={'$size.8'}
-          left={'$6'}
+          left={'$5'}
           size="$2.5"
           circular
           bg={'$backgroundTransparent'}
@@ -102,7 +102,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
         <Button
           pos={'absolute'}
           top={'$size.8'}
-          right={'$6'}
+          right={'$5'}
           size="$2.5"
           circular
           bg={'$backgroundTransparent'}

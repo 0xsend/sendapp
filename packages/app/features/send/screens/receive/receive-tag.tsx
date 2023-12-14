@@ -57,14 +57,12 @@ const tags = [
     avatar: 'https://avatars.githubusercontent.com/u/101268960?v=4'
   }
 ]
-const sendAmount = 0.25
-const asset = { icon: <IconEthereum />, name: 'ETH' }
 
 export const ReceiveTagScreen = ({ setCurrentScreen }: ReceiveScreenProps) => {
   return (
     <YStack
       gap={'$5'}
-      px={'$6'}
+      px={'$5'}
       pt={'$size.8'}
       pb={'$7'}
       fullscreen
@@ -137,7 +135,7 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: ReceiveScreenProps) => {
       <Button
         pos={'absolute'}
         top={'$size.8'}
-        left={'$6'}
+        left={'$5'}
         size="$2.5"
         circular
         bg={'$backgroundTransparent'}

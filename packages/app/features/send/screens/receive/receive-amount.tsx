@@ -33,7 +33,7 @@ export const ReceiveAmountScreen = ({ setCurrentScreen }: ReceiveScreenProps) =>
     <>
       <YStack
         gap={'$5'}
-        px={'$6'}
+        px={'$5'}
         pt={'$11'}
         pb={'$7'}
         ai={'center'}
@@ -80,7 +80,7 @@ export const ReceiveAmountScreen = ({ setCurrentScreen }: ReceiveScreenProps) =>
         <Button
           pos={'absolute'}
           top={'$11'}
-          right={'$6'}
+          right={'$5'}
           size="$2.5"
           circular
           bg={'$backgroundTransparent'}

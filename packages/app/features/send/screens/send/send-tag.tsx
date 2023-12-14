@@ -64,7 +64,7 @@ export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
   return (
     <YStack
       gap={'$5'}
-      px={'$6'}
+      px={'$5'}
       pt={'$size.8'}
       pb={'$7'}
       fullscreen
@@ -145,7 +145,7 @@ export const SendTagScreen = ({ setCurrentScreen }: SendScreenProps) => {
       <Button
         pos={'absolute'}
         top={'$size.8'}
-        right={'$6'}
+        right={'$5'}
         size="$2.5"
         circular
         bg={'$backgroundTransparent'}
