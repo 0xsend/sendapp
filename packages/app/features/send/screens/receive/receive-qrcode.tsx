@@ -2,8 +2,6 @@ import {
   Button,
   Image,
   SizableText,
-  Theme,
-  ThemeName,
   XStack,
   YStack,
 } from "@my/ui"
@@ -58,24 +56,33 @@ export const ReceiveQRCodeScreen = ({ setCurrentScreen }: ReceiveScreenProps) =>
       </YStack>
 
       <XStack
-        backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
+        backgroundColor={resolvedTheme === 'dark' ? '$black' : '$primary'}
         borderRadius={'$7'}
         p={'$1'}
         gap={'$2'}
       >
         <Button
+          fg={1}
           borderRadius={'$6'}
-          flexBasis={'50%'}
         >
-          <SizableText fontWeight={'700'} color={'$primary'}>Receive</SizableText>
+          <SizableText
+            fontWeight={'700'}
+            color={resolvedTheme === 'dark' ? '$primary' : '$color12'}
+          >
+            Receive
+          </SizableText>
         </Button>
         <Button
+          fg={1}
           borderRadius={'$6'}
-          backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
-          flexBasis={'50%'}
+          backgroundColor={resolvedTheme === 'dark' ? '$black' : '$primary'}
           onPress={() => setCurrentScreen(['receive-tag', 1])}
         >
-          Request
+          <SizableText
+            color={'$white'}
+          >
+            Request
+          </SizableText>
         </Button>
       </XStack>
       <Button
