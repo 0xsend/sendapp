@@ -53,14 +53,6 @@ export const TransferProvider = ({ children }: ISharedStateProviderProps) => {
         avatar: 'https://avatars.githubusercontent.com/u/101268960?v=4'
       }
     ],
-    sendTo: {
-      name: 'BigBoss',
-      avatar: 'https://avatars.githubusercontent.com/u/95193764?v=4'
-    },
-    requestTo: {
-      name: 'BigBoss',
-      avatar: 'https://avatars.githubusercontent.com/u/95193764?v=4'
-    },
   });
 
   const updateSharedState = (newState: Partial<ISharedStateType>) => {

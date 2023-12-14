@@ -30,7 +30,7 @@ const CustomInput = styled(Input, {
 export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
   const { sharedState, updateSharedState } = useSharedState()
 
-  const { currentToken, sendAmount, tags } = sharedState
+  const { currentToken, sendAmount, sendTo, tags } = sharedState
 
   return (
     <YStack
@@ -81,6 +81,7 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
             ai={'center'}
             gap={'$3.5'}
             mr={index === tags.length - 1 ? '$6' : '$5'}
+            onPress={() => updateSharedState({ sendTo: tag })}
           >
             <Image
               source={{ uri: tag.avatar }}
@@ -88,7 +89,12 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
               height={'$6'}
               borderRadius={'$6'}
             />
-            <SizableText color={'$primary'}>@{tag.name}</SizableText>
+            <SizableText
+              color={'$primary'}
+              fontWeight={sendTo === tag ? '700' : '400'}
+            >
+              @{tag.name}
+            </SizableText>
           </YStack>
         )}
       </ScrollView>
@@ -100,6 +106,9 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
           <CustomInput placeholder="Add a note (optional)" />
         </XStack>
         <Button
+          /* just hide when no tags selected, need to disable */
+          /* btn later coz no design for disabled status */
+          style={{ visibility: sendTo ? 'visible' : 'hidden' }}
           my={'$5'}
           py={'$6'}
           br={'$9'}

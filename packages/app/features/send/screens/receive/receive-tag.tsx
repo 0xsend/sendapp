@@ -30,7 +30,7 @@ const CustomInput = styled(Input, {
 export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
   const { sharedState, updateSharedState } = useSharedState()
 
-  const { tags } = sharedState
+  const { tags, requestTo } = sharedState
 
   return (
     <YStack
@@ -79,6 +79,7 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
               width={'$6'}
               height={'$6'}
               borderRadius={'$6'}
+              onPress={() => updateSharedState({ requestTo: tag })}
             />
             <SizableText color={'$primary'}>@{tag.name}</SizableText>
           </YStack>
@@ -92,6 +93,9 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
           <CustomInput placeholder="Add a note (optional)" />
         </XStack>
         <Button
+          /* just hide when no tags selected, need to disable */
+          /* btn later coz no design for disabled status */
+          style={{ visibility: requestTo ? 'visible' : 'hidden' }}
           my={'$5'}
           py={'$6'}
           br={'$9'}
