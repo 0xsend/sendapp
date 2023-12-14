@@ -64,6 +64,7 @@ export const RequestConfirmModal = ({ showModal, setShowModal }: ConfirmModalPro
               animation="lazy"
               enterStyle={{ opacity: 0 }}
               exitStyle={{ opacity: 0 }}
+              opacity={0.7}
             />
           </Sheet>
         </Adapt>
