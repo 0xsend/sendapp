@@ -56,6 +56,7 @@ export const SendConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps)
               px={'$5'}
               py={'$7'}
               borderRadius={0}
+              backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
             >
               <Adapt.Contents />
             </Sheet.Frame>
@@ -93,6 +94,7 @@ export const SendConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps)
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             px={'$5'}
             py={'$7'}
+            backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
             fullscreen
           >
             <XStack>

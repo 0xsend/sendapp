@@ -13,7 +13,7 @@ import {
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
 import { ReceiveScreenProps } from "../../types"
-import { IconArrowLeft, IconClose, IconEthereum, IconSearch } from "app/components/icons"
+import { IconArrowLeft, IconEthereum, IconSearch } from "app/components/icons"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',

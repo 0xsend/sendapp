@@ -1,3 +1,3 @@
 export * from './send-confirm-modal'
-export * from './receive-confirm-modal'
-export * from './SendItButton'
+export * from './request-confirm-modal'
+export * from './GradientButton'

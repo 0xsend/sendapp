@@ -29,7 +29,7 @@ export type Tag = {
 
 export type SendScreenType = 'send' | 'send-tag' | 'send-it'
 
-export type ReceiveScreenType = 'receive-tag' | 'receive-amount'
+export type ReceiveScreenType = 'receive-qrcode' | 'receive-tag' | 'receive-amount'
 
 export type SendScreenProps = {
   setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void

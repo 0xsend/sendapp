@@ -24,7 +24,7 @@ export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
     <>
       <MainLayout>
         <Container>
-          <YStack maw={314} pt={'$10'} $shorter={{ maw: '$18', pt: '$8' }}>
+          <YStack maw={304} pt={'$10'} $shorter={{ maw: '$18', pt: '$8' }}>
             <NumPad value={sendAmount} setValue={setSendAmount} balance={balance} />
             <Button
               my={'$5'}
@@ -33,10 +33,10 @@ export const MainScreen = ({ setCurrentScreen }: SendScreenProps) => {
               bc={'$backgroundTransparent'}
               boc={'$borderColorFocus'}
               width={'100%'}
-              maw={314}
+              maw={304}
               $shorter={{
-                maw: '18',
-                py: '$4',
+                maw: '$18',
+                py: '$5',
                 br: '$7'
               }}
               onPress={() => setCurrentScreen(['send-tag', 1])}

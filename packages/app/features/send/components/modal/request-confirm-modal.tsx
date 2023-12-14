@@ -12,10 +12,10 @@ import {
   YStack,
   styled,
 } from "@my/ui"
-import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { ConfirmModalProps } from "../../types"
 import { useThemeSetting } from "@tamagui/next-theme"
+import { ConfirmModalProps } from "../../types"
 import { IconClose, IconUSDC } from "app/components/icons"
+import { GradientButton } from "./GradientButton"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -38,7 +38,7 @@ const USDAmount = 149.99
 const fees = 0.1
 const asset = { icon: <IconUSDC />, name: 'USDC' }
 
-export const ReceiveConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => {
+export const RequestConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => {
   const { resolvedTheme } = useThemeSetting()
 
   return (
@@ -55,7 +55,8 @@ export const ReceiveConfirmModal = ({ showModal, setShowModal }: ConfirmModalPro
             <Sheet.Frame
               px={'$5'}
               py={'$7'}
-              borderRadius={0}
+              borderRadius={'$11'}
+              backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
             >
               <Adapt.Contents />
             </Sheet.Frame>
@@ -93,17 +94,18 @@ export const ReceiveConfirmModal = ({ showModal, setShowModal }: ConfirmModalPro
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             px={'$5'}
             py={'$7'}
+            backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
             fullscreen
           >
             <XStack>
               <Dialog.Title>
-                <SizableText fontSize={'$9'} fontWeight={'700'}>Send it 🚀</SizableText>
+                <SizableText fontSize={'$9'} fontWeight={'700'}>Request 📌</SizableText>
               </Dialog.Title>
             </XStack>
             <YStack gap={'$6'} separator={<Separator />}>
               <YStack gap={'$5'} mt={'$8'}>
                 <XStack jc={'space-between'}>
-                  <SizableText theme={'alt2'}>To</SizableText>
+                  <SizableText theme={'alt2'}>From</SizableText>
                   <SizableText fontWeight={'700'}>{tag.name}</SizableText>
                 </XStack>
                 <XStack jc={'space-between'}>
@@ -121,7 +123,9 @@ export const ReceiveConfirmModal = ({ showModal, setShowModal }: ConfirmModalPro
                   <CustomInput placeholder="Type here..." />
                 </YStack>
                 <YStack fg={1} jc={'flex-end'}>
-                  <SendButton height={'$6'} borderRadius={'$9'} />
+                  <GradientButton>
+                    <SizableText size={'$6'} fontWeight={'700'} color={'white'}>Send Request</SizableText>
+                  </GradientButton>
                 </YStack>
               </YStack>
             </YStack>
