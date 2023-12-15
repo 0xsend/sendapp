@@ -1,14 +1,10 @@
-import { createPublicClient, http } from 'viem'
+import { createPublicClient, defineChain, http } from 'viem'
 import { mainnet as mainnetViem, localhost, type Chain } from 'wagmi/chains'
 import debug from 'debug'
 
 const log = debug('app:utils:viem:client')
 
-// allow for creating private RPC url
-const MAINNET_RPC_URL =
-  process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'
-
-const staging: Chain = {
+const stagingMainnet: Chain = defineChain({
   id: 8008,
   name: 'Sendstack Anvil Staging',
   rpcUrls: {
@@ -21,17 +17,36 @@ const staging: Chain = {
   },
   nativeCurrency: mainnetViem.nativeCurrency,
   network: 'sendnet',
-}
+})
+
+/**
+ * Base Localhost is an anvil fork of Base Mainnet.
+ */
+const baseLocal: Chain = defineChain({
+  id: 845_337,
+  name: 'Base Localhost',
+  network: 'baselocalhost',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ether',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: { http: ['http://127.0.0.1:8546'] },
+    public: { http: ['http://127.0.0.1:8546'] },
+  },
+})
 
 const appChains = {
   [String(mainnetViem.id)]: mainnetViem,
-  [String(staging.id)]: staging,
+  [String(stagingMainnet.id)]: stagingMainnet,
   [String(localhost.id)]: localhost,
-}
+  [String(baseLocal.id)]: baseLocal,
+} as const
 
-const envToChain = () => {
+export const mainnet = (() => {
   if (process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID) {
-    const chain = appChains[process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID!]
+    const chain = appChains[process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID]
     if (!chain) {
       throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID}`)
     }
@@ -41,19 +56,50 @@ const envToChain = () => {
     return localhost
   }
   return mainnetViem
-}
-
-const chain = envToChain()
+})()
 
 log(
-  'Using chain',
-  `chain=${chain.name}`,
-  `hostname=${new URL(chain.rpcUrls.default.http[0]).hostname}`
+  'Using mainnet chain',
+  `chain=${mainnet.name}`,
+  `hostname=${new URL(mainnet.rpcUrls.default.http[0]).hostname}`
 )
 
-export const mainnet = chain
+// allow for creating private RPC url
+const MAINNET_RPC_URL =
+  process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'
 
 export const mainnetClient = createPublicClient({
   chain: mainnet,
   transport: http(MAINNET_RPC_URL),
+})
+
+export const baseMainnet = (() => {
+  if (process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID) {
+    const chain = appChains[process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID]
+    if (!chain) {
+      throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID}`)
+    }
+    return chain
+  }
+  if (__DEV__ || process.env.CI) {
+    return localhost
+  }
+  return mainnetViem
+})()
+
+log(
+  'Using baseMainnet chain',
+  `chain=${baseMainnet.name}`,
+  `hostname=${new URL(baseMainnet.rpcUrls.default.http[0]).hostname}`
+)
+
+// allow for creating private RPC url
+const BASE_MAINNET_RPC_URL =
+  process.env.BASE_MAINNET_RPC_URL ??
+  process.env.NEXT_PUBLIC_BASE_MAINNET_RPC_URL ??
+  'http://127.0.0.1:8546/'
+
+export const baseMainnetClient = createPublicClient({
+  chain: baseMainnet,
+  transport: http(BASE_MAINNET_RPC_URL),
 })
