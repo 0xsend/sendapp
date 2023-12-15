@@ -13,12 +13,25 @@ import {
   createPasskey,
   signWithPasskey,
 } from '@daimo/expo-passkeys'
-import { Button, Container, H1, H2, TextArea, YStack } from '@my/ui'
+import { Button, Container, H1, H2, Paragraph, TextArea, YStack } from '@my/ui'
+import { derKeytoContractFriendlyKey, parseCreateResponse } from 'app/utils/passkeys'
 import React, { useState } from 'react'
+import { Hex } from 'viem'
+
+// const onboardingState = {
+//   passkeyAddress: null,
+// }
+
+// const onboardingContext = React.createContext(onboardingState)
+
+// export function OnboardingProvider({ children }) {
+//   return <onboardingContext.Provider value={onboardingState}>{children}</onboardingContext.Provider>
+// }
 
 export function OnboardingScreen() {
   const [createResult, setCreateResult] = useState<CreateResult | null>(null)
   const [signResult, setSignResult] = useState<SignResult | null>(null)
+  const [publicKey, setPublicKey] = useState<Hex[] | null>(null)
 
   return (
     <Container>
@@ -33,12 +46,16 @@ export function OnboardingScreen() {
               passkeyName: 'sendappuser.1',
               passkeyDisplayTitle: 'SendAppUser',
             })
-            console.log(result)
+            console.log('Onboarding screen', result)
             setCreateResult(result)
+
+            setPublicKey(derKeytoContractFriendlyKey(parseCreateResponse(result)))
           }}
         >
           Create
         </Button>
+        <Paragraph>Your DER public key:</Paragraph>
+        <TextArea height="$16" fontFamily={'monospace'} value={publicKey ? publicKey : undefined} />
         <TextArea
           height="$16"
           fontFamily={'monospace'}

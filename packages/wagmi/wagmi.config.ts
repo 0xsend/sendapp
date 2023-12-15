@@ -113,6 +113,8 @@ export default defineConfig({
         'console2.sol/**',
         'test.sol/**',
         'Test.sol/**',
+        'MockERC20.sol/**',
+        'MockERC721.sol/**',
         '**.s.sol/*.json',
         '**.t.sol/*.json',
       ],
