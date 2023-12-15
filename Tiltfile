@@ -47,7 +47,7 @@ local_resource(
     deps =
         files_matching(
             os.path.join("packages", "contracts"),
-            lambda f: f.endswith(".sol"),
+            lambda f: f.endswith(".sol") and f.find("cache") == -1,
         ),
 )
 
@@ -173,8 +173,8 @@ cmd_button(
 
 mainnet_fork_block_number = str(local(
     "cat packages/contracts/foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
-    # echo_off = True,
-    # quiet = True,
+    echo_off = True,
+    quiet = True,
 )).strip()
 
 if (mainnet_fork_block_number == ""):
@@ -409,7 +409,7 @@ local_resource(
     deps =
         files_matching(
             os.path.join("packages", "contracts"),
-            lambda f: f.endswith(".sol"),
+            lambda f: f.endswith(".sol") and f.find("cache") == -1,
         ),
 )
 
