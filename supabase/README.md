@@ -13,7 +13,7 @@ npx snaplet snapshot capture
 Start the local Supabase instance.
 
 ```shell
-yarn supa start
+yarn supabase start
 ```
 
 Restore the snapshot. Make sure to replace `<SNAPSHOT_NAME>` with the name of your snapshot. Supabase does not support dropping the database, so you will need to pass `--no-reset` to the restore command.
@@ -22,9 +22,7 @@ Restore the snapshot. Make sure to replace `<SNAPSHOT_NAME>` with the name of yo
 npx snaplet snapshot restore --no-reset ./.snaplet/snapshots/<SNAPSHOT_NAME>.snaplet
 ```
 
-## Setting up Supabase
-
-To go through the supabase setup, CD to the root of the directory and run `yarn setup`.
+## Setting up Supabase\
 
 Here are some guides from the official Supabase documentation:
 
@@ -39,7 +37,7 @@ After setting it up, you can use the [scripts](#scripts) to manage the common ta
 
 NOTE: Scripts starting with underscore (`_`) are not meant to be used directly.
 
-You can also run these scripts from the root by adding `supa` after yarn. So `yarn supa start` or `yarn supa g`.
+You can also run these scripts from the root by adding `supabase` after yarn. So `yarn supabase start` or `yarn supabase g`.
 
 ### Link Project
 
