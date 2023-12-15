@@ -1,6 +1,5 @@
 import {
   Button,
-  Image,
   SizableText,
   XStack,
   YStack,
@@ -9,8 +8,6 @@ import { Link } from '@my/ui/src/components'
 import { useThemeSetting } from "@tamagui/next-theme"
 import { IReceiveScreenProps } from "../../types"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
-
-import qrcode from "app/assets/img/qr.png"
 
 export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
   const { resolvedTheme } = useThemeSetting()
