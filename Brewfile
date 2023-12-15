@@ -8,8 +8,8 @@ CI = ENV["CI"].present?
 puts "Installing applications... (this may take a while)"
 
 # install tools if not present
-brew "jq" unless system "which jq"
-unless system "which yq"
+brew "jq" unless system "jq --version"
+unless system "yj -v"
   tap "bruceadams/utilities"
   brew "bruceadams/utilities/yj"
 end
