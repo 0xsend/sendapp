@@ -25,7 +25,7 @@ const stagingMainnet: Chain = defineChain({
  * Base Localhost is an anvil fork of Base Mainnet.
  */
 const baseLocal: Chain = defineChain({
-  id: 845_337,
+  id: 845337,
   name: 'Base Localhost',
   network: 'baselocalhost',
   nativeCurrency: {
