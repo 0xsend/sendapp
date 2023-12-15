@@ -1,5 +1,5 @@
 import { Button, styled } from "@my/ui"
-import { INumpadButtonProps } from "../../types"
+import { INumpadButtonProps } from "app/features/send/types"
 
 const CustomButton = styled(Button, {
   name: "CustomButton",

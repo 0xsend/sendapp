@@ -13,8 +13,8 @@ import {
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
 import { IconClose, IconSearch } from "app/components/icons"
-import { ISendScreenProps } from "../../types"
-import { useTransferContext } from "../../providers/transfer-provider"
+import { ISendScreenProps } from "app/features/send/types"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',

@@ -11,9 +11,9 @@ import { useState } from "react"
 import { Link } from '@my/ui/src/components'
 import { IconBack, IconClose } from "app/components/icons"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { SendConfirmModal } from "../../components/modal"
-import { ISendScreenProps } from "../../types"
-import { useTransferContext } from "../../providers/transfer-provider"
+import { SendConfirmModal } from "app/features/send/components/modal"
+import { ISendScreenProps } from "app/features/send/types"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',

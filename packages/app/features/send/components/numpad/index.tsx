@@ -1,8 +1,8 @@
 import { H1, SizableText, XStack, YStack } from "@my/ui"
 import { NumpadButton } from "./numpad-button"
-import { Select } from '../../components/select'
-import { INumPadProps } from "../../types"
-import { useTransferContext } from "../../providers/transfer-provider"
+import { Select } from 'app/features/send/components/select'
+import { INumPadProps } from "app/features/send/types"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 import formatNumpadInput from "app/utils/formatNumpadInput"
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {

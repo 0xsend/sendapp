@@ -9,10 +9,10 @@ import {
 } from '@my/ui'
 import { Link } from '@my/ui/src/components'
 import { IconClose } from 'app/components/icons'
-import { IReceiveScreenProps } from '../../types'
-import { NumPad } from '../../components/numpad'
-import { RequestConfirmModal } from '../../components/modal'
-import { useTransferContext } from '../../providers/transfer-provider'
+import { IReceiveScreenProps } from 'app/features/send/types'
+import { NumPad } from 'app/features/send/components/numpad'
+import { RequestConfirmModal } from 'app/features/send/components/modal'
+import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
   const { transferContext, updateTransferContext } = useTransferContext()

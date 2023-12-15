@@ -5,9 +5,9 @@ import {
   YStack,
 } from '@my/ui'
 import { MainLayout } from 'app/components/layout'
-import { NumPad } from '../../components/numpad'
-import { ISendScreenProps } from '../../types'
-import { useTransferContext } from '../../providers/transfer-provider'
+import { NumPad } from 'app/features/send/components/numpad'
+import { ISendScreenProps } from 'app/features/send/types'
+import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const MainScreen = ({ setCurrentScreen }: ISendScreenProps) => {
   const { transferContext, updateTransferContext } = useTransferContext()

@@ -3,7 +3,7 @@ import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons"
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
 import { useMemo } from "react"
-import { IToken } from "../../types"
+import { IToken } from "app/features/send/types"
 
 export function Select({ items, currentItem, ...props }: SelectProps & { items: Array<IToken>, currentItem: IToken }) {
 

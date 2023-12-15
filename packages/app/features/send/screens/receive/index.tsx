@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { ReceiveQRCodeScreen } from './receive-qrcode';
 import { ReceiveTagScreen } from './receive-tag';
 import { ReceiveAmountScreen } from './receive-amount';
-import { IReceiveScreenType } from '../../types';
-import { AnimationLayout } from '../../../../components/layout/animation-layout';
-import { TransferProvider } from '../../providers';
+import { IReceiveScreenType } from 'app/features/send/types';
+import { AnimationLayout } from 'app/components/layout/animation-layout';
+import { TransferProvider } from 'app/features/send/providers';
 
 const screens = {
   'receive-qrcode': ReceiveQRCodeScreen,

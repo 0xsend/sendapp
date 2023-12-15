@@ -12,9 +12,9 @@ import {
   styled
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
-import { IReceiveScreenProps } from "../../types"
+import { IReceiveScreenProps } from "app/features/send/types"
 import { IconArrowLeft, IconSearch } from "app/components/icons"
-import { useTransferContext } from "../../providers/transfer-provider"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -81,7 +81,12 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
               borderRadius={'$6'}
               onPress={() => updateTransferContext({ requestTo: tag })}
             />
-            <SizableText color={'$primary'}>@{tag.name}</SizableText>
+            <SizableText
+              color={'$primary'}
+              fontWeight={requestTo === tag ? '700' : '400'}
+            >
+              @{tag.name}
+            </SizableText>
           </YStack>
         )}
       </ScrollView>

@@ -6,7 +6,7 @@ import {
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
 import { useThemeSetting } from "@tamagui/next-theme"
-import { IReceiveScreenProps } from "../../types"
+import { IReceiveScreenProps } from "app/features/send/types"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
 
 export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {

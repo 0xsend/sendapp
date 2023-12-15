@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { MainScreen } from './send';
 import { SendTagScreen } from './send-tag';
 import { SendItScreen } from './send-it';
-import { ISendScreenType } from '../../types';
-import { AnimationLayout } from '../../../../components/layout/animation-layout';
-import { TransferProvider } from '../../providers';
+import { ISendScreenType } from 'app/features/send/types';
+import { AnimationLayout } from 'app/components/layout/animation-layout';
+import { TransferProvider } from 'app/features/send/providers';
 
 const screens = {
   send: MainScreen,

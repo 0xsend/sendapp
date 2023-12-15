@@ -13,10 +13,10 @@ import {
   styled,
 } from "@my/ui"
 import { useThemeSetting } from "@tamagui/next-theme"
-import { IConfirmModalProps } from "../../types"
+import { IConfirmModalProps } from "app/features/send/types"
 import { IconClose } from "app/components/icons"
 import { GradientButton } from "./GradientButton"
-import { useTransferContext } from "../../providers/transfer-provider"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
