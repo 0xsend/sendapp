@@ -28,9 +28,9 @@ const CustomInput = styled(Input, {
 })
 
 export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { transferContext, updateTransferContext } = useTransferContext()
+  const { transferState, updateTransferContext } = useTransferContext()
 
-  const { currentToken, sendAmount, sendTo } = transferContext
+  const { currentToken, sendAmount, sendTo } = transferState
 
   const [showModal, setShowModal] = useState(false)
 

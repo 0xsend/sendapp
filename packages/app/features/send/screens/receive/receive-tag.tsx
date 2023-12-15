@@ -28,9 +28,9 @@ const CustomInput = styled(Input, {
 })
 
 export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { transferContext, updateTransferContext } = useTransferContext()
+  const { transferState, updateTransferContext } = useTransferContext()
 
-  const { tags, requestTo } = transferContext
+  const { tags, requestTo } = transferState
 
   return (
     <YStack

@@ -6,9 +6,9 @@ import { useTransferContext } from "app/features/send/providers/transfer-provide
 import formatNumpadInput from "app/utils/formatNumpadInput"
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {
-  const { transferContext, updateTransferContext } = useTransferContext()
+  const { transferState, updateTransferContext } = useTransferContext()
 
-  const { balance, tokens, currentToken } = transferContext
+  const { balance, tokens, currentToken } = transferState
 
   const numpadpressHandler = (input: string) => {
     setValue(formatNumpadInput(value, input, balance))

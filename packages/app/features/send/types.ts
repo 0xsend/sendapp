@@ -1,6 +1,6 @@
 import { ButtonProps } from "@my/ui"
 
-export type INumPadProps = {
+export interface INumPadProps {
   value: string
   setValue: (val: string) => void
 }
@@ -11,35 +11,35 @@ export interface INumpadButtonProps extends ButtonProps {
   pressHandler: (val: string) => void
 }
 
-export type IConfirmModalProps = {
+export interface IConfirmModalProps {
   showModal: boolean
   setShowModal: (showModal: boolean) => void
 }
 
-export type IToken = {
+export interface IToken {
   icon?: React.ReactNode
   name: string
   price: number
 }
 
-export type ITag = {
+export interface ITag {
   name: string
   avatar: string
 }
 
-export type ISendScreenType = 'send' | 'send-tag' | 'send-it'
+export type SendScreenType = 'send' | 'send-tag' | 'send-it'
 
-export type IReceiveScreenType = 'receive-qrcode' | 'receive-tag' | 'receive-amount'
+export type ReceiveScreenType = 'receive-qrcode' | 'receive-tag' | 'receive-amount'
 
-export type ISendScreenProps = {
-  setCurrentScreen: ([currentScreen, direction]: [currentScreen: ISendScreenType, direction: number]) => void
+export interface ISendScreenProps {
+  setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void
 }
 
-export type IReceiveScreenProps = {
-  setCurrentScreen: ([currentScreen, direction]: [currentScreen: IReceiveScreenType, direction: number]) => void
+export interface IReceiveScreenProps {
+  setCurrentScreen: ([currentScreen, direction]: [currentScreen: ReceiveScreenType, direction: number]) => void
 }
 
-export type ITransferContextType = {
+export interface ITransferState {
   sendAmount: string
   requestAmount: string
   balance: number
@@ -50,11 +50,11 @@ export type ITransferContextType = {
   requestTo?: ITag
 };
 
-export type ITransferContextContextType = {
-  transferContext: ITransferContextType;
-  updateTransferContext: (newState: Partial<ITransferContextType>) => void;
+export interface ITransferContext {
+  transferState: ITransferState;
+  updateTransferContext: (newState: Partial<ITransferState>) => void;
 };
 
-export type ITransferContextProviderProps = {
+export interface ITransferContextProviderProps {
   children: React.ReactNode;
 };

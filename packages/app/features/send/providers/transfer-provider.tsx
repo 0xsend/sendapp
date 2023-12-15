@@ -1,19 +1,19 @@
 import { createContext, useContext, useState } from 'react';
-import { ITransferContextContextType, ITransferContextProviderProps, ITransferContextType } from '../types';
+import { ITransferContext, ITransferContextProviderProps, ITransferState } from '../types';
 import { IconEthereum, IconUSDC } from 'app/components/icons';
 
-const TransferContext = createContext<ITransferContextContextType | undefined>(undefined);
+const TransferContext = createContext<ITransferContext | undefined>(undefined);
 
 export const useTransferContext = () => {
   const context = useContext(TransferContext);
   if (!context) {
-    throw new Error('useTransferContext must be used within a SharedStateProvider');
+    throw new Error('useTransferContext must be used within a TransferContextProvider');
   }
   return context;
 };
 
 export const TransferProvider = ({ children }: ITransferContextProviderProps) => {
-  const [transferContext, setTransferContext] = useState<ITransferContextType>({
+  const [transferState, setTransferContext] = useState<ITransferState>({
     sendAmount: '0',
     requestAmount: '0',
     balance: 9.25,
@@ -55,12 +55,12 @@ export const TransferProvider = ({ children }: ITransferContextProviderProps) =>
     ],
   });
 
-  const updateTransferContext = (newState: Partial<ITransferContextType>) => {
+  const updateTransferContext = (newState: Partial<ITransferState>) => {
     setTransferContext((prev) => ({ ...prev, ...newState }));
   };
 
-  const value: ITransferContextContextType = {
-    transferContext,
+  const value: ITransferContext = {
+    transferState,
     updateTransferContext,
   };
 

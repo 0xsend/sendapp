@@ -10,9 +10,9 @@ import { ISendScreenProps } from 'app/features/send/types'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const MainScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { transferContext, updateTransferContext } = useTransferContext()
+  const { transferState, updateTransferContext } = useTransferContext()
 
-  const { sendAmount } = transferContext
+  const { sendAmount } = transferState
 
   const setSendAmount = (val: string) => {
     updateTransferContext({ sendAmount: val })

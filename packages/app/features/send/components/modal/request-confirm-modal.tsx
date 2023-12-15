@@ -31,9 +31,9 @@ const CustomInput = styled(Input, {
 })
 
 export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps) => {
-  const { transferContext } = useTransferContext()
+  const { transferState } = useTransferContext()
 
-  const { requestAmount, requestTo, currentToken } = transferContext
+  const { requestAmount, requestTo, currentToken } = transferState
 
   const { resolvedTheme } = useThemeSetting()
 
