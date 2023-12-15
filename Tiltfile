@@ -177,6 +177,9 @@ mainnet_fork_block_number = str(local(
     # quiet = True,
 )).strip()
 
+if (mainnet_fork_block_number == ""):
+    fail("mainnet_fork_block_number is empty")
+
 local_resource(
     "anvil:mainnet",
     allow_parallel = True,
@@ -208,6 +211,9 @@ base_fork_block_number = str(local(
     echo_off = True,
     quiet = True,
 )).strip()
+
+if (base_fork_block_number == ""):
+    fail("base_fork_block_number is empty")
 
 local_resource(
     "anvil:base",

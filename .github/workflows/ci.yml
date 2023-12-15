@@ -34,6 +34,7 @@ jobs:
         run: |
           brew bundle
           brew cleanup
+          sudo chown -R $(whoami) $(brew --prefix)/*
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
