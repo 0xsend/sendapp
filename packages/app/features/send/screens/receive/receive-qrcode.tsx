@@ -42,10 +42,10 @@ export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) =
       </XStack>
 
       <YStack ai={'center'}>
-        <Image
-          source={{ uri: qrcode.src }}
+        <XStack
           width={330}
           height={330}
+          backgroundColor={'$primary'}
           mb={'$6'}
         />
         <SizableText theme={'alt1'}>Share your payment link</SizableText>
