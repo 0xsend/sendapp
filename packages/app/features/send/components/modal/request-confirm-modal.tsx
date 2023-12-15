@@ -16,7 +16,7 @@ import { useThemeSetting } from "@tamagui/next-theme"
 import { IConfirmModalProps } from "../../types"
 import { IconClose } from "app/components/icons"
 import { GradientButton } from "./GradientButton"
-import { useSharedState } from "../../providers/transfer-provider"
+import { useTransferContext } from "../../providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -31,9 +31,9 @@ const CustomInput = styled(Input, {
 })
 
 export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps) => {
-  const { sharedState } = useSharedState()
+  const { transferContext } = useTransferContext()
 
-  const { requestAmount, requestTo, currentToken } = sharedState
+  const { requestAmount, requestTo, currentToken } = transferContext
 
   const { resolvedTheme } = useThemeSetting()
 

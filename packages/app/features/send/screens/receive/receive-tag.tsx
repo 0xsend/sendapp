@@ -14,7 +14,7 @@ import {
 import { Link } from '@my/ui/src/components'
 import { IReceiveScreenProps } from "../../types"
 import { IconArrowLeft, IconSearch } from "app/components/icons"
-import { useSharedState } from "../../providers/transfer-provider"
+import { useTransferContext } from "../../providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -28,9 +28,9 @@ const CustomInput = styled(Input, {
 })
 
 export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { sharedState, updateSharedState } = useSharedState()
+  const { transferContext, updateTransferContext } = useTransferContext()
 
-  const { tags, requestTo } = sharedState
+  const { tags, requestTo } = transferContext
 
   return (
     <YStack
@@ -79,7 +79,7 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
               width={'$6'}
               height={'$6'}
               borderRadius={'$6'}
-              onPress={() => updateSharedState({ requestTo: tag })}
+              onPress={() => updateTransferContext({ requestTo: tag })}
             />
             <SizableText color={'$primary'}>@{tag.name}</SizableText>
           </YStack>

@@ -39,7 +39,7 @@ export type IReceiveScreenProps = {
   setCurrentScreen: ([currentScreen, direction]: [currentScreen: IReceiveScreenType, direction: number]) => void
 }
 
-export type ISharedStateType = {
+export type ITransferContextType = {
   sendAmount: string
   requestAmount: string
   balance: number
@@ -50,11 +50,11 @@ export type ISharedStateType = {
   requestTo?: ITag
 };
 
-export type ISharedStateContextType = {
-  sharedState: ISharedStateType;
-  updateSharedState: (newState: Partial<ISharedStateType>) => void;
+export type ITransferContextContextType = {
+  transferContext: ITransferContextType;
+  updateTransferContext: (newState: Partial<ITransferContextType>) => void;
 };
 
-export type ISharedStateProviderProps = {
+export type ITransferContextProviderProps = {
   children: React.ReactNode;
 };

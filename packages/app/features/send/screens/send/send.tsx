@@ -7,15 +7,15 @@ import {
 import { MainLayout } from 'app/components/layout'
 import { NumPad } from '../../components/numpad'
 import { ISendScreenProps } from '../../types'
-import { useSharedState } from '../../providers/transfer-provider'
+import { useTransferContext } from '../../providers/transfer-provider'
 
 export const MainScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { sharedState, updateSharedState } = useSharedState()
+  const { transferContext, updateTransferContext } = useTransferContext()
 
-  const { sendAmount } = sharedState
+  const { sendAmount } = transferContext
 
   const setSendAmount = (val: string) => {
-    updateSharedState({ sendAmount: val })
+    updateTransferContext({ sendAmount: val })
   }
 
   return (

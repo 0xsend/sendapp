@@ -14,7 +14,7 @@ import {
 import { Link } from '@my/ui/src/components'
 import { IconClose, IconSearch } from "app/components/icons"
 import { ISendScreenProps } from "../../types"
-import { useSharedState } from "../../providers/transfer-provider"
+import { useTransferContext } from "../../providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -28,9 +28,9 @@ const CustomInput = styled(Input, {
 })
 
 export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { sharedState, updateSharedState } = useSharedState()
+  const { transferContext, updateTransferContext } = useTransferContext()
 
-  const { currentToken, sendAmount, sendTo, tags } = sharedState
+  const { currentToken, sendAmount, sendTo, tags } = transferContext
 
   return (
     <YStack
@@ -81,7 +81,7 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
             ai={'center'}
             gap={'$3.5'}
             mr={index === tags.length - 1 ? '$6' : '$5'}
-            onPress={() => updateSharedState({ sendTo: tag })}
+            onPress={() => updateTransferContext({ sendTo: tag })}
           >
             <Image
               source={{ uri: tag.avatar }}

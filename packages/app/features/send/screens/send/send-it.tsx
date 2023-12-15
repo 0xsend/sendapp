@@ -13,7 +13,7 @@ import { IconBack, IconClose } from "app/components/icons"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { SendConfirmModal } from "../../components/modal"
 import { ISendScreenProps } from "../../types"
-import { useSharedState } from "../../providers/transfer-provider"
+import { useTransferContext } from "../../providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -28,9 +28,9 @@ const CustomInput = styled(Input, {
 })
 
 export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { sharedState, updateSharedState } = useSharedState()
+  const { transferContext, updateTransferContext } = useTransferContext()
 
-  const { currentToken, sendAmount, sendTo } = sharedState
+  const { currentToken, sendAmount, sendTo } = transferContext
 
   const [showModal, setShowModal] = useState(false)
 

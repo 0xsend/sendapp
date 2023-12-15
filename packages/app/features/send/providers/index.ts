@@ -1,1 +1,1 @@
-export { TransferProvider, useSharedState } from './transfer-provider'
+export { TransferProvider, useTransferContext } from './transfer-provider'

@@ -12,17 +12,17 @@ import { IconClose } from 'app/components/icons'
 import { IReceiveScreenProps } from '../../types'
 import { NumPad } from '../../components/numpad'
 import { RequestConfirmModal } from '../../components/modal'
-import { useSharedState } from '../../providers/transfer-provider'
+import { useTransferContext } from '../../providers/transfer-provider'
 
 export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { sharedState, updateSharedState } = useSharedState()
+  const { transferContext, updateTransferContext } = useTransferContext()
 
-  const { requestAmount, requestTo } = sharedState
+  const { requestAmount, requestTo } = transferContext
 
   const [showModal, setShowModal] = useState(false)
 
   const setRequestAmount = (val: string) => {
-    updateSharedState({ requestAmount: val })
+    updateTransferContext({ requestAmount: val })
   }
 
   return (

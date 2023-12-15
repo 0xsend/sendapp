@@ -2,13 +2,13 @@ import { H1, SizableText, XStack, YStack } from "@my/ui"
 import { NumpadButton } from "./numpad-button"
 import { Select } from '../../components/select'
 import { INumPadProps } from "../../types"
-import { useSharedState } from "../../providers/transfer-provider"
+import { useTransferContext } from "../../providers/transfer-provider"
 import formatNumpadInput from "app/utils/formatNumpadInput"
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {
-  const { sharedState, updateSharedState } = useSharedState()
+  const { transferContext, updateTransferContext } = useTransferContext()
 
-  const { balance, tokens, currentToken } = sharedState
+  const { balance, tokens, currentToken } = transferContext
 
   const numpadpressHandler = (input: string) => {
     setValue(formatNumpadInput(value, input, balance))
@@ -16,7 +16,7 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
 
   const setCurrentToken = (value: string) => {
     const token = tokens.filter((tok) => tok.name.toLowerCase() === value)[0]
-    updateSharedState({ currentToken: token })
+    updateTransferContext({ currentToken: token })
   }
 
   return (

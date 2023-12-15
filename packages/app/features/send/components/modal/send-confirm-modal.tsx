@@ -16,7 +16,7 @@ import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { IConfirmModalProps } from "../../types"
 import { useThemeSetting } from "@tamagui/next-theme"
 import { IconClose } from "app/components/icons"
-import { useSharedState } from "../../providers/transfer-provider"
+import { useTransferContext } from "../../providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -31,9 +31,9 @@ const CustomInput = styled(Input, {
 })
 
 export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps) => {
-  const { sharedState } = useSharedState()
+  const { transferContext } = useTransferContext()
 
-  const { sendAmount, sendTo, currentToken } = sharedState
+  const { sendAmount, sendTo, currentToken } = transferContext
 
   const { resolvedTheme } = useThemeSetting()
 
