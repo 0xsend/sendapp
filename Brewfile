@@ -9,9 +9,6 @@ puts "Installing applications... (this may take a while)"
 
 # install tools if not present
 brew "jq" unless system "jq --version"
-unless system "yj -v"
-  tap "bruceadams/utilities"
-  brew "bruceadams/utilities/yj"
-end
-brew "tilt" unless system "which tilt"
-brew "caddy" unless system "which caddy"
+brew "yj" unless system "yj -v"
+brew "tilt" unless system "tilt version"
+brew "caddy" unless system "caddy version"
