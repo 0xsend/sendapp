@@ -173,8 +173,8 @@ cmd_button(
 
 mainnet_fork_block_number = str(local(
     "cat packages/contracts/foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
-    echo_off = True,
-    quiet = True,
+    # echo_off = True,
+    # quiet = True,
 )).strip()
 
 local_resource(
