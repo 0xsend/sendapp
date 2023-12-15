@@ -1,6 +1,6 @@
 load("ext://color", "color")
 load("ext://dotenv", "dotenv")
-load("ext://uibutton", "LOCATION_NAV", "cmd_button")
+load("ext://uibutton", "cmd_button", "location")
 
 def files_matching(dir, lambda_):
     return [f for f in listdir(dir, recursive = True) if lambda_(f)]
@@ -166,7 +166,7 @@ cmd_button(
         "cd supabase && yarn run reset",
     ],
     icon_name = "restart_alt",
-    location = LOCATION_NAV,
+    location = location.NAV,
     resource = "supabase",
     text = "supabase db reset",
 )
@@ -254,27 +254,28 @@ local_resource(
     trigger_mode = TRIGGER_MODE_MANUAL,
 )
 
-local_resource(
-    "silius:base",
-    allow_parallel = True,
-    labels = labels,
-    readiness_probe = probe(
-        exec = exec_action(
-            command = [
-                "cast",
-                "bn",
-                "--rpc-url=127.0.0.1:3030",
-            ],
-        ),
-        period_secs = 15,
-        timeout_secs = 5,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:base",
-    ],
-    serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
-)
+# TODO: decide if we will use silius bundler or not
+# local_resource(
+#     "silius:base",
+#     allow_parallel = True,
+#     labels = labels,
+#     readiness_probe = probe(
+#         exec = exec_action(
+#             command = [
+#                 "cast",
+#                 "bn",
+#                 "--rpc-url=127.0.0.1:3030",
+#             ],
+#         ),
+#         period_secs = 15,
+#         timeout_secs = 5,
+#     ),
+#     resource_deps = [
+#         "yarn:install",
+#         "anvil:base",
+#     ],
+#     serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
+# )
 
 # APPS
 labels = ["apps"]
@@ -321,6 +322,21 @@ local_resource(
             os.path.join("packages", "app"),
             lambda f: f.endswith(".ts") or f.endswith(".tsx"),
         ),
+)
+
+cmd_button(
+    "app:test:update-snapshots",
+    argv = [
+        "yarn",
+        "workspace",
+        "app",
+        "test",
+        "-u",
+    ],
+    icon_name = "update",
+    location = location.RESOURCE,
+    resource = "app:test",
+    text = "update snapshots",
 )
 
 local_resource(

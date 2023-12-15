@@ -1086,6 +1086,20 @@ export const daimoVerifierProxyABI = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC165
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc165ABI = [
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Proxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2118,6 +2132,20 @@ export const ierc1271ABI = [
     ],
     name: 'isValidSignature',
     outputs: [{ name: 'magicValue', internalType: 'bytes4', type: 'bytes4' }],
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IERC165
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ierc165ABI = [
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
   },
 ] as const
 
@@ -5193,6 +5221,26 @@ export function getDaimoVerifierProxy(config: Omit<GetContractArgs, 'abi'>) {
 }
 
 /**
+ * Wraps __{@link getContract}__ with `abi` set to __{@link erc165ABI}__.
+ */
+export function getErc165(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: erc165ABI, ...config })
+}
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc165ABI}__.
+ */
+export function readErc165<
+  TAbi extends readonly unknown[] = typeof erc165ABI,
+  TFunctionName extends string = string
+>(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return readContract({ abi: erc165ABI, ...config } as unknown as ReadContractConfig<
+    TAbi,
+    TFunctionName
+  >)
+}
+
+/**
  * Wraps __{@link getContract}__ with `abi` set to __{@link erc1967ProxyABI}__.
  */
 export function getErc1967Proxy(config: Omit<GetContractArgs, 'abi'>) {
@@ -5436,6 +5484,26 @@ export function readIerc1271<
   TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: ierc1271ABI, ...config } as unknown as ReadContractConfig<
+    TAbi,
+    TFunctionName
+  >)
+}
+
+/**
+ * Wraps __{@link getContract}__ with `abi` set to __{@link ierc165ABI}__.
+ */
+export function getIerc165(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: ierc165ABI, ...config })
+}
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link ierc165ABI}__.
+ */
+export function readIerc165<
+  TAbi extends readonly unknown[] = typeof ierc165ABI,
+  TFunctionName extends string = string
+>(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return readContract({ abi: ierc165ABI, ...config } as unknown as ReadContractConfig<
     TAbi,
     TFunctionName
   >)

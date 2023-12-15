@@ -2,6 +2,8 @@ import { createPublicClient, defineChain, http } from 'viem'
 import { mainnet as mainnetViem, localhost, type Chain } from 'wagmi/chains'
 import debug from 'debug'
 
+// TODO: convert to wagmi/core https://wagmi.sh/core/providers/configuring-chains
+
 const log = debug('app:utils:viem:client')
 
 const stagingMainnet: Chain = defineChain({
