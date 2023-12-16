@@ -1,7 +1,7 @@
 # Contribution Guide: WIP
 
 ## Preface
-Send Stack uses bleeding-edge web development technology to deliver great DX to our contributors, quick iteration cycles, and clean bug-free code.
+Send Stack uses bleeding-edge web development technology to deliver great DX to our contributors, quick iteration cycles, and clean code.
 
 **Send Stack**
  - **Typescript** (strict mode)
@@ -58,9 +58,6 @@ Here are some things to keep in mind about thee SEND philosophy when contributin
      </li>
      <li>
      Write once, Run everywhere
-     </li>
-     <li>
-     ?
      </li>
      </ul>
 </details>
@@ -153,7 +150,7 @@ If everything is setup, the app should open in dev mode on your [localhost](http
 
 
 
-<img src="https://hackmd.io/_uploads/B1heDBuSa.png" width="100" style="border-radius:999px">
+<img src="https://hackmd.io/_uploads/B1heDBuSa.png" width="100" style="border-radius:9999px">
 </details>
 
 <details style="padding: 1rem">
@@ -190,4 +187,3 @@ Once the next app is running in dev mode, enter the app using the standard dev c
 yarn native
 ```
 </details>
-
