@@ -1,5 +1,10 @@
 import { createPublicClient, defineChain, http } from 'viem'
-import { mainnet as mainnetViem, localhost, type Chain } from 'wagmi/chains'
+import {
+  mainnet as mainnetViem,
+  localhost,
+  base as baseMainnetViem,
+  type Chain,
+} from 'wagmi/chains'
 import debug from 'debug'
 
 // TODO: convert to wagmi/core https://wagmi.sh/core/providers/configuring-chains
@@ -43,6 +48,7 @@ const appChains = {
   [String(mainnetViem.id)]: mainnetViem,
   [String(stagingMainnet.id)]: stagingMainnet,
   [String(localhost.id)]: localhost,
+  [String(baseMainnetViem.id)]: baseMainnetViem,
   [String(baseLocal.id)]: baseLocal,
 } as const
 
@@ -62,7 +68,7 @@ export const mainnet = (() => {
 
 log(
   'Using mainnet chain',
-  `chain=${mainnet.name}`,
+  `chain=${mainnet.name} (${mainnet.id}))`,
   `hostname=${new URL(mainnet.rpcUrls.default.http[0]).hostname}`
 )
 
@@ -84,14 +90,14 @@ export const baseMainnet = (() => {
     return chain
   }
   if (__DEV__ || process.env.CI) {
-    return localhost
+    return baseLocal
   }
-  return mainnetViem
+  return baseMainnetViem
 })()
 
 log(
   'Using baseMainnet chain',
-  `chain=${baseMainnet.name}`,
+  `chain=${baseMainnet.name} (${baseMainnet.id}))`,
   `hostname=${new URL(baseMainnet.rpcUrls.default.http[0]).hostname}`
 )
 
