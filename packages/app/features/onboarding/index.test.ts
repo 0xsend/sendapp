@@ -9,10 +9,10 @@ import {
   concat,
   encodeFunctionData,
 } from 'viem'
-import { baseMainnetClient, baseMainnetBundlerClient } from 'app/utils/viem/client'
+import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
 import { daimoAccountFactoryABI } from '@my/wagmi'
 import debug from 'debug'
-import { getSenderAddress } from 'permissionless'
+import { UserOperation, getSenderAddress } from 'permissionless'
 export const log = debug('app:features:onboarding:screen')
 
 test('can create a new account', async () => {
@@ -68,16 +68,25 @@ test('can create a new account', async () => {
   expect(address).toBeDefined()
   expect(address).toEqual('0x05F8Ce8f747365b3b53e5C8f4cFe50c3F53BEb99')
 
+  // TODO: this will have to be a userop after user transfers funds to the account, for now, assume we sponsor the creation
+  log('setting balance', address)
+  await createTestClient({
+    chain: baseMainnetClient.chain,
+    transport: http(baseMainnetClient.transport.url),
+    mode: 'hardhat',
+  }).setBalance({
+    address: address,
+    value: parseEther('1'),
+  })
+
   const privateKey = generatePrivateKey()
   const dummyAccount = privateKeyToAccount(privateKey)
 
-  // TODO: this will have to be a userop after user transfers funds to the account, for now, assume we sponsor the creation
   log('setting balance', dummyAccount.address)
   await createTestClient({
     chain: baseMainnetClient.chain,
     transport: http(baseMainnetClient.transport.url),
-    account: dummyAccount,
-    mode: 'anvil',
+    mode: 'hardhat',
   }).setBalance({
     address: dummyAccount.address,
     value: parseEther('1'),
@@ -113,6 +122,16 @@ test('can create a new account', async () => {
   expect(receipt.status).toEqual('success')
   log('receipt', receipt)
 
+  // send test userop via bundler
+
+  // UserOp signature structure:
+  // - uint8 version
+
+  // v1: 1+6+1+(unknown) bytes
+  // - uint48 validUntil
+  // - uint8 keySlot
+  // - bytes (type Signature) signature
+
   // const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
   //   userOperation: {
   //     sender: '0x0C123D90Da0a640fFE54a2359D159629065775C5',
@@ -133,11 +152,81 @@ test('can create a new account', async () => {
   //   entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
   // })
 
-  // send test userop via bundler
+  // GENERATE THE CALLDATA
+  const to = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' // vitalik
+  const value = 0n
+  const data = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
+
+  const callData = encodeFunctionData({
+    abi: [
+      {
+        inputs: [
+          { name: 'dest', type: 'address' },
+          { name: 'value', type: 'uint256' },
+          { name: 'func', type: 'bytes' },
+        ],
+        name: 'execute',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    args: [to, value, data],
+  })
+
+  log('initCode', initCode)
+  log('callData', callData)
+
+  /**
+   * User Operation struct
+   * @param sender the sender account of this request.
+   * @param nonce unique value the sender uses to verify it is not a replay.
+   * @param initCode if set, the account contract will be created by this constructor/
+   * @param callData the method call to execute on this account.
+   * @param callGasLimit the gas limit passed to the callData method call.
+   * @param verificationGasLimit gas used for validateUserOp and validatePaymasterUserOp.
+   * @param preVerificationGas gas not calculated by the handleOps method, but added to the gas paid. Covers batch overhead.
+   * @param maxFeePerGas same as EIP-1559 gas parameter.
+   * @param maxPriorityFeePerGas same as EIP-1559 gas parameter.
+   * @param paymasterAndData if set, this field holds the paymaster address and paymaster-specific data. the paymaster will pay for the transaction instead of the sender.
+   * @param signature sender-verified signature over the entire request, the EntryPoint address and the chain ID.
+   */
+  const userOp: UserOperation = {
+    sender: address,
+    nonce: 0n,
+    initCode: '0x',
+    callData,
+    callGasLimit: 50305n,
+    verificationGasLimit: 80565n,
+    preVerificationGas: 56135n,
+    maxFeePerGas: 113000000n,
+    maxPriorityFeePerGas: 113000100n,
+    paymasterAndData: '0x',
+    signature: '0x',
+  }
+
+  // TODO: find a bundler that works for local dev 😢
+  // const gasPrice = await bundlerClient.estimateUserOperationGas({
+  //   userOperation: userOp,
+  //   entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  // })
+  // log('gasPrice', gasPrice)
+
+  // const userOpHash = await bundlerClient.sendUserOperation({
+  //   userOperation: userOp,
+  //   entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  // })
+  // log('userOpHash', userOpHash)
 }, 10_000)
 
 test('can create a new account with bundler', async () => {
-  const supportedEntryPoints = await baseMainnetBundlerClient.supportedEntryPoints()
+  const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
   console.log('supportedEntryPoints', supportedEntryPoints)
   log('TODO: implement bundler test', supportedEntryPoints)
+})
+
+test('can get gas user operation gas prices', async () => {
+  const gasPrice = await baseMainnetClient.getGasPrice()
+  expect(gasPrice).toBeDefined()
+  log('gasPrice', gasPrice)
 })
