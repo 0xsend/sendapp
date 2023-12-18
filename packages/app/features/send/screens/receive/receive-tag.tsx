@@ -38,6 +38,7 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
       px={'$5'}
       pt={'$size.8'}
       pb={'$7'}
+      overflow={'hidden'}
       fullscreen
       $shorter={{
         pt: '$8',
