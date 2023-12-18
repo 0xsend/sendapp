@@ -9,12 +9,11 @@ import {
 } from "@my/ui"
 import { useState } from "react"
 import { Link } from '@my/ui/src/components'
-import { IconClose } from "app/components/icons/IconClose"
+import { IconBack, IconClose } from "app/components/icons"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { IconEthereum } from "app/components/icons"
-import { ConfirmModal } from "../../components/send"
-import { IconBack } from "app/components/icons/IconBack"
-import { SendScreenProps } from "../../types"
+import { SendConfirmModal } from "app/features/send/components/modal"
+import { ISendScreenProps } from "app/features/send/types"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -28,20 +27,17 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-const tag = {
-  name: 'ethentree',
-  avatar: 'https://s3-alpha-sig.figma.com/img/4133/975a/0b108534bd4dd4c0583a2af270bbad58?Expires=1702252800&Signature=mYVUhTB3oUN0sTjkMnCN1wJ4os~qnnX-YJAXLFoZ3SqrgzMbUC8Yw0Y-IgCMMae2KIgDgDx93gNKngn6QZmAtLlzqdDvwCHqEyNZPjALg7kwrvsAw3jKxnUQ-G1FyYbSkYO64cK23JHc2QzMpJawR3Cr-JX8KkSQ8c-W72ChrNVZSm6T9sYCmgsjFCk1RT8YIW6a888kcuqVd4L~unAEFQUYTFXSqSAi5Pb21L5aelzGFDpMeJfbQ~sP1i0YgIPqKrd2JlkkfEtbGDyOQkjKTlkbX39~8WPj~bZZ2ae5cE6nmq6sJ9dU2itEvx~WSbdhGaxdzJBbb0JTLCkNFp7n-g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4'
-}
-const sendAmount = 0.25
-const asset = { icon: <IconEthereum />, name: 'ETH' }
+export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
+  const { transferState, updateTransferContext } = useTransferContext()
 
-export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
+  const { currentToken, sendAmount, sendTo } = transferState
+
   const [showModal, setShowModal] = useState(false)
 
   return (
     <>
       <YStack
-        px={'$6'}
+        px={'$5'}
         pt={'$size.8'}
         pb={'$9'}
         fullscreen
@@ -64,19 +60,19 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
             <SizableText theme={'alt2'}>To</SizableText>
             <XStack ai={'center'} gap={'$3.5'}>
               <Image
-                source={{ uri: tag?.avatar }}
+                source={{ uri: sendTo?.avatar }}
                 width={'$4.5'}
                 height={'$4.5'}
                 borderRadius={'$6'}
               />
-              <SizableText fontSize={'$8'} fontWeight={'700'} color={'$primary'}>{tag?.name}</SizableText>
+              <SizableText fontSize={'$8'} fontWeight={'700'} color={'$primary'}>{sendTo?.name}</SizableText>
             </XStack>
           </YStack>
           <YStack gap={'$5'}>
             <SizableText theme={'alt2'}>Amount</SizableText>
             <XStack ai={'center'}>
-              {asset?.icon}
-              <SizableText fontSize={'$9'} ml={'$1.5'}>{asset?.name}</SizableText>
+              {currentToken?.icon}
+              <SizableText fontSize={'$9'} ml={'$1.5'}>{currentToken?.name}</SizableText>
               <SizableText fontSize={'$9'} fontWeight={'700'} ml={'$2'}>{sendAmount}</SizableText>
             </XStack>
           </YStack>
@@ -92,19 +88,19 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
         <Button
           pos={'absolute'}
           top={'$size.8'}
-          left={'$6'}
+          left={'$5'}
           size="$2.5"
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentScreen(['sendtag', -1])}
+          onPress={() => setCurrentScreen(['send-tag', -1])}
         >
           <IconBack />
         </Button>
         <Button
           pos={'absolute'}
           top={'$size.8'}
-          right={'$6'}
+          right={'$5'}
           size="$2.5"
           circular
           bg={'$backgroundTransparent'}
@@ -115,7 +111,7 @@ export const SendItScreen = ({ setCurrentScreen }: SendScreenProps) => {
           </Link>
         </Button>
       </YStack>
-      <ConfirmModal showModal={showModal} setShowModal={setShowModal} />
+      <SendConfirmModal showModal={showModal} setShowModal={setShowModal} />
     </>
   )
 }

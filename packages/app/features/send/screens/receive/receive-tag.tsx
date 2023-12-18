@@ -12,8 +12,8 @@ import {
   styled
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
-import { IconClose, IconSearch } from "app/components/icons"
-import { ISendScreenProps } from "app/features/send/types"
+import { IReceiveScreenProps } from "app/features/send/types"
+import { IconArrowLeft, IconSearch } from "app/components/icons"
 import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
@@ -27,10 +27,10 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
+export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
   const { transferState, updateTransferContext } = useTransferContext()
 
-  const { currentToken, sendAmount, sendTo, tags } = transferState
+  const { tags, requestTo } = transferState
 
   return (
     <YStack
@@ -44,22 +44,14 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
         pb: '$6'
       }}
     >
-      <XStack>
-        <SizableText
-          fontSize={'$9'}
-          mr={'$2.5'}
-          $shorter={{ fontSize: '$8' }}
-        >
-          Send
-        </SizableText>
-        {currentToken?.icon}
+      <XStack jc={'center'}>
         <SizableText
           fontSize={'$9'}
           fontWeight={'700'}
-          ml={'$1.5'}
+          mr={'$2.5'}
           $shorter={{ fontSize: '$8' }}
         >
-          {sendAmount}
+          Request
         </SizableText>
       </XStack>
       <XStack ai={'center'}>
@@ -80,7 +72,7 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
             key={`tag-${tag.name}`}
             ai={'center'}
             gap={'$3.5'}
-            onPress={() => updateTransferContext({ sendTo: tag })}
+            onPress={() => updateTransferContext({ requestTo: tag })}
           >
             <Image
               source={{ uri: tag.avatar }}
@@ -90,7 +82,7 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
             />
             <SizableText
               color={'$primary'}
-              fontWeight={sendTo === tag ? '700' : '400'}
+              fontWeight={requestTo === tag ? '700' : '400'}
             >
               @{tag.name}
             </SizableText>
@@ -107,14 +99,14 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
         <Button
           /* just hide when no tags selected, need to disable */
           /* btn later coz no design for disabled status */
-          style={{ visibility: sendTo ? 'visible' : 'hidden' }}
+          style={{ visibility: requestTo ? 'visible' : 'hidden' }}
           my={'$5'}
           py={'$6'}
           br={'$9'}
           bc={'$backgroundTransparent'}
           boc={'$borderColorFocus'}
           width={'100%'}
-          onPress={() => setCurrentScreen(['send-it', 1])}
+          onPress={() => setCurrentScreen(['receive-amount', 1])}
         >
           <Paragraph size={'$6'} fontWeight={'700'}>
             Continue
@@ -124,14 +116,14 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
       <Button
         pos={'absolute'}
         top={'$size.8'}
-        right={'$5'}
+        left={'$5'}
         size="$2.5"
         circular
         bg={'$backgroundTransparent'}
         $shorter={{ top: '$size.4' }}
       >
         <Link href={'/'} display={'flex'}>
-          <IconClose />
+          <IconArrowLeft />
         </Link>
       </Button>
     </YStack>

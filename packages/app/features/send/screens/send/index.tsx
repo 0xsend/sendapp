@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { MainScreen } from './send';
 import { SendTagScreen } from './send-tag';
 import { SendItScreen } from './send-it';
-import { SendScreenType } from '../../types';
-import { AnimationLayout } from '../../../../components/layout/animation-layout';
+import { SendScreenType } from 'app/features/send/types';
+import { AnimationLayout } from 'app/components/layout/animation-layout';
+import { TransferProvider } from 'app/features/send/providers';
 
 const screens = {
   send: MainScreen,
-  sendtag: SendTagScreen,
-  sendit: SendItScreen,
+  'send-tag': SendTagScreen,
+  'send-it': SendItScreen,
 };
 
 export const SendScreen = () => {
@@ -17,8 +18,10 @@ export const SendScreen = () => {
   const ScreenComponent = screens[currentScreen];
 
   return (
-    <AnimationLayout currentKey={currentScreen} direction={direction}>
-      <ScreenComponent setCurrentScreen={setCurrentScreen} />
-    </AnimationLayout>
+    <TransferProvider>
+      <AnimationLayout currentKey={currentScreen} direction={direction}>
+        <ScreenComponent setCurrentScreen={setCurrentScreen} />
+      </AnimationLayout>
+    </TransferProvider>
   );
 };

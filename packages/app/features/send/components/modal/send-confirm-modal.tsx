@@ -12,11 +12,11 @@ import {
   YStack,
   styled,
 } from "@my/ui"
-import { IconClose } from "app/components/icons/IconClose"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { ConfirmModalProps } from "../../types"
+import { IConfirmModalProps } from "app/features/send/types"
 import { useThemeSetting } from "@tamagui/next-theme"
-import { IconEthereum } from "app/components/icons"
+import { IconClose } from "app/components/icons"
+import { useTransferContext } from "app/features/send/providers/transfer-provider"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -30,16 +30,11 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-const tag = {
-  name: 'ethentree',
-  avatar: 'https://s3-alpha-sig.figma.com/img/4133/975a/0b108534bd4dd4c0583a2af270bbad58?Expires=1702252800&Signature=mYVUhTB3oUN0sTjkMnCN1wJ4os~qnnX-YJAXLFoZ3SqrgzMbUC8Yw0Y-IgCMMae2KIgDgDx93gNKngn6QZmAtLlzqdDvwCHqEyNZPjALg7kwrvsAw3jKxnUQ-G1FyYbSkYO64cK23JHc2QzMpJawR3Cr-JX8KkSQ8c-W72ChrNVZSm6T9sYCmgsjFCk1RT8YIW6a888kcuqVd4L~unAEFQUYTFXSqSAi5Pb21L5aelzGFDpMeJfbQ~sP1i0YgIPqKrd2JlkkfEtbGDyOQkjKTlkbX39~8WPj~bZZ2ae5cE6nmq6sJ9dU2itEvx~WSbdhGaxdzJBbb0JTLCkNFp7n-g__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4'
-}
-const sendAmount = 150
-const USDAmount = 149.99
-const fees = 0.1
-const asset = { icon: <IconEthereum />, name: 'USDC' }
+export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps) => {
+  const { transferState } = useTransferContext()
 
-export const ConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => {
+  const { sendAmount, sendTo, currentToken } = transferState
+
   const { resolvedTheme } = useThemeSetting()
 
   return (
@@ -56,7 +51,8 @@ export const ConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => 
             <Sheet.Frame
               px={'$5'}
               py={'$7'}
-              borderRadius={0}
+              borderRadius={'$11'}
+              backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
             >
               <Adapt.Contents />
             </Sheet.Frame>
@@ -64,6 +60,7 @@ export const ConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => 
               animation="lazy"
               enterStyle={{ opacity: 0 }}
               exitStyle={{ opacity: 0 }}
+              opacity={0.7}
             />
           </Sheet>
         </Adapt>
@@ -94,6 +91,7 @@ export const ConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => 
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             px={'$5'}
             py={'$7'}
+            backgroundColor={resolvedTheme === 'dark' ? '$black' : '$white'}
             fullscreen
           >
             <XStack>
@@ -105,15 +103,17 @@ export const ConfirmModal = ({ showModal, setShowModal }: ConfirmModalProps) => 
               <YStack gap={'$5'} mt={'$8'}>
                 <XStack jc={'space-between'}>
                   <SizableText theme={'alt2'}>To</SizableText>
-                  <SizableText fontWeight={'700'}>{tag.name}</SizableText>
+                  <SizableText fontWeight={'700'}>{sendTo?.name}</SizableText>
                 </XStack>
                 <XStack jc={'space-between'}>
                   <SizableText theme={'alt2'}>Amount</SizableText>
-                  <SizableText fontWeight={'700'}>{sendAmount} {asset.name} (${USDAmount})</SizableText>
+                  <SizableText fontWeight={'700'}>
+                    {sendAmount} {currentToken.name} (${Number(sendAmount) * currentToken.price})
+                  </SizableText>
                 </XStack>
                 <XStack jc={'space-between'}>
                   <SizableText theme={'alt2'}>Fees</SizableText>
-                  <SizableText fontWeight={'700'}>${fees}</SizableText>
+                  <SizableText fontWeight={'700'}>0.1</SizableText>
                 </XStack>
               </YStack>
               <YStack gap={'$7'}>

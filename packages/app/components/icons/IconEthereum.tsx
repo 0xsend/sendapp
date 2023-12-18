@@ -1,3 +1,4 @@
+import { XStack } from '@my/ui'
 import { ColorTokens } from '@my/ui/types'
 import { themed, IconProps } from '@tamagui/helpers-icon'
 import { memo } from 'react'
@@ -6,18 +7,28 @@ import { Path, Svg } from 'react-native-svg'
 const Ethereum = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
-    <Svg
-      viewBox="0 0 24 24"
-      color={color as ColorTokens | undefined}
-      width={size ?? 24}
-      height={size ?? 24}
-      {...rest}
-    >
-      <Path
-        fill="currentColor"
-        d="M18.4589 11.7099L12.4037 2.62709C12.2018 2.32433 11.7982 2.32433 11.5963 2.62709L5.54113 11.7099C5.44021 11.9117 5.44021 12.1136 5.54113 12.3154L11.5963 21.3982C11.6972 21.4991 11.7982 21.6 12 21.6C12.2018 21.6 12.3028 21.4991 12.4037 21.3982L18.4589 12.3154C18.5598 12.1136 18.5598 11.9117 18.4589 11.7099ZM12 20.1871L7.35769 13.2237L11.7982 15.2421C11.8991 15.343 12.1009 15.343 12.2018 15.2421L16.6423 13.2237L12 20.1871ZM12 14.132L6.65125 11.7099L12 3.83813L17.3487 11.8108L12 14.132Z"
-      />
-    </Svg>
+    <XStack
+      width={'$1.5'}
+      height={'$1.5'}
+      backgroundColor={'$black'}
+      borderRadius={999}
+      jc={'center'}
+      ai={'center'}>
+      <Svg
+        viewBox="0 0 12 18"
+        color={color as ColorTokens | undefined}
+        width={size ?? 12}
+        height={size ?? 18}
+        {...rest}
+      >
+        <Path d="M6.37476 0.00146484V6.65328L11.9967 9.16605L6.37476 0.00146484Z" fill="#C8C8C8" />
+        <Path d="M6.37478 0.00146484L0.749573 9.16605L6.37478 6.65328V0.00146484Z" fill="white" />
+        <Path d="M6.37476 13.478V17.9984L12 10.2124L6.37476 13.478Z" fill="#C8C8C8" />
+        <Path d="M6.37478 17.9981V13.4777L0.749573 10.2153L6.37478 18.0013V17.9981Z" fill="white" />
+        <Path d="M6.37476 12.4284L11.9967 9.16283L6.37476 6.65332V12.4284Z" fill="#A0A0A0" />
+        <Path d="M0.749573 9.16624L6.37478 12.4319V6.65674L0.749573 9.16624Z" fill="#C8C8C8" />
+      </Svg>
+    </XStack>
   )
 }
 const IconEthereum = memo(themed(Ethereum))
