@@ -1,4 +1,4 @@
-import { createPublicClient, defineChain, http } from 'viem'
+import { createClient, createPublicClient, defineChain, http } from 'viem'
 import {
   mainnet as mainnetViem,
   localhost,
@@ -6,6 +6,7 @@ import {
   type Chain,
 } from 'wagmi/chains'
 import debug from 'debug'
+import { bundlerActions } from 'permissionless'
 
 // TODO: convert to wagmi/core https://wagmi.sh/core/providers/configuring-chains
 
@@ -111,3 +112,8 @@ export const baseMainnetClient = createPublicClient({
   chain: baseMainnet,
   transport: http(BASE_MAINNET_RPC_URL),
 })
+
+export const baseMainnetBundlerClient = createClient({
+  chain: baseMainnet,
+  transport: http('http://127.0.0.1:3030'),
+}).extend(bundlerActions)
