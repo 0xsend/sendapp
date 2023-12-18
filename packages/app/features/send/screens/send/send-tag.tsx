@@ -38,7 +38,6 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
       px={'$5'}
       pt={'$size.8'}
       pb={'$7'}
-      overflow={'hidden'}
       fullscreen
       $shorter={{
         pt: '$8',
@@ -75,13 +74,12 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
       >
         Suggestions
       </SizableText>
-      <ScrollView horizontal fg={0} mr={'$-6'} showsHorizontalScrollIndicator={false}>
-        {tags.map((tag, index) =>
+      <ScrollView horizontal fg={0} space={'$5'} showsHorizontalScrollIndicator={false}>
+        {tags.map((tag) =>
           <YStack
             key={`tag-${tag.name}`}
             ai={'center'}
             gap={'$3.5'}
-            mr={index === tags.length - 1 ? '$6' : '$5'}
             onPress={() => updateTransferContext({ sendTo: tag })}
           >
             <Image
