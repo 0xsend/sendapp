@@ -72,13 +72,13 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
             key={`tag-${tag.name}`}
             ai={'center'}
             gap={'$3.5'}
+            onPress={() => updateTransferContext({ requestTo: tag })}
           >
             <Image
               source={{ uri: tag.avatar }}
               width={'$6'}
               height={'$6'}
               borderRadius={'$6'}
-              onPress={() => updateTransferContext({ requestTo: tag })}
             />
             <SizableText
               color={'$primary'}
