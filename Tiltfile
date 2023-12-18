@@ -318,6 +318,7 @@ local_resource(
     labels = ["test"],
     resource_deps = [
         "yarn:install",
+        "silius:base",  # TODO: remove once bundler tests are moved to playwright
         "anvil:send-account-fixtures",  # TODO: remove once bundler tests are moved to playwright
     ],
     deps =
