@@ -115,5 +115,5 @@ export const baseMainnetClient = createPublicClient({
 
 export const baseMainnetBundlerClient = createClient({
   chain: baseMainnet,
-  transport: http('http://127.0.0.1:3030'),
+  transport: http('http://127.0.0.1:3030/rpc'),
 }).extend(bundlerActions)
