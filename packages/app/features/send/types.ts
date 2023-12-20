@@ -31,12 +31,18 @@ export type SendScreenType = 'send' | 'send-tag' | 'send-it'
 
 export type ReceiveScreenType = 'receive-qrcode' | 'receive-tag' | 'receive-amount'
 
+export type QRScreenType = 'qr-scan' | 'qr-mycode'
+
 export interface ISendScreenProps {
   setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void
 }
 
 export interface IReceiveScreenProps {
   setCurrentScreen: ([currentScreen, direction]: [currentScreen: ReceiveScreenType, direction: number]) => void
+}
+
+export interface IQRScreenProps {
+  setCurrentScreen: ([currentScreen, direction]: [currentScreen: QRScreenType, direction: number]) => void
 }
 
 export interface ITransferState {
