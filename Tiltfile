@@ -1,9 +1,9 @@
 load("ext://color", "color")
 load("ext://dotenv", "dotenv")
 load("ext://uibutton", "cmd_button", "location")
+load("./etc/tilt/utils.tiltfile", "files_matching", "require_tools")
 
-def files_matching(dir, lambda_):
-    return [f for f in listdir(dir, recursive = True) if lambda_(f)]
+require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "caddy", "node", "bun")
 
 CI = os.getenv("CI") != None
 
