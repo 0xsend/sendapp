@@ -194,7 +194,7 @@ test('can create a new account', async () => {
   const userOp: UserOperation = {
     sender: address,
     nonce: 0n,
-    initCode: '0x',
+    initCode,
     callData,
     callGasLimit: 50305n,
     verificationGasLimit: 80565n,

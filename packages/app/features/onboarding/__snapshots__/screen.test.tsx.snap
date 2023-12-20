@@ -236,6 +236,160 @@ exports[`OnboardingScreen 1`] = `
         }
       }
     />
+    <Text
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Your sender address:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 224,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Your userOp hash:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 224,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
     <TextInput
       editable={true}
       focusable={true}
@@ -305,7 +459,7 @@ exports[`OnboardingScreen 1`] = `
       }
       suppressHighlighting={true}
     >
-      Then sign a message with it
+      Then sign ther userOpHash with it
     </Text>
     <View
       pointerEvents="none"
@@ -419,7 +573,7 @@ exports[`OnboardingScreen 1`] = `
           "fontFamily": "monospace",
           "fontSize": 16.8,
           "fontWeight": "400",
-          "height": 224,
+          "height": 284,
           "lineHeight": 19,
           "minWidth": 0,
           "paddingBottom": 13,
