@@ -48,6 +48,8 @@ function createWebauthnCredential({
     signCounter,
     rpId,
     userHandle,
+    assertions: [],
+    attestations: [],
   }
   CredentialsStore[id.toString('base64')] = cred
   return cred
@@ -87,7 +89,7 @@ export async function createPublicKeyCredential(
     throw new Error('Unsupported algorithm')
   }
   const challenge = base64.decode(credOptsPubKey.challenge)
-  const clientDataJSON = base64.encode(
+  const clientDataJSON = Buffer.from(
     new TextEncoder().encode(
       JSON.stringify({
         challenge: base64.encode(challenge),
@@ -97,7 +99,7 @@ export async function createPublicKeyCredential(
     )
   )
   const rpId = credOptsPubKey.rp.id || 'localhost'
-  const userHandle = credOptsPubKey.user.id || null
+  const userHandle = Buffer.from(credOptsPubKey.user.id) || null
   const cred = createWebauthnCredential({
     rpId,
     userHandle,
@@ -108,16 +110,27 @@ export async function createPublicKeyCredential(
   cred.signCounter++ // increment counter on each "access" to the authenticator
   const attestationObject = generateAttestionObject(authData, clientDataJSON, privateKey)
 
-  return {
+  // save response to cred for inspection
+  const response = {
+    attestationObject,
+    clientDataJSON,
+  }
+  cred.attestations.push(response)
+
+  const credentialResponse: PublicKeyCredentialAttestationSerialized = {
     id: credentialId.toString('base64'),
     rawId: credentialId.toString('base64'),
     authenticatorAttachment: 'platform',
     response: {
       attestationObject: attestationObject.toString('base64'),
-      clientDataJSON,
+      clientDataJSON: base64.encode(clientDataJSON),
     },
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
+
+  console.log('[webauthn-authenticator] createPublicKeyCredential', credentialResponse)
+
+  return credentialResponse
 }
 
 /**
@@ -156,18 +169,31 @@ export async function getPublicKeyCredential(
   const authData = generateAuthenticatorData(rpId, signCounter, null)
   cred.signCounter++ // increment counter on each "access" to the authenticator
   const assertionObject = generateAssertionObject(authData, clientDataBuffer, privateKey)
+  const response: AuthenticatorAssertionResponse = {
+    authenticatorData: authData,
+    clientDataJSON: clientDataBuffer,
+    signature: assertionObject,
+    userHandle: cred.userHandle,
+  }
 
-  return {
+  // save response to cred for inspection
+  cred.assertions.push(response)
+
+  const credentialResponse = {
     id: credentialId.toString('base64'),
     rawId: credentialId.toString('base64'),
     response: {
-      authenticatorData: authData.toString('base64'),
-      clientDataJSON: clientDataBuffer.toString('base64'),
-      signature: assertionObject.toString('base64'),
-      userHandle: cred.userHandle,
+      authenticatorData: base64.encode(authData),
+      clientDataJSON: base64.encode(clientDataBuffer),
+      signature: base64.encode(assertionObject),
+      userHandle: cred.userHandle ? base64.encode(Buffer.from(cred.userHandle)) : null,
     },
     type: 'public-key',
   } as PublicKeyCredentialAssertionSerialized
+
+  console.log('[webauthn-authenticator] getPublicKeyCredential', credentialResponse)
+
+  return credentialResponse
 }
 
 /**
@@ -233,10 +259,10 @@ function generateAttestedCredentialData(credentialId: Buffer, publicKey: Buffer)
  */
 function generateAttestionObject(
   authData: Buffer,
-  clientDataJSON: string,
+  clientDataJSON: Buffer,
   privateKey: string
 ): Buffer {
-  const concated = Buffer.concat([authData, Buffer.from(clientDataJSON, 'base64')])
+  const concated = Buffer.concat([authData, clientDataJSON])
   const sign = crypto.createSign('sha256')
   sign.write(concated)
   sign.end()

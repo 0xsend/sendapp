@@ -13,7 +13,7 @@ import {
   createPasskey,
   signWithPasskey,
 } from '@daimo/expo-passkeys'
-import { Button, Container, H1, H2, Paragraph, TextArea, YStack } from '@my/ui'
+import { Button, Container, H1, H2, Label, TextArea, YStack } from '@my/ui'
 import {
   derKeytoContractFriendlyKey,
   parseAndNormalizeSig,
@@ -184,21 +184,30 @@ export function OnboardingScreen() {
         >
           Create
         </Button>
-        <Paragraph>Your DER public key:</Paragraph>
-        <TextArea height="$16" fontFamily={'monospace'} value={publicKey ? publicKey : undefined} />
-        <Paragraph>Your sender address:</Paragraph>
+        <Label htmlFor="publicKey">Your DER public key:</Label>
         <TextArea
+          id="publicKey"
           height="$16"
+          fontFamily={'monospace'}
+          value={publicKey ? JSON.stringify(publicKey, null, 2) : undefined}
+        />
+        <Label htmlFor="senderAddress">Your sender address:</Label>
+        <TextArea
+          id="senderAddress"
+          height="$6"
           fontFamily={'monospace'}
           value={senderAddress ? senderAddress : undefined}
         />
-        <Paragraph>Your userOp hash:</Paragraph>
+        <Label htmlFor="userOpHash">Your userOp hash:</Label>
         <TextArea
-          height="$16"
+          id="userOpHash"
+          height="$6"
           fontFamily={'monospace'}
           value={userOpHash ? userOpHash : undefined}
         />
+        <Label htmlFor="createResult">Create result:</Label>
         <TextArea
+          id="createResult"
           height="$16"
           fontFamily={'monospace'}
           value={createResult ? JSON.stringify(createResult, null, 2) : undefined}
@@ -221,7 +230,9 @@ export function OnboardingScreen() {
         >
           Sign
         </Button>
+        <Label htmlFor="signResult">Sign result:</Label>
         <TextArea
+          id="signResult"
           height="$20"
           fontFamily={'monospace'}
           value={signResult ? JSON.stringify(signResult, null, 2) : undefined}
