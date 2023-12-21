@@ -77,6 +77,8 @@ export function installWebAuthnMock({
 
     const cred = utils.deserializePublicKeyCredentialAttestion(credSer)
 
+    console.log('[webauthn mock] create cred', cred)
+
     return cred
   }
   navigator.credentials.get = async (credential: CredentialRequestOptions) => {
@@ -107,9 +109,11 @@ export function installWebAuthnMock({
 
     const assertionSer = await getCredFunc(credOpts)
 
-    console.debug('[webauthn mock] assertion', assertionSer)
+    console.debug('[webauthn mock] assertionSer', assertionSer)
 
     const assertion = utils.deserializePublicKeyCredentialAssertion(assertionSer)
+
+    console.debug('[webauthn mock] assertion', assertion)
 
     return assertion
   }

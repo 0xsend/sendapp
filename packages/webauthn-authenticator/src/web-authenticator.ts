@@ -99,7 +99,7 @@ export async function createPublicKeyCredential(
     )
   )
   const rpId = credOptsPubKey.rp.id || 'localhost'
-  const userHandle = Buffer.from(credOptsPubKey.user.id) || null
+  const userHandle = Buffer.from(credOptsPubKey.user.id, 'base64') || null
   const cred = createWebauthnCredential({
     rpId,
     userHandle,
@@ -123,7 +123,7 @@ export async function createPublicKeyCredential(
     authenticatorAttachment: 'platform',
     response: {
       attestationObject: attestationObject.toString('base64'),
-      clientDataJSON: base64.encode(clientDataJSON),
+      clientDataJSON: clientDataJSON.toString('base64'),
     },
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
@@ -207,7 +207,7 @@ function generateAuthenticatorData(
   attestedCredentialData: Buffer | null
 ) {
   const rpIdHash = crypto.createHash('sha256').update(rpId).digest()
-  const flags = new Uint8Array() // 1 byte Flags (bit 0 is the least significant bit): User Present (UP) flag (bit 0) set
+  const flags = new Uint8Array(1) // 1 byte Flags (bit 0 is the least significant bit): User Present (UP) flag (bit 0) set
   if (attestedCredentialData) {
     flags[0] = 0b01000101 // bit 6, 1 means user is present, 0 means user is not present
   } else {

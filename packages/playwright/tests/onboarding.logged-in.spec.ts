@@ -47,6 +47,8 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
     )
   )
 
+  await expect(page.getByLabel('Your userOp Hash:')).toHaveValue(/^0x[a-f0-9]{64}$/)
+
   // TODO: check address, userOp, public key
 
   await page.getByRole('button', { name: 'Sign' }).click()
@@ -57,7 +59,18 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
     throw new Error('Missing credential assertion')
   }
 
-  await expect(page.getByLabel('Sign result:')).toHaveValue('asdf')
+  await expect(page.getByLabel('Sign result:')).toHaveValue(
+    JSON.stringify(
+      {
+        passkeyName: Buffer.from(assertion.userHandle || Buffer.from([0])).toString('utf-8'),
+        rawClientDataJSONB64: Buffer.from(assertion.clientDataJSON).toString('base64'),
+        rawAuthenticatorDataB64: Buffer.from(assertion.authenticatorData).toString('base64'),
+        signatureB64: Buffer.from(assertion.signature).toString('base64'),
+      },
+      null,
+      2
+    )
+  )
 
   // await page.pause()
 })

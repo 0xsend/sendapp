@@ -20,19 +20,13 @@ export function deserializePublicKeyCredentialAttestion(
   if (!attestation) {
     throw new Error('Invalid attestation object')
   }
-
   const { attStmt, authData } = attestation
-
   // so weird, but decoder is not decoding to Map so we have to do it manually
-  const coseKeyElems = cbor.decodeAllSync(
+  const publicCoseKey = cbor.decodeAllSync(
     authData.subarray(37 + AAGUID.byteLength + 2 + credentialId.byteLength)
-  )
-  const publicCoseKey = new Map()
-  for (let i = 0; i < coseKeyElems.length; i += 2) {
-    publicCoseKey.set(coseKeyElems[i], coseKeyElems[i + 1])
-  }
+  )[0]
 
-  console.log('publicCoseKey', publicCoseKey)
+  console.log('[webauthn-authenticator utils] publicCoseKey', publicCoseKey)
 
   const response: AuthenticatorAttestationResponse = {
     attestationObject,
