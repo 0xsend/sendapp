@@ -30,7 +30,6 @@ export { CreateRequest, CreateResult, SignRequest, SignResult }
  */
 export async function createPasskey(request: CreateRequest): Promise<CreateResult> {
   const userIDB64 = base64.encode(new TextEncoder().encode(request.passkeyName))
-  console.log('createPasskey', { request, userIDB64 })
   switch (Platform.OS) {
     case 'ios': {
       const ret = await ExpoPasskeysModule.createPasskey(
