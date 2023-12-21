@@ -7,11 +7,10 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { Link } from '@my/ui/src/components'
 import { IconClose } from 'app/components/icons'
 import { IQRScreenProps } from 'app/features/send/types'
 import { NumPad } from 'app/features/send/components/numpad'
-import { RequestConfirmModal } from 'app/features/send/components/modal'
+import { RequestConfirmModal, SendConfirmModal } from 'app/features/send/components/modal'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const QRAmountScreen = ({ setCurrentScreen, sendOrRequest }: IQRScreenProps) => {
@@ -32,6 +31,7 @@ export const QRAmountScreen = ({ setCurrentScreen, sendOrRequest }: IQRScreenPro
   const to = sendOrRequest === 'Send' ? sendTo : requestTo
   const amount = sendOrRequest === 'Send' ? sendAmount : requestAmount
   const setAmount = sendOrRequest === 'Send' ? setSendAmount : setRequestAmount
+  const ConfirmModal = sendOrRequest === 'Send' ? SendConfirmModal : RequestConfirmModal
 
   return (
     <>
@@ -101,7 +101,7 @@ export const QRAmountScreen = ({ setCurrentScreen, sendOrRequest }: IQRScreenPro
           <IconClose />
         </Button>
       </YStack>
-      <RequestConfirmModal showModal={showModal} setShowModal={setShowModal} />
+      <ConfirmModal showModal={showModal} setShowModal={setShowModal} />
     </>
   )
 }
