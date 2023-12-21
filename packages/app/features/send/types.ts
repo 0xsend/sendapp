@@ -16,6 +16,12 @@ export interface IConfirmModalProps {
   setShowModal: (showModal: boolean) => void
 }
 
+export interface ISendRequestModalProps {
+  showModal: boolean
+  setShowModal: (showModal: boolean) => void
+  to?: ITag
+}
+
 export interface IToken {
   icon?: React.ReactNode
   name: string
