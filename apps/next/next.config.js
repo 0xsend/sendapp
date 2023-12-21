@@ -31,7 +31,7 @@ const plugins = [
   }),
 ]
 
-module.exports = function () {
+module.exports = () => {
   /** @type {import('next').NextConfig} */
   let config = {
     typescript: {
@@ -39,7 +39,7 @@ module.exports = function () {
     },
     modularizeImports: {
       '@tamagui/lucide-icons': {
-        transform: `@tamagui/lucide-icons/dist/esm/icons/{{kebabCase member}}`,
+        transform: '@tamagui/lucide-icons/dist/esm/icons/{{kebabCase member}}',
         skipDefaultConversion: true,
       },
     },
