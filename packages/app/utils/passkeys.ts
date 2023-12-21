@@ -80,10 +80,10 @@ function parseMakeCredAuthData(buffer: Uint8Array) {
 // Takes COSE encoded public key and converts it to DER keys
 // https://www.rfc-editor.org/rfc/rfc8152.html#section-13.1
 function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
-  const coseStruct = cbor.decodeAllSync(COSEPublicKey)[0]
-  const x = coseStruct.get(-2)
-  const y = coseStruct.get(-3)
-
+  const coseStruct = cbor.decodeAllSync(COSEPublicKey)
+  assert(coseStruct.length === 1, 'CBOR encoded public key must have exactly one element')
+  const x = coseStruct[0].get(-2)
+  const y = coseStruct[0].get(-3)
   return contractFriendlyKeyToDER([
     `0x${Buffer.from(x).toString('hex')}`,
     `0x${Buffer.from(y).toString('hex')}`,

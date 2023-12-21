@@ -255,27 +255,38 @@ local_resource(
 )
 
 # TODO: decide if we will use silius bundler or not
-# local_resource(
-#     "silius:base",
-#     allow_parallel = True,
-#     labels = labels,
-#     readiness_probe = probe(
-#         exec = exec_action(
-#             command = [
-#                 "cast",
-#                 "bn",
-#                 "--rpc-url=127.0.0.1:3030",
-#             ],
-#         ),
-#         period_secs = 15,
-#         timeout_secs = 5,
-#     ),
-#     resource_deps = [
-#         "yarn:install",
-#         "anvil:base",
-#     ],
-#     serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
-# )
+local_resource(
+    "aa_bundler:base",
+    allow_parallel = True,
+    labels = labels,
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/",
+            port = 3030,
+        ),
+        period_secs = 15,
+        timeout_secs = 5,
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:base",
+    ],
+    serve_cmd = """
+    docker run --rm \
+        --add-host=host.docker.internal:host-gateway \
+        -p 3030:3030 \
+        -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+        -v ./etc/aa-bundler:/app/etc/aa-bundler \
+        0xbigboss/bundler \
+        --port 3030 \
+        --config /app/etc/aa-bundler/aa-bundler.config.json \
+        --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+        --network http://host.docker.internal:8546 \
+        --entryPoint 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789 \
+        --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+        --unsafe
+    """,
+)
 
 # APPS
 labels = ["apps"]
@@ -316,7 +327,11 @@ local_resource(
     "yarn workspace app test",
     allow_parallel = True,
     labels = ["test"],
-    resource_deps = ["yarn:install"],
+    resource_deps = [
+        "yarn:install",
+        "aa_bundler:base",  # TODO: remove once bundler tests are moved to playwright
+        "anvil:send-account-fixtures",  # TODO: remove once bundler tests are moved to playwright
+    ],
     deps =
         files_matching(
             os.path.join("packages", "app"),

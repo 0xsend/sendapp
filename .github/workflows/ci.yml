@@ -54,8 +54,8 @@ jobs:
           DEBUG: test:*,app:*
         run: |
           yarn playwright playwright install --with-deps
-          # start mainnet anvil
-          nohup tilt up anvil:mainnet &
+          # start localnet
+          nohup tilt up anvil:mainnet anvil:base anvil:send-account-fixtures &
           echo waiting for tilt and anvil to be ready
           for i in {1..10}; do
             curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i failed, trying again..."

@@ -11549,6 +11549,7 @@ __metadata:
     expo-secure-store: "npm:~12.3.1"
     jest: "npm:^29.7.0"
     jest-expo: "npm:^49.0.0"
+    permissionless: "npm:^0.0.16"
     react-hook-form: "npm:^7.48.2"
     react-native-safe-area-context: "npm:4.6.3"
     react-native-svg: "npm:13.9.0"
@@ -24782,6 +24783,15 @@ __metadata:
     estree-walker: "npm:^3.0.0"
     is-reference: "npm:^3.0.0"
   checksum: 088a85a6de42e2f34414392dec8348218508609389ecb8002b009c357fa26bdfb67c385d9ec0e4e1089e27748ddc0789254073ef78fd576a32b5e641474c56ba
+  languageName: node
+  linkType: hard
+
+"permissionless@npm:^0.0.16":
+  version: 0.0.16
+  resolution: "permissionless@npm:0.0.16"
+  peerDependencies:
+    viem: ^1.19.4
+  checksum: 573bfa479e605198b2abf85d356bd65fe5b860bf3b7320550ecc038da0dca9a2151775cf6087dce359da7e2af04e3bb104748787bd2007767f5d02d15cabf89e
   languageName: node
   linkType: hard
 

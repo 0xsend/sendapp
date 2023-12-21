@@ -61,7 +61,7 @@ export function installWebAuthnMock({
       },
     } as CredentialCreationOptionsSerialized
 
-    console.log('webauthn mock create credentialSerialized', credOptSer)
+    console.log('[webauthn mock] create credentialSerialized', credOptSer)
 
     // biome-ignore lint/suspicious/noExplicitAny: explicit any is needed here
     const createCredFunc: typeof createPublicKeyCredential = (window as any)[
@@ -73,9 +73,11 @@ export function installWebAuthnMock({
 
     const credSer = await createCredFunc(credOptSer)
 
-    console.log('webauthn mock create credSer', credSer)
+    console.log('[webauthn mock] create credSer', credSer)
 
     const cred = utils.deserializePublicKeyCredentialAttestion(credSer)
+
+    console.log('[webauthn mock] create cred', cred)
 
     return cred
   }
@@ -107,9 +109,11 @@ export function installWebAuthnMock({
 
     const assertionSer = await getCredFunc(credOpts)
 
-    console.debug('[webauthn mock] assertion', assertionSer)
+    console.debug('[webauthn mock] assertionSer', assertionSer)
 
     const assertion = utils.deserializePublicKeyCredentialAssertion(assertionSer)
+
+    console.debug('[webauthn mock] assertion', assertion)
 
     return assertion
   }

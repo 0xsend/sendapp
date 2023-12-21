@@ -49,7 +49,7 @@ export interface PublicKeyCredentialAssertionSerialized
 }
 export type CreateWebauthnCredentialOptions = {
   rpId?: string
-  userHandle?: string | null
+  userHandle?: ArrayBuffer | null
 }
 
 export type WebauthnCredential = {
@@ -77,7 +77,9 @@ export type WebauthnCredential = {
    * Here it is stored as a string in base64 format.
    * @see https://www.w3.org/TR/webauthn-2/#user-handle
    */
-  userHandle: string | null
+  userHandle: ArrayBuffer | null
+  attestations: Pick<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'>[]
+  assertions: AuthenticatorAssertionResponse[]
 }
 
 export type Attestation = {
