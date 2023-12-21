@@ -7,7 +7,7 @@ import type {
   CredentialRequestOptionsSerialized,
 } from './types'
 import { type createPublicKeyCredential, type getPublicKeyCredential } from './web-authenticator'
-
+import { base64urlnopad } from '@scure/base'
 export { utils }
 
 /**
@@ -47,15 +47,17 @@ export function installWebAuthnMock({
     const credOptSer = {
       publicKey: {
         ...credOpt.publicKey,
-        challenge: Buffer.from(credOpt.publicKey.challenge as ArrayBuffer).toString('base64'),
+        challenge: base64urlnopad.encode(
+          new Uint8Array(credOpt.publicKey.challenge as ArrayBuffer)
+        ),
         user: {
           ...credOpt.publicKey.user,
-          id: Buffer.from(credOpt.publicKey.user.id as ArrayBuffer).toString('base64'),
+          id: base64urlnopad.encode(new Uint8Array(credOpt.publicKey.user.id as ArrayBuffer)),
         },
         excludeCredentials: credOpt.publicKey.excludeCredentials?.map((c) => {
           return {
             ...c,
-            id: Buffer.from(c.id as ArrayBuffer).toString('base64'),
+            id: base64urlnopad.encode(new Uint8Array(c.id as ArrayBuffer)),
           }
         }),
       },
@@ -91,11 +93,13 @@ export function installWebAuthnMock({
     const credOpts = {
       publicKey: {
         ...credential.publicKey,
-        challenge: Buffer.from(credential.publicKey.challenge as ArrayBuffer).toString('base64'),
+        challenge: base64urlnopad.encode(
+          new Uint8Array(credential.publicKey.challenge as ArrayBuffer)
+        ),
         allowCredentials: credential.publicKey.allowCredentials?.map((c) => {
           return {
             ...c,
-            id: Buffer.from(c.id as ArrayBuffer).toString('base64'),
+            id: base64urlnopad.encode(new Uint8Array(c.id as ArrayBuffer)),
           }
         }),
       },

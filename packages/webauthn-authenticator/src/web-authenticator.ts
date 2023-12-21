@@ -7,7 +7,6 @@
 
 import crypto from 'crypto'
 import cbor from 'cbor'
-import { base64 } from '@scure/base'
 import {
   CreateWebauthnCredentialOptions,
   CredentialCreationOptionsSerialized,
@@ -51,7 +50,7 @@ function createWebauthnCredential({
     assertions: [],
     attestations: [],
   }
-  CredentialsStore[id.toString('base64')] = cred
+  CredentialsStore[id.toString('base64url')] = cred
   return cred
 }
 
@@ -88,18 +87,18 @@ export async function createPublicKeyCredential(
   ) {
     throw new Error('Unsupported algorithm')
   }
-  const challenge = base64.decode(credOptsPubKey.challenge)
+  const challenge = Buffer.from(credOptsPubKey.challenge, 'base64url')
   const clientDataJSON = Buffer.from(
     new TextEncoder().encode(
       JSON.stringify({
-        challenge: base64.encode(challenge),
+        challenge: credOptsPubKey.challenge,
         origin: `https://${credOptsPubKey.rp.id}`,
         type: 'webauthn.create',
       })
     )
   )
   const rpId = credOptsPubKey.rp.id || 'localhost'
-  const userHandle = Buffer.from(credOptsPubKey.user.id, 'base64') || null
+  const userHandle = Buffer.from(credOptsPubKey.user.id, 'base64url') || null
   const cred = createWebauthnCredential({
     rpId,
     userHandle,
@@ -118,12 +117,12 @@ export async function createPublicKeyCredential(
   cred.attestations.push(response)
 
   const credentialResponse: PublicKeyCredentialAttestationSerialized = {
-    id: credentialId.toString('base64'),
-    rawId: credentialId.toString('base64'),
+    id: credentialId.toString('base64url'),
+    rawId: credentialId.toString('base64url'),
     authenticatorAttachment: 'platform',
     response: {
-      attestationObject: attestationObject.toString('base64'),
-      clientDataJSON: clientDataJSON.toString('base64'),
+      attestationObject: attestationObject.toString('base64url'),
+      clientDataJSON: clientDataJSON.toString('base64url'),
     },
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
@@ -145,11 +144,10 @@ export async function getPublicKeyCredential(
   credentialRequestOptions: CredentialRequestOptionsSerialized
 ) {
   const credReqOptsPubKey = credentialRequestOptions.publicKey
-  const challenge = base64.decode(credentialRequestOptions.publicKey.challenge)
   const clientDataBuffer = Buffer.from(
     new TextEncoder().encode(
       JSON.stringify({
-        challenge: base64.encode(challenge),
+        challenge: credentialRequestOptions.publicKey.challenge,
         origin: credentialRequestOptions.publicKey.rpId,
         type: 'webauthn.get',
       })
@@ -180,13 +178,13 @@ export async function getPublicKeyCredential(
   cred.assertions.push(response)
 
   const credentialResponse = {
-    id: credentialId.toString('base64'),
-    rawId: credentialId.toString('base64'),
+    id: credentialId.toString('base64url'),
+    rawId: credentialId.toString('base64url'),
     response: {
-      authenticatorData: base64.encode(authData),
-      clientDataJSON: base64.encode(clientDataBuffer),
-      signature: base64.encode(assertionObject),
-      userHandle: cred.userHandle ? base64.encode(Buffer.from(cred.userHandle)) : null,
+      authenticatorData: Buffer.from(authData).toString('base64url'),
+      clientDataJSON: Buffer.from(clientDataBuffer).toString('base64url'),
+      signature: Buffer.from(assertionObject).toString('base64url'),
+      userHandle: cred.userHandle ? Buffer.from(cred.userHandle).toString('base64url') : null,
     },
     type: 'public-key',
   } as PublicKeyCredentialAssertionSerialized

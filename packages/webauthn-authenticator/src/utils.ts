@@ -5,6 +5,15 @@ import type {
   Attestation,
   PublicKeyCredentialAssertionSerialized,
 } from './types'
+import { base64urlnopad } from '@scure/base'
+
+export function bufferToBase64URL(buffer: Buffer | Uint8Array) {
+  return base64urlnopad.encode(buffer)
+}
+
+export function base64URLToBuffer(str: string) {
+  return base64urlnopad.decode(str)
+}
 
 /**
  * Deserialize a serialized public key credential attestation into a PublicKeyCredential.
@@ -12,9 +21,9 @@ import type {
 export function deserializePublicKeyCredentialAttestion(
   credential: PublicKeyCredentialAttestationSerialized
 ) {
-  const credentialId = Buffer.from(credential.id, 'base64')
-  const clientDataJSON = Buffer.from(credential.response.clientDataJSON, 'base64')
-  const attestationObject = Buffer.from(credential.response.attestationObject, 'base64')
+  const credentialId = base64URLToBuffer(credential.id)
+  const clientDataJSON = base64URLToBuffer(credential.response.clientDataJSON)
+  const attestationObject = base64URLToBuffer(credential.response.attestationObject)
   const attestation = cbor.decodeAllSync(attestationObject)[0] as Attestation
 
   if (!attestation) {
@@ -56,7 +65,7 @@ export function deserializePublicKeyCredentialAttestion(
     },
   }
   return {
-    id: credentialId.toString('base64'),
+    id: bufferToBase64URL(credentialId),
     rawId: credentialId,
     authenticatorAttachment: 'platform',
     attestationObject,
@@ -77,12 +86,12 @@ export function deserializePublicKeyCredentialAttestion(
 export function deserializePublicKeyCredentialAssertion(
   credential: PublicKeyCredentialAssertionSerialized
 ) {
-  const credentialId = Buffer.from(credential.id, 'base64')
-  const clientDataJSON = Buffer.from(credential.response.clientDataJSON, 'base64')
-  const authenticatorData = Buffer.from(credential.response.authenticatorData, 'base64')
-  const signature = Buffer.from(credential.response.signature, 'base64')
+  const credentialId = base64URLToBuffer(credential.id)
+  const clientDataJSON = base64URLToBuffer(credential.response.clientDataJSON)
+  const authenticatorData = base64URLToBuffer(credential.response.authenticatorData)
+  const signature = base64URLToBuffer(credential.response.signature)
   const userHandle = credential.response.userHandle
-    ? Buffer.from(credential.response.userHandle, 'base64')
+    ? base64URLToBuffer(credential.response.userHandle)
     : null
 
   const response: AuthenticatorAssertionResponse = {
@@ -92,7 +101,7 @@ export function deserializePublicKeyCredentialAssertion(
     userHandle,
   }
   return {
-    id: credentialId.toString('base64'),
+    id: credential.id,
     rawId: credentialId,
     authenticatorAttachment: 'platform',
     clientDataJSON,
