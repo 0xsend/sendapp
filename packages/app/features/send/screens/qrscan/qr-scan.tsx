@@ -84,7 +84,12 @@ export const QRScanScreen = ({ setCurrentScreen }: IQRScreenProps) => {
           </Link>
         </Button>
       </YStack>
-      <SendRequestModal showModal={showModal} setShowModal={setShowModal} to={sendTo} />
+      <SendRequestModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        to={sendTo}
+        setCurrentScreen={setCurrentScreen}
+      />
     </>
   )
 }

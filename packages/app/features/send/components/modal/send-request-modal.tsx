@@ -17,7 +17,13 @@ import { ISendRequestModalProps } from "app/features/send/types"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { GradientButton } from "./GradientButton"
 
-export const SendRequestModal = ({ showModal, setShowModal, to }: ISendRequestModalProps) => {
+export const SendRequestModal = ({
+  showModal,
+  setShowModal,
+  to,
+  setCurrentScreen,
+  sendOrRequest
+}: ISendRequestModalProps) => {
   const { resolvedTheme } = useThemeSetting()
 
   return (
@@ -116,8 +122,18 @@ export const SendRequestModal = ({ showModal, setShowModal, to }: ISendRequestMo
                 Aooarels, Footwears, Sneakers, Boots, Shoes
               </SizableText>
               <YStack mt={'$7'} gap={'$3.5'}>
-                <SendButton height={'$5'} borderRadius={'$6'} iconHeight={12} blackIcon />
-                <GradientButton height={'$5'} borderRadius={'$6'}>
+                <SendButton
+                  height={'$5'}
+                  borderRadius={'$6'}
+                  iconHeight={12}
+                  blackIcon
+                  onPress={() => setCurrentScreen(['qr-amount', 1, 'Send'])}
+                />
+                <GradientButton
+                  height={'$5'}
+                  borderRadius={'$6'}
+                  onPress={() => setCurrentScreen(['qr-amount', 1, 'Request'])}
+                >
                   <SizableText
                     size={'$5'}
                     fontWeight={'700'}
@@ -127,7 +143,6 @@ export const SendRequestModal = ({ showModal, setShowModal, to }: ISendRequestMo
                   </SizableText>
                 </GradientButton>
                 <Button
-                  // py={'$4'}
                   height={'$5'}
                   br={'$6'}
                   bc={'$backgroundTransparent'}

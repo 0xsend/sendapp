@@ -16,7 +16,7 @@ export interface IConfirmModalProps {
   setShowModal: (showModal: boolean) => void
 }
 
-export interface ISendRequestModalProps {
+export interface ISendRequestModalProps extends IQRScreenProps {
   showModal: boolean
   setShowModal: (showModal: boolean) => void
   to?: ITag
@@ -37,7 +37,7 @@ export type SendScreenType = 'send' | 'send-tag' | 'send-it'
 
 export type ReceiveScreenType = 'receive-qrcode' | 'receive-tag' | 'receive-amount'
 
-export type QRScreenType = 'qr-scan' | 'qr-mycode'
+export type QRScreenType = 'qr-scan' | 'qr-mycode' | 'qr-amount'
 
 export interface ISendScreenProps {
   setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void
@@ -48,7 +48,8 @@ export interface IReceiveScreenProps {
 }
 
 export interface IQRScreenProps {
-  setCurrentScreen: ([currentScreen, direction]: [currentScreen: QRScreenType, direction: number]) => void
+  setCurrentScreen: ([currentScreen, direction, sendOrRequest]: [currentScreen: QRScreenType, direction: number, sendOrRequest?: 'Send' | 'Request']) => void
+  sendOrRequest?: 'Send' | 'Request'
 }
 
 export interface ITransferState {
