@@ -10,7 +10,7 @@ import { useTransferContext } from "app/features/send/providers"
 import { Switch } from "app/features/send/components/switch"
 import { IQRScreenProps } from "app/features/send/types"
 import { IconArrowLeft } from "app/components/icons"
-import { SendRequestModal } from "../../components/modal/send-request-modal"
+import { SendRequestModal } from "../../components/modal"
 
 export const QRScanScreen = ({ setCurrentScreen }: IQRScreenProps) => {
   const { transferState, updateTransferContext } = useTransferContext()
