@@ -3,23 +3,18 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from './_app'
 import { GetServerSidePropsContext } from 'next'
-import { XStack } from '@my/ui'
-import { SideBar } from 'app/components/sidebar'
-import { useRouter } from 'next/router'
 
 
 export const Page: NextPageWithLayout = () => {
-  const location = useRouter().pathname
+
 
   return (
     <>
       <Head>
         <title>Home</title>
       </Head>
-      <XStack bg="$color4" h="100svh" >
-        <SideBar location={location} />
-        <HomeScreen />
-      </XStack>
+      <HomeScreen />
+
     </>
   )
 }
