@@ -1,10 +1,10 @@
 
 import { SideBar as SideBarUI, Button, ButtonIcon, XStack, YStack, Nav } from "@my/ui";
 import { Link } from "@my/ui";
-import { IconSendLogo, IconSendLogoSmall, IconTelegramLogo, IconTwitterLogo } from "app/components/icons";
+import { IconSendLogo, IconSendLogoSmall, IconTelegramLogo, IconTwitterLogo } from "../../icons";
 import { SideBarNavLink } from "./SideBarNavLink";
 import { SideBarFooterLink } from "./SideBarFooterLink";
-import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
+import { twitter as twitterSocial, telegram as telegramSocial } from '../../../data/socialLinks'
 
 export const SideBar = ({ location }: { location: string }) => (
   <SideBarUI>
