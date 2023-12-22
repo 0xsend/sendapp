@@ -7,7 +7,7 @@ import { SideBarFooterLink } from "./SideBarFooterLink";
 import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
 
 export const SideBar = ({ location }: { location: string }) => (
-  <SideBarUI>
+  <SideBarUI >
     <Link href={"/"} marginTop={"$10"}>
       <Button borderRadius={9999} w={"$11"} h={"$11"} bg={"transparent"}>
         {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
@@ -18,9 +18,9 @@ export const SideBar = ({ location }: { location: string }) => (
     </Link>
     <Nav display="flex" flex={2} justifyContent={"center"} alignItems="center">
       <YStack gap={"$4"} alignItems='flex-start' justifyContent='center'>
-        <SideBarNavLink location={location} icon={<IconSendLogoSmall />} text={"Dashboard"} href={"/"} />
-        <SideBarNavLink location={location} icon={<IconSendLogoSmall />} text={"Distributions"} href={"/distributions"} />
-        <SideBarNavLink location={location} icon={<IconSendLogoSmall />} text={"Leaderboard"} href={"/leaderboard"} disabled={true} hoverStyle={{ cursor: "not-allowed" }} />
+        <SideBarNavLink icon={<IconSendLogoSmall />} text={"Dashboard"} href={"/"} isActive={location === "/"} />
+        <SideBarNavLink icon={<IconSendLogoSmall />} text={"Distributions"} href={"/distributions"} isActive={location.includes("/distributions")} />
+        <SideBarNavLink icon={<IconSendLogoSmall />} text={"Leaderboard"} href={"/leaderboard"} isActive={location.includes("/leaderboard")} disabled={true} hoverStyle={{ cursor: "not-allowed" }} />
       </YStack>
     </Nav>
     <YStack gap="$4" alignItems='center'>
