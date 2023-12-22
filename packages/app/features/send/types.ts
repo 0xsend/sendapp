@@ -22,6 +22,12 @@ export interface ISendRequestModalProps extends IQRScreenProps {
   to?: ITag
 }
 
+export interface IProfileModalProps {
+  showModal: boolean
+  setShowModal: (showModal: boolean) => void
+  tag?: ITag
+}
+
 export interface IToken {
   icon?: React.ReactNode
   name: string
