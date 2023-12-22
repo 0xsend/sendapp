@@ -1,11 +1,9 @@
-import { HomeScreen } from 'app/features/home/screen'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
+import { HomeScreen } from 'app/features/home/screen'
+import { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from './_app'
-import { GetServerSidePropsContext } from 'next'
-
-
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -15,7 +13,7 @@ export const Page: NextPageWithLayout = () => {
       </Head>
       <HomeSideBarWrapper>
         <HomeScreen />
-      </HomeSideBarWrapper >
+      </HomeSideBarWrapper>
     </>
   )
 }
