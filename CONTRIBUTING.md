@@ -131,59 +131,81 @@ Prerequisites:
 yarn supabase start
 ```
 
+#### 5. Fork blockchain to local node
+Use foundry's local testnet node [anvil](https://book.getfoundry.sh/anvil/)
 
-
-If the build succeeds you're good to go!
-
-
-<details style="padding: 1rem">
-<summary ><h3 style="display:inline;padding:0 1rem;">Next App Development</h3></summary>
-<br/>
-
-In project root, run
-
+**Fork Ethereum Mainnet (port: 8545)**
 ```console!
-yarn web
+anvil -f https://rpc.ankr.com/eth
+```
+**Fork Base Mainnet (port: 8546)**
+```console!
+anvil -f https://mainnet.base.org -p 8546
 ```
 
-If everything is setup, the app should open in dev mode on your [localhost](http://localhost:3000)!
+*Note*: These RPC urls can be rate limited. If you want something more reliable, use [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/)
 
 
+Alright If the build succeeds you're ready to send it 🚀
 
-<img src="https://hackmd.io/_uploads/B1heDBuSa.png" width="100" style="border-radius:9999px">
-</details>
 
 <details style="padding: 1rem">
-<summary ><h3 style="display:inline;padding:0 1rem;">Entering the App</h3></summary>
-<br/>
+   <summary ><h3 style="display:inline;padding:0 1rem;">Next App Development</h3></summary>
+   <br/>
+   In project root, run
 
-- *Entering the app requires Send's supabase instance running*
-     `yarn supabase start`
+   ```console!
+   yarn web
+   ```
 
-
-
-Once the next app is running in dev mode, enter the app using the standard dev credentials
-
-<img src="https://hackmd.io/_uploads/BkKRmSF8p.png" width="600">
-
-*Any 10 letter phone number will work*
+   If everything is setup, the app should open in dev mode on your [localhost](http://localhost:3000)!
 
 
-<img src="https://hackmd.io/_uploads/By9e4rtL6.png" width="600">
 
-*123456*
+   <img src="https://hackmd.io/_uploads/B1heDBuSa.png" width="100" style="border-radius:9999px">
+
+   <details style="padding: 1rem;">
+      <summary ><h3 style="display:inline;padding:0 1rem;">Entering the App</h3></summary>
+      <br/>
+
+  - *Entering the app requires Send's supabase instance running*
+
+   `yarn supabase start`
+
+
+   Once the next app is running in dev mode, enter the app using the standard dev credentials
+
+   <img src="https://hackmd.io/_uploads/BkKRmSF8p.png" width="600">
+
+   *Any 10 letter phone number will work*
+
+   <img src="https://hackmd.io/_uploads/By9e4rtL6.png" width="600">
+
+   *123456*
+   </details>
+   <details style="padding: 1rem;">
+      <summary ><h3 style="display:inline;padding:0 1rem;">Interacting with Send contracts</h3></summary>
+      <br/>
+
+  - *Interacting with contracts requires a local blockchain node to be running in the background*
+
+   `anvil -f https://rpc.ankr.com/eth` (or any other mainnet RPC url)
+
+   </details>
 </details>
+
+
 
 
 
 
 <details  style="padding: 1rem">
-<summary><h3 style="display:inline;padding:0 1rem;">Native App Development</h3></summary>
-<br/>
+   <summary><h3 style="display:inline;padding:0 1rem;">Native App Development</h3></summary>
+   <br/>
 
-*Note:* Send uses React Native with Expo. [Download Expo Go ](https://expo.dev/client)for a streamlined native development experience
+   *Note:* Send uses React Native with Expo. [Download Expo Go ](https://expo.dev/client)for a streamlined native development experience
 
-```console!
-yarn native
-```
+   ```console!
+   yarn native
+   ```
 </details>
