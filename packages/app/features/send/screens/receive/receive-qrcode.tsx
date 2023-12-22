@@ -7,6 +7,7 @@ import {
 import { Link } from '@my/ui/src/components'
 import { useThemeSetting } from "@tamagui/next-theme"
 import { IReceiveScreenProps } from "app/features/send/types"
+import { Switch } from "app/features/send/components/switch"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
 
 export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
@@ -51,37 +52,13 @@ export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) =
           <IconCopy />
         </XStack>
       </YStack>
-
-      <XStack
-        backgroundColor={resolvedTheme === 'dark' ? '$black' : '$primary'}
-        borderRadius={'$7'}
-        p={'$1'}
-        gap={'$2'}
-      >
-        <Button
-          fg={1}
-          borderRadius={'$6'}
-        >
-          <SizableText
-            fontWeight={'700'}
-            color={resolvedTheme === 'dark' ? '$primary' : '$color12'}
-          >
-            Receive
-          </SizableText>
-        </Button>
-        <Button
-          fg={1}
-          borderRadius={'$6'}
-          backgroundColor={resolvedTheme === 'dark' ? '$black' : '$primary'}
-          onPress={() => setCurrentScreen(['receive-tag', 1])}
-        >
-          <SizableText
-            color={'$white'}
-          >
-            Request
-          </SizableText>
-        </Button>
-      </XStack>
+      <Switch
+        leftText={'Receive'}
+        leftHandler={() => { }}
+        rightText={'Request'}
+        rightHandler={() => setCurrentScreen(['receive-tag', 1])}
+        active={'left'}
+      />
       <Button
         pos={'absolute'}
         top={'$size.8'}
