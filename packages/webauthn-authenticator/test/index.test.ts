@@ -103,7 +103,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         const credSer2 = await getPublicKeyCredential(credReqOptsSer)
         const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
 
-        expect(cred2.rawId).toEqual(testBytes)
+        expect(cred2.rawId).toEqual(new Uint8Array(testBytes))
         expect(cred2.id).toEqual(testBytes.toString('base64url'))
         const verified = crypto.verify(
           'sha256',

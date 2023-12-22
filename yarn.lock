@@ -5578,6 +5578,7 @@ __metadata:
     "@types/dotenv-flow": "npm:^3.3.1"
     "@types/jsonwebtoken": "npm:^9.0.2"
     app: "workspace:*"
+    cbor: "npm:^9.0.1"
     debug: "npm:^4.3.4"
     dotenv: "npm:^16.3.1"
     dotenv-flow: "npm:^3.3.0"

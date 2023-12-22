@@ -4,8 +4,11 @@
  * Currently, Playwright browsers do no support WebAuthn, so we mock the call to the WebAuthn API.
  */
 
+import { Attestation } from '@0xsend/webauthn-authenticator/types'
 import { test, expect } from './fixtures/auth'
+import cbor from 'cbor'
 
+// TODO: add a detereministic seed for the credential store
 test('can visit onboarding page', async ({ page, credentialsStore }) => {
   await page.goto('/onboarding')
   expect(page).toHaveURL('/onboarding')

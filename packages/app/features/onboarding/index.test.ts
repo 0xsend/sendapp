@@ -86,7 +86,7 @@ test('can create a new account', async () => {
   await createTestClient({
     chain: baseMainnetClient.chain,
     transport: http(baseMainnetClient.transport.url),
-    mode: 'hardhat',
+    mode: 'anvil',
   }).setBalance({
     address: dummyAccount.address,
     value: parseEther('1'),
