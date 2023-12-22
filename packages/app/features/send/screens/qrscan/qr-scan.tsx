@@ -12,6 +12,8 @@ import { IQRScreenProps } from "app/features/send/types"
 import { IconArrowLeft } from "app/components/icons"
 import { SendRequestModal } from "../../components/modal"
 
+// TODO: Replace background with camera screen
+
 export const QRScanScreen = ({ setCurrentScreen }: IQRScreenProps) => {
   const { transferState, updateTransferContext } = useTransferContext()
 

@@ -100,6 +100,7 @@ export const SendRequestModal = ({
                         height: '$10',
                       }}
                     />
+                    {/* TODO: Place QR-Code img here instead of XStack */}
                     <XStack
                       width={'$12'}
                       height={'$12'}
