@@ -438,7 +438,7 @@ local_resource(
 
 local_resource(
     "contracts:test",
-    "yarn contracts test -vvv --fork-url https://base-goerli.publicnode.com",
+    "yarn contracts test -vvv",
     allow_parallel = True,
     labels = ["test"],
     resource_deps = [
