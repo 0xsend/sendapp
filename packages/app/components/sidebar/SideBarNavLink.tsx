@@ -2,7 +2,8 @@ import { Button, ButtonIcon, ButtonText, Link, type LinkProps } from "@my/ui";
 import { type ReactElement } from "react";
 
 export function SideBarNavLink({ icon, text, location, ...props }: { icon?: ReactElement, text: string, location: string } & Omit<LinkProps, "children">): ReactElement {
-  const isActiveRoute = location === props.href
+  const href = typeof props.href === "string" ? props.href : props.href.pathname
+  const isActiveRoute = location.includes(href || "/")
 
   return (
     <Link {...props} href={props.disabled ? "" : props.href} >
