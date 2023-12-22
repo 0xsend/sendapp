@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.13;
 
-import "forge-std/Test.sol";
+import "./BaseGoerliForkTest.sol";
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
 import "../src/DaimoAccount.sol";
@@ -9,7 +9,7 @@ import "./Utils.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
 
-contract AccountVerify1271Test is Test {
+contract AccountVerify1271Test is BaseGoerliForkTest {
     using UserOperationLib for UserOperation;
 
     EntryPoint public entryPoint;
@@ -18,6 +18,7 @@ contract AccountVerify1271Test is Test {
     DaimoAccount public account;
 
     function setUp() public {
+        this.createAndSelectFork();
         entryPoint = new EntryPoint();
         verifier = new DaimoVerifier();
         factory = new DaimoAccountFactory(entryPoint, verifier);
@@ -41,11 +42,7 @@ contract AccountVerify1271Test is Test {
             uint8(0), // keySlot
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
-                    challenge: abi.encodePacked(
-                        bytes32(
-                            0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5
-                        )
-                    ),
+                    challenge: abi.encodePacked(bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)),
                     r: 0x3f033e5c93d0310f33632295f64d526f7569c4cb30895f50d60de5fe9e0e6a9a,
                     s: 0x2adcff2bd06fc3cdd03e21e5e4c197913e96e75cad0bc6e9c9c14607af4f3a37
                 })
@@ -70,11 +67,7 @@ contract AccountVerify1271Test is Test {
             uint8(0), // keySlot
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
-                    challenge: abi.encodePacked(
-                        bytes32(
-                            0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5
-                        )
-                    ),
+                    challenge: abi.encodePacked(bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)),
                     r: 0x3f033e5c93d0310f33632295f64d526f7569c4cb30895f50d60de5fe9e0e6a9a,
                     s: s
                 })
@@ -93,11 +86,7 @@ contract AccountVerify1271Test is Test {
             uint8(0), // keySlot
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
-                    challenge: abi.encodePacked(
-                        bytes32(
-                            0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5
-                        )
-                    ),
+                    challenge: abi.encodePacked(bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)),
                     r: 0x3f033e5c93d0310f33632295f64d526f7569c4cb30895f50d60de5fe9e0e6a9a,
                     s: s
                 })
