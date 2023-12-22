@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.13;
 
-import "forge-std/Test.sol";
+import "./BaseGoerliForkTest.sol";
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
 import "../src/DaimoAccount.sol";
@@ -12,7 +12,7 @@ import "account-abstraction/interfaces/IEntryPoint.sol";
 
 import "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-contract AccountSendUseropTest is Test {
+contract AccountSendUseropTest is BaseGoerliForkTest {
     using UserOperationLib for UserOperation;
 
     EntryPoint public entryPoint;
@@ -20,6 +20,7 @@ contract AccountSendUseropTest is Test {
     DaimoAccountFactory public factory;
 
     function setUp() public {
+        this.createAndSelectFork();
         entryPoint = new EntryPoint();
         verifier = new DaimoVerifier();
         factory = new DaimoAccountFactory(entryPoint, verifier);
