@@ -13,6 +13,11 @@ import Head from 'next/head'
 import 'raf/polyfill'
 import { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
+import { XStack } from '@my/ui'
+import { SideBar } from 'app/components/sidebar'
+
+import { useRouter } from 'next/router'
+
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -30,6 +35,9 @@ function MyApp({
   const getLayout = Component.getLayout || ((page) => page)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_theme, setTheme] = useRootTheme()
+
+  const location = useRouter().pathname
+  const isLoggedIn = pageProps.initialSession?.user !== null && pageProps.initialSession?.user !== undefined
 
   return (
     <>
@@ -52,9 +60,17 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {getLayout(<Component {...pageProps} />)}
+          {getLayout(
+            isLoggedIn ?
+              <XStack bg="$color4">
+                <SideBar location={location} />
+                <Component {...pageProps} />
+              </XStack>
+              :
+              <Component {...pageProps} />
+          )}
         </Provider>
-      </NextThemeProvider>
+      </NextThemeProvider >
     </>
   )
 }
