@@ -13,7 +13,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('can visit distributions page', async ({ page }) => {
-  await page.pause()
   await page.goto('/distributions')
-  expect(page).toHaveURL('/distributions')
+  await expect(page).toHaveURL('/distributions')
 })
