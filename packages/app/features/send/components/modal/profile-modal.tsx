@@ -18,6 +18,7 @@ export const ProfileModal = ({
   showModal,
   setShowModal,
   tag,
+  setCurrentScreen,
 }: IProfileModalProps) => {
   const { resolvedTheme } = useThemeSetting()
 
@@ -146,7 +147,7 @@ export const ProfileModal = ({
                   pos={'absolute'}
                   top={'$5'}
                   right={'$5'}
-                  onPress={() => { }}
+                  onPress={() => setCurrentScreen(['qr-share', 1])}
                 >
                   <IconShare />
                 </Button>

@@ -180,7 +180,12 @@ export const SendRequestModal = ({
           </Dialog.Portal>
         </Dialog>
       </Theme>
-      <ProfileModal showModal={showProfileModal} setShowModal={setShowProfileModal} tag={to} />
+      <ProfileModal
+        showModal={showProfileModal}
+        setShowModal={setShowProfileModal}
+        tag={to}
+        setCurrentScreen={setCurrentScreen}
+      />
     </>
   )
 }
