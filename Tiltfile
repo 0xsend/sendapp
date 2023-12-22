@@ -273,10 +273,13 @@ local_resource(
     ],
     serve_cmd = """
     docker run --rm \
+        --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
         -p 3030:3030 \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./etc/aa-bundler:/app/etc/aa-bundler \
+        -e "DEBUG=aa*" \
+        -e "DEBUG_COLORS=true" \
         0xbigboss/bundler \
         --port 3030 \
         --config /app/etc/aa-bundler/aa-bundler.config.json \
