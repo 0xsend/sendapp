@@ -89,6 +89,10 @@ export const ProfileModal = ({
                       width={'$12'}
                       height={'$12'}
                       borderRadius={'$6'}
+                      $shorter={{
+                        width: '$10',
+                        height: '$10',
+                      }}
                     />
                   </XStack>
                   <SizableText

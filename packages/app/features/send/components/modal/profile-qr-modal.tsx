@@ -79,6 +79,8 @@ export const ProfileQRModal = ({
                 px={'$5'}
                 py={'$7'}
                 borderRadius={'$10'}
+                width={'100%'}
+                ai={'center'}
               >
                 <SizableText
                   textAlign={'center'}
@@ -97,8 +99,10 @@ export const ProfileQRModal = ({
                 </SizableText>
                 <YStack
                   mt={'$3'}
-                  width={330}
-                  height={330}
+                  maxWidth={330}
+                  maxHeight={330}
+                  width={'75vw'}  // Will use width: '100%' when we place Image
+                  height={'75vw'}  // height: 'auto'
                   backgroundColor={'$primary'}
                 />
                 <Dialog.Close asChild displayWhenAdapted>

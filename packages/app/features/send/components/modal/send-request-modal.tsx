@@ -84,13 +84,21 @@ export const SendRequestModal = ({
               fullscreen
             >
               <YStack ai={'center'}>
-                <YStack backgroundColor={'$background'} p={'$7'} borderRadius={'$10'}>
+                <YStack backgroundColor={'$background'} p={'$7'} borderRadius={'$10'}
+                  $shorter={{
+                    px: '$6',
+                    py: '$5',
+                  }}>
                   <XStack jc={'space-between'}>
                     <Image
                       source={{ uri: to?.avatar }}
                       width={'$12'}
                       height={'$12'}
                       borderRadius={'$6'}
+                      $shorter={{
+                        width: '$10',
+                        height: '$10',
+                      }}
                     />
                     <XStack
                       width={'$12'}
@@ -98,6 +106,10 @@ export const SendRequestModal = ({
                       borderWidth={1}
                       borderColor={'$primary'}
                       borderRadius={'$6'}
+                      $shorter={{
+                        width: '$10',
+                        height: '$10',
+                      }}
                     />
                   </XStack>
                   <SizableText
@@ -105,6 +117,9 @@ export const SendRequestModal = ({
                     textAlign={'center'}
                     fontSize={'$9'}
                     fontWeight={'700'}
+                    $shorter={{
+                      mt: '$5'
+                    }}
                   >
                     {to?.name}
                   </SizableText>
@@ -113,6 +128,9 @@ export const SendRequestModal = ({
                     textAlign={'center'}
                     fontSize={'$6'}
                     color={'$primary'}
+                    $shorter={{
+                      mt: '$3'
+                    }}
                   >
                     @{to?.name.toLowerCase()}
                   </SizableText>
@@ -122,10 +140,19 @@ export const SendRequestModal = ({
                     fontSize={'$3'}
                     theme={'alt1'}
                     fontWeight={'400'}
+                    $shorter={{
+                      mt: '$4'
+                    }}
                   >
                     Aooarels, Footwears, Sneakers, Boots, Shoes
                   </SizableText>
-                  <YStack mt={'$7'} gap={'$3.5'}>
+                  <YStack
+                    mt={'$7'}
+                    gap={'$3.5'}
+                    $shorter={{
+                      mt: '$5'
+                    }}
+                  >
                     <SendButton
                       height={'$5'}
                       borderRadius={'$6'}
