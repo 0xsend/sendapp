@@ -1,13 +1,13 @@
 
-import { SideBar as SideBarUI, Button, ButtonIcon, XStack, YStack, Nav } from "@my/ui";
+import { SideBarWrapper, Button, ButtonIcon, XStack, YStack, Nav, SideBar, YStackProps } from "@my/ui";
 import { Link } from "@my/ui";
 import { IconSendLogo, IconSLogo, IconTelegramLogo, IconXLogo, IconDistributions, IconDashboard } from "app/components/icons";
 import { SideBarNavLink } from "./SideBarNavLink";
 import { SideBarFooterLink } from "./SideBarFooterLink";
 import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
 
-export const SideBar = ({ location }: { location: string }) => (
-  <SideBarUI >
+const HomeSideBar = ({ location, ...props }: { location: string } & YStackProps) => (
+  <SideBar {...props}>
     <Link href={"/"} marginTop={"$10"}>
       <Button borderRadius={9999} w={"$11"} h={"$11"} bg={"transparent"}>
         {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
@@ -30,5 +30,11 @@ export const SideBar = ({ location }: { location: string }) => (
         <SideBarFooterLink icon={<IconTelegramLogo />} href={telegramSocial} target='_blank' borderRadius={9999} />
       </XStack>
     </YStack>
-  </SideBarUI >
+  </SideBar>
+)
+
+export const HomeSideBarWrapper = ({ children, location }: { children?: React.ReactNode, location: string }) => (
+  <SideBarWrapper sidebar={<HomeSideBar location={location} backgroundColor={"$backgroundStrong"} />}>
+    {children}
+  </SideBarWrapper>
 )
