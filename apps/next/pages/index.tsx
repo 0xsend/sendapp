@@ -1,5 +1,5 @@
 import { HomeScreen } from 'app/features/home/screen'
-import { HomeSideBarWrapper } from 'app/components/sidebar'
+import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from './_app'

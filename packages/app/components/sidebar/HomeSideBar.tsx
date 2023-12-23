@@ -2,8 +2,8 @@
 import { SideBarWrapper, Button, ButtonIcon, XStack, YStack, Nav, SideBar, YStackProps } from "@my/ui";
 import { Link } from "@my/ui";
 import { IconSendLogo, IconSLogo, IconTelegramLogo, IconXLogo, IconDistributions, IconDashboard } from "app/components/icons";
-import { SideBarNavLink } from "./SideBarNavLink";
-import { SideBarFooterLink } from "./SideBarFooterLink";
+import { SideBarNavLink } from "app/components/sidebar/SideBarNavLink";
+import { SideBarFooterLink } from "app/components/sidebar/SideBarFooterLink";
 import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
 
 const HomeSideBar = ({ location, ...props }: { location: string } & YStackProps) => (
