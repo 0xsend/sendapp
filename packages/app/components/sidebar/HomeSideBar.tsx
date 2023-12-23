@@ -5,36 +5,42 @@ import { IconSendLogo, IconSLogo, IconTelegramLogo, IconXLogo, IconDistributions
 import { SideBarNavLink } from "app/components/sidebar/SideBarNavLink";
 import { SideBarFooterLink } from "app/components/sidebar/SideBarFooterLink";
 import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
+import { usePathname } from "app/utils/usePathname";
 
-const HomeSideBar = ({ location, ...props }: { location: string } & YStackProps) => (
-  <SideBar {...props}>
-    <Link href={"/"} marginTop={"$10"}>
-      <Button borderRadius={9999} w={"$11"} h={"$11"} bg={"transparent"}>
-        {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
-        <ButtonIcon>
-          <IconSLogo size={"$10"} />
-        </ButtonIcon>
-      </Button  >
-    </Link>
-    <Nav display="flex" flex={2} justifyContent={"center"} alignItems="center">
-      <YStack gap={"$4"} alignItems='flex-start' justifyContent='center'>
-        <SideBarNavLink icon={<IconDashboard size={"$2"} />} text={"Dashboard"} href={"/"} isActive={location === "/"} />
-        <SideBarNavLink icon={<IconDistributions size={"$2"} />} text={"Distributions"} href={"/distributions"} isActive={location.includes("/distributions")} />
-        <SideBarNavLink icon={<IconSLogo size={"$2"} />} text={"Leaderboard"} href={"/leaderboard"} isActive={location.includes("/leaderboard")} disabled={true} hoverStyle={{ cursor: "not-allowed" }} />
+
+
+const HomeSideBar = ({ ...props }: YStackProps) => {
+  const pathName = usePathname()
+  return (
+    < SideBar {...props}>
+      <Link href={"/"} marginTop={"$10"}>
+        <Button borderRadius={9999} w={"$11"} h={"$11"} bg={"transparent"}>
+          {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
+          <ButtonIcon>
+            <IconSLogo size={"$10"} />
+          </ButtonIcon>
+        </Button  >
+      </Link>
+      <Nav display="flex" flex={2} justifyContent={"center"} alignItems="center">
+        <YStack gap={"$4"} alignItems='flex-start' justifyContent='center'>
+          <SideBarNavLink icon={<IconDashboard size={"$2"} />} text={"Dashboard"} href={"/"} isActive={pathName === "/"} />
+          <SideBarNavLink icon={<IconDistributions size={"$2"} />} text={"Distributions"} href={"/distributions"} isActive={pathName.includes("/distributions")} />
+          <SideBarNavLink icon={<IconSLogo size={"$2"} />} text={"Leaderboard"} href={"/leaderboard"} isActive={pathName.includes("/leaderboard")} disabled={true} hoverStyle={{ cursor: "not-allowed" }} />
+        </YStack>
+      </Nav>
+      <YStack gap="$4" alignItems='center'>
+        <IconSendLogo />
+        <XStack gap="$2">
+          <SideBarFooterLink icon={<IconXLogo />} href={twitterSocial} target='_blank' borderRadius={9999} />
+          <SideBarFooterLink icon={<IconTelegramLogo />} href={telegramSocial} target='_blank' borderRadius={9999} />
+        </XStack>
       </YStack>
-    </Nav>
-    <YStack gap="$4" alignItems='center'>
-      <IconSendLogo />
-      <XStack gap="$2">
-        <SideBarFooterLink icon={<IconXLogo />} href={twitterSocial} target='_blank' borderRadius={9999} />
-        <SideBarFooterLink icon={<IconTelegramLogo />} href={telegramSocial} target='_blank' borderRadius={9999} />
-      </XStack>
-    </YStack>
-  </SideBar>
-)
+    </SideBar >)
+}
 
-export const HomeSideBarWrapper = ({ children, location }: { children?: React.ReactNode, location: string }) => (
-  <SideBarWrapper sidebar={<HomeSideBar location={location} backgroundColor={"$backgroundStrong"} />}>
+export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => (
+  <SideBarWrapper sidebar={<HomeSideBar backgroundColor={"$backgroundStrong"} />}>
     {children}
   </SideBarWrapper>
 )
+
