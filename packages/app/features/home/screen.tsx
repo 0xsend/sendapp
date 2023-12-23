@@ -4,10 +4,17 @@ import { HomeHeader } from 'app/components/HomeHeader'
 
 export function HomeScreen() {
   return (
-    <ScrollView f={3} fb={0} p="$4" $gtSm={{ p: "$12" }} $theme-light={{ bg: "#F0EEE9" }} $theme-dark={{ bg: "#292929" }}>
+    <ScrollView
+      f={3}
+      fb={0}
+      p="$4"
+      $gtSm={{ p: '$12' }}
+      $theme-light={{ bg: '#F0EEE9' }}
+      $theme-dark={{ bg: '#292929' }}
+    >
       <YStack gap="$6" pt="$5" pb="$8">
         <YStack space="$4">
-          <HomeHeader> Dashboard</HomeHeader>
+          <HomeHeader>Dashboard</HomeHeader>
           <Button
             onPress={async () => {
               // const result = await createPasskey({
@@ -38,7 +45,6 @@ export function HomeScreen() {
           </Button>
         </YStack>
       </YStack>
-    </ScrollView >
-
+    </ScrollView>
   )
 }
