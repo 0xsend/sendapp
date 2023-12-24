@@ -18,8 +18,9 @@ import {
   derKeytoContractFriendlyKey,
   parseAndNormalizeSig,
   parseCreateResponse,
+  parseSignResponse,
 } from 'app/utils/passkeys'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   bytesToHex,
   concat,
@@ -40,6 +41,15 @@ import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'ap
 import { daimoAccountABI, daimoAccountFactoryABI, iEntryPointABI } from '@my/wagmi'
 import { UserOperation, getSenderAddress } from 'permissionless'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { base64url } from '@scure/base'
+
+const privateKey = generatePrivateKey()
+const dummyAccount = privateKeyToAccount(privateKey)
+const walletClient = createWalletClient({
+  chain: baseMainnetClient.chain,
+  transport: http(baseMainnetClient.transport.url),
+  account: dummyAccount,
+})
 
 const testClient = createTestClient({
   chain: baseMainnetClient.chain,
@@ -61,49 +71,21 @@ const entrypoint = getContract({
   address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
 })
 
+// DaimoAccountFactory.createAccount arguments
 const VERSION = 1
 const VALID_UNTIL = 60
-const KEY_SLOT = 0n
-
-/**
- * TODO: use an EOA to create the account for now, this will need to changed to use the init code
- */
-async function createAccountUsingEOA(pubKey: [Hex, Hex]) {
-  const privateKey = generatePrivateKey()
-  const dummyAccount = privateKeyToAccount(privateKey)
-  await testClient.setBalance({
-    address: dummyAccount.address,
-    value: parseEther('1'),
-  })
-  const walletClient = createWalletClient({
-    chain: baseMainnetClient.chain,
-    transport: http(baseMainnetClient.transport.url),
-    account: dummyAccount,
-  })
-
-  const { request } = await baseMainnetClient.simulateContract({
-    address: daimoAccountFactory.address,
-    functionName: 'createAccount',
-    abi: daimoAccountFactory.abi,
-    args: [0, pubKey, [], KEY_SLOT],
-    account: dummyAccount,
-  })
-
-  const hash = await walletClient.writeContract(request)
-
-  return await baseMainnetClient.waitForTransactionReceipt({ hash })
-}
+const KEY_SLOT = 0
+const SALT = 0n
 
 export function OnboardingScreen() {
-  const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}`)
+  const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
   const [createResult, setCreateResult] = useState<CreateResult | null>(null)
-  const [signResult, setSignResult] = useState<SignResult | null>(null)
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
   const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
   const [challenge, setChallenge] = useState<Hex | null>(null)
-  const [rS, setRS] = useState<[Hex, Hex] | null>(null) // [r, s]
+  const [signature, setSignature] = useState<Uint8Array | null>(null)
 
   async function createAccount() {
     const result = await createPasskey({
@@ -114,146 +96,45 @@ export function OnboardingScreen() {
     })
     console.log('Onboarding screen create', result)
     setCreateResult(result)
-    setPublicKey(derKeytoContractFriendlyKey(parseCreateResponse(result)))
+    const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
+    setPublicKey(_publicKey)
+
+    const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(_publicKey)
+
+    // generate challenge
+    const _challenge = generateChallenge(_userOpHash)
+
+    setSenderAddress(_userOp.sender)
+    setUserOp(_userOp)
+    setUserOpHash(_userOpHash)
+    setChallenge(_challenge)
+    console.log('senderAddress', _userOp.sender)
+    console.log('userOp', _userOp)
+    console.log('userOpHash', _userOpHash)
+    console.log('challenge', _challenge)
   }
 
   async function _signWithPasskey() {
-    if (!challenge) {
-      throw new Error('No challenge to sign')
+    if (!challenge || challenge.length <= 0) {
+      throw new Error('No challenge')
     }
-    const sign = await signWithPasskey({
-      domain: window.location.hostname,
-      challengeB64: Buffer.from(challenge, 'hex').toString('base64'),
-    })
-    console.log('Onbboarding screen sign', sign)
-    setSignResult(sign)
-  }
-
-  async function sendUserOp() {
-    console.log('sending', { userOp, userOpHash, rS, signResult })
-
-    if (!publicKey) {
-      throw new Error('No public key')
+    if (!userOpHash) {
+      throw new Error('No userOpHash')
     }
-
-    if (!senderAddress) {
-      throw new Error('No sender address')
+    const encodedWebAuthnSig = await signChallenge(challenge)
+    console.log('encodedWebAuthnSig', encodedWebAuthnSig)
+    if (!encodedWebAuthnSig || encodedWebAuthnSig.length <= 2) {
+      throw new Error('No encodedWebAuthnSig')
     }
-
-    if (!userOp || !userOpHash) {
-      throw new Error('No userOp')
-    }
-
-    if (!rS) {
-      throw new Error('No signature')
-    }
-
-    if (!signResult) {
-      throw new Error('No sign result')
-    }
-
-    // TODO: sponsor the creation by setting the balance using anvil
-    // await testClient.setBalance({
-    //   address: senderAddress,
-    //   value: parseEther('1'),
-    // })
-
-    await createAccountUsingEOA(publicKey)
-
-    const authenticatorData = bytesToHex(Buffer.from(signResult?.rawAuthenticatorDataB64, 'base64'))
-    const clientDataJSON = Buffer.from(signResult?.rawClientDataJSONB64, 'base64').toString('utf-8')
-    const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
-    const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":'))
-    console.log({
-      challengeLocation,
-      responseTypeLocation,
-    })
-    const webauthnSig = {
-      authenticatorData,
-      clientDataJSON,
-      challengeLocation,
-      responseTypeLocation,
-      r: hexToBigInt(rS[0]),
-      s: hexToBigInt(rS[1]),
-    }
-    console.log('onboarding sig', webauthnSig)
-    const encodedWebAuthnSig = encodeAbiParameters(
-      getAbiItem({
-        abi: daimoAccountABI,
-        name: 'signatureStruct',
-      }).inputs,
-      [webauthnSig]
-    )
-
-    const signature = concat([
+    const _signature = concat([
       numberToBytes(VERSION, { size: 1 }),
       numberToBytes(VALID_UNTIL, { size: 6 }),
       numberToBytes(KEY_SLOT, { size: 1 }),
       hexToBytes(userOpHash),
       hexToBytes(encodedWebAuthnSig),
     ])
-
-    const _userOp: UserOperation = {
-      ...userOp,
-      signature: bytesToHex(signature),
-    }
-
-    console.log('sending userOp', _userOp)
-
-    // verify hash is same
-    if (userOpHash !== (await entrypoint.read.getUserOpHash([_userOp]))) {
-      throw new Error('Hash mismatch')
-    }
-
-    const hash = await bundlerClient.sendUserOperation({
-      userOperation: _userOp,
-      entryPoint: entrypoint.address,
-    })
-
-    console.log('hash', hash)
-
-    const receipt = await bundlerClient.waitForUserOperationReceipt({ hash })
-
-    console.log('receipt', receipt)
+    setSignature(_signature)
   }
-
-  // generate challenge
-  useEffect(() => {
-    if (!publicKey) {
-      return
-    }
-    if (publicKey.length !== 2) {
-      throw new Error('Invalid public key')
-    }
-    void (async () => {
-      const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
-
-      // generate challenge
-      const _challenge = generateChallenge(_userOpHash)
-
-      setSenderAddress(_userOp.sender)
-      setUserOp(_userOp)
-      setUserOpHash(_userOpHash)
-      setChallenge(_challenge)
-      console.log('senderAddress', _userOp.sender)
-      console.log('userOp', _userOp)
-      console.log('userOpHash', _userOpHash)
-      console.log('challenge', _challenge)
-    })()
-  }, [publicKey])
-
-  // process sign result to get r and s
-  useEffect(() => {
-    if (!signResult) {
-      return
-    }
-
-    const { signatureB64 } = signResult
-    const signatureBytes = Buffer.from(signatureB64, 'base64')
-    const signatureHex = bytesToHex(signatureBytes)
-    const { r, s } = parseAndNormalizeSig(signatureHex)
-    setRS([`0x${r.toString(16)}`, `0x${s.toString(16)}`])
-  }, [signResult])
 
   return (
     <Container>
@@ -303,21 +184,161 @@ export function OnboardingScreen() {
           height="$20"
           // @ts-expect-error setup monospace font
           fontFamily={'monospace'}
-          value={signResult ? JSON.stringify(signResult, null, 2) : undefined}
-        />
-        <Label htmlFor="signature">R and S:</Label>
-        <TextArea
-          id="rS"
-          height="$20"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={rS ? JSON.stringify(rS, null, 2) : undefined}
+          value={
+            signature && signature?.byteLength > 0
+              ? `0x${Buffer.from(signature).toString('hex')}`
+              : undefined
+          }
         />
         <H2>Send it</H2>
-        <Button onPress={sendUserOp}>Send</Button>
+        <Button
+          onPress={async () => {
+            if (!publicKey) {
+              throw new Error('No public key')
+            }
+
+            if (!userOp || !userOpHash) {
+              throw new Error('No userOp')
+            }
+
+            if (!signature || signature.byteLength <= 0) {
+              throw new Error('No signature')
+            }
+
+            if (!senderAddress) {
+              throw new Error('No sender address')
+            }
+            await sendUserOp({ userOp, userOpHash, signature, senderAddress })
+          }}
+        >
+          Send
+        </Button>
       </YStack>
     </Container>
   )
+}
+
+async function sendUserOp({
+  userOp,
+  userOpHash,
+  signature,
+  senderAddress,
+}: {
+  userOp: UserOperation
+  userOpHash: Hex
+  signature: Uint8Array
+  senderAddress: Hex
+}) {
+  console.log('sending', { userOp, userOpHash, signature })
+
+  // FIXME: sponsor the creation by setting the balance using anvil
+  await testClient.setBalance({
+    address: senderAddress,
+    value: parseEther('1'),
+  })
+
+  // FIXME: sponsor the creation by setting the balance using anvil
+  await testClient.setBalance({
+    address: dummyAccount.address,
+    value: parseEther('1'),
+  })
+
+  // await createAccountUsingEOA(publicKey)
+  const _userOp: UserOperation = {
+    ...userOp,
+    signature: bytesToHex(signature),
+  }
+
+  console.log('sending userOp', _userOp)
+
+  // verify hash is same
+  if (userOpHash !== (await entrypoint.read.getUserOpHash([_userOp]))) {
+    throw new Error('Hash mismatch')
+  }
+
+  // TODO: handle error correctly, simulateValidation always reverts
+  await baseMainnetClient.simulateContract({
+    address: entrypoint.address,
+    functionName: 'simulateValidation',
+    abi: iEntryPointABI,
+    args: [_userOp],
+  })
+
+  const hash = await bundlerClient.sendUserOperation({
+    userOperation: _userOp,
+    entryPoint: entrypoint.address,
+  })
+
+  console.log('hash', hash)
+
+  const receipt = await bundlerClient.waitForUserOperationReceipt({ hash })
+
+  console.log('receipt', receipt)
+
+  if (receipt.success !== true) {
+    throw new Error('Failed to send userOp')
+  }
+}
+
+async function signChallenge(challenge: Hex) {
+  if (!challenge || challenge.length <= 0) {
+    throw new Error('No challenge to sign')
+  }
+  console.log('Onbboarding screen signing', challenge)
+  const challengeBytes = hexToBytes(challenge)
+  console.log('Onbboarding screen signing bytes', challengeBytes)
+  const challengeB64 = Buffer.from(challengeBytes).toString('base64')
+  console.log('Onbboarding screen signing B64', challengeB64)
+  if (!challengeB64) {
+    throw new Error('No challengeB64 to sign')
+  }
+  const sign = await signWithPasskey({
+    domain: window.location.hostname,
+    challengeB64,
+  })
+  console.log('Onbboarding screen signed', sign)
+  const _signResult = parseSignResponse(sign)
+  console.log('Onbboarding screen sign result', _signResult)
+
+  const clientDataJSON = _signResult.clientDataJSON
+  const clientDataChallenge = JSON.parse(clientDataJSON).challenge
+  const clientDataChallengeBytes = base64url.decode(clientDataChallenge)
+  console.log('clientDataChallenge', clientDataChallenge)
+  console.log('clientDataChallengeBytes', clientDataChallengeBytes)
+
+  if (Buffer.compare(clientDataChallengeBytes, challengeBytes) !== 0) {
+    throw new Error('Challenge mismatch')
+  }
+
+  const authenticatorData = bytesToHex(_signResult.rawAuthenticatorData)
+  const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
+  const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":'))
+  const { r, s } = parseAndNormalizeSig(_signResult.derSig)
+  const webauthnSig = {
+    authenticatorData,
+    clientDataJSON,
+    challengeLocation,
+    responseTypeLocation,
+    r,
+    s,
+  }
+  console.log('onboarding sig', {
+    authenticatorData,
+    clientDataJSON,
+    challengeLocation,
+    responseTypeLocation,
+    r: `0x${r.toString(16)}`,
+    s: `0x${s.toString(16)}`,
+  })
+  const encodedWebAuthnSig = encodeAbiParameters(
+    getAbiItem({
+      abi: daimoAccountABI,
+      name: 'signatureStruct',
+    }).inputs,
+    [webauthnSig]
+  )
+  console.log('encodedWebAuthnSig', encodedWebAuthnSig)
+  return encodedWebAuthnSig
 }
 
 function generateChallenge(_userOpHash: Hex): Hex {
@@ -329,20 +350,14 @@ function generateChallenge(_userOpHash: Hex): Hex {
 }
 
 async function generateUserOp(publicKey: [Hex, Hex]) {
-  const initCode = concat([
-    daimoAccountFactoryAddress,
-    encodeFunctionData({
-      abi: [getAbiItem({ abi: daimoAccountFactoryABI, name: 'createAccount' })],
-      args: [0, publicKey, [], KEY_SLOT],
-    }),
-  ])
+  const initCode = concat([daimoAccountFactoryAddress, encodeCreateAccountData(publicKey)])
 
   const senderAddress = await getSenderAddress(baseMainnetClient, {
     initCode,
     entryPoint: entrypoint.address,
   })
 
-  const address = await daimoAccountFactory.read.getAddress([0, publicKey, [], KEY_SLOT])
+  const address = await daimoAccountFactory.read.getAddress([KEY_SLOT, publicKey, [], SALT])
 
   if (address !== senderAddress) {
     throw new Error('Address mismatch')
@@ -370,10 +385,10 @@ async function generateUserOp(publicKey: [Hex, Hex]) {
     args: [to, value, data],
   })
 
-  const _userOp: UserOperation = {
+  const userOp: UserOperation = {
     sender: senderAddress,
     nonce: 0n,
-    initCode: '0x',
+    initCode: initCode,
     callData,
     callGasLimit: 300000n,
     verificationGasLimit: 700000n,
@@ -385,10 +400,52 @@ async function generateUserOp(publicKey: [Hex, Hex]) {
   }
 
   // get userop hash
-  const userOpHash = await entrypoint.read.getUserOpHash([_userOp])
+  const userOpHash = await entrypoint.read.getUserOpHash([userOp])
 
   return {
-    userOp: _userOp,
+    userOp,
     userOpHash,
   }
+}
+
+function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
+  return encodeFunctionData({
+    abi: [getAbiItem({ abi: daimoAccountFactoryABI, name: 'createAccount' })],
+    args: [
+      KEY_SLOT, // key slot
+      publicKey, // public key
+      [], // init calls
+      SALT, // salt
+    ],
+  })
+}
+
+/**
+ * TODO: use an EOA to create the account for now, this will need to changed to use the init code
+ */
+async function createAccountUsingEOA(pubKey: [Hex, Hex]) {
+  await testClient.setBalance({
+    address: dummyAccount.address,
+    value: parseEther('1'),
+  })
+
+  const { request } = await baseMainnetClient.simulateContract({
+    address: daimoAccountFactory.address,
+    functionName: 'createAccount',
+    abi: daimoAccountFactory.abi,
+    args: [KEY_SLOT, pubKey, [], SALT],
+    account: dummyAccount,
+  })
+
+  const hash = await walletClient.writeContract(request)
+
+  const receipt = await baseMainnetClient.waitForTransactionReceipt({ hash })
+
+  console.log('createAccountUsingEOA receipt', receipt)
+
+  if (receipt.status !== 'success') {
+    throw new Error('Failed to create account')
+  }
+
+  return receipt
 }

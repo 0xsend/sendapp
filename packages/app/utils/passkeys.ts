@@ -109,9 +109,7 @@ export function parseSignResponse(result: SignResult) {
   const [accountName, keySlotStr] = passkeyName.split('.') // Assumes account name does not have periods (.) in it.
   assert(!!accountName && !!keySlotStr, 'Invalid passkey name')
   const keySlot = parseInt(keySlotStr, 10)
-
   const clientDataJSON = Buffer.from(base64.decode(result.rawClientDataJSONB64)).toString('utf-8')
-
   const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":"'))
   const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":"'))
 
