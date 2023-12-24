@@ -82,24 +82,18 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
 
         // dummy op
         UserOperation memory op = UserOperation({
-            sender: address(0),
+            sender: address(acc),
             nonce: 0,
             initCode: hex"",
             callData: hex"00",
-            callGasLimit: 0,
-            verificationGasLimit: 150000,
+            callGasLimit: 200000,
+            verificationGasLimit: 2000000,
             preVerificationGas: 21000,
-            maxFeePerGas: 0,
+            maxFeePerGas: 3e9,
             maxPriorityFeePerGas: 1e9,
             paymasterAndData: hex"",
             signature: hex"00"
         });
-
-        // fill data
-        op.sender = address(acc);
-        op.callGasLimit = 200000;
-        op.verificationGasLimit = 2000000;
-        op.maxFeePerGas = 3e9;
 
         bytes32 hash = entryPoint.getUserOpHash(op);
         console2.log("op hash: ");
