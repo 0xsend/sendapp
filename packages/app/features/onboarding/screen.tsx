@@ -36,15 +36,19 @@ import {
   http,
   createWalletClient,
   numberToBytes,
+  ContractFunctionExecutionError,
+  ContractFunctionRevertedError,
 } from 'viem'
 import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
 import { daimoAccountABI, daimoAccountFactoryABI, iEntryPointABI } from '@my/wagmi'
 import { UserOperation, getSenderAddress } from 'permissionless'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { base64url } from '@scure/base'
+import { base64urlnopad } from '@scure/base'
 
 const privateKey = generatePrivateKey()
 const dummyAccount = privateKeyToAccount(privateKey)
+const receiverAccount = privateKeyToAccount(generatePrivateKey())
+console.log('receiverAccount.address', receiverAccount.address)
 const walletClient = createWalletClient({
   chain: baseMainnetClient.chain,
   transport: http(baseMainnetClient.transport.url),
@@ -73,7 +77,7 @@ const entrypoint = getContract({
 
 // DaimoAccountFactory.createAccount arguments
 const VERSION = 1
-const VALID_UNTIL = 60
+const VALID_UNTIL = 0
 const KEY_SLOT = 0
 const SALT = 0n
 
@@ -98,6 +102,8 @@ export function OnboardingScreen() {
     setCreateResult(result)
     const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
     setPublicKey(_publicKey)
+
+    await createAccountUsingEOA(_publicKey)
 
     const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(_publicKey)
 
@@ -234,16 +240,32 @@ async function sendUserOp({
   // FIXME: sponsor the creation by setting the balance using anvil
   await testClient.setBalance({
     address: senderAddress,
-    value: parseEther('1'),
+    value: parseEther('10'),
   })
 
   // FIXME: sponsor the creation by setting the balance using anvil
   await testClient.setBalance({
     address: dummyAccount.address,
-    value: parseEther('1'),
+    value: parseEther('10'),
   })
 
-  // await createAccountUsingEOA(publicKey)
+  // FIXME: sponsor the creation by setting the deposit on the Entry Point
+  const { request: depositRequest } = await baseMainnetClient.simulateContract({
+    address: entrypoint.address,
+    functionName: 'depositTo',
+    abi: iEntryPointABI,
+    args: [senderAddress],
+    account: dummyAccount,
+    value: parseEther('0.5'),
+  })
+  const depositHash = await walletClient.writeContract(depositRequest)
+  const depositReceipt = await baseMainnetClient.waitForTransactionReceipt({ hash: depositHash })
+  console.log('depositReceipt', depositReceipt)
+
+  if (depositReceipt.status !== 'success') {
+    throw new Error('Failed to deposit')
+  }
+
   const _userOp: UserOperation = {
     ...userOp,
     signature: bytesToHex(signature),
@@ -257,12 +279,22 @@ async function sendUserOp({
   }
 
   // TODO: handle error correctly, simulateValidation always reverts
-  await baseMainnetClient.simulateContract({
-    address: entrypoint.address,
-    functionName: 'simulateValidation',
-    abi: iEntryPointABI,
-    args: [_userOp],
-  })
+  // always reverts
+  await baseMainnetClient
+    .simulateContract({
+      address: entrypoint.address,
+      functionName: 'simulateValidation',
+      abi: iEntryPointABI,
+      args: [_userOp],
+    })
+    .catch((e: ContractFunctionExecutionError) => {
+      const cause: ContractFunctionRevertedError = e.cause
+      if (cause.data?.errorName !== 'ValidationResult') {
+        throw e
+      }
+      const validationResult = cause.data.args?.[0]
+      console.log('Validation result:', validationResult)
+    })
 
   const hash = await bundlerClient.sendUserOperation({
     userOperation: _userOp,
@@ -302,7 +334,7 @@ async function signChallenge(challenge: Hex) {
 
   const clientDataJSON = _signResult.clientDataJSON
   const clientDataChallenge = JSON.parse(clientDataJSON).challenge
-  const clientDataChallengeBytes = base64url.decode(clientDataChallenge)
+  const clientDataChallengeBytes = base64urlnopad.decode(clientDataChallenge)
   console.log('clientDataChallenge', clientDataChallenge)
   console.log('clientDataChallengeBytes', clientDataChallengeBytes)
 
@@ -364,31 +396,28 @@ async function generateUserOp(publicKey: [Hex, Hex]) {
   }
 
   // GENERATE THE CALLDATA
-  const to = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' // vitalik
-  const value = 0n
-  const data = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
+  // Finally, we should be able to do a userop from our new Daimo account.
+  const to = receiverAccount.address
+  const value = parseEther('0.01')
+  const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
 
   const callData = encodeFunctionData({
-    abi: [
-      {
-        inputs: [
-          { name: 'dest', type: 'address' },
-          { name: 'value', type: 'uint256' },
-          { name: 'func', type: 'bytes' },
-        ],
-        name: 'execute',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
+    abi: daimoAccountABI,
+    functionName: 'executeBatch',
+    args: [
+      [
+        {
+          dest: to,
+          value: value,
+          data: data,
+        },
+      ],
     ],
-    args: [to, value, data],
   })
-
   const userOp: UserOperation = {
     sender: senderAddress,
     nonce: 0n,
-    initCode: initCode,
+    initCode: '0x', // initCode,
     callData,
     callGasLimit: 300000n,
     verificationGasLimit: 700000n,
