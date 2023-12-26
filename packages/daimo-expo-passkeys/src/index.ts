@@ -15,7 +15,7 @@ import {
 } from './utils'
 import type ExpoPasskeysModuleWeb from './ExpoPasskeysModule.web'
 
-export { CreateRequest, CreateResult, SignRequest, SignResult }
+export type { CreateRequest, CreateResult, SignRequest, SignResult }
 
 /**
  * Create a new passkey.
