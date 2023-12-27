@@ -1,6 +1,7 @@
 import { ScrollView, YStack, XStack, Avatar, Paragraph, Theme } from "@my/ui";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { MainFooter } from "./footer";
+import { IconQr } from 'app/components/icons';
 
 const MainLayout = ({ scrollable = false, children }: { scrollable?: boolean, children?: React.ReactNode }) => {
   return (
@@ -11,10 +12,9 @@ const MainLayout = ({ scrollable = false, children }: { scrollable?: boolean, ch
             <Avatar br={"$6"} size={"$4.5"}>
               <Avatar.Image src="./avatar.png" />
             </Avatar>
+            {/* <IconLogo /> */}
             <Paragraph size={"$9"} fontWeight={'700'}>Money</Paragraph>
-            <Avatar br={"$3"} size={"$2.5"}>
-              <Avatar.Image src="./qr code.png" />
-            </Avatar>
+            <IconQr />
           </XStack>
         </Theme>
         {scrollable ?

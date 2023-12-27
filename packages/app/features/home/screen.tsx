@@ -119,7 +119,7 @@ export function HomeScreen() {
                     </YStack>
                   </YStack>
                   <Card.Background borderRadius={"$8"} backgroundColor={resolvedTheme?.startsWith('dark') ? "rgb(0,0,0,1)" : "$khaki900"}>
-                    <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} />
+                    {/* <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} /> */}
                   </Card.Background>
                 </Card>
               </XStack>
@@ -141,7 +141,7 @@ export function HomeScreen() {
                     </YStack>
                   </ScrollView>
                   <Card.Background borderRadius={"$8"} backgroundColor={resolvedTheme?.startsWith('dark') ? "rgb(0,0,0,1)" : "$khaki900"}>
-                    <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} />
+                    {/* <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} /> */}
                   </Card.Background>
                 </Card>
                 <YStack width={"$3"} height={"$3"} mt={"$4"} onPress={() => setExpandBalance(false)}>
