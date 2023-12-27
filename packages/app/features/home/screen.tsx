@@ -3,6 +3,8 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { Image } from '@my/ui'
 import { MainLayout } from '../../components/layout';
 import { useState } from 'react';
+import { CommentsTime } from 'app/utils/dateHelper';
+import { IconEthereum, IconUSDC, IconSend, IconArrowDown, IconClose, IconDeposit, IconReceive, IconSendTile } from 'app/components/icons';
 
 export function HomeScreen() {
   const { resolvedTheme } = useThemeSetting()
@@ -11,35 +13,11 @@ export function HomeScreen() {
     currency: 'USD',
   });
   const [expandBalance, setExpandBalance] = useState(false)
-  const CommentsTime = (dateString: any) => {
-    const date: any = new Date(dateString);
-    const currentDate: any = new Date();
-    const timeDifference = currentDate - date;
-    const secondsAgo = Math.floor(timeDifference / 1000);
-    const minutesAgo = Math.floor(secondsAgo / 60);
-    const hoursAgo = Math.floor(minutesAgo / 60);
-    const daysAgo = Math.floor(hoursAgo / 24);
-    const monthsAgo = Math.floor(daysAgo / 30);
-    const yearsAgo = Math.floor(monthsAgo / 12);
 
-    if (yearsAgo > 0) {
-      return `${yearsAgo} year ago`;
-    } else if (monthsAgo > 0) {
-      return `${monthsAgo} mon ago`;
-    } else if (daysAgo > 0) {
-      return `${daysAgo} day ago`;
-    } else if (hoursAgo > 0) {
-      return `${hoursAgo} hour ago`;
-    } else if (minutesAgo > 0) {
-      return `${minutesAgo} min ago`;
-    } else {
-      return `${secondsAgo} sec ago`;
-    }
-  };
   const actionButtons = [
-    { label: "Deposit", iconPNGPath: 'depositIcon.png', href: "/" },
-    { label: "Recieve", iconPNGPath: 'recieveIcon.png', href: "/" },
-    { label: "Send", iconPNGPath: 'sendButtonIcon.png', href: "/checkout" }
+    { label: "Deposit", iconPNGPath: <IconDeposit />, href: "/" },
+    { label: "Recieve", iconPNGPath: <IconReceive />, href: "/" },
+    { label: "Send", iconPNGPath: <IconSendTile />, href: "/checkout" }
   ]
   const balanceViewButtons = [
     { label: "Ethereum", onPress: (e: any) => { } },
@@ -93,27 +71,26 @@ export function HomeScreen() {
   ]
   const balanceDetails = [
     {
-      icon: "eth.png",
       currency: "Ethereum",
       symbol: "eth",
       balance: 1.45
-    }, {
-      icon: "usdc.png",
+    },
+    {
       currency: "USDC",
       symbol: "usdc",
       balance: 125
-    }, {
-      icon: "send.png",
+    },
+    {
       currency: "SEND",
       symbol: "send",
       balance: 71454457
-    }, {
-      icon: "send.png",
+    },
+    {
       currency: "SEND",
       symbol: "send",
       balance: 4412
-    }, {
-      icon: "usdc.png",
+    },
+    {
       currency: "USDC",
       symbol: "usdc",
       balance: 2.0
@@ -121,32 +98,16 @@ export function HomeScreen() {
   ]
   return (
     <>
-      <MainLayout>
-        <Theme name={"dark"}>
+      <MainLayout scrollable={true}>
+        <Theme name="send">
           <Container >
-            <YStack $gtLg={{ width: 600 }} $sm={{ width: '100vw' }} $gtSm={{ width: '100vw' }} ai={"center"} paddingTop={"$6"} gap={"$space.6"} theme={"gold"}>
-              {/* Header */}
-              <XStack w={"90%"} ai={"center"} jc={"space-between"}>
-                <Avatar br={"$6"} size={"$4.5"}>
-                  <Avatar.Image src="./avatar.png" />
-                  {/* @ts-ignore */}
-                  <Avatar.Fallback bc="$background" borderWidth={1} br={"inherit"} borderColor={"$primary"} />
-                </Avatar>
-                <Paragraph size={"$9"} fontWeight={'700'}>Money</Paragraph>
-                <Avatar br={"$3"} size={"$2.5"}>
-                  <Avatar.Image src="./qr code.png" />
-                  {/* @ts-ignore */}
-                  <Avatar.Fallback bc="$background" borderWidth={1} br={"inherit"} borderColor={"$primary"} />
-                </Avatar>
-              </XStack>
+            <YStack $gtLg={{ width: 600 }} $sm={{ width: '100vw' }} $gtSm={{ width: '100vw' }} ai={"center"} paddingTop={"$6"} gap={"$space.6"}>
               {/* Balance Card */}
               <XStack w={"90%"} ai={"center"} jc={"space-between"} zIndex={4}>
                 <Card cur={"pointer"} w={"100%"} h={"$13"} borderRadius={"$8"} shadowColor={"rgba(0, 0, 0, 0.1)"} shadowOffset={{ width: 0, height: 4 }} shadowRadius={8} shadowOpacity={0.1} onPress={() => { !expandBalance && setExpandBalance(!expandBalance) }}>
                   <YStack m={"$3"}>
-                    <XStack jc={"flex-end"} height={"$2.5"}>
-                      {!expandBalance && <Avatar size={"$2.5"}>
-                        <Avatar.Image src={"./arrowDown.png"}></Avatar.Image>
-                      </Avatar>}
+                    <XStack jc={"flex-end"} height={"$2.5"} zIndex={5}>
+                      {!expandBalance && <IconArrowDown />}
                     </XStack>
                     <YStack ai={"center"} jc={"center"}>
                       <Paragraph color={"$primary"} fontSize={"$4"} zIndex={1}>Total Balance</Paragraph>
@@ -162,16 +123,16 @@ export function HomeScreen() {
                   </Card.Background>
                 </Card>
               </XStack>
-              {expandBalance && <YStack position={"absolute"} top={0} left={0} width={"100%"} height={"100%"}
+              {expandBalance && <YStack position={"absolute"} top={210} left={0} width={"100%"} height={"100%"}
                 backgroundColor={resolvedTheme?.startsWith('dark') ? "rgb(0,0,0,0.1)" : "rgb(255,255,255,0.1"} style={{ backdropFilter: 'blur(15px)' }}
-                zIndex={3} alignItems='center' justifyContent='center'>
+                zIndex={3} alignItems='center' >
                 <Card cur={"pointer"} w={"90%"} h={"$18"} borderRadius={"$8"} shadowColor={"rgba(0, 0, 0, 0.3)"} shadowOffset={{ width: 0, height: 4 }} shadowRadius={8} shadowOpacity={0.1} overflow={"scroll"} paddingVertical={"$3"} paddingBottom={"$7"}>
                   <ScrollView zi={4} bc={"transparent"}>
                     <YStack m={"$1"}>
                       {balanceDetails.map(balance => (<ListItem bc={"transparent"}>
                         <XStack f={1} h={"100%"} paddingLeft={"$3"} paddingRight={"$3"} paddingTop={"$2"} alignItems='center' jc={"space-between"} zi={4} >
                           <XStack alignItems='center' jc={"space-between"} gap={"$2"}>
-                            <Image source={{ uri: balance.icon }} width={"$3.5"} height={"$3.5"} />
+                            {(balance.currency === "Ethereum" ? <IconEthereum size={30} /> : (balance.currency === "USDC" ? <IconUSDC size={30} /> : <IconSend size={30} />))}
                             <Paragraph size={"$4"} fontWeight={"400"} color={"$white"}>{`${balance.currency}`}
                             </Paragraph>
                           </XStack>
@@ -183,17 +144,17 @@ export function HomeScreen() {
                     <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} />
                   </Card.Background>
                 </Card>
-                <Image source={{ uri: resolvedTheme?.startsWith('dark') ? "close_dark.png" : "close.png" }} width={"$3"} height={"$3"} mt={"$4"} onPress={() => setExpandBalance(false)} />
+                <YStack width={"$3"} height={"$3"} mt={"$4"} onPress={() => setExpandBalance(false)}>
+                  <IconClose color={"$gray10"} />
+                </YStack>
               </YStack>}
 
               {/* D-R-S Buttons */}
               <XStack w={"90%"} ai={"center"} jc={"space-evenly"} gap={"$4"}>
                 {actionButtons.map(actionButton => <YStack f={1} w={"inherit"} gap={"$2"}>
                   <Card f={1} h={"$12"} borderRadius={"$8"} $sm={{ height: "$10" }} shadowColor={"rgba(0, 0, 0, 0.1)"} shadowOffset={{ width: 0, height: 4 }} shadowRadius={8} shadowOpacity={0.1} onPress={() => window.location.pathname = actionButton.href}>
-                    <XStack f={1} alignItems={"center"} justifyContent={"center"}>
-                      <Avatar size={"$3.5"}>
-                        <Avatar.Image src={actionButton.iconPNGPath}></Avatar.Image>
-                      </Avatar>
+                    <XStack f={1} alignItems={"center"} justifyContent={"center"} zIndex={2}>
+                      {actionButton.iconPNGPath}
                     </XStack>
                     <Card.Background borderRadius={"$8"} backgrounded backgroundColor={resolvedTheme?.startsWith('dark') ? "$cinereous" : "white"}>
                     </Card.Background>
@@ -207,7 +168,7 @@ export function HomeScreen() {
                   return (
                     <Button
                       f={1}
-                      br={"$8"}
+                      br={"$radius.true"}
                       bw={"$0.5"}
                       borderColor={"rgba(195, 171, 142, 0.3)"}
                       bg={"transparent"}

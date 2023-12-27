@@ -29,7 +29,7 @@ export const palettes = (() => {
   const lightColor = 'rgba(22, 22, 25, 1)'
   const lightPalette = [
     lightTransparent,
-    '#fff',
+    '#000',
     '#f9f9f9',
     'hsl(0, 0%, 97.3%)',
     'hsl(0, 0%, 95.1%)',

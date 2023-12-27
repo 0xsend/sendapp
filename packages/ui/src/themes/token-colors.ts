@@ -19,7 +19,8 @@ import {
   gold,
   goldDark,
   brandColors,
-  sendDark
+  sendDark,
+  send
 } from './colors'
 
 export {
@@ -42,7 +43,7 @@ export const colorTokens = {
     red: red,
     yellow: yellow,
     gold: gold,
-    send: sendDark
+    send: send
   },
   dark: {
     blue: blueDark,
@@ -54,7 +55,7 @@ export const colorTokens = {
     red: redDark,
     yellow: yellowDark,
     gold: goldDark,
-    send: sendDark
+    send: sendDark,
   },
 }
 
