@@ -67,6 +67,7 @@ async function waitForTx(publicClient: PublicClient, hash: Hex) {
   const receipt = await publicClient.waitForTransactionReceipt({
     hash,
     timeout: 30000,
+    confirmations: 3,
   })
   console.log(`...status: ${receipt.status}`)
 }
@@ -176,7 +177,7 @@ test('can create a new account', async () => {
   })
   const hash = await walletClient.writeContract(request)
   console.log(`[API] deploy transaction ${hash}`)
-  const tx = await publicClient.waitForTransactionReceipt({ hash })
+  const tx = await publicClient.waitForTransactionReceipt({ hash, confirmations: 3 })
   console.log(`[API] deploy transaction ${tx.status}`)
 
   const depositTxHash = await walletClient.writeContract({
