@@ -13,6 +13,277 @@ import {
 } from 'wagmi/actions'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BaseGoerliForkTest
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const baseGoerliForkTestABI = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
+    name: 'log',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'address', type: 'address', indexed: false }],
+    name: 'log_address',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'val', internalType: 'uint256[]', type: 'uint256[]', indexed: false }],
+    name: 'log_array',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'val', internalType: 'int256[]', type: 'int256[]', indexed: false }],
+    name: 'log_array',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'val', internalType: 'address[]', type: 'address[]', indexed: false }],
+    name: 'log_array',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
+    name: 'log_bytes',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32', indexed: false }],
+    name: 'log_bytes32',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'int256', type: 'int256', indexed: false }],
+    name: 'log_int',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'log_named_address',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'uint256[]', type: 'uint256[]', indexed: false },
+    ],
+    name: 'log_named_array',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'int256[]', type: 'int256[]', indexed: false },
+    ],
+    name: 'log_named_array',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'address[]', type: 'address[]', indexed: false },
+    ],
+    name: 'log_named_array',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'log_named_bytes',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'bytes32', type: 'bytes32', indexed: false },
+    ],
+    name: 'log_named_bytes32',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
+      { name: 'decimals', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'log_named_decimal_int',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'decimals', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'log_named_decimal_uint',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'int256', type: 'int256', indexed: false },
+    ],
+    name: 'log_named_int',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'string', type: 'string', indexed: false },
+    ],
+    name: 'log_named_string',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'key', internalType: 'string', type: 'string', indexed: false },
+      { name: 'val', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'log_named_uint',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'string', type: 'string', indexed: false }],
+    name: 'log_string',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256', indexed: false }],
+    name: 'log_uint',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: '', internalType: 'bytes', type: 'bytes', indexed: false }],
+    name: 'logs',
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'IS_TEST',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [],
+    name: 'createAndSelectFork',
+    outputs: [],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'excludeArtifacts',
+    outputs: [{ name: 'excludedArtifacts_', internalType: 'string[]', type: 'string[]' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'excludeContracts',
+    outputs: [{ name: 'excludedContracts_', internalType: 'address[]', type: 'address[]' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'excludeSenders',
+    outputs: [{ name: 'excludedSenders_', internalType: 'address[]', type: 'address[]' }],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [],
+    name: 'failed',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'targetArtifactSelectors',
+    outputs: [
+      {
+        name: 'targetedArtifactSelectors_',
+        internalType: 'struct StdInvariant.FuzzSelector[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'addr', internalType: 'address', type: 'address' },
+          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+        ],
+      },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'targetArtifacts',
+    outputs: [{ name: 'targetedArtifacts_', internalType: 'string[]', type: 'string[]' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'targetContracts',
+    outputs: [{ name: 'targetedContracts_', internalType: 'address[]', type: 'address[]' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'targetSelectors',
+    outputs: [
+      {
+        name: 'targetedSelectors_',
+        internalType: 'struct StdInvariant.FuzzSelector[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'addr', internalType: 'address', type: 'address' },
+          { name: 'selectors', internalType: 'bytes4[]', type: 'bytes4[]' },
+        ],
+      },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'targetSenders',
+    outputs: [{ name: 'targetedSenders_', internalType: 'address[]', type: 'address[]' }],
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // BasePaymaster
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1086,20 +1357,6 @@ export const daimoVerifierProxyABI = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ERC165
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const erc165ABI = [
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Proxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2132,20 +2389,6 @@ export const ierc1271ABI = [
     ],
     name: 'isValidSignature',
     outputs: [{ name: 'magicValue', internalType: 'bytes4', type: 'bytes4' }],
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IERC165
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const ierc165ABI = [
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
-    name: 'supportsInterface',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
   },
 ] as const
 
@@ -4871,6 +5114,53 @@ export const utilsABI = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Wraps __{@link getContract}__ with `abi` set to __{@link baseGoerliForkTestABI}__.
+ */
+export function getBaseGoerliForkTest(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: baseGoerliForkTestABI, ...config })
+}
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link baseGoerliForkTestABI}__.
+ */
+export function readBaseGoerliForkTest<
+  TAbi extends readonly unknown[] = typeof baseGoerliForkTestABI,
+  TFunctionName extends string = string
+>(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return readContract({ abi: baseGoerliForkTestABI, ...config } as unknown as ReadContractConfig<
+    TAbi,
+    TFunctionName
+  >)
+}
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link baseGoerliForkTestABI}__.
+ */
+export function writeBaseGoerliForkTest<TFunctionName extends string>(
+  config:
+    | Omit<WriteContractPreparedArgs<typeof baseGoerliForkTestABI, TFunctionName>, 'abi'>
+    | Omit<WriteContractUnpreparedArgs<typeof baseGoerliForkTestABI, TFunctionName>, 'abi'>
+) {
+  return writeContract({ abi: baseGoerliForkTestABI, ...config } as unknown as WriteContractArgs<
+    typeof baseGoerliForkTestABI,
+    TFunctionName
+  >)
+}
+
+/**
+ * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link baseGoerliForkTestABI}__.
+ */
+export function prepareWriteBaseGoerliForkTest<
+  TAbi extends readonly unknown[] = typeof baseGoerliForkTestABI,
+  TFunctionName extends string = string
+>(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return prepareWriteContract({
+    abi: baseGoerliForkTestABI,
+    ...config,
+  } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
+}
+
+/**
  * Wraps __{@link getContract}__ with `abi` set to __{@link basePaymasterABI}__.
  */
 export function getBasePaymaster(config: Omit<GetContractArgs, 'abi'>) {
@@ -5221,26 +5511,6 @@ export function getDaimoVerifierProxy(config: Omit<GetContractArgs, 'abi'>) {
 }
 
 /**
- * Wraps __{@link getContract}__ with `abi` set to __{@link erc165ABI}__.
- */
-export function getErc165(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: erc165ABI, ...config })
-}
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc165ABI}__.
- */
-export function readErc165<
-  TAbi extends readonly unknown[] = typeof erc165ABI,
-  TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return readContract({ abi: erc165ABI, ...config } as unknown as ReadContractConfig<
-    TAbi,
-    TFunctionName
-  >)
-}
-
-/**
  * Wraps __{@link getContract}__ with `abi` set to __{@link erc1967ProxyABI}__.
  */
 export function getErc1967Proxy(config: Omit<GetContractArgs, 'abi'>) {
@@ -5484,26 +5754,6 @@ export function readIerc1271<
   TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: ierc1271ABI, ...config } as unknown as ReadContractConfig<
-    TAbi,
-    TFunctionName
-  >)
-}
-
-/**
- * Wraps __{@link getContract}__ with `abi` set to __{@link ierc165ABI}__.
- */
-export function getIerc165(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: ierc165ABI, ...config })
-}
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link ierc165ABI}__.
- */
-export function readIerc165<
-  TAbi extends readonly unknown[] = typeof ierc165ABI,
-  TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return readContract({ abi: ierc165ABI, ...config } as unknown as ReadContractConfig<
     TAbi,
     TFunctionName
   >)
