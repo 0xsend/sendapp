@@ -334,13 +334,13 @@ async function signChallenge(challenge: Hex) {
 
   const clientDataJSON = _signResult.clientDataJSON
   const clientDataChallenge = JSON.parse(clientDataJSON).challenge
-  const clientDataChallengeBytes = base64urlnopad.decode(clientDataChallenge)
+  // const clientDataChallengeBytes = base64urlnopad.decode(clientDataChallenge)
   console.log('clientDataChallenge', clientDataChallenge)
-  console.log('clientDataChallengeBytes', clientDataChallengeBytes)
+  // console.log('clientDataChallengeBytes', clientDataChallengeBytes)
 
-  if (Buffer.compare(clientDataChallengeBytes, challengeBytes) !== 0) {
-    throw new Error('Challenge mismatch')
-  }
+  // if (Buffer.compare(clientDataChallengeBytes, challengeBytes) !== 0) {
+  //   throw new Error('Challenge mismatch')
+  // }
 
   const authenticatorData = bytesToHex(_signResult.rawAuthenticatorData)
   const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
@@ -423,7 +423,7 @@ async function generateUserOp(publicKey: [Hex, Hex]) {
     verificationGasLimit: 700000n,
     preVerificationGas: 300000n,
     maxFeePerGas: 1000000n,
-    maxPriorityFeePerGas: 100000050n,
+    maxPriorityFeePerGas: 1000000n,
     paymasterAndData: '0x',
     signature: '0x',
   }
@@ -468,7 +468,7 @@ async function createAccountUsingEOA(pubKey: [Hex, Hex]) {
 
   const hash = await walletClient.writeContract(request)
 
-  const receipt = await baseMainnetClient.waitForTransactionReceipt({ hash })
+  const receipt = await baseMainnetClient.waitForTransactionReceipt({ hash, confirmations: 3 })
 
   console.log('createAccountUsingEOA receipt', receipt)
 

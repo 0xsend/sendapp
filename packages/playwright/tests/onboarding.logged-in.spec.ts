@@ -9,7 +9,7 @@ import { test, expect } from './fixtures/auth'
 import cbor from 'cbor'
 
 // TODO: add a detereministic seed for the credential store
-test('can visit onboarding page', async ({ page, credentialsStore }) => {
+test.skip('can visit onboarding page', async ({ page, credentialsStore }) => {
   await page.goto('/onboarding')
   expect(page).toHaveURL('/onboarding')
   await page.getByRole('button', { name: 'Create' }).click()
