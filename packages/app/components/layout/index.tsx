@@ -10,14 +10,10 @@ const MainLayout = ({ scrollable = false, children }: { scrollable?: boolean, ch
           <XStack w={"90%"} ai={"center"} jc={"space-between"} marginHorizontal={"5%"} paddingTop={"$6"}>
             <Avatar br={"$6"} size={"$4.5"}>
               <Avatar.Image src="./avatar.png" />
-              {/* @ts-ignore */}
-              <Avatar.Fallback bc="$background" borderWidth={1} br={"inherit"} borderColor={"$primary"} />
             </Avatar>
             <Paragraph size={"$9"} fontWeight={'700'}>Money</Paragraph>
             <Avatar br={"$3"} size={"$2.5"}>
               <Avatar.Image src="./qr code.png" />
-              {/* @ts-ignore */}
-              <Avatar.Fallback bc="$background" borderWidth={1} br={"inherit"} borderColor={"$primary"} />
             </Avatar>
           </XStack>
         </Theme>
