@@ -1,27 +1,16 @@
 /// <reference lib="dom" />
 
-import type {
-  PublicKeyCredential,
-  PublicKeyCredentialCreationOptions,
-  PublicKeyCredentialRequestOptions,
-} from '@simplewebauthn/typescript-types'
+import { base64 } from '@scure/base'
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  let binary = ''
-  const bytes = new Uint8Array(buffer)
-  for (let i = 0; i < bytes.byteLength; ++i) {
-    binary += String.fromCharCode(bytes[i])
+/**
+ * Check if WebAuthn is available.
+ * @see https://www.w3.org/TR/webauthn-2/#sctn-sample-registration
+ */
+function checkPasskeyAvailableOrThrow() {
+  if (!window.PublicKeyCredential) {
+    throw new Error('WebAuthn is not available')
   }
-  return btoa(binary)
-}
-
-function base64ToArrayBuffer(base64: string) {
-  const binaryString = window.atob(base64)
-  const bytes = new Uint8Array(binaryString.length)
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i)
-  }
-  return bytes.buffer
+  return true
 }
 
 const ExpoPasskeysModuleWeb = {
@@ -30,14 +19,27 @@ const ExpoPasskeysModuleWeb = {
     accountName: string,
     userIdBase64: string,
     challengeBase64: string
-  ): Promise<string> {
-    const userId = base64ToArrayBuffer(userIdBase64)
-    const challenge = base64ToArrayBuffer(challengeBase64)
+  ): Promise<{
+    rawClientDataJSON: string
+    rawAttestationObject: string
+  }> {
+    checkPasskeyAvailableOrThrow()
+
+    const userId = base64.decode(userIdBase64)
+    const challenge = base64.decode(challengeBase64)
+
+    console.debug('[daimo-expo-passkeys] createPasskey', {
+      domain,
+      accountName,
+      userId,
+      challenge,
+    })
 
     // Prepare PublicKeyCredentialCreationOptions for WebAuthn
     const publicKeyCredentialCreationOptions = {
       challenge,
       rp: {
+        id: domain,
         name: domain,
       },
       user: {
@@ -59,11 +61,16 @@ const ExpoPasskeysModuleWeb = {
 
     const credential = (await navigator.credentials.create({
       publicKey: publicKeyCredentialCreationOptions,
-    })) as PublicKeyCredential
+    })) as PublicKeyCredential & {
+      response: AuthenticatorAttestationResponse
+    }
 
-    console.debug('credential', credential)
+    console.debug('[daimo-expo-passkeys] credential', credential)
 
-    return arrayBufferToBase64(credential.rawId)
+    return {
+      rawClientDataJSON: base64.encode(new Uint8Array(credential.response.clientDataJSON)),
+      rawAttestationObject: base64.encode(new Uint8Array(credential.response.attestationObject)),
+    }
   },
 
   async signWithPasskey(
@@ -72,10 +79,12 @@ const ExpoPasskeysModuleWeb = {
   ): Promise<{
     passkeyName: string
     signature: string
-    rawAuthenticatorData: string
-    rawClientDataJSON: string
+    rawAuthenticatorDataB64: string
+    rawClientDataJSONB64: string
   }> {
-    const challenge = base64ToArrayBuffer(challengeBase64)
+    checkPasskeyAvailableOrThrow()
+
+    const challenge = base64.decode(challengeBase64)
 
     // Prepare PublicKeyCredentialRequestOptions for WebAuthn
     const publicKeyCredentialRequestOptions = {
@@ -89,20 +98,22 @@ const ExpoPasskeysModuleWeb = {
       response: AuthenticatorAssertionResponse
     }
 
-    console.debug('assertion', assertion)
+    console.debug('[daimo-expo-passkeys] assertion', assertion)
 
     // Extracting various parts of the assertion
     const decoder = new TextDecoder('utf-8')
-    const signature = arrayBufferToBase64(assertion.response.signature)
-    const rawAuthenticatorData = arrayBufferToBase64(assertion.response.authenticatorData)
-    const rawClientDataJSON = arrayBufferToBase64(assertion.response.clientDataJSON)
+    const signature = base64.encode(new Uint8Array(assertion.response.signature))
+    const rawAuthenticatorDataB64 = base64.encode(
+      new Uint8Array(assertion.response.authenticatorData)
+    )
+    const rawClientDataJSONB64 = base64.encode(new Uint8Array(assertion.response.clientDataJSON))
     const passkeyName = decoder.decode(assertion.response.userHandle as ArrayBuffer)
 
     return {
       passkeyName,
       signature,
-      rawAuthenticatorData,
-      rawClientDataJSON,
+      rawAuthenticatorDataB64,
+      rawClientDataJSONB64,
     }
   },
 }

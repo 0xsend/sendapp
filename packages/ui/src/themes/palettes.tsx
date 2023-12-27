@@ -47,10 +47,10 @@ export const palettes = (() => {
   const darkColor = 'rgba(241, 241, 238, 1)'
   const darkPalette = [
     darkTransparent,
-    '#050505',
+    '#101010',
     '#151515',
     '#191919',
-    '#232323',
+    '#212121',
     '#282828',
     '#323232',
     '#424242',

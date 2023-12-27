@@ -13,8 +13,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('can visit distributions page', async ({ page }) => {
-  await page.pause()
   await page.goto('/distributions')
-  // FIXME: This is failing because the user is not eligible for distributions
-  // expect(page).toHaveURL('/distributions')
+  await expect(page).toHaveURL('/distributions')
 })

@@ -81,7 +81,7 @@ export default defineConfig({
   ],
   plugins: [
     foundry({
-      project: '../..',
+      project: '../contracts',
       deployments: {
         Send: {
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
@@ -113,6 +113,8 @@ export default defineConfig({
         'console2.sol/**',
         'test.sol/**',
         'Test.sol/**',
+        'MockERC20.sol/**',
+        'MockERC721.sol/**',
         '**.s.sol/*.json',
         '**.t.sol/*.json',
       ],

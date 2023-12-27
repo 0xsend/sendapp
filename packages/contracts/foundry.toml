@@ -1,11 +1,12 @@
 [profile.default]
-src = "packages/contracts/src"
-test = "packages/contracts/test"
-out = "packages/contracts/out"
-libs = ["node_modules", "packages/contracts/lib"]
+src = "src"
+test = "test"
+out = "out"
+libs = ["lib"]
 ffi = true
-evm_version = "shanghai"
 solc_version = "0.8.21"
+optimizer = true
+optimizer_runs = 999_999
 
 [profile.deploy]
 via_ir = true
@@ -25,5 +26,5 @@ mainnet = "${MAINNET_RPC_URL}"
 base = "${BASE_RPC_URL}"
 
 [etherscan]
-mainnet = { key = "${ETHERSCAN_API_KEY}" }
-base = { key = "${ETHERSCAN_API_KEY}" }
+# mainnet = { key = "${ETHERSCAN_API_KEY}" }
+# base = { key = "${ETHERSCAN_API_KEY}" }

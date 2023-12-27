@@ -2,7 +2,7 @@ import { shorthands } from '@tamagui/shorthands'
 import { createTokens } from '@tamagui/web'
 import { createTamagui } from 'tamagui'
 import { animations } from './config/animations'
-import {bodyFont, headingFont} from './config/fonts'
+import { bodyFont, headingFont } from './config/fonts'
 import { media, mediaQueryDefaultActive } from './config/media'
 import { radius } from './themes/token-radius'
 import { size } from './themes/token-size'
@@ -15,7 +15,10 @@ import { color } from './themes/token-colors'
 /**
  * This avoids shipping themes as JS. Instead, Tamagui will hydrate them from CSS.
  */
-const themes = process.env.TAMAGUI_IS_SERVER ? themesIn : ({} as typeof themesIn)
+const themes =
+  process.env.NODE_ENV === 'test' || process.env.TAMAGUI_IS_SERVER
+    ? themesIn
+    : ({} as typeof themesIn)
 
 const conf = {
   themes,

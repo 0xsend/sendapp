@@ -1,2 +1,1 @@
-# npm needs 9.5 since something is off with the way it calls npx
-dependencies: npm node@20.9.0 forge bun jq yj tilt
+dependencies: yarnpkg.com node@20 forge bun jq yj tilt python caddy

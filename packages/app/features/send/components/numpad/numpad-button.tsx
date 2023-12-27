@@ -1,4 +1,5 @@
-import { Button, ButtonProps, styled } from "@my/ui"
+import { Button, styled } from "@my/ui"
+import { INumpadButtonProps } from "app/features/send/types"
 
 const CustomButton = styled(Button, {
   name: "CustomButton",
@@ -12,18 +13,16 @@ const CustomButton = styled(Button, {
         backgroundColor: "$backgroundHover",
       },
     }
+  },
+  $shorter: {
+    width: "$6",
+    height: "$6"
   }
 })
 
-interface INumpadButtonProps extends ButtonProps {
-  value: string,
-  num?: boolean,
-  pressHandler: (val: string) => void
-}
-
 export function NumpadButton({ value, num, pressHandler, ...otherProps }: INumpadButtonProps) {
   return (
-    <CustomButton num={num} onPress={(e: any) => pressHandler(value)} {...otherProps}>
+    <CustomButton num={num} onPress={() => pressHandler(value)} {...otherProps}>
       {value}
     </CustomButton>
   )

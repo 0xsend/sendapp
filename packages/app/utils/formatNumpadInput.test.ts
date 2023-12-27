@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'vitest'
+import { describe, expect, it } from '@jest/globals'
 
 import formatNumpadInput from './formatNumpadInput' // Adjust the import path
 
@@ -27,7 +27,7 @@ describe('formatNumpadInput', () => {
     expect(formatNumpadInput('0', '1')).toBe('1')
   })
 
-  it('should not handle input when the length of fractional part is equal or greater than 3', () => {
-    expect(formatNumpadInput('123.456', '7')).toBe('123.456')
+  it('should return max value when the current value is greater than max value', () => {
+    expect(formatNumpadInput('1.2', '6', 1.25)).toBe('1.25')
   })
 })

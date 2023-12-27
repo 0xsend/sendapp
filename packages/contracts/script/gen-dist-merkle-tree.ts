@@ -7,18 +7,21 @@ import debug from 'debug'
 
 const log = debug('contracts:script:gen-merkle-tree')
 
-const dotenvPath = join(__dirname, '..', '..', '..', '.env.local')
-log(`Loading environment variables from ${dotenvPath}`)
-config({ path: dotenvPath })
+const dotenvPath = join(__dirname, '..', '..', '..', '.env.production.local')
+config({ path: dotenvPath, debug: true })
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+log(`Loaded environment variables from ${dotenvPath}`)
+
+const NEXT_PUBLIC_SUPABASE_URL = String(process.env.NEXT_PUBLIC_SUPABASE_URL)
+if (!NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
-    `NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.`
+    'NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.'
   )
 }
-if (!process.env.SUPABASE_SERVICE_ROLE) {
+const SUPABASE_SERVICE_ROLE = String(process.env.SUPABASE_SERVICE_ROLE)
+if (!SUPABASE_SERVICE_ROLE) {
   throw new Error(
-    `SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.`
+    'SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.'
   )
 }
 
@@ -28,19 +31,16 @@ async function genMerkleTree() {
 
   log(`Generating merkle tree for distribution ${distributionId}`)
 
-  if (isNaN(distributionId)) {
+  if (Number.isNaN(distributionId)) {
     throw new Error('Distribution ID is not a number. Please pass a number as the first argument.')
   }
 
-  const supabaseAdmin = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE!
-  )
+  const supabaseAdmin = createClient<Database>(NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
   // lookup active distributions
   const { data: shares, error } = await supabaseAdmin
     .from('distribution_shares')
-    .select(`index, address, amount`)
+    .select('index, address, amount')
     .eq('distribution_id', distributionId)
     .order('index', { ascending: true })
 

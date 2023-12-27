@@ -9,7 +9,8 @@
       "app/*": ["./packages/app/*"],
       "@my/ui/*": ["./packages/ui/src/*"],
       "@my/wagmi/*": ["./packages/wagmi/src/*"],
-      "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"]
+      "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"],
+      "@0xsend/webauthn-authenticator/*": ["./packages/webauthn-authenticator/src/*"]
     },
     "plugins": [
       {

@@ -63,3 +63,6 @@ tmp
 cache/
 out/
 broadcast
+
+# ignore for now
+Brewfile.lock.json

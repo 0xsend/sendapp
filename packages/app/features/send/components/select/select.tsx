@@ -2,22 +2,30 @@ import { Adapt, Select as TamaguiSelect, SelectProps, Sheet, YStack, getFontSize
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons"
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
-import { useMemo, useState } from "react"
-import { IconProps } from "@tamagui/helpers-icon"
+import { useMemo } from "react"
+import { IToken } from "app/features/send/types"
 
-export function Select({ items, ...props }: SelectProps & { items: Array<{ icon?: React.ReactNode, name: string }> }) {
-  const [val, setVal] = useState(items[0]?.name.toLowerCase())
+export function Select({ items, currentItem, ...props }: SelectProps & { items: Array<IToken>, currentItem: IToken }) {
 
   return (
     <TamaguiSelect
-      value={val}
-      onValueChange={setVal}
+      value={currentItem.name.toLowerCase()}
       disablePreventBodyScroll
       {...props}
     >
-      <TamaguiSelect.Trigger w="auto" px={'$3.5'} bg={'$backgroundPress'} iconAfter={<IconTriangleDown width={12} height={'$0.75'} />}>
-        <XStack space={'$1.5'}>
-          {items.filter((item) => item.name.toLowerCase() === val)[0]?.icon}
+      <TamaguiSelect.Trigger
+        w="auto"
+        px={'$3.5'}
+        bg={'$backgroundPress'}
+        iconAfter={<IconTriangleDown width={12} height={'$0.75'} />}
+        $shorter={{
+          minHeight: '$3.5',
+          px: '$2.5',
+          py: '$2'
+        }}
+      >
+        <XStack space={'$1.5'} ai={'center'}>
+          {currentItem.icon}
           <TamaguiSelect.Value placeholder="Something" fow={'700'} />
         </XStack>
       </TamaguiSelect.Trigger>
@@ -88,7 +96,7 @@ export function Select({ items, ...props }: SelectProps & { items: Array<{ icon?
                       key={item.name}
                       value={item.name.toLowerCase()}
                     >
-                      <XStack space={'$2'}>
+                      <XStack space={'$2'} ai={'center'}>
                         <TamaguiSelect.Icon>
                           {item.icon}
                         </TamaguiSelect.Icon>

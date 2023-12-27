@@ -18,24 +18,24 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
-    "@tamagui/animations-moti": "^1.79.1",
-    "@tamagui/animations-react-native": "^1.79.1",
-    "@tamagui/cli": "^1.79.1",
-    "@tamagui/create-theme": "^1.79.1",
-    "@tamagui/font-inter": "^1.79.1",
-    "@tamagui/helpers-icon": "^1.79.1",
-    "@tamagui/react-native-media-driver": "^1.79.1",
-    "@tamagui/shorthands": "^1.79.1",
-    "@tamagui/theme-builder": "^1.79.1",
-    "@tamagui/themes": "^1.79.1",
-    "@tamagui/toast": "^1.79.1",
+    "@tamagui/animations-moti": "^1.79.7",
+    "@tamagui/animations-react-native": "^1.79.7",
+    "@tamagui/cli": "^1.79.7",
+    "@tamagui/create-theme": "^1.79.7",
+    "@tamagui/font-inter": "^1.79.7",
+    "@tamagui/helpers-icon": "^1.79.7",
+    "@tamagui/react-native-media-driver": "^1.79.7",
+    "@tamagui/shorthands": "^1.79.7",
+    "@tamagui/theme-builder": "^1.79.7",
+    "@tamagui/themes": "^1.79.7",
+    "@tamagui/toast": "^1.79.7",
     "@ts-react/form": "^1.8.3",
     "moti": "^0.25.3",
     "react-hook-form": "^7.48.2",
-    "tamagui": "^1.79.1",
+    "tamagui": "^1.79.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@tamagui/build": "^1.79.1"
+    "@tamagui/build": "^1.79.7"
   }
 }

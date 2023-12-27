@@ -1,0 +1,727 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OnboardingScreen 1`] = `
+<View
+  style={
+    {
+      "alignItems": "stretch",
+      "alignSelf": "center",
+      "flex": 1,
+      "flexDirection": "row",
+      "maxWidth": 1480,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+        "maxWidth": 600,
+      }
+    }
+  >
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 46,
+          "fontWeight": "700",
+          "lineHeight": 50,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Welcome to Send
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "700",
+          "lineHeight": 34,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Start by creating a Passkey below
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <View
+      accessibilityRole="button"
+      cancelable={true}
+      cursor="pointer"
+      focusable={[Function]}
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#212121",
+          "borderBottomColor": "transparent",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "transparent",
+          "borderLeftWidth": 1,
+          "borderRightColor": "transparent",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "transparent",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "flexDirection": "row",
+          "flexWrap": "nowrap",
+          "height": 44,
+          "justifyContent": "center",
+          "paddingLeft": 18,
+          "paddingRight": 18,
+        }
+      }
+    >
+      <Text
+        cursor="pointer"
+        lineBreakMode="clip"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#fff",
+            "flexGrow": 0,
+            "flexShrink": 1,
+            "fontFamily": "System",
+            "fontSize": 16.8,
+            "fontWeight": "400",
+            "lineHeight": 19,
+          }
+        }
+        suppressHighlighting={true}
+        userSelect="none"
+      >
+        Create
+      </Text>
+    </View>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="publicKey"
+      id=":r0:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Your DER public key:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="publicKey"
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 224,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="senderAddress"
+      id=":r1:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Your sender address:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="senderAddress"
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 64,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="userOpHash"
+      id=":r2:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Your userOp hash:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="userOpHash"
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 64,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="createResult"
+      id=":r3:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Create result:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="createResult"
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 224,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "700",
+          "lineHeight": 34,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Then sign ther userOpHash with it
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <View
+      accessibilityRole="button"
+      cancelable={true}
+      cursor="pointer"
+      focusable={[Function]}
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#212121",
+          "borderBottomColor": "transparent",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "transparent",
+          "borderLeftWidth": 1,
+          "borderRightColor": "transparent",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "transparent",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "flexDirection": "row",
+          "flexWrap": "nowrap",
+          "height": 44,
+          "justifyContent": "center",
+          "paddingLeft": 18,
+          "paddingRight": 18,
+        }
+      }
+    >
+      <Text
+        cursor="pointer"
+        lineBreakMode="clip"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#fff",
+            "flexGrow": 0,
+            "flexShrink": 1,
+            "fontFamily": "System",
+            "fontSize": 16.8,
+            "fontWeight": "400",
+            "lineHeight": 19,
+          }
+        }
+        suppressHighlighting={true}
+        userSelect="none"
+      >
+        Sign
+      </Text>
+    </View>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="signResult"
+      id=":r4:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Sign result:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="signResult"
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 284,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
+  </View>
+</View>
+`;

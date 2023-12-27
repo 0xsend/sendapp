@@ -1,0 +1,9 @@
+{
+  "gasFactor": "1",
+  "minBalance": "1",
+  "maxBundleGas": 5e6,
+  "minStake": "1",
+  "minUnstakeDelay": 0,
+  "autoBundleInterval": 3,
+  "autoBundleMempoolSize": 10
+}
