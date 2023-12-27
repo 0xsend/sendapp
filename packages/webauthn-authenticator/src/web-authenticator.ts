@@ -87,7 +87,6 @@ export async function createPublicKeyCredential(
   ) {
     throw new Error('Unsupported algorithm')
   }
-  const challenge = Buffer.from(credOptsPubKey.challenge, 'base64url')
   const clientDataJSON = Buffer.from(
     new TextEncoder().encode(
       JSON.stringify({
