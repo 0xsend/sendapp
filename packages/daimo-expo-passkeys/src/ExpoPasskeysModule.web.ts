@@ -28,7 +28,7 @@ const ExpoPasskeysModuleWeb = {
     const userId = base64.decode(userIdBase64)
     const challenge = base64.decode(challengeBase64)
 
-    console.debug('[daimo-expo-passkeys] createPasskey', {
+    console.log('[daimo-expo-passkeys] createPasskey', {
       domain,
       accountName,
       userId,
@@ -65,7 +65,7 @@ const ExpoPasskeysModuleWeb = {
       response: AuthenticatorAttestationResponse
     }
 
-    console.debug('[daimo-expo-passkeys] credential', credential)
+    console.log('[daimo-expo-passkeys] credential', credential)
 
     return {
       rawClientDataJSON: base64.encode(new Uint8Array(credential.response.clientDataJSON)),
@@ -98,7 +98,7 @@ const ExpoPasskeysModuleWeb = {
       response: AuthenticatorAssertionResponse
     }
 
-    console.debug('[daimo-expo-passkeys] assertion', assertion)
+    console.log('[daimo-expo-passkeys] assertion', assertion)
 
     // Extracting various parts of the assertion
     const decoder = new TextDecoder('utf-8')

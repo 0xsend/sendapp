@@ -22,6 +22,8 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
     throw new Error('Missing credential')
   }
 
+  console.log('credential', credential)
+
   expect(credential.attestations?.length).toBe(1)
   const attestation = credential.attestations?.[0]
 

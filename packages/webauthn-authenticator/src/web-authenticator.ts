@@ -98,7 +98,7 @@ export async function createPublicKeyCredential(
     )
   )
   const rpId = credOptsPubKey.rp.id || 'localhost'
-  const userHandle = Buffer.from(credOptsPubKey.user.id, 'base64url') || null
+  const userHandle = base64urlnopad.decode(credOptsPubKey.user.id) || null
   const cred = createWebauthnCredential({
     rpId,
     userHandle,
@@ -117,12 +117,12 @@ export async function createPublicKeyCredential(
   cred.attestations.push(response)
 
   const credentialResponse: PublicKeyCredentialAttestationSerialized = {
-    id: credentialId.toString('base64url'),
-    rawId: credentialId.toString('base64url'),
+    id: base64urlnopad.encode(credentialId),
+    rawId: base64urlnopad.encode(credentialId),
     authenticatorAttachment: 'platform',
     response: {
-      attestationObject: attestationObject.toString('base64url'),
-      clientDataJSON: clientDataJSON.toString('base64url'),
+      attestationObject: base64urlnopad.encode(attestationObject),
+      clientDataJSON: base64urlnopad.encode(clientDataJSON),
     },
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
@@ -182,13 +182,13 @@ export async function getPublicKeyCredential(
   cred.assertions.push(response)
 
   const credentialResponse = {
-    id: credentialId.toString('base64url'),
-    rawId: credentialId.toString('base64url'),
+    id: base64urlnopad.encode(credentialId),
+    rawId: base64urlnopad.encode(credentialId),
     response: {
-      authenticatorData: Buffer.from(authData).toString('base64url'),
-      clientDataJSON: Buffer.from(clientDataBuffer).toString('base64url'),
-      signature: Buffer.from(assertionObject).toString('base64url'),
-      userHandle: cred.userHandle ? Buffer.from(cred.userHandle).toString('base64url') : null,
+      authenticatorData: base64urlnopad.encode(Buffer.from(authData)),
+      clientDataJSON: base64urlnopad.encode(Buffer.from(clientDataBuffer)),
+      signature: base64urlnopad.encode(Buffer.from(assertionObject)),
+      userHandle: cred.userHandle ? base64urlnopad.encode(Buffer.from(cred.userHandle)) : null,
     },
     type: 'public-key',
   } as PublicKeyCredentialAssertionSerialized

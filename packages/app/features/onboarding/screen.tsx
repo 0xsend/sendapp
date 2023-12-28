@@ -167,7 +167,7 @@ export function OnboardingScreen() {
         <Label htmlFor="signResult">Sign result:</Label>
         <TextArea
           id="signResult"
-          height="$20"
+          height="$6"
           // @ts-expect-error setup monospace font
           fontFamily={'monospace'}
           value={
@@ -300,7 +300,7 @@ async function signChallenge(challenge: Hex) {
     throw new Error('No challengeB64 to sign')
   }
   const sign = await signWithPasskey({
-    domain: window.location.hostname,
+    domain: window.location.origin,
     challengeB64,
   })
   console.log('Onbboarding screen signed', sign)

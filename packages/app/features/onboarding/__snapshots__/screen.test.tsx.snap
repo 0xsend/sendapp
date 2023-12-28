@@ -804,7 +804,7 @@ exports[`OnboardingScreen 1`] = `
           "fontFamily": "monospace",
           "fontSize": 16.8,
           "fontWeight": "400",
-          "height": 284,
+          "height": 64,
           "lineHeight": 19,
           "minWidth": 0,
           "paddingBottom": 13,
