@@ -1,8 +1,9 @@
 import { expect, test } from '@jest/globals'
 
 import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
-import { daimoAccountFactoryABI } from '@my/wagmi'
+import { daimoAccountFactoryABI, daimoVerifierABI } from '@my/wagmi'
 import debug from 'debug'
+
 export const log = debug('app:features:onboarding:screen')
 import crypto from 'node:crypto'
 import {
@@ -10,42 +11,26 @@ import {
   PublicClient,
   bytesToHex,
   concat,
-  createWalletClient,
   encodeAbiParameters,
   getAbiItem,
   hexToBytes,
-  http,
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
-  decodeEventLog,
+  parseEther,
   formatEther,
 } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
 
-import { encodeFunctionData, getContract, createTestClient, parseEther, numberToBytes } from 'viem'
+import { getContract, numberToBytes } from 'viem'
 import { daimoAccountABI, iEntryPointABI } from '@my/wagmi'
-import { generatePrivateKey } from 'viem/accounts'
 import { base64urlnopad } from '@scure/base'
-import { USEROP_VALID_UNTIL, generateUserOp } from 'app/utils/userop'
-import SuperJSON from 'superjson'
-
-const privateKey = generatePrivateKey()
-const dummyAccount = privateKeyToAccount(privateKey)
-const walletClient = createWalletClient({
-  chain: baseMainnetClient.chain,
-  transport: http(baseMainnetClient.transport.url),
-  account: dummyAccount,
-})
-
-const receiverAccount = privateKeyToAccount(generatePrivateKey())
-console.log('receiverAccount.address', receiverAccount.address)
-
-const testClient = createTestClient({
-  chain: baseMainnetClient.chain,
-  transport: http(baseMainnetClient.transport.url),
-  mode: 'anvil',
-})
-const daimoAccountFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
+import {
+  USEROP_VALID_UNTIL,
+  USEROP_VERSION,
+  daimoAccountFactoryAddress,
+  generateUserOp,
+  receiverAccount,
+  testClient,
+} from 'app/utils/userop'
 
 const daimoAccountFactory = getContract({
   abi: daimoAccountFactoryABI,
@@ -59,69 +44,63 @@ const entrypoint = getContract({
   address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
 })
 
-test('can create a new account', async () => {
-  console.log('dummyAccount.address', dummyAccount.address)
+const daimoVerifierAddress = '0x5ccF3633f2018D836db449071262B57e3882A762'
 
-  // Viem
-  const chain = baseMainnetClient.chain
-  const publicClient = baseMainnetClient
-  console.log(`Connected to ${chain.name}, ${publicClient.transport.url}`)
+const verifier = getContract({
+  abi: daimoVerifierABI,
+  publicClient: baseMainnetClient,
+  address: daimoVerifierAddress,
+})
 
+const signatureStruct = getAbiItem({
+  abi: daimoAccountABI,
+  name: 'signatureStruct',
+}).inputs
+
+async function createAccountAndVerifySignature() {
   // Generate keypair
-  const p256 = { name: 'ECDSA', namedCurve: 'P-256', hash: 'SHA-256' }
-  const key = await crypto.subtle.generateKey(p256, true, ['sign', 'verify'])
+  const keygen = { name: 'ECDSA', namedCurve: 'P-256', hash: 'SHA-256' }
+  const key = await crypto.subtle.generateKey(keygen, true, ['sign', 'verify'])
   const pubKeyDer = await crypto.subtle.exportKey('spki', key.publicKey)
   const pubKeyHex = Buffer.from(pubKeyDer).toString('hex')
-  console.log(`Generated pubkey: ${pubKeyHex}`)
 
   // Daimo account
   const signer = async (challenge: Hex) => {
-    console.log(`Signing message: ${challenge}`)
     const bChallenge = hexToBytes(challenge)
     const challengeB64URL = base64urlnopad.encode(bChallenge)
-
     const clientDataJSON = JSON.stringify({
       type: 'webauthn.get',
       challenge: challengeB64URL,
-      origin: 'daimo.com',
+      origin: 'sendapp.localhost',
     })
-
-    // const clientDataHash = new Uint8Array(
-    //   await Crypto.digest(
-    //     Crypto.CryptoDigestAlgorithm.SHA256,
-    //     new TextEncoder().encode(clientDataJSON)
-    //   )
-    // );
     const clientDataHash = await crypto.subtle.digest('SHA-256', Buffer.from(clientDataJSON))
 
     const authenticatorData = new Uint8Array(37) // rpIdHash (32) + flags (1) + counter (4)
     authenticatorData[32] = 5 // flags: user present (1) + user verified (4)
     const message = concat([authenticatorData, new Uint8Array(clientDataHash)])
 
-    const sigRaw = await crypto.subtle.sign(p256, key.privateKey, Buffer.from(message))
+    const sigRaw = await crypto.subtle.sign(keygen, key.privateKey, Buffer.from(message))
 
     // DER encode
-    const r = Buffer.from(sigRaw).subarray(0, 32).toString('hex')
-    const s = Buffer.from(sigRaw).subarray(32, 64).toString('hex')
+    const r = BigInt(`0x${Buffer.from(sigRaw).subarray(0, 32).toString('hex')}`)
+    let s = BigInt(`0x${Buffer.from(sigRaw).subarray(32, 64).toString('hex')}`)
 
-    const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
-    const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":'))
+    const n = BigInt('0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551')
+    if (s > n / 2n) {
+      s = n - s
+    }
 
-    const signatureStruct = getAbiItem({
-      abi: daimoAccountABI,
-      name: 'signatureStruct',
-    }).inputs
+    const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":"'))
+    const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":"webauthn.get"'))
 
     const sigStruct = {
       authenticatorData: bytesToHex(authenticatorData),
       clientDataJSON,
       challengeLocation,
       responseTypeLocation,
-      r: BigInt(`0x${r}`),
-      s: BigInt(`0x${s}`),
+      r,
+      s,
     }
-
-    console.log('Signature struct:', sigStruct)
 
     const encodedSig = encodeAbiParameters(signatureStruct, [sigStruct])
 
@@ -142,9 +121,6 @@ test('can create a new account', async () => {
   const args = [0, [key1, key2], [], salt] as const
 
   const address = await daimoAccountFactory.read.getAddress(args)
-  console.log(`Daimo account address: ${address}`)
-
-  console.log('Prefunding account. Setting balance...')
   await testClient.setBalance({
     address: address,
     value: parseEther('100'),
@@ -154,28 +130,32 @@ test('can create a new account', async () => {
 
   const { userOp, userOpHash } = await generateUserOp([key1, key2])
 
-  console.log('UserOp:', SuperJSON.stringify(userOp))
-
-  // get userop hash
-  // const userOpHash = await entrypoint.read.getUserOpHash([userOp])
-  console.log(`UserOp hash: ${userOpHash}`)
-
-  console.log('Signing userOp...')
-  const bVersion = numberToBytes(1, { size: 1 })
+  const bVersion = numberToBytes(USEROP_VERSION, { size: 1 })
   const bValidUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
   const bOpHash = hexToBytes(userOpHash)
   const bMsg = concat([bVersion, bValidUntil, bOpHash])
-  const { keySlot, encodedSig } = await signer(bytesToHex(bMsg))
+  const challenge = bytesToHex(bMsg)
+  const { keySlot, encodedSig: sig } = await signer(challenge)
   const bKeySlot = numberToBytes(keySlot, { size: 1 })
-  const signature = bytesToHex(concat([bVersion, bValidUntil, bKeySlot, hexToBytes(encodedSig)]))
+  const opSig = bytesToHex(concat([bVersion, bValidUntil, bKeySlot, hexToBytes(sig)]))
 
   const _userOp = {
     ...userOp,
-    signature: signature,
+    signature: opSig,
   }
   if (userOpHash !== (await entrypoint.read.getUserOpHash([_userOp]))) {
     throw new Error('Invalid signature')
   }
+
+  const message = challenge
+  const signature = bytesToHex(hexToBytes(opSig).slice(7))
+  const x = BigInt(key1)
+  const y = BigInt(key2)
+
+  // verify signature
+  const result = await verifier.read.verifySignature([message, signature, x, y])
+  expect(result).toBe(true)
+
   // always reverts
   await baseMainnetClient
     .simulateContract({
@@ -190,51 +170,45 @@ test('can create a new account', async () => {
         throw e
       }
       const validationResult = cause.data.args?.[0]
-      console.log('Validation result:', validationResult)
+      if ((validationResult as { sigFailed: boolean })?.sigFailed) {
+        console.log('Validation result: ', validationResult)
+        throw new Error('Signature failed')
+      }
     })
 
+  return { userOp: _userOp, userOpHash }
+}
+
+test('can create a new account', async () => {
+  const { userOp } = await createAccountAndVerifySignature()
   // submit userop
   const _userOpHash = await bundlerClient.sendUserOperation({
-    userOperation: _userOp,
+    userOperation: userOp,
     entryPoint: entrypoint.address,
+  })
+  const senderBalA = await baseMainnetClient.getBalance({ address: userOp.sender })
+  const receiverBalA = await baseMainnetClient.getBalance({
+    address: receiverAccount.address,
   })
 
   const userOpReceipt = await bundlerClient.waitForUserOperationReceipt({ hash: _userOpHash })
-  console.log('userOpReceipt', userOpReceipt)
-
-  if (!userOpReceipt.success) {
-    console.error('UserOp failed:', userOpReceipt)
-  }
-
   const txReceipt = await baseMainnetClient.getTransactionReceipt({
     hash: userOpReceipt.receipt.transactionHash,
   })
 
-  for (const log of txReceipt.logs) {
-    try {
-      console.log(
-        'event emitted',
-        decodeEventLog({
-          abi: iEntryPointABI,
-          data: log.data,
-          topics: log.topics,
-        })
-      )
-    } catch (e) {
-      console.error('error decoding event log', e)
-    }
-  }
+  const senderBalB = await baseMainnetClient.getBalance({ address: userOp.sender })
+  const receiverBaB = await baseMainnetClient.getBalance({
+    address: receiverAccount.address,
+  })
 
-  const senderBalance = await baseMainnetClient.getBalance({ address: address })
-  const receiverBalance = await baseMainnetClient.getBalance({ address: receiverAccount.address })
-
-  console.log('senderBalance', formatEther(senderBalance))
-  console.log('receiverBalance', formatEther(receiverBalance))
+  expect(txReceipt.status).toBe('success')
+  expect(senderBalB).toBeLessThan(senderBalA)
+  expect(receiverBaB).toBeGreaterThan(receiverBalA)
+  expect(formatEther(receiverBaB - receiverBalA)).toBe('0.01')
 }, 60_000)
 
 test('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
-  console.log('supportedEntryPoints', supportedEntryPoints)
   log('TODO: implement bundler test', supportedEntryPoints)
 })
 

@@ -14,13 +14,12 @@ import {
 import { baseMainnetClient } from './viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
-const daimoAccountFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
+export const daimoAccountFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
 
 // TODO: remove this wallet client and test client
 const privateKey = generatePrivateKey()
 export const dummyAccount = privateKeyToAccount(privateKey)
 export const receiverAccount = privateKeyToAccount(generatePrivateKey())
-console.log('receiverAccount.address', receiverAccount.address)
 export const walletClient = createWalletClient({
   chain: baseMainnetClient.chain,
   transport: http(baseMainnetClient.transport.url),
