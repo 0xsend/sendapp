@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "@my/contracts": "workspace:*",
-    "@wagmi/core": "^1.4.3",
-    "viem": "^1.15.1",
-    "wagmi": "^1.4.6"
+    "@wagmi/core": "^1.4.12",
+    "viem": "^1.21.1",
+    "wagmi": "^1.4.12"
   }
 }
