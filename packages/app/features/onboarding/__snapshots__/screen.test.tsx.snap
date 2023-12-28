@@ -919,6 +919,100 @@ exports[`OnboardingScreen 1`] = `
         Send
       </Text>
     </View>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="sendResult"
+      id=":r6:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Send result:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="sendResult"
+      multiline={true}
+      numberOfLines={4}
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "monospace",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 64,
+          "lineHeight": 19,
+          "minWidth": 0,
+          "paddingBottom": 13,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "paddingTop": 13,
+        }
+      }
+    />
   </View>
 </View>
 `;

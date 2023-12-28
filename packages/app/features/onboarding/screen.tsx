@@ -42,6 +42,7 @@ import {
   generateUserOp,
   walletClient,
   testClient,
+  verifier,
 } from 'app/utils/userop'
 
 // DaimoAccountFactory.createAccount arguments
@@ -55,10 +56,11 @@ export function OnboardingScreen() {
   const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
   const [challenge, setChallenge] = useState<Hex | null>(null)
   const [signature, setSignature] = useState<Uint8Array | null>(null)
+  const [sendResult, setSendResult] = useState<boolean | null>(null)
 
   async function createAccount() {
     const result = await createPasskey({
-      domain: window.location.hostname,
+      domain: window.location.origin,
       challengeB64: window.btoa('foobar'),
       passkeyName: accountName,
       passkeyDisplayTitle: `Send App: ${accountName}`,
@@ -68,7 +70,7 @@ export function OnboardingScreen() {
     const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
     setPublicKey(_publicKey)
 
-    await createAccountUsingEOA(_publicKey)
+    // await createAccountUsingEOA(_publicKey)
 
     const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(_publicKey)
 
@@ -92,6 +94,9 @@ export function OnboardingScreen() {
     if (!userOpHash) {
       throw new Error('No userOpHash')
     }
+    if (!publicKey) {
+      throw new Error('No publicKey')
+    }
     const encodedWebAuthnSig = await signChallenge(challenge)
     console.log('encodedWebAuthnSig', encodedWebAuthnSig)
     if (!encodedWebAuthnSig || encodedWebAuthnSig.length <= 2) {
@@ -101,9 +106,19 @@ export function OnboardingScreen() {
       numberToBytes(USEROP_VERSION, { size: 1 }),
       numberToBytes(USEROP_VALID_UNTIL, { size: 6 }),
       numberToBytes(USEROP_KEY_SLOT, { size: 1 }),
-      hexToBytes(userOpHash),
       hexToBytes(encodedWebAuthnSig),
     ])
+
+    // verify signature is correct
+    const message = challenge
+    const signature = bytesToHex(_signature.slice(7))
+    const x = BigInt(publicKey[0])
+    const y = BigInt(publicKey[1])
+
+    // verify signature
+    const result = await verifier.read.verifySignature([message, signature, x, y])
+    console.log('verifySignature result', result)
+
     setSignature(_signature)
   }
 
@@ -179,11 +194,19 @@ export function OnboardingScreen() {
             if (!senderAddress) {
               throw new Error('No sender address')
             }
-            await sendUserOp({ userOp, userOpHash, signature, senderAddress })
+            setSendResult(await sendUserOp({ userOp, userOpHash, signature, senderAddress }))
           }}
         >
           Send
         </Button>
+        <Label htmlFor="sendResult">Send result:</Label>
+        <TextArea
+          id="sendResult"
+          height="$6"
+          // @ts-expect-error setup monospace font
+          fontFamily={'monospace'}
+          value={sendResult ? sendResult : undefined}
+        />
       </YStack>
     </Container>
   )
@@ -199,7 +222,7 @@ async function sendUserOp({
   userOpHash: Hex
   signature: Uint8Array
   senderAddress: Hex
-}) {
+}): Promise<boolean> {
   console.log('sending', { userOp, userOpHash, signature })
 
   // FIXME: sponsor the creation by setting the balance using anvil
@@ -208,28 +231,20 @@ async function sendUserOp({
     value: parseEther('10'),
   })
 
-  // FIXME: sponsor the creation by setting the balance using anvil
-  await testClient.setBalance({
-    address: dummyAccount.address,
-    value: parseEther('10'),
-  })
-
   // FIXME: sponsor the creation by setting the deposit on the Entry Point
-  const { request: depositRequest } = await baseMainnetClient.simulateContract({
-    address: entrypoint.address,
-    functionName: 'depositTo',
-    abi: iEntryPointABI,
-    args: [senderAddress],
-    account: dummyAccount,
-    value: parseEther('0.5'),
-  })
-  const depositHash = await walletClient.writeContract(depositRequest)
-  const depositReceipt = await baseMainnetClient.waitForTransactionReceipt({ hash: depositHash })
-  console.log('depositReceipt', depositReceipt)
-
-  if (depositReceipt.status !== 'success') {
-    throw new Error('Failed to deposit')
-  }
+  // const { request: depositRequest } = await baseMainnetClient.simulateContract({
+  //   address: entrypoint.address,
+  //   functionName: 'depositTo',
+  //   abi: iEntryPointABI,
+  //   args: [senderAddress],
+  //   account: dummyAccount,
+  //   value: parseEther('0.5'),
+  // })
+  // const depositHash = await walletClient.writeContract(depositRequest)
+  // const depositReceipt = await baseMainnetClient.waitForTransactionReceipt({ hash: depositHash })
+  // if (depositReceipt.status !== 'success') {
+  //   throw new Error('Failed to deposit')
+  // }
 
   const _userOp: UserOperation = {
     ...userOp,
@@ -238,12 +253,6 @@ async function sendUserOp({
 
   console.log('sending userOp', _userOp)
 
-  // verify hash is same
-  if (userOpHash !== (await entrypoint.read.getUserOpHash([_userOp]))) {
-    throw new Error('Hash mismatch')
-  }
-
-  // TODO: handle error correctly, simulateValidation always reverts
   // always reverts
   await baseMainnetClient
     .simulateContract({
@@ -275,6 +284,7 @@ async function sendUserOp({
   if (receipt.success !== true) {
     throw new Error('Failed to send userOp')
   }
+  return receipt.success
 }
 
 async function signChallenge(challenge: Hex) {
