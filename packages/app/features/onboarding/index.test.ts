@@ -26,6 +26,8 @@ import { encodeFunctionData, getContract, createTestClient, parseEther, numberTo
 import { daimoAccountABI, iEntryPointABI } from '@my/wagmi'
 import { generatePrivateKey } from 'viem/accounts'
 import { base64urlnopad } from '@scure/base'
+import { USEROP_VALID_UNTIL, generateUserOp } from 'app/utils/userop'
+import SuperJSON from 'superjson'
 
 const privateKey = generatePrivateKey()
 const dummyAccount = privateKeyToAccount(privateKey)
@@ -57,22 +59,9 @@ const entrypoint = getContract({
   address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
 })
 
-// DaimoAccountFactory.createAccount arguments
-const VERSION = 1
-const VALID_UNTIL = 0
-const KEY_SLOT = 0
-const SALT = 0n
-
-async function waitForTx(publicClient: PublicClient, hash: Hex) {
-  const receipt = await publicClient.waitForTransactionReceipt({
-    hash,
-    timeout: 30000,
-    confirmations: 3,
-  })
-  console.log(`...status: ${receipt.status}`)
-}
-
 test('can create a new account', async () => {
+  console.log('dummyAccount.address', dummyAccount.address)
+
   // Viem
   const chain = baseMainnetClient.chain
   const publicClient = baseMainnetClient
@@ -153,89 +142,31 @@ test('can create a new account', async () => {
   const args = [0, [key1, key2], [], salt] as const
 
   const address = await daimoAccountFactory.read.getAddress(args)
-  const addr = address
   console.log(`Daimo account address: ${address}`)
 
-  await testClient.setBalance({
-    address: dummyAccount.address,
-    value: parseEther('100'),
-  })
-
+  console.log('Prefunding account. Setting balance...')
   await testClient.setBalance({
     address: address,
     value: parseEther('100'),
   })
 
-  // Deploy account
-  const { request } = await baseMainnetClient.simulateContract({
-    account: dummyAccount,
-    address: daimoAccountFactoryAddress,
-    abi: daimoAccountFactoryABI,
-    functionName: 'createAccount',
-    args: args,
-    value: 0n,
-  })
-  const hash = await walletClient.writeContract(request)
-  console.log(`[API] deploy transaction ${hash}`)
-  const tx = await publicClient.waitForTransactionReceipt({ hash, confirmations: 3 })
-  console.log(`[API] deploy transaction ${tx.status}`)
+  // await deployAccount(args, publicClient, addr)
 
-  const depositTxHash = await walletClient.writeContract({
-    address: entrypoint.address,
-    abi: iEntryPointABI,
-    functionName: 'depositTo',
-    args: [addr],
-    value: parseEther('1'), // 0.01 ETH
-  })
-  console.log(`Faucet deposited prefund: ${depositTxHash}`)
-  await waitForTx(publicClient as PublicClient, depositTxHash)
+  const { userOp, userOpHash } = await generateUserOp([key1, key2])
 
-  // Finally, we should be able to do a userop from our new Daimo account.
-  const to = receiverAccount.address
-  const value = parseEther('0.01')
-  const data: Hex = '0x' // "hello" encoded to utf-8 bytes
-
-  const callData = encodeFunctionData({
-    abi: daimoAccountABI,
-    functionName: 'executeBatch',
-    args: [
-      [
-        {
-          dest: to,
-          value: value,
-          data: data,
-        },
-      ],
-    ],
-  })
-
-  const userOp = {
-    sender: address,
-    nonce: 0n,
-    initCode: '0x' as Hex,
-    callData,
-    callGasLimit: 300000n,
-    verificationGasLimit: 700000n,
-    preVerificationGas: 300000n,
-    maxFeePerGas: 1000000n,
-    maxPriorityFeePerGas: 1000000n,
-    paymasterAndData: '0x' as Hex,
-    signature: '0x' as Hex,
-  }
-
-  console.log('UserOp:', userOp)
+  console.log('UserOp:', SuperJSON.stringify(userOp))
 
   // get userop hash
-  const userOpHash = await entrypoint.read.getUserOpHash([userOp])
+  // const userOpHash = await entrypoint.read.getUserOpHash([userOp])
   console.log(`UserOp hash: ${userOpHash}`)
+
+  console.log('Signing userOp...')
   const bVersion = numberToBytes(1, { size: 1 })
-  const bValidUntil = numberToBytes(VALID_UNTIL, { size: 6 })
+  const bValidUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
   const bOpHash = hexToBytes(userOpHash)
   const bMsg = concat([bVersion, bValidUntil, bOpHash])
   const { keySlot, encodedSig } = await signer(bytesToHex(bMsg))
-
   const bKeySlot = numberToBytes(keySlot, { size: 1 })
-
   const signature = bytesToHex(concat([bVersion, bValidUntil, bKeySlot, hexToBytes(encodedSig)]))
 
   const _userOp = {
@@ -280,14 +211,18 @@ test('can create a new account', async () => {
   })
 
   for (const log of txReceipt.logs) {
-    console.log(
-      'event emitted',
-      decodeEventLog({
-        abi: iEntryPointABI,
-        data: log.data,
-        topics: log.topics,
-      })
-    )
+    try {
+      console.log(
+        'event emitted',
+        decodeEventLog({
+          abi: iEntryPointABI,
+          data: log.data,
+          topics: log.topics,
+        })
+      )
+    } catch (e) {
+      console.error('error decoding event log', e)
+    }
   }
 
   const senderBalance = await baseMainnetClient.getBalance({ address: address })
@@ -308,3 +243,43 @@ test('can get gas user operation gas prices', async () => {
   expect(gasPrice).toBeDefined()
   log('gasPrice', gasPrice)
 })
+
+// async function deployAccount(args: , publicClient, addr: string) {
+//   await testClient.setBalance({
+//     address: dummyAccount.address,
+//     value: parseEther('100'),
+//   })
+
+//   // Deploy account
+//   const { request } = await baseMainnetClient.simulateContract({
+//     account: dummyAccount,
+//     address: daimoAccountFactoryAddress,
+//     abi: daimoAccountFactoryABI,
+//     functionName: 'createAccount',
+//     args: args,
+//     value: 0n,
+//   })
+//   const hash = await walletClient.writeContract(request)
+//   console.log(`[API] deploy transaction ${hash}`)
+//   const tx = await publicClient.waitForTransactionReceipt({ hash, confirmations: 3 })
+//   console.log(`[API] deploy transaction ${tx.status}`)
+
+//   const depositTxHash = await walletClient.writeContract({
+//     address: entrypoint.address,
+//     abi: iEntryPointABI,
+//     functionName: 'depositTo',
+//     args: [addr],
+//     value: parseEther('1'), // 0.01 ETH
+//   })
+//   console.log(`Faucet deposited prefund: ${depositTxHash}`)
+//   await waitForTx(publicClient as PublicClient, depositTxHash)
+// }
+
+async function waitForTx(publicClient: PublicClient, hash: Hex) {
+  const receipt = await publicClient.waitForTransactionReceipt({
+    hash,
+    timeout: 30000,
+    confirmations: 3,
+  })
+  console.log(`...status: ${receipt.status}`)
+}
