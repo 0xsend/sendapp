@@ -59,7 +59,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         const credOptSer = {
           publicKey: {
             rp: {
-              id: 'send.app',
+              id: 'https://send.app',
               name: 'Send',
             },
             user: {
@@ -163,7 +163,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         const credOptSer = {
           publicKey: {
             rp: {
-              id: 'send.app',
+              id: 'https://send.app',
               name: 'Send',
             },
             user: {

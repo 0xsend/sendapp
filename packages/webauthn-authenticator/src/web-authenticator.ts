@@ -18,6 +18,7 @@ import {
   GetWebAuthnCredentialQuery,
 } from './types'
 import { AAGUID } from './aaguid'
+import { base64, base64urlnopad } from '@scure/base'
 
 export const COSE_PUB_KEY_ALG = -7 // ECDSA w/ SHA-256
 
@@ -91,7 +92,7 @@ export async function createPublicKeyCredential(
     new TextEncoder().encode(
       JSON.stringify({
         challenge: credOptsPubKey.challenge,
-        origin: `https://${credOptsPubKey.rp.id}`,
+        origin: credOptsPubKey.rp.id,
         type: 'webauthn.create',
       })
     )
@@ -142,16 +143,20 @@ export async function createPublicKeyCredential(
 export async function getPublicKeyCredential(
   credentialRequestOptions: CredentialRequestOptionsSerialized
 ) {
+  console.log('[webauthn-authenticator] getPublicKeyCredential', credentialRequestOptions)
+  const challenge = credentialRequestOptions.publicKey.challenge // base64url encoded challenge
   const credReqOptsPubKey = credentialRequestOptions.publicKey
-  const clientDataBuffer = Buffer.from(
-    new TextEncoder().encode(
-      JSON.stringify({
-        challenge: credentialRequestOptions.publicKey.challenge,
-        origin: credentialRequestOptions.publicKey.rpId,
-        type: 'webauthn.get',
-      })
-    )
+  const clientDataJSON = {
+    type: 'webauthn.get',
+    challenge: credentialRequestOptions.publicKey.challenge,
+    origin: credentialRequestOptions.publicKey.rpId,
+  }
+  console.log('[webauthn-authenticator] getPublicKeyCredential clientDataJSON', clientDataJSON)
+  console.log(
+    '[webauthn-authenticator] challenge',
+    Buffer.from(base64urlnopad.decode(challenge)).toString('hex')
   )
+  const clientDataBuffer = Buffer.from(new TextEncoder().encode(JSON.stringify(clientDataJSON)))
   const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
   const credQuery: GetWebAuthnCredentialQuery = {
     credentialId: credReqOptsPubKey?.allowCredentials?.[0]?.id,
@@ -189,6 +194,10 @@ export async function getPublicKeyCredential(
   } as PublicKeyCredentialAssertionSerialized
 
   console.log('[webauthn-authenticator] getPublicKeyCredential', credentialResponse)
+  console.log(
+    '[webauthn-authenticator] credentialResponse',
+    Buffer.from(base64urlnopad.decode(credentialResponse.response.clientDataJSON)).toString('utf-8')
+  )
 
   return credentialResponse
 }

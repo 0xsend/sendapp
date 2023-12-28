@@ -113,11 +113,11 @@ export function installWebAuthnMock({
 
     const assertionSer = await getCredFunc(credOpts)
 
-    console.debug('[webauthn mock] assertionSer', assertionSer)
+    console.log('[webauthn mock] assertionSer', assertionSer)
 
     const assertion = utils.deserializePublicKeyCredentialAssertion(assertionSer)
 
-    console.debug('[webauthn mock] assertion', assertion)
+    console.log('[webauthn mock] assertion', assertion)
 
     return assertion
   }
