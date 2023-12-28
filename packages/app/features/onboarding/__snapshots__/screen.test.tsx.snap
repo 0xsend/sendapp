@@ -18,6 +18,8 @@ exports[`OnboardingScreen 1`] = `
         "alignItems": "stretch",
         "flexDirection": "column",
         "maxWidth": 600,
+        "paddingBottom": 32,
+        "paddingTop": 32,
       }
     }
   >
@@ -47,10 +49,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -80,10 +82,100 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
+        }
+      }
+    />
+    <Text
+      cancelable={true}
+      cursor="default"
+      focusable={true}
+      htmlFor="accountName"
+      id=":r0:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "#fff",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 44,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Account name:
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
+        }
+      }
+    />
+    <TextInput
+      editable={true}
+      focusable={true}
+      id="accountName"
+      onChangeText={[Function]}
+      outlineWidth={0}
+      placeholderTextColor="#545454"
+      style={
+        {
+          "backgroundColor": "#151515",
+          "borderBottomColor": "#323232",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#323232",
+          "borderLeftWidth": 1,
+          "borderRightColor": "#323232",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "#323232",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "height": 44,
+          "minWidth": 0,
+          "paddingLeft": 16,
+          "paddingRight": 16,
+        }
+      }
+      value="Sender foobar.0"
+    />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -152,10 +244,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -164,7 +256,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="publicKey"
-      id=":r0:"
+      id=":r1:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -195,10 +287,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -246,10 +338,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -258,7 +350,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="senderAddress"
-      id=":r1:"
+      id=":r2:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -289,10 +381,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -340,10 +432,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -352,7 +444,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="userOpHash"
-      id=":r2:"
+      id=":r3:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -383,10 +475,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -434,10 +526,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -446,7 +538,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="createResult"
-      id=":r3:"
+      id=":r4:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -477,10 +569,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -528,10 +620,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -561,10 +653,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -633,10 +725,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -645,7 +737,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="signResult"
-      id=":r4:"
+      id=":r5:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -676,10 +768,10 @@ exports[`OnboardingScreen 1`] = `
       style={
         {
           "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
         }
       }
     />
@@ -722,6 +814,111 @@ exports[`OnboardingScreen 1`] = `
         }
       }
     />
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "#fff",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "700",
+          "lineHeight": 34,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Send it
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "alignItems": "stretch",
+          "height": 7,
+          "minHeight": 7,
+          "minWidth": 7,
+          "width": 7,
+        }
+      }
+    />
+    <View
+      accessibilityRole="button"
+      cancelable={true}
+      cursor="pointer"
+      focusable={[Function]}
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#212121",
+          "borderBottomColor": "transparent",
+          "borderBottomLeftRadius": 9,
+          "borderBottomRightRadius": 9,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "transparent",
+          "borderLeftWidth": 1,
+          "borderRightColor": "transparent",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "transparent",
+          "borderTopLeftRadius": 9,
+          "borderTopRightRadius": 9,
+          "borderTopWidth": 1,
+          "flexDirection": "row",
+          "flexWrap": "nowrap",
+          "height": 44,
+          "justifyContent": "center",
+          "paddingLeft": 18,
+          "paddingRight": 18,
+        }
+      }
+    >
+      <Text
+        cursor="pointer"
+        lineBreakMode="clip"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#fff",
+            "flexGrow": 0,
+            "flexShrink": 1,
+            "fontFamily": "System",
+            "fontSize": 16.8,
+            "fontWeight": "400",
+            "lineHeight": 19,
+          }
+        }
+        suppressHighlighting={true}
+        userSelect="none"
+      >
+        Send
+      </Text>
+    </View>
   </View>
 </View>
 `;

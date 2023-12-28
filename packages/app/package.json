@@ -19,6 +19,7 @@
     "@noble/curves": "^1.2.0",
     "@openzeppelin/merkle-tree": "1.0.5",
     "@react-native-async-storage/async-storage": "1.18.2",
+    "@scure/base": "^1.1.5",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/supabase-js": "^2.38.5",

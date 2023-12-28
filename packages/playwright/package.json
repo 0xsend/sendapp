@@ -20,5 +20,8 @@
   "scripts": {
     "codegen": "npx ts-node ./bin/codegen.ts",
     "test": "playwright test"
+  },
+  "dependencies": {
+    "cbor": "^9.0.1"
   }
 }

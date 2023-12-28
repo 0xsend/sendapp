@@ -54,7 +54,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           deserializePublicKeyCredentialAssertion,
         } = await import('../src')
 
-        const attestationChallenge = Buffer.from('test challenge').toString('base64')
+        const attestationChallenge = Buffer.from('test challenge').toString('base64url')
 
         const credOptSer = {
           publicKey: {
@@ -63,7 +63,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
               name: 'Send',
             },
             user: {
-              id: Buffer.from('test user').toString('base64'),
+              id: Buffer.from('test user').toString('base64url'),
               name: 'sendusername',
               displayName: 'Send User',
             },
@@ -82,8 +82,8 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
-        expect(cred.rawId).toEqual(testBytes)
-        expect(cred.id).toEqual(testBytes.toString('base64'))
+        expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+        expect(cred.id).toEqual(testBytes.toString('base64url'))
 
         verifyCredChallenge({ cred, attestationChallenge, publicKey: keyPair.publicKey })
 
@@ -103,8 +103,8 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         const credSer2 = await getPublicKeyCredential(credReqOptsSer)
         const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
 
-        expect(cred2.rawId).toEqual(testBytes)
-        expect(cred2.id).toEqual(testBytes.toString('base64'))
+        expect(cred2.rawId).toEqual(new Uint8Array(testBytes))
+        expect(cred2.id).toEqual(testBytes.toString('base64url'))
         const verified = crypto.verify(
           'sha256',
           Buffer.concat([
@@ -158,7 +158,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           '../src'
         )
 
-        const attestationChallenge = Buffer.from('test challenge').toString('base64')
+        const attestationChallenge = Buffer.from('test challenge').toString('base64url')
 
         const credOptSer = {
           publicKey: {
@@ -167,7 +167,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
               name: 'Send',
             },
             user: {
-              id: Buffer.from('test user').toString('base64'),
+              id: Buffer.from('test user').toString('base64url'),
               name: 'sendusername',
               displayName: 'Send User',
             },
@@ -186,8 +186,8 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
-        expect(cred.rawId).toEqual(testBytes)
-        expect(cred.id).toEqual(testBytes.toString('base64'))
+        expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+        expect(cred.id).toEqual(testBytes.toString('base64url'))
         verifyCredChallenge({ cred, attestationChallenge, publicKey: keyPair.publicKey })
       })
     })
