@@ -36,7 +36,6 @@ import { signChallenge } from 'app/utils/userop'
 
 export function OnboardingScreen() {
   const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
-  const [createResult, setCreateResult] = useState<CreateResult | null>(null)
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
@@ -52,8 +51,6 @@ export function OnboardingScreen() {
       passkeyName: accountName,
       passkeyDisplayTitle: `Send App: ${accountName}`,
     })
-    console.log('Onboarding screen create', result)
-    setCreateResult(result)
     const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
     setPublicKey(_publicKey)
 
@@ -138,14 +135,6 @@ export function OnboardingScreen() {
           // @ts-expect-error setup monospace font
           fontFamily={'monospace'}
           value={userOpHash ? userOpHash : undefined}
-        />
-        <Label htmlFor="createResult">Create result:</Label>
-        <TextArea
-          id="createResult"
-          height="$16"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={createResult ? JSON.stringify(createResult, null, 2) : undefined}
         />
         <H2>Then sign ther userOpHash with it</H2>
         <Button onPress={_signWithPasskey}>Sign</Button>
