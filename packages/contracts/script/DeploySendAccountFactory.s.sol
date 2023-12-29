@@ -28,7 +28,6 @@ contract DeploySendAccountFactoryScript is Script, Helper {
             address(verifierProxy) == SEND_VERIFIER_PROXY,
             "DeploySendAccountFactoryScript: SEND_VERIFIER_PROXY address mismatch"
         );
-        // TODO: unsure what is going on with the tests here
         require(
             address(factory) == SEND_ACCOUNT_FACTORY,
             "DeploySendAccountFactoryScript: SEND_ACCOUNT_FACTORY address mismatch"
