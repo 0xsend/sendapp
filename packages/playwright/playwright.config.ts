@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test'
 import path from 'path'
 import dotenv from 'dotenv-flow'
 
+// @ts-expect-error - set global __DEV__ variable to handle app react native imports
+globalThis.__DEV__ = false
+
 // load env vars
 dotenv.config({
   path: path.resolve(__dirname, '..', '..'),

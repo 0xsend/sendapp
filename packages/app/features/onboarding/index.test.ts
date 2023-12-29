@@ -33,6 +33,11 @@ import {
   verifier,
 } from 'app/utils/userop'
 
+jest.mock('@daimo/expo-passkeys', () => ({
+  createPasskey: jest.fn(),
+  signWithPasskey: jest.fn(),
+}))
+
 const signatureStruct = getAbiItem({
   abi: daimoAccountABI,
   name: 'signatureStruct',
@@ -101,11 +106,14 @@ async function createAccountAndVerifySignature() {
   const salt = 0n
   const args = [0, [key1, key2], [], salt] as const
 
+  // Simulate user depositing funds to new account
   const address = await daimoAccountFactory.read.getAddress(args)
   await testClient.setBalance({
     address: address,
-    value: parseEther('100'),
+    value: parseEther('1'),
   })
+
+  expect(await baseMainnetClient.getBalance({ address })).toBe(parseEther('1'))
 
   // await deployAccount(args, publicClient, addr)
 

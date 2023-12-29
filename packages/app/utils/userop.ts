@@ -17,9 +17,15 @@ import {
   createWalletClient,
   getContract,
   http,
+  numberToBytes,
+  bytesToHex,
+  encodeAbiParameters,
+  hexToBytes,
 } from 'viem'
 import { baseMainnetClient } from './viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { signWithPasskey } from '@daimo/expo-passkeys'
+import { parseSignResponse, parseAndNormalizeSig } from './passkeys'
 
 // TODO: remove this wallet client and test client
 const privateKey = generatePrivateKey()
@@ -133,4 +139,48 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     userOp,
     userOpHash,
   }
+}
+export function generateChallenge(_userOpHash: Hex): Hex {
+  const version = numberToBytes(USEROP_VERSION, { size: 1 })
+  const validUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
+  const opHash = hexToBytes(_userOpHash)
+  const challenge = bytesToHex(concat([version, validUntil, opHash]))
+  return challenge
+}
+export async function signChallenge(challenge: Hex) {
+  if (!challenge || challenge.length <= 0) {
+    throw new Error('No challenge to sign')
+  }
+  const challengeBytes = hexToBytes(challenge)
+  const challengeB64 = Buffer.from(challengeBytes).toString('base64')
+  if (!challengeB64) {
+    throw new Error('No challengeB64 to sign')
+  }
+  const sign = await signWithPasskey({
+    domain: window.location.hostname,
+    challengeB64,
+  })
+  const _signResult = parseSignResponse(sign)
+  const clientDataJSON = _signResult.clientDataJSON
+  const authenticatorData = bytesToHex(_signResult.rawAuthenticatorData)
+  const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
+  const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":'))
+  const { r, s } = parseAndNormalizeSig(_signResult.derSig)
+  const webauthnSig = {
+    authenticatorData,
+    clientDataJSON,
+    challengeLocation,
+    responseTypeLocation,
+    r,
+    s,
+  }
+
+  const encodedWebAuthnSig = encodeAbiParameters(
+    getAbiItem({
+      abi: daimoAccountABI,
+      name: 'signatureStruct',
+    }).inputs,
+    [webauthnSig]
+  )
+  return encodedWebAuthnSig
 }
