@@ -20,7 +20,8 @@ contract DeploySendAccountFactoryScript is Script, Helper {
 
         vm.startBroadcast();
 
-        new DaimoAccountFactory(IEntryPoint(AA_ENTRY_POINT), DaimoVerifier(verifierProxy));
+        address factory =
+            address(new DaimoAccountFactory{salt: 0}(IEntryPoint(AA_ENTRY_POINT), DaimoVerifier(verifierProxy)));
 
         require(address(verifier) == SEND_VERIFIER, "DeploySendAccountFactoryScript: SEND_VERIFIER address mismatch");
         require(
@@ -28,10 +29,10 @@ contract DeploySendAccountFactoryScript is Script, Helper {
             "DeploySendAccountFactoryScript: SEND_VERIFIER_PROXY address mismatch"
         );
         // TODO: unsure what is going on with the tests here
-        // require(
-        //     address(factory) == SEND_ACCOUNT_FACTORY,
-        //     "DeploySendAccountFactoryScript: SEND_ACCOUNT_FACTORY address mismatch"
-        // );
+        require(
+            address(factory) == SEND_ACCOUNT_FACTORY,
+            "DeploySendAccountFactoryScript: SEND_ACCOUNT_FACTORY address mismatch"
+        );
 
         vm.stopBroadcast();
     }
