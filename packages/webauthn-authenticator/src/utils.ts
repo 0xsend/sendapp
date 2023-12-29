@@ -49,8 +49,7 @@ export function parseCredAuthData(buffer: Uint8Array) {
   const credIDLen = Buffer.from(credIDLenBuf).readUInt16BE(0)
   const credID = buf.slice(0, credIDLen)
   buf = buf.slice(credIDLen)
-
-  console.log('[webauthn-authenticator utils] buf', buf)
+  const COSEPublicKey = buf
 
   return {
     rpIdHash,
@@ -60,7 +59,7 @@ export function parseCredAuthData(buffer: Uint8Array) {
     counterBuf,
     aaguid,
     credID,
-    COSEPublicKey: buf.byteLength ? buf : null,
+    COSEPublicKey,
   }
 }
 
@@ -87,8 +86,6 @@ export function deserializePublicKeyCredentialAttestion(
 
   const publicKey = cbor.decodeAllSync(COSEPublicKey)[0]
 
-  console.log('[webauthn-authenticator utils] publicCoseKey', publicKey)
-
   const response: AuthenticatorAttestationResponse = {
     attestationObject,
     clientDataJSON,
@@ -103,7 +100,6 @@ export function deserializePublicKeyCredentialAttestion(
         publicKey.get(-2),
         publicKey.get(-3),
       ]
-      console.log('key', key)
       return Buffer.concat(key)
     },
     getPublicKeyAlgorithm() {
@@ -142,12 +138,6 @@ export function deserializePublicKeyCredentialAssertion(
   const userHandle = credential.response.userHandle
     ? base64URLToBuffer(credential.response.userHandle)
     : null
-
-  console.log('[webauthn-authenticator utils] userHandle', userHandle)
-  console.log('[webauthn-authenticator utils] authenticatorData', authenticatorData)
-  console.log('[webauthn-authenticator utils] signature', signature)
-  console.log('[webauthn-authenticator utils] clientDataJSON', clientDataJSON)
-
   const response: AuthenticatorAssertionResponse = {
     authenticatorData,
     clientDataJSON,
