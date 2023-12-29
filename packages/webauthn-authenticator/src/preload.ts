@@ -31,8 +31,6 @@ export function installWebAuthnMock({
 
   // Mock the WebAuthn API
   navigator.credentials.create = async (credOpt: CredentialCreationOptions) => {
-    console.log('webauthn mock create credential', credOpt)
-
     if (!credOpt.publicKey) throw new Error('Missing publicKey in credentialOptions')
     if (!credOpt.publicKey.challenge) throw new Error('Missing challenge in publicKey')
     if (!credOpt.publicKey.rp || !credOpt.publicKey.rp.id) {
@@ -63,8 +61,6 @@ export function installWebAuthnMock({
       },
     } as CredentialCreationOptionsSerialized
 
-    console.log('[webauthn mock] create credentialSerialized', credOptSer)
-
     // biome-ignore lint/suspicious/noExplicitAny: explicit any is needed here
     const createCredFunc: typeof createPublicKeyCredential = (window as any)[
       exposedCreateCredFuncName
@@ -74,18 +70,10 @@ export function installWebAuthnMock({
     }
 
     const credSer = await createCredFunc(credOptSer)
-
-    console.log('[webauthn mock] create credSer', credSer)
-
     const cred = utils.deserializePublicKeyCredentialAttestion(credSer)
-
-    console.log('[webauthn mock] create cred', cred)
-
     return cred
   }
   navigator.credentials.get = async (credential: CredentialRequestOptions) => {
-    console.log('[webauthn mock] get credential', credential)
-
     if (!credential.publicKey) throw new Error('Missing publicKey in credentialOptions')
     if (!credential.publicKey.challenge) throw new Error('Missing challenge in publicKey')
     if (!credential.publicKey.rpId) throw new Error('Missing rpId in publicKey')
@@ -112,13 +100,7 @@ export function installWebAuthnMock({
     }
 
     const assertionSer = await getCredFunc(credOpts)
-
-    console.debug('[webauthn mock] assertionSer', assertionSer)
-
     const assertion = utils.deserializePublicKeyCredentialAssertion(assertionSer)
-
-    console.debug('[webauthn mock] assertion', assertion)
-
     return assertion
   }
 }

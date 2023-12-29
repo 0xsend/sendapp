@@ -27,6 +27,21 @@ export function parseCredAuthData(buffer: Uint8Array) {
   const counterBuf = buf.slice(0, 4)
   buf = buf.slice(4)
   const counter = Buffer.from(counterBuf).readUInt32BE(0)
+
+  // in case of no attestation data
+  if (buf.byteLength === 0) {
+    return {
+      rpIdHash,
+      flagsBuf,
+      flags,
+      counter,
+      counterBuf,
+      aaguid: null,
+      credID: null,
+      COSEPublicKey: null,
+    }
+  }
+
   const aaguid = buf.slice(0, 16)
   buf = buf.slice(16)
   const credIDLenBuf = buf.slice(0, 2)
@@ -64,9 +79,12 @@ export function deserializePublicKeyCredentialAttestion(
   }
   const { attStmt, authData } = attestation
   const { COSEPublicKey } = parseCredAuthData(authData)
-  const publicKey = cbor.decodeAllSync(COSEPublicKey)[0]
 
-  console.log('[webauthn-authenticator utils] publicCoseKey', publicKey)
+  if (!COSEPublicKey) {
+    throw new Error('Invalid COSEPublicKey')
+  }
+
+  const publicKey = cbor.decodeAllSync(COSEPublicKey)[0]
 
   const response: AuthenticatorAttestationResponse = {
     attestationObject,
@@ -82,7 +100,6 @@ export function deserializePublicKeyCredentialAttestion(
         publicKey.get(-2),
         publicKey.get(-3),
       ]
-      console.log('key', key)
       return Buffer.concat(key)
     },
     getPublicKeyAlgorithm() {
@@ -121,7 +138,6 @@ export function deserializePublicKeyCredentialAssertion(
   const userHandle = credential.response.userHandle
     ? base64URLToBuffer(credential.response.userHandle)
     : null
-
   const response: AuthenticatorAssertionResponse = {
     authenticatorData,
     clientDataJSON,

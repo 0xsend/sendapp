@@ -1,10 +1,9 @@
 import { expect, test } from '@jest/globals'
 
 import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
-import { daimoAccountFactoryABI, daimoVerifierABI } from '@my/wagmi'
 import debug from 'debug'
 
-export const log = debug('app:features:onboarding:screen')
+const log = debug('app:features:onboarding:screen')
 import crypto from 'node:crypto'
 import {
   Hex,
@@ -20,37 +19,19 @@ import {
   formatEther,
 } from 'viem'
 
-import { getContract, numberToBytes } from 'viem'
+import { numberToBytes } from 'viem'
 import { daimoAccountABI, iEntryPointABI } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import {
   USEROP_VALID_UNTIL,
   USEROP_VERSION,
-  daimoAccountFactoryAddress,
+  daimoAccountFactory,
+  entrypoint,
   generateUserOp,
   receiverAccount,
   testClient,
+  verifier,
 } from 'app/utils/userop'
-
-const daimoAccountFactory = getContract({
-  abi: daimoAccountFactoryABI,
-  publicClient: baseMainnetClient,
-  address: daimoAccountFactoryAddress,
-})
-
-const entrypoint = getContract({
-  abi: [getAbiItem({ abi: iEntryPointABI, name: 'getUserOpHash' })],
-  publicClient: baseMainnetClient,
-  address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-})
-
-const daimoVerifierAddress = '0x5ccF3633f2018D836db449071262B57e3882A762'
-
-const verifier = getContract({
-  abi: daimoVerifierABI,
-  publicClient: baseMainnetClient,
-  address: daimoVerifierAddress,
-})
 
 const signatureStruct = getAbiItem({
   abi: daimoAccountABI,
@@ -71,7 +52,7 @@ async function createAccountAndVerifySignature() {
     const clientDataJSON = JSON.stringify({
       type: 'webauthn.get',
       challenge: challengeB64URL,
-      origin: 'sendapp.localhost',
+      origin: 'https://send.app.localhost',
     })
     const clientDataHash = await crypto.subtle.digest('SHA-256', Buffer.from(clientDataJSON))
 

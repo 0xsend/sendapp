@@ -18,6 +18,7 @@ import {
   GetWebAuthnCredentialQuery,
 } from './types'
 import { AAGUID } from './aaguid'
+import { base64, base64urlnopad } from '@scure/base'
 
 export const COSE_PUB_KEY_ALG = -7 // ECDSA w/ SHA-256
 
@@ -91,13 +92,14 @@ export async function createPublicKeyCredential(
     new TextEncoder().encode(
       JSON.stringify({
         challenge: credOptsPubKey.challenge,
-        origin: `https://${credOptsPubKey.rp.id}`,
+        origin: credOptsPubKey.rp.id,
         type: 'webauthn.create',
       })
     )
   )
+  const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataJSON))
   const rpId = credOptsPubKey.rp.id || 'localhost'
-  const userHandle = Buffer.from(credOptsPubKey.user.id, 'base64url') || null
+  const userHandle = base64urlnopad.decode(credOptsPubKey.user.id) || null
   const cred = createWebauthnCredential({
     rpId,
     userHandle,
@@ -106,7 +108,7 @@ export async function createPublicKeyCredential(
   const attestedCredentialData = generateAttestedCredentialData(credentialId, publicKey)
   const authData = generateAuthenticatorData(rpId, signCounter, attestedCredentialData)
   cred.signCounter++ // increment counter on each "access" to the authenticator
-  const attestationObject = generateAttestionObject(authData, clientDataJSON, privateKey)
+  const attestationObject = generateAttestionObject(authData, clientDataHash, privateKey)
 
   // save response to cred for inspection
   const response = {
@@ -116,18 +118,15 @@ export async function createPublicKeyCredential(
   cred.attestations.push(response)
 
   const credentialResponse: PublicKeyCredentialAttestationSerialized = {
-    id: credentialId.toString('base64url'),
-    rawId: credentialId.toString('base64url'),
+    id: base64urlnopad.encode(credentialId),
+    rawId: base64urlnopad.encode(credentialId),
     authenticatorAttachment: 'platform',
     response: {
-      attestationObject: attestationObject.toString('base64url'),
-      clientDataJSON: clientDataJSON.toString('base64url'),
+      attestationObject: base64urlnopad.encode(attestationObject),
+      clientDataJSON: base64urlnopad.encode(clientDataJSON),
     },
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
-
-  console.log('[webauthn-authenticator] createPublicKeyCredential', credentialResponse)
-
   return credentialResponse
 }
 
@@ -142,16 +141,15 @@ export async function createPublicKeyCredential(
 export async function getPublicKeyCredential(
   credentialRequestOptions: CredentialRequestOptionsSerialized
 ) {
+  const challenge = credentialRequestOptions.publicKey.challenge // base64url encoded challenge
   const credReqOptsPubKey = credentialRequestOptions.publicKey
-  const clientDataBuffer = Buffer.from(
-    new TextEncoder().encode(
-      JSON.stringify({
-        challenge: credentialRequestOptions.publicKey.challenge,
-        origin: credentialRequestOptions.publicKey.rpId,
-        type: 'webauthn.get',
-      })
-    )
-  )
+  const clientDataJSON = {
+    type: 'webauthn.get',
+    challenge: credentialRequestOptions.publicKey.challenge,
+    origin: credentialRequestOptions.publicKey.rpId,
+  }
+  const clientDataBuffer = Buffer.from(new TextEncoder().encode(JSON.stringify(clientDataJSON)))
+  const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataBuffer))
   const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
   const credQuery: GetWebAuthnCredentialQuery = {
     credentialId: credReqOptsPubKey?.allowCredentials?.[0]?.id,
@@ -165,7 +163,7 @@ export async function getPublicKeyCredential(
 
   const authData = generateAuthenticatorData(rpId, signCounter, null)
   cred.signCounter++ // increment counter on each "access" to the authenticator
-  const assertionObject = generateAssertionObject(authData, clientDataBuffer, privateKey)
+  const assertionObject = generateAssertionObject(authData, clientDataHash, privateKey)
   const response: AuthenticatorAssertionResponse = {
     authenticatorData: authData,
     clientDataJSON: clientDataBuffer,
@@ -177,18 +175,16 @@ export async function getPublicKeyCredential(
   cred.assertions.push(response)
 
   const credentialResponse = {
-    id: credentialId.toString('base64url'),
-    rawId: credentialId.toString('base64url'),
+    id: base64urlnopad.encode(credentialId),
+    rawId: base64urlnopad.encode(credentialId),
     response: {
-      authenticatorData: Buffer.from(authData).toString('base64url'),
-      clientDataJSON: Buffer.from(clientDataBuffer).toString('base64url'),
-      signature: Buffer.from(assertionObject).toString('base64url'),
-      userHandle: cred.userHandle ? Buffer.from(cred.userHandle).toString('base64url') : null,
+      authenticatorData: base64urlnopad.encode(Buffer.from(authData)),
+      clientDataJSON: base64urlnopad.encode(Buffer.from(clientDataBuffer)),
+      signature: base64urlnopad.encode(Buffer.from(assertionObject)),
+      userHandle: cred.userHandle ? base64urlnopad.encode(Buffer.from(cred.userHandle)) : null,
     },
     type: 'public-key',
   } as PublicKeyCredentialAssertionSerialized
-
-  console.log('[webauthn-authenticator] getPublicKeyCredential', credentialResponse)
 
   return credentialResponse
 }

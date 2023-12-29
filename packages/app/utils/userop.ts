@@ -1,4 +1,9 @@
-import { daimoAccountABI, daimoAccountFactoryABI, iEntryPointABI } from '@my/wagmi'
+import {
+  daimoAccountABI,
+  daimoAccountFactoryABI,
+  daimoVerifierABI,
+  iEntryPointABI,
+} from '@my/wagmi'
 import { getSenderAddress, UserOperation } from 'permissionless'
 import {
   Hex,
@@ -42,6 +47,14 @@ export const entrypoint = getContract({
   abi: [getAbiItem({ abi: iEntryPointABI, name: 'getUserOpHash' })],
   publicClient: baseMainnetClient,
   address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+})
+
+export const daimoVerifierAddress = '0x5ccF3633f2018D836db449071262B57e3882A762'
+
+export const verifier = getContract({
+  abi: daimoVerifierABI,
+  publicClient: baseMainnetClient,
+  address: daimoVerifierAddress,
 })
 
 export const USEROP_VERSION = 1
