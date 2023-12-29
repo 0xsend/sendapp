@@ -38,17 +38,18 @@ local_resource(
 if CI and os.getenv("INSTALL_PLAYWRIGHT_DEPS") != None:
     local_resource("yarn:install:playwright-deps", "yarnx playwright install --with-deps", labels = labels)
 
+contract_files = files_matching(
+    os.path.join("packages", "contracts"),
+    lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
+)
+
 local_resource(
     "contracts:build",
     "yarn contracts build --sizes",
     allow_parallel = True,
     labels = labels,
     resource_deps = ["yarn:install"],
-    deps =
-        files_matching(
-            os.path.join("packages", "contracts"),
-            lambda f: f.endswith(".sol") and f.find("cache") == -1,
-        ),
+    deps = contract_files,
 )
 
 local_resource(
@@ -473,10 +474,6 @@ local_resource(
         "yarn:install",
         "contracts:build",
     ],
-    deps =
-        files_matching(
-            os.path.join("packages", "contracts"),
-            lambda f: f.endswith(".sol") and f.find("cache") == -1,
-        ),
+    deps = contract_files,
 )
 
