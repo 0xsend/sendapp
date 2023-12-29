@@ -1,4 +1,4 @@
-import { testClient } from '../viem'
+import { testMainnetClient } from '../viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 import { test as base, mergeTests } from '@playwright/test'
@@ -28,7 +28,7 @@ export const test = base.extend<{
     const accounts = signers.map((k) => privateKeyToAccount(k as `0x${string}`))
     // set balance for accounts
     for (const account of accounts) {
-      await testClient.setBalance({
+      await testMainnetClient.setBalance({
         address: account.address as `0x${string}`,
         value: parseEther('10000'),
       })

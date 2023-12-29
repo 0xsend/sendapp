@@ -4,11 +4,10 @@
  * Currently, Playwright browsers do no support WebAuthn, so we mock the call to the WebAuthn API.
  */
 
-import { Attestation } from '@0xsend/webauthn-authenticator/types'
+import { testBaseClient } from './fixtures/viem/base'
 import { test, expect } from './fixtures/auth'
-import cbor from 'cbor'
+import { Hex, parseEther } from 'viem'
 
-// TODO: add a detereministic seed for the credential store
 test('can visit onboarding page', async ({ page, credentialsStore }) => {
   await page.goto('/onboarding')
   expect(page).toHaveURL('/onboarding')
@@ -21,8 +20,6 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
   if (!credential) {
     throw new Error('Missing credential')
   }
-
-  console.log('credential', credential)
 
   expect(credential.attestations?.length).toBe(1)
   const attestation = credential.attestations?.[0]
@@ -48,9 +45,17 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
     )
   )
 
-  await expect(page.getByLabel('Your userOp Hash:')).toHaveValue(/^0x[a-f0-9]{64}$/)
+  const addrLocator = page.getByLabel('Your sender address:')
+  await expect(addrLocator).toHaveValue(/^0x[a-f0-9]{40}$/i)
+  const address = await addrLocator.inputValue({ timeout: 1_000 })
 
-  // TODO: check address, userOp, public key
+  // sponsor the creation by setting the balance using anvil
+  await testBaseClient.setBalance({
+    address: address as Hex,
+    value: parseEther('1'),
+  })
+
+  await expect(page.getByLabel('Your userOp Hash:')).toHaveValue(/^0x[a-f0-9]{64}$/i)
 
   await page.getByRole('button', { name: 'Sign' }).click()
 
@@ -61,7 +66,7 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
   }
 
   const signResult = page.getByLabel('Sign result:')
-  await expect(signResult).toHaveValue(/^0x[a-f0-9]+$/)
+  await expect(signResult).toHaveValue(/^0x[a-f0-9]+$/i)
 
   // send user op
   await page.getByRole('button', { name: 'Send' }).click()
