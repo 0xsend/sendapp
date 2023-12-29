@@ -45,8 +45,6 @@ import {
   verifier,
 } from 'app/utils/userop'
 
-// DaimoAccountFactory.createAccount arguments
-
 export function OnboardingScreen() {
   const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
   const [createResult, setCreateResult] = useState<CreateResult | null>(null)
@@ -60,7 +58,7 @@ export function OnboardingScreen() {
 
   async function createAccount() {
     const result = await createPasskey({
-      domain: window.location.origin,
+      domain: window.location.hostname,
       challengeB64: window.btoa('foobar'),
       passkeyName: accountName,
       passkeyDisplayTitle: `Send App: ${accountName}`,
@@ -117,7 +115,10 @@ export function OnboardingScreen() {
 
     // verify signature
     const result = await verifier.read.verifySignature([message, signature, x, y])
-    console.log('verifySignature result', result)
+
+    if (!result) {
+      throw new Error('Signature invalid')
+    }
 
     setSignature(_signature)
   }
@@ -300,7 +301,7 @@ async function signChallenge(challenge: Hex) {
     throw new Error('No challengeB64 to sign')
   }
   const sign = await signWithPasskey({
-    domain: window.location.origin,
+    domain: window.location.hostname,
     challengeB64,
   })
   console.log('Onbboarding screen signed', sign)
@@ -337,6 +338,7 @@ async function signChallenge(challenge: Hex) {
     r: `0x${r.toString(16)}`,
     s: `0x${s.toString(16)}`,
   })
+
   const encodedWebAuthnSig = encodeAbiParameters(
     getAbiItem({
       abi: daimoAccountABI,

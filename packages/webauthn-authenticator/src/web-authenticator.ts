@@ -97,6 +97,7 @@ export async function createPublicKeyCredential(
       })
     )
   )
+  const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataJSON))
   const rpId = credOptsPubKey.rp.id || 'localhost'
   const userHandle = base64urlnopad.decode(credOptsPubKey.user.id) || null
   const cred = createWebauthnCredential({
@@ -107,7 +108,7 @@ export async function createPublicKeyCredential(
   const attestedCredentialData = generateAttestedCredentialData(credentialId, publicKey)
   const authData = generateAuthenticatorData(rpId, signCounter, attestedCredentialData)
   cred.signCounter++ // increment counter on each "access" to the authenticator
-  const attestationObject = generateAttestionObject(authData, clientDataJSON, privateKey)
+  const attestationObject = generateAttestionObject(authData, clientDataHash, privateKey)
 
   // save response to cred for inspection
   const response = {
@@ -157,6 +158,7 @@ export async function getPublicKeyCredential(
     Buffer.from(base64urlnopad.decode(challenge)).toString('hex')
   )
   const clientDataBuffer = Buffer.from(new TextEncoder().encode(JSON.stringify(clientDataJSON)))
+  const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataBuffer))
   const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
   const credQuery: GetWebAuthnCredentialQuery = {
     credentialId: credReqOptsPubKey?.allowCredentials?.[0]?.id,
@@ -170,7 +172,7 @@ export async function getPublicKeyCredential(
 
   const authData = generateAuthenticatorData(rpId, signCounter, null)
   cred.signCounter++ // increment counter on each "access" to the authenticator
-  const assertionObject = generateAssertionObject(authData, clientDataBuffer, privateKey)
+  const assertionObject = generateAssertionObject(authData, clientDataHash, privateKey)
   const response: AuthenticatorAssertionResponse = {
     authenticatorData: authData,
     clientDataJSON: clientDataBuffer,

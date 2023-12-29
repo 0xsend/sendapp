@@ -80,6 +80,11 @@ export function deserializePublicKeyCredentialAttestion(
   }
   const { attStmt, authData } = attestation
   const { COSEPublicKey } = parseCredAuthData(authData)
+
+  if (!COSEPublicKey) {
+    throw new Error('Invalid COSEPublicKey')
+  }
+
   const publicKey = cbor.decodeAllSync(COSEPublicKey)[0]
 
   console.log('[webauthn-authenticator utils] publicCoseKey', publicKey)
