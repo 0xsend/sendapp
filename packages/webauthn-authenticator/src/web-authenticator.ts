@@ -127,9 +127,6 @@ export async function createPublicKeyCredential(
     },
     type: 'public-key',
   } as PublicKeyCredentialAttestationSerialized
-
-  console.log('[webauthn-authenticator] createPublicKeyCredential', credentialResponse)
-
   return credentialResponse
 }
 
@@ -144,7 +141,6 @@ export async function createPublicKeyCredential(
 export async function getPublicKeyCredential(
   credentialRequestOptions: CredentialRequestOptionsSerialized
 ) {
-  console.log('[webauthn-authenticator] getPublicKeyCredential', credentialRequestOptions)
   const challenge = credentialRequestOptions.publicKey.challenge // base64url encoded challenge
   const credReqOptsPubKey = credentialRequestOptions.publicKey
   const clientDataJSON = {
@@ -152,11 +148,6 @@ export async function getPublicKeyCredential(
     challenge: credentialRequestOptions.publicKey.challenge,
     origin: credentialRequestOptions.publicKey.rpId,
   }
-  console.log('[webauthn-authenticator] getPublicKeyCredential clientDataJSON', clientDataJSON)
-  console.log(
-    '[webauthn-authenticator] challenge',
-    Buffer.from(base64urlnopad.decode(challenge)).toString('hex')
-  )
   const clientDataBuffer = Buffer.from(new TextEncoder().encode(JSON.stringify(clientDataJSON)))
   const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataBuffer))
   const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
@@ -194,12 +185,6 @@ export async function getPublicKeyCredential(
     },
     type: 'public-key',
   } as PublicKeyCredentialAssertionSerialized
-
-  console.log('[webauthn-authenticator] getPublicKeyCredential', credentialResponse)
-  console.log(
-    '[webauthn-authenticator] credentialResponse',
-    Buffer.from(base64urlnopad.decode(credentialResponse.response.clientDataJSON)).toString('utf-8')
-  )
 
   return credentialResponse
 }
