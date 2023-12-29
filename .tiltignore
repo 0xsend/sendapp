@@ -1,3 +1,6 @@
 **/.auth
 packages/playwright/test-results
 packages/playwright/playwright-report
+**/cache
+/broadcast/**/run-*.json
+!/broadcast/**/run-latest.json

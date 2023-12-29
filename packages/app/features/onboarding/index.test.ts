@@ -186,7 +186,7 @@ test('can create a new account', async () => {
   expect(senderBalB).toBeLessThan(senderBalA)
   expect(receiverBaB).toBeGreaterThan(receiverBalA)
   expect(formatEther(receiverBaB - receiverBalA)).toBe('0.01')
-}, 60_000)
+}, 30_000)
 
 test('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()

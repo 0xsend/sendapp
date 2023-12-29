@@ -273,6 +273,9 @@ export const daimoAccountABI = [
 // DaimoAccountFactory
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ *
+ */
 export const daimoAccountFactoryABI = [
   {
     stateMutability: 'nonpayable',
@@ -346,6 +349,21 @@ export const daimoAccountFactoryABI = [
     outputs: [{ name: '', internalType: 'contract DaimoVerifier', type: 'address' }],
   },
 ] as const
+
+/**
+ *
+ */
+export const daimoAccountFactoryAddress = {
+  845337: '0xb722912027054bb1145c711426d404016a90BBF0',
+} as const
+
+/**
+ *
+ */
+export const daimoAccountFactoryConfig = {
+  address: daimoAccountFactoryAddress,
+  abi: daimoAccountFactoryABI,
+} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoEphemeralNotes
@@ -588,6 +606,44 @@ export const daimoNameRegistryABI = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoNameRegistryProxy
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoNameRegistryProxyABI = [
+  {
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+    inputs: [
+      { name: '_logic', internalType: 'address', type: 'address' },
+      { name: '_data', internalType: 'bytes', type: 'bytes' },
+    ],
+  },
+  { stateMutability: 'payable', type: 'fallback' },
+  { stateMutability: 'payable', type: 'receive' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
+      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AdminChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
+    name: 'BeaconUpgraded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoPaymaster
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -766,6 +822,9 @@ export const daimoPaymasterABI = [
 // DaimoVerifier
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ *
+ */
 export const daimoVerifierABI = [
   { stateMutability: 'nonpayable', type: 'constructor', inputs: [] },
   {
@@ -877,13 +936,81 @@ export const daimoVerifierABI = [
   },
 ] as const
 
+/**
+ *
+ */
+export const daimoVerifierAddress = {
+  845337: '0x90ebcFFfc78297a5039491CFCb7B1675a4618BAc',
+} as const
+
+/**
+ *
+ */
+export const daimoVerifierConfig = { address: daimoVerifierAddress, abi: daimoVerifierABI } as const
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoVerifierProxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ *
+ */
 export const daimoVerifierProxyABI = [
   {
     stateMutability: 'nonpayable',
+    type: 'constructor',
+    inputs: [
+      { name: '_logic', internalType: 'address', type: 'address' },
+      { name: '_data', internalType: 'bytes', type: 'bytes' },
+    ],
+  },
+  { stateMutability: 'payable', type: 'fallback' },
+  { stateMutability: 'payable', type: 'receive' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
+      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AdminChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
+    name: 'BeaconUpgraded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+] as const
+
+/**
+ *
+ */
+export const daimoVerifierProxyAddress = {
+  845337: '0x5ccF3633f2018D836db449071262B57e3882A762',
+} as const
+
+/**
+ *
+ */
+export const daimoVerifierProxyConfig = {
+  address: daimoVerifierProxyAddress,
+  abi: daimoVerifierProxyABI,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC1967Proxy
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc1967ProxyABI = [
+  {
+    stateMutability: 'payable',
     type: 'constructor',
     inputs: [
       { name: '_logic', internalType: 'address', type: 'address' },
@@ -2326,434 +2453,7 @@ export const sendMultisigSignerPayoutsSafeConfig = {
 // SendRevenueSafe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const sendRevenueSafeABI = [
-  { stateMutability: 'nonpayable', type: 'constructor', inputs: [] },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address', indexed: false }],
-    name: 'AddedOwner',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'approvedHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-    ],
-    name: 'ApproveHash',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'handler', internalType: 'address', type: 'address', indexed: false }],
-    name: 'ChangedFallbackHandler',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'guard', internalType: 'address', type: 'address', indexed: false }],
-    name: 'ChangedGuard',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'threshold', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'ChangedThreshold',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'module', internalType: 'address', type: 'address', indexed: false }],
-    name: 'DisabledModule',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'module', internalType: 'address', type: 'address', indexed: false }],
-    name: 'EnabledModule',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'txHash', internalType: 'bytes32', type: 'bytes32', indexed: false },
-      { name: 'payment', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'ExecutionFailure',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'module', internalType: 'address', type: 'address', indexed: true }],
-    name: 'ExecutionFromModuleFailure',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'module', internalType: 'address', type: 'address', indexed: true }],
-    name: 'ExecutionFromModuleSuccess',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'txHash', internalType: 'bytes32', type: 'bytes32', indexed: false },
-      { name: 'payment', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'ExecutionSuccess',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address', indexed: false }],
-    name: 'RemovedOwner',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'SafeReceived',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'initiator', internalType: 'address', type: 'address', indexed: true },
-      { name: 'owners', internalType: 'address[]', type: 'address[]', indexed: false },
-      { name: 'threshold', internalType: 'uint256', type: 'uint256', indexed: false },
-      { name: 'initializer', internalType: 'address', type: 'address', indexed: false },
-      { name: 'fallbackHandler', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'SafeSetup',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'msgHash', internalType: 'bytes32', type: 'bytes32', indexed: true }],
-    name: 'SignMsg',
-  },
-  { stateMutability: 'nonpayable', type: 'fallback' },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'VERSION',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: '_threshold', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'addOwnerWithThreshold',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [{ name: 'hashToApprove', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'approveHash',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'bytes32', type: 'bytes32' },
-    ],
-    name: 'approvedHashes',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [{ name: '_threshold', internalType: 'uint256', type: 'uint256' }],
-    name: 'changeThreshold',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: 'dataHash', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'signatures', internalType: 'bytes', type: 'bytes' },
-      { name: 'requiredSignatures', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'checkNSignatures',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: 'dataHash', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'signatures', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'checkSignatures',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'prevModule', internalType: 'address', type: 'address' },
-      { name: 'module', internalType: 'address', type: 'address' },
-    ],
-    name: 'disableModule',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'domainSeparator',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [{ name: 'module', internalType: 'address', type: 'address' }],
-    name: 'enableModule',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'operation', internalType: 'enum Enum.Operation', type: 'uint8' },
-      { name: 'safeTxGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'baseGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'gasPrice', internalType: 'uint256', type: 'uint256' },
-      { name: 'gasToken', internalType: 'address', type: 'address' },
-      { name: 'refundReceiver', internalType: 'address', type: 'address' },
-      { name: '_nonce', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'encodeTransactionData',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-  },
-  {
-    stateMutability: 'payable',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'operation', internalType: 'enum Enum.Operation', type: 'uint8' },
-      { name: 'safeTxGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'baseGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'gasPrice', internalType: 'uint256', type: 'uint256' },
-      { name: 'gasToken', internalType: 'address', type: 'address' },
-      { name: 'refundReceiver', internalType: 'address payable', type: 'address' },
-      { name: 'signatures', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'execTransaction',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'operation', internalType: 'enum Enum.Operation', type: 'uint8' },
-    ],
-    name: 'execTransactionFromModule',
-    outputs: [{ name: 'success', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'operation', internalType: 'enum Enum.Operation', type: 'uint8' },
-    ],
-    name: 'execTransactionFromModuleReturnData',
-    outputs: [
-      { name: 'success', internalType: 'bool', type: 'bool' },
-      { name: 'returnData', internalType: 'bytes', type: 'bytes' },
-    ],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'getChainId',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: 'start', internalType: 'address', type: 'address' },
-      { name: 'pageSize', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'getModulesPaginated',
-    outputs: [
-      { name: 'array', internalType: 'address[]', type: 'address[]' },
-      { name: 'next', internalType: 'address', type: 'address' },
-    ],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'getOwners',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: 'offset', internalType: 'uint256', type: 'uint256' },
-      { name: 'length', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'getStorageAt',
-    outputs: [{ name: '', internalType: 'bytes', type: 'bytes' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'getThreshold',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'operation', internalType: 'enum Enum.Operation', type: 'uint8' },
-      { name: 'safeTxGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'baseGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'gasPrice', internalType: 'uint256', type: 'uint256' },
-      { name: 'gasToken', internalType: 'address', type: 'address' },
-      { name: 'refundReceiver', internalType: 'address', type: 'address' },
-      { name: '_nonce', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'getTransactionHash',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'module', internalType: 'address', type: 'address' }],
-    name: 'isModuleEnabled',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'isOwner',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [],
-    name: 'nonce',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'prevOwner', internalType: 'address', type: 'address' },
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: '_threshold', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'removeOwner',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'operation', internalType: 'enum Enum.Operation', type: 'uint8' },
-    ],
-    name: 'requiredTxGas',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [{ name: 'handler', internalType: 'address', type: 'address' }],
-    name: 'setFallbackHandler',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [{ name: 'guard', internalType: 'address', type: 'address' }],
-    name: 'setGuard',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: '_owners', internalType: 'address[]', type: 'address[]' },
-      { name: '_threshold', internalType: 'uint256', type: 'uint256' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-      { name: 'fallbackHandler', internalType: 'address', type: 'address' },
-      { name: 'paymentToken', internalType: 'address', type: 'address' },
-      { name: 'payment', internalType: 'uint256', type: 'uint256' },
-      { name: 'paymentReceiver', internalType: 'address payable', type: 'address' },
-    ],
-    name: 'setup',
-    outputs: [],
-  },
-  {
-    stateMutability: 'view',
-    type: 'function',
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'signedMessages',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'targetContract', internalType: 'address', type: 'address' },
-      { name: 'calldataPayload', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'simulateAndRevert',
-    outputs: [],
-  },
-  {
-    stateMutability: 'nonpayable',
-    type: 'function',
-    inputs: [
-      { name: 'prevOwner', internalType: 'address', type: 'address' },
-      { name: 'oldOwner', internalType: 'address', type: 'address' },
-      { name: 'newOwner', internalType: 'address', type: 'address' },
-    ],
-    name: 'swapOwner',
-    outputs: [],
-  },
-  { stateMutability: 'payable', type: 'receive' },
-] as const
+export const sendRevenueSafeABI = [] as const
 
 export const sendRevenueSafeAddress = '0xBB253919a15C5E0C9986d83f205A9279b4247E3d' as const
 
@@ -2979,47 +2679,90 @@ export function prepareWriteDaimoAccount<
 
 /**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
+ *
+ *
  */
-export function getDaimoAccountFactory(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: daimoAccountFactoryABI, ...config })
+export function getDaimoAccountFactory(
+  config: Omit<GetContractArgs, 'abi' | 'address'> & {
+    chainId?: keyof typeof daimoAccountFactoryAddress
+  }
+) {
+  return getContract({
+    abi: daimoAccountFactoryABI,
+    address: daimoAccountFactoryAddress[845337],
+    ...config,
+  })
 }
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
+ *
+ *
  */
 export function readDaimoAccountFactory<
   TAbi extends readonly unknown[] = typeof daimoAccountFactoryABI,
   TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return readContract({ abi: daimoAccountFactoryABI, ...config } as unknown as ReadContractConfig<
-    TAbi,
-    TFunctionName
-  >)
+>(
+  config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
+    chainId?: keyof typeof daimoAccountFactoryAddress
+  }
+) {
+  return readContract({
+    abi: daimoAccountFactoryABI,
+    address: daimoAccountFactoryAddress[845337],
+    ...config,
+  } as unknown as ReadContractConfig<TAbi, TFunctionName>)
 }
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
+ *
+ *
  */
-export function writeDaimoAccountFactory<TFunctionName extends string>(
+export function writeDaimoAccountFactory<
+  TFunctionName extends string,
+  TMode extends WriteContractMode,
+  TChainId extends number = keyof typeof daimoAccountFactoryAddress
+>(
   config:
-    | Omit<WriteContractPreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>, 'abi'>
-    | Omit<WriteContractUnpreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>, 'abi'>
+    | (Omit<
+        WriteContractPreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>,
+        'abi' | 'address'
+      > & {
+        mode: TMode
+        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoAccountFactoryAddress
+      })
+    | (Omit<
+        WriteContractUnpreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>,
+        'abi' | 'address'
+      > & {
+        mode: TMode
+        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoAccountFactoryAddress
+      })
 ) {
-  return writeContract({ abi: daimoAccountFactoryABI, ...config } as unknown as WriteContractArgs<
-    typeof daimoAccountFactoryABI,
-    TFunctionName
-  >)
+  return writeContract({
+    abi: daimoAccountFactoryABI,
+    address: daimoAccountFactoryAddress[845337],
+    ...config,
+  } as unknown as WriteContractArgs<typeof daimoAccountFactoryABI, TFunctionName>)
 }
 
 /**
  * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
+ *
+ *
  */
 export function prepareWriteDaimoAccountFactory<
   TAbi extends readonly unknown[] = typeof daimoAccountFactoryABI,
   TFunctionName extends string = string
->(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
+>(
+  config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
+    chainId?: keyof typeof daimoAccountFactoryAddress
+  }
+) {
   return prepareWriteContract({
     abi: daimoAccountFactoryABI,
+    address: daimoAccountFactoryAddress[845337],
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
@@ -3119,6 +2862,13 @@ export function prepareWriteDaimoNameRegistry<
 }
 
 /**
+ * Wraps __{@link getContract}__ with `abi` set to __{@link daimoNameRegistryProxyABI}__.
+ */
+export function getDaimoNameRegistryProxy(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: daimoNameRegistryProxyABI, ...config })
+}
+
+/**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoPaymasterABI}__.
  */
 export function getDaimoPaymaster(config: Omit<GetContractArgs, 'abi'>) {
@@ -3167,56 +2917,110 @@ export function prepareWriteDaimoPaymaster<
 
 /**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoVerifierABI}__.
+ *
+ *
  */
-export function getDaimoVerifier(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: daimoVerifierABI, ...config })
+export function getDaimoVerifier(
+  config: Omit<GetContractArgs, 'abi' | 'address'> & { chainId?: keyof typeof daimoVerifierAddress }
+) {
+  return getContract({ abi: daimoVerifierABI, address: daimoVerifierAddress[845337], ...config })
 }
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierABI}__.
+ *
+ *
  */
 export function readDaimoVerifier<
   TAbi extends readonly unknown[] = typeof daimoVerifierABI,
   TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
-  return readContract({ abi: daimoVerifierABI, ...config } as unknown as ReadContractConfig<
-    TAbi,
-    TFunctionName
-  >)
+>(
+  config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
+    chainId?: keyof typeof daimoVerifierAddress
+  }
+) {
+  return readContract({
+    abi: daimoVerifierABI,
+    address: daimoVerifierAddress[845337],
+    ...config,
+  } as unknown as ReadContractConfig<TAbi, TFunctionName>)
 }
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierABI}__.
+ *
+ *
  */
-export function writeDaimoVerifier<TFunctionName extends string>(
+export function writeDaimoVerifier<
+  TFunctionName extends string,
+  TMode extends WriteContractMode,
+  TChainId extends number = keyof typeof daimoVerifierAddress
+>(
   config:
-    | Omit<WriteContractPreparedArgs<typeof daimoVerifierABI, TFunctionName>, 'abi'>
-    | Omit<WriteContractUnpreparedArgs<typeof daimoVerifierABI, TFunctionName>, 'abi'>
+    | (Omit<
+        WriteContractPreparedArgs<typeof daimoVerifierABI, TFunctionName>,
+        'abi' | 'address'
+      > & {
+        mode: TMode
+        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoVerifierAddress
+      })
+    | (Omit<
+        WriteContractUnpreparedArgs<typeof daimoVerifierABI, TFunctionName>,
+        'abi' | 'address'
+      > & {
+        mode: TMode
+        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoVerifierAddress
+      })
 ) {
-  return writeContract({ abi: daimoVerifierABI, ...config } as unknown as WriteContractArgs<
-    typeof daimoVerifierABI,
-    TFunctionName
-  >)
+  return writeContract({
+    abi: daimoVerifierABI,
+    address: daimoVerifierAddress[845337],
+    ...config,
+  } as unknown as WriteContractArgs<typeof daimoVerifierABI, TFunctionName>)
 }
 
 /**
  * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link daimoVerifierABI}__.
+ *
+ *
  */
 export function prepareWriteDaimoVerifier<
   TAbi extends readonly unknown[] = typeof daimoVerifierABI,
   TFunctionName extends string = string
->(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
+>(
+  config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
+    chainId?: keyof typeof daimoVerifierAddress
+  }
+) {
   return prepareWriteContract({
     abi: daimoVerifierABI,
+    address: daimoVerifierAddress[845337],
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
 
 /**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoVerifierProxyABI}__.
+ *
+ *
  */
-export function getDaimoVerifierProxy(config: Omit<GetContractArgs, 'abi'>) {
-  return getContract({ abi: daimoVerifierProxyABI, ...config })
+export function getDaimoVerifierProxy(
+  config: Omit<GetContractArgs, 'abi' | 'address'> & {
+    chainId?: keyof typeof daimoVerifierProxyAddress
+  }
+) {
+  return getContract({
+    abi: daimoVerifierProxyABI,
+    address: daimoVerifierProxyAddress[845337],
+    ...config,
+  })
+}
+
+/**
+ * Wraps __{@link getContract}__ with `abi` set to __{@link erc1967ProxyABI}__.
+ */
+export function getErc1967Proxy(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: erc1967ProxyABI, ...config })
 }
 
 /**
@@ -3629,49 +3433,6 @@ export function getSendMultisigSignerPayoutsSafe(config: Omit<GetContractArgs, '
  */
 export function getSendRevenueSafe(config: Omit<GetContractArgs, 'abi' | 'address'>) {
   return getContract({ abi: sendRevenueSafeABI, address: sendRevenueSafeAddress, ...config })
-}
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendRevenueSafeABI}__.
- */
-export function readSendRevenueSafe<
-  TAbi extends readonly unknown[] = typeof sendRevenueSafeABI,
-  TFunctionName extends string = string
->(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'>) {
-  return readContract({
-    abi: sendRevenueSafeABI,
-    address: sendRevenueSafeAddress,
-    ...config,
-  } as unknown as ReadContractConfig<TAbi, TFunctionName>)
-}
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendRevenueSafeABI}__.
- */
-export function writeSendRevenueSafe<TFunctionName extends string>(
-  config:
-    | Omit<WriteContractPreparedArgs<typeof sendRevenueSafeABI, TFunctionName>, 'abi' | 'address'>
-    | Omit<WriteContractUnpreparedArgs<typeof sendRevenueSafeABI, TFunctionName>, 'abi' | 'address'>
-) {
-  return writeContract({
-    abi: sendRevenueSafeABI,
-    address: sendRevenueSafeAddress,
-    ...config,
-  } as unknown as WriteContractArgs<typeof sendRevenueSafeABI, TFunctionName>)
-}
-
-/**
- * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link sendRevenueSafeABI}__.
- */
-export function prepareWriteSendRevenueSafe<
-  TAbi extends readonly unknown[] = typeof sendRevenueSafeABI,
-  TFunctionName extends string = string
->(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'>) {
-  return prepareWriteContract({
-    abi: sendRevenueSafeABI,
-    address: sendRevenueSafeAddress,
-    ...config,
-  } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
 
 /**

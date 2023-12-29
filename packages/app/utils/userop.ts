@@ -1,8 +1,10 @@
 import {
   daimoAccountABI,
+  daimoAccountFactoryAddress as daimoAccountFactoryAddresses,
   daimoAccountFactoryABI,
   daimoVerifierABI,
   iEntryPointABI,
+  daimoVerifierProxyAddress,
 } from '@my/wagmi'
 import { getSenderAddress, UserOperation } from 'permissionless'
 import {
@@ -18,8 +20,6 @@ import {
 } from 'viem'
 import { baseMainnetClient } from './viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-
-export const daimoAccountFactoryAddress = '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82'
 
 // TODO: remove this wallet client and test client
 const privateKey = generatePrivateKey()
@@ -39,8 +39,8 @@ export const testClient = createTestClient({
 
 export const daimoAccountFactory = getContract({
   abi: daimoAccountFactoryABI,
+  address: daimoAccountFactoryAddresses[845337], // TODO: use chain id
   publicClient: baseMainnetClient,
-  address: daimoAccountFactoryAddress,
 })
 
 export const entrypoint = getContract({
@@ -49,7 +49,7 @@ export const entrypoint = getContract({
   address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
 })
 
-export const daimoVerifierAddress = '0x5ccF3633f2018D836db449071262B57e3882A762'
+export const daimoVerifierAddress = daimoVerifierProxyAddress[845337] // TODO: use chain id
 
 export const verifier = getContract({
   abi: daimoVerifierABI,
@@ -75,7 +75,7 @@ function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
 }
 
 export async function generateUserOp(publicKey: [Hex, Hex]) {
-  const initCode = concat([daimoAccountFactoryAddress, encodeCreateAccountData(publicKey)])
+  const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(publicKey)])
 
   const senderAddress = await getSenderAddress(baseMainnetClient, {
     initCode,

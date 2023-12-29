@@ -1,17 +1,39 @@
 import { defineConfig } from '@wagmi/cli'
 import { actions, foundry } from '@wagmi/cli/plugins'
-import { mainnet } from 'wagmi/chains'
-import { getSafeSingletonDeployment } from '@safe-global/safe-deployments'
+import { globby } from 'globby'
 
-// Returns released contract version for specific version
-const safeSingleton130Mainnet = getSafeSingletonDeployment({
-  version: '1.3.0',
-  network: mainnet.id.toString(),
-})
+const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
+const deployments = await broadcasts.reduce(async (accP, file) => {
+  const acc = await accP
+  const data = await import(file, {
+    assert: { type: 'json' },
+  })
+  if (!data?.default) throw new Error(`No data found in ${file}`)
+  const { chain, transactions } = data.default as {
+    chain: string
+    transactions: { contractName: string; contractAddress: string; transactionType: string }[]
+  }
 
-if (!safeSingleton130Mainnet) {
-  throw new Error('No safe singleton deployment found')
-}
+  transactions
+    .filter((tx) => {
+      if (!tx.transactionType) throw new Error(`No transactionType found in ${file}`)
+      return tx.transactionType === 'CREATE2'
+    })
+    .map((tx) => {
+      const { contractAddress, contractName } = tx
+      if (!contractName) throw new Error(`No contractName found in ${file}`)
+      if (!contractAddress) throw new Error(`No contractAddress found in ${file}`)
+      console.log('Processing', { file, contractName, contractAddress, chain })
+      acc[contractName] = {
+        ...acc[contractName],
+        [chain]: contractAddress,
+      }
+    })
+
+  return acc
+}, Promise.resolve({}))
+
+console.log({ deployments })
 
 export default defineConfig({
   out: 'src/generated.ts',
@@ -19,7 +41,7 @@ export default defineConfig({
     {
       name: 'SendRevenueSafe',
       address: '0xBB253919a15C5E0C9986d83f205A9279b4247E3d',
-      abi: safeSingleton130Mainnet?.abi,
+      abi: [],
     },
     {
       /**
@@ -93,39 +115,14 @@ export default defineConfig({
           8008: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
         },
+        ...deployments,
       },
-      exclude: [
-        // the following patterns are excluded by default
-        'Common.sol/**',
-        'Helper.sol/**',
-        'Components.sol/**',
-        'Script.sol/**',
-        'StdAssertions.sol/**',
-        'StdInvariant.sol/**',
-        'StdError.sol/**',
-        'StdCheats.sol/**',
-        'StdMath.sol/**',
-        'StdJson.sol/**',
-        'StdStorage.sol/**',
-        'StdUtils.sol/**',
-        'Vm.sol/**',
-        'console.sol/**',
-        'console2.sol/**',
-        'test.sol/**',
-        'Test.sol/**',
-        'Test*.sol/**',
-        'MockERC20.sol/**',
-        'MockERC721.sol/**',
-        '**.s.sol/*.json',
-        '**.t.sol/*.json',
-        '*Proxy.sol/**',
-      ],
       include: [
-        'Send*.sol/**',
-        'Daimo*.sol/**',
-        'ERC*.sol/**',
-        'Entrypoint*.sol/**',
-        'IEntryPoint*.sol/**',
+        'Send*.sol/*',
+        'Daimo*.sol/*',
+        'ERC*.sol/*',
+        'Entrypoint*.sol/*',
+        'IEntryPoint*.sol/*',
       ],
     }),
     actions({
