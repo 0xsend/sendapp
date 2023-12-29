@@ -69,7 +69,7 @@ export const mainnet = (() => {
 
 log(
   'Using mainnet chain',
-  `chain=${mainnet.name} (${mainnet.id}))`,
+  `chain=${mainnet.name} (${mainnet.id})`,
   `hostname=${new URL(mainnet.rpcUrls.default.http[0]).hostname}`
 )
 
@@ -82,7 +82,7 @@ export const mainnetClient = createPublicClient({
   transport: http(MAINNET_RPC_URL),
 })
 
-export const baseMainnet = (() => {
+export const baseMainnet: typeof baseMainnetViem | typeof baseLocal = (() => {
   if (process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID) {
     const chain = appChains[process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID]
     if (!chain) {
@@ -98,7 +98,7 @@ export const baseMainnet = (() => {
 
 log(
   'Using baseMainnet chain',
-  `chain=${baseMainnet.name} (${baseMainnet.id}))`,
+  `chain=${baseMainnet.name} (${baseMainnet.id})`,
   `hostname=${new URL(baseMainnet.rpcUrls.default.http[0]).hostname}`
 )
 
@@ -115,5 +115,5 @@ export const baseMainnetClient = createPublicClient({
 
 export const baseMainnetBundlerClient = createClient({
   chain: baseMainnet,
-  transport: http('http://127.0.0.1:3030/rpc'),
+  transport: http('http://127.0.0.1:3030/rpc'), // TODO: make configurable
 }).extend(bundlerActions)

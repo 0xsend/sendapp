@@ -60,10 +60,15 @@ local_resource(
         "yarn:install",
         "contracts:build",
     ],
-    deps = [os.path.join("packages", "wagmi", "wagmi.config.ts")] + files_matching(
-        os.path.join("packages", "wagmi", "src"),
-        lambda f: f.endswith(".ts") and f.find("generated.ts") == -1,
-    ),
+    deps =
+        [os.path.join("packages", "wagmi", "wagmi.config.ts")] +
+        files_matching(
+            os.path.join("packages", "wagmi", "src"),
+            lambda f: f.endswith(".ts") and f.find("generated.ts") == -1,
+        ) + files_matching(
+            os.path.join("packages", "contracts", "broadcast"),
+            lambda f: f.endswith("run-latest.json"),
+        ),
 )
 
 local_resource(
