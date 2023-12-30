@@ -57,25 +57,19 @@ exports[`OnboardingScreen 1`] = `
       }
     />
     <Text
-      accessibilityRole="header"
       selectable={true}
       style={
         {
           "color": "#fff",
           "fontFamily": "System",
-          "fontSize": 30,
-          "fontWeight": "700",
-          "lineHeight": 34,
-          "marginBottom": 0,
-          "marginLeft": 0,
-          "marginRight": 0,
-          "marginTop": 0,
-          "textTransform": "none",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
         }
       }
       suppressHighlighting={true}
     >
-      Start by creating a Passkey below
+      Start by creating a Passkey below.
     </Text>
     <View
       pointerEvents="none"
@@ -255,102 +249,8 @@ exports[`OnboardingScreen 1`] = `
       cancelable={true}
       cursor="default"
       focusable={true}
-      htmlFor="publicKey"
-      id=":r1:"
-      minPressDuration={0}
-      onBlur={[Function]}
-      onFocus={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "transparent",
-          "color": "#fff",
-          "display": "flex",
-          "fontFamily": "System",
-          "fontSize": 16.8,
-          "fontWeight": "400",
-          "lineHeight": 44,
-        }
-      }
-      suppressHighlighting={true}
-      userSelect="none"
-    >
-      Your DER public key:
-    </Text>
-    <View
-      pointerEvents="none"
-      style={
-        {
-          "alignItems": "stretch",
-          "height": 7,
-          "minHeight": 7,
-          "minWidth": 7,
-          "width": 7,
-        }
-      }
-    />
-    <TextInput
-      editable={true}
-      focusable={true}
-      id="publicKey"
-      multiline={true}
-      numberOfLines={4}
-      onChangeText={[Function]}
-      outlineWidth={0}
-      placeholderTextColor="#545454"
-      style={
-        {
-          "backgroundColor": "#151515",
-          "borderBottomColor": "#323232",
-          "borderBottomLeftRadius": 9,
-          "borderBottomRightRadius": 9,
-          "borderBottomWidth": 1,
-          "borderLeftColor": "#323232",
-          "borderLeftWidth": 1,
-          "borderRightColor": "#323232",
-          "borderRightWidth": 1,
-          "borderStyle": "solid",
-          "borderTopColor": "#323232",
-          "borderTopLeftRadius": 9,
-          "borderTopRightRadius": 9,
-          "borderTopWidth": 1,
-          "color": "#fff",
-          "fontFamily": "monospace",
-          "fontSize": 16.8,
-          "fontWeight": "400",
-          "height": 224,
-          "lineHeight": 19,
-          "minWidth": 0,
-          "paddingBottom": 13,
-          "paddingLeft": 16,
-          "paddingRight": 16,
-          "paddingTop": 13,
-        }
-      }
-    />
-    <View
-      pointerEvents="none"
-      style={
-        {
-          "alignItems": "stretch",
-          "height": 7,
-          "minHeight": 7,
-          "minWidth": 7,
-          "width": 7,
-        }
-      }
-    />
-    <Text
-      cancelable={true}
-      cursor="default"
-      focusable={true}
       htmlFor="senderAddress"
-      id=":r2:"
+      id=":r1:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -444,7 +344,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="userOpHash"
-      id=":r3:"
+      id=":r2:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -512,100 +412,6 @@ exports[`OnboardingScreen 1`] = `
           "fontSize": 16.8,
           "fontWeight": "400",
           "height": 64,
-          "lineHeight": 19,
-          "minWidth": 0,
-          "paddingBottom": 13,
-          "paddingLeft": 16,
-          "paddingRight": 16,
-          "paddingTop": 13,
-        }
-      }
-    />
-    <View
-      pointerEvents="none"
-      style={
-        {
-          "alignItems": "stretch",
-          "height": 7,
-          "minHeight": 7,
-          "minWidth": 7,
-          "width": 7,
-        }
-      }
-    />
-    <Text
-      cancelable={true}
-      cursor="default"
-      focusable={true}
-      htmlFor="createResult"
-      id=":r4:"
-      minPressDuration={0}
-      onBlur={[Function]}
-      onFocus={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "transparent",
-          "color": "#fff",
-          "display": "flex",
-          "fontFamily": "System",
-          "fontSize": 16.8,
-          "fontWeight": "400",
-          "lineHeight": 44,
-        }
-      }
-      suppressHighlighting={true}
-      userSelect="none"
-    >
-      Create result:
-    </Text>
-    <View
-      pointerEvents="none"
-      style={
-        {
-          "alignItems": "stretch",
-          "height": 7,
-          "minHeight": 7,
-          "minWidth": 7,
-          "width": 7,
-        }
-      }
-    />
-    <TextInput
-      editable={true}
-      focusable={true}
-      id="createResult"
-      multiline={true}
-      numberOfLines={4}
-      onChangeText={[Function]}
-      outlineWidth={0}
-      placeholderTextColor="#545454"
-      style={
-        {
-          "backgroundColor": "#151515",
-          "borderBottomColor": "#323232",
-          "borderBottomLeftRadius": 9,
-          "borderBottomRightRadius": 9,
-          "borderBottomWidth": 1,
-          "borderLeftColor": "#323232",
-          "borderLeftWidth": 1,
-          "borderRightColor": "#323232",
-          "borderRightWidth": 1,
-          "borderStyle": "solid",
-          "borderTopColor": "#323232",
-          "borderTopLeftRadius": 9,
-          "borderTopRightRadius": 9,
-          "borderTopWidth": 1,
-          "color": "#fff",
-          "fontFamily": "monospace",
-          "fontSize": 16.8,
-          "fontWeight": "400",
-          "height": 224,
           "lineHeight": 19,
           "minWidth": 0,
           "paddingBottom": 13,
@@ -737,7 +543,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="signResult"
-      id=":r5:"
+      id=":r3:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}
@@ -936,7 +742,7 @@ exports[`OnboardingScreen 1`] = `
       cursor="default"
       focusable={true}
       htmlFor="sendResult"
-      id=":r6:"
+      id=":r4:"
       minPressDuration={0}
       onBlur={[Function]}
       onFocus={[Function]}

@@ -7,8 +7,8 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { type CreateResult, createPasskey } from '@daimo/expo-passkeys'
-import { Button, Container, H1, H2, Input, Label, TextArea, YStack } from '@my/ui'
+import { createPasskey } from '@daimo/expo-passkeys'
+import { Button, Container, H1, H2, Input, Label, Paragraph, TextArea, YStack } from '@my/ui'
 import { derKeytoContractFriendlyKey, parseCreateResponse } from 'app/utils/passkeys'
 import React, { useState } from 'react'
 import {
@@ -31,12 +31,10 @@ import {
   generateUserOp,
   verifier,
 } from 'app/utils/userop'
-import { generateChallenge } from 'app/utils/userop'
-import { signChallenge } from 'app/utils/userop'
+import { signChallenge, generateChallenge } from 'app/utils/userop'
 
 export function OnboardingScreen() {
   const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
-  const [createResult, setCreateResult] = useState<CreateResult | null>(null)
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
@@ -52,8 +50,6 @@ export function OnboardingScreen() {
       passkeyName: accountName,
       passkeyDisplayTitle: `Send App: ${accountName}`,
     })
-    console.log('Onboarding screen create', result)
-    setCreateResult(result)
     const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
     setPublicKey(_publicKey)
 
@@ -111,18 +107,10 @@ export function OnboardingScreen() {
     <Container>
       <YStack space="$2" maxWidth={600} py="$6">
         <H1>Welcome to Send</H1>
-        <H2>Start by creating a Passkey below</H2>
+        <Paragraph>Start by creating a Passkey below.</Paragraph>
         <Label htmlFor="accountName">Account name:</Label>
         <Input id="accountName" onChangeText={setAccountName} value={accountName} />
         <Button onPress={createAccount}>Create</Button>
-        <Label htmlFor="publicKey">Your DER public key:</Label>
-        <TextArea
-          id="publicKey"
-          height="$16"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={publicKey ? JSON.stringify(publicKey, null, 2) : undefined}
-        />
         <Label htmlFor="senderAddress">Your sender address:</Label>
         <TextArea
           id="senderAddress"
@@ -138,14 +126,6 @@ export function OnboardingScreen() {
           // @ts-expect-error setup monospace font
           fontFamily={'monospace'}
           value={userOpHash ? userOpHash : undefined}
-        />
-        <Label htmlFor="createResult">Create result:</Label>
-        <TextArea
-          id="createResult"
-          height="$16"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={createResult ? JSON.stringify(createResult, null, 2) : undefined}
         />
         <H2>Then sign ther userOpHash with it</H2>
         <Button onPress={_signWithPasskey}>Sign</Button>
