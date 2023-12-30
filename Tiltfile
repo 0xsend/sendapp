@@ -162,25 +162,6 @@ local_resource(
     serve_cmd = "while true; do docker logs -f -n 1 supabase_db_send; sleep 1; done",
 )
 
-# ensure snaplet id_rsa is present
-if CI and not os.path.exists(os.path.join("supabase", ".snaplet", "id_rsa")):
-    if not os.getenv("SNAPLET_PRIVATE_KEY"):
-        fail("SNAPLET_PRIVATE_KEY is not set")
-    local("echo $SNAPLET_PRIVATE_KEY | base64 -d > supabase/.snaplet/id_rsa", echo_off = True, quiet = True)
-
-local_resource(
-    "snaplet:restore",
-    "yarn workspace @my/supabase snaplet snapshot restore --latest --no-reset",
-    allow_parallel = True,
-    auto_init = True if CI else False,
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "supabase",
-    ],
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
-
 if config.tilt_subcommand == "down":
     local("yarn supabase stop --no-backup")
 
