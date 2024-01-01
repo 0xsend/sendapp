@@ -20,6 +20,7 @@ const ExpoPasskeysModuleWeb = {
     userIdBase64: string,
     challengeBase64: string
   ): Promise<{
+    credentialID: string
     rawClientDataJSON: string
     rawAttestationObject: string
   }> {
@@ -59,6 +60,7 @@ const ExpoPasskeysModuleWeb = {
     }
 
     return {
+      credentialID: base64.encode(new Uint8Array(credential.rawId)),
       rawClientDataJSON: base64.encode(new Uint8Array(credential.response.clientDataJSON)),
       rawAttestationObject: base64.encode(new Uint8Array(credential.response.attestationObject)),
     }

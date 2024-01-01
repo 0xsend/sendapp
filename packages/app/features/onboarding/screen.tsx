@@ -9,8 +9,12 @@
  */
 import { createPasskey } from '@daimo/expo-passkeys'
 import { Button, Container, H1, H2, Input, Label, Paragraph, TextArea, YStack } from '@my/ui'
-import { derKeytoContractFriendlyKey, parseCreateResponse } from 'app/utils/passkeys'
-import React, { useState } from 'react'
+import {
+  derKeytoContractFriendlyKey,
+  createResponseToDER,
+  parseCreateResponse,
+} from 'app/utils/passkeys'
+import React, { useEffect, useState } from 'react'
 import {
   bytesToHex,
   concat,
@@ -32,40 +36,95 @@ import {
   verifier,
 } from 'app/utils/userop'
 import { signChallenge, generateChallenge } from 'app/utils/userop'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { base16, base64 } from '@scure/base'
+import { useUser } from 'app/utils/useUser'
+import { assert } from 'app/utils/assert'
 
 export function OnboardingScreen() {
+  const supabase = useSupabase()
+  const { user } = useUser()
+
+  // PASSKEY / ACCOUNT CREATION STATE
   const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
+
+  // SIGNING / SENDING USEROP STATE
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
   const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
   const [challenge, setChallenge] = useState<Hex | null>(null)
   const [signature, setSignature] = useState<Uint8Array | null>(null)
   const [sendResult, setSendResult] = useState<boolean | null>(null)
 
+  useEffect(() => {
+    ;(async () => {
+      const { data: creds, error } = await supabase.from('webauthn_credentials').select('*')
+      if (error) {
+        throw error
+      }
+      console.log(creds)
+    })()
+  }, [supabase])
+
+  /**
+   * Create a passkey and save it to the database
+   */
   async function createAccount() {
-    const result = await createPasskey({
+    assert(!!user?.id, 'No user id')
+
+    const passkeyName = `${user.id}.0`
+    const [cred, authData, derPubKey] = await createPasskey({
       domain: window.location.hostname,
-      challengeB64: window.btoa('foobar'),
-      passkeyName: accountName,
+      challengeB64: window.btoa('foobar'), // TODO: generate a random challenge from the server
+      passkeyName,
       passkeyDisplayTitle: `Send App: ${accountName}`,
+    }).then((r) => [r, parseCreateResponse(r), createResponseToDER(r)] as const)
+
+    // save the result
+    const { error: insertError } = await supabase.from('webauthn_credentials').insert({
+      name: accountName,
+      raw_credential_id: `\\x${base16.encode(base64.decode(cred.credentialIDB64))}`,
+      public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
+      sign_count: 0,
+      attestation_object: `\\x${base16.encode(base64.decode(cred.rawAttestationObjectB64))}`,
+      key_type: 'ES256',
     })
-    const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
+
+    if (insertError) {
+      throw insertError
+    }
+
+    const _publicKey = derKeytoContractFriendlyKey(derPubKey)
     setPublicKey(_publicKey)
 
     // await createAccountUsingEOA(_publicKey)
-
-    const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(_publicKey)
-
-    // generate challenge
-    const _challenge = generateChallenge(_userOpHash)
-
-    setSenderAddress(_userOp.sender)
-    setUserOp(_userOp)
-    setUserOpHash(_userOpHash)
-    setChallenge(_challenge)
   }
 
+  // generate user op based on public key, and generate challenge from the user op hash
+  // TODO: decouple generate user op from public key and instead only use sender address
+  useEffect(() => {
+    if (!publicKey) {
+      return
+    }
+    ;(async () => {
+      const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
+
+      // generate challenge
+      const _challenge = generateChallenge(_userOpHash)
+
+      setSenderAddress(_userOp.sender)
+      setUserOp(_userOp)
+      setUserOpHash(_userOpHash)
+      setChallenge(_challenge)
+    })()
+  }, [publicKey])
+
+  /**
+   * Sign the challenge with the passkey.
+   *
+   * Assumes key slot 0 on the account.
+   */
   async function _signWithPasskey() {
     if (!challenge || challenge.length <= 0) {
       throw new Error('No challenge')

@@ -170,7 +170,7 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "cd supabase && yarn run reset",
+        "cd supabase && yarn run reset && yarn run generate",
     ],
     icon_name = "restart_alt",
     location = location.NAV,

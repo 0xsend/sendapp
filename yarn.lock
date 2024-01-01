@@ -6296,6 +6296,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-community/netinfo@npm:^11.2.1":
+  version: 11.2.1
+  resolution: "@react-native-community/netinfo@npm:11.2.1"
+  peerDependencies:
+    react-native: ">=0.59"
+  checksum: 1b1fc805af3601d8babd1200eeb87bbb9a89239dd2d4e10184ace46e1ffa5e18bfb3e257129d8a443b66f04090fd5e9628866683f1ae86ee9dd739a93d5c6cff
+  languageName: node
+  linkType: hard
+
 "@react-native/assets-registry@npm:^0.72.0":
   version: 0.72.0
   resolution: "@react-native/assets-registry@npm:0.72.0"
@@ -17223,6 +17232,7 @@ __metadata:
     "@expo/config-plugins": "npm:~7.2.2"
     "@expo/metro-config": "npm:~0.10.0"
     "@my/ui": "workspace:*"
+    "@react-native-community/netinfo": "npm:^11.2.1"
     "@react-navigation/native": "npm:^6.1.6"
     "@tamagui/babel-plugin": "npm:^1.79.7"
     app: "workspace:*"

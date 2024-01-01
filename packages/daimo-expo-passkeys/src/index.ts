@@ -39,6 +39,7 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
         request.challengeB64
       )
       return {
+        credentialIDB64: ret.credentialID,
         rawClientDataJSONB64: ret.rawClientDataJSON,
         rawAttestationObjectB64: ret.rawAttestationObject,
       }
@@ -47,6 +48,7 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
       const requestJSON = toAndroidCreateRequest(request, userIDB64)
       const ret = JSON.parse(await ExpoPasskeysModule.createPasskey(requestJSON))
       return {
+        credentialIDB64: toBase64(ret.rawId),
         rawClientDataJSONB64: toBase64(ret.response.clientDataJSON),
         rawAttestationObjectB64: toBase64(ret.response.attestationObject),
       }
@@ -60,6 +62,7 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
       )
 
       return {
+        credentialIDB64: ret.credentialID,
         rawClientDataJSONB64: ret.rawClientDataJSON,
         rawAttestationObjectB64: ret.rawAttestationObject,
       }

@@ -88,12 +88,17 @@ function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
   ])
 }
 
-// Parses DER public key from Webauthn MakeCredential response
-// https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred
+// Parses Webauthn MakeCredential authData
 export function parseCreateResponse(result: CreateResult) {
   const rawAttestationObject = base64.decode(result.rawAttestationObjectB64)
   const attestationObject = cbor.decode(rawAttestationObject)
-  const authData = parseMakeCredAuthData(attestationObject.authData)
+  return parseMakeCredAuthData(attestationObject.authData)
+}
+
+// Parses DER public key from Webauthn MakeCredential response
+// https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred
+export function createResponseToDER(result: CreateResult) {
+  const authData = parseCreateResponse(result)
   const pubKey = COSEECDHAtoDER(authData.COSEPublicKey)
   return pubKey
 }

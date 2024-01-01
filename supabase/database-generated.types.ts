@@ -423,6 +423,52 @@ export interface Database {
           }
         ]
       }
+      webauthn_credentials: {
+        Row: {
+          attestation_object: string
+          created_at: string | null
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attestation_object: string
+          created_at?: string | null
+          id?: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          attestation_object?: string
+          created_at?: string | null
+          id?: string
+          key_type?: Database["public"]["Enums"]["key_type_enum"]
+          name?: string
+          public_key?: string
+          raw_credential_id?: string
+          sign_count?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webauthn_credentials_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       distribution_verifications_summary: {
@@ -541,6 +587,7 @@ export interface Database {
       }
     }
     Enums: {
+      key_type_enum: "ES256"
       tag_status: "pending" | "confirmed"
       verification_type: "tag_registration" | "tag_referral"
     }
