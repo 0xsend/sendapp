@@ -1,10 +1,11 @@
 import { Anchor, Avatar, Button, Card, Container, H1, Paragraph, XStack, YStack, Dialog, ScrollView, ListItem, Theme } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { Image } from '@my/ui'
-import { MainLayout } from '../../components/layout';
+import { MainLayout } from 'app/components/layout';
 import { useState } from 'react';
-import { CommentsTime } from 'app/utils/dateHelper';
+import { CommentsTime } from 'app/utils/dateHelper.test';
 import { IconEthereum, IconUSDC, IconSend, IconArrowDown, IconClose, IconDeposit, IconReceive, IconSendTile } from 'app/components/icons';
+import { Square } from 'tamagui'
 
 export function HomeScreen() {
   const { resolvedTheme } = useThemeSetting()
@@ -26,7 +27,6 @@ export function HomeScreen() {
   const transactions = [
     {
       user: {
-        image: './avatar.png',
         sendTag: 'ethantree'
       },
       type: 'inbound',
@@ -37,7 +37,6 @@ export function HomeScreen() {
     },
     {
       user: {
-        image: './avatar.png',
         sendTag: 'You'
       },
       type: 'outbound',
@@ -48,7 +47,6 @@ export function HomeScreen() {
     },
     {
       user: {
-        image: './avatar.png',
         sendTag: 'You'
       },
       type: 'outbound',
@@ -59,7 +57,6 @@ export function HomeScreen() {
     },
     {
       user: {
-        image: './avatar.png',
         sendTag: 'You'
       },
       type: 'outbound',
@@ -200,7 +197,7 @@ export function HomeScreen() {
                     backgroundColor={resolvedTheme?.startsWith('dark') ? "$cinereous" : "white"}>
                     <XStack h={"inherit"} ai="center" padding={"$2"} paddingRight={"$3"}>
                       <Avatar br={"$4"} size={"$4.5"}>
-                        <Avatar.Image src={transaction.user.image} />
+                        <Square size={"$2"} backgroundColor="$color" elevation="$4" />
                         <Avatar.Fallback theme={"gold"} />
                       </Avatar>
                       <YStack f={1} >
@@ -209,7 +206,7 @@ export function HomeScreen() {
                             <Paragraph size={"$4"} fontWeight={"400"} color={"$primary"}>{transaction.user.sendTag}
                             </Paragraph>
                             <Avatar size={"$s16"}>
-                              <Avatar.Image src={transaction.type == 'inbound' ? './recieveIcon.png' : './sendButtonIcon.png'}></Avatar.Image>
+                              {transaction.type == 'inbound' ? <IconReceive /> : <IconSendTile />}
                             </Avatar>
                           </XStack>
                           <Paragraph size={"$3"} fontWeight={"400"}>{`${transaction.amount} ${transaction.currency} (${USDollar.format(transaction.amountInUSD)})`}</Paragraph>
