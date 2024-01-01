@@ -50,7 +50,6 @@ export const CountryCodeField = ({
     if (!country) return
     field.onChange(country.dialCode)
   }, [country, field])
-
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>

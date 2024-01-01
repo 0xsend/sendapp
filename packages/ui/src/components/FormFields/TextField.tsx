@@ -15,19 +15,18 @@ export const TextField = (props: InputProps) => {
   const themeName = useThemeName()
   const id = useId()
   const disabled = isSubmitting
-
-
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       {/* flex 1 is needed to make the input fill the width of the parent in the case of a being in a container with flex direction row */}
       <Fieldset f={1}>
         {!!label && (
-          <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
+          <Label size={props.size || '$3'} htmlFor={id}>
             {label} {isOptional && '(Optional)'}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
           <Input
+            color={'black'}
             disabled={disabled}
             maxLength={maxLength}
             placeholderTextColor="$color10"
