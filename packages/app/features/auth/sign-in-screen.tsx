@@ -167,12 +167,12 @@ export const SignInScreen = () => {
             {(fields) => (
               <>
                 <YStack gap="$3" mb="$4">
-                  <H4 $sm={{ size: '$8' }}>Welcome to Send</H4>
-                  <Paragraph theme="alt1" size={'$1'}>
+                  <H4 $sm={{ size: '$8' }} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>Welcome to Send</H4>
+                  <Paragraph theme="alt1" size={'$1'} color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}>
                     Sign up or Sign in with your phone number
                   </Paragraph>
                 </YStack>
-                <Paragraph size={'$1'} fontWeight={'500'}>
+                <Paragraph size={'$1'} fontWeight={'500'} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>
                   Your Phone
                 </Paragraph>
                 <XStack gap="$2">{Object.values(fields)}</XStack>
@@ -202,7 +202,7 @@ export const SignInScreen = () => {
           justifyContent={'center'}
           ac={'center'}
         >
-          <Paragraph size={'$1'}>Connect with us </Paragraph>
+          <Paragraph size={'$1'} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>Connect with us </Paragraph>
           <XStack gap={'$2'} mt={'$2'}>
             <Anchor
               href={'https://x.com/Send'}

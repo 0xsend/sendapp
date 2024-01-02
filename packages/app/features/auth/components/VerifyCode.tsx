@@ -79,12 +79,12 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         {(fields) => (
           <>
             <YStack gap="$3" mb="$5">
-              <H4 $sm={{ size: '$8' }}>Confirm</H4>
-              <Paragraph theme="alt1" size={'$1'}>
+              <H4 $sm={{ size: '$8' }} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>Confirm</H4>
+              <Paragraph theme="alt1" size={'$1'} color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}>
                 Enter the code we sent you
               </Paragraph>
             </YStack>
-            <Paragraph size={'$1'} fontWeight={'500'}>
+            <Paragraph size={'$1'} fontWeight={'500'} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>
               Your Code
             </Paragraph>
             {Object.values(fields)}
