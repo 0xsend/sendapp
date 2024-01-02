@@ -53,6 +53,14 @@ add constraint "account_credentials_account_id_fkey" foreign key (account_id) re
 alter table "public"."send_account_credentials"
 add constraint "account_credentials_credential_id_fkey" foreign key (credential_id) references webauthn_credentials (id);
 
+alter table "public"."send_account_credentials"
+add constraint "account_credentials_key_slot_check" check (
+    key_slot >= 0
+    and key_slot <= 255
+  );
+
+create unique index "send_account_credentials_account_id_key_slot_key" on "public"."send_account_credentials" using btree ("account_id", "key_slot");
+
 alter table "public"."send_account_credentials" enable row level security;
 
 create policy "insert_own_account_credentials" on "public"."send_account_credentials" as permissive for
