@@ -354,6 +354,7 @@ export interface Database {
           created_at: string | null
           deleted_at: string | null
           id: string
+          init_code: string
           updated_at: string | null
           user_id: string
         }
@@ -363,6 +364,7 @@ export interface Database {
           created_at?: string | null
           deleted_at?: string | null
           id?: string
+          init_code: string
           updated_at?: string | null
           user_id?: string
         }
@@ -372,6 +374,7 @@ export interface Database {
           created_at?: string | null
           deleted_at?: string | null
           id?: string
+          init_code?: string
           updated_at?: string | null
           user_id?: string
         }

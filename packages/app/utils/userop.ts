@@ -68,7 +68,7 @@ export const USEROP_VALID_UNTIL = 0
 export const USEROP_KEY_SLOT = 0
 export const USEROP_SALT = 0n
 
-function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
+export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
   return encodeFunctionData({
     abi: [getAbiItem({ abi: daimoAccountFactoryABI, name: 'createAccount' })],
     args: [

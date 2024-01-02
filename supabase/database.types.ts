@@ -14,9 +14,21 @@ export type Database = MergeDeep<
           Row: {
             address: `0x${string}`
           }
+          Insert: {
+            address: `0x${string}`
+          }
+          Update: {
+            address: `0x${string}`
+          }
         }
         distribution_shares: {
           Row: {
+            address: `0x${string}`
+          }
+          Insert: {
+            address: `0x${string}`
+          }
+          Update: {
             address: `0x${string}`
           }
         }
@@ -35,6 +47,20 @@ export type Database = MergeDeep<
             raw_credential_id: PgBytea
             public_key: PgBytea
             attestation_object: PgBytea
+          }
+        }
+        send_accounts: {
+          Row: {
+            address: `0x${string}`
+            init_code: PgBytea
+          }
+          Insert: {
+            address: `0x${string}`
+            init_code: PgBytea
+          }
+          Update: {
+            address: `0x${string}`
+            init_code: PgBytea
           }
         }
       }

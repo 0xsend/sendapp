@@ -26,11 +26,13 @@ import {
 } from 'viem'
 import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
 import { iEntryPointABI } from '@my/wagmi'
-import { UserOperation } from 'permissionless'
+import { UserOperation, getSenderAddress } from 'permissionless'
 import {
   USEROP_KEY_SLOT,
   USEROP_VALID_UNTIL,
   USEROP_VERSION,
+  daimoAccountFactory,
+  encodeCreateAccountData,
   entrypoint,
   generateUserOp,
   verifier,
@@ -41,8 +43,11 @@ import { base16, base64 } from '@scure/base'
 import { useUser } from 'app/utils/useUser'
 import { assert } from 'app/utils/assert'
 import { useWebauthnCredentials } from 'app/utils/useWebauthnCredentials'
+import { useSendAccounts } from 'app/utils/useSendAccounts'
+import { Tables } from '@my/supabase/database.types'
 
 export function OnboardingScreen() {
+  // REMOTE / SUPABASE STATE
   const supabase = useSupabase()
   const { user } = useUser()
   const {
@@ -52,10 +57,28 @@ export function OnboardingScreen() {
     refetch: credsRefetch,
   } = useWebauthnCredentials()
 
+  // TODO: remove me
+  useEffect(() => {
+    console.log('webauthn creds', { creds, credsError, credsIsLoading })
+  }, [creds, credsError, credsIsLoading])
+
+  const {
+    data: sendAccts,
+    error: sendAcctsError,
+    isLoading: sendAcctsIsLoading,
+    refetch: sendAcctsRefetch,
+  } = useSendAccounts()
+
+  // TODO: remove me
+  useEffect(() => {
+    console.log('send accounts', { sendAccts, sendAcctsError, sendAcctsIsLoading })
+  }, [sendAccts, sendAcctsError, sendAcctsIsLoading])
+
   // PASSKEY / ACCOUNT CREATION STATE
-  const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
+  const [accountName, setAccountName] = useState<string>('') // TODO: use expo-device to get device name
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
+  const [webauthnCred, setWebauthnCred] = useState<Tables<'webauthn_credentials'> | null>(null) // TODO: type this
 
   // SIGNING / SENDING USEROP STATE
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
@@ -63,10 +86,6 @@ export function OnboardingScreen() {
   const [challenge, setChallenge] = useState<Hex | null>(null)
   const [signature, setSignature] = useState<Uint8Array | null>(null)
   const [sendResult, setSendResult] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    console.log('webauthn creds', { creds, credsError, credsIsLoading })
-  }, [creds, credsError, credsIsLoading])
 
   /**
    * Create a passkey and save it to the database
@@ -82,26 +101,68 @@ export function OnboardingScreen() {
       passkeyDisplayTitle: `Send App: ${accountName}`,
     }).then((r) => [r, parseCreateResponse(r), createResponseToDER(r)] as const)
 
-    // save the result
-    const { error: insertError } = await supabase.from('webauthn_credentials').insert({
-      name: passkeyName,
-      display_name: accountName,
-      raw_credential_id: `\\x${base16.encode(base64.decode(cred.credentialIDB64))}`,
-      public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
-      sign_count: 0,
-      attestation_object: `\\x${base16.encode(base64.decode(cred.rawAttestationObjectB64))}`,
-      key_type: 'ES256',
-    })
+    // save the credential to the database
+    const { data: webauthnCred, error: credUpsertErr } = await supabase
+      .from('webauthn_credentials')
+      .upsert({
+        name: passkeyName,
+        display_name: accountName,
+        raw_credential_id: `\\x${base16.encode(base64.decode(cred.credentialIDB64))}`,
+        public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
+        sign_count: 0,
+        attestation_object: `\\x${base16.encode(base64.decode(cred.rawAttestationObjectB64))}`,
+        key_type: 'ES256',
+      })
+      .select()
+      .single()
 
-    if (insertError) {
-      throw insertError
+    if (credUpsertErr) {
+      throw credUpsertErr
     }
 
-    // refetch the credentials
-    await credsRefetch()
+    setWebauthnCred(webauthnCred)
 
     const _publicKey = derKeytoContractFriendlyKey(derPubKey)
     setPublicKey(_publicKey)
+
+    // store the init code in the database to avoid having to recompute it in case user drops off
+    // and does not finish onboarding flow
+    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
+    const senderAddress = await getSenderAddress(baseMainnetClient, {
+      initCode,
+      entryPoint: entrypoint.address,
+    })
+    setSenderAddress(senderAddress)
+
+    // save the send account to the database
+    const { data: sendAcct, error: sendAcctUpsertErr } = await supabase
+      .from('send_accounts')
+      .upsert({
+        address: senderAddress,
+        chain_id: baseMainnetClient.chain.id,
+        init_code: `\\x${initCode.slice(2)}`,
+      })
+      .select()
+      .single()
+
+    if (sendAcctUpsertErr) {
+      throw sendAcctUpsertErr
+    }
+
+    // associate the credential with the account
+    const { error: sendAcctCredInsertErr } = await supabase
+      .from('send_account_credentials')
+      .insert({
+        account_id: sendAcct.id,
+        credential_id: webauthnCred.id,
+        key_slot: 0, // TODO: for create account, we always use key slot 0, but this should be dynamic and based on the account's key slots
+      })
+
+    if (sendAcctCredInsertErr) {
+      throw sendAcctCredInsertErr
+    }
+
+    await sendAcctsRefetch()
 
     // await createAccountUsingEOA(_publicKey)
   }

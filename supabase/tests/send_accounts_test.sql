@@ -74,12 +74,14 @@ SELECT lives_ok(
     INSERT INTO public.send_accounts(
         user_id,
         address,
-        chain_id
+        chain_id,
+        init_code
       )
     VALUES (
         tests.get_supabase_uid('send_account_test_user'),
         '0x1234567890ABCDEF1234567890ABCDEF12345678',
-        1
+        1,
+        '\\x00112233445566778899AABBCCDDEEFF'
       ) $$,
       'Insert a valid send account'
   );
@@ -90,12 +92,14 @@ SELECT throws_ok(
     INSERT INTO public.send_accounts(
         user_id,
         address,
-        chain_id
+        chain_id,
+        init_code
       )
     VALUES (
         tests.get_supabase_uid('send_account_test_user'),
         'invalid_address',
-        1
+        1,
+        '\\x00112233445566778899AABBCCDDEEFF'
       ) $$,
       'new row for relation "send_accounts" violates check constraint "chain_addresses_address_check"',
       'Insert should fail due to invalid address format'
@@ -107,12 +111,14 @@ SELECT throws_ok(
     INSERT INTO public.send_accounts(
         user_id,
         address,
-        chain_id
+        chain_id,
+        init_code
       )
     VALUES (
         tests.get_supabase_uid('send_account_test_user'),
         '0x1234567890ABCDEF1234567890ABCDEF12345678',
-        1
+        1,
+        '\\x00112233445566778899AABBCCDDEEFF'
       ) $$,
       'duplicate key value violates unique constraint "send_accounts_address_key"',
       'Insert should fail due to duplicate address and chain_id'

@@ -9,6 +9,7 @@ create table "public"."send_accounts" (
     and (address ~ '^0x[A-Fa-f0-9]{40}$'::citext)
   ),
   "chain_id" integer not null,
+  "init_code" bytea not null,
   "created_at" timestamp with time zone default current_timestamp,
   "updated_at" timestamp with time zone default current_timestamp,
   "deleted_at" timestamp with time zone
@@ -38,11 +39,16 @@ update to authenticated using ((auth.uid() = user_id));
 create table "public"."send_account_credentials" (
   "account_id" uuid not null,
   "credential_id" uuid not null,
-  "key_slot" integer not null,
+  "key_slot" integer not null constraint account_credentials_key_slot_check check (
+    key_slot >= 0
+    and key_slot <= 255
+  ),
   "created_at" timestamp with time zone default current_timestamp
 );
 
 create unique index account_credentials_pkey on public."send_account_credentials" using btree (account_id, credential_id);
+
+create unique index "send_account_credentials_account_id_key_slot_key" on "public"."send_account_credentials" using btree ("account_id", "key_slot");
 
 alter table "public"."send_account_credentials"
 add constraint "account_credentials_pkey" primary key using index "account_credentials_pkey";
@@ -52,14 +58,6 @@ add constraint "account_credentials_account_id_fkey" foreign key (account_id) re
 
 alter table "public"."send_account_credentials"
 add constraint "account_credentials_credential_id_fkey" foreign key (credential_id) references webauthn_credentials (id);
-
-alter table "public"."send_account_credentials"
-add constraint "account_credentials_key_slot_check" check (
-    key_slot >= 0
-    and key_slot <= 255
-  );
-
-create unique index "send_account_credentials_account_id_key_slot_key" on "public"."send_account_credentials" using btree ("account_id", "key_slot");
 
 alter table "public"."send_account_credentials" enable row level security;
 
