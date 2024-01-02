@@ -13,7 +13,7 @@ export const ThemeContext = createContext<
   (ThemeProviderProps & { current: ThemeName | null }) | null
 >(null)
 
-type ThemeName = 'light' | 'dark' | 'system' | 'send'
+type ThemeName = 'light' | 'dark' | 'system'
 
 export const UniversalThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const current = useThemePreference()

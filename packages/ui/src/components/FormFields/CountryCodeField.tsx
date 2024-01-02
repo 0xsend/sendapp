@@ -17,6 +17,7 @@ import { countries } from 'app/utils/country'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { useEffect, useState } from 'react'
 import { useTsController } from '@ts-react/form'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 type SelectItem = {
   value: string
@@ -35,6 +36,7 @@ export const CountryCodeField = ({
   const { data: geoData, isLoading } = useGeoIp()
   const { field, error } = useTsController<string>()
   const themeName = useThemeName()
+  const { resolvedTheme } = useThemeSetting()
 
   // set the country code based on geoip
   useEffect(() => {
@@ -76,12 +78,13 @@ export const CountryCodeField = ({
             }}
             borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
+            color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'}
+
           >
             {country ? (
               <Text
                 fontSize="$1"
                 fontWeight="bold"
-                color="$text"
                 style={{
                   textTransform: 'uppercase',
                 }}
@@ -126,7 +129,8 @@ export const CountryCodeField = ({
             <Select.Viewport>
               <XStack>
                 <Select.Group space="$0">
-                  <Select.Label>Country</Select.Label>
+                  <Select.Label color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'}
+                  >Country</Select.Label>
                   {countries.map((country, i) => {
                     return (
                       <Select.Item
@@ -136,7 +140,8 @@ export const CountryCodeField = ({
                         value={country.name}
                         cursor="pointer"
                       >
-                        <Select.ItemText>
+                        <Select.ItemText color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'}
+                        >
                           {country.flag}&nbsp;{country.dialCode} {isOpen && country.name}
                         </Select.ItemText>
                         <Select.ItemIndicator marginLeft="auto">
