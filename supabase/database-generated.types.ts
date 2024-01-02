@@ -313,6 +313,74 @@ export interface Database {
           }
         ]
       }
+      send_account_credentials: {
+        Row: {
+          account_id: string
+          created_at: string | null
+          credential_id: string
+          key_slot: number
+        }
+        Insert: {
+          account_id: string
+          created_at?: string | null
+          credential_id: string
+          key_slot: number
+        }
+        Update: {
+          account_id?: string
+          created_at?: string | null
+          credential_id?: string
+          key_slot?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_credentials_account_id_fkey"
+            columns: ["account_id"]
+            referencedRelation: "send_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_credentials_credential_id_fkey"
+            columns: ["credential_id"]
+            referencedRelation: "webauthn_credentials"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      send_accounts: {
+        Row: {
+          address: string
+          chain_id: number
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address: string
+          chain_id: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          address?: string
+          chain_id?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_accounts_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       send_transfer_logs: {
         Row: {
           block_hash: string
