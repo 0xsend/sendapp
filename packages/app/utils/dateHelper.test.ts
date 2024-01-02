@@ -1,25 +1,26 @@
-export const CommentsTime = (dateString: any) => {
-    const date: any = new Date(dateString);
-    const currentDate: any = new Date();
-    const timeDifference = currentDate - date;
-    const secondsAgo = Math.floor(timeDifference / 1000);
-    const minutesAgo = Math.floor(secondsAgo / 60);
-    const hoursAgo = Math.floor(minutesAgo / 60);
-    const daysAgo = Math.floor(hoursAgo / 24);
-    const monthsAgo = Math.floor(daysAgo / 30);
-    const yearsAgo = Math.floor(monthsAgo / 12);
+import { expect, it, describe } from '@jest/globals'
+import { CommentsTime } from './dateHelper'
+describe('CommentsTime', () => {
+    it('time should be 0 sec ago', () => {
+        expect(CommentsTime(new Date())).toBe("0 sec ago")
+    })
+    it('time should be 4 day ago', () => {
+        let dateObj = new Date();
+        dateObj.setDate(dateObj.getDate() - 4);
+        console.log(dateObj);
+        expect(CommentsTime(dateObj)).toBe("4 day ago")
+    })
+    it('time should be 1 mon ago', () => {
+        let dateObj = new Date();
+        dateObj.setDate(dateObj.getDate() - 30);
+        console.log(dateObj);
+        expect(CommentsTime(dateObj)).toBe("1 mon ago")
+    })
+    it('time should be 1 year ago', () => {
+        let dateObj = new Date();
+        dateObj.setDate(dateObj.getDate() - 365);
+        console.log(dateObj);
+        expect(CommentsTime(dateObj)).toBe("1 year ago")
+    })
 
-    if (yearsAgo > 0) {
-      return `${yearsAgo} year ago`;
-    } else if (monthsAgo > 0) {
-      return `${monthsAgo} mon ago`;
-    } else if (daysAgo > 0) {
-      return `${daysAgo} day ago`;
-    } else if (hoursAgo > 0) {
-      return `${hoursAgo} hour ago`;
-    } else if (minutesAgo > 0) {
-      return `${minutesAgo} min ago`;
-    } else {
-      return `${secondsAgo} sec ago`;
-    }
-  };
+})

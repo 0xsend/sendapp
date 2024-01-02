@@ -3,7 +3,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { Image } from '@my/ui'
 import { MainLayout } from 'app/components/layout';
 import { useState } from 'react';
-import { CommentsTime } from 'app/utils/dateHelper.test';
+import { CommentsTime } from 'app/utils/dateHelper';
 import { IconEthereum, IconUSDC, IconSend, IconArrowDown, IconClose, IconDeposit, IconReceive, IconSendTile } from 'app/components/icons';
 import { Square } from 'tamagui'
 
