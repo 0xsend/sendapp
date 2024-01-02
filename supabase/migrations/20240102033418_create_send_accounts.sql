@@ -10,7 +10,8 @@ create table "public"."send_accounts" (
   ),
   "chain_id" integer not null,
   "created_at" timestamp with time zone default current_timestamp,
-  "updated_at" timestamp with time zone default current_timestamp
+  "updated_at" timestamp with time zone default current_timestamp,
+  "deleted_at" timestamp with time zone
 );
 
 create unique index "send_accounts_pkey" on "public"."send_accounts" using btree ("id");

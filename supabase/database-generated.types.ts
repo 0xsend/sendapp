@@ -352,6 +352,7 @@ export interface Database {
           address: string
           chain_id: number
           created_at: string | null
+          deleted_at: string | null
           id: string
           updated_at: string | null
           user_id: string
@@ -360,6 +361,7 @@ export interface Database {
           address: string
           chain_id: number
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           updated_at?: string | null
           user_id?: string
@@ -368,6 +370,7 @@ export interface Database {
           address?: string
           chain_id?: number
           created_at?: string | null
+          deleted_at?: string | null
           id?: string
           updated_at?: string | null
           user_id?: string
@@ -495,6 +498,8 @@ export interface Database {
         Row: {
           attestation_object: string
           created_at: string | null
+          deleted_at: string | null
+          display_name: string
           id: string
           key_type: Database["public"]["Enums"]["key_type_enum"]
           name: string
@@ -507,6 +512,8 @@ export interface Database {
         Insert: {
           attestation_object: string
           created_at?: string | null
+          deleted_at?: string | null
+          display_name: string
           id?: string
           key_type: Database["public"]["Enums"]["key_type_enum"]
           name: string
@@ -519,6 +526,8 @@ export interface Database {
         Update: {
           attestation_object?: string
           created_at?: string | null
+          deleted_at?: string | null
+          display_name?: string
           id?: string
           key_type?: Database["public"]["Enums"]["key_type_enum"]
           name?: string

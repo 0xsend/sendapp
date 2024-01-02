@@ -3,6 +3,7 @@ create type "public"."key_type_enum" as enum ('ES256');
 create table "public"."webauthn_credentials" (
     "id" uuid not null default gen_random_uuid(),
     "name" text not null,
+    "display_name" text not null,
     "raw_credential_id" bytea not null,
     "user_id" uuid not null default auth.uid(),
     "public_key" bytea not null,
@@ -10,7 +11,8 @@ create table "public"."webauthn_credentials" (
     "sign_count" bigint not null,
     "attestation_object" bytea not null,
     "created_at" timestamp with time zone default CURRENT_TIMESTAMP,
-    "updated_at" timestamp with time zone default CURRENT_TIMESTAMP
+    "updated_at" timestamp with time zone default CURRENT_TIMESTAMP,
+    "deleted_at" timestamp with time zone
 );
 
 alter table "public"."webauthn_credentials" enable row level security;

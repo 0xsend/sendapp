@@ -73,6 +73,15 @@ jest.mock('app/utils/useUser', () => ({
   }),
 }))
 
+jest.mock('app/utils/useWebauthnCredentials', () => ({
+  useWebauthnCredentials: jest.fn().mockReturnValue({
+    data: null,
+    error: null,
+    isLoading: false,
+    refetch: jest.fn(),
+  }),
+}))
+
 afterEach(() => {
   // restore the spy created with spyOn
   jest.restoreAllMocks()

@@ -40,10 +40,17 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { base16, base64 } from '@scure/base'
 import { useUser } from 'app/utils/useUser'
 import { assert } from 'app/utils/assert'
+import { useWebauthnCredentials } from 'app/utils/useWebauthnCredentials'
 
 export function OnboardingScreen() {
   const supabase = useSupabase()
   const { user } = useUser()
+  const {
+    data: creds,
+    error: credsError,
+    isLoading: credsIsLoading,
+    refetch: credsRefetch,
+  } = useWebauthnCredentials()
 
   // PASSKEY / ACCOUNT CREATION STATE
   const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
@@ -58,14 +65,8 @@ export function OnboardingScreen() {
   const [sendResult, setSendResult] = useState<boolean | null>(null)
 
   useEffect(() => {
-    ;(async () => {
-      const { data: creds, error } = await supabase.from('webauthn_credentials').select('*')
-      if (error) {
-        throw error
-      }
-      console.log(creds)
-    })()
-  }, [supabase])
+    console.log('webauthn creds', { creds, credsError, credsIsLoading })
+  }, [creds, credsError, credsIsLoading])
 
   /**
    * Create a passkey and save it to the database
@@ -83,7 +84,8 @@ export function OnboardingScreen() {
 
     // save the result
     const { error: insertError } = await supabase.from('webauthn_credentials').insert({
-      name: accountName,
+      name: passkeyName,
+      display_name: accountName,
       raw_credential_id: `\\x${base16.encode(base64.decode(cred.credentialIDB64))}`,
       public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
       sign_count: 0,
@@ -94,6 +96,9 @@ export function OnboardingScreen() {
     if (insertError) {
       throw insertError
     }
+
+    // refetch the credentials
+    await credsRefetch()
 
     const _publicKey = derKeytoContractFriendlyKey(derPubKey)
     setPublicKey(_publicKey)

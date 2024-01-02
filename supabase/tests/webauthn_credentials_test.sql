@@ -18,6 +18,7 @@ SELECT lives_ok(
     $$
     INSERT INTO public.webauthn_credentials(
         name,
+        display_name,
         raw_credential_id,
         public_key,
         key_type,
@@ -26,6 +27,7 @@ SELECT lives_ok(
       )
     VALUES (
         'test_credential',
+        'Test Credential',
         decode('00112233445566778899AABBCCDDEEFF', 'hex'),
         decode('00112233445566778899AABBCCDDEEFF', 'hex'),
         'ES256',
@@ -71,6 +73,7 @@ SELECT throws_ok(
     $$
     INSERT INTO public.webauthn_credentials(
         name,
+        display_name,
         raw_credential_id,
         public_key,
         key_type,
@@ -79,6 +82,7 @@ SELECT throws_ok(
       )
     VALUES (
         'test_credential',
+        'Test Credential',
         decode('FEDCBA98765432100123456789ABCDEF', 'hex'),
         decode('FEDCBA98765432100123456789ABCDEF', 'hex'),
         'ES256',
@@ -94,6 +98,7 @@ SELECT throws_ok(
     $$
     INSERT INTO public.webauthn_credentials(
         name,
+        display_name,
         raw_credential_id,
         public_key,
         key_type,
@@ -102,6 +107,7 @@ SELECT throws_ok(
       )
     VALUES (
         'test_credential',
+        'Test Credential',
         decode('00112233445566778899AABBCCDDEEFF', 'hex'),
         decode('FFEEAABB44556677889900CCDDEE1122', 'hex'),
         'ES256',
@@ -120,6 +126,7 @@ SELECT throws_ok(
     $$
     INSERT INTO public.webauthn_credentials(
         name,
+        display_name,
         raw_credential_id,
         user_id,
         public_key,
@@ -129,6 +136,7 @@ SELECT throws_ok(
       )
     VALUES (
         'test_credential',
+        'Test Credential',
         decode('11223344556677889900AABBCCDDEEFF', 'hex'),
         tests.get_supabase_uid('webauthn_user'),
         -- Trying to insert for webauthn_user
