@@ -7,19 +7,16 @@ describe('CommentsTime', () => {
     it('time should be 4 day ago', () => {
         let dateObj = new Date();
         dateObj.setDate(dateObj.getDate() - 4);
-        console.log(dateObj);
         expect(CommentsTime(dateObj)).toBe("4 day ago")
     })
     it('time should be 1 mon ago', () => {
         let dateObj = new Date();
         dateObj.setDate(dateObj.getDate() - 30);
-        console.log(dateObj);
         expect(CommentsTime(dateObj)).toBe("1 mon ago")
     })
     it('time should be 1 year ago', () => {
         let dateObj = new Date();
         dateObj.setDate(dateObj.getDate() - 365);
-        console.log(dateObj);
         expect(CommentsTime(dateObj)).toBe("1 year ago")
     })
 
