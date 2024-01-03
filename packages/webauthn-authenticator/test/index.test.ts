@@ -54,16 +54,16 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           deserializePublicKeyCredentialAssertion,
         } = await import('../src')
 
-        const attestationChallenge = Buffer.from('test challenge').toString('base64')
+        const attestationChallenge = Buffer.from('test challenge').toString('base64url')
 
         const credOptSer = {
           publicKey: {
             rp: {
-              id: 'send.app',
+              id: 'https://send.app',
               name: 'Send',
             },
             user: {
-              id: Buffer.from('test user').toString('base64'),
+              id: Buffer.from('test user').toString('base64url'),
               name: 'sendusername',
               displayName: 'Send User',
             },
@@ -82,10 +82,10 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
-        expect(cred.rawId).toEqual(testBytes)
-        expect(cred.id).toEqual(testBytes.toString('base64'))
+        expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+        expect(cred.id).toEqual(testBytes.toString('base64url'))
 
-        verifyCredChallenge({ cred, attestationChallenge, publicKey: keyPair.publicKey })
+        verifyAttestation({ cred, attestationChallenge, publicKey: keyPair.publicKey })
 
         const credReqOptsSer = {
           publicKey: {
@@ -103,22 +103,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         const credSer2 = await getPublicKeyCredential(credReqOptsSer)
         const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
 
-        expect(cred2.rawId).toEqual(testBytes)
-        expect(cred2.id).toEqual(testBytes.toString('base64'))
-        const verified = crypto.verify(
-          'sha256',
-          Buffer.concat([
-            Buffer.from(cred2.response.authenticatorData),
-            Buffer.from(cred2.response.clientDataJSON),
-          ]),
-          crypto.createPublicKey({
-            key: keyPair.publicKey,
-            format: 'der',
-            type: 'spki',
-          }),
-          Buffer.from(cred2.response.signature)
-        )
-        expect(verified).toBeTruthy()
+        verifyAssertion({ cred: cred2, testBytes, keyPair })
       })
     })
 
@@ -154,20 +139,23 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
         vi.resetAllMocks()
       })
       it('should create a credential', async () => {
-        const { createPublicKeyCredential, deserializePublicKeyCredentialAttestion } = await import(
-          '../src'
-        )
+        const {
+          createPublicKeyCredential,
+          deserializePublicKeyCredentialAttestion,
+          getPublicKeyCredential,
+          deserializePublicKeyCredentialAssertion,
+        } = await import('../src')
 
-        const attestationChallenge = Buffer.from('test challenge').toString('base64')
+        const attestationChallenge = Buffer.from('test challenge').toString('base64url')
 
         const credOptSer = {
           publicKey: {
             rp: {
-              id: 'send.app',
+              id: 'https://send.app',
               name: 'Send',
             },
             user: {
-              id: Buffer.from('test user').toString('base64'),
+              id: Buffer.from('test user').toString('base64url'),
               name: 'sendusername',
               displayName: 'Send User',
             },
@@ -186,15 +174,60 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
-        expect(cred.rawId).toEqual(testBytes)
-        expect(cred.id).toEqual(testBytes.toString('base64'))
-        verifyCredChallenge({ cred, attestationChallenge, publicKey: keyPair.publicKey })
+        expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+        expect(cred.id).toEqual(testBytes.toString('base64url'))
+        verifyAttestation({ cred, attestationChallenge, publicKey: keyPair.publicKey })
+
+        const credReqOptsSer = {
+          publicKey: {
+            challenge: attestationChallenge,
+            allowCredentials: [
+              {
+                id: cred.id,
+                type: 'public-key',
+              },
+            ],
+            timeout: 60000,
+          },
+        } as CredentialRequestOptionsSerialized
+
+        const credSer2 = await getPublicKeyCredential(credReqOptsSer)
+        const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
+
+        verifyAssertion({ cred: cred2, testBytes, keyPair })
       })
     })
   })
 })
 
-function verifyCredChallenge({
+async function verifyAssertion({
+  cred,
+  testBytes,
+  keyPair,
+}: {
+  cred: PublicKeyCredential & { response: AuthenticatorAssertionResponse }
+  testBytes: Buffer
+  keyPair: { publicKey: Buffer; privateKey: string }
+}) {
+  expect(cred.rawId).toEqual(new Uint8Array(testBytes))
+  expect(cred.id).toEqual(testBytes.toString('base64url'))
+  const clientDataHash = Buffer.from(
+    await crypto.subtle.digest('SHA-256', cred.response.clientDataJSON)
+  )
+  const verified = crypto.verify(
+    'sha256',
+    Buffer.concat([Buffer.from(cred.response.authenticatorData), Buffer.from(clientDataHash)]),
+    crypto.createPublicKey({
+      key: keyPair.publicKey,
+      format: 'der',
+      type: 'spki',
+    }),
+    Buffer.from(cred.response.signature)
+  )
+  expect(verified).toBeTruthy()
+}
+
+async function verifyAttestation({
   cred,
   attestationChallenge,
   publicKey,
@@ -208,6 +241,9 @@ function verifyCredChallenge({
   // verify the attestations and clientDataJSON
   const response = cred.response
   expect(response.clientDataJSON).toBeDefined()
+  const clientDataHash = Buffer.from(
+    await crypto.subtle.digest('SHA-256', cred.response.clientDataJSON)
+  )
   expect(JSON.parse(Buffer.from(response.clientDataJSON).toString())).toEqual({
     challenge: attestationChallenge,
     origin: 'https://send.app',
@@ -233,7 +269,7 @@ function verifyCredChallenge({
   expect(attestation.attStmt.sig).toBeDefined()
   const verified = crypto.verify(
     'sha256',
-    Buffer.concat([attestation.authData, response.clientDataJSON]),
+    Buffer.concat([attestation.authData, clientDataHash]),
     crypto.createPublicKey({
       key: publicKey,
       format: 'der',

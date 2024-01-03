@@ -2,23 +2,21 @@ import { p256 } from '@noble/curves/p256'
 import { Hex, bytesToBigInt, hexToBytes, bytesToHex } from 'viem'
 import { base64 } from '@scure/base'
 import cbor from 'cbor'
-import { CreateResult, SignResult } from '@daimo/expo-passkeys'
+import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
+import { assert } from './assert'
 
+/**
+ * DER-encoded public key prefix
+ * ASN.1 SubjectPublicKeyInfo structure for EC public keys
+ */
 const derPrefix = '0x3059301306072a8648ce3d020106082a8648ce3d03010703420004'
-
-function assert(condition: boolean, msg?: string): asserts condition {
-  if (!condition) throw new Error(msg || 'Assertion failed')
-}
 
 export function isDERPubKey(pubKeyHex: Hex): boolean {
   return pubKeyHex.startsWith(derPrefix) && pubKeyHex.length === derPrefix.length + 128
 }
 
 export function derKeytoContractFriendlyKey(pubKeyHex: Hex): [Hex, Hex] {
-  if (!isDERPubKey(pubKeyHex)) {
-    throw new Error('Invalid public key format')
-  }
-
+  assert(isDERPubKey(pubKeyHex), 'Invalid DER public key')
   const pubKey = pubKeyHex.substring(derPrefix.length)
   assert(pubKey.length === 128)
 
@@ -109,9 +107,7 @@ export function parseSignResponse(result: SignResult) {
   const [accountName, keySlotStr] = passkeyName.split('.') // Assumes account name does not have periods (.) in it.
   assert(!!accountName && !!keySlotStr, 'Invalid passkey name')
   const keySlot = parseInt(keySlotStr, 10)
-
   const clientDataJSON = Buffer.from(base64.decode(result.rawClientDataJSONB64)).toString('utf-8')
-
   const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":"'))
   const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":"'))
 

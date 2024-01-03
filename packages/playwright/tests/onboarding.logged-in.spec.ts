@@ -4,7 +4,11 @@
  * Currently, Playwright browsers do no support WebAuthn, so we mock the call to the WebAuthn API.
  */
 
+import { testBaseClient } from './fixtures/viem/base'
 import { test, expect } from './fixtures/auth'
+import { Hex, parseEther } from 'viem'
+import { assert } from 'app/utils/assert'
+import debug from 'debug'
 
 test('can visit onboarding page', async ({ page, credentialsStore }) => {
   await page.goto('/onboarding')
@@ -12,65 +16,43 @@ test('can visit onboarding page', async ({ page, credentialsStore }) => {
   await page.getByRole('button', { name: 'Create' }).click()
 
   // assert passkey was created
-  //console.log('credentialsStore', credentialsStore)
   expect(Object.values(credentialsStore).length).toBe(1)
   const credential = Object.values(credentialsStore)[0]
 
-  if (!credential) {
-    throw new Error('Missing credential')
-  }
+  assert(!!credential, 'Missing credential')
 
-  //console.log('credential', credential)
+  expect(credential.attestations.length).toBe(1)
+  const attestation = credential.attestations[0]
 
-  expect(credential.attestations?.length).toBe(1)
-  const attestation = credential.attestations?.[0]
-
-  if (!attestation) {
-    throw new Error('Missing credential attestation')
-  }
-  //console.log('attestation', attestation)
+  assert(!!attestation, 'Missing credential attestation')
 
   const { clientDataJSON, attestationObject } = attestation
 
-  if (!clientDataJSON || !attestationObject) {
-    throw new Error('Missing clientDataJSON or attestationObject')
-  }
+  assert(!!clientDataJSON && !!attestationObject, 'Missing clientDataJSON or attestationObject')
 
-  await expect(page.getByLabel('Create result:')).toHaveValue(
-    JSON.stringify(
-      {
-        rawClientDataJSONB64: Buffer.from(clientDataJSON).toString('base64'),
-        rawAttestationObjectB64: Buffer.from(attestationObject).toString('base64'),
-      },
-      null,
-      2
-    )
-  )
+  const addrLocator = page.getByLabel('Your sender address:')
+  await expect(addrLocator).toHaveValue(/^0x[a-f0-9]{40}$/i)
+  const address = await addrLocator.inputValue()
 
-  await expect(page.getByLabel('Your userOp Hash:')).toHaveValue(/^0x[a-f0-9]{64}$/)
+  // sponsor the creation by setting the balance using anvil
+  await testBaseClient.setBalance({
+    address: address as Hex,
+    value: parseEther('1'),
+  })
 
-  // TODO: check address, userOp, public key
+  await expect(page.getByLabel('Your userOp Hash:')).toHaveValue(/^0x[a-f0-9]{64}$/i)
 
   await page.getByRole('button', { name: 'Sign' }).click()
 
   // verify assertion
-  const assertion = credential.assertions?.[0]
-  if (!assertion) {
-    throw new Error('Missing credential assertion')
-  }
+  const assertion = credential.assertions[0]
+  assert(!!assertion, 'Missing credential assertion')
 
-  await expect(page.getByLabel('Sign result:')).toHaveValue(
-    JSON.stringify(
-      {
-        passkeyName: Buffer.from(assertion.userHandle || Buffer.from([0])).toString('utf-8'),
-        rawClientDataJSONB64: Buffer.from(assertion.clientDataJSON).toString('base64'),
-        rawAuthenticatorDataB64: Buffer.from(assertion.authenticatorData).toString('base64'),
-        signatureB64: Buffer.from(assertion.signature).toString('base64'),
-      },
-      null,
-      2
-    )
-  )
+  const signResult = page.getByLabel('Sign result:')
+  await expect(signResult).toHaveValue(/^0x[a-f0-9]+$/i)
 
-  // await page.pause()
+  // send user op
+  await page.getByRole('button', { name: 'Send' }).click()
+
+  await expect(page.getByLabel('Send result:')).toHaveValue('true')
 })

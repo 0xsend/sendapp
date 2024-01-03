@@ -38,17 +38,18 @@ local_resource(
 if CI and os.getenv("INSTALL_PLAYWRIGHT_DEPS") != None:
     local_resource("yarn:install:playwright-deps", "yarnx playwright install --with-deps", labels = labels)
 
+contract_files = files_matching(
+    os.path.join("packages", "contracts"),
+    lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
+)
+
 local_resource(
     "contracts:build",
     "yarn contracts build --sizes",
     allow_parallel = True,
     labels = labels,
     resource_deps = ["yarn:install"],
-    deps =
-        files_matching(
-            os.path.join("packages", "contracts"),
-            lambda f: f.endswith(".sol") and f.find("cache") == -1,
-        ),
+    deps = contract_files,
 )
 
 local_resource(
@@ -59,11 +60,17 @@ local_resource(
     resource_deps = [
         "yarn:install",
         "contracts:build",
+        "anvil:send-account-fixtures",
     ],
-    deps = [os.path.join("packages", "wagmi", "wagmi.config.ts")] + files_matching(
-        os.path.join("packages", "wagmi", "src"),
-        lambda f: f.endswith(".ts") and f.find("generated.ts") == -1,
-    ),
+    deps =
+        [os.path.join("packages", "wagmi", "wagmi.config.ts")] +
+        files_matching(
+            os.path.join("packages", "wagmi", "src"),
+            lambda f: f.endswith(".ts") and f.find("generated.ts") == -1,
+        ) + files_matching(
+            os.path.join("packages", "contracts", "broadcast"),
+            lambda f: f.endswith("run-latest.json"),
+        ),
 )
 
 local_resource(
@@ -273,10 +280,13 @@ local_resource(
     ],
     serve_cmd = """
     docker run --rm \
+        --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
         -p 3030:3030 \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./etc/aa-bundler:/app/etc/aa-bundler \
+        -e "DEBUG=aa*" \
+        -e "DEBUG_COLORS=true" \
         0xbigboss/bundler \
         --port 3030 \
         --config /app/etc/aa-bundler/aa-bundler.config.json \
@@ -287,6 +297,29 @@ local_resource(
         --unsafe
     """,
 )
+
+# TODO: decide if we will use silius bundler or not
+# local_resource(
+#     "silius:base",
+#     allow_parallel = True,
+#     labels = labels,
+#     readiness_probe = probe(
+#         exec = exec_action(
+#             command = [
+#                 "cast",
+#                 "bn",
+#                 "--rpc-url=127.0.0.1:3030",
+#             ],
+#         ),
+#         period_secs = 15,
+#         timeout_secs = 5,
+#     ),
+#     resource_deps = [
+#         "yarn:install",
+#         "anvil:base",
+#     ],
+#     serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --uopool-mode unsafe --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
+# )
 
 # APPS
 labels = ["apps"]
@@ -360,6 +393,11 @@ local_resource(
     allow_parallel = True,
     labels = ["test"],
     resource_deps = ["yarn:install"],
+    deps =
+        files_matching(
+            os.path.join("packages", "webauthn-authenticator"),
+            lambda f: f.endswith(".ts"),
+        ),
 )
 
 local_resource(
@@ -437,10 +475,6 @@ local_resource(
         "yarn:install",
         "contracts:build",
     ],
-    deps =
-        files_matching(
-            os.path.join("packages", "contracts"),
-            lambda f: f.endswith(".sol") and f.find("cache") == -1,
-        ),
+    deps = contract_files,
 )
 

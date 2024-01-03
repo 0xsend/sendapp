@@ -13,6 +13,7 @@ interface WebAuthnAuthenticatorWindow {
   WebAuthnAuthenticator?: typeof WebAuthnAuthenticator
 }
 
+// TODO: add a detereministic seed for the credential store
 export const test = base.extend<{
   context: BrowserContext
   page: Page

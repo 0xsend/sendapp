@@ -23,9 +23,9 @@
     "test": "npx supabase test db"
   },
   "devDependencies": {
-    "@snaplet/copycat": "^0.17.3",
+    "@snaplet/copycat": "^1.1.0",
     "dotenv-cli": "^6.0.0",
-    "snaplet": "^0.74.2",
+    "snaplet": "^0.77.2",
     "supabase": "^1.99.0",
     "type-fest": "^4.3.1"
   }
