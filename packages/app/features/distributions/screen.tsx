@@ -1,4 +1,4 @@
-import { Button, Container, ScrollView, Theme, XStack, YStack } from '@my/ui'
+import { Button, Container, H4, ScrollView, Theme, XStack, YStack } from '@my/ui'
 import { sendAirdropsSafeAddress } from '@my/wagmi'
 import { ArrowRight } from '@tamagui/lucide-icons'
 import { HomeHeader } from 'app/components/HomeHeader'
@@ -26,7 +26,9 @@ export function DistributionsScreen() {
 }
 
 const DistributionSection = () => {
-  const etherscanLink = useLink({ href: `https://etherscan.io/address/${sendAirdropsSafeAddress}` })
+  const etherscanLink = useLink({
+    href: `https://etherscan.io/address/${sendAirdropsSafeAddress}`,
+  })
 
   return (
     <YStack gap="$4">

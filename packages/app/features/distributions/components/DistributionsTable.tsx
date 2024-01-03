@@ -104,7 +104,7 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
   } = useTimeRemaining(distribution.claim_end)
 
   return (
-    <DistributionsStatCard w="100%" f={1} $gtMd={{ flexBasis: 'auto' }}>
+    <DistributionsStatCard w="100%" f={1} $gtMd={{ flexBasis: 'auto' }} br="$8" p="$2">
       {/* Header */}
       <Card.Header gap="$4">
         <XStack gap="$4" fd="column" $gtSm={{ jc: 'space-between', fd: 'row' }}>
@@ -208,7 +208,7 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
                             </SizableText>
                           )}
                           {Number(sendBalanceData?.value ?? BigInt(0)) <
-                          distribution.hodler_min_balance ? (
+                            distribution.hodler_min_balance ? (
                             <SizableText>
                               Your balance is below the minimum required to qualify for rewards.{' '}
                               {formatAmount(distribution.hodler_min_balance, 9, 0)} send required.
