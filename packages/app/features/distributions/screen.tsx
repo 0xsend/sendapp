@@ -11,15 +11,14 @@ import { DistributionsTable } from './components/DistributionsTable'
 
 export function DistributionsScreen() {
   return (
-    <Container>
-      <ScrollView f={3} fb={0}>
-        <YStack gap="$6" pt="$5" pb="$8">
-          <YStack gap="$8">
-            <DistributionSection />
-          </YStack>
+    <ScrollView f={3} fb={0} bg="#F0EEE9">
+      <YStack gap="$6" pt="$5" pb="$8">
+        <YStack gap="$8">
+          <DistributionSection />
         </YStack>
-      </ScrollView>
-    </Container>
+      </YStack>
+    </ScrollView>
+
   )
 }
 
