@@ -9,11 +9,7 @@
  */
 import { createPasskey } from '@daimo/expo-passkeys'
 import { Button, Container, H1, H2, Input, Label, Paragraph, TextArea, YStack } from '@my/ui'
-import {
-  derKeytoContractFriendlyKey,
-  createResponseToDER,
-  parseCreateResponse,
-} from 'app/utils/passkeys'
+import { parseCreateResponse, COSEECDHAtoXY } from 'app/utils/passkeys'
 import React, { useEffect, useState } from 'react'
 import {
   bytesToHex,
@@ -42,31 +38,15 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { base16, base64 } from '@scure/base'
 import { useUser } from 'app/utils/useUser'
 import { assert } from 'app/utils/assert'
-import { useWebauthnCredentials } from 'app/utils/useWebauthnCredentials'
 import { useSendAccounts } from 'app/utils/useSendAccounts'
-import { Tables } from '@my/supabase/database.types'
+import { base64ToBase16 } from 'app/utils/base64ToBase16'
+import * as Device from 'expo-device'
 
 export function OnboardingScreen() {
-  // REMOTE / SUPABASE STATE
-  const supabase = useSupabase()
-  const { user } = useUser()
-  const {
-    data: creds,
-    error: credsError,
-    isLoading: credsIsLoading,
-    refetch: credsRefetch,
-  } = useWebauthnCredentials()
-
-  // TODO: remove me
-  useEffect(() => {
-    console.log('webauthn creds', { creds, credsError, credsIsLoading })
-  }, [creds, credsError, credsIsLoading])
-
   const {
     data: sendAccts,
     error: sendAcctsError,
     isLoading: sendAcctsIsLoading,
-    refetch: sendAcctsRefetch,
   } = useSendAccounts()
 
   // TODO: remove me
@@ -74,11 +54,8 @@ export function OnboardingScreen() {
     console.log('send accounts', { sendAccts, sendAcctsError, sendAcctsIsLoading })
   }, [sendAccts, sendAcctsError, sendAcctsIsLoading])
 
-  // PASSKEY / ACCOUNT CREATION STATE
-  const [accountName, setAccountName] = useState<string>('') // TODO: use expo-device to get device name
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
-  const [webauthnCred, setWebauthnCred] = useState<Tables<'webauthn_credentials'> | null>(null) // TODO: type this
 
   // SIGNING / SENDING USEROP STATE
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
@@ -87,85 +64,18 @@ export function OnboardingScreen() {
   const [signature, setSignature] = useState<Uint8Array | null>(null)
   const [sendResult, setSendResult] = useState<boolean | null>(null)
 
-  /**
-   * Create a passkey and save it to the database
-   */
-  async function createAccount() {
-    assert(!!user?.id, 'No user id')
-
-    const passkeyName = `${user.id}.0`
-    const [cred, authData, derPubKey] = await createPasskey({
-      domain: window.location.hostname,
-      challengeB64: window.btoa('foobar'), // TODO: generate a random challenge from the server
-      passkeyName,
-      passkeyDisplayTitle: `Send App: ${accountName}`,
-    }).then((r) => [r, parseCreateResponse(r), createResponseToDER(r)] as const)
-
-    // save the credential to the database
-    const { data: webauthnCred, error: credUpsertErr } = await supabase
-      .from('webauthn_credentials')
-      .upsert({
-        name: passkeyName,
-        display_name: accountName,
-        raw_credential_id: `\\x${base16.encode(base64.decode(cred.credentialIDB64))}`,
-        public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
-        sign_count: 0,
-        attestation_object: `\\x${base16.encode(base64.decode(cred.rawAttestationObjectB64))}`,
-        key_type: 'ES256',
-      })
-      .select()
-      .single()
-
-    if (credUpsertErr) {
-      throw credUpsertErr
+  // monitor send accounts, automatically set the public key if there is one
+  useEffect(() => {
+    if (!sendAccts?.length) {
+      return
     }
-
-    setWebauthnCred(webauthnCred)
-
-    const _publicKey = derKeytoContractFriendlyKey(derPubKey)
-    setPublicKey(_publicKey)
-
-    // store the init code in the database to avoid having to recompute it in case user drops off
-    // and does not finish onboarding flow
-    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
-    const senderAddress = await getSenderAddress(baseMainnetClient, {
-      initCode,
-      entryPoint: entrypoint.address,
-    })
-    setSenderAddress(senderAddress)
-
-    // save the send account to the database
-    const { data: sendAcct, error: sendAcctUpsertErr } = await supabase
-      .from('send_accounts')
-      .upsert({
-        address: senderAddress,
-        chain_id: baseMainnetClient.chain.id,
-        init_code: `\\x${initCode.slice(2)}`,
-      })
-      .select()
-      .single()
-
-    if (sendAcctUpsertErr) {
-      throw sendAcctUpsertErr
-    }
-
-    // associate the credential with the account
-    const { error: sendAcctCredInsertErr } = await supabase
-      .from('send_account_credentials')
-      .insert({
-        account_id: sendAcct.id,
-        credential_id: webauthnCred.id,
-        key_slot: 0, // TODO: for create account, we always use key slot 0, but this should be dynamic and based on the account's key slots
-      })
-
-    if (sendAcctCredInsertErr) {
-      throw sendAcctCredInsertErr
-    }
-
-    await sendAcctsRefetch()
-
-    // await createAccountUsingEOA(_publicKey)
-  }
+    const sendAcct = sendAccts[0]
+    assert(!!sendAcct, 'No send account')
+    const webauthnCred = sendAcct.webauthn_credentials[0]
+    assert(!!webauthnCred, 'No send account credentials')
+    setSenderAddress(sendAcct.address)
+    setPublicKey(COSEECDHAtoXY(base16.decode(webauthnCred.public_key.slice(2).toUpperCase())))
+  }, [sendAccts])
 
   // generate user op based on public key, and generate challenge from the user op hash
   // TODO: decouple generate user op from public key and instead only use sender address
@@ -232,10 +142,13 @@ export function OnboardingScreen() {
     <Container>
       <YStack space="$2" maxWidth={600} py="$6">
         <H1>Welcome to Send</H1>
-        <Paragraph>Start by creating a Passkey below.</Paragraph>
-        <Label htmlFor="accountName">Account name:</Label>
-        <Input id="accountName" onChangeText={setAccountName} value={accountName} />
-        <Button onPress={createAccount}>Create</Button>
+        <Paragraph>
+          Start by creating a Passkey below. Send uses passkeys to secure your account. Press the
+          button below to get started.
+        </Paragraph>
+
+        <CreateSendAccount />
+
         <Label htmlFor="senderAddress">Your sender address:</Label>
         <TextArea
           id="senderAddress"
@@ -244,28 +157,14 @@ export function OnboardingScreen() {
           fontFamily={'monospace'}
           value={senderAddress ? senderAddress : undefined}
         />
-        <Label htmlFor="userOpHash">Your userOp hash:</Label>
-        <TextArea
-          id="userOpHash"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={userOpHash ? userOpHash : undefined}
-        />
-        <H2>Then sign ther userOpHash with it</H2>
-        <Button onPress={_signWithPasskey}>Sign</Button>
-        <Label htmlFor="signResult">Sign result:</Label>
-        <TextArea
-          id="signResult"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={
-            signature && signature?.byteLength > 0
-              ? `0x${Buffer.from(signature).toString('hex')}`
-              : undefined
-          }
-        />
+
+        {!signature || signature.byteLength <= 0 ? (
+          <>
+            <H2>Sign a user operation</H2>
+            <Button onPress={_signWithPasskey}>Sign</Button>
+          </>
+        ) : null}
+
         <H2>Send it</H2>
         <Button
           onPress={async () => {
@@ -299,6 +198,112 @@ export function OnboardingScreen() {
         />
       </YStack>
     </Container>
+  )
+}
+
+/**
+ * Create a send account but not onchain, yet.
+ */
+function CreateSendAccount() {
+  // REMOTE / SUPABASE STATE
+  const supabase = useSupabase()
+  const { user } = useUser()
+  const { refetch: sendAcctsRefetch } = useSendAccounts()
+  // PASSKEY / ACCOUNT CREATION STATE
+  const deviceName = Device.deviceName
+    ? Device.deviceName
+    : `My ${Device.modelName ?? 'Send Account'}`
+  const [accountName, setAccountName] = useState<string>(deviceName) // TODO: use expo-device to get device name
+
+  // TODO: split creating the on-device and remote creation to introduce retries in-case of failures
+  async function createAccount() {
+    assert(!!user?.id, 'No user id')
+
+    const passkeyName = `${user.id}.0`
+    const [rawCred, authData] = await createPasskey({
+      domain: window.location.hostname,
+      challengeB64: base64.encode(Buffer.from('foobar')), // TODO: generate a random challenge from the server
+      passkeyName,
+      passkeyDisplayTitle: `Send App: ${accountName}`,
+    }).then((r) => [r, parseCreateResponse(r)] as const)
+
+    // save the credential to the database
+    const { data: webauthnCred, error: credUpsertErr } = await supabase
+      .from('webauthn_credentials')
+      .upsert({
+        name: passkeyName,
+        display_name: accountName,
+        raw_credential_id: `\\x${base64ToBase16(rawCred.credentialIDB64)}`,
+        public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
+        sign_count: 0,
+        attestation_object: `\\x${base64ToBase16(rawCred.rawAttestationObjectB64)}`,
+        key_type: 'ES256',
+      })
+      .select()
+      .single()
+
+    if (credUpsertErr) {
+      throw credUpsertErr
+    }
+
+    const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
+
+    // store the init code in the database to avoid having to recompute it in case user drops off
+    // and does not finish onboarding flow
+    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
+    const senderAddress = await getSenderAddress(baseMainnetClient, {
+      initCode,
+      entryPoint: entrypoint.address,
+    })
+
+    // save the send account to the database
+    const { data: sendAcct, error: sendAcctUpsertErr } = await supabase
+      .from('send_accounts')
+      .upsert(
+        {
+          address: senderAddress,
+          chain_id: baseMainnetClient.chain.id,
+          init_code: `\\x${initCode.slice(2)}`,
+        },
+        {
+          onConflict: 'address, chain_id',
+        }
+      )
+      .select()
+      .single()
+
+    if (sendAcctUpsertErr) {
+      throw sendAcctUpsertErr
+    }
+
+    // associate the credential with the account
+    const { error: sendAcctCredInsertErr } = await supabase.from('send_account_credentials').upsert(
+      {
+        account_id: sendAcct.id,
+        credential_id: webauthnCred.id,
+        key_slot: 0, // for create account, we always use key slot 0
+      },
+      {
+        onConflict: 'account_id, credential_id',
+      }
+    )
+
+    if (sendAcctCredInsertErr) {
+      throw sendAcctCredInsertErr
+    }
+
+    await sendAcctsRefetch()
+
+    // await createAccountUsingEOA(_publicKey)
+  }
+
+  return (
+    // TODO: turn into a form
+    <YStack space="$4">
+      <Label htmlFor="accountName">Account name:</Label>
+      <Input id="accountName" onChangeText={setAccountName} value={accountName} />
+      <Button onPress={createAccount}>Create</Button>
+    </YStack>
   )
 }
 

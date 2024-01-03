@@ -2,6 +2,10 @@ sendapp.localhost {
 	reverse_proxy http://localhost:3000
 }
 
+supabase.localhost {
+	reverse_proxy http://localhost:54321
+}
+
 distributor.localhost {
 	reverse_proxy http://localhost:3050
 }

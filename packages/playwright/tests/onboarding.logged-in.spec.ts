@@ -80,16 +80,13 @@ test('can visit onboarding page', async ({ page, credentialsStore, supabase, aut
     value: parseEther('1'),
   })
 
-  await expect(page.getByLabel('Your userOp Hash:')).toHaveValue(/^0x[a-f0-9]{64}$/i)
-
   await page.getByRole('button', { name: 'Sign' }).click()
 
   // verify assertion
   const assertion = credential.assertions[0]
   assert(!!assertion, 'Missing credential assertion')
 
-  const signResult = page.getByLabel('Sign result:')
-  await expect(signResult).toHaveValue(/^0x[a-f0-9]+$/i)
+  // TODO: verify authData and clientDataJSON hash with sha256
 
   // send user op
   await page.getByRole('button', { name: 'Send' }).click()

@@ -353,6 +353,9 @@ local_resource(
     "caddy:web",
     labels = labels,
     serve_cmd = "caddy run --watch --config Caddyfile.dev",
+    deps = [
+        "Caddyfile.dev",
+    ],
 )
 
 local_resource(
