@@ -57,7 +57,7 @@ alter table "public"."send_account_credentials"
 add constraint "account_credentials_account_id_fkey" foreign key (account_id) references send_accounts (id) on delete cascade;
 
 alter table "public"."send_account_credentials"
-add constraint "account_credentials_credential_id_fkey" foreign key (credential_id) references webauthn_credentials (id);
+add constraint "account_credentials_credential_id_fkey" foreign key (credential_id) references webauthn_credentials (id) on delete cascade;
 
 alter table "public"."send_account_credentials" enable row level security;
 
