@@ -26,7 +26,7 @@ export const darkTransparent = 'rgba(241, 241, 238, 0)'
 
 export const lightPalette = [
   lightTransparent,
-  '#000',
+  '#fff',
   '#f9f9f9',
   'hsl(0, 0%, 97.3%)',
   'hsl(0, 0%, 95.1%)',

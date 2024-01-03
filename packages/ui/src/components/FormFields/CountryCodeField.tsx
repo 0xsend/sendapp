@@ -78,7 +78,7 @@ export const CountryCodeField = ({
             }}
             borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
-            color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'}
+            color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
 
           >
             {country ? (
@@ -115,7 +115,7 @@ export const CountryCodeField = ({
               width="100%"
             >
               <YStack zIndex={10}>
-                <ChevronUp size={44} />
+                <ChevronUp size={30} color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'} />
               </YStack>
               <LinearGradient
                 start={[0, 0]}
@@ -129,9 +129,9 @@ export const CountryCodeField = ({
             <Select.Viewport>
               <XStack>
                 <Select.Group space="$0">
-                  <Select.Label color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'}
-                  >Country</Select.Label>
-                  {countries.map((country, i) => {
+                  <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+                  >Select Country</Select.Label>
+                  {countries?.map((country, i) => {
                     return (
                       <Select.Item
                         id={`dialCode-${country.code}`}
@@ -139,8 +139,10 @@ export const CountryCodeField = ({
                         key={country.name}
                         value={country.name}
                         cursor="pointer"
+                        theme={themeName}
+                        color={"white"}
                       >
-                        <Select.ItemText color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'}
+                        <Select.ItemText color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
                         >
                           {country.flag}&nbsp;{country.dialCode} {isOpen && country.name}
                         </Select.ItemText>
@@ -162,7 +164,7 @@ export const CountryCodeField = ({
               height="$3"
             >
               <YStack zIndex={10}>
-                <ChevronDown size={20} />
+                <ChevronDown size={30} color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'} />
               </YStack>
               <LinearGradient
                 start={[0, 0]}
