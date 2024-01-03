@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { CommentsTime } from 'app/utils/dateHelper';
 import { IconEthereum, IconUSDC, IconSend, IconArrowDown, IconClose, IconDeposit, IconReceive, IconSendTile } from 'app/components/icons';
 import { Square } from 'tamagui'
+import cardBackground from 'app/assets/img/home/card-background.png'
 
 export function HomeScreen() {
   const { resolvedTheme } = useThemeSetting()
@@ -116,7 +117,7 @@ export function HomeScreen() {
                     </YStack>
                   </YStack>
                   <Card.Background borderRadius={"$8"} backgroundColor={resolvedTheme?.startsWith('dark') ? "rgb(0,0,0,1)" : "$khaki900"}>
-                    {/* <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} /> */}
+                    <Image source={{ uri: cardBackground.src }} width={"100%"} height={"100%"} />
                   </Card.Background>
                 </Card>
               </XStack>
