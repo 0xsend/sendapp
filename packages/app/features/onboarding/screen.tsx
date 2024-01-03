@@ -54,90 +54,6 @@ export function OnboardingScreen() {
     console.log('send accounts', { sendAccts, sendAcctsError, sendAcctsIsLoading })
   }, [sendAccts, sendAcctsError, sendAcctsIsLoading])
 
-  const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
-  const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
-
-  // SIGNING / SENDING USEROP STATE
-  const [userOp, setUserOp] = useState<UserOperation | null>(null)
-  const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
-  const [challenge, setChallenge] = useState<Hex | null>(null)
-  const [signature, setSignature] = useState<Uint8Array | null>(null)
-  const [sendResult, setSendResult] = useState<boolean | null>(null)
-
-  // monitor send accounts, automatically set the public key if there is one
-  useEffect(() => {
-    if (!sendAccts?.length) {
-      return
-    }
-    const sendAcct = sendAccts[0]
-    assert(!!sendAcct, 'No send account')
-    const webauthnCred = sendAcct.webauthn_credentials[0]
-    assert(!!webauthnCred, 'No send account credentials')
-    setSenderAddress(sendAcct.address)
-    setPublicKey(COSEECDHAtoXY(base16.decode(webauthnCred.public_key.slice(2).toUpperCase())))
-  }, [sendAccts])
-
-  // generate user op based on public key, and generate challenge from the user op hash
-  // TODO: decouple generate user op from public key and instead only use sender address
-  useEffect(() => {
-    if (!publicKey) {
-      return
-    }
-    ;(async () => {
-      const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
-
-      // generate challenge
-      const _challenge = generateChallenge(_userOpHash)
-
-      setSenderAddress(_userOp.sender)
-      setUserOp(_userOp)
-      setUserOpHash(_userOpHash)
-      setChallenge(_challenge)
-    })()
-  }, [publicKey])
-
-  /**
-   * Sign the challenge with the passkey.
-   *
-   * Assumes key slot 0 on the account.
-   */
-  async function _signWithPasskey() {
-    if (!challenge || challenge.length <= 0) {
-      throw new Error('No challenge')
-    }
-    if (!userOpHash) {
-      throw new Error('No userOpHash')
-    }
-    if (!publicKey) {
-      throw new Error('No publicKey')
-    }
-    const encodedWebAuthnSig = await signChallenge(challenge)
-    if (!encodedWebAuthnSig || encodedWebAuthnSig.length <= 2) {
-      throw new Error('No encodedWebAuthnSig')
-    }
-    const _signature = concat([
-      numberToBytes(USEROP_VERSION, { size: 1 }),
-      numberToBytes(USEROP_VALID_UNTIL, { size: 6 }),
-      numberToBytes(USEROP_KEY_SLOT, { size: 1 }),
-      hexToBytes(encodedWebAuthnSig),
-    ])
-
-    // verify signature is correct
-    const message = challenge
-    const signature = bytesToHex(_signature.slice(7))
-    const x = BigInt(publicKey[0])
-    const y = BigInt(publicKey[1])
-
-    // verify signature
-    const result = await verifier.read.verifySignature([message, signature, x, y])
-
-    if (!result) {
-      throw new Error('Signature invalid')
-    }
-
-    setSignature(_signature)
-  }
-
   return (
     <Container>
       <YStack space="$2" maxWidth={600} py="$6">
@@ -149,53 +65,7 @@ export function OnboardingScreen() {
 
         <CreateSendAccount />
 
-        <Label htmlFor="senderAddress">Your sender address:</Label>
-        <TextArea
-          id="senderAddress"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={senderAddress ? senderAddress : undefined}
-        />
-
-        {!signature || signature.byteLength <= 0 ? (
-          <>
-            <H2>Sign a user operation</H2>
-            <Button onPress={_signWithPasskey}>Sign</Button>
-          </>
-        ) : null}
-
-        <H2>Send it</H2>
-        <Button
-          onPress={async () => {
-            if (!publicKey) {
-              throw new Error('No public key')
-            }
-
-            if (!userOp || !userOpHash) {
-              throw new Error('No userOp')
-            }
-
-            if (!signature || signature.byteLength <= 0) {
-              throw new Error('No signature')
-            }
-
-            if (!senderAddress) {
-              throw new Error('No sender address')
-            }
-            setSendResult(await sendUserOp({ userOp, signature }))
-          }}
-        >
-          Send
-        </Button>
-        <Label htmlFor="sendResult">Send result:</Label>
-        <TextArea
-          id="sendResult"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={sendResult ? sendResult.toString() : undefined}
-        />
+        <SendAccountUserOp />
       </YStack>
     </Container>
   )
@@ -303,6 +173,141 @@ function CreateSendAccount() {
       <Label htmlFor="accountName">Account name:</Label>
       <Input id="accountName" onChangeText={setAccountName} value={accountName} />
       <Button onPress={createAccount}>Create</Button>
+    </YStack>
+  )
+}
+
+/**
+ * Send a Send Account user operation to the bundler
+ */
+function SendAccountUserOp() {
+  const {
+    data: sendAccts,
+    error: sendAcctsError,
+    isLoading: sendAcctsIsLoading,
+  } = useSendAccounts()
+
+  const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
+  const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
+
+  // SIGNING / SENDING USEROP STATE
+  const [userOp, setUserOp] = useState<UserOperation | null>(null)
+  const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
+  const [challenge, setChallenge] = useState<Hex | null>(null)
+  const [sendResult, setSendResult] = useState<boolean | null>(null)
+
+  // monitor send accounts, automatically set the public key if there is one
+  useEffect(() => {
+    if (!sendAccts?.length) {
+      return
+    }
+    const sendAcct = sendAccts[0]
+    assert(!!sendAcct, 'No send account')
+    const webauthnCred = sendAcct.webauthn_credentials[0]
+    assert(!!webauthnCred, 'No send account credentials')
+    setSenderAddress(sendAcct.address)
+    setPublicKey(COSEECDHAtoXY(base16.decode(webauthnCred.public_key.slice(2).toUpperCase())))
+  }, [sendAccts])
+
+  // generate user op based on public key, and generate challenge from the user op hash
+  // TODO: decouple generate user op from public key and instead only use sender address
+  useEffect(() => {
+    if (!publicKey) {
+      return
+    }
+    ;(async () => {
+      const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
+
+      // generate challenge
+      const _challenge = generateChallenge(_userOpHash)
+
+      setSenderAddress(_userOp.sender)
+      setUserOp(_userOp)
+      setUserOpHash(_userOpHash)
+      setChallenge(_challenge)
+    })()
+  }, [publicKey])
+  /**
+   * Sign the challenge with the passkey.
+   *
+   * Assumes key slot 0 on the account.
+   */
+  async function signWithPasskey() {
+    if (!challenge || challenge.length <= 0) {
+      throw new Error('No challenge')
+    }
+    if (!userOpHash) {
+      throw new Error('No userOpHash')
+    }
+    if (!publicKey) {
+      throw new Error('No publicKey')
+    }
+    const encodedWebAuthnSig = await signChallenge(challenge)
+    if (!encodedWebAuthnSig || encodedWebAuthnSig.length <= 2) {
+      throw new Error('No encodedWebAuthnSig')
+    }
+    const _signature = concat([
+      numberToBytes(USEROP_VERSION, { size: 1 }),
+      numberToBytes(USEROP_VALID_UNTIL, { size: 6 }),
+      numberToBytes(USEROP_KEY_SLOT, { size: 1 }),
+      hexToBytes(encodedWebAuthnSig),
+    ])
+
+    // verify signature is correct
+    const message = challenge
+    const signature = bytesToHex(_signature.slice(7))
+    const x = BigInt(publicKey[0])
+    const y = BigInt(publicKey[1])
+
+    // verify signature
+    const result = await verifier.read.verifySignature([message, signature, x, y])
+
+    if (!result) {
+      throw new Error('Signature invalid')
+    }
+
+    return _signature
+  }
+
+  return (
+    <YStack space="$4">
+      <Label htmlFor="senderAddress">Your sender address:</Label>
+      <TextArea
+        id="senderAddress"
+        height="$6"
+        // @ts-expect-error setup monospace font
+        fontFamily={'monospace'}
+        value={senderAddress ? senderAddress : undefined}
+      />
+      <H2>Send it</H2>
+      <Button
+        onPress={async () => {
+          if (!publicKey) {
+            throw new Error('No public key')
+          }
+
+          if (!userOp || !userOpHash) {
+            throw new Error('No userOp')
+          }
+
+          if (!senderAddress) {
+            throw new Error('No sender address')
+          }
+
+          const signature = await signWithPasskey()
+          setSendResult(await sendUserOp({ userOp, signature }))
+        }}
+      >
+        Send
+      </Button>
+      <Label htmlFor="sendResult">Send result:</Label>
+      <TextArea
+        id="sendResult"
+        height="$6"
+        // @ts-expect-error setup monospace font
+        fontFamily={'monospace'}
+        value={sendResult ? sendResult.toString() : undefined}
+      />
     </YStack>
   )
 }
