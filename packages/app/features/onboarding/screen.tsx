@@ -324,7 +324,7 @@ async function sendUserOp({
     signature: bytesToHex(signature),
   }
 
-  // always reverts
+  // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
   await baseMainnetClient
     .simulateContract({
       address: entrypoint.address,
@@ -339,11 +339,38 @@ async function sendUserOp({
         if ((data.args?.[0] as { sigFailed: boolean }).sigFailed) {
           throw new Error('Signature failed')
         }
+        // console.log('ValidationResult', data)
+        return data
       }
-      if (cause.data?.errorName !== 'ValidationResult') {
-        throw e
-      }
+      throw e
     })
+
+  // [simulateHandleOp](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L203)
+  await baseMainnetClient
+    .simulateContract({
+      address: entrypoint.address,
+      functionName: 'simulateHandleOp',
+      abi: iEntryPointABI,
+      args: [
+        _userOp,
+        '0x0000000000000000000000000000000000000000', // target address TODO: optionally return target address result
+        '0x', // target calldata
+      ],
+    })
+    .catch((e: ContractFunctionExecutionError) => {
+      const cause: ContractFunctionRevertedError = e.cause
+      if (cause.data?.errorName === 'ExecutionResult') {
+        const data = cause.data
+        if ((data.args?.[0] as { success: boolean }).success) {
+          throw new Error('Handle op failed')
+        }
+        // console.log('ExecutionResult', data)
+        // TODO: use to estimate gas
+        return data
+      }
+      throw e
+    })
+
   const hash = await bundlerClient.sendUserOperation({
     userOperation: _userOp,
     entryPoint: entrypoint.address,
