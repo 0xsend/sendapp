@@ -82,6 +82,7 @@ export const lightColors = {
   ...colorTokens.light.red,
   ...colorTokens.light.yellow,
   ...colorTokens.light.gold,
+  ...colorTokens.dark.send
 }
 
 export const color = {

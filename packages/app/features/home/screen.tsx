@@ -198,14 +198,14 @@ export function HomeScreen() {
                     <XStack h={"inherit"} ai="center" padding={"$2"} paddingRight={"$3"}>
                       <Avatar br={"$4"} size={"$4.5"}>
                         <Square size={"$2"} backgroundColor="$color" elevation="$4" />
-                        <Avatar.Fallback theme={"gold"} />
+                        <Avatar.Fallback theme={"send"} />
                       </Avatar>
                       <YStack f={1} >
                         <XStack f={1} h={"Inherit"} paddingLeft={"$3"} paddingTop={"$2"} alignItems='center' jc={"space-between"}>
                           <XStack alignItems='center' jc={"space-between"} gap={"$2"}>
                             <Paragraph size={"$4"} fontWeight={"400"} color={"$primary"}>{transaction.user.sendTag}
                             </Paragraph>
-                            <Avatar size={"$s16"}>
+                            <Avatar size={"$0.9"}>
                               {transaction.type == 'inbound' ? <IconReceive /> : <IconSendTile />}
                             </Avatar>
                           </XStack>

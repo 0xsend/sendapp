@@ -26,6 +26,7 @@ export const { templates, maskOptions } = (() => {
     // can publish components for others to use without mandating a specific color scale
     // the @tamagui/button Button component looks for `$background`, so you set the
     // dark_red_Button theme to have a stronger background than the dark_red theme.
+    // Integer value represent the index of color in 12 color palette. The platte values can be located in token-colors.ts file
     background: 2,
     backgroundHover: 2,
     backgroundPress: 2,
@@ -97,8 +98,8 @@ export const { templates, maskOptions } = (() => {
       ...baseMaskOptions,
       override: {
         ...overrideWithColors,
-        borderColor: 1,
-        borderColorHover: 1,
+        borderColor: 'transparent',
+        borderColorHover: 'transparent',
         borderColorPress: 2,
         borderColorFocus: 1,
         backgroundPress: 2,

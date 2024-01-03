@@ -144,7 +144,7 @@ export const SignInScreen = () => {
                         fontWeight={'700'}
                         padding={'unset'}
                         margin={'unset'}
-                        theme={resolvedTheme}
+                      // theme={resolvedTheme?.startsWith('dark') ?? 'light'}
                       >
                         {'SEND IT!'}
                       </Paragraph>
