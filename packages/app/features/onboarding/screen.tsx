@@ -31,6 +31,7 @@ import {
   numberToBytes,
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
+  parseEther,
 } from 'viem'
 import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
 import { iEntryPointABI } from '@my/wagmi'
@@ -54,6 +55,7 @@ import { assert } from 'app/utils/assert'
 import { useSendAccounts } from 'app/utils/useSendAccounts'
 import { base64ToBase16 } from 'app/utils/base64ToBase16'
 import * as Device from 'expo-device'
+import { testBaseClient } from '../../../playwright/tests/fixtures/viem/base'
 
 export function OnboardingScreen() {
   const {
@@ -320,6 +322,14 @@ async function sendUserOp({
   const _userOp: UserOperation = {
     ...userOp,
     signature: bytesToHex(signature),
+  }
+
+  if (__DEV__ || process.env.CI) {
+    console.log('Funding sending address', _userOp.sender)
+    await testBaseClient.setBalance({
+      address: _userOp.sender,
+      value: parseEther('1'),
+    })
   }
 
   // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
