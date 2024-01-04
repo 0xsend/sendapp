@@ -49,6 +49,7 @@ module.exports = () => {
       'expo-linking',
       'expo-constants',
       'expo-modules-core',
+      'expo-device',
     ],
     experimental: {
       scrollRestoration: true,

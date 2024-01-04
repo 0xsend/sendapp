@@ -77,23 +77,31 @@ function parseMakeCredAuthData(buffer: Uint8Array) {
 
 // Takes COSE encoded public key and converts it to DER keys
 // https://www.rfc-editor.org/rfc/rfc8152.html#section-13.1
-function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
+export function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
+  return contractFriendlyKeyToDER(COSEECDHAtoXY(COSEPublicKey))
+}
+
+// Takes COSE encoded public key and return x and y coordinates
+// https://www.rfc-editor.org/rfc/rfc8152.html#section-13.1
+export function COSEECDHAtoXY(COSEPublicKey: Uint8Array): [Hex, Hex] {
   const coseStruct = cbor.decodeAllSync(COSEPublicKey)
   assert(coseStruct.length === 1, 'CBOR encoded public key must have exactly one element')
   const x = coseStruct[0].get(-2)
   const y = coseStruct[0].get(-3)
-  return contractFriendlyKeyToDER([
-    `0x${Buffer.from(x).toString('hex')}`,
-    `0x${Buffer.from(y).toString('hex')}`,
-  ])
+  return [`0x${Buffer.from(x).toString('hex')}`, `0x${Buffer.from(y).toString('hex')}`]
+}
+
+// Parses Webauthn MakeCredential authData
+export function parseCreateResponse(result: CreateResult) {
+  const rawAttestationObject = base64.decode(result.rawAttestationObjectB64)
+  const attestationObject = cbor.decode(rawAttestationObject)
+  return parseMakeCredAuthData(attestationObject.authData)
 }
 
 // Parses DER public key from Webauthn MakeCredential response
 // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred
-export function parseCreateResponse(result: CreateResult) {
-  const rawAttestationObject = base64.decode(result.rawAttestationObjectB64)
-  const attestationObject = cbor.decode(rawAttestationObject)
-  const authData = parseMakeCredAuthData(attestationObject.authData)
+export function createResponseToDER(result: CreateResult) {
+  const authData = parseCreateResponse(result)
   const pubKey = COSEECDHAtoDER(authData.COSEPublicKey)
   return pubKey
 }

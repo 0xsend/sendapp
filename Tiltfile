@@ -170,7 +170,7 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "cd supabase && yarn run reset",
+        "cd supabase && yarn run reset && yarn run generate",
     ],
     icon_name = "restart_alt",
     location = location.NAV,
@@ -353,6 +353,9 @@ local_resource(
     "caddy:web",
     labels = labels,
     serve_cmd = "caddy run --watch --config Caddyfile.dev",
+    deps = [
+        "Caddyfile.dev",
+    ],
 )
 
 local_resource(

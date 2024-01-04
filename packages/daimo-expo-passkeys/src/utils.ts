@@ -6,6 +6,7 @@ export type CreateRequest = {
 }
 
 export type CreateResult = {
+  credentialIDB64: string
   rawClientDataJSONB64: string
   rawAttestationObjectB64: string
 }
