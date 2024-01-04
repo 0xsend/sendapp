@@ -116,8 +116,8 @@ export function HomeScreen() {
                       </XStack>
                     </YStack>
                   </YStack>
-                  <Card.Background borderRadius={"$8"} backgroundColor={resolvedTheme?.startsWith('dark') ? "rgb(0,0,0,1)" : "$khaki900"}>
-                    <Image source={{ uri: cardBackground.src }} width={"100%"} height={"100%"} />
+                  <Card.Background borderRadius={"$8"} backgroundColor={resolvedTheme?.startsWith('dark') ? "rgb(0,0,0,0.5)" : "$khaki900"}>
+                    {/* <Image source={{ uri: cardBackground.src }} width={"100%"} height={"100%"} /> */}
                   </Card.Background>
                 </Card>
               </XStack>
