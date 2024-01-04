@@ -1,4 +1,4 @@
-import { XStack, YStackProps, XStackProps, SideBar } from "@my/ui";
+import { XStack, YStackProps, XStackProps } from "@my/ui";
 import { ReactElement } from "react";
 
 
