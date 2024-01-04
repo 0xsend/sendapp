@@ -213,7 +213,7 @@ export function HomeScreen() {
                           <Paragraph size={"$3"} fontWeight={"400"}>{`${transaction.amount} ${transaction.currency} (${USDollar.format(transaction.amountInUSD)})`}</Paragraph>
                         </XStack>
                         <XStack f={1} h={"Inherit"} alignItems='center' jc={"flex-end"}>
-                          <Paragraph opacity={0.6} size={"$1"} fontWeight={"400"}>{CommentsTime(new Date)}</Paragraph>
+                          <Paragraph opacity={0.6} size={"$1"} fontWeight={"400"}>{CommentsTime((new Date).toISOString())}</Paragraph>
                         </XStack>
                       </YStack>
                     </XStack>

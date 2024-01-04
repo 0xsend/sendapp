@@ -1,4 +1,4 @@
-export const CommentsTime = (dateString: any) => {
+export const CommentsTime = (dateString: string) => {
   const date: any = new Date(dateString);
   const currentDate: any = new Date();
   const timeDifference = currentDate - date;
