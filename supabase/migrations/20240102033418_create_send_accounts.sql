@@ -10,8 +10,8 @@ create table "public"."send_accounts" (
   ),
   "chain_id" integer not null,
   "init_code" bytea not null,
-  "created_at" timestamp with time zone default current_timestamp,
-  "updated_at" timestamp with time zone default current_timestamp,
+  "created_at" timestamp with time zone not null default current_timestamp,
+  "updated_at" timestamp with time zone not null default current_timestamp,
   "deleted_at" timestamp with time zone
 );
 
@@ -93,3 +93,67 @@ create policy "delete_own_account_credentials" on "public"."send_account_credent
     )
   )
 );
+
+-- function to create a send account and associate it with a webauthn credential
+create or replace function "public"."create_send_account"(
+    send_account send_accounts,
+    webauthn_credential webauthn_credentials,
+    key_slot int
+  ) returns json language plpgsql as $$
+declare _send_account send_accounts;
+
+_webauthn_credential webauthn_credentials;
+
+begin --
+
+-- insert the credential
+insert into webauthn_credentials (
+    name,
+    display_name,
+    raw_credential_id,
+    public_key,
+    sign_count,
+    attestation_object,
+    key_type
+  )
+values (
+    webauthn_credential.name,
+    webauthn_credential.display_name,
+    webauthn_credential.raw_credential_id,
+    webauthn_credential.public_key,
+    webauthn_credential.sign_count,
+    webauthn_credential.attestation_object,
+    webauthn_credential.key_type
+  )
+returning * into _webauthn_credential;
+
+-- insert the send account
+insert into send_accounts (address, chain_id, init_code)
+values (
+    send_account.address,
+    send_account.chain_id,
+    send_account.init_code
+  ) on conflict (address, chain_id) do
+update
+set init_code = excluded.init_code
+returning * into _send_account;
+
+-- associate the credential with the send account
+insert into send_account_credentials (account_id, credential_id, key_slot)
+values (
+    _send_account.id,
+    _webauthn_credential.id,
+    $3
+  );
+
+-- return the send account
+return json_build_object(
+  'send_account',
+  _send_account,
+  'webauthn_credential',
+  _webauthn_credential
+);
+
+end;
+
+$$;

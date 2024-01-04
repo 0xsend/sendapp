@@ -351,31 +351,31 @@ export interface Database {
         Row: {
           address: string
           chain_id: number
-          created_at: string | null
+          created_at: string
           deleted_at: string | null
           id: string
           init_code: string
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           address: string
           chain_id: number
-          created_at?: string | null
+          created_at?: string
           deleted_at?: string | null
           id?: string
           init_code: string
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Update: {
           address?: string
           chain_id?: number
-          created_at?: string | null
+          created_at?: string
           deleted_at?: string | null
           id?: string
           init_code?: string
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -500,7 +500,7 @@ export interface Database {
       webauthn_credentials: {
         Row: {
           attestation_object: string
-          created_at: string | null
+          created_at: string
           deleted_at: string | null
           display_name: string
           id: string
@@ -509,12 +509,12 @@ export interface Database {
           public_key: string
           raw_credential_id: string
           sign_count: number
-          updated_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           attestation_object: string
-          created_at?: string | null
+          created_at?: string
           deleted_at?: string | null
           display_name: string
           id?: string
@@ -523,12 +523,12 @@ export interface Database {
           public_key: string
           raw_credential_id: string
           sign_count: number
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Update: {
           attestation_object?: string
-          created_at?: string | null
+          created_at?: string
           deleted_at?: string | null
           display_name?: string
           id?: string
@@ -537,7 +537,7 @@ export interface Database {
           public_key?: string
           raw_credential_id?: string
           sign_count?: number
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -631,6 +631,14 @@ export interface Database {
           referral_code_input: string
         }
         Returns: undefined
+      }
+      create_send_account: {
+        Args: {
+          send_account: unknown
+          webauthn_credential: unknown
+          key_slot: number
+        }
+        Returns: Json
       }
       distribution_hodler_addresses: {
         Args: {

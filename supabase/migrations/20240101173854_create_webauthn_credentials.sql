@@ -10,8 +10,8 @@ create table "public"."webauthn_credentials" (
     "key_type" key_type_enum not null,
     "sign_count" bigint not null,
     "attestation_object" bytea not null,
-    "created_at" timestamp with time zone default CURRENT_TIMESTAMP,
-    "updated_at" timestamp with time zone default CURRENT_TIMESTAMP,
+    "created_at" timestamp with time zone not null default CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone not null default CURRENT_TIMESTAMP,
     "deleted_at" timestamp with time zone
 );
 

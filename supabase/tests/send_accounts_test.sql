@@ -1,18 +1,15 @@
 BEGIN;
 
 -- Plan the number of tests to run
-SELECT plan(10);
+SELECT plan(11);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
-CREATE OR REPLACE FUNCTION tests.webauthn_credential() RETURNS uuid AS $$
-DECLARE cred_id uuid;
-
-creds_count integer;
+-- This function creates a new webauthn_credential row
+CREATE OR REPLACE FUNCTION tests.new_webauthn_credential() RETURNS SETOF webauthn_credentials AS $$
+DECLARE creds_count INTEGER;
 
 BEGIN -- Generate a new UUID for the credential
-cred_id := extensions.uuid_generate_v4();
-
 -- Get the count of existing credentials for the user to ensure uniqueness
 creds_count := (
   SELECT COUNT(*)
@@ -20,41 +17,56 @@ creds_count := (
   WHERE user_id = auth.uid()
 );
 
+-- Return the new credential as a set of webauthn_credentials
+RETURN QUERY
+SELECT gen_random_uuid() AS id,
+  'test_credential_' || creds_count::text AS name,
+  'Test Credential ' || creds_count::text AS display_name,
+  decode(
+    '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
+    'hex'
+  ) AS raw_credential_id,
+  auth.uid() AS user_id,
+  decode(
+    '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
+    'hex'
+  ) AS public_key,
+  'ES256'::key_type_enum AS key_type,
+  0::bigint AS sign_count,
+  decode(
+    '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
+    'hex'
+  ) AS attestation_object,
+  now() AS created_at,
+  now() AS updated_at,
+  NULL::timestamptz AS deleted_at;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tests.insert_webauthn_credential() RETURNS uuid AS $$
+declare cred_id uuid;
+
+BEGIN -- Generate a new UUID for the credential
 -- Create a webauthn_credential for the user with unique values
 INSERT INTO public.webauthn_credentials(
-    id,
     name,
     display_name,
     raw_credential_id,
     public_key,
-    key_type,
     sign_count,
-    attestation_object
+    attestation_object,
+    key_type
   )
-VALUES (
-    cred_id,
-    -- Use the generated UUID
-    'test_credential_' || creds_count::text,
-    -- Append count for uniqueness
-    'Test Credential ' || creds_count::text,
-    -- Append count for uniqueness
-    decode(
-      '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
-      'hex'
-    ),
-    -- Append count for uniqueness
-    decode(
-      '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
-      'hex'
-    ),
-    -- Append count for uniqueness
-    'ES256',
-    0,
-    decode(
-      '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
-      'hex'
-    ) -- Append count for uniqueness
-  )
+SELECT name,
+  display_name,
+  raw_credential_id,
+  public_key,
+  sign_count,
+  attestation_object,
+  key_type
+FROM tests.new_webauthn_credential()
 RETURNING id INTO cred_id;
 
 RETURN cred_id;
@@ -138,7 +150,7 @@ SELECT lives_ok(
           FROM public.send_accounts
           WHERE user_id = tests.get_supabase_uid('send_account_test_user')
           LIMIT 1
-        ), tests.webauthn_credential(), 1
+        ), tests.insert_webauthn_credential(), 1
       ) $$, 'Insert a valid send account credential'
   );
 
@@ -156,7 +168,7 @@ SELECT throws_ok(
           FROM public.send_accounts
           WHERE user_id = tests.get_supabase_uid('send_account_test_user')
           LIMIT 1
-        ), tests.webauthn_credential(), -1
+        ), tests.insert_webauthn_credential(), -1
       ) $$, 'new row for relation "send_account_credentials" violates check constraint "account_credentials_key_slot_check"', 'Insert should fail due to invalid key slot'
   );
 
@@ -174,7 +186,7 @@ SELECT throws_ok(
           FROM public.send_accounts
           WHERE user_id = tests.get_supabase_uid('send_account_test_user')
           LIMIT 1
-        ), tests.webauthn_credential(), 1
+        ), tests.insert_webauthn_credential(), 1
       ) $$, 'duplicate key value violates unique constraint "send_account_credentials_account_id_key_slot_key"', 'Insert should fail due to duplicate account_id and key_slot'
   );
 
@@ -235,11 +247,24 @@ SELECT throws_ok(
     VALUES (
         gen_random_uuid(),
         -- Non-existent account ID
-        tests.webauthn_credential(),
+        tests.insert_webauthn_credential(),
         1
       ) $$,
       'new row violates row-level security policy for table "send_account_credentials"',
       'Insert should fail due to non-existent account'
+  );
+
+-- Test function create_send_account(send_account, webauthn_credential, key_slot)
+SELECT isnt_empty(
+    $$
+    SELECT public.create_send_account(
+        (
+          SELECT row(sa.*)::send_accounts sa
+          FROM public.send_accounts sa
+          WHERE user_id = tests.get_supabase_uid('send_account_test_user')
+          LIMIT 1
+        ), tests.new_webauthn_credential(), 1
+      ) $$, 'Create send account with credential'
   );
 
 -- Complete the tests

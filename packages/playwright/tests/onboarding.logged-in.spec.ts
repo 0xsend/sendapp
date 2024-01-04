@@ -4,7 +4,7 @@
  * Currently, Playwright browsers do no support WebAuthn, so we mock the call to the WebAuthn API.
  */
 
-import { testBaseClient } from './fixtures/viem/base'
+import { testBaseClient, baseMainnetClient } from './fixtures/viem/base'
 import { test, expect } from './fixtures/auth'
 import { Hex, parseEther } from 'viem'
 import { assert } from 'app/utils/assert'
@@ -39,7 +39,6 @@ test('can visit onboarding page', async ({ page, credentialsStore, supabase, aut
   // validate sender address is computed
   const addrLocator = page.getByLabel('Your sender address:')
   await expect(addrLocator).toHaveValue(/^0x[a-f0-9]{40}$/i)
-  const address = await addrLocator.inputValue()
 
   // validate send account is created
   const { data: sendAcct, error: sendAcctErr } = await supabase
@@ -76,7 +75,7 @@ test('can visit onboarding page', async ({ page, credentialsStore, supabase, aut
 
   // sponsor the creation by setting the balance using anvil
   await testBaseClient.setBalance({
-    address: address as Hex,
+    address: sendAcct.address,
     value: parseEther('1'),
   })
 
@@ -88,4 +87,13 @@ test('can visit onboarding page', async ({ page, credentialsStore, supabase, aut
   assert(!!assertion, 'Missing credential assertion')
 
   await expect(page.getByLabel('Send result:')).toHaveValue('true')
+
+  // verify receiver balance
+  const receiverAddress = await page.getByRole('textbox', { name: 'Sending to:' }).inputValue()
+  const ethAmount = await page.getByRole('textbox', { name: 'ETH Amount:' }).inputValue()
+
+  const receiverBalance = await baseMainnetClient.getBalance({
+    address: receiverAddress as Hex,
+  })
+  expect(receiverBalance.toString()).toBe(parseEther(ethAmount).toString())
 })

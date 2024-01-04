@@ -8,7 +8,19 @@
  * - Ask the user to deposit funds
  */
 import { createPasskey } from '@daimo/expo-passkeys'
-import { Button, Container, H1, H2, Input, Label, Paragraph, TextArea, YStack } from '@my/ui'
+import {
+  Button,
+  Container,
+  H1,
+  H2,
+  H4,
+  Input,
+  Label,
+  Paragraph,
+  Separator,
+  TextArea,
+  YStack,
+} from '@my/ui'
 import { parseCreateResponse, COSEECDHAtoXY } from 'app/utils/passkeys'
 import React, { useEffect, useState } from 'react'
 import {
@@ -31,6 +43,7 @@ import {
   encodeCreateAccountData,
   entrypoint,
   generateUserOp,
+  receiverAccount,
   verifier,
 } from 'app/utils/userop'
 import { signChallenge, generateChallenge } from 'app/utils/userop'
@@ -56,14 +69,36 @@ export function OnboardingScreen() {
 
   return (
     <Container>
-      <YStack space="$2" maxWidth={600} py="$6">
+      <YStack space="$6" maxWidth={600} py="$6">
         <H1>Welcome to Send</H1>
         <Paragraph>
           Start by creating a Passkey below. Send uses passkeys to secure your account. Press the
           button below to get started.
         </Paragraph>
 
-        <CreateSendAccount />
+        {sendAccts?.length === 0 && <CreateSendAccount />}
+
+        {sendAccts?.map((sendAcct) => (
+          <YStack key={sendAcct.id} space="$2">
+            <Label htmlFor="senderAddress">Your sender address:</Label>
+            <Input
+              id="senderAddress"
+              // @ts-expect-error setup monospace font
+              fontFamily={'monospace'}
+              value={sendAcct.address ? sendAcct.address : undefined}
+            />
+            <H4>Credentials</H4>
+            {sendAcct.webauthn_credentials.map((webauthnCred) => (
+              <YStack key={webauthnCred.id} space="$4">
+                <Paragraph>
+                  {webauthnCred.display_name} created on{' '}
+                  {new Date(webauthnCred.created_at).toLocaleString()}
+                </Paragraph>
+              </YStack>
+            ))}
+            <Separator />
+          </YStack>
+        ))}
 
         <SendAccountUserOp />
       </YStack>
@@ -79,6 +114,7 @@ function CreateSendAccount() {
   const supabase = useSupabase()
   const { user } = useUser()
   const { refetch: sendAcctsRefetch } = useSendAccounts()
+
   // PASSKEY / ACCOUNT CREATION STATE
   const deviceName = Device.deviceName
     ? Device.deviceName
@@ -89,7 +125,8 @@ function CreateSendAccount() {
   async function createAccount() {
     assert(!!user?.id, 'No user id')
 
-    const passkeyName = `${user.id}.0`
+    const keySlot = 0
+    const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
     const [rawCred, authData] = await createPasskey({
       domain: window.location.hostname,
       challengeB64: base64.encode(Buffer.from('foobar')), // TODO: generate a random challenge from the server
@@ -97,10 +134,21 @@ function CreateSendAccount() {
       passkeyDisplayTitle: `Send App: ${accountName}`,
     }).then((r) => [r, parseCreateResponse(r)] as const)
 
-    // save the credential to the database
-    const { data: webauthnCred, error: credUpsertErr } = await supabase
-      .from('webauthn_credentials')
-      .upsert({
+    // store the init code in the database to avoid having to recompute it in case user drops off
+    // and does not finish onboarding flow
+    const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
+    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
+    const senderAddress = await getSenderAddress(baseMainnetClient, {
+      initCode,
+      entryPoint: entrypoint.address,
+    })
+    const { error } = await supabase.rpc('create_send_account', {
+      send_account: {
+        address: senderAddress,
+        chain_id: baseMainnetClient.chain.id,
+        init_code: `\\x${initCode.slice(2)}`,
+      },
+      webauthn_credential: {
         name: passkeyName,
         display_name: accountName,
         raw_credential_id: `\\x${base64ToBase16(rawCred.credentialIDB64)}`,
@@ -108,58 +156,12 @@ function CreateSendAccount() {
         sign_count: 0,
         attestation_object: `\\x${base64ToBase16(rawCred.rawAttestationObjectB64)}`,
         key_type: 'ES256',
-      })
-      .select()
-      .single()
-
-    if (credUpsertErr) {
-      throw credUpsertErr
-    }
-
-    const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
-
-    // store the init code in the database to avoid having to recompute it in case user drops off
-    // and does not finish onboarding flow
-    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
-    const senderAddress = await getSenderAddress(baseMainnetClient, {
-      initCode,
-      entryPoint: entrypoint.address,
+      },
+      key_slot: keySlot,
     })
 
-    // save the send account to the database
-    const { data: sendAcct, error: sendAcctUpsertErr } = await supabase
-      .from('send_accounts')
-      .upsert(
-        {
-          address: senderAddress,
-          chain_id: baseMainnetClient.chain.id,
-          init_code: `\\x${initCode.slice(2)}`,
-        },
-        {
-          onConflict: 'address, chain_id',
-        }
-      )
-      .select()
-      .single()
-
-    if (sendAcctUpsertErr) {
-      throw sendAcctUpsertErr
-    }
-
-    // associate the credential with the account
-    const { error: sendAcctCredInsertErr } = await supabase.from('send_account_credentials').upsert(
-      {
-        account_id: sendAcct.id,
-        credential_id: webauthnCred.id,
-        key_slot: 0, // for create account, we always use key slot 0
-      },
-      {
-        onConflict: 'account_id, credential_id',
-      }
-    )
-
-    if (sendAcctCredInsertErr) {
-      throw sendAcctCredInsertErr
+    if (error) {
+      throw error
     }
 
     await sendAcctsRefetch()
@@ -271,15 +273,11 @@ function SendAccountUserOp() {
 
   return (
     <YStack space="$4">
-      <Label htmlFor="senderAddress">Your sender address:</Label>
-      <TextArea
-        id="senderAddress"
-        height="$6"
-        // @ts-expect-error setup monospace font
-        fontFamily={'monospace'}
-        value={senderAddress ? senderAddress : undefined}
-      />
       <H2>Send it</H2>
+      <Label htmlFor="sendTo">Sending to:</Label>
+      <Input id="sendTo" value={receiverAccount.address} />
+      <Label htmlFor="sendAmount">ETH Amount:</Label>
+      <Input id="sendAmount" value="0.01" />
       <Button
         onPress={async () => {
           if (!publicKey) {

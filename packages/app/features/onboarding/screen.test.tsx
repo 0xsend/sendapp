@@ -91,6 +91,13 @@ jest.mock('app/utils/useSendAccounts', () => ({
   }),
 }))
 
+jest.mock('app/utils/userop', () => ({
+  ...jest.requireActual('app/utils/userop'),
+  receiverAccount: {
+    address: '0x123',
+  },
+}))
+
 afterEach(() => {
   // restore the spy created with spyOn
   jest.restoreAllMocks()
