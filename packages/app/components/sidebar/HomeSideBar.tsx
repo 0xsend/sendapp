@@ -1,11 +1,13 @@
 
-import { SideBarWrapper, Button, Sheet, ButtonIcon, XStack, YStack, Nav, SideBar, YStackProps, BottomSheet, useMedia } from "@my/ui";
+import { SideBarWrapper, Button, ButtonIcon, XStack, YStack, Nav, SideBar, YStackProps, BottomSheet, useMedia, SheetProps } from "@my/ui";
 import { Link } from "@my/ui";
 import { IconSendLogo, IconSLogo, IconTelegramLogo, IconXLogo, IconDistributions, IconDashboard } from "app/components/icons";
 import { SideBarNavLink } from "app/components/sidebar/SideBarNavLink";
 import { SideBarFooterLink } from "app/components/sidebar/SideBarFooterLink";
 import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
 import { usePathname } from "app/utils/usePathname";
+
+import { useParams } from "app/routers/params";
 
 
 
@@ -38,10 +40,19 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
     </SideBar >)
 }
 
-const HomeBottomSheet = () => {
+const HomeBottomSheet = ({ open }: SheetProps) => {
+  const { params, setParams } = useParams()
+
+  const handleHomeBottomSheet = () => {
+    setParams({
+      // params will merge with existing ones
+      nav: params.nav ? undefined : 'home'
+    })
+  }
+
   const pathName = usePathname()
   return (
-    <BottomSheet open>
+    <BottomSheet open={open} onOpenChange={handleHomeBottomSheet}>
       <Link href={"/"} marginTop={"$4"}>
         <Button borderRadius={9999} w={"$11"} h={"$11"} bg={"transparent"}>
           {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
@@ -70,7 +81,8 @@ const HomeBottomSheet = () => {
 
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
-  if (media.gtMd)
+  const { params } = useParams()
+  if (media.gtLg)
     return (
       <SideBarWrapper sidebar={< HomeSideBar backgroundColor={"$backgroundStrong"} />}>
         {children}
@@ -79,7 +91,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
     )
   return (
     <>
-      <HomeBottomSheet />
+      <HomeBottomSheet open={params.nav === "home"} />
       {children}
     </>
 
