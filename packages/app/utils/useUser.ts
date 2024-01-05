@@ -61,16 +61,42 @@ export const useUser = () => {
     return `https://ui-avatars.com/api.jpg?${params.toString()}`
   })()
 
+  const {
+    data: referrals,
+    isLoading: isLoadingReferrals,
+    refetch: refetchReferrals,
+  } = useQuery(['referrals'], {
+    queryFn: async () => {
+      if (!user?.id) return null
+      const { data, error } = await supabase.from('referrals').select('*').eq('referrer_id', user.id)
+
+      if (error) {
+        // no rows
+        if (error.code === 'PGRST116') {
+          return []
+        }
+        throw new Error(error.message)
+      }
+      return data
+    },
+  })
+
+
   return {
     session,
     user,
     profile,
     avatarUrl,
     tags,
-    updateProfile: () => refetch().then(() => refetchTags()),
+    referrals,
+    updateProfile: () => refetch().then(() => {
+      refetchTags()
+      refetchReferrals()
+    }),
     isLoadingSession,
     isLoadingProfile,
     isLoadingTags,
-    isLoading: isLoadingSession || isLoadingProfile || isLoadingTags,
+    isLoadingReferrals,
+    isLoading: isLoadingSession || isLoadingProfile || isLoadingTags || isLoadingReferrals,
   }
 }

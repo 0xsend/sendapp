@@ -1,6 +1,6 @@
-import { Anchor, Button, Card, H1, Header, Link, XStack, useToastController, Text } from "@my/ui";
+import { Anchor, Button, H1, Header, Link, XStack, useToastController, Text } from "@my/ui";
 import { useUser } from "app/utils/useUser";
-import { Copy, X } from "@tamagui/lucide-icons";
+import { Copy } from "@tamagui/lucide-icons";
 import { getReferralHref } from "app/utils/getReferralLink";
 import { IconClose, IconSettings } from "./icons";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
@@ -15,7 +15,7 @@ export function HomeHeader({ children }: { children: string }) {
         <H1 fontWeight={"100"}>{children}</H1>
         <XStack $sm={{ display: "none" }} ai="center" space="$2" height="$4" $gtSm={{ fd: 'row' }}>
           <ReferralCodeCard />
-          <PointsCount />
+          <ReferralsCount />
           <SettingsButton />
           <WagmiAccountInfo />
         </XStack>
@@ -68,16 +68,14 @@ function ReferralCodeCard() {
   )
 }
 
-function PointsCount() {
-  // const user = useUser()
-  // const points = user?.profile?.points ?? 0
-  const points = 0
+function ReferralsCount() {
+  const user = useUser()
+  const referrals = user?.referrals ? user.referrals.length : 0
 
   return (
-
     <XStack ai="center" space="$2" $gtSm={{ fd: 'row' }} cursor="not-allowed" bg="$background" h="100%" borderWidth={2} boc={"$goldVibrant"} f={1} px={"$3"} br="$4" >
       <IconStar size={"$2"} color={"$goldVibrant"} />
-      <Text color={"$goldVibrant"} fontSize={"$1"} fontWeight={"600"}>{points}</Text>
+      <Text color={"$goldVibrant"} fontSize={"$1"} fontWeight={"600"}>{referrals}</Text>
     </XStack >
 
 
