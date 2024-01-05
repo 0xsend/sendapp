@@ -5,8 +5,18 @@ import { getReferralHref } from "app/utils/getReferralLink";
 import { IconClose, IconHamburger, IconSettings } from "./icons";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { IconStar } from "./icons/IconStar";
+import { useParams } from "app/routers/params";
 
 export function HomeHeader({ children }: { children: string }) {
+  const { params, setParams } = useParams()
+  const handleHomeBottomSheet = () => {
+    setParams({
+      // params will merge with existing ones
+      nav: params.nav ? undefined : "home",
+    })
+  }
+
+
   return (
     <Header w="100%" $gtSm={{ miw: 804 }}>
       <XStack jc="space-between" fd="row" ai="center">
@@ -18,7 +28,7 @@ export function HomeHeader({ children }: { children: string }) {
           <WagmiAccountInfo />
         </XStack>
         <XStack $gtLg={{ display: "none" }} ai="center" space="$2" height="$4">
-          <Button bg="transparent" icon={<IconHamburger size={"$3"} />} />
+          <Button onPress={handleHomeBottomSheet} bg="transparent" icon={<IconHamburger size={"$3"} />} />
         </XStack>
       </XStack>
     </Header >)
