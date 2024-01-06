@@ -1,35 +1,74 @@
 import crypto from 'crypto'
 import { describe, it } from '@jest/globals'
 import { base64 } from '@scure/base'
-import { Hex, bytesToHex } from 'viem'
+import { Hex, bytesToHex, hexToBytes } from 'viem'
 import {
   contractFriendlyKeyToDER,
   derKeytoContractFriendlyKey,
   parseAndNormalizeSig,
-  parseCreateResponse,
+  createResponseToDER,
   parseSignResponse,
+  parseCreateResponse,
 } from './passkeys'
 import { CreateResult, SignResult } from '@daimo/expo-passkeys'
 import { p256 } from '@noble/curves/p256'
 
-const mockAttestations: [CreateResult, string][] = [
+type ExpectedCreateResult = {
+  expectedDer: Hex
+  expectedAuthData: {
+    rpIdHash: Hex
+    flags: number
+    counter: number
+    aaguid: Hex
+    credID: Hex
+    COSEPublicKey: Hex
+  }
+}
+
+const mockAttestations: [CreateResult, ExpectedCreateResult][] = [
   [
     {
+      credentialIDB64: 'y5p83Ze+tE9+X1GsNFxK2w==',
       rawClientDataJSONB64:
         'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYzI5dFpTQmphR0ZzYkdWdVoyVSIsIm9yaWdpbiI6Imh0dHBzOi8vc2VuZGFwcC5sb2NhbGhvc3QifQ==',
       rawAttestationObjectB64:
         'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViUVVJTlMb5JhbV7rFoaFKDcCvBmzc1HOD7tW1Q7aed139dAAAAALraVWanqkAfvZZFYZpVEg0AECiF0g45fqmWxdVxz4i5f4ulAQIDJiABIVggfpK6HX0EGYMbV8afoFaCZkUcfQ+dw9YE0jSNRcAC0zYiWCAdWvSb1BQUVM3/dW/urTzaX80vFmZ95ClXofI1uTn4Gg==',
     },
-    '0x3059301306072a8648ce3d020106082a8648ce3d030107034200047e92ba1d7d0419831b57c69fa0568266451c7d0f9dc3d604d2348d45c002d3361d5af49bd4141454cdff756feead3cda5fcd2f16667de42957a1f235b939f81a',
+    {
+      expectedAuthData: {
+        rpIdHash: '0x55525394c6f92616d5eeb168685283702bc19b37351ce0fbb56d50eda79dd77f',
+        flags: 93,
+        counter: 0,
+        aaguid: '0xbada5566a7aa401fbd9645619a55120d',
+        credID: '0x2885d20e397ea996c5d571cf88b97f8b',
+        COSEPublicKey:
+          '0xa50102032620012158207e92ba1d7d0419831b57c69fa0568266451c7d0f9dc3d604d2348d45c002d3362258201d5af49bd4141454cdff756feead3cda5fcd2f16667de42957a1f235b939f81a',
+      },
+      expectedDer:
+        '0x3059301306072a8648ce3d020106082a8648ce3d030107034200047e92ba1d7d0419831b57c69fa0568266451c7d0f9dc3d604d2348d45c002d3361d5af49bd4141454cdff756feead3cda5fcd2f16667de42957a1f235b939f81a',
+    },
   ],
   [
     {
+      credentialIDB64: 'y5p83Ze+tE9+X1GsNFxK2w==',
       rawAttestationObjectB64:
         'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYizwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsRdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFI6/XGQDoO+69ZA1ZDSqXMU1A8q2pQECAyYgASFYILbo5B0aQxUxtm2tq4VU9VILS61c4ZSqXLXFEBdgbo61Ilgg4Lme/b/dEoIbWLn85MlpREPQLp82agWlpoaOLVgTgsQ=',
       rawClientDataJSONB64:
         'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWTNKbFlYUmxJR3RsZVNCMFpYTjBNek1nTVRJNCIsIm9yaWdpbiI6Imh0dHBzOi8vZGFpbW8ueHl6In0=',
     },
-    '0x3059301306072a8648ce3d020106082a8648ce3d03010703420004b6e8e41d1a431531b66dadab8554f5520b4bad5ce194aa5cb5c51017606e8eb5e0b99efdbfdd12821b58b9fce4c9694443d02e9f366a05a5a6868e2d581382c4',
+    {
+      expectedAuthData: {
+        rpIdHash: '0x8b3c24efbe5f75f66700f21b0895c7d90a8e42cd59793c621b133f704c5132c4',
+        flags: 93,
+        counter: 0,
+        aaguid: '0x00000000000000000000000000000000',
+        credID: '0x8ebf5c6403a0efbaf590356434aa5cc53503cab6',
+        COSEPublicKey:
+          '0xa5010203262001215820b6e8e41d1a431531b66dadab8554f5520b4bad5ce194aa5cb5c51017606e8eb5225820e0b99efdbfdd12821b58b9fce4c9694443d02e9f366a05a5a6868e2d581382c4',
+      },
+      expectedDer:
+        '0x3059301306072a8648ce3d020106082a8648ce3d03010703420004b6e8e41d1a431531b66dadab8554f5520b4bad5ce194aa5cb5c51017606e8eb5e0b99efdbfdd12821b58b9fce4c9694443d02e9f366a05a5a6868e2d581382c4',
+    },
   ],
 ]
 
@@ -62,11 +101,34 @@ const mockAssertions: [SignResult, (typeof expectedParsedAssertions)[number]][] 
   ],
 ]
 
-describe('parseCreateResponse', () => {
+describe(createResponseToDER.name, () => {
   it('can parse attestation objects', () => {
-    for (const [attestation, expected] of mockAttestations) {
-      const parsed = parseCreateResponse(attestation)
+    for (const [attestation, { expectedDer: expected }] of mockAttestations) {
+      const parsed = createResponseToDER(attestation)
       expect(parsed).toStrictEqual(expected)
+    }
+  })
+})
+
+describe(parseCreateResponse.name, () => {
+  it('can parse attestation objects', () => {
+    for (const [attestation, { expectedAuthData }] of mockAttestations) {
+      const authData = parseCreateResponse(attestation)
+      expect({
+        rpIdHash: bytesToHex(authData.rpIdHash),
+        flags: authData.flags,
+        counter: authData.counter,
+        aaguid: bytesToHex(authData.aaguid),
+        credID: bytesToHex(authData.credID),
+        COSEPublicKey: bytesToHex(authData.COSEPublicKey),
+      }).toStrictEqual({
+        rpIdHash: expectedAuthData.rpIdHash,
+        flags: expectedAuthData.flags,
+        counter: expectedAuthData.counter,
+        aaguid: expectedAuthData.aaguid,
+        credID: expectedAuthData.credID,
+        COSEPublicKey: expectedAuthData.COSEPublicKey,
+      })
     }
   })
 })
@@ -168,7 +230,7 @@ const signResult = {
 
 describe('Passkey', () => {
   it('Parses create response', () => {
-    const derKey = parseCreateResponse(createResult)
+    const derKey = createResponseToDER(createResult)
     const expectedContractKey = [
       '0xb6e8e41d1a431531b66dadab8554f5520b4bad5ce194aa5cb5c51017606e8eb5',
       '0xe0b99efdbfdd12821b58b9fce4c9694443d02e9f366a05a5a6868e2d581382c4',

@@ -46,6 +46,7 @@ public class PasskeyManager {
             switch response.credential {
                 case let credential as ASAuthorizationPlatformPublicKeyCredentialRegistration:
                     let response: [AnyHashable: Any] = [
+                        "credentialID": credential.credentialID.base64EncodedString(),
                         "rawClientDataJSON": credential.rawClientDataJSON.base64EncodedString(),
                         "rawAttestationObject": credential.rawAttestationObject?.base64EncodedString()
                     ]

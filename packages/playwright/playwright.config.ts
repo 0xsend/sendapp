@@ -12,7 +12,7 @@ dotenv.config({
 })
 
 // validate environment ensuring we aren't talking to prod or staging or something
-if (process.env.NEXT_PUBLIC_SUPABASE_URL !== 'http://localhost:54321') {
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('localhost')) {
   console.log(`
 
 NEXT_PUBLIC_SUPABASE_URL is ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Please update your environment to point to a local supabase instance.

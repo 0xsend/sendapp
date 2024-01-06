@@ -8,9 +8,21 @@
  * - Ask the user to deposit funds
  */
 import { createPasskey } from '@daimo/expo-passkeys'
-import { Button, Container, H1, H2, Input, Label, Paragraph, TextArea, YStack } from '@my/ui'
-import { derKeytoContractFriendlyKey, parseCreateResponse } from 'app/utils/passkeys'
-import React, { useState } from 'react'
+import {
+  Button,
+  Container,
+  H1,
+  H2,
+  H4,
+  Input,
+  Label,
+  Paragraph,
+  Separator,
+  TextArea,
+  YStack,
+} from '@my/ui'
+import { parseCreateResponse, COSEECDHAtoXY } from 'app/utils/passkeys'
+import React, { useEffect, useState } from 'react'
 import {
   bytesToHex,
   concat,
@@ -19,54 +31,212 @@ import {
   numberToBytes,
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
+  parseEther,
 } from 'viem'
 import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
 import { iEntryPointABI } from '@my/wagmi'
-import { UserOperation } from 'permissionless'
+import { UserOperation, getSenderAddress } from 'permissionless'
 import {
   USEROP_KEY_SLOT,
   USEROP_VALID_UNTIL,
   USEROP_VERSION,
+  daimoAccountFactory,
+  encodeCreateAccountData,
   entrypoint,
   generateUserOp,
+  receiverAccount,
   verifier,
 } from 'app/utils/userop'
 import { signChallenge, generateChallenge } from 'app/utils/userop'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { base16, base64 } from '@scure/base'
+import { useUser } from 'app/utils/useUser'
+import { assert } from 'app/utils/assert'
+import { useSendAccounts } from 'app/utils/useSendAccounts'
+import { base64ToBase16 } from 'app/utils/base64ToBase16'
+import * as Device from 'expo-device'
+import { testBaseClient } from '../../../playwright/tests/fixtures/viem/base'
 
 export function OnboardingScreen() {
-  const [accountName, setAccountName] = useState<string>(`Sender ${new Date().toLocaleString()}.0`)
+  const {
+    data: sendAccts,
+    error: sendAcctsError,
+    isLoading: sendAcctsIsLoading,
+  } = useSendAccounts()
+
+  // TODO: remove me
+  useEffect(() => {
+    console.log('send accounts', { sendAccts, sendAcctsError, sendAcctsIsLoading })
+  }, [sendAccts, sendAcctsError, sendAcctsIsLoading])
+
+  return (
+    <Container>
+      <YStack space="$6" maxWidth={600} py="$6">
+        <H1>Welcome to Send</H1>
+        <Paragraph>
+          Start by creating a Passkey below. Send uses passkeys to secure your account. Press the
+          button below to get started.
+        </Paragraph>
+
+        {sendAccts?.length === 0 && <CreateSendAccount />}
+
+        {sendAccts?.map((sendAcct) => (
+          <YStack key={sendAcct.id} space="$2">
+            <Label htmlFor="senderAddress">Your sender address:</Label>
+            <Input
+              id="senderAddress"
+              // @ts-expect-error setup monospace font
+              fontFamily={'monospace'}
+              value={sendAcct.address ? sendAcct.address : undefined}
+            />
+            <H4>Credentials</H4>
+            {sendAcct.webauthn_credentials.map((webauthnCred) => (
+              <YStack key={webauthnCred.id} space="$4">
+                <Paragraph>
+                  {webauthnCred.display_name} created on{' '}
+                  {new Date(webauthnCred.created_at).toLocaleString()}
+                </Paragraph>
+              </YStack>
+            ))}
+            <Separator />
+          </YStack>
+        ))}
+
+        <SendAccountUserOp />
+      </YStack>
+    </Container>
+  )
+}
+
+/**
+ * Create a send account but not onchain, yet.
+ */
+function CreateSendAccount() {
+  // REMOTE / SUPABASE STATE
+  const supabase = useSupabase()
+  const { user } = useUser()
+  const { refetch: sendAcctsRefetch } = useSendAccounts()
+
+  // PASSKEY / ACCOUNT CREATION STATE
+  const deviceName = Device.deviceName
+    ? Device.deviceName
+    : `My ${Device.modelName ?? 'Send Account'}`
+  const [accountName, setAccountName] = useState<string>(deviceName) // TODO: use expo-device to get device name
+
+  // TODO: split creating the on-device and remote creation to introduce retries in-case of failures
+  async function createAccount() {
+    assert(!!user?.id, 'No user id')
+
+    const keySlot = 0
+    const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
+    const [rawCred, authData] = await createPasskey({
+      domain: window.location.hostname,
+      challengeB64: base64.encode(Buffer.from('foobar')), // TODO: generate a random challenge from the server
+      passkeyName,
+      passkeyDisplayTitle: `Send App: ${accountName}`,
+    }).then((r) => [r, parseCreateResponse(r)] as const)
+
+    // store the init code in the database to avoid having to recompute it in case user drops off
+    // and does not finish onboarding flow
+    const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
+    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
+    const senderAddress = await getSenderAddress(baseMainnetClient, {
+      initCode,
+      entryPoint: entrypoint.address,
+    })
+    const { error } = await supabase.rpc('create_send_account', {
+      send_account: {
+        address: senderAddress,
+        chain_id: baseMainnetClient.chain.id,
+        init_code: `\\x${initCode.slice(2)}`,
+      },
+      webauthn_credential: {
+        name: passkeyName,
+        display_name: accountName,
+        raw_credential_id: `\\x${base64ToBase16(rawCred.credentialIDB64)}`,
+        public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
+        sign_count: 0,
+        attestation_object: `\\x${base64ToBase16(rawCred.rawAttestationObjectB64)}`,
+        key_type: 'ES256',
+      },
+      key_slot: keySlot,
+    })
+
+    if (error) {
+      throw error
+    }
+
+    await sendAcctsRefetch()
+
+    // await createAccountUsingEOA(_publicKey)
+  }
+
+  return (
+    // TODO: turn into a form
+    <YStack space="$4">
+      <Label htmlFor="accountName">Account name:</Label>
+      <Input id="accountName" onChangeText={setAccountName} value={accountName} />
+      <Button onPress={createAccount}>Create</Button>
+    </YStack>
+  )
+}
+
+/**
+ * Send a Send Account user operation to the bundler
+ */
+function SendAccountUserOp() {
+  const {
+    data: sendAccts,
+    error: sendAcctsError,
+    isLoading: sendAcctsIsLoading,
+  } = useSendAccounts()
+
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
+
+  // SIGNING / SENDING USEROP STATE
   const [userOp, setUserOp] = useState<UserOperation | null>(null)
   const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
   const [challenge, setChallenge] = useState<Hex | null>(null)
-  const [signature, setSignature] = useState<Uint8Array | null>(null)
   const [sendResult, setSendResult] = useState<boolean | null>(null)
 
-  async function createAccount() {
-    const result = await createPasskey({
-      domain: window.location.hostname,
-      challengeB64: window.btoa('foobar'),
-      passkeyName: accountName,
-      passkeyDisplayTitle: `Send App: ${accountName}`,
-    })
-    const _publicKey = derKeytoContractFriendlyKey(parseCreateResponse(result))
-    setPublicKey(_publicKey)
+  // monitor send accounts, automatically set the public key if there is one
+  useEffect(() => {
+    if (!sendAccts?.length) {
+      return
+    }
+    const sendAcct = sendAccts[0]
+    assert(!!sendAcct, 'No send account')
+    const webauthnCred = sendAcct.webauthn_credentials[0]
+    assert(!!webauthnCred, 'No send account credentials')
+    setSenderAddress(sendAcct.address)
+    setPublicKey(COSEECDHAtoXY(base16.decode(webauthnCred.public_key.slice(2).toUpperCase())))
+  }, [sendAccts])
 
-    // await createAccountUsingEOA(_publicKey)
+  // generate user op based on public key, and generate challenge from the user op hash
+  // TODO: decouple generate user op from public key and instead only use sender address
+  useEffect(() => {
+    if (!publicKey) {
+      return
+    }
+    ;(async () => {
+      const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
 
-    const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(_publicKey)
+      // generate challenge
+      const _challenge = generateChallenge(_userOpHash)
 
-    // generate challenge
-    const _challenge = generateChallenge(_userOpHash)
-
-    setSenderAddress(_userOp.sender)
-    setUserOp(_userOp)
-    setUserOpHash(_userOpHash)
-    setChallenge(_challenge)
-  }
-
-  async function _signWithPasskey() {
+      setSenderAddress(_userOp.sender)
+      setUserOp(_userOp)
+      setUserOpHash(_userOpHash)
+      setChallenge(_challenge)
+    })()
+  }, [publicKey])
+  /**
+   * Sign the challenge with the passkey.
+   *
+   * Assumes key slot 0 on the account.
+   */
+  async function signWithPasskey() {
     if (!challenge || challenge.length <= 0) {
       throw new Error('No challenge')
     }
@@ -100,80 +270,45 @@ export function OnboardingScreen() {
       throw new Error('Signature invalid')
     }
 
-    setSignature(_signature)
+    return _signature
   }
 
   return (
-    <Container>
-      <YStack space="$2" maxWidth={600} py="$6">
-        <H1>Welcome to Send</H1>
-        <Paragraph>Start by creating a Passkey below.</Paragraph>
-        <Label htmlFor="accountName">Account name:</Label>
-        <Input id="accountName" onChangeText={setAccountName} value={accountName} />
-        <Button onPress={createAccount}>Create</Button>
-        <Label htmlFor="senderAddress">Your sender address:</Label>
-        <TextArea
-          id="senderAddress"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={senderAddress ? senderAddress : undefined}
-        />
-        <Label htmlFor="userOpHash">Your userOp hash:</Label>
-        <TextArea
-          id="userOpHash"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={userOpHash ? userOpHash : undefined}
-        />
-        <H2>Then sign ther userOpHash with it</H2>
-        <Button onPress={_signWithPasskey}>Sign</Button>
-        <Label htmlFor="signResult">Sign result:</Label>
-        <TextArea
-          id="signResult"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={
-            signature && signature?.byteLength > 0
-              ? `0x${Buffer.from(signature).toString('hex')}`
-              : undefined
+    <YStack space="$4">
+      <H2>Send it</H2>
+      <Label htmlFor="sendTo">Sending to:</Label>
+      <Input id="sendTo" value={receiverAccount.address} />
+      <Label htmlFor="sendAmount">ETH Amount:</Label>
+      <Input id="sendAmount" value="0.01" />
+      <Button
+        onPress={async () => {
+          if (!publicKey) {
+            throw new Error('No public key')
           }
-        />
-        <H2>Send it</H2>
-        <Button
-          onPress={async () => {
-            if (!publicKey) {
-              throw new Error('No public key')
-            }
 
-            if (!userOp || !userOpHash) {
-              throw new Error('No userOp')
-            }
+          if (!userOp || !userOpHash) {
+            throw new Error('No userOp')
+          }
 
-            if (!signature || signature.byteLength <= 0) {
-              throw new Error('No signature')
-            }
+          if (!senderAddress) {
+            throw new Error('No sender address')
+          }
 
-            if (!senderAddress) {
-              throw new Error('No sender address')
-            }
-            setSendResult(await sendUserOp({ userOp, signature }))
-          }}
-        >
-          Send
-        </Button>
-        <Label htmlFor="sendResult">Send result:</Label>
-        <TextArea
-          id="sendResult"
-          height="$6"
-          // @ts-expect-error setup monospace font
-          fontFamily={'monospace'}
-          value={sendResult ? sendResult.toString() : undefined}
-        />
-      </YStack>
-    </Container>
+          const signature = await signWithPasskey()
+          setSendResult(await sendUserOp({ userOp, signature }))
+        }}
+      >
+        Send
+      </Button>
+      <Label htmlFor="sendResult">Send result:</Label>
+      <TextArea
+        id="sendResult"
+        height="$6"
+        // @ts-expect-error setup monospace font
+        fontFamily={'monospace'}
+        value={sendResult ? sendResult.toString() : undefined}
+      />
+    </YStack>
   )
 }
 
@@ -189,7 +324,15 @@ async function sendUserOp({
     signature: bytesToHex(signature),
   }
 
-  // always reverts
+  if (__DEV__ || process.env.CI) {
+    console.log('Funding sending address', _userOp.sender)
+    await testBaseClient.setBalance({
+      address: _userOp.sender,
+      value: parseEther('1'),
+    })
+  }
+
+  // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
   await baseMainnetClient
     .simulateContract({
       address: entrypoint.address,
@@ -204,11 +347,38 @@ async function sendUserOp({
         if ((data.args?.[0] as { sigFailed: boolean }).sigFailed) {
           throw new Error('Signature failed')
         }
+        // console.log('ValidationResult', data)
+        return data
       }
-      if (cause.data?.errorName !== 'ValidationResult') {
-        throw e
-      }
+      throw e
     })
+
+  // [simulateHandleOp](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L203)
+  await baseMainnetClient
+    .simulateContract({
+      address: entrypoint.address,
+      functionName: 'simulateHandleOp',
+      abi: iEntryPointABI,
+      args: [
+        _userOp,
+        '0x0000000000000000000000000000000000000000', // target address TODO: optionally return target address result
+        '0x', // target calldata
+      ],
+    })
+    .catch((e: ContractFunctionExecutionError) => {
+      const cause: ContractFunctionRevertedError = e.cause
+      if (cause.data?.errorName === 'ExecutionResult') {
+        const data = cause.data
+        if ((data.args?.[0] as { success: boolean }).success) {
+          throw new Error('Handle op failed')
+        }
+        // console.log('ExecutionResult', data)
+        // TODO: use to estimate gas
+        return data
+      }
+      throw e
+    })
+
   const hash = await bundlerClient.sendUserOperation({
     userOperation: _userOp,
     entryPoint: entrypoint.address,
