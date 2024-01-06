@@ -7,7 +7,7 @@ import { SideBarFooterLink } from "app/components/sidebar/SideBarFooterLink";
 import { twitter as twitterSocial, telegram as telegramSocial } from 'app/data/socialLinks'
 import { usePathname } from "app/utils/usePathname";
 
-import { useParams } from "app/routers/params";
+import { useNav } from "app/routers/params";
 
 
 
@@ -41,18 +41,16 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
 }
 
 const HomeBottomSheet = ({ open }: SheetProps) => {
-  const { params, setParams } = useParams()
+  const [nav, setNavParam] = useNav()
 
-  const handleHomeBottomSheet = () => {
-    setParams({
-      // params will merge with existing ones
-      nav: params.nav ? undefined : 'home'
-    })
+  const onOpenChange = () => {
+    if (open) setNavParam("home", { webBehavior: "replace" })
+    else setNavParam(undefined, { webBehavior: "replace" })
   }
 
   const pathName = usePathname()
   return (
-    <BottomSheet open={open} onOpenChange={handleHomeBottomSheet}>
+    <BottomSheet open={nav === "home"} onOpenChange={onOpenChange}>
       <Link href={"/"} marginTop={"$4"}>
         <Button borderRadius={9999} w={"$11"} h={"$11"} bg={"transparent"}>
           {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
@@ -81,7 +79,7 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
 
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
-  const { params } = useParams()
+
   if (media.gtLg)
     return (
       <SideBarWrapper sidebar={< HomeSideBar backgroundColor={"$backgroundStrong"} />}>
@@ -89,9 +87,9 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
       </SideBarWrapper >
 
     )
-  return (
+  else return (
     <>
-      <HomeBottomSheet open={params.nav === "home"} />
+      <HomeBottomSheet />
       {children}
     </>
 
