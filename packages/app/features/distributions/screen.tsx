@@ -8,6 +8,7 @@ import { ArrowRight } from '@tamagui/lucide-icons'
 import { useLink } from 'solito/link'
 import { sendAirdropsSafeAddress } from '@my/wagmi'
 import { DistributionsTable } from './components/DistributionsTable'
+import { HomeHeader } from 'app/components/HomeHeader'
 
 export function DistributionsScreen() {
   return (
@@ -15,6 +16,7 @@ export function DistributionsScreen() {
       <ScrollView f={3} fb={0}>
         <YStack gap="$6" pt="$5" pb="$8">
           <YStack gap="$8">
+            <HomeHeader>Distributions</HomeHeader>
             <DistributionSection />
           </YStack>
         </YStack>
@@ -28,8 +30,7 @@ const DistributionSection = () => {
 
   return (
     <YStack gap="$4">
-      <XStack px="$4.5" ai="center" gap="$2" jc="space-between" mb="$4">
-        <H4 fontWeight="400">Distributions</H4>
+      <XStack px="$4.5" ai="center" gap="$2" jc="flex-end" mb="$4">
         <Theme name="alt2">
           <Button size="$2" chromeless {...etherscanLink} iconAfter={ArrowRight}>
             View on Etherscan

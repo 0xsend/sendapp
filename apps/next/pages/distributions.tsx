@@ -14,7 +14,7 @@ export const Page: NextPageWithLayout = () => {
           key="desc"
         />
       </Head>
-      <DistributionsScreen/>
+      <DistributionsScreen />
     </>
   )
 }
