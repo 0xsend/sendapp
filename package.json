@@ -1,7 +1,11 @@
 {
   "name": "sendapp",
   "private": true,
-  "workspaces": ["apps/*", "packages/*", "supabase"],
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "supabase"
+  ],
   "scripts": {
     "vercel:install": "yarn set version berry && yarn install",
     "native": "cd apps/expo && yarn start",
