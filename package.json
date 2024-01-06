@@ -1,11 +1,7 @@
 {
   "name": "sendapp",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "supabase"
-  ],
+  "workspaces": ["apps/*", "packages/*", "supabase"],
   "scripts": {
     "vercel:install": "yarn set version berry && yarn install",
     "native": "cd apps/expo && yarn start",
@@ -47,6 +43,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
-    "@biomejs/biome": "1.4.0"
+    "@biomejs/biome": "1.4.0",
+    "lefthook": "^1.5.5"
   }
 }
