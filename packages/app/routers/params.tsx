@@ -1,7 +1,22 @@
 import { createParam } from 'solito'
 
-export type Params = {
-  nav?: "home" | undefined
+type Nav = { nav?: "home" }
+
+const { useParam: useNavParam } = createParam<Nav>()
+
+export const useNav = () => {
+  const [nav, setNavParam] = useNavParam('nav')
+
+  return [
+    nav,
+    setNavParam
+  ] as const
 }
 
-export const { useParam, useParams } = createParam<Params>()
+export const useNavParams = () => {
+  const [nav] = useNavParam('nav')
+
+  return {
+    nav
+  }
+}
