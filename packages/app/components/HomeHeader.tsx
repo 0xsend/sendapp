@@ -5,15 +5,12 @@ import { getReferralHref } from "app/utils/getReferralLink";
 import { IconClose, IconHamburger, IconSettings } from "./icons";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { IconStar } from "./icons/IconStar";
-import { useParams } from "app/routers/params";
+import { useNav } from "app/routers/params";
 
 export function HomeHeader({ children }: { children: string }) {
-  const { params, setParams } = useParams()
+  const [nav, setNavParam] = useNav()
   const handleHomeBottomSheet = () => {
-    setParams({
-      // params will merge with existing ones
-      nav: params.nav ? undefined : "home",
-    })
+    setNavParam(nav ? undefined : "home", { webBehavior: "replace" })
   }
 
 
