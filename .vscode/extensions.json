@@ -1,3 +1,8 @@
 {
-  "recommendations": ["JuanBlanco.solidity"]
+  "recommendations": [
+    "JuanBlanco.solidity",
+    "biomejs.biome",
+    "ms-playwright.playwright",
+    "tilt-dev.tiltfile"
+  ]
 }
