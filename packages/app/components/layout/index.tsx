@@ -2,6 +2,8 @@ import { ScrollView, YStack } from "@my/ui";
 import { LinearGradient } from "@tamagui/linear-gradient";
 import { MainFooter } from "./footer";
 
+
+
 const MainLayout = ({ scrollable = false, children }: { scrollable?: boolean, children?: React.ReactNode }) => {
   return (
     <YStack>
@@ -28,6 +30,7 @@ const MainLayout = ({ scrollable = false, children }: { scrollable?: boolean, ch
       </YStack>
       <MainFooter />
     </YStack>
+
   )
 }
 

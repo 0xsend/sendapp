@@ -1002,6 +1002,7 @@ export const dark_gold_active = n74 as Theme
 const n75 = t([[12, 0],[13, 1],[14, 2],[15, 3],[16, 0],[17, 0],[18, 11],[19, 10],[20, 11],[21, 10],[22, 11],[23, 3],[24, 4],[25, 2],[26, 3],[27, 9]]) as Theme
 
 export const light_ListItem = n75 as Theme
+export const light_SideBar = n75 as Theme
 const n76 = t([[12, 2],[13, 3],[14, 4],[15, 5],[16, 1],[17, 0],[18, 11],[19, 10],[20, 11],[21, 10],[22, 11],[23, 5],[24, 6],[25, 4],[26, 5],[27, 7]]) as Theme
 
 export const light_Card = n76 as Theme
@@ -1035,6 +1036,7 @@ export const light_TextArea = n82 as Theme
 const n83 = t([[12, 121],[13, 122],[14, 123],[15, 124],[16, 120],[17, 13],[18, 0],[19, 130],[20, 0],[21, 130],[22, 12],[23, 124],[24, 125],[25, 123],[26, 124],[27, 128]]) as Theme
 
 export const dark_ListItem = n83 as Theme
+export const dark_SideBar = n83 as Theme
 const n84 = t([[12, 122],[13, 123],[14, 124],[15, 125],[16, 121],[17, 120],[18, 0],[19, 130],[20, 0],[21, 130],[22, 0],[23, 125],[24, 126],[25, 124],[26, 125],[27, 127]]) as Theme
 
 export const dark_Card = n84 as Theme
@@ -1068,6 +1070,7 @@ export const dark_TextArea = n90 as Theme
 const n91 = t([[12, 46],[13, 47],[14, 48],[15, 49],[16, 46],[17, 46],[18, 11],[19, 57],[20, 11],[21, 57],[22, 11],[23, 48],[24, 49],[25, 48],[26, 48],[27, 56]]) as Theme
 
 export const light_orange_ListItem = n91 as Theme
+export const light_orange_SideBar = n91 as Theme
 const n92 = t([[12, 48],[13, 49],[14, 50],[15, 51],[16, 47],[17, 46],[18, 11],[19, 57],[20, 11],[21, 57],[22, 11],[23, 50],[24, 51],[25, 50],[26, 50],[27, 54]]) as Theme
 
 export const light_orange_Card = n92 as Theme
@@ -1101,6 +1104,7 @@ export const light_orange_TextArea = n98 as Theme
 const n99 = t([[12, 94],[13, 95],[14, 96],[15, 97],[16, 94],[17, 94],[18, 11],[19, 105],[20, 11],[21, 105],[22, 11],[23, 96],[24, 97],[25, 96],[26, 96],[27, 104]]) as Theme
 
 export const light_yellow_ListItem = n99 as Theme
+export const light_yellow_SideBar = n99 as Theme
 const n100 = t([[12, 96],[13, 97],[14, 98],[15, 99],[16, 95],[17, 94],[18, 11],[19, 105],[20, 11],[21, 105],[22, 11],[23, 98],[24, 99],[25, 98],[26, 98],[27, 102]]) as Theme
 
 export const light_yellow_Card = n100 as Theme
@@ -1134,6 +1138,7 @@ export const light_yellow_TextArea = n106 as Theme
 const n107 = t([[12, 34],[13, 35],[14, 36],[15, 37],[16, 34],[17, 34],[18, 11],[19, 45],[20, 11],[21, 45],[22, 11],[23, 36],[24, 37],[25, 36],[26, 36],[27, 44]]) as Theme
 
 export const light_green_ListItem = n107 as Theme
+export const light_green_SideBar = n107 as Theme
 const n108 = t([[12, 36],[13, 37],[14, 38],[15, 39],[16, 35],[17, 34],[18, 11],[19, 45],[20, 11],[21, 45],[22, 11],[23, 38],[24, 39],[25, 38],[26, 38],[27, 42]]) as Theme
 
 export const light_green_Card = n108 as Theme
@@ -1167,6 +1172,7 @@ export const light_green_TextArea = n114 as Theme
 const n115 = t([[12, 14],[13, 15],[14, 16],[15, 17],[16, 14],[17, 14],[18, 11],[19, 25],[20, 11],[21, 25],[22, 11],[23, 16],[24, 17],[25, 16],[26, 16],[27, 24]]) as Theme
 
 export const light_blue_ListItem = n115 as Theme
+export const light_blue_SideBar = n115 as Theme
 const n116 = t([[12, 16],[13, 17],[14, 18],[15, 19],[16, 15],[17, 14],[18, 11],[19, 25],[20, 11],[21, 25],[22, 11],[23, 18],[24, 19],[25, 18],[26, 18],[27, 22]]) as Theme
 
 export const light_blue_Card = n116 as Theme
@@ -1200,6 +1206,7 @@ export const light_blue_TextArea = n122 as Theme
 const n123 = t([[12, 70],[13, 71],[14, 72],[15, 73],[16, 70],[17, 70],[18, 11],[19, 81],[20, 11],[21, 81],[22, 11],[23, 72],[24, 73],[25, 72],[26, 72],[27, 80]]) as Theme
 
 export const light_purple_ListItem = n123 as Theme
+export const light_purple_SideBar = n123 as Theme
 const n124 = t([[12, 72],[13, 73],[14, 74],[15, 75],[16, 71],[17, 70],[18, 11],[19, 81],[20, 11],[21, 81],[22, 11],[23, 74],[24, 75],[25, 74],[26, 74],[27, 78]]) as Theme
 
 export const light_purple_Card = n124 as Theme
@@ -1233,6 +1240,7 @@ export const light_purple_TextArea = n130 as Theme
 const n131 = t([[12, 58],[13, 59],[14, 60],[15, 61],[16, 58],[17, 58],[18, 11],[19, 69],[20, 11],[21, 69],[22, 11],[23, 60],[24, 61],[25, 60],[26, 60],[27, 68]]) as Theme
 
 export const light_pink_ListItem = n131 as Theme
+export const light_pink_SideBar = n131 as Theme
 const n132 = t([[12, 60],[13, 61],[14, 62],[15, 63],[16, 59],[17, 58],[18, 11],[19, 69],[20, 11],[21, 69],[22, 11],[23, 62],[24, 63],[25, 62],[26, 62],[27, 66]]) as Theme
 
 export const light_pink_Card = n132 as Theme
@@ -1266,6 +1274,7 @@ export const light_pink_TextArea = n138 as Theme
 const n139 = t([[12, 82],[13, 83],[14, 84],[15, 85],[16, 82],[17, 82],[18, 11],[19, 93],[20, 11],[21, 93],[22, 11],[23, 84],[24, 85],[25, 84],[26, 84],[27, 92]]) as Theme
 
 export const light_red_ListItem = n139 as Theme
+export const light_red_SideBar = n139 as Theme
 const n140 = t([[12, 84],[13, 85],[14, 86],[15, 87],[16, 83],[17, 82],[18, 11],[19, 93],[20, 11],[21, 93],[22, 11],[23, 86],[24, 87],[25, 86],[26, 86],[27, 90]]) as Theme
 
 export const light_red_Card = n140 as Theme
@@ -1299,6 +1308,7 @@ export const light_red_TextArea = n146 as Theme
 const n147 = t([[12, 106],[13, 107],[14, 108],[15, 109],[16, 106],[17, 106],[18, 11],[19, 117],[20, 11],[21, 117],[22, 11],[23, 108],[24, 109],[25, 108],[26, 108],[27, 116]]) as Theme
 
 export const light_gold_ListItem = n147 as Theme
+export const light_gold_SideBar = n147 as Theme
 const n148 = t([[12, 108],[13, 109],[14, 110],[15, 111],[16, 107],[17, 106],[18, 11],[19, 117],[20, 11],[21, 117],[22, 11],[23, 110],[24, 111],[25, 110],[26, 110],[27, 114]]) as Theme
 
 export const light_gold_Card = n148 as Theme
@@ -1332,6 +1342,7 @@ export const light_gold_TextArea = n154 as Theme
 const n155 = t([[12, 165],[13, 166],[14, 167],[15, 168],[16, 164],[17, 248],[18, 0],[19, 174],[20, 0],[21, 174],[22, 249],[23, 168],[24, 169],[25, 167],[26, 168],[27, 172]]) as Theme
 
 export const dark_orange_ListItem = n155 as Theme
+export const dark_orange_SideBar = n155 as Theme
 const n156 = t([[12, 166],[13, 167],[14, 168],[15, 169],[16, 165],[17, 164],[18, 0],[19, 174],[20, 0],[21, 174],[22, 0],[23, 169],[24, 171],[25, 168],[26, 169],[27, 54]]) as Theme
 
 export const dark_orange_Card = n156 as Theme
@@ -1365,6 +1376,7 @@ export const dark_orange_TextArea = n162 as Theme
 const n163 = t([[12, 209],[13, 210],[14, 211],[15, 212],[16, 208],[17, 250],[18, 0],[19, 218],[20, 0],[21, 218],[22, 251],[23, 212],[24, 213],[25, 211],[26, 212],[27, 216]]) as Theme
 
 export const dark_yellow_ListItem = n163 as Theme
+export const dark_yellow_SideBar = n163 as Theme
 const n164 = t([[12, 210],[13, 211],[14, 212],[15, 213],[16, 209],[17, 208],[18, 0],[19, 218],[20, 0],[21, 218],[22, 0],[23, 213],[24, 215],[25, 212],[26, 213],[27, 102]]) as Theme
 
 export const dark_yellow_Card = n164 as Theme
@@ -1398,6 +1410,7 @@ export const dark_yellow_TextArea = n170 as Theme
 const n171 = t([[12, 154],[13, 155],[14, 156],[15, 157],[16, 153],[17, 252],[18, 0],[19, 163],[20, 0],[21, 163],[22, 253],[23, 157],[24, 158],[25, 156],[26, 157],[27, 161]]) as Theme
 
 export const dark_green_ListItem = n171 as Theme
+export const dark_green_SideBar = n171 as Theme
 const n172 = t([[12, 155],[13, 156],[14, 157],[15, 158],[16, 154],[17, 153],[18, 0],[19, 163],[20, 0],[21, 163],[22, 0],[23, 158],[24, 160],[25, 157],[26, 158],[27, 42]]) as Theme
 
 export const dark_green_Card = n172 as Theme
@@ -1431,6 +1444,7 @@ export const dark_green_TextArea = n178 as Theme
 const n179 = t([[12, 132],[13, 133],[14, 134],[15, 135],[16, 131],[17, 254],[18, 0],[19, 141],[20, 0],[21, 141],[22, 255],[23, 135],[24, 136],[25, 134],[26, 135],[27, 139]]) as Theme
 
 export const dark_blue_ListItem = n179 as Theme
+export const dark_blue_SideBar = n179 as Theme
 const n180 = t([[12, 133],[13, 134],[14, 135],[15, 136],[16, 132],[17, 131],[18, 0],[19, 141],[20, 0],[21, 141],[22, 0],[23, 136],[24, 138],[25, 135],[26, 136],[27, 22]]) as Theme
 
 export const dark_blue_Card = n180 as Theme
@@ -1464,6 +1478,7 @@ export const dark_blue_TextArea = n186 as Theme
 const n187 = t([[12, 187],[13, 188],[14, 189],[15, 190],[16, 186],[17, 256],[18, 0],[19, 196],[20, 0],[21, 196],[22, 257],[23, 190],[24, 191],[25, 189],[26, 190],[27, 194]]) as Theme
 
 export const dark_purple_ListItem = n187 as Theme
+export const dark_purple_SideBar = n187 as Theme
 const n188 = t([[12, 188],[13, 189],[14, 190],[15, 191],[16, 187],[17, 186],[18, 0],[19, 196],[20, 0],[21, 196],[22, 0],[23, 191],[24, 193],[25, 190],[26, 191],[27, 78]]) as Theme
 
 export const dark_purple_Card = n188 as Theme
@@ -1497,6 +1512,7 @@ export const dark_purple_TextArea = n194 as Theme
 const n195 = t([[12, 176],[13, 177],[14, 178],[15, 179],[16, 175],[17, 258],[18, 0],[19, 185],[20, 0],[21, 185],[22, 259],[23, 179],[24, 180],[25, 178],[26, 179],[27, 183]]) as Theme
 
 export const dark_pink_ListItem = n195 as Theme
+export const dark_pink_SideBar = n195 as Theme
 const n196 = t([[12, 177],[13, 178],[14, 179],[15, 180],[16, 176],[17, 175],[18, 0],[19, 185],[20, 0],[21, 185],[22, 0],[23, 180],[24, 182],[25, 179],[26, 180],[27, 66]]) as Theme
 
 export const dark_pink_Card = n196 as Theme
@@ -1530,6 +1546,7 @@ export const dark_pink_TextArea = n202 as Theme
 const n203 = t([[12, 198],[13, 199],[14, 200],[15, 201],[16, 197],[17, 260],[18, 0],[19, 207],[20, 0],[21, 207],[22, 261],[23, 201],[24, 202],[25, 200],[26, 201],[27, 205]]) as Theme
 
 export const dark_red_ListItem = n203 as Theme
+export const dark_red_SideBar = n203 as Theme
 const n204 = t([[12, 199],[13, 200],[14, 201],[15, 202],[16, 198],[17, 197],[18, 0],[19, 207],[20, 0],[21, 207],[22, 0],[23, 202],[24, 204],[25, 201],[26, 202],[27, 90]]) as Theme
 
 export const dark_red_Card = n204 as Theme
@@ -1563,6 +1580,7 @@ export const dark_red_TextArea = n210 as Theme
 const n211 = t([[12, 220],[13, 221],[14, 222],[15, 223],[16, 219],[17, 262],[18, 0],[19, 229],[20, 0],[21, 229],[22, 263],[23, 223],[24, 224],[25, 222],[26, 223],[27, 227]]) as Theme
 
 export const dark_gold_ListItem = n211 as Theme
+export const dark_gold_SideBar = n211 as Theme
 const n212 = t([[12, 221],[13, 222],[14, 223],[15, 224],[16, 220],[17, 219],[18, 0],[19, 229],[20, 0],[21, 229],[22, 0],[23, 224],[24, 226],[25, 223],[26, 224],[27, 114]]) as Theme
 
 export const dark_gold_Card = n212 as Theme
@@ -1596,6 +1614,7 @@ export const dark_gold_TextArea = n218 as Theme
 const n219 = t([[12, 1],[13, 2],[14, 3],[15, 4],[16, 0],[17, 0],[18, 10],[19, 9],[20, 10],[21, 9],[22, 11],[23, 4],[24, 5],[25, 3],[26, 4],[27, 8]]) as Theme
 
 export const light_alt1_ListItem = n219 as Theme
+export const light_alt1_SideBar = n219 as Theme
 const n220 = t([[12, 3],[13, 4],[14, 5],[15, 6],[16, 2],[17, 1],[18, 10],[19, 9],[20, 10],[21, 9],[22, 10],[23, 6],[24, 7],[25, 5],[26, 6],[27, 6]]) as Theme
 
 export const light_alt1_Card = n220 as Theme
@@ -1629,6 +1648,7 @@ export const light_alt1_TextArea = n226 as Theme
 const n227 = t([[12, 2],[13, 3],[14, 4],[15, 5],[16, 1],[17, 0],[18, 9],[19, 8],[20, 9],[21, 8],[22, 11],[23, 5],[24, 6],[25, 4],[26, 5],[27, 7]]) as Theme
 
 export const light_alt2_ListItem = n227 as Theme
+export const light_alt2_SideBar = n227 as Theme
 const n228 = t([[12, 4],[13, 5],[14, 6],[15, 7],[16, 3],[17, 2],[18, 9],[19, 8],[20, 9],[21, 8],[22, 9],[23, 7],[24, 8],[25, 6],[26, 7],[27, 5]]) as Theme
 
 export const light_alt2_Card = n228 as Theme
@@ -1662,6 +1682,7 @@ export const light_alt2_TextArea = n234 as Theme
 const n235 = t([[12, 3],[13, 4],[14, 5],[15, 6],[16, 2],[17, 1],[19, 7],[20, 8],[21, 7],[22, 10],[23, 6],[24, 7],[25, 5],[26, 6],[27, 6]]) as Theme
 
 export const light_active_ListItem = n235 as Theme
+export const light_active_SideBar = n235 as Theme
 const n236 = t([[12, 5],[13, 6],[14, 7],[15, 8],[16, 4],[17, 3],[19, 7],[20, 8],[21, 7],[22, 8],[23, 8],[24, 9],[25, 7],[26, 8],[27, 4]]) as Theme
 
 export const light_active_Card = n236 as Theme
@@ -1695,6 +1716,7 @@ export const light_active_TextArea = n242 as Theme
 const n243 = t([[12, 122],[13, 123],[14, 124],[15, 125],[16, 121],[17, 120],[18, 130],[19, 129],[20, 130],[21, 129],[22, 0],[23, 125],[24, 126],[25, 124],[26, 125],[27, 127]]) as Theme
 
 export const dark_alt1_ListItem = n243 as Theme
+export const dark_alt1_SideBar = n243 as Theme
 const n244 = t([[12, 123],[13, 124],[14, 125],[15, 126],[16, 122],[17, 121],[18, 130],[19, 129],[20, 130],[21, 129],[22, 130],[23, 126],[24, 127],[25, 125],[26, 126],[27, 126]]) as Theme
 
 export const dark_alt1_Card = n244 as Theme
@@ -1728,6 +1750,7 @@ export const dark_alt1_TextArea = n250 as Theme
 const n251 = t([[12, 123],[13, 124],[14, 125],[15, 126],[16, 122],[17, 121],[18, 129],[19, 128],[20, 129],[21, 128],[22, 130],[23, 126],[24, 127],[25, 125],[26, 126],[27, 126]]) as Theme
 
 export const dark_alt2_ListItem = n251 as Theme
+export const dark_alt2_SideBar = n251 as Theme
 const n252 = t([[12, 124],[13, 125],[14, 126],[15, 127],[16, 123],[17, 122],[18, 129],[19, 128],[20, 129],[21, 128],[22, 129],[23, 127],[24, 128],[25, 126],[26, 127],[27, 125]]) as Theme
 
 export const dark_alt2_Card = n252 as Theme
@@ -1761,6 +1784,7 @@ export const dark_alt2_TextArea = n258 as Theme
 const n259 = t([[12, 124],[13, 125],[14, 126],[15, 127],[16, 123],[17, 122],[19, 127],[20, 128],[21, 127],[22, 129],[23, 127],[24, 128],[25, 126],[26, 127],[27, 125]]) as Theme
 
 export const dark_active_ListItem = n259 as Theme
+export const dark_active_SideBar = n259 as Theme
 const n260 = t([[12, 125],[13, 126],[14, 127],[15, 128],[16, 124],[17, 123],[19, 127],[20, 128],[21, 127],[22, 128],[23, 128],[24, 129],[25, 127],[26, 128],[27, 124]]) as Theme
 
 export const dark_active_Card = n260 as Theme
@@ -1794,6 +1818,7 @@ export const dark_active_TextArea = n266 as Theme
 const n267 = t([[12, 47],[13, 48],[14, 49],[15, 50],[16, 46],[17, 46],[18, 57],[19, 56],[20, 57],[21, 56],[22, 11],[23, 49],[24, 50],[25, 49],[26, 49],[27, 55]]) as Theme
 
 export const light_orange_alt1_ListItem = n267 as Theme
+export const light_orange_alt1_SideBar = n267 as Theme
 const n268 = t([[12, 49],[13, 50],[14, 51],[15, 53],[16, 48],[17, 47],[18, 57],[19, 56],[20, 57],[21, 56],[22, 57],[23, 51],[24, 53],[25, 51],[26, 51],[27, 53]]) as Theme
 
 export const light_orange_alt1_Card = n268 as Theme
@@ -1827,6 +1852,7 @@ export const light_orange_alt1_TextArea = n274 as Theme
 const n275 = t([[12, 48],[13, 49],[14, 50],[15, 51],[16, 47],[17, 46],[18, 56],[19, 55],[20, 56],[21, 55],[22, 11],[23, 50],[24, 51],[25, 50],[26, 50],[27, 54]]) as Theme
 
 export const light_orange_alt2_ListItem = n275 as Theme
+export const light_orange_alt2_SideBar = n275 as Theme
 const n276 = t([[12, 50],[13, 51],[14, 53],[15, 54],[16, 49],[17, 48],[18, 56],[19, 55],[20, 56],[21, 55],[22, 56],[23, 53],[24, 54],[25, 53],[26, 53],[27, 51]]) as Theme
 
 export const light_orange_alt2_Card = n276 as Theme
@@ -1860,6 +1886,7 @@ export const light_orange_alt2_TextArea = n282 as Theme
 const n283 = t([[12, 49],[13, 50],[14, 51],[15, 53],[16, 48],[17, 47],[19, 54],[20, 55],[21, 54],[22, 57],[23, 51],[24, 53],[25, 51],[26, 51],[27, 53]]) as Theme
 
 export const light_orange_active_ListItem = n283 as Theme
+export const light_orange_active_SideBar = n283 as Theme
 const n284 = t([[12, 51],[13, 53],[14, 54],[15, 55],[16, 50],[17, 49],[19, 54],[20, 55],[21, 54],[22, 55],[23, 54],[24, 55],[25, 54],[26, 54],[27, 50]]) as Theme
 
 export const light_orange_active_Card = n284 as Theme
@@ -1893,6 +1920,7 @@ export const light_orange_active_TextArea = n290 as Theme
 const n291 = t([[12, 95],[13, 96],[14, 97],[15, 98],[16, 94],[17, 94],[18, 105],[19, 104],[20, 105],[21, 104],[22, 11],[23, 97],[24, 98],[25, 97],[26, 97],[27, 103]]) as Theme
 
 export const light_yellow_alt1_ListItem = n291 as Theme
+export const light_yellow_alt1_SideBar = n291 as Theme
 const n292 = t([[12, 97],[13, 98],[14, 99],[15, 101],[16, 96],[17, 95],[18, 105],[19, 104],[20, 105],[21, 104],[22, 105],[23, 99],[24, 101],[25, 99],[26, 99],[27, 101]]) as Theme
 
 export const light_yellow_alt1_Card = n292 as Theme
@@ -1926,6 +1954,7 @@ export const light_yellow_alt1_TextArea = n298 as Theme
 const n299 = t([[12, 96],[13, 97],[14, 98],[15, 99],[16, 95],[17, 94],[18, 104],[19, 103],[20, 104],[21, 103],[22, 11],[23, 98],[24, 99],[25, 98],[26, 98],[27, 102]]) as Theme
 
 export const light_yellow_alt2_ListItem = n299 as Theme
+export const light_yellow_alt2_SideBar = n299 as Theme
 const n300 = t([[12, 98],[13, 99],[14, 101],[15, 102],[16, 97],[17, 96],[18, 104],[19, 103],[20, 104],[21, 103],[22, 104],[23, 101],[24, 102],[25, 101],[26, 101],[27, 99]]) as Theme
 
 export const light_yellow_alt2_Card = n300 as Theme
@@ -1959,6 +1988,7 @@ export const light_yellow_alt2_TextArea = n306 as Theme
 const n307 = t([[12, 97],[13, 98],[14, 99],[15, 101],[16, 96],[17, 95],[19, 102],[20, 103],[21, 102],[22, 105],[23, 99],[24, 101],[25, 99],[26, 99],[27, 101]]) as Theme
 
 export const light_yellow_active_ListItem = n307 as Theme
+export const light_yellow_active_SideBar = n307 as Theme
 const n308 = t([[12, 99],[13, 101],[14, 102],[15, 103],[16, 98],[17, 97],[19, 102],[20, 103],[21, 102],[22, 103],[23, 102],[24, 103],[25, 102],[26, 102],[27, 98]]) as Theme
 
 export const light_yellow_active_Card = n308 as Theme
@@ -1992,6 +2022,7 @@ export const light_yellow_active_TextArea = n314 as Theme
 const n315 = t([[12, 35],[13, 36],[14, 37],[15, 38],[16, 34],[17, 34],[18, 45],[19, 44],[20, 45],[21, 44],[22, 11],[23, 37],[24, 38],[25, 37],[26, 37],[27, 43]]) as Theme
 
 export const light_green_alt1_ListItem = n315 as Theme
+export const light_green_alt1_SideBar = n315 as Theme
 const n316 = t([[12, 37],[13, 38],[14, 39],[15, 41],[16, 36],[17, 35],[18, 45],[19, 44],[20, 45],[21, 44],[22, 45],[23, 39],[24, 41],[25, 39],[26, 39],[27, 41]]) as Theme
 
 export const light_green_alt1_Card = n316 as Theme
@@ -2025,6 +2056,7 @@ export const light_green_alt1_TextArea = n322 as Theme
 const n323 = t([[12, 36],[13, 37],[14, 38],[15, 39],[16, 35],[17, 34],[18, 44],[19, 43],[20, 44],[21, 43],[22, 11],[23, 38],[24, 39],[25, 38],[26, 38],[27, 42]]) as Theme
 
 export const light_green_alt2_ListItem = n323 as Theme
+export const light_green_alt2_SideBar = n323 as Theme
 const n324 = t([[12, 38],[13, 39],[14, 41],[15, 42],[16, 37],[17, 36],[18, 44],[19, 43],[20, 44],[21, 43],[22, 44],[23, 41],[24, 42],[25, 41],[26, 41],[27, 39]]) as Theme
 
 export const light_green_alt2_Card = n324 as Theme
@@ -2058,6 +2090,7 @@ export const light_green_alt2_TextArea = n330 as Theme
 const n331 = t([[12, 37],[13, 38],[14, 39],[15, 41],[16, 36],[17, 35],[19, 42],[20, 43],[21, 42],[22, 45],[23, 39],[24, 41],[25, 39],[26, 39],[27, 41]]) as Theme
 
 export const light_green_active_ListItem = n331 as Theme
+export const light_green_active_SideBar = n331 as Theme
 const n332 = t([[12, 39],[13, 41],[14, 42],[15, 43],[16, 38],[17, 37],[19, 42],[20, 43],[21, 42],[22, 43],[23, 42],[24, 43],[25, 42],[26, 42],[27, 38]]) as Theme
 
 export const light_green_active_Card = n332 as Theme
@@ -2091,6 +2124,7 @@ export const light_green_active_TextArea = n338 as Theme
 const n339 = t([[12, 15],[13, 16],[14, 17],[15, 18],[16, 14],[17, 14],[18, 25],[19, 24],[20, 25],[21, 24],[22, 11],[23, 17],[24, 18],[25, 17],[26, 17],[27, 23]]) as Theme
 
 export const light_blue_alt1_ListItem = n339 as Theme
+export const light_blue_alt1_SideBar = n339 as Theme
 const n340 = t([[12, 17],[13, 18],[14, 19],[15, 21],[16, 16],[17, 15],[18, 25],[19, 24],[20, 25],[21, 24],[22, 25],[23, 19],[24, 21],[25, 19],[26, 19],[27, 21]]) as Theme
 
 export const light_blue_alt1_Card = n340 as Theme
@@ -2124,6 +2158,7 @@ export const light_blue_alt1_TextArea = n346 as Theme
 const n347 = t([[12, 16],[13, 17],[14, 18],[15, 19],[16, 15],[17, 14],[18, 24],[19, 23],[20, 24],[21, 23],[22, 11],[23, 18],[24, 19],[25, 18],[26, 18],[27, 22]]) as Theme
 
 export const light_blue_alt2_ListItem = n347 as Theme
+export const light_blue_alt2_SideBar = n347 as Theme
 const n348 = t([[12, 18],[13, 19],[14, 21],[15, 22],[16, 17],[17, 16],[18, 24],[19, 23],[20, 24],[21, 23],[22, 24],[23, 21],[24, 22],[25, 21],[26, 21],[27, 19]]) as Theme
 
 export const light_blue_alt2_Card = n348 as Theme
@@ -2157,6 +2192,7 @@ export const light_blue_alt2_TextArea = n354 as Theme
 const n355 = t([[12, 17],[13, 18],[14, 19],[15, 21],[16, 16],[17, 15],[19, 22],[20, 23],[21, 22],[22, 25],[23, 19],[24, 21],[25, 19],[26, 19],[27, 21]]) as Theme
 
 export const light_blue_active_ListItem = n355 as Theme
+export const light_blue_active_SideBar = n355 as Theme
 const n356 = t([[12, 19],[13, 21],[14, 22],[15, 23],[16, 18],[17, 17],[19, 22],[20, 23],[21, 22],[22, 23],[23, 22],[24, 23],[25, 22],[26, 22],[27, 18]]) as Theme
 
 export const light_blue_active_Card = n356 as Theme
@@ -2190,6 +2226,7 @@ export const light_blue_active_TextArea = n362 as Theme
 const n363 = t([[12, 71],[13, 72],[14, 73],[15, 74],[16, 70],[17, 70],[18, 81],[19, 80],[20, 81],[21, 80],[22, 11],[23, 73],[24, 74],[25, 73],[26, 73],[27, 79]]) as Theme
 
 export const light_purple_alt1_ListItem = n363 as Theme
+export const light_purple_alt1_SideBar = n363 as Theme
 const n364 = t([[12, 73],[13, 74],[14, 75],[15, 77],[16, 72],[17, 71],[18, 81],[19, 80],[20, 81],[21, 80],[22, 81],[23, 75],[24, 77],[25, 75],[26, 75],[27, 77]]) as Theme
 
 export const light_purple_alt1_Card = n364 as Theme
@@ -2223,6 +2260,7 @@ export const light_purple_alt1_TextArea = n370 as Theme
 const n371 = t([[12, 72],[13, 73],[14, 74],[15, 75],[16, 71],[17, 70],[18, 80],[19, 79],[20, 80],[21, 79],[22, 11],[23, 74],[24, 75],[25, 74],[26, 74],[27, 78]]) as Theme
 
 export const light_purple_alt2_ListItem = n371 as Theme
+export const light_purple_alt2_SideBar = n371 as Theme
 const n372 = t([[12, 74],[13, 75],[14, 77],[15, 78],[16, 73],[17, 72],[18, 80],[19, 79],[20, 80],[21, 79],[22, 80],[23, 77],[24, 78],[25, 77],[26, 77],[27, 75]]) as Theme
 
 export const light_purple_alt2_Card = n372 as Theme
@@ -2256,6 +2294,7 @@ export const light_purple_alt2_TextArea = n378 as Theme
 const n379 = t([[12, 73],[13, 74],[14, 75],[15, 77],[16, 72],[17, 71],[19, 78],[20, 79],[21, 78],[22, 81],[23, 75],[24, 77],[25, 75],[26, 75],[27, 77]]) as Theme
 
 export const light_purple_active_ListItem = n379 as Theme
+export const light_purple_active_SideBar = n379 as Theme
 const n380 = t([[12, 75],[13, 77],[14, 78],[15, 79],[16, 74],[17, 73],[19, 78],[20, 79],[21, 78],[22, 79],[23, 78],[24, 79],[25, 78],[26, 78],[27, 74]]) as Theme
 
 export const light_purple_active_Card = n380 as Theme
@@ -2289,6 +2328,7 @@ export const light_purple_active_TextArea = n386 as Theme
 const n387 = t([[12, 59],[13, 60],[14, 61],[15, 62],[16, 58],[17, 58],[18, 69],[19, 68],[20, 69],[21, 68],[22, 11],[23, 61],[24, 62],[25, 61],[26, 61],[27, 67]]) as Theme
 
 export const light_pink_alt1_ListItem = n387 as Theme
+export const light_pink_alt1_SideBar = n387 as Theme
 const n388 = t([[12, 61],[13, 62],[14, 63],[15, 65],[16, 60],[17, 59],[18, 69],[19, 68],[20, 69],[21, 68],[22, 69],[23, 63],[24, 65],[25, 63],[26, 63],[27, 65]]) as Theme
 
 export const light_pink_alt1_Card = n388 as Theme
@@ -2322,6 +2362,7 @@ export const light_pink_alt1_TextArea = n394 as Theme
 const n395 = t([[12, 60],[13, 61],[14, 62],[15, 63],[16, 59],[17, 58],[18, 68],[19, 67],[20, 68],[21, 67],[22, 11],[23, 62],[24, 63],[25, 62],[26, 62],[27, 66]]) as Theme
 
 export const light_pink_alt2_ListItem = n395 as Theme
+export const light_pink_alt2_SideBar = n395 as Theme
 const n396 = t([[12, 62],[13, 63],[14, 65],[15, 66],[16, 61],[17, 60],[18, 68],[19, 67],[20, 68],[21, 67],[22, 68],[23, 65],[24, 66],[25, 65],[26, 65],[27, 63]]) as Theme
 
 export const light_pink_alt2_Card = n396 as Theme
@@ -2355,6 +2396,7 @@ export const light_pink_alt2_TextArea = n402 as Theme
 const n403 = t([[12, 61],[13, 62],[14, 63],[15, 65],[16, 60],[17, 59],[19, 66],[20, 67],[21, 66],[22, 69],[23, 63],[24, 65],[25, 63],[26, 63],[27, 65]]) as Theme
 
 export const light_pink_active_ListItem = n403 as Theme
+export const light_pink_active_SideBar = n403 as Theme
 const n404 = t([[12, 63],[13, 65],[14, 66],[15, 67],[16, 62],[17, 61],[19, 66],[20, 67],[21, 66],[22, 67],[23, 66],[24, 67],[25, 66],[26, 66],[27, 62]]) as Theme
 
 export const light_pink_active_Card = n404 as Theme
@@ -2388,6 +2430,7 @@ export const light_pink_active_TextArea = n410 as Theme
 const n411 = t([[12, 83],[13, 84],[14, 85],[15, 86],[16, 82],[17, 82],[18, 93],[19, 92],[20, 93],[21, 92],[22, 11],[23, 85],[24, 86],[25, 85],[26, 85],[27, 91]]) as Theme
 
 export const light_red_alt1_ListItem = n411 as Theme
+export const light_red_alt1_SideBar = n411 as Theme
 const n412 = t([[12, 85],[13, 86],[14, 87],[15, 89],[16, 84],[17, 83],[18, 93],[19, 92],[20, 93],[21, 92],[22, 93],[23, 87],[24, 89],[25, 87],[26, 87],[27, 89]]) as Theme
 
 export const light_red_alt1_Card = n412 as Theme
@@ -2421,6 +2464,7 @@ export const light_red_alt1_TextArea = n418 as Theme
 const n419 = t([[12, 84],[13, 85],[14, 86],[15, 87],[16, 83],[17, 82],[18, 92],[19, 91],[20, 92],[21, 91],[22, 11],[23, 86],[24, 87],[25, 86],[26, 86],[27, 90]]) as Theme
 
 export const light_red_alt2_ListItem = n419 as Theme
+export const light_red_alt2_SideBar = n419 as Theme
 const n420 = t([[12, 86],[13, 87],[14, 89],[15, 90],[16, 85],[17, 84],[18, 92],[19, 91],[20, 92],[21, 91],[22, 92],[23, 89],[24, 90],[25, 89],[26, 89],[27, 87]]) as Theme
 
 export const light_red_alt2_Card = n420 as Theme
@@ -2454,6 +2498,7 @@ export const light_red_alt2_TextArea = n426 as Theme
 const n427 = t([[12, 85],[13, 86],[14, 87],[15, 89],[16, 84],[17, 83],[19, 90],[20, 91],[21, 90],[22, 93],[23, 87],[24, 89],[25, 87],[26, 87],[27, 89]]) as Theme
 
 export const light_red_active_ListItem = n427 as Theme
+export const light_red_active_SideBar = n427 as Theme
 const n428 = t([[12, 87],[13, 89],[14, 90],[15, 91],[16, 86],[17, 85],[19, 90],[20, 91],[21, 90],[22, 91],[23, 90],[24, 91],[25, 90],[26, 90],[27, 86]]) as Theme
 
 export const light_red_active_Card = n428 as Theme
@@ -2487,6 +2532,7 @@ export const light_red_active_TextArea = n434 as Theme
 const n435 = t([[12, 107],[13, 108],[14, 109],[15, 110],[16, 106],[17, 106],[18, 117],[19, 116],[20, 117],[21, 116],[22, 11],[23, 109],[24, 110],[25, 109],[26, 109],[27, 115]]) as Theme
 
 export const light_gold_alt1_ListItem = n435 as Theme
+export const light_gold_alt1_SideBar = n435 as Theme
 const n436 = t([[12, 109],[13, 110],[14, 111],[15, 113],[16, 108],[17, 107],[18, 117],[19, 116],[20, 117],[21, 116],[22, 117],[23, 111],[24, 113],[25, 111],[26, 111],[27, 113]]) as Theme
 
 export const light_gold_alt1_Card = n436 as Theme
@@ -2520,6 +2566,7 @@ export const light_gold_alt1_TextArea = n442 as Theme
 const n443 = t([[12, 108],[13, 109],[14, 110],[15, 111],[16, 107],[17, 106],[18, 116],[19, 115],[20, 116],[21, 115],[22, 11],[23, 110],[24, 111],[25, 110],[26, 110],[27, 114]]) as Theme
 
 export const light_gold_alt2_ListItem = n443 as Theme
+export const light_gold_alt2_SideBar = n443 as Theme
 const n444 = t([[12, 110],[13, 111],[14, 113],[15, 114],[16, 109],[17, 108],[18, 116],[19, 115],[20, 116],[21, 115],[22, 116],[23, 113],[24, 114],[25, 113],[26, 113],[27, 111]]) as Theme
 
 export const light_gold_alt2_Card = n444 as Theme
@@ -2553,6 +2600,7 @@ export const light_gold_alt2_TextArea = n450 as Theme
 const n451 = t([[12, 109],[13, 110],[14, 111],[15, 113],[16, 108],[17, 107],[19, 114],[20, 115],[21, 114],[22, 117],[23, 111],[24, 113],[25, 111],[26, 111],[27, 113]]) as Theme
 
 export const light_gold_active_ListItem = n451 as Theme
+export const light_gold_active_SideBar = n451 as Theme
 const n452 = t([[12, 111],[13, 113],[14, 114],[15, 115],[16, 110],[17, 109],[19, 114],[20, 115],[21, 114],[22, 115],[23, 114],[24, 115],[25, 114],[26, 114],[27, 110]]) as Theme
 
 export const light_gold_active_Card = n452 as Theme
@@ -2586,6 +2634,7 @@ export const light_gold_active_TextArea = n458 as Theme
 const n459 = t([[12, 166],[13, 167],[14, 168],[15, 169],[16, 165],[17, 164],[18, 174],[19, 173],[20, 174],[21, 173],[22, 0],[23, 169],[24, 171],[25, 168],[26, 169],[27, 54]]) as Theme
 
 export const dark_orange_alt1_ListItem = n459 as Theme
+export const dark_orange_alt1_SideBar = n459 as Theme
 const n460 = t([[12, 167],[13, 168],[14, 169],[15, 171],[16, 166],[17, 165],[18, 174],[19, 173],[20, 174],[21, 173],[22, 174],[23, 171],[24, 54],[25, 169],[26, 171],[27, 171]]) as Theme
 
 export const dark_orange_alt1_Card = n460 as Theme
@@ -2619,6 +2668,7 @@ export const dark_orange_alt1_TextArea = n466 as Theme
 const n467 = t([[12, 167],[13, 168],[14, 169],[15, 171],[16, 166],[17, 165],[18, 173],[19, 172],[20, 173],[21, 172],[22, 174],[23, 171],[24, 54],[25, 169],[26, 171],[27, 171]]) as Theme
 
 export const dark_orange_alt2_ListItem = n467 as Theme
+export const dark_orange_alt2_SideBar = n467 as Theme
 const n468 = t([[12, 168],[13, 169],[14, 171],[15, 54],[16, 167],[17, 166],[18, 173],[19, 172],[20, 173],[21, 172],[22, 173],[23, 54],[24, 172],[25, 171],[26, 54],[27, 169]]) as Theme
 
 export const dark_orange_alt2_Card = n468 as Theme
@@ -2652,6 +2702,7 @@ export const dark_orange_alt2_TextArea = n474 as Theme
 const n475 = t([[12, 168],[13, 169],[14, 171],[15, 54],[16, 167],[17, 166],[19, 54],[20, 172],[21, 54],[22, 173],[23, 54],[24, 172],[25, 171],[26, 54],[27, 169]]) as Theme
 
 export const dark_orange_active_ListItem = n475 as Theme
+export const dark_orange_active_SideBar = n475 as Theme
 const n476 = t([[12, 169],[13, 171],[14, 54],[15, 172],[16, 168],[17, 167],[19, 54],[20, 172],[21, 54],[22, 172],[23, 172],[24, 173],[25, 54],[26, 172],[27, 168]]) as Theme
 
 export const dark_orange_active_Card = n476 as Theme
@@ -2685,6 +2736,7 @@ export const dark_orange_active_TextArea = n482 as Theme
 const n483 = t([[12, 210],[13, 211],[14, 212],[15, 213],[16, 209],[17, 208],[18, 218],[19, 217],[20, 218],[21, 217],[22, 0],[23, 213],[24, 215],[25, 212],[26, 213],[27, 102]]) as Theme
 
 export const dark_yellow_alt1_ListItem = n483 as Theme
+export const dark_yellow_alt1_SideBar = n483 as Theme
 const n484 = t([[12, 211],[13, 212],[14, 213],[15, 215],[16, 210],[17, 209],[18, 218],[19, 217],[20, 218],[21, 217],[22, 218],[23, 215],[24, 102],[25, 213],[26, 215],[27, 215]]) as Theme
 
 export const dark_yellow_alt1_Card = n484 as Theme
@@ -2718,6 +2770,7 @@ export const dark_yellow_alt1_TextArea = n490 as Theme
 const n491 = t([[12, 211],[13, 212],[14, 213],[15, 215],[16, 210],[17, 209],[18, 217],[19, 216],[20, 217],[21, 216],[22, 218],[23, 215],[24, 102],[25, 213],[26, 215],[27, 215]]) as Theme
 
 export const dark_yellow_alt2_ListItem = n491 as Theme
+export const dark_yellow_alt2_SideBar = n491 as Theme
 const n492 = t([[12, 212],[13, 213],[14, 215],[15, 102],[16, 211],[17, 210],[18, 217],[19, 216],[20, 217],[21, 216],[22, 217],[23, 102],[24, 216],[25, 215],[26, 102],[27, 213]]) as Theme
 
 export const dark_yellow_alt2_Card = n492 as Theme
@@ -2751,6 +2804,7 @@ export const dark_yellow_alt2_TextArea = n498 as Theme
 const n499 = t([[12, 212],[13, 213],[14, 215],[15, 102],[16, 211],[17, 210],[19, 102],[20, 216],[21, 102],[22, 217],[23, 102],[24, 216],[25, 215],[26, 102],[27, 213]]) as Theme
 
 export const dark_yellow_active_ListItem = n499 as Theme
+export const dark_yellow_active_SideBar = n499 as Theme
 const n500 = t([[12, 213],[13, 215],[14, 102],[15, 216],[16, 212],[17, 211],[19, 102],[20, 216],[21, 102],[22, 216],[23, 216],[24, 217],[25, 102],[26, 216],[27, 212]]) as Theme
 
 export const dark_yellow_active_Card = n500 as Theme
@@ -2784,6 +2838,7 @@ export const dark_yellow_active_TextArea = n506 as Theme
 const n507 = t([[12, 155],[13, 156],[14, 157],[15, 158],[16, 154],[17, 153],[18, 163],[19, 162],[20, 163],[21, 162],[22, 0],[23, 158],[24, 160],[25, 157],[26, 158],[27, 42]]) as Theme
 
 export const dark_green_alt1_ListItem = n507 as Theme
+export const dark_green_alt1_SideBar = n507 as Theme
 const n508 = t([[12, 156],[13, 157],[14, 158],[15, 160],[16, 155],[17, 154],[18, 163],[19, 162],[20, 163],[21, 162],[22, 163],[23, 160],[24, 42],[25, 158],[26, 160],[27, 160]]) as Theme
 
 export const dark_green_alt1_Card = n508 as Theme
@@ -2817,6 +2872,7 @@ export const dark_green_alt1_TextArea = n514 as Theme
 const n515 = t([[12, 156],[13, 157],[14, 158],[15, 160],[16, 155],[17, 154],[18, 162],[19, 161],[20, 162],[21, 161],[22, 163],[23, 160],[24, 42],[25, 158],[26, 160],[27, 160]]) as Theme
 
 export const dark_green_alt2_ListItem = n515 as Theme
+export const dark_green_alt2_SideBar = n515 as Theme
 const n516 = t([[12, 157],[13, 158],[14, 160],[15, 42],[16, 156],[17, 155],[18, 162],[19, 161],[20, 162],[21, 161],[22, 162],[23, 42],[24, 161],[25, 160],[26, 42],[27, 158]]) as Theme
 
 export const dark_green_alt2_Card = n516 as Theme
@@ -2850,6 +2906,7 @@ export const dark_green_alt2_TextArea = n522 as Theme
 const n523 = t([[12, 157],[13, 158],[14, 160],[15, 42],[16, 156],[17, 155],[19, 42],[20, 161],[21, 42],[22, 162],[23, 42],[24, 161],[25, 160],[26, 42],[27, 158]]) as Theme
 
 export const dark_green_active_ListItem = n523 as Theme
+export const dark_green_active_SideBar = n523 as Theme
 const n524 = t([[12, 158],[13, 160],[14, 42],[15, 161],[16, 157],[17, 156],[19, 42],[20, 161],[21, 42],[22, 161],[23, 161],[24, 162],[25, 42],[26, 161],[27, 157]]) as Theme
 
 export const dark_green_active_Card = n524 as Theme
@@ -2883,6 +2940,7 @@ export const dark_green_active_TextArea = n530 as Theme
 const n531 = t([[12, 133],[13, 134],[14, 135],[15, 136],[16, 132],[17, 131],[18, 141],[19, 140],[20, 141],[21, 140],[22, 0],[23, 136],[24, 138],[25, 135],[26, 136],[27, 22]]) as Theme
 
 export const dark_blue_alt1_ListItem = n531 as Theme
+export const dark_blue_alt1_SideBar = n531 as Theme
 const n532 = t([[12, 134],[13, 135],[14, 136],[15, 138],[16, 133],[17, 132],[18, 141],[19, 140],[20, 141],[21, 140],[22, 141],[23, 138],[24, 22],[25, 136],[26, 138],[27, 138]]) as Theme
 
 export const dark_blue_alt1_Card = n532 as Theme
@@ -2916,6 +2974,7 @@ export const dark_blue_alt1_TextArea = n538 as Theme
 const n539 = t([[12, 134],[13, 135],[14, 136],[15, 138],[16, 133],[17, 132],[18, 140],[19, 139],[20, 140],[21, 139],[22, 141],[23, 138],[24, 22],[25, 136],[26, 138],[27, 138]]) as Theme
 
 export const dark_blue_alt2_ListItem = n539 as Theme
+export const dark_blue_alt2_SideBar = n539 as Theme
 const n540 = t([[12, 135],[13, 136],[14, 138],[15, 22],[16, 134],[17, 133],[18, 140],[19, 139],[20, 140],[21, 139],[22, 140],[23, 22],[24, 139],[25, 138],[26, 22],[27, 136]]) as Theme
 
 export const dark_blue_alt2_Card = n540 as Theme
@@ -2949,6 +3008,7 @@ export const dark_blue_alt2_TextArea = n546 as Theme
 const n547 = t([[12, 135],[13, 136],[14, 138],[15, 22],[16, 134],[17, 133],[19, 22],[20, 139],[21, 22],[22, 140],[23, 22],[24, 139],[25, 138],[26, 22],[27, 136]]) as Theme
 
 export const dark_blue_active_ListItem = n547 as Theme
+export const dark_blue_active_SideBar = n547 as Theme
 const n548 = t([[12, 136],[13, 138],[14, 22],[15, 139],[16, 135],[17, 134],[19, 22],[20, 139],[21, 22],[22, 139],[23, 139],[24, 140],[25, 22],[26, 139],[27, 135]]) as Theme
 
 export const dark_blue_active_Card = n548 as Theme
@@ -2982,6 +3042,7 @@ export const dark_blue_active_TextArea = n554 as Theme
 const n555 = t([[12, 188],[13, 189],[14, 190],[15, 191],[16, 187],[17, 186],[18, 196],[19, 195],[20, 196],[21, 195],[22, 0],[23, 191],[24, 193],[25, 190],[26, 191],[27, 78]]) as Theme
 
 export const dark_purple_alt1_ListItem = n555 as Theme
+export const dark_purple_alt1_SideBar = n555 as Theme
 const n556 = t([[12, 189],[13, 190],[14, 191],[15, 193],[16, 188],[17, 187],[18, 196],[19, 195],[20, 196],[21, 195],[22, 196],[23, 193],[24, 78],[25, 191],[26, 193],[27, 193]]) as Theme
 
 export const dark_purple_alt1_Card = n556 as Theme
@@ -3015,6 +3076,7 @@ export const dark_purple_alt1_TextArea = n562 as Theme
 const n563 = t([[12, 189],[13, 190],[14, 191],[15, 193],[16, 188],[17, 187],[18, 195],[19, 194],[20, 195],[21, 194],[22, 196],[23, 193],[24, 78],[25, 191],[26, 193],[27, 193]]) as Theme
 
 export const dark_purple_alt2_ListItem = n563 as Theme
+export const dark_purple_alt2_SideBar = n563 as Theme
 const n564 = t([[12, 190],[13, 191],[14, 193],[15, 78],[16, 189],[17, 188],[18, 195],[19, 194],[20, 195],[21, 194],[22, 195],[23, 78],[24, 194],[25, 193],[26, 78],[27, 191]]) as Theme
 
 export const dark_purple_alt2_Card = n564 as Theme
@@ -3048,6 +3110,7 @@ export const dark_purple_alt2_TextArea = n570 as Theme
 const n571 = t([[12, 190],[13, 191],[14, 193],[15, 78],[16, 189],[17, 188],[19, 78],[20, 194],[21, 78],[22, 195],[23, 78],[24, 194],[25, 193],[26, 78],[27, 191]]) as Theme
 
 export const dark_purple_active_ListItem = n571 as Theme
+export const dark_purple_active_SideBar = n571 as Theme
 const n572 = t([[12, 191],[13, 193],[14, 78],[15, 194],[16, 190],[17, 189],[19, 78],[20, 194],[21, 78],[22, 194],[23, 194],[24, 195],[25, 78],[26, 194],[27, 190]]) as Theme
 
 export const dark_purple_active_Card = n572 as Theme
@@ -3081,6 +3144,7 @@ export const dark_purple_active_TextArea = n578 as Theme
 const n579 = t([[12, 177],[13, 178],[14, 179],[15, 180],[16, 176],[17, 175],[18, 185],[19, 184],[20, 185],[21, 184],[22, 0],[23, 180],[24, 182],[25, 179],[26, 180],[27, 66]]) as Theme
 
 export const dark_pink_alt1_ListItem = n579 as Theme
+export const dark_pink_alt1_SideBar = n579 as Theme
 const n580 = t([[12, 178],[13, 179],[14, 180],[15, 182],[16, 177],[17, 176],[18, 185],[19, 184],[20, 185],[21, 184],[22, 185],[23, 182],[24, 66],[25, 180],[26, 182],[27, 182]]) as Theme
 
 export const dark_pink_alt1_Card = n580 as Theme
@@ -3114,6 +3178,7 @@ export const dark_pink_alt1_TextArea = n586 as Theme
 const n587 = t([[12, 178],[13, 179],[14, 180],[15, 182],[16, 177],[17, 176],[18, 184],[19, 183],[20, 184],[21, 183],[22, 185],[23, 182],[24, 66],[25, 180],[26, 182],[27, 182]]) as Theme
 
 export const dark_pink_alt2_ListItem = n587 as Theme
+export const dark_pink_alt2_SideBar = n587 as Theme
 const n588 = t([[12, 179],[13, 180],[14, 182],[15, 66],[16, 178],[17, 177],[18, 184],[19, 183],[20, 184],[21, 183],[22, 184],[23, 66],[24, 183],[25, 182],[26, 66],[27, 180]]) as Theme
 
 export const dark_pink_alt2_Card = n588 as Theme
@@ -3147,6 +3212,7 @@ export const dark_pink_alt2_TextArea = n594 as Theme
 const n595 = t([[12, 179],[13, 180],[14, 182],[15, 66],[16, 178],[17, 177],[19, 66],[20, 183],[21, 66],[22, 184],[23, 66],[24, 183],[25, 182],[26, 66],[27, 180]]) as Theme
 
 export const dark_pink_active_ListItem = n595 as Theme
+export const dark_pink_active_SideBar = n595 as Theme
 const n596 = t([[12, 180],[13, 182],[14, 66],[15, 183],[16, 179],[17, 178],[19, 66],[20, 183],[21, 66],[22, 183],[23, 183],[24, 184],[25, 66],[26, 183],[27, 179]]) as Theme
 
 export const dark_pink_active_Card = n596 as Theme
@@ -3180,6 +3246,7 @@ export const dark_pink_active_TextArea = n602 as Theme
 const n603 = t([[12, 199],[13, 200],[14, 201],[15, 202],[16, 198],[17, 197],[18, 207],[19, 206],[20, 207],[21, 206],[22, 0],[23, 202],[24, 204],[25, 201],[26, 202],[27, 90]]) as Theme
 
 export const dark_red_alt1_ListItem = n603 as Theme
+export const dark_red_alt1_SideBar = n603 as Theme
 const n604 = t([[12, 200],[13, 201],[14, 202],[15, 204],[16, 199],[17, 198],[18, 207],[19, 206],[20, 207],[21, 206],[22, 207],[23, 204],[24, 90],[25, 202],[26, 204],[27, 204]]) as Theme
 
 export const dark_red_alt1_Card = n604 as Theme
@@ -3213,6 +3280,7 @@ export const dark_red_alt1_TextArea = n610 as Theme
 const n611 = t([[12, 200],[13, 201],[14, 202],[15, 204],[16, 199],[17, 198],[18, 206],[19, 205],[20, 206],[21, 205],[22, 207],[23, 204],[24, 90],[25, 202],[26, 204],[27, 204]]) as Theme
 
 export const dark_red_alt2_ListItem = n611 as Theme
+export const dark_red_alt2_SideBar = n611 as Theme
 const n612 = t([[12, 201],[13, 202],[14, 204],[15, 90],[16, 200],[17, 199],[18, 206],[19, 205],[20, 206],[21, 205],[22, 206],[23, 90],[24, 205],[25, 204],[26, 90],[27, 202]]) as Theme
 
 export const dark_red_alt2_Card = n612 as Theme
@@ -3246,6 +3314,7 @@ export const dark_red_alt2_TextArea = n618 as Theme
 const n619 = t([[12, 201],[13, 202],[14, 204],[15, 90],[16, 200],[17, 199],[19, 90],[20, 205],[21, 90],[22, 206],[23, 90],[24, 205],[25, 204],[26, 90],[27, 202]]) as Theme
 
 export const dark_red_active_ListItem = n619 as Theme
+export const dark_red_active_SideBar = n619 as Theme
 const n620 = t([[12, 202],[13, 204],[14, 90],[15, 205],[16, 201],[17, 200],[19, 90],[20, 205],[21, 90],[22, 205],[23, 205],[24, 206],[25, 90],[26, 205],[27, 201]]) as Theme
 
 export const dark_red_active_Card = n620 as Theme
@@ -3279,6 +3348,7 @@ export const dark_red_active_TextArea = n626 as Theme
 const n627 = t([[12, 221],[13, 222],[14, 223],[15, 224],[16, 220],[17, 219],[18, 229],[19, 228],[20, 229],[21, 228],[22, 0],[23, 224],[24, 226],[25, 223],[26, 224],[27, 114]]) as Theme
 
 export const dark_gold_alt1_ListItem = n627 as Theme
+export const dark_gold_alt1_SideBar = n627 as Theme
 const n628 = t([[12, 222],[13, 223],[14, 224],[15, 226],[16, 221],[17, 220],[18, 229],[19, 228],[20, 229],[21, 228],[22, 229],[23, 226],[24, 114],[25, 224],[26, 226],[27, 226]]) as Theme
 
 export const dark_gold_alt1_Card = n628 as Theme
@@ -3312,6 +3382,7 @@ export const dark_gold_alt1_TextArea = n634 as Theme
 const n635 = t([[12, 222],[13, 223],[14, 224],[15, 226],[16, 221],[17, 220],[18, 228],[19, 227],[20, 228],[21, 227],[22, 229],[23, 226],[24, 114],[25, 224],[26, 226],[27, 226]]) as Theme
 
 export const dark_gold_alt2_ListItem = n635 as Theme
+export const dark_gold_alt2_SideBar = n635 as Theme
 const n636 = t([[12, 223],[13, 224],[14, 226],[15, 114],[16, 222],[17, 221],[18, 228],[19, 227],[20, 228],[21, 227],[22, 228],[23, 114],[24, 227],[25, 226],[26, 114],[27, 224]]) as Theme
 
 export const dark_gold_alt2_Card = n636 as Theme
@@ -3345,6 +3416,7 @@ export const dark_gold_alt2_TextArea = n642 as Theme
 const n643 = t([[12, 223],[13, 224],[14, 226],[15, 114],[16, 222],[17, 221],[19, 114],[20, 227],[21, 114],[22, 228],[23, 114],[24, 227],[25, 226],[26, 114],[27, 224]]) as Theme
 
 export const dark_gold_active_ListItem = n643 as Theme
+export const dark_gold_active_SideBar = n643 as Theme
 const n644 = t([[12, 224],[13, 226],[14, 114],[15, 227],[16, 223],[17, 222],[19, 114],[20, 227],[21, 114],[22, 227],[23, 227],[24, 228],[25, 114],[26, 227],[27, 223]]) as Theme
 
 export const dark_gold_active_Card = n644 as Theme

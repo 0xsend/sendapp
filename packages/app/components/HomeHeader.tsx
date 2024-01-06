@@ -2,22 +2,23 @@ import { Anchor, Button, H1, Header, Link, XStack, useToastController, Text } fr
 import { useUser } from "app/utils/useUser";
 import { Copy } from "@tamagui/lucide-icons";
 import { getReferralHref } from "app/utils/getReferralLink";
-import { IconClose, IconSettings } from "./icons";
+import { IconClose, IconHamburger, IconSettings } from "./icons";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { IconStar } from "./icons/IconStar";
 
-
-
 export function HomeHeader({ children }: { children: string }) {
   return (
-    <Header w="100%" miw={804}>
-      <XStack jc="space-between" fd="column" ai="center" $gtSm={{ fd: 'row' }}>
+    <Header w="100%" $gtSm={{ miw: 804 }}>
+      <XStack jc="space-between" fd="row" ai="center">
         <H1 fontWeight={"100"}>{children}</H1>
-        <XStack $sm={{ display: "none" }} ai="center" space="$2" height="$4" $gtSm={{ fd: 'row' }}>
+        <XStack $lg={{ display: "none" }} ai="center" space="$2" height="$4" $gtSm={{ fd: 'row' }}>
           <ReferralCodeCard />
           <ReferralsCount />
           <SettingsButton />
           <WagmiAccountInfo />
+        </XStack>
+        <XStack $gtLg={{ display: "none" }} ai="center" space="$2" height="$4">
+          <Button bg="transparent" icon={<IconHamburger size={"$3"} />} />
         </XStack>
       </XStack>
     </Header >)

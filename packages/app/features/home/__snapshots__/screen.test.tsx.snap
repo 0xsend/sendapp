@@ -5,39 +5,19 @@ exports[`HomeScreen 1`] = `
   style={
     {
       "alignItems": "stretch",
-      "alignSelf": "center",
-      "flex": 1,
-      "flexDirection": "row",
-      "maxWidth": 1480,
+      "flexDirection": "column",
+      "paddingBottom": 60,
+      "paddingLeft": 60,
+      "paddingRight": 60,
+      "paddingTop": 60,
     }
   }
 >
-  <Text
-    accessibilityRole="header"
-    selectable={true}
-    style={
-      {
-        "color": "#fff",
-        "fontFamily": "System",
-        "fontSize": 46,
-        "fontWeight": "700",
-        "lineHeight": 50,
-        "marginBottom": 0,
-        "marginLeft": 0,
-        "marginRight": 0,
-        "marginTop": 0,
-        "textTransform": "none",
-      }
-    }
-    suppressHighlighting={true}
-  >
-    Home
-  </Text>
   <View
     style={
       {
         "alignItems": "stretch",
-        "flexDirection": "column",
+        "flexDirection": "row",
       }
     }
   >
@@ -60,152 +40,152 @@ exports[`HomeScreen 1`] = `
       }
       suppressHighlighting={true}
     >
-      Sign In
+      Dashboard
     </Text>
-    <View
-      pointerEvents="none"
-      style={
-        {
-          "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
-        }
+  </View>
+  <View
+    pointerEvents="none"
+    style={
+      {
+        "alignItems": "stretch",
+        "height": 18,
+        "minHeight": 18,
+        "minWidth": 18,
+        "width": 18,
       }
-    />
-    <View
-      accessibilityRole="button"
-      cancelable={true}
+    }
+  />
+  <View
+    accessibilityRole="button"
+    cancelable={true}
+    cursor="pointer"
+    focusable={[Function]}
+    minPressDuration={0}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    onPress={[Function]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#212121",
+        "borderBottomColor": "transparent",
+        "borderBottomLeftRadius": 9,
+        "borderBottomRightRadius": 9,
+        "borderBottomWidth": 1,
+        "borderLeftColor": "transparent",
+        "borderLeftWidth": 1,
+        "borderRightColor": "transparent",
+        "borderRightWidth": 1,
+        "borderStyle": "solid",
+        "borderTopColor": "transparent",
+        "borderTopLeftRadius": 9,
+        "borderTopRightRadius": 9,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "flexWrap": "nowrap",
+        "height": 44,
+        "justifyContent": "center",
+        "paddingLeft": 18,
+        "paddingRight": 18,
+      }
+    }
+  >
+    <Text
       cursor="pointer"
-      focusable={[Function]}
-      minPressDuration={0}
-      onBlur={[Function]}
-      onFocus={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
+      lineBreakMode="clip"
+      numberOfLines={1}
       style={
         {
-          "alignItems": "center",
-          "backgroundColor": "#212121",
-          "borderBottomColor": "transparent",
-          "borderBottomLeftRadius": 9,
-          "borderBottomRightRadius": 9,
-          "borderBottomWidth": 1,
-          "borderLeftColor": "transparent",
-          "borderLeftWidth": 1,
-          "borderRightColor": "transparent",
-          "borderRightWidth": 1,
-          "borderStyle": "solid",
-          "borderTopColor": "transparent",
-          "borderTopLeftRadius": 9,
-          "borderTopRightRadius": 9,
-          "borderTopWidth": 1,
-          "flexDirection": "row",
-          "flexWrap": "nowrap",
-          "height": 44,
-          "justifyContent": "center",
-          "paddingLeft": 18,
-          "paddingRight": 18,
+          "color": "#fff",
+          "flexGrow": 0,
+          "flexShrink": 1,
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
         }
       }
+      suppressHighlighting={true}
+      userSelect="none"
     >
-      <Text
-        cursor="pointer"
-        lineBreakMode="clip"
-        numberOfLines={1}
-        style={
-          {
-            "color": "#fff",
-            "flexGrow": 0,
-            "flexShrink": 1,
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "lineHeight": 19,
-          }
-        }
-        suppressHighlighting={true}
-        userSelect="none"
-      >
-        Create
-      </Text>
-    </View>
-    <View
-      pointerEvents="none"
-      style={
-        {
-          "alignItems": "stretch",
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
-        }
+      Create
+    </Text>
+  </View>
+  <View
+    pointerEvents="none"
+    style={
+      {
+        "alignItems": "stretch",
+        "height": 18,
+        "minHeight": 18,
+        "minWidth": 18,
+        "width": 18,
       }
-    />
-    <View
-      accessibilityRole="button"
-      cancelable={true}
+    }
+  />
+  <View
+    accessibilityRole="button"
+    cancelable={true}
+    cursor="pointer"
+    focusable={[Function]}
+    minPressDuration={0}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    onPress={[Function]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#212121",
+        "borderBottomColor": "transparent",
+        "borderBottomLeftRadius": 9,
+        "borderBottomRightRadius": 9,
+        "borderBottomWidth": 1,
+        "borderLeftColor": "transparent",
+        "borderLeftWidth": 1,
+        "borderRightColor": "transparent",
+        "borderRightWidth": 1,
+        "borderStyle": "solid",
+        "borderTopColor": "transparent",
+        "borderTopLeftRadius": 9,
+        "borderTopRightRadius": 9,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "flexWrap": "nowrap",
+        "height": 44,
+        "justifyContent": "center",
+        "paddingLeft": 18,
+        "paddingRight": 18,
+      }
+    }
+  >
+    <Text
       cursor="pointer"
-      focusable={[Function]}
-      minPressDuration={0}
-      onBlur={[Function]}
-      onFocus={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
+      lineBreakMode="clip"
+      numberOfLines={1}
       style={
         {
-          "alignItems": "center",
-          "backgroundColor": "#212121",
-          "borderBottomColor": "transparent",
-          "borderBottomLeftRadius": 9,
-          "borderBottomRightRadius": 9,
-          "borderBottomWidth": 1,
-          "borderLeftColor": "transparent",
-          "borderLeftWidth": 1,
-          "borderRightColor": "transparent",
-          "borderRightWidth": 1,
-          "borderStyle": "solid",
-          "borderTopColor": "transparent",
-          "borderTopLeftRadius": 9,
-          "borderTopRightRadius": 9,
-          "borderTopWidth": 1,
-          "flexDirection": "row",
-          "flexWrap": "nowrap",
-          "height": 44,
-          "justifyContent": "center",
-          "paddingLeft": 18,
-          "paddingRight": 18,
+          "color": "#fff",
+          "flexGrow": 0,
+          "flexShrink": 1,
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
         }
       }
+      suppressHighlighting={true}
+      userSelect="none"
     >
-      <Text
-        cursor="pointer"
-        lineBreakMode="clip"
-        numberOfLines={1}
-        style={
-          {
-            "color": "#fff",
-            "flexGrow": 0,
-            "flexShrink": 1,
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "lineHeight": 19,
-          }
-        }
-        suppressHighlighting={true}
-        userSelect="none"
-      >
-        Sign
-      </Text>
-    </View>
+      Sign
+    </Text>
   </View>
 </View>
 `;

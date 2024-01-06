@@ -13,7 +13,7 @@ import { HomeHeader } from 'app/components/HomeHeader'
 export function DistributionsScreen() {
   return (
     <Container>
-      <ScrollView f={3} fb={0}>
+      <ScrollView f={3} fb={0} backgroundColor={"$backgroundHover"}>
         <YStack gap="$6" pt="$5" pb="$8">
           <YStack gap="$8">
             <HomeHeader>Distributions</HomeHeader>
