@@ -10,9 +10,7 @@ import { IconArrowLeft, IconCopy } from "app/components/icons"
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const QRShareScreen = ({ setCurrentScreen }: IQRScreenProps) => {
-  const { transferState } = useTransferContext()
-
-  const { sendTo } = transferState
+  const { sendTo } = useTransferContext()
 
   const share_link = `send.app/${sendTo?.name.toLowerCase()}`
 

@@ -28,9 +28,7 @@ const CustomInput = styled(Input, {
 })
 
 export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { tags, requestTo } = transferState
+  const { tags, requestTo, setRequestTo } = useTransferContext()
 
   return (
     <YStack
@@ -72,7 +70,7 @@ export const ReceiveTagScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
             key={`tag-${tag.name}`}
             ai={'center'}
             gap={'$3.5'}
-            onPress={() => updateTransferContext({ requestTo: tag })}
+            onPress={() => setRequestTo(tag)}
           >
             <Image
               source={{ uri: tag.avatar }}

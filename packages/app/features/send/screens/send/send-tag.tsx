@@ -28,9 +28,7 @@ const CustomInput = styled(Input, {
 })
 
 export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { currentToken, sendAmount, sendTo, tags } = transferState
+  const { currentToken, sendAmount, sendTo, tags, setSendTo } = useTransferContext()
 
   return (
     <YStack
@@ -80,7 +78,7 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
             key={`tag-${tag.name}`}
             ai={'center'}
             gap={'$3.5'}
-            onPress={() => updateTransferContext({ sendTo: tag })}
+            onPress={() => setSendTo(tag)}
           >
             <Image
               source={{ uri: tag.avatar }}

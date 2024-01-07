@@ -14,19 +14,9 @@ import { RequestConfirmModal, SendConfirmModal } from 'app/features/send/compone
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const QRAmountScreen = ({ setCurrentScreen, sendOrRequest }: IQRScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { sendTo, sendAmount, requestAmount, requestTo } = transferState
+  const { sendTo, sendAmount, requestAmount, requestTo, setSendAmount, setRequestAmount } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
-
-  const setSendAmount = (val: string) => {
-    updateTransferContext({ sendAmount: val })
-  }
-
-  const setRequestAmount = (val: string) => {
-    updateTransferContext({ requestAmount: val })
-  }
 
   const to = sendOrRequest === 'Send' ? sendTo : requestTo
   const amount = sendOrRequest === 'Send' ? sendAmount : requestAmount

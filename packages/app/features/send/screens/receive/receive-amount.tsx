@@ -15,15 +15,9 @@ import { RequestConfirmModal } from 'app/features/send/components/modal'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
 
 export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { requestAmount, requestTo } = transferState
+  const { requestAmount, requestTo, setRequestAmount } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
-
-  const setRequestAmount = (val: string) => {
-    updateTransferContext({ requestAmount: val })
-  }
 
   return (
     <>

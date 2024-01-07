@@ -64,7 +64,7 @@ export interface IQRScreenProps {
   sendOrRequest?: 'Send' | 'Request'
 }
 
-export interface ITransferState {
+export interface ITransferContext {
   sendAmount: string
   requestAmount: string
   balance: number
@@ -73,11 +73,14 @@ export interface ITransferState {
   tags: ITag[]
   sendTo?: ITag
   requestTo?: ITag
-};
-
-export interface ITransferContext {
-  transferState: ITransferState;
-  updateTransferContext: (newState: Partial<ITransferState>) => void;
+  setSendAmount: (sendAmount: string) => void
+  setRequestAmount: (requestAmount: string) => void
+  setBalance: (balance: number) => void
+  setTokens: (tokens: IToken[]) => void
+  setCurrentToken: (currentToken: IToken) => void
+  setTags: (tags: ITag[]) => void
+  setSendTo: (sendTo: ITag) => void
+  setRequestTo: (requestTo: ITag) => void
 };
 
 export interface ITransferContextProviderProps {
