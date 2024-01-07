@@ -1,7 +1,7 @@
 BEGIN;
 
 -- Plan the number of tests to run
-SELECT plan(11);
+SELECT plan(12);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -265,6 +265,29 @@ SELECT isnt_empty(
           LIMIT 1
         ), tests.new_webauthn_credential(), 1
       ) $$, 'Create send account with credential'
+  );
+
+-- Test users can only create 1 send account
+SELECT throws_ok(
+    $$
+    SELECT public.create_send_account(
+        (
+          row(
+            gen_random_uuid(),
+            tests.get_supabase_uid('send_account_test_user'),
+            '0x1234567890ABCDEF1234567890ABCDEF12345678',
+            1,
+            '\\x00112233445566778899AABBCCDDEEFF',
+            now(),
+            now(),
+            NULL
+          )::send_accounts
+        ),
+        tests.new_webauthn_credential(),
+        0
+      ) $$,
+      'User can have at most 1 send account',
+      'User can have at most 1 send account'
   );
 
 -- Complete the tests
