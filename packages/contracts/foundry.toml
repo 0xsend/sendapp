@@ -13,11 +13,11 @@ via_ir = true
 
 [profile.mainnet]
 # should be updated after releases
-fork_block_number = 18537716
+fork_block_number = 18952309
 
 [profile.base]
 # should be updated after releases
-fork_block_number = 6427975
+fork_block_number = 8903308
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 
