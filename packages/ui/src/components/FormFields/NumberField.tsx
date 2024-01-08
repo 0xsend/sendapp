@@ -14,7 +14,6 @@ export const NumberField = (props: Pick<InputProps, 'size' | 'autoFocus'>) => {
   const themeName = useThemeName()
   const id = useId()
   const disabled = isSubmitting
-
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
