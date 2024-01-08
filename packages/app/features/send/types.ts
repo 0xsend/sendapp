@@ -52,6 +52,9 @@ export type ReceiveScreenType = 'home' | 'receive-qrcode' | 'receive-tag' | 'rec
 
 export type QRScreenType = 'home' | 'qr-scan' | 'qr-mycode' | 'qr-amount' | 'qr-share'
 
+export const ANIMATE_DIRECTION_LEFT = -1
+export const ANIMATE_DIRECTION_RIGHT = 1
+export type ANIMATE_DIRECTION = typeof ANIMATE_DIRECTION_LEFT | typeof ANIMATE_DIRECTION_RIGHT
 export interface ITransferContext {
   sendAmount: string
   requestAmount: string
@@ -73,7 +76,7 @@ export interface ITransferContext {
 
 export interface ISubScreenContext {
   currentComponent: QRScreenType | SendScreenType | ReceiveScreenType
-  direction: number
+  direction: ANIMATE_DIRECTION
   sendOrRequest: 'Send' | 'Request' | undefined
   setCurrentComponent: ([
     newScreen,
@@ -81,7 +84,7 @@ export interface ISubScreenContext {
     newSendOrRequest
   ]: [
       newScreen: QRScreenType | SendScreenType | ReceiveScreenType,
-      newDirection: number,
+      newDirection: ANIMATE_DIRECTION,
       newSendOrRequest?: 'Send' | 'Request'
     ]) => void
 }

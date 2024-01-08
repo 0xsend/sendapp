@@ -8,6 +8,7 @@ import { Link } from '@my/ui/src/components'
 import { Switch } from "app/features/send/components/switch"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
 import { useSubScreenContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_RIGHT } from "app/features/send/types"
 
 export const ReceiveQRCodeScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
@@ -54,7 +55,7 @@ export const ReceiveQRCodeScreen = () => {
         leftText={'Receive'}
         leftHandler={() => { }}
         rightText={'Request'}
-        rightHandler={() => setCurrentComponent(['receive-tag', 1])}
+        rightHandler={() => setCurrentComponent(['receive-tag', ANIMATE_DIRECTION_RIGHT])}
         active={'left'}
       />
       <Button

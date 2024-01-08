@@ -11,6 +11,7 @@ import { IconClose } from 'app/components/icons'
 import { NumPad } from 'app/features/send/components/numpad'
 import { RequestConfirmModal, SendConfirmModal } from 'app/features/send/components/modal'
 import { useTransferContext, useSubScreenContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
 
 export const QRAmountScreen = () => {
   const { setCurrentComponent, sendOrRequest } = useSubScreenContext()
@@ -86,7 +87,7 @@ export const QRAmountScreen = () => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentComponent(['qr-scan', -1])}
+          onPress={() => setCurrentComponent(['qr-scan', ANIMATE_DIRECTION_LEFT])}
         >
           <IconClose />
         </Button>

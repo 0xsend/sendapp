@@ -8,7 +8,7 @@ import {
 import { Link } from '@my/ui/src/components'
 import { useSubScreenContext, useTransferContext } from "app/features/send/providers"
 import { Switch } from "app/features/send/components/switch"
-import { IQRScreenProps } from "app/features/send/types"
+import { ANIMATE_DIRECTION_RIGHT } from "app/features/send/types"
 import { IconArrowLeft } from "app/components/icons"
 import { SendRequestModal } from "../../components/modal"
 
@@ -65,7 +65,7 @@ export const QRScanScreen = () => {
             leftText="Scan"
             rightText="My Code"
             leftHandler={() => { }}
-            rightHandler={() => setCurrentComponent(['qr-mycode', 1])}
+            rightHandler={() => setCurrentComponent(['qr-mycode', ANIMATE_DIRECTION_RIGHT])}
             active="left"
           />
         </YStack>

@@ -13,7 +13,7 @@ import {
 } from "@my/ui"
 import { useThemeSetting } from "@tamagui/next-theme"
 import { IconClose, IconQRCode, IconShare } from "app/components/icons"
-import { IProfileModalProps } from "app/features/send/types"
+import { ANIMATE_DIRECTION_RIGHT, IProfileModalProps } from "app/features/send/types"
 import { ProfileQRModal } from "./profile-qr-modal"
 import { useSubScreenContext } from "app/features/send/providers"
 
@@ -157,7 +157,7 @@ export const ProfileModal = ({
                     pos={'absolute'}
                     top={'$5'}
                     right={'$5'}
-                    onPress={() => setCurrentComponent(['qr-share', 1])}
+                    onPress={() => setCurrentComponent(['qr-share', ANIMATE_DIRECTION_RIGHT])}
                   >
                     <IconShare />
                   </Button>

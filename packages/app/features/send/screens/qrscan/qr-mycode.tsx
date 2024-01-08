@@ -8,6 +8,7 @@ import { Link } from '@my/ui/src/components'
 import { Switch } from "app/features/send/components/switch"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
 import { useSubScreenContext } from "app/features/send/providers"
+import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
 
 export const QRMyCodeScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
@@ -54,7 +55,7 @@ export const QRMyCodeScreen = () => {
       <Switch
         leftText="Scan"
         rightText="My Code"
-        leftHandler={() => setCurrentComponent(['qr-scan', -1])}
+        leftHandler={() => setCurrentComponent(['qr-scan', ANIMATE_DIRECTION_LEFT])}
         rightHandler={() => { }}
         active="right"
       />

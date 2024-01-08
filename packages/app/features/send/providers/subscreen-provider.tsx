@@ -1,5 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import {
+  ANIMATE_DIRECTION,
+  ANIMATE_DIRECTION_LEFT,
   ISubScreenContext,
   ISubScreenContextProviderProps,
   QRScreenType,
@@ -18,9 +20,9 @@ export const useSubScreenContext = () => {
 };
 
 export const SubScreenProvider = ({ children }: ISubScreenContextProviderProps) => {
-  const [[currentComponent, direction, sendOrRequest], setCurrentScreenState] = useState<
-    [QRScreenType | SendScreenType | ReceiveScreenType, number, 'Send' | 'Request' | undefined]
-  >(['home', -1, undefined]);
+  const [[currentComponent, direction, sendOrRequest], setCurrentComponentState] = useState<
+    [QRScreenType | SendScreenType | ReceiveScreenType, ANIMATE_DIRECTION, 'Send' | 'Request' | undefined]
+  >(['home', ANIMATE_DIRECTION_LEFT, undefined]);
 
   const setCurrentComponent = (
     [
@@ -29,10 +31,10 @@ export const SubScreenProvider = ({ children }: ISubScreenContextProviderProps) 
       newSendOrRequest
     ]: [
         newScreen: QRScreenType | SendScreenType | ReceiveScreenType,
-        newDirection: number,
+        newDirection: ANIMATE_DIRECTION,
         newSendOrRequest?: 'Send' | 'Request'
       ]) => {
-    setCurrentScreenState([newComponent, newDirection, newSendOrRequest]);
+    setCurrentComponentState([newComponent, newDirection, newSendOrRequest]);
   };
 
   const value: ISubScreenContext = {
