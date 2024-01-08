@@ -3,6 +3,8 @@ import { Database as DatabaseGenerated } from './database-generated.types'
 export type { Json } from './database-generated.types'
 import { PostgrestError } from '@supabase/supabase-js'
 
+export type PgBytea = `\\x${string}`
+
 export type Database = MergeDeep<
   DatabaseGenerated,
   {
@@ -12,10 +14,53 @@ export type Database = MergeDeep<
           Row: {
             address: `0x${string}`
           }
+          Insert: {
+            address: `0x${string}`
+          }
+          Update: {
+            address: `0x${string}`
+          }
         }
         distribution_shares: {
           Row: {
             address: `0x${string}`
+          }
+          Insert: {
+            address: `0x${string}`
+          }
+          Update: {
+            address: `0x${string}`
+          }
+        }
+        webauthn_credentials: {
+          Row: {
+            raw_credential_id: PgBytea
+            public_key: PgBytea
+            attestation_object: PgBytea
+          }
+          Insert: {
+            raw_credential_id: PgBytea
+            public_key: PgBytea
+            attestation_object: PgBytea
+          }
+          Update: {
+            raw_credential_id: PgBytea
+            public_key: PgBytea
+            attestation_object: PgBytea
+          }
+        }
+        send_accounts: {
+          Row: {
+            address: `0x${string}`
+            init_code: PgBytea
+          }
+          Insert: {
+            address: `0x${string}`
+            init_code: PgBytea
+          }
+          Update: {
+            address: `0x${string}`
+            init_code: PgBytea
           }
         }
       }

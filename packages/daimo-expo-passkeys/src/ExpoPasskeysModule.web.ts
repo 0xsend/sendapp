@@ -20,6 +20,7 @@ const ExpoPasskeysModuleWeb = {
     userIdBase64: string,
     challengeBase64: string
   ): Promise<{
+    credentialID: string
     rawClientDataJSON: string
     rawAttestationObject: string
   }> {
@@ -27,13 +28,6 @@ const ExpoPasskeysModuleWeb = {
 
     const userId = base64.decode(userIdBase64)
     const challenge = base64.decode(challengeBase64)
-
-    console.debug('[daimo-expo-passkeys] createPasskey', {
-      domain,
-      accountName,
-      userId,
-      challenge,
-    })
 
     // Prepare PublicKeyCredentialCreationOptions for WebAuthn
     const publicKeyCredentialCreationOptions = {
@@ -65,9 +59,8 @@ const ExpoPasskeysModuleWeb = {
       response: AuthenticatorAttestationResponse
     }
 
-    console.debug('[daimo-expo-passkeys] credential', credential)
-
     return {
+      credentialID: base64.encode(new Uint8Array(credential.rawId)),
       rawClientDataJSON: base64.encode(new Uint8Array(credential.response.clientDataJSON)),
       rawAttestationObject: base64.encode(new Uint8Array(credential.response.attestationObject)),
     }
@@ -97,8 +90,6 @@ const ExpoPasskeysModuleWeb = {
     })) as PublicKeyCredential & {
       response: AuthenticatorAssertionResponse
     }
-
-    console.debug('[daimo-expo-passkeys] assertion', assertion)
 
     // Extracting various parts of the assertion
     const decoder = new TextDecoder('utf-8')

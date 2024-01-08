@@ -15,7 +15,7 @@ import {
 } from './utils'
 import type ExpoPasskeysModuleWeb from './ExpoPasskeysModule.web'
 
-export { CreateRequest, CreateResult, SignRequest, SignResult }
+export type { CreateRequest, CreateResult, SignRequest, SignResult }
 
 /**
  * Create a new passkey.
@@ -30,7 +30,6 @@ export { CreateRequest, CreateResult, SignRequest, SignResult }
  */
 export async function createPasskey(request: CreateRequest): Promise<CreateResult> {
   const userIDB64 = base64.encode(new TextEncoder().encode(request.passkeyName))
-  console.log('createPasskey', { request, userIDB64 })
   switch (Platform.OS) {
     case 'ios': {
       const ret = await ExpoPasskeysModule.createPasskey(
@@ -40,6 +39,7 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
         request.challengeB64
       )
       return {
+        credentialIDB64: ret.credentialID,
         rawClientDataJSONB64: ret.rawClientDataJSON,
         rawAttestationObjectB64: ret.rawAttestationObject,
       }
@@ -48,6 +48,7 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
       const requestJSON = toAndroidCreateRequest(request, userIDB64)
       const ret = JSON.parse(await ExpoPasskeysModule.createPasskey(requestJSON))
       return {
+        credentialIDB64: toBase64(ret.rawId),
         rawClientDataJSONB64: toBase64(ret.response.clientDataJSON),
         rawAttestationObjectB64: toBase64(ret.response.attestationObject),
       }
@@ -61,6 +62,7 @@ export async function createPasskey(request: CreateRequest): Promise<CreateResul
       )
 
       return {
+        credentialIDB64: ret.credentialID,
         rawClientDataJSONB64: ret.rawClientDataJSON,
         rawAttestationObjectB64: ret.rawAttestationObject,
       }

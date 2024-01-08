@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "es2022"
+  },
+  "include": ["src", "wagmi.config.ts"]
+}

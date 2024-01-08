@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test'
 import path from 'path'
 import dotenv from 'dotenv-flow'
 
+// @ts-expect-error - set global __DEV__ variable to handle app react native imports
+globalThis.__DEV__ = false
+
 // load env vars
 dotenv.config({
   path: path.resolve(__dirname, '..', '..'),
@@ -9,7 +12,7 @@ dotenv.config({
 })
 
 // validate environment ensuring we aren't talking to prod or staging or something
-if (process.env.NEXT_PUBLIC_SUPABASE_URL !== 'http://localhost:54321') {
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('localhost')) {
   console.log(`
 
 NEXT_PUBLIC_SUPABASE_URL is ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Please update your environment to point to a local supabase instance.
