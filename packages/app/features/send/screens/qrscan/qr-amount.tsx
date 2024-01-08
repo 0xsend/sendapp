@@ -8,12 +8,12 @@ import {
   YStack,
 } from '@my/ui'
 import { IconClose } from 'app/components/icons'
-import { IQRScreenProps } from 'app/features/send/types'
 import { NumPad } from 'app/features/send/components/numpad'
 import { RequestConfirmModal, SendConfirmModal } from 'app/features/send/components/modal'
-import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { useTransferContext, useSubScreenContext } from 'app/features/send/providers'
 
-export const QRAmountScreen = ({ setCurrentScreen, sendOrRequest }: IQRScreenProps) => {
+export const QRAmountScreen = () => {
+  const { setCurrentComponent, sendOrRequest } = useSubScreenContext()
   const { sendTo, sendAmount, requestAmount, requestTo, setSendAmount, setRequestAmount } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
@@ -86,7 +86,7 @@ export const QRAmountScreen = ({ setCurrentScreen, sendOrRequest }: IQRScreenPro
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentScreen(['qr-scan', -1])}
+          onPress={() => setCurrentComponent(['qr-scan', -1])}
         >
           <IconClose />
         </Button>

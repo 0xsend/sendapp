@@ -4,12 +4,12 @@ import {
   XStack,
   YStack,
 } from "@my/ui"
-import { Link } from '@my/ui/src/components'
 import { IQRScreenProps } from "app/features/send/types"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
-import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { useTransferContext, useSubScreenContext } from 'app/features/send/providers'
 
-export const QRShareScreen = ({ setCurrentScreen }: IQRScreenProps) => {
+export const QRShareScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
   const { sendTo } = useTransferContext()
 
   const share_link = `send.app/${sendTo?.name.toLowerCase()}`
@@ -67,7 +67,7 @@ export const QRShareScreen = ({ setCurrentScreen }: IQRScreenProps) => {
         bg={'$backgroundTransparent'}
         ai={'center'}
         $shorter={{ top: '$size.4' }}
-        onPress={() => setCurrentScreen(['qr-scan', -1])}
+        onPress={() => setCurrentComponent(['qr-scan', -1])}
       >
         <IconArrowLeft />
       </Button>

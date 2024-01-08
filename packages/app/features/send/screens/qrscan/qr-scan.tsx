@@ -6,7 +6,7 @@ import {
   YStack,
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
-import { useTransferContext } from "app/features/send/providers"
+import { useSubScreenContext, useTransferContext } from "app/features/send/providers"
 import { Switch } from "app/features/send/components/switch"
 import { IQRScreenProps } from "app/features/send/types"
 import { IconArrowLeft } from "app/components/icons"
@@ -14,7 +14,8 @@ import { SendRequestModal } from "../../components/modal"
 
 // TODO: Replace background with camera screen
 
-export const QRScanScreen = ({ setCurrentScreen }: IQRScreenProps) => {
+export const QRScanScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
   const { sendTo, setSendTo, setRequestTo } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
@@ -64,7 +65,7 @@ export const QRScanScreen = ({ setCurrentScreen }: IQRScreenProps) => {
             leftText="Scan"
             rightText="My Code"
             leftHandler={() => { }}
-            rightHandler={() => setCurrentScreen(['qr-mycode', 1])}
+            rightHandler={() => setCurrentComponent(['qr-mycode', 1])}
             active="left"
           />
         </YStack>
@@ -86,7 +87,6 @@ export const QRScanScreen = ({ setCurrentScreen }: IQRScreenProps) => {
         showModal={showModal}
         setShowModal={setShowModal}
         to={sendTo}
-        setCurrentScreen={setCurrentScreen}
       />
     </>
   )

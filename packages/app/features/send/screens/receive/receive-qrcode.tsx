@@ -5,14 +5,12 @@ import {
   YStack,
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
-import { useThemeSetting } from "@tamagui/next-theme"
-import { IReceiveScreenProps } from "app/features/send/types"
 import { Switch } from "app/features/send/components/switch"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
+import { useSubScreenContext } from 'app/features/send/providers'
 
-export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { resolvedTheme } = useThemeSetting()
-
+export const ReceiveQRCodeScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
   const share_link = 'send.app/brother'
 
   return (
@@ -56,7 +54,7 @@ export const ReceiveQRCodeScreen = ({ setCurrentScreen }: IReceiveScreenProps) =
         leftText={'Receive'}
         leftHandler={() => { }}
         rightText={'Request'}
-        rightHandler={() => setCurrentScreen(['receive-tag', 1])}
+        rightHandler={() => setCurrentComponent(['receive-tag', 1])}
         active={'left'}
       />
       <Button

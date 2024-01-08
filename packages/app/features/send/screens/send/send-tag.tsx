@@ -13,8 +13,7 @@ import {
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
 import { IconClose, IconSearch } from "app/components/icons"
-import { ISendScreenProps } from "app/features/send/types"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
+import { useSubScreenContext, useTransferContext } from "app/features/send/providers"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -27,7 +26,8 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
+export const SendTagScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
   const { currentToken, sendAmount, sendTo, tags, setSendTo } = useTransferContext()
 
   return (
@@ -112,7 +112,7 @@ export const SendTagScreen = ({ setCurrentScreen }: ISendScreenProps) => {
           bc={'$backgroundTransparent'}
           boc={'$borderColorFocus'}
           width={'100%'}
-          onPress={() => setCurrentScreen(['send-it', 1])}
+          onPress={() => setCurrentComponent(['send-it', 1])}
         >
           <Paragraph size={'$6'} fontWeight={'700'}>
             Continue

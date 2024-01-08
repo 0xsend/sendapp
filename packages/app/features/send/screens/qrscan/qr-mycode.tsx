@@ -5,14 +5,12 @@ import {
   YStack,
 } from "@my/ui"
 import { Link } from '@my/ui/src/components'
-import { useThemeSetting } from "@tamagui/next-theme"
 import { Switch } from "app/features/send/components/switch"
-import { IQRScreenProps } from "app/features/send/types"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
+import { useSubScreenContext } from "app/features/send/providers"
 
-export const QRMyCodeScreen = ({ setCurrentScreen }: IQRScreenProps) => {
-  const { resolvedTheme } = useThemeSetting()
-
+export const QRMyCodeScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
   const share_link = 'send.app/brother'
 
   return (
@@ -56,7 +54,7 @@ export const QRMyCodeScreen = ({ setCurrentScreen }: IQRScreenProps) => {
       <Switch
         leftText="Scan"
         rightText="My Code"
-        leftHandler={() => setCurrentScreen(['qr-scan', -1])}
+        leftHandler={() => setCurrentComponent(['qr-scan', -1])}
         rightHandler={() => { }}
         active="right"
       />

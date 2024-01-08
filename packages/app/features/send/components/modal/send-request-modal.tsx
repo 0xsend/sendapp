@@ -17,14 +17,14 @@ import { ISendRequestModalProps } from "app/features/send/types"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { GradientButton } from "./GradientButton"
 import { ProfileModal } from "./profile-modal"
+import { useSubScreenContext } from "app/features/send/providers"
 
 export const SendRequestModal = ({
   showModal,
   setShowModal,
   to,
-  setCurrentScreen,
-  sendOrRequest
 }: ISendRequestModalProps) => {
+  const { setCurrentComponent } = useSubScreenContext()
   const { resolvedTheme } = useThemeSetting()
   const [showProfileModal, setShowProfileModal] = useState(false)
 
@@ -159,12 +159,12 @@ export const SendRequestModal = ({
                       borderRadius={'$6'}
                       iconHeight={12}
                       blackIcon
-                      onPress={() => setCurrentScreen(['qr-amount', 1, 'Send'])}
+                      onPress={() => setCurrentComponent(['qr-amount', 1, 'Send'])}
                     />
                     <GradientButton
                       height={'$5'}
                       borderRadius={'$6'}
-                      onPress={() => setCurrentScreen(['qr-amount', 1, 'Request'])}
+                      onPress={() => setCurrentComponent(['qr-amount', 1, 'Request'])}
                     >
                       <SizableText
                         size={'$5'}
@@ -212,7 +212,6 @@ export const SendRequestModal = ({
         showModal={showProfileModal}
         setShowModal={setShowProfileModal}
         tag={to}
-        setCurrentScreen={setCurrentScreen}
       />
     </>
   )

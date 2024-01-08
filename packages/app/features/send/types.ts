@@ -1,4 +1,5 @@
 import { ButtonProps } from "@my/ui"
+import React from "react"
 
 export interface INumPadProps {
   value: string
@@ -16,13 +17,13 @@ export interface IConfirmModalProps {
   setShowModal: (showModal: boolean) => void
 }
 
-export interface ISendRequestModalProps extends IQRScreenProps {
+export interface ISendRequestModalProps {
   showModal: boolean
   setShowModal: (showModal: boolean) => void
   to?: ITag
 }
 
-export interface IProfileModalProps extends IQRScreenProps {
+export interface IProfileModalProps {
   showModal: boolean
   setShowModal: (showModal: boolean) => void
   tag?: ITag
@@ -45,24 +46,11 @@ export interface ITag {
   avatar: string
 }
 
-export type SendScreenType = 'send' | 'send-tag' | 'send-it'
+export type SendScreenType = 'home' | 'send' | 'send-tag' | 'send-it'
 
-export type ReceiveScreenType = 'receive-qrcode' | 'receive-tag' | 'receive-amount'
+export type ReceiveScreenType = 'home' | 'receive-qrcode' | 'receive-tag' | 'receive-amount'
 
-export type QRScreenType = 'qr-scan' | 'qr-mycode' | 'qr-amount' | 'qr-share'
-
-export interface ISendScreenProps {
-  setCurrentScreen: ([currentScreen, direction]: [currentScreen: SendScreenType, direction: number]) => void
-}
-
-export interface IReceiveScreenProps {
-  setCurrentScreen: ([currentScreen, direction]: [currentScreen: ReceiveScreenType, direction: number]) => void
-}
-
-export interface IQRScreenProps {
-  setCurrentScreen: ([currentScreen, direction, sendOrRequest]: [currentScreen: QRScreenType, direction: number, sendOrRequest?: 'Send' | 'Request']) => void
-  sendOrRequest?: 'Send' | 'Request'
-}
+export type QRScreenType = 'home' | 'qr-scan' | 'qr-mycode' | 'qr-amount' | 'qr-share'
 
 export interface ITransferContext {
   sendAmount: string
@@ -83,6 +71,25 @@ export interface ITransferContext {
   setRequestTo: (requestTo: ITag) => void
 };
 
+export interface ISubScreenContext {
+  currentComponent: QRScreenType | SendScreenType | ReceiveScreenType
+  direction: number
+  sendOrRequest: 'Send' | 'Request' | undefined
+  setCurrentComponent: ([
+    newScreen,
+    newDirection,
+    newSendOrRequest
+  ]: [
+      newScreen: QRScreenType | SendScreenType | ReceiveScreenType,
+      newDirection: number,
+      newSendOrRequest?: 'Send' | 'Request'
+    ]) => void
+}
+
 export interface ITransferContextProviderProps {
   children: React.ReactNode;
 };
+
+export interface ISubScreenContextProviderProps {
+  children: React.ReactNode;
+}
