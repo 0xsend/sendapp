@@ -12,8 +12,8 @@ import { Link } from '@my/ui/src/components'
 import { IconBack, IconClose } from "app/components/icons"
 import { SendButton } from "app/components/layout/footer/components/SendButton"
 import { SendConfirmModal } from "app/features/send/components/modal"
-import { ISendScreenProps } from "app/features/send/types"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
+import { useTransferContext, useSubScreenContext } from "app/features/send/providers"
+import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -27,10 +27,9 @@ const CustomInput = styled(Input, {
   height: '$4.5'
 })
 
-export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { currentToken, sendAmount, sendTo } = transferState
+export const SendItScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
+  const { currentToken, sendAmount, sendTo } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
 
@@ -93,7 +92,7 @@ export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentScreen(['send-tag', -1])}
+          onPress={() => setCurrentComponent(['send-tag', ANIMATE_DIRECTION_LEFT])}
         >
           <IconBack />
         </Button>

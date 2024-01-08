@@ -6,17 +6,15 @@ import { useTransferContext } from "app/features/send/providers/transfer-provide
 import formatNumpadInput from "app/utils/formatNumpadInput"
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { balance, tokens, currentToken } = transferState
+  const { balance, tokens, currentToken, setCurrentToken } = useTransferContext()
 
   const numpadpressHandler = (input: string) => {
     setValue(formatNumpadInput(value, input, balance))
   }
 
-  const setCurrentToken = (value: string) => {
+  const updateCurrentToken = (value: string) => {
     const token = tokens.filter((tok) => tok.name.toLowerCase() === value)[0]
-    updateTransferContext({ currentToken: token })
+    setCurrentToken(token ?? currentToken)
   }
 
   return (
@@ -34,7 +32,7 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
         </H1>
       </XStack>
       <XStack jc={'space-between'} mt={'$2'}>
-        <Select items={tokens} currentItem={currentToken} onValueChange={setCurrentToken} />
+        <Select items={tokens} currentItem={currentToken} onValueChange={updateCurrentToken} />
         <XStack
           px={'$5'}
           py={'$2.5'}

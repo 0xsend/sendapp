@@ -7,10 +7,10 @@ const ArrowLeft = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 24 16"
       color={color as ColorTokens | undefined}
       width={size ?? 24}
-      height={size ?? 24}
+      height={size ?? 16}
       fill={'none'}
       {...rest}
     >

@@ -1,27 +1,33 @@
-import { useState } from 'react';
 import { MainScreen } from './send';
-import { SendTagScreen } from './send-tag';
+import { SendTagScreen } from "./send-tag";
 import { SendItScreen } from './send-it';
 import { SendScreenType } from 'app/features/send/types';
 import { AnimationLayout } from 'app/components/layout/animation-layout';
-import { TransferProvider } from 'app/features/send/providers';
+import {
+  SubScreenProvider,
+  TransferProvider,
+  useSubScreenContext
+} from 'app/features/send/providers';
 
 const screens = {
+  home: MainScreen,
   send: MainScreen,
   'send-tag': SendTagScreen,
   'send-it': SendItScreen,
 };
 
-export const SendScreen = () => {
-  const [[currentScreen, direction], setCurrentScreen] = useState<[SendScreenType, number]>(['send', -1]);
+const Screen = () => {
+  const { currentComponent, direction } = useSubScreenContext()
 
-  const ScreenComponent = screens[currentScreen];
+  const ScreenComponent = screens[currentComponent as SendScreenType];
 
   return (
     <TransferProvider>
-      <AnimationLayout currentKey={currentScreen} direction={direction}>
-        <ScreenComponent setCurrentScreen={setCurrentScreen} />
+      <AnimationLayout currentKey={currentComponent} direction={direction}>
+        <ScreenComponent />
       </AnimationLayout>
     </TransferProvider>
   );
 };
+
+export const SendScreen = () => <SubScreenProvider><Screen /></SubScreenProvider>

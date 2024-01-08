@@ -7,10 +7,10 @@ import {
 import { Link } from '@my/ui/src/components'
 import { Switch } from "app/features/send/components/switch"
 import { IconArrowLeft, IconCopy } from "app/components/icons"
-import { useSubScreenContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT } from "app/features/send/types"
+import { useSubScreenContext } from "app/features/send/providers"
+import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
 
-export const ReceiveQRCodeScreen = () => {
+export const QRMyCodeScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
   const share_link = 'send.app/brother'
 
@@ -34,7 +34,7 @@ export const ReceiveQRCodeScreen = () => {
           mr={'$2.5'}
           $shorter={{ fontSize: '$8' }}
         >
-          Receive
+          QR Code
         </SizableText>
       </XStack>
 
@@ -51,12 +51,13 @@ export const ReceiveQRCodeScreen = () => {
           <IconCopy />
         </XStack>
       </YStack>
+
       <Switch
-        leftText={'Receive'}
-        leftHandler={() => { }}
-        rightText={'Request'}
-        rightHandler={() => setCurrentComponent(['receive-tag', ANIMATE_DIRECTION_RIGHT])}
-        active={'left'}
+        leftText="Scan"
+        rightText="My Code"
+        leftHandler={() => setCurrentComponent(['qr-scan', ANIMATE_DIRECTION_LEFT])}
+        rightHandler={() => { }}
+        active="right"
       />
       <Button
         pos={'absolute'}
