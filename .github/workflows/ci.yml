@@ -62,7 +62,7 @@ jobs:
             sleep 1
           done
           echo tilt is ready
-          tilt wait --for=condition=Ready "uiresource/anvil:mainnet"
+          tilt wait --timeout 60s --for=condition=Ready "uiresource/anvil:mainnet" "uiresource/anvil:base" "uiresource/anvil:send-account-fixtures" "uiresource/aa_bundler:base"
           echo anvil is ready
           yarn playwright test
       - uses: actions/upload-artifact@v3
