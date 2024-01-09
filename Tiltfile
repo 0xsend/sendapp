@@ -279,6 +279,7 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
+    docker ps -a | grep aa-bundler | awk '{print $1}' | xargs docker rm -f
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
