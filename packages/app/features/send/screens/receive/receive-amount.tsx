@@ -1,17 +1,9 @@
-import { useState } from 'react'
-import {
-  Button,
-  Image,
-  Paragraph,
-  SizableText,
-  XStack,
-  YStack,
-} from '@my/ui'
-import { Link } from '@my/ui/src/components'
+import { Button, Image, Link, Paragraph, SizableText, XStack, YStack } from '@my/ui'
 import { IconClose } from 'app/components/icons'
-import { NumPad } from 'app/features/send/components/numpad'
 import { RequestConfirmModal } from 'app/features/send/components/modal'
+import { NumPad } from 'app/features/send/components/numpad'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { useState } from 'react'
 
 export const ReceiveAmountScreen = () => {
   const { requestAmount, requestTo, setRequestAmount } = useTransferContext()
@@ -29,7 +21,7 @@ export const ReceiveAmountScreen = () => {
         fullscreen
         $shorter={{
           pt: '$8',
-          pb: '$6'
+          pb: '$6',
         }}
       >
         <XStack alignSelf={'flex-start'} ai={'center'} gap={'$2'}>
@@ -40,7 +32,9 @@ export const ReceiveAmountScreen = () => {
             borderRadius={'$3'}
             mr={'$2.5'}
           />
-          <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>Request</SizableText>
+          <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>
+            Request
+          </SizableText>
           <SizableText
             color={'$primary'}
             fontSize={'$8'}
@@ -63,7 +57,7 @@ export const ReceiveAmountScreen = () => {
               $shorter={{
                 maw: '$18',
                 py: '$5',
-                br: '$7'
+                br: '$7',
               }}
               onPress={() => setShowModal(true)}
             >

@@ -1,14 +1,8 @@
-import {
-  Button,
-  SizableText,
-  XStack,
-  YStack,
-} from "@my/ui"
-import { Link } from '@my/ui/src/components'
-import { Switch } from "app/features/send/components/switch"
-import { IconArrowLeft, IconCopy } from "app/components/icons"
-import { useSubScreenContext } from "app/features/send/providers"
-import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
+import { Button, Link, SizableText, XStack, YStack } from '@my/ui'
+import { IconArrowLeft, IconCopy } from 'app/components/icons'
+import { Switch } from 'app/features/send/components/switch'
+import { useSubScreenContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_LEFT } from 'app/features/send/types'
 
 export const QRMyCodeScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
@@ -24,30 +18,22 @@ export const QRMyCodeScreen = () => {
       fullscreen
       $shorter={{
         pt: '$8',
-        pb: '$6'
+        pb: '$6',
       }}
     >
       <XStack jc={'center'}>
-        <SizableText
-          fontSize={'$9'}
-          fontWeight={'700'}
-          mr={'$2.5'}
-          $shorter={{ fontSize: '$8' }}
-        >
+        <SizableText fontSize={'$9'} fontWeight={'700'} mr={'$2.5'} $shorter={{ fontSize: '$8' }}>
           QR Code
         </SizableText>
       </XStack>
 
       <YStack ai={'center'}>
-        <XStack
-          width={330}
-          height={330}
-          backgroundColor={'$primary'}
-          mb={'$6'}
-        />
+        <XStack width={330} height={330} backgroundColor={'$primary'} mb={'$6'} />
         <SizableText theme={'alt1'}>Share your payment link</SizableText>
         <XStack ai={'center'} gap="$3">
-          <SizableText color={'$primary'} fontWeight={'700'}>{share_link}</SizableText>
+          <SizableText color={'$primary'} fontWeight={'700'}>
+            {share_link}
+          </SizableText>
           <IconCopy />
         </XStack>
       </YStack>
@@ -56,7 +42,7 @@ export const QRMyCodeScreen = () => {
         leftText="Scan"
         rightText="My Code"
         leftHandler={() => setCurrentComponent(['qr-scan', ANIMATE_DIRECTION_LEFT])}
-        rightHandler={() => { }}
+        rightHandler={() => {}}
         active="right"
       />
       <Button

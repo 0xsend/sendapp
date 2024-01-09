@@ -1,19 +1,10 @@
-import {
-  Button,
-  Image,
-  Input,
-  SizableText,
-  XStack,
-  YStack,
-  styled,
-} from "@my/ui"
-import { useState } from "react"
-import { Link } from '@my/ui/src/components'
-import { IconBack, IconClose } from "app/components/icons"
-import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { SendConfirmModal } from "app/features/send/components/modal"
-import { useTransferContext, useSubScreenContext } from "app/features/send/providers"
-import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
+import { Button, Image, Input, Link, SizableText, XStack, YStack, styled } from '@my/ui'
+import { IconBack, IconClose } from 'app/components/icons'
+import { SendButton } from 'app/components/layout/footer/components/SendButton'
+import { SendConfirmModal } from 'app/features/send/components/modal'
+import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_LEFT } from 'app/features/send/types'
+import { useState } from 'react'
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -24,7 +15,7 @@ const CustomInput = styled(Input, {
   fontSize: '$3',
   fontStyle: 'italic',
   width: '100%',
-  height: '$4.5'
+  height: '$4.5',
 })
 
 export const SendItScreen = () => {
@@ -42,15 +33,11 @@ export const SendItScreen = () => {
         fullscreen
         $shorter={{
           pt: '$8',
-          pb: '$6'
+          pb: '$6',
         }}
       >
         <XStack jc={'center'}>
-          <SizableText
-            fontSize={'$9'}
-            fontWeight={'700'}
-            $shorter={{ fontSize: '$8' }}
-          >
+          <SizableText fontSize={'$9'} fontWeight={'700'} $shorter={{ fontSize: '$8' }}>
             Send it 🚀
           </SizableText>
         </XStack>
@@ -64,15 +51,21 @@ export const SendItScreen = () => {
                 height={'$4.5'}
                 borderRadius={'$6'}
               />
-              <SizableText fontSize={'$8'} fontWeight={'700'} color={'$primary'}>{sendTo?.name}</SizableText>
+              <SizableText fontSize={'$8'} fontWeight={'700'} color={'$primary'}>
+                {sendTo?.name}
+              </SizableText>
             </XStack>
           </YStack>
           <YStack gap={'$5'}>
             <SizableText theme={'alt2'}>Amount</SizableText>
             <XStack ai={'center'}>
               {currentToken?.icon}
-              <SizableText fontSize={'$9'} ml={'$1.5'}>{currentToken?.name}</SizableText>
-              <SizableText fontSize={'$9'} fontWeight={'700'} ml={'$2'}>{sendAmount}</SizableText>
+              <SizableText fontSize={'$9'} ml={'$1.5'}>
+                {currentToken?.name}
+              </SizableText>
+              <SizableText fontSize={'$9'} fontWeight={'700'} ml={'$2'}>
+                {sendAmount}
+              </SizableText>
             </XStack>
           </YStack>
           <YStack gap={'$5'}>
