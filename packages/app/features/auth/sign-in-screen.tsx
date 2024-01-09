@@ -1,26 +1,26 @@
 import {
+  Anchor,
   Card,
   H4,
   Paragraph,
   SendLogo,
-  SubmitButton,
-  Theme,
-  YStack,
-  XStack,
   SendLogoComplete,
   SendLogoCompleteLight,
-  Anchor,
   SendLogoLight,
+  SubmitButton,
+  Theme,
+  XStack,
+  YStack,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { IconTelegramLogo, IconXLogo } from 'app/components/icons'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { VerifyCode } from './components/VerifyCode'
-import { useRouter } from 'solito/router'
-import { IconXLogo, IconTelegramLogo } from 'app/components/icons'
 
 const SignInSchema = z.object({
   countrycode: formFields.countrycode,
