@@ -1,14 +1,22 @@
-import { Button, Image, Link, Paragraph, SizableText, XStack, YStack } from '@my/ui'
+import { Button, Image, Paragraph, SizableText, XStack, YStack } from '@my/ui'
 import { IconClose } from 'app/components/icons'
-import { RequestConfirmModal } from 'app/features/send/components/modal'
+import { RequestConfirmModal, SendConfirmModal } from 'app/features/send/components/modal'
 import { NumPad } from 'app/features/send/components/numpad'
-import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_LEFT, QRScreen } from 'app/features/send/types'
 import { useState } from 'react'
 
-export const ReceiveAmountScreen = () => {
-  const { requestAmount, requestTo, setRequestAmount } = useTransferContext()
+export const QRAmountScreen = () => {
+  const { setCurrentComponent, sendOrRequest } = useSubScreenContext()
+  const { sendTo, sendAmount, requestAmount, requestTo, setSendAmount, setRequestAmount } =
+    useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
+
+  const to = sendOrRequest === 'Send' ? sendTo : requestTo
+  const amount = sendOrRequest === 'Send' ? sendAmount : requestAmount
+  const setAmount = sendOrRequest === 'Send' ? setSendAmount : setRequestAmount
+  const ConfirmModal = sendOrRequest === 'Send' ? SendConfirmModal : RequestConfirmModal
 
   return (
     <>
@@ -26,14 +34,14 @@ export const ReceiveAmountScreen = () => {
       >
         <XStack alignSelf={'flex-start'} ai={'center'} gap={'$2'}>
           <Image
-            source={{ uri: requestTo?.avatar }}
+            source={{ uri: to?.avatar }}
             width={'$2.5'}
             height={'$2.5'}
             borderRadius={'$3'}
             mr={'$2.5'}
           />
           <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>
-            Request
+            {sendOrRequest}
           </SizableText>
           <SizableText
             color={'$primary'}
@@ -41,11 +49,11 @@ export const ReceiveAmountScreen = () => {
             fontWeight={'700'}
             $shorter={{ fontSize: '$6' }}
           >
-            {requestTo?.name}
+            {to?.name}
           </SizableText>
         </XStack>
         <YStack maw={304} fg={1} $shorter={{ maw: '$18' }}>
-          <NumPad value={requestAmount} setValue={setRequestAmount} />
+          <NumPad value={amount} setValue={setAmount} />
           <YStack fg={1} jc={'flex-end'}>
             <Button
               py={'$6'}
@@ -75,13 +83,12 @@ export const ReceiveAmountScreen = () => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
+          onPress={() => setCurrentComponent([QRScreen.QR_SCAN, ANIMATE_DIRECTION_LEFT])}
         >
-          <Link href={'/'} display={'flex'}>
-            <IconClose />
-          </Link>
+          <IconClose />
         </Button>
       </YStack>
-      <RequestConfirmModal showModal={showModal} setShowModal={setShowModal} />
+      <ConfirmModal showModal={showModal} setShowModal={setShowModal} />
     </>
   )
 }

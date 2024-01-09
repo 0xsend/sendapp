@@ -1,22 +1,12 @@
-import {
-  Button,
-  Container,
-  Paragraph,
-  YStack,
-} from '@my/ui'
+import { Button, Container, Paragraph, YStack } from '@my/ui'
 import { MainLayout } from 'app/components/layout'
 import { NumPad } from 'app/features/send/components/numpad'
-import { ISendScreenProps } from 'app/features/send/types'
-import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_RIGHT, SendScreen } from 'app/features/send/types'
 
-export const MainScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { sendAmount } = transferState
-
-  const setSendAmount = (val: string) => {
-    updateTransferContext({ sendAmount: val })
-  }
+export const MainScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
+  const { sendAmount, setSendAmount } = useTransferContext()
 
   return (
     <>
@@ -35,9 +25,9 @@ export const MainScreen = ({ setCurrentScreen }: ISendScreenProps) => {
               $shorter={{
                 maw: '$18',
                 py: '$5',
-                br: '$7'
+                br: '$7',
               }}
-              onPress={() => setCurrentScreen(['send-tag', 1])}
+              onPress={() => setCurrentComponent([SendScreen.SEND_TAG, ANIMATE_DIRECTION_RIGHT])}
             >
               <Paragraph size={'$6'} fontWeight={'700'}>
                 Continue

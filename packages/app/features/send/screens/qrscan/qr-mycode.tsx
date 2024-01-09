@@ -2,9 +2,9 @@ import { Button, Link, SizableText, XStack, YStack } from '@my/ui'
 import { IconArrowLeft, IconCopy } from 'app/components/icons'
 import { Switch } from 'app/features/send/components/switch'
 import { useSubScreenContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT, ReceiveScreen } from 'app/features/send/types'
+import { ANIMATE_DIRECTION_LEFT, QRScreen } from 'app/features/send/types'
 
-export const ReceiveQRCodeScreen = () => {
+export const QRMyCodeScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
   const share_link = 'send.app/brother'
 
@@ -23,7 +23,7 @@ export const ReceiveQRCodeScreen = () => {
     >
       <XStack jc={'center'}>
         <SizableText fontSize={'$9'} fontWeight={'700'} mr={'$2.5'} $shorter={{ fontSize: '$8' }}>
-          Receive
+          QR Code
         </SizableText>
       </XStack>
 
@@ -37,14 +37,13 @@ export const ReceiveQRCodeScreen = () => {
           <IconCopy />
         </XStack>
       </YStack>
+
       <Switch
-        leftText={'Receive'}
-        leftHandler={() => {}}
-        rightText={'Request'}
-        rightHandler={() =>
-          setCurrentComponent([ReceiveScreen.RECEIVE_TAG, ANIMATE_DIRECTION_RIGHT])
-        }
-        active={'left'}
+        leftText="Scan"
+        rightText="My Code"
+        leftHandler={() => setCurrentComponent([QRScreen.QR_SCAN, ANIMATE_DIRECTION_LEFT])}
+        rightHandler={() => {}}
+        active="right"
       />
       <Button
         pos={'absolute'}

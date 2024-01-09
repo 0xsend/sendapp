@@ -1,7 +1,7 @@
 import { Button, ButtonProps } from "@my/ui"
 import { IconSendLogo } from "app/components/icons"
 
-export const SendButton = (props: ButtonProps) => {
+export const SendButton = ({ iconHeight, blackIcon, ...props }: ButtonProps & { iconHeight?: number, blackIcon?: boolean }) => {
   return (
     <Button
       br={'$6'}
@@ -13,7 +13,10 @@ export const SendButton = (props: ButtonProps) => {
       }}
       {...props}
     >
-      <IconSendLogo />
+      {blackIcon
+        ? <IconSendLogo size={iconHeight} color={'#161619'} />
+        : <IconSendLogo size={iconHeight} />
+      }
     </Button>
   )
 }
