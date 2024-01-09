@@ -1,13 +1,8 @@
-import {
-  Button,
-  Container,
-  Paragraph,
-  YStack,
-} from '@my/ui'
+import { Button, Container, Paragraph, YStack } from '@my/ui'
 import { MainLayout } from 'app/components/layout'
 import { NumPad } from 'app/features/send/components/numpad'
 import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT } from "app/features/send/types"
+import { ANIMATE_DIRECTION_RIGHT, SendScreen } from 'app/features/send/types'
 
 export const MainScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
@@ -30,9 +25,9 @@ export const MainScreen = () => {
               $shorter={{
                 maw: '$18',
                 py: '$5',
-                br: '$7'
+                br: '$7',
               }}
-              onPress={() => setCurrentComponent(['send-tag', ANIMATE_DIRECTION_RIGHT])}
+              onPress={() => setCurrentComponent([SendScreen.SEND_TAG, ANIMATE_DIRECTION_RIGHT])}
             >
               <Paragraph size={'$6'} fontWeight={'700'}>
                 Continue

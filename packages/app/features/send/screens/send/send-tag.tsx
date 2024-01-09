@@ -14,7 +14,7 @@ import {
 } from '@my/ui'
 import { IconClose, IconSearch } from 'app/components/icons'
 import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT } from 'app/features/send/types'
+import { ANIMATE_DIRECTION_RIGHT, SendScreen } from 'app/features/send/types'
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -90,7 +90,7 @@ export const SendTagScreen = () => {
           bc={'$backgroundTransparent'}
           boc={'$borderColorFocus'}
           width={'100%'}
-          onPress={() => setCurrentComponent(['send-it', ANIMATE_DIRECTION_RIGHT])}
+          onPress={() => setCurrentComponent([SendScreen.SEND_IT, ANIMATE_DIRECTION_RIGHT])}
         >
           <Paragraph size={'$6'} fontWeight={'700'}>
             Continue

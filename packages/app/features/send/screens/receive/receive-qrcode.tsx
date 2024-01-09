@@ -2,7 +2,7 @@ import { Button, Link, SizableText, XStack, YStack } from '@my/ui'
 import { IconArrowLeft, IconCopy } from 'app/components/icons'
 import { Switch } from 'app/features/send/components/switch'
 import { useSubScreenContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT } from 'app/features/send/types'
+import { ANIMATE_DIRECTION_RIGHT, ReceiveScreen } from 'app/features/send/types'
 
 export const ReceiveQRCodeScreen = () => {
   const { setCurrentComponent } = useSubScreenContext()
@@ -41,7 +41,9 @@ export const ReceiveQRCodeScreen = () => {
         leftText={'Receive'}
         leftHandler={() => {}}
         rightText={'Request'}
-        rightHandler={() => setCurrentComponent(['receive-tag', ANIMATE_DIRECTION_RIGHT])}
+        rightHandler={() =>
+          setCurrentComponent([ReceiveScreen.RECEIVE_TAG, ANIMATE_DIRECTION_RIGHT])
+        }
         active={'left'}
       />
       <Button

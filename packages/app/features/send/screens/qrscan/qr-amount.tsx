@@ -1,21 +1,15 @@
-import { useState } from 'react'
-import {
-  Button,
-  Image,
-  Paragraph,
-  SizableText,
-  XStack,
-  YStack,
-} from '@my/ui'
+import { Button, Image, Paragraph, SizableText, XStack, YStack } from '@my/ui'
 import { IconClose } from 'app/components/icons'
-import { NumPad } from 'app/features/send/components/numpad'
 import { RequestConfirmModal, SendConfirmModal } from 'app/features/send/components/modal'
-import { useTransferContext, useSubScreenContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_LEFT } from "app/features/send/types"
+import { NumPad } from 'app/features/send/components/numpad'
+import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_LEFT, QRScreen } from 'app/features/send/types'
+import { useState } from 'react'
 
 export const QRAmountScreen = () => {
   const { setCurrentComponent, sendOrRequest } = useSubScreenContext()
-  const { sendTo, sendAmount, requestAmount, requestTo, setSendAmount, setRequestAmount } = useTransferContext()
+  const { sendTo, sendAmount, requestAmount, requestTo, setSendAmount, setRequestAmount } =
+    useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
 
@@ -35,7 +29,7 @@ export const QRAmountScreen = () => {
         fullscreen
         $shorter={{
           pt: '$8',
-          pb: '$6'
+          pb: '$6',
         }}
       >
         <XStack alignSelf={'flex-start'} ai={'center'} gap={'$2'}>
@@ -46,7 +40,9 @@ export const QRAmountScreen = () => {
             borderRadius={'$3'}
             mr={'$2.5'}
           />
-          <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>{sendOrRequest}</SizableText>
+          <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>
+            {sendOrRequest}
+          </SizableText>
           <SizableText
             color={'$primary'}
             fontSize={'$8'}
@@ -69,7 +65,7 @@ export const QRAmountScreen = () => {
               $shorter={{
                 maw: '$18',
                 py: '$5',
-                br: '$7'
+                br: '$7',
               }}
               onPress={() => setShowModal(true)}
             >
@@ -87,7 +83,7 @@ export const QRAmountScreen = () => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentComponent(['qr-scan', ANIMATE_DIRECTION_LEFT])}
+          onPress={() => setCurrentComponent([QRScreen.QR_SCAN, ANIMATE_DIRECTION_LEFT])}
         >
           <IconClose />
         </Button>

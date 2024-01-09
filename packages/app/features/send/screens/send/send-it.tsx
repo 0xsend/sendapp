@@ -3,7 +3,7 @@ import { IconBack, IconClose } from 'app/components/icons'
 import { SendButton } from 'app/components/layout/footer/components/SendButton'
 import { SendConfirmModal } from 'app/features/send/components/modal'
 import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_LEFT } from 'app/features/send/types'
+import { ANIMATE_DIRECTION_LEFT, SendScreen } from 'app/features/send/types'
 import { useState } from 'react'
 
 const CustomInput = styled(Input, {
@@ -85,7 +85,7 @@ export const SendItScreen = () => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentComponent(['send-tag', ANIMATE_DIRECTION_LEFT])}
+          onPress={() => setCurrentComponent([SendScreen.SEND_TAG, ANIMATE_DIRECTION_LEFT])}
         >
           <IconBack />
         </Button>

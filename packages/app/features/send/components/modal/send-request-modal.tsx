@@ -1,4 +1,3 @@
-import { useState } from "react"
 import {
   Adapt,
   Button,
@@ -10,20 +9,17 @@ import {
   ThemeName,
   XStack,
   YStack,
-} from "@my/ui"
-import { useThemeSetting } from "@tamagui/next-theme"
-import { IconClose } from "app/components/icons"
-import { ANIMATE_DIRECTION_RIGHT, ISendRequestModalProps } from "app/features/send/types"
-import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { GradientButton } from "./GradientButton"
-import { ProfileModal } from "./profile-modal"
-import { useSubScreenContext } from "app/features/send/providers"
+} from '@my/ui'
+import { useThemeSetting } from '@tamagui/next-theme'
+import { IconClose } from 'app/components/icons'
+import { SendButton } from 'app/components/layout/footer/components/SendButton'
+import { useSubScreenContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_RIGHT, ISendRequestModalProps, QRScreen } from 'app/features/send/types'
+import { useState } from 'react'
+import { GradientButton } from './GradientButton'
+import { ProfileModal } from './profile-modal'
 
-export const SendRequestModal = ({
-  showModal,
-  setShowModal,
-  to,
-}: ISendRequestModalProps) => {
+export const SendRequestModal = ({ showModal, setShowModal, to }: ISendRequestModalProps) => {
   const { setCurrentComponent } = useSubScreenContext()
   const { resolvedTheme } = useThemeSetting()
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -40,11 +36,7 @@ export const SendRequestModal = ({
         >
           <Adapt when="sm" platform="touch">
             <Sheet animation="medium" zIndex={200000} modal snapPoints={[100]}>
-              <Sheet.Frame
-                p={'$5'}
-                backgroundColor={'$backgroundTransparent'}
-                jc={'center'}
-              >
+              <Sheet.Frame p={'$5'} backgroundColor={'$backgroundTransparent'} jc={'center'}>
                 <Adapt.Contents />
               </Sheet.Frame>
               <Sheet.Overlay
@@ -84,11 +76,15 @@ export const SendRequestModal = ({
               fullscreen
             >
               <YStack ai={'center'}>
-                <YStack backgroundColor={'$background'} p={'$7'} borderRadius={'$10'}
+                <YStack
+                  backgroundColor={'$background'}
+                  p={'$7'}
+                  borderRadius={'$10'}
                   $shorter={{
                     px: '$6',
                     py: '$5',
-                  }}>
+                  }}
+                >
                   <XStack jc={'space-between'}>
                     <Image
                       source={{ uri: to?.avatar }}
@@ -119,7 +115,7 @@ export const SendRequestModal = ({
                     fontSize={'$9'}
                     fontWeight={'700'}
                     $shorter={{
-                      mt: '$5'
+                      mt: '$5',
                     }}
                   >
                     {to?.name}
@@ -130,7 +126,7 @@ export const SendRequestModal = ({
                     fontSize={'$6'}
                     color={'$primary'}
                     $shorter={{
-                      mt: '$3'
+                      mt: '$3',
                     }}
                   >
                     @{to?.name.toLowerCase()}
@@ -142,7 +138,7 @@ export const SendRequestModal = ({
                     theme={'alt1'}
                     fontWeight={'400'}
                     $shorter={{
-                      mt: '$4'
+                      mt: '$4',
                     }}
                   >
                     Aooarels, Footwears, Sneakers, Boots, Shoes
@@ -151,7 +147,7 @@ export const SendRequestModal = ({
                     mt={'$7'}
                     gap={'$3.5'}
                     $shorter={{
-                      mt: '$5'
+                      mt: '$5',
                     }}
                   >
                     <SendButton
@@ -159,12 +155,20 @@ export const SendRequestModal = ({
                       borderRadius={'$6'}
                       iconHeight={12}
                       blackIcon
-                      onPress={() => setCurrentComponent(['qr-amount', ANIMATE_DIRECTION_RIGHT, 'Send'])}
+                      onPress={() =>
+                        setCurrentComponent([QRScreen.QR_AMOUNT, ANIMATE_DIRECTION_RIGHT, 'Send'])
+                      }
                     />
                     <GradientButton
                       height={'$5'}
                       borderRadius={'$6'}
-                      onPress={() => setCurrentComponent(['qr-amount', ANIMATE_DIRECTION_RIGHT, 'Request'])}
+                      onPress={() =>
+                        setCurrentComponent([
+                          QRScreen.QR_AMOUNT,
+                          ANIMATE_DIRECTION_RIGHT,
+                          'Request',
+                        ])
+                      }
                     >
                       <SizableText
                         size={'$5'}
@@ -182,7 +186,7 @@ export const SendRequestModal = ({
                       width={'100%'}
                       $shorter={{
                         py: '$5',
-                        br: '$7'
+                        br: '$7',
                       }}
                       onPress={() => setShowProfileModal(true)}
                     >
@@ -193,13 +197,7 @@ export const SendRequestModal = ({
                   </YStack>
                 </YStack>
                 <Dialog.Close asChild displayWhenAdapted>
-                  <Button
-                    size="$2.5"
-                    circular
-                    bg={'unset'}
-                    pos={'absolute'}
-                    bottom={'$-9'}
-                  >
+                  <Button size="$2.5" circular bg={'unset'} pos={'absolute'} bottom={'$-9'}>
                     <IconClose opacity={0.5} />
                   </Button>
                 </Dialog.Close>
@@ -208,11 +206,7 @@ export const SendRequestModal = ({
           </Dialog.Portal>
         </Dialog>
       </Theme>
-      <ProfileModal
-        showModal={showProfileModal}
-        setShowModal={setShowProfileModal}
-        tag={to}
-      />
+      <ProfileModal showModal={showProfileModal} setShowModal={setShowProfileModal} tag={to} />
     </>
   )
 }
