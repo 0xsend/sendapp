@@ -1,11 +1,11 @@
-import { FormWrapper, H2, H4, Paragraph, SubmitButton, Theme, YStack, XStack } from '@my/ui'
+import { FormWrapper, H2, H4, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
 import { MobileOtpType } from '@supabase/supabase-js'
+import { useThemeSetting } from '@tamagui/next-theme'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useThemeSetting } from '@tamagui/next-theme'
 
 const ConfirmSchema = z.object({
   token: formFields.text,
@@ -46,7 +46,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         props={{
           token: {
             'aria-label': 'One-time Password',
-            'placeholder': 'Code'
+            placeholder: 'Code',
+            borderColor: 'rgba(195, 171, 142, 0.6)',
+            borderWidth: 1,
           },
         }}
         renderAfter={({ submit }) => (
@@ -56,7 +58,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
                 <SubmitButton
                   onPress={() => submit()}
                   borderRadius="$4"
-                  backgroundColor={"$primary"}
+                  backgroundColor={'$primary'}
                   width={'$12'}
                   $sm={{ width: '$10' }}
                 >
@@ -79,12 +81,25 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         {(fields) => (
           <>
             <YStack gap="$3" mb="$5">
-              <H4 $sm={{ size: '$8' }} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>Confirm</H4>
-              <Paragraph theme="alt1" size={'$1'} color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}>
+              <H4
+                $sm={{ size: '$8' }}
+                color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
+              >
+                Confirm
+              </H4>
+              <Paragraph
+                theme="alt1"
+                size={'$1'}
+                color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}
+              >
                 Enter the code we sent you
               </Paragraph>
             </YStack>
-            <Paragraph size={'$1'} fontWeight={'500'} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>
+            <Paragraph
+              size={'$1'}
+              fontWeight={'500'}
+              color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
+            >
               Your Code
             </Paragraph>
             {Object.values(fields)}

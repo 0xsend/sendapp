@@ -17244,6 +17244,7 @@ __metadata:
     expo-constants: "npm:~14.4.2"
     expo-dev-client: "npm:~2.4.11"
     expo-font: "npm:~11.4.0"
+    expo-image-picker: "npm:~14.3.1"
     expo-linear-gradient: "npm:~12.3.0"
     expo-linking: "npm:~5.0.2"
     expo-router: "npm:^2.0.0"

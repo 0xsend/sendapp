@@ -1,15 +1,15 @@
 import {
-  getContract,
   GetContractArgs,
-  readContract,
+  PrepareWriteContractConfig,
   ReadContractConfig,
-  writeContract,
   WriteContractArgs,
+  WriteContractMode,
   WriteContractPreparedArgs,
   WriteContractUnpreparedArgs,
+  getContract,
   prepareWriteContract,
-  PrepareWriteContractConfig,
-  WriteContractMode,
+  readContract,
+  writeContract,
 } from 'wagmi/actions'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,9 +273,6 @@ export const daimoAccountABI = [
 // DaimoAccountFactory
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- *
- */
 export const daimoAccountFactoryABI = [
   {
     stateMutability: 'nonpayable',
@@ -349,21 +346,6 @@ export const daimoAccountFactoryABI = [
     outputs: [{ name: '', internalType: 'contract DaimoVerifier', type: 'address' }],
   },
 ] as const
-
-/**
- *
- */
-export const daimoAccountFactoryAddress = {
-  845337: '0xb722912027054bb1145c711426d404016a90BBF0',
-} as const
-
-/**
- *
- */
-export const daimoAccountFactoryConfig = {
-  address: daimoAccountFactoryAddress,
-  abi: daimoAccountFactoryABI,
-} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoEphemeralNotes
@@ -822,9 +804,6 @@ export const daimoPaymasterABI = [
 // DaimoVerifier
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- *
- */
 export const daimoVerifierABI = [
   { stateMutability: 'nonpayable', type: 'constructor', inputs: [] },
   {
@@ -936,25 +915,10 @@ export const daimoVerifierABI = [
   },
 ] as const
 
-/**
- *
- */
-export const daimoVerifierAddress = {
-  845337: '0x90ebcFFfc78297a5039491CFCb7B1675a4618BAc',
-} as const
-
-/**
- *
- */
-export const daimoVerifierConfig = { address: daimoVerifierAddress, abi: daimoVerifierABI } as const
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoVerifierProxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- *
- */
 export const daimoVerifierProxyABI = [
   {
     stateMutability: 'nonpayable',
@@ -988,21 +952,6 @@ export const daimoVerifierProxyABI = [
     name: 'Upgraded',
   },
 ] as const
-
-/**
- *
- */
-export const daimoVerifierProxyAddress = {
-  845337: '0x5ccF3633f2018D836db449071262B57e3882A762',
-} as const
-
-/**
- *
- */
-export const daimoVerifierProxyConfig = {
-  address: daimoVerifierProxyAddress,
-  abi: daimoVerifierProxyABI,
-} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Proxy
@@ -2642,7 +2591,7 @@ export function getDaimoAccount(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoAccount<
   TAbi extends readonly unknown[] = typeof daimoAccountABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoAccountABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2669,7 +2618,7 @@ export function writeDaimoAccount<TFunctionName extends string>(
  */
 export function prepareWriteDaimoAccount<
   TAbi extends readonly unknown[] = typeof daimoAccountABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoAccountABI,
@@ -2679,90 +2628,47 @@ export function prepareWriteDaimoAccount<
 
 /**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
- *
- *
  */
-export function getDaimoAccountFactory(
-  config: Omit<GetContractArgs, 'abi' | 'address'> & {
-    chainId?: keyof typeof daimoAccountFactoryAddress
-  }
-) {
-  return getContract({
-    abi: daimoAccountFactoryABI,
-    address: daimoAccountFactoryAddress[845337],
-    ...config,
-  })
+export function getDaimoAccountFactory(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: daimoAccountFactoryABI, ...config })
 }
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
- *
- *
  */
 export function readDaimoAccountFactory<
   TAbi extends readonly unknown[] = typeof daimoAccountFactoryABI,
-  TFunctionName extends string = string
->(
-  config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
-    chainId?: keyof typeof daimoAccountFactoryAddress
-  }
-) {
-  return readContract({
-    abi: daimoAccountFactoryABI,
-    address: daimoAccountFactoryAddress[845337],
-    ...config,
-  } as unknown as ReadContractConfig<TAbi, TFunctionName>)
+  TFunctionName extends string = string,
+>(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return readContract({ abi: daimoAccountFactoryABI, ...config } as unknown as ReadContractConfig<
+    TAbi,
+    TFunctionName
+  >)
 }
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
- *
- *
  */
-export function writeDaimoAccountFactory<
-  TFunctionName extends string,
-  TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof daimoAccountFactoryAddress
->(
+export function writeDaimoAccountFactory<TFunctionName extends string>(
   config:
-    | (Omit<
-        WriteContractPreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>,
-        'abi' | 'address'
-      > & {
-        mode: TMode
-        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoAccountFactoryAddress
-      })
-    | (Omit<
-        WriteContractUnpreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>,
-        'abi' | 'address'
-      > & {
-        mode: TMode
-        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoAccountFactoryAddress
-      })
+    | Omit<WriteContractPreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>, 'abi'>
+    | Omit<WriteContractUnpreparedArgs<typeof daimoAccountFactoryABI, TFunctionName>, 'abi'>
 ) {
-  return writeContract({
-    abi: daimoAccountFactoryABI,
-    address: daimoAccountFactoryAddress[845337],
-    ...config,
-  } as unknown as WriteContractArgs<typeof daimoAccountFactoryABI, TFunctionName>)
+  return writeContract({ abi: daimoAccountFactoryABI, ...config } as unknown as WriteContractArgs<
+    typeof daimoAccountFactoryABI,
+    TFunctionName
+  >)
 }
 
 /**
  * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link daimoAccountFactoryABI}__.
- *
- *
  */
 export function prepareWriteDaimoAccountFactory<
   TAbi extends readonly unknown[] = typeof daimoAccountFactoryABI,
-  TFunctionName extends string = string
->(
-  config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
-    chainId?: keyof typeof daimoAccountFactoryAddress
-  }
-) {
+  TFunctionName extends string = string,
+>(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoAccountFactoryABI,
-    address: daimoAccountFactoryAddress[845337],
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
@@ -2779,7 +2685,7 @@ export function getDaimoEphemeralNotes(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoEphemeralNotes<
   TAbi extends readonly unknown[] = typeof daimoEphemeralNotesABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoEphemeralNotesABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2806,7 +2712,7 @@ export function writeDaimoEphemeralNotes<TFunctionName extends string>(
  */
 export function prepareWriteDaimoEphemeralNotes<
   TAbi extends readonly unknown[] = typeof daimoEphemeralNotesABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoEphemeralNotesABI,
@@ -2826,7 +2732,7 @@ export function getDaimoNameRegistry(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoNameRegistry<
   TAbi extends readonly unknown[] = typeof daimoNameRegistryABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoNameRegistryABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2853,7 +2759,7 @@ export function writeDaimoNameRegistry<TFunctionName extends string>(
  */
 export function prepareWriteDaimoNameRegistry<
   TAbi extends readonly unknown[] = typeof daimoNameRegistryABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoNameRegistryABI,
@@ -2880,7 +2786,7 @@ export function getDaimoPaymaster(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoPaymaster<
   TAbi extends readonly unknown[] = typeof daimoPaymasterABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoPaymasterABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2907,7 +2813,7 @@ export function writeDaimoPaymaster<TFunctionName extends string>(
  */
 export function prepareWriteDaimoPaymaster<
   TAbi extends readonly unknown[] = typeof daimoPaymasterABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoPaymasterABI,
@@ -2917,103 +2823,56 @@ export function prepareWriteDaimoPaymaster<
 
 /**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoVerifierABI}__.
- *
- *
  */
-export function getDaimoVerifier(
-  config: Omit<GetContractArgs, 'abi' | 'address'> & { chainId?: keyof typeof daimoVerifierAddress }
-) {
-  return getContract({ abi: daimoVerifierABI, address: daimoVerifierAddress[845337], ...config })
+export function getDaimoVerifier(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: daimoVerifierABI, ...config })
 }
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierABI}__.
- *
- *
  */
 export function readDaimoVerifier<
   TAbi extends readonly unknown[] = typeof daimoVerifierABI,
-  TFunctionName extends string = string
->(
-  config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
-    chainId?: keyof typeof daimoVerifierAddress
-  }
-) {
-  return readContract({
-    abi: daimoVerifierABI,
-    address: daimoVerifierAddress[845337],
-    ...config,
-  } as unknown as ReadContractConfig<TAbi, TFunctionName>)
+  TFunctionName extends string = string,
+>(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
+  return readContract({ abi: daimoVerifierABI, ...config } as unknown as ReadContractConfig<
+    TAbi,
+    TFunctionName
+  >)
 }
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierABI}__.
- *
- *
  */
-export function writeDaimoVerifier<
-  TFunctionName extends string,
-  TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof daimoVerifierAddress
->(
+export function writeDaimoVerifier<TFunctionName extends string>(
   config:
-    | (Omit<
-        WriteContractPreparedArgs<typeof daimoVerifierABI, TFunctionName>,
-        'abi' | 'address'
-      > & {
-        mode: TMode
-        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoVerifierAddress
-      })
-    | (Omit<
-        WriteContractUnpreparedArgs<typeof daimoVerifierABI, TFunctionName>,
-        'abi' | 'address'
-      > & {
-        mode: TMode
-        chainId?: TMode extends 'prepared' ? TChainId : keyof typeof daimoVerifierAddress
-      })
+    | Omit<WriteContractPreparedArgs<typeof daimoVerifierABI, TFunctionName>, 'abi'>
+    | Omit<WriteContractUnpreparedArgs<typeof daimoVerifierABI, TFunctionName>, 'abi'>
 ) {
-  return writeContract({
-    abi: daimoVerifierABI,
-    address: daimoVerifierAddress[845337],
-    ...config,
-  } as unknown as WriteContractArgs<typeof daimoVerifierABI, TFunctionName>)
+  return writeContract({ abi: daimoVerifierABI, ...config } as unknown as WriteContractArgs<
+    typeof daimoVerifierABI,
+    TFunctionName
+  >)
 }
 
 /**
  * Wraps __{@link prepareWriteContract}__ with `abi` set to __{@link daimoVerifierABI}__.
- *
- *
  */
 export function prepareWriteDaimoVerifier<
   TAbi extends readonly unknown[] = typeof daimoVerifierABI,
-  TFunctionName extends string = string
->(
-  config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
-    chainId?: keyof typeof daimoVerifierAddress
-  }
-) {
+  TFunctionName extends string = string,
+>(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoVerifierABI,
-    address: daimoVerifierAddress[845337],
     ...config,
   } as unknown as PrepareWriteContractConfig<TAbi, TFunctionName>)
 }
 
 /**
  * Wraps __{@link getContract}__ with `abi` set to __{@link daimoVerifierProxyABI}__.
- *
- *
  */
-export function getDaimoVerifierProxy(
-  config: Omit<GetContractArgs, 'abi' | 'address'> & {
-    chainId?: keyof typeof daimoVerifierProxyAddress
-  }
-) {
-  return getContract({
-    abi: daimoVerifierProxyABI,
-    address: daimoVerifierProxyAddress[845337],
-    ...config,
-  })
+export function getDaimoVerifierProxy(config: Omit<GetContractArgs, 'abi'>) {
+  return getContract({ abi: daimoVerifierProxyABI, ...config })
 }
 
 /**
@@ -3042,7 +2901,7 @@ export function getErc20(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readErc20<
   TAbi extends readonly unknown[] = typeof erc20ABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: erc20ABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3069,7 +2928,7 @@ export function writeErc20<TFunctionName extends string>(
  */
 export function prepareWriteErc20<
   TAbi extends readonly unknown[] = typeof erc20ABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({ abi: erc20ABI, ...config } as unknown as PrepareWriteContractConfig<
     TAbi,
@@ -3089,7 +2948,7 @@ export function getErc20Snapshot(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readErc20Snapshot<
   TAbi extends readonly unknown[] = typeof erc20SnapshotABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: erc20SnapshotABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3116,7 +2975,7 @@ export function writeErc20Snapshot<TFunctionName extends string>(
  */
 export function prepareWriteErc20Snapshot<
   TAbi extends readonly unknown[] = typeof erc20SnapshotABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: erc20SnapshotABI,
@@ -3136,7 +2995,7 @@ export function getIEntryPoint(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readIEntryPoint<
   TAbi extends readonly unknown[] = typeof iEntryPointABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: iEntryPointABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3163,7 +3022,7 @@ export function writeIEntryPoint<TFunctionName extends string>(
  */
 export function prepareWriteIEntryPoint<
   TAbi extends readonly unknown[] = typeof iEntryPointABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: iEntryPointABI,
@@ -3197,7 +3056,7 @@ export function writeIMetaPaymaster<TFunctionName extends string>(
  */
 export function prepareWriteIMetaPaymaster<
   TAbi extends readonly unknown[] = typeof iMetaPaymasterABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: iMetaPaymasterABI,
@@ -3229,7 +3088,7 @@ export function getSend(
  */
 export function readSend<
   TAbi extends readonly unknown[] = typeof sendABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(
   config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendAddress
@@ -3251,7 +3110,7 @@ export function readSend<
 export function writeSend<
   TFunctionName extends string,
   TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof sendAddress
+  TChainId extends number = keyof typeof sendAddress,
 >(
   config:
     | (Omit<WriteContractPreparedArgs<typeof sendABI, TFunctionName>, 'abi' | 'address'> & {
@@ -3278,7 +3137,7 @@ export function writeSend<
  */
 export function prepareWriteSend<
   TAbi extends readonly unknown[] = typeof sendABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(
   config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendAddress
@@ -3349,7 +3208,7 @@ export function getSendMerkleDrop(
  */
 export function readSendMerkleDrop<
   TAbi extends readonly unknown[] = typeof sendMerkleDropABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(
   config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendMerkleDropAddress
@@ -3371,7 +3230,7 @@ export function readSendMerkleDrop<
 export function writeSendMerkleDrop<
   TFunctionName extends string,
   TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof sendMerkleDropAddress
+  TChainId extends number = keyof typeof sendMerkleDropAddress,
 >(
   config:
     | (Omit<
@@ -3404,7 +3263,7 @@ export function writeSendMerkleDrop<
  */
 export function prepareWriteSendMerkleDrop<
   TAbi extends readonly unknown[] = typeof sendMerkleDropABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(
   config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendMerkleDropAddress
@@ -3475,7 +3334,7 @@ export function writeSenderCreator<TFunctionName extends string>(
  */
 export function prepareWriteSenderCreator<
   TAbi extends readonly unknown[] = typeof senderCreatorABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: senderCreatorABI,
@@ -3495,7 +3354,7 @@ export function getTestUsdc(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readTestUsdc<
   TAbi extends readonly unknown[] = typeof testUsdcABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: testUsdcABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3522,7 +3381,7 @@ export function writeTestUsdc<TFunctionName extends string>(
  */
 export function prepareWriteTestUsdc<
   TAbi extends readonly unknown[] = typeof testUsdcABI,
-  TFunctionName extends string = string
+  TFunctionName extends string = string,
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: testUsdcABI,

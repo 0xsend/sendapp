@@ -1,9 +1,9 @@
+import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
 import { Fieldset, Input, InputProps, Label, Theme, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
-import { useThemeSetting } from '@tamagui/next-theme'
 
 export const TextField = (props: InputProps) => {
   const {
@@ -22,7 +22,7 @@ export const TextField = (props: InputProps) => {
       {/* flex 1 is needed to make the input fill the width of the parent in the case of a being in a container with flex direction row */}
       <Fieldset f={1}>
         {!!label && (
-          <Label size={props.size || '$3'} htmlFor={id}>
+          <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
             {label} {isOptional && '(Optional)'}
           </Label>
         )}

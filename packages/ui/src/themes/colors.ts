@@ -220,13 +220,13 @@ export const brandColors = {
   networkBase: '#2151F5',
   networkBnb: '#F0B90B',
   fiatOnRampBanner: '#FB36D0',
-  khaki900: "#9f7750",
-  khaki: "#C3B29E",
-  cinereous: "#1D1D20",
+  khaki900: '#9f7750',
+  khaki: '#C3B29E',
+  cinereous: '#1D1D20',
 }
 export const sendDark = {
   send1: '#C3AB8E',
-  send2: 'hsl(357, 34.4%, 12.0%)',
+  send2: '#FFFFFF',
   send3: '#1D1D20',
   send4: '#151515',
   send5: '#1D1D20',
@@ -241,7 +241,7 @@ export const sendDark = {
 
 export const send = {
   send1: '#C3AB8E',
-  send2: 'hsl(357, 34.4%, 12.0%)',
+  send2: '#000000',
   send3: '#fff',
   send4: '#151515',
   send5: '#1D1D20',
