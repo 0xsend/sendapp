@@ -17,7 +17,7 @@ export function HomeHeader({ children }: { children: string }) {
         <H1 fontWeight={'100'}>{children}</H1>
         <XStack $lg={{ display: 'none' }} ai="center" space="$2" height="$4" $gtSm={{ fd: 'row' }}>
           <ReferralCodeCard />
-          <ReferralsCount />
+          <PointsCount />
           <SettingsButton />
           <WagmiAccountInfo />
         </XStack>
@@ -77,7 +77,7 @@ function ReferralCodeCard() {
   )
 }
 
-function ReferralsCount() {
+function PointsCount() {
   const user = useUser()
   const referrals = 0
 
@@ -97,7 +97,7 @@ function ReferralsCount() {
     >
       <IconStar size={'$2'} color={'$goldVibrant'} />
       <Text color={'$goldVibrant'} fontSize={'$1'} fontWeight={'600'}>
-        {referrals}
+        {points}
       </Text>
     </XStack>
   )
