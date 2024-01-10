@@ -36,7 +36,7 @@ export const UploadAvatar = ({ children }: { children: React.ReactNode }) => {
       const base64Image = image.base64
 
       if (!base64Image) {
-        throw new Error('No image provided.')
+        throw new Error('No image provided. ')
       }
 
       const base64Str = base64Image.includes('base64,')
