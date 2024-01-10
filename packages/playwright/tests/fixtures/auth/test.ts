@@ -2,13 +2,13 @@ import { type BrowserContext, mergeTests, test as base } from '@playwright/test'
 import { test as ethereumTest } from '../ethereum'
 import { test as webauthnTest } from '../webauthn'
 
-import debug from 'debug'
-import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
-import { SupabaseClient, createClient } from '@supabase/supabase-js'
-import jwt, { type JwtPayload } from 'jsonwebtoken'
 import { Database } from '@my/supabase/database.types'
-import config from '../../../playwright.config'
+import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { countries } from 'app/utils/country'
+import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
+import debug from 'debug'
+import jwt, { type JwtPayload } from 'jsonwebtoken'
+import config from '../../../playwright.config'
 
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]

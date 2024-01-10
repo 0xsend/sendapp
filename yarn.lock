@@ -5619,6 +5619,7 @@ __metadata:
     extract-zip: "npm:^2.0.1"
     headless-web3-provider: "npm:^0.2.2"
     jsonwebtoken: "npm:^9.0.2"
+    permissionless: "npm:^0.0.21"
     viem: "npm:^1.21.1"
   languageName: unknown
   linkType: soft
@@ -25509,6 +25510,15 @@ __metadata:
   peerDependencies:
     viem: ^1.19.4
   checksum: d3ff09def0e2f1066dc2932ec9f3997fb680bb3e19d3426aaf75b109fb977b36c9f5ed78db138a4cb50ad0b3bf1c27a5385148cf692cd39e781424e3a1372e5c
+  languageName: node
+  linkType: hard
+
+"permissionless@npm:^0.0.21":
+  version: 0.0.21
+  resolution: "permissionless@npm:0.0.21"
+  peerDependencies:
+    viem: ^2.0.0
+  checksum: 76cec1b6e5cc698a8401a4716e49fc0eb53f002028841bd486b88ba9a79336550732478eae33b545d55458f427ed3ffb574ce151d288f41ea71a4853738f97d8
   languageName: node
   linkType: hard
 
