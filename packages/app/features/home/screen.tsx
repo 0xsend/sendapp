@@ -29,6 +29,7 @@ import {
 import { MainLayout } from 'app/components/layout'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { useState } from 'react'
+import { useRouter } from 'solito/router'
 import { Square } from 'tamagui'
 
 export function HomeScreen() {
@@ -41,8 +42,8 @@ export function HomeScreen() {
 
   const actionButtons = [
     { label: 'Deposit', iconPNGPath: <IconDeposit />, href: '/' },
-    { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/' },
-    { label: 'Send', iconPNGPath: <IconSendTile />, href: '/checkout' },
+    { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/receive' },
+    { label: 'Send', iconPNGPath: <IconSendTile />, href: '/send' },
   ]
   const balanceViewButtons = [
     { label: 'Ethereum', onPress: () => {} },
@@ -117,6 +118,10 @@ export function HomeScreen() {
       balance: 2.0,
     },
   ]
+  const navigateToScreen = (href: string) => {
+    window.location.href = href
+  }
+
   return (
     <>
       <MainLayout scrollable={true}>
@@ -277,6 +282,7 @@ export function HomeScreen() {
                       shadowOffset={{ width: 0, height: 4 }}
                       shadowRadius={8}
                       shadowOpacity={0.1}
+                      onPress={() => navigateToScreen(actionButton.href)}
                     >
                       <XStack f={1} alignItems={'center'} justifyContent={'center'} zIndex={2}>
                         {actionButton.iconPNGPath}
