@@ -54,10 +54,9 @@ export function userProtectedGetSSP<
     }
 
     if (
-      (sendAcctCount === 0 &&
-        ctx.req.url?.startsWith('/_next') &&
-        !ctx.req.url?.endsWith('onboarding.json')) ||
-      (!ctx.req.url?.startsWith('/_next') && !ctx.req.url?.endsWith('onboarding'))
+      sendAcctCount === 0 &&
+      ((ctx.req.url?.startsWith('/_next') && !ctx.req.url?.endsWith('onboarding.json')) ||
+        (!ctx.req.url?.startsWith('/_next') && !ctx.req.url?.endsWith('onboarding')))
     ) {
       log('no send accounts')
       return {
