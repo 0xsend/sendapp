@@ -10,10 +10,14 @@ import { assert } from 'app/utils/assert'
 import cbor from 'cbor'
 import { Hex, parseEther } from 'viem'
 import { expect, test } from './fixtures/auth'
+import { OnboardingPage } from './fixtures/send-accounts'
 import { baseMainnetClient, testBaseClient } from './fixtures/viem/base'
 
 // TODO: consider creating an onboarding page fixture
 test('can visit onboarding page', async ({ page, credentialsStore, supabase, authSession }) => {
+  const onboardingPage = new OnboardingPage(page)
+  await onboardingPage.completeOnboarding(expect)
+
   // assert passkey was created
   expect(Object.values(credentialsStore).length).toBe(1)
   const credential = Object.values(credentialsStore)[0]
@@ -49,7 +53,7 @@ test('can visit onboarding page', async ({ page, credentialsStore, supabase, aut
   // verify webauthn credential
   const webAuthnCred = sendAcct.webauthn_credentials[0]
   assert(!!webAuthnCred, 'Missing webauthn credential')
-  expect(webAuthnCred.display_name).toBe(acctName)
+  expect(webAuthnCred.display_name).toBe(onboardingPage.accountName)
   expect(webAuthnCred.name).toBe(`${authSession.decoded.sub}.0`)
   expect(webAuthnCred.raw_credential_id).toBe(`\\x${credential.id.toString('hex')}`)
   assert(!!attestation, 'Missing credential attestation')

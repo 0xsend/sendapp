@@ -1,22 +1,13 @@
 import { Page } from '@playwright/test'
 import { test as base } from '../auth'
+import { OnboardingPage } from './page'
 
 const sendAccountTest = base.extend<{
   page: Page
 }>({
   page: async ({ page, context, supabase }, use) => {
-    // TODO: create a send account directly with the API
-    const onboardingPage = await context.newPage()
-    await onboardingPage.goto('/')
-    expect(onboardingPage).toHaveURL('/onboarding') // no send accounts redirects to onboarding page
-
-    // choose a random account name
-    const acctName = `test-${Math.floor(Math.random() * 1000000)}`
-    await onboardingPage.getByRole('textbox', { name: 'Account name:' }).fill(acctName)
-    await expect(onboardingPage.getByLabel('Account name:')).toHaveValue(acctName)
-
-    await onboardingPage.getByRole('button', { name: 'Create' }).click()
-    await onboardingPage.getByRole('button', { name: 'Create' }).waitFor({ state: 'detached' })
+    const onboardingPage = new OnboardingPage(await context.newPage())
+    await onboardingPage.completeOnboarding(expect)
     const { count, error } = await supabase
       .from('send_accounts')
       .select('*', { count: 'exact' })
@@ -25,8 +16,7 @@ const sendAccountTest = base.extend<{
       throw error
     }
     expect(count).toBe(1)
-    await onboardingPage.close()
-
+    await onboardingPage.page.close()
     await use(page)
   },
 })
