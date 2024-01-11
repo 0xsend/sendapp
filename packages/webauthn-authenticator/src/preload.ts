@@ -1,13 +1,14 @@
 /**
  * This file is loaded in the browser before the tests are run. It mocks the WebAuthn API and exposes a WebAuthnAuthenticator object on the window.
  */
-import * as utils from './utils'
+import { base64urlnopad } from '@scure/base'
 import type {
   CredentialCreationOptionsSerialized,
   CredentialRequestOptionsSerialized,
 } from './types'
-import { type createPublicKeyCredential, type getPublicKeyCredential } from './web-authenticator'
-import { base64urlnopad } from '@scure/base'
+
+import * as utils from './utils'
+import type { Authenticator } from './web-authenticator'
 export { utils }
 
 /**
@@ -61,10 +62,8 @@ export function installWebAuthnMock({
       },
     } as CredentialCreationOptionsSerialized
 
-    // biome-ignore lint/suspicious/noExplicitAny: explicit any is needed here
-    const createCredFunc: typeof createPublicKeyCredential = (window as any)[
-      exposedCreateCredFuncName
-    ]
+    const createCredFunc: InstanceType<typeof Authenticator>['createPublicKeyCredential'] =
+      window[exposedCreateCredFuncName]
     if (!createCredFunc || typeof createCredFunc !== 'function') {
       throw new Error(`Missing ${exposedCreateCredFuncName} function. Did you forget to expose it?`)
     }
@@ -93,8 +92,8 @@ export function installWebAuthnMock({
       },
     } as CredentialRequestOptionsSerialized
 
-    // biome-ignore lint/suspicious/noExplicitAny: explicit any is needed here
-    const getCredFunc: typeof getPublicKeyCredential = (window as any)[exposedGetCredFuncName]
+    const getCredFunc: InstanceType<typeof Authenticator>['getPublicKeyCredential'] =
+      window[exposedGetCredFuncName]
     if (!getCredFunc || typeof getCredFunc !== 'function') {
       throw new Error(`Missing ${exposedGetCredFuncName} function. Did you forget to expose it?`)
     }

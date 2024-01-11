@@ -13,14 +13,14 @@ import { expect, test } from './fixtures/auth'
 import { OnboardingPage } from './fixtures/send-accounts'
 import { baseMainnetClient, testBaseClient } from './fixtures/viem/base'
 
-// TODO: consider creating an onboarding page fixture
-test('can visit onboarding page', async ({ page, credentialsStore, supabase, authSession }) => {
+test('can visit onboarding page', async ({ page, supabase, authSession, authenticator }) => {
   const onboardingPage = new OnboardingPage(page)
   await onboardingPage.completeOnboarding(expect)
 
   // assert passkey was created
-  expect(Object.values(credentialsStore).length).toBe(1)
-  const credential = Object.values(credentialsStore)[0]
+  const credentials = authenticator.credentials
+  expect(Object.values(credentials).length).toBe(1)
+  const credential = Object.values(credentials)[0]
   assert(!!credential, 'Missing credential')
   expect(credential.attestations.length).toBe(1)
 
