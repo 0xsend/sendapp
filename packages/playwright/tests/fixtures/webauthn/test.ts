@@ -1,10 +1,10 @@
-import { type BrowserContext, test as base, Page } from '@playwright/test'
 import {
-  CredentialsStore,
-  createPublicKeyCredential,
-  getPublicKeyCredential,
+  Authenticator,
+  CredentialCreationOptionsSerialized,
+  CredentialRequestOptionsSerialized,
 } from '@0xsend/webauthn-authenticator'
 import { type WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
+import { type BrowserContext, Page, test as base } from '@playwright/test'
 import debug from 'debug'
 
 let log: debug.Debugger
@@ -15,25 +15,37 @@ interface WebAuthnAuthenticatorWindow {
 
 // TODO: add a detereministic seed for the credential store
 export const test = base.extend<{
+  authenticator: Authenticator
   context: BrowserContext
   page: Page
-  credentialsStore: typeof CredentialsStore
 }>({
-  context: async ({ context }, use) => {
+  // biome-ignore lint/correctness/noEmptyPattern: empty pattern is required for test.extend
+  authenticator: ({}, use) => {
+    const authenticator = new Authenticator()
+    return use(authenticator)
+  },
+  context: async ({ context, authenticator }, use) => {
     log = debug(`test:fixtures:webauthn:${test.info().parallelIndex}`)
 
     log('context created')
 
-    const exposedCreateCredFuncName = `__${createPublicKeyCredential.name}`
-    const exposedGetCredFuncName = `__${getPublicKeyCredential.name}`
+    const exposedCreateCredFuncName = `__${authenticator.createPublicKeyCredential.name}`
+    const exposedGetCredFuncName = `__${authenticator.getPublicKeyCredential.name}`
 
     log('exposing functions', {
       exposedCreateCredFuncName,
       exposedGetCredFuncName,
     })
-    // TODO: just move all this to the preload script, handle crypto stuff there
-    await context.exposeFunction(exposedCreateCredFuncName, createPublicKeyCredential)
-    await context.exposeFunction(exposedGetCredFuncName, getPublicKeyCredential)
+
+    await context.exposeFunction(
+      exposedCreateCredFuncName,
+      async (args: CredentialCreationOptionsSerialized) =>
+        authenticator.createPublicKeyCredential(args)
+    )
+    await context.exposeFunction(
+      exposedGetCredFuncName,
+      async (args: CredentialRequestOptionsSerialized) => authenticator.getPublicKeyCredential(args)
+    )
 
     log('adding init script: preload.js', {
       path: require.resolve('@0xsend/webauthn-authenticator/dist/preload.js'),
@@ -83,9 +95,5 @@ export const test = base.extend<{
     )
 
     await use(page)
-  },
-  // biome-ignore lint/correctness/noEmptyPattern: empty pattern is needed here
-  credentialsStore: async ({}, use) => {
-    await use(CredentialsStore)
   },
 })
