@@ -21,10 +21,12 @@ import {
   useIsTouchDevice,
   useToastController,
 } from '@my/ui'
+import { sendRevenueSafeAddress } from '@my/wagmi'
 import { AlertTriangle, Clock, Info, X, XCircle } from '@tamagui/lucide-icons'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
+import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
 import React, { useEffect, useMemo } from 'react'
@@ -32,8 +34,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { PublicClient, formatEther, parseEther } from 'viem'
 import { z } from 'zod'
 import { ConfirmDialog } from './components/confirm-dialog'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
-import { sendRevenueSafeAddress } from '@my/wagmi'
 
 const CheckoutSchema = z.object({
   name: formFields.text
@@ -68,9 +68,8 @@ export function tagLengthToWei(length: number, isFirstTag = false) {
     default:
       if (isFirstTag) {
         return parseEther('0.005')
-      } else {
-        return parseEther('0.01')
       }
+      return parseEther('0.01')
   }
 }
 

@@ -1,7 +1,7 @@
-import type { Expect, Locator, Page } from '@playwright/test'
-import { Web3ProviderBackend, Web3RequestKind } from 'headless-web3-provider'
-import debug from 'debug'
 import path from 'path'
+import type { Expect, Locator, Page } from '@playwright/test'
+import debug from 'debug'
+import { Web3ProviderBackend, Web3RequestKind } from 'headless-web3-provider'
 
 const log = debug('test:fixtures:checkout:page')
 
@@ -9,7 +9,10 @@ export class CheckoutPage {
   public readonly pricingDialog: Locator
   public readonly confirmDialog: Locator
   public readonly submitTagButton: Locator
-  constructor(public readonly page: Page, public readonly wallet: Web3ProviderBackend) {
+  constructor(
+    public readonly page: Page,
+    public readonly wallet: Web3ProviderBackend
+  ) {
     this.pricingDialog = page.getByLabel('Send Tag Pricing')
     this.confirmDialog = page.getByLabel('Confirming Send Tags')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })

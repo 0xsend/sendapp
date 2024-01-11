@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { countries } from 'app/utils/country'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import debug from 'debug'
 
-let log: debug.Debugger | undefined
+let log: debug.Debugger
 
 test.beforeEach(async ({ page }) => {
   log = debug(`test:sign-in:${test.info().parallelIndex}`)
@@ -21,7 +21,7 @@ test('can login', async ({ page }) => {
   await page.getByLabel('One-time Password').fill('123456')
   await page.getByRole('button', { name: 'Verify' }).click()
   await page.waitForLoadState()
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/onboarding')
 })
 
 test('country code is selected based on geoip', async ({ page, context }) => {
@@ -43,9 +43,9 @@ test('country code is selected based on geoip', async ({ page, context }) => {
   await page.getByLabel('Phone number').fill(phone)
 
   // ensure that auth api receives the correct country code
-  await context.route(`${SUPABASE_URL}/**`, async (route) => {
-    log?.('route', route.request().url())
-    log?.('route', route.request().postDataJSON())
+  await context.route(`${SUPABASE_URL}/auth/v1/verify*`, async (route) => {
+    log('route', route.request().url())
+    log('route', route.request().postDataJSON())
     expect(route.request().postDataJSON().phone).toBe(`${country.dialCode}${phone}`)
     await route.fulfill({
       json: await route.fetch().then((res) => res.json()),
@@ -56,5 +56,5 @@ test('country code is selected based on geoip', async ({ page, context }) => {
   await page.getByLabel('One-time Password').fill('123456')
   await page.getByRole('button', { name: 'Verify' }).click()
   await page.waitForLoadState()
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/onboarding')
 })

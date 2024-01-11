@@ -219,6 +219,7 @@ function SendAccountUserOp() {
     if (!publicKey) {
       return
     }
+    // eslint-disable-next-line no-extra-semi
     ;(async () => {
       const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
 
