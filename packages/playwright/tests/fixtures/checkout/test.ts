@@ -1,5 +1,5 @@
-import { test as base } from '../auth/test'
 import debug from 'debug'
+import { test as base } from '../send-accounts'
 import { CheckoutPage } from './page'
 
 const log = debug('test:fixtures:auth:test')

@@ -22,6 +22,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "cbor": "^9.0.1"
+    "cbor": "^9.0.1",
+    "permissionless": "^0.0.21"
   }
 }
