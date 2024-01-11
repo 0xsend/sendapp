@@ -464,6 +464,7 @@ local_resource(
     "playwright:test",
     "yarn playwright test",
     allow_parallel = True,
+    auto_init = CI == True,
     labels = ["test"],
     resource_deps = ["next:web"],
     deps = files_matching(
