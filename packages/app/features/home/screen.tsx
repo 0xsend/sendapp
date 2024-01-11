@@ -51,6 +51,7 @@ export function HomeScreen() {
   ]
   const transactions = [
     {
+      id: 1,
       user: {
         sendTag: 'ethantree',
       },
@@ -71,6 +72,7 @@ export function HomeScreen() {
       created_on: '',
     },
     {
+      id: 2,
       user: {
         sendTag: 'You',
       },
@@ -81,6 +83,7 @@ export function HomeScreen() {
       created_on: '',
     },
     {
+      id: 3,
       user: {
         sendTag: 'You',
       },
@@ -159,12 +162,12 @@ export function HomeScreen() {
                         Total Balance
                       </Paragraph>
                       <XStack style={{ color: 'white' }}>
-                        <Paragraph color={'$light'} fontSize={'$6'} zIndex={1}>
+                        <Paragraph color={'white'} fontSize={'$6'} zIndex={1}>
                           {'$'}
                         </Paragraph>
                         <Paragraph
                           fontWeight={'700'}
-                          color={'$light'}
+                          color={'white'}
                           fontSize={'$10'}
                           lineHeight={'$8'}
                           zIndex={1}
@@ -172,7 +175,7 @@ export function HomeScreen() {
                         >
                           {USDollar.format(6990).replace('$', '').split('.')[0]}
                         </Paragraph>
-                        <Paragraph color={'$light'} fontSize={'$6'} zIndex={1}>
+                        <Paragraph color={'white'} fontSize={'$6'} zIndex={1}>
                           {'.00'}
                         </Paragraph>
                       </XStack>
@@ -272,7 +275,7 @@ export function HomeScreen() {
               {/* D-R-S Buttons */}
               <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$4'}>
                 {actionButtons.map((actionButton) => (
-                  <YStack f={1} w={'inherit'} gap={'$2'}>
+                  <YStack f={1} w={'inherit'} gap={'$2'} key={actionButton.label}>
                     <Card
                       f={1}
                       h={'$12'}
@@ -295,7 +298,7 @@ export function HomeScreen() {
                     </Card>
                     <Paragraph
                       textAlign={'center'}
-                      color={resolvedTheme?.startsWith('dark') ? '$primary' : ''}
+                      color={resolvedTheme?.startsWith('dark') ? '$primary' : '#050505'}
                     >
                       {actionButton.label}
                     </Paragraph>
@@ -307,6 +310,7 @@ export function HomeScreen() {
                 {balanceViewButtons.map((balanceViewButton) => {
                   return (
                     <Button
+                      key={balanceViewButton.label}
                       f={1}
                       br={'$radius.true'}
                       bw={'$0.5'}
@@ -333,6 +337,7 @@ export function HomeScreen() {
                 </XStack>
                 {transactions.map((transaction) => (
                   <Card
+                    key={transaction.id}
                     h={'$6'}
                     borderRadius={'$4'}
                     shadowColor={'rgba(0, 0, 0, 0.1)'}

@@ -551,7 +551,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "$light",
+                            "color": "white",
                             "fontFamily": "System",
                             "fontSize": 21.599999999999998,
                             "fontWeight": "400",
@@ -567,7 +567,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "$light",
+                            "color": "white",
                             "fontFamily": "System",
                             "fontSize": 55.199999999999996,
                             "fontWeight": "700",
@@ -587,7 +587,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "$light",
+                            "color": "white",
                             "fontFamily": "System",
                             "fontSize": 21.599999999999998,
                             "fontWeight": "400",
@@ -823,7 +823,7 @@ exports[`HomeScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "",
+                      "color": "#050505",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
@@ -991,7 +991,7 @@ exports[`HomeScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "",
+                      "color": "#050505",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
@@ -1159,7 +1159,7 @@ exports[`HomeScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "",
+                      "color": "#050505",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
