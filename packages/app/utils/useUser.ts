@@ -50,7 +50,7 @@ export const useUser = () => {
     },
   })
 
-  const avatarUrl = (function () {
+  const avatarUrl = (() => {
     if (profile?.avatar_url) return profile.avatar_url
     if (typeof user?.user_metadata.avatar_url === 'string') return user.user_metadata.avatar_url
 
@@ -61,42 +61,19 @@ export const useUser = () => {
     return `https://ui-avatars.com/api.jpg?${params.toString()}`
   })()
 
-  const {
-    data: referrals,
-    isLoading: isLoadingReferrals,
-    refetch: refetchReferrals,
-  } = useQuery(['referrals'], {
-    queryFn: async () => {
-      if (!user?.id) return null
-      const { data, error } = await supabase.from('referrals').select('*').eq('referrer_id', user.id)
-
-      if (error) {
-        // no rows
-        if (error.code === 'PGRST116') {
-          return []
-        }
-        throw new Error(error.message)
-      }
-      return data
-    },
-  })
-
-
   return {
     session,
     user,
     profile,
     avatarUrl,
     tags,
-    referrals,
-    updateProfile: () => refetch().then(() => {
-      refetchTags()
-      refetchReferrals()
-    }),
+    updateProfile: () =>
+      refetch().then(() => {
+        refetchTags()
+      }),
     isLoadingSession,
     isLoadingProfile,
     isLoadingTags,
-    isLoadingReferrals,
-    isLoading: isLoadingSession || isLoadingProfile || isLoadingTags || isLoadingReferrals,
+    isLoading: isLoadingSession || isLoadingProfile || isLoadingTags,
   }
 }
