@@ -208,7 +208,7 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
                             </SizableText>
                           )}
                           {Number(sendBalanceData?.value ?? BigInt(0)) <
-                            distribution.hodler_min_balance ? (
+                          distribution.hodler_min_balance ? (
                             <SizableText>
                               Your balance is below the minimum required to qualify for rewards.{' '}
                               {formatAmount(distribution.hodler_min_balance, 9, 0)} send required.
