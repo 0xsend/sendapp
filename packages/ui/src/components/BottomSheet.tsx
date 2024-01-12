@@ -1,11 +1,11 @@
-import { Sheet, SheetProps } from "@my/ui";
+import { Sheet, SheetProps } from 'tamagui'
 
 export const BottomSheet = ({ children, ...props }: SheetProps) => {
   return (
-    <Sheet {...props} modal animation={"quick"} dismissOnSnapToBottom>
+    <Sheet {...props} modal animation={'quick'} dismissOnSnapToBottom>
       <Sheet.Overlay />
       <Sheet.Handle />
-      <Sheet.Frame px="$6" zIndex={1} justifyContent="space-around" alignItems="center" >
+      <Sheet.Frame px="$6" zIndex={1} justifyContent="space-around" alignItems="center">
         {children}
       </Sheet.Frame>
     </Sheet>

@@ -1,4 +1,4 @@
-import { YStack, YStackProps } from '@my/ui'
+import { YStack, YStackProps } from 'tamagui'
 
 export const SideBar = ({ children, ...props }: { children?: React.ReactNode } & YStackProps) => {
   return (
