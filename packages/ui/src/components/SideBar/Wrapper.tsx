@@ -1,8 +1,11 @@
-import { XStack, YStackProps, XStackProps } from "@my/ui";
-import { ReactElement } from "react";
+import { ReactElement } from 'react'
+import { XStack, XStackProps, YStackProps } from 'tamagui'
 
-
-export const SideBarWrapper = ({ children, sidebar, ...props }: { children?: React.ReactNode, sidebar: ReactElement<YStackProps> } & XStackProps) => {
+export const SideBarWrapper = ({
+  children,
+  sidebar,
+  ...props
+}: { children?: ReactElement; sidebar: ReactElement<YStackProps> } & XStackProps) => {
   return (
     <XStack {...props}>
       {sidebar}
