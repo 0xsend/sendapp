@@ -1,11 +1,9 @@
 import { Anchor, Button, H1, Header, Link, Text, XStack, useToastController } from '@my/ui'
-import { Copy } from '@tamagui/lucide-icons'
 import { useNav } from 'app/routers/params'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { IconClose, IconHamburger, IconSettings } from './icons'
-import { IconStar } from './icons/IconStar'
+import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from './icons'
 
 export function HomeHeader({ children }: { children: string }) {
   const [nav, setNavParam] = useNav()
@@ -58,7 +56,7 @@ function ReferralCodeCard() {
       </Anchor>
       <Button
         size="$2"
-        icon={<Copy />}
+        icon={<IconCopy />}
         // @ts-expect-error tamagui doesn't support this yet
         type="button"
         onPress={() => {
