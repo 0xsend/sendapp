@@ -37,6 +37,10 @@ jest.mock('solito/link', () => ({
   Link: jest.fn(),
 }))
 
+jest.mock('app/utils/UseUserReferralsCount', () => ({
+  useUserReferralsCount: jest.fn().mockReturnValue(123),
+}))
+
 test('HomeScreen', () => {
   const tree = render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>

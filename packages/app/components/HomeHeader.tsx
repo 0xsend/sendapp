@@ -1,5 +1,6 @@
 import { Anchor, Button, H1, Header, Link, Text, XStack, useToastController } from '@my/ui'
 import { useNav } from 'app/routers/params'
+import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
@@ -78,8 +79,8 @@ function ReferralCodeCard() {
 }
 
 function PointsCount() {
-  const user = useUser()
-  const referrals = 0
+  const { referralsCount, error } = useUserReferralsCount()
+  const points = error ? '?' : referralsCount || 0
 
   return (
     <XStack
