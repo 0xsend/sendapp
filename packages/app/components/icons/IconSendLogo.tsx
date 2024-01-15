@@ -1,10 +1,9 @@
-import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
 const SendLogo = (props: IconProps) => {
-  const { size, color, ...rest } = props
+  const { size, color } = props
   return (
     <Svg width={95} height={size ?? 16} viewBox="0 0 154 26" fill="none">
       <Path

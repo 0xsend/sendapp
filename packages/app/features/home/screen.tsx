@@ -4,8 +4,6 @@ import {
   Button,
   Card,
   Container,
-  Dialog,
-  H1,
   ListItem,
   Paragraph,
   ScrollView,
@@ -13,9 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { Image } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
-import cardBackground from 'app/assets/img/home/card-background.png'
 import {
   IconArrowDown,
   IconClose,
@@ -29,7 +25,6 @@ import {
 import { MainLayout } from 'app/components/layout'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { useState } from 'react'
-import { useRouter } from 'solito/router'
 import { Square } from 'tamagui'
 
 export function HomeScreen() {
@@ -219,7 +214,7 @@ export function HomeScreen() {
                     <ScrollView zi={4} bc={'transparent'}>
                       <YStack m={'$1'}>
                         {balanceDetails.map((balance) => (
-                          <ListItem bc={'transparent'}>
+                          <ListItem key={balance.balance} bc={'transparent'}>
                             <XStack
                               f={1}
                               h={'100%'}
@@ -312,7 +307,7 @@ export function HomeScreen() {
                     <Button
                       key={balanceViewButton.label}
                       f={1}
-                      br={'$radius.true'}
+                      br={'$true'}
                       bw={'$0.5'}
                       borderColor={'rgba(195, 171, 142, 0.3)'}
                       bg={'transparent'}

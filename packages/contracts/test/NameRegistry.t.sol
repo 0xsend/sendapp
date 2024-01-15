@@ -20,9 +20,7 @@ contract Brick {
 
 contract UpgradeableBrick is UUPSUpgradeable, OwnableUpgradeable {
     /// UUPSUpsgradeable: only allow owner to upgrade
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal view override onlyOwner {
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
         (newImplementation); // No-op; silence unused parameter warning
     }
 
@@ -45,8 +43,7 @@ contract NameRegistryTest is Test {
     function setUp() public {
         implementation = address(new DaimoNameRegistry{salt: 0}());
         DaimoNameRegistryProxy proxy = new DaimoNameRegistryProxy{salt: 0}(
-            implementation,
-            abi.encodeWithSelector(DaimoNameRegistry.init.selector, initOwner)
+            implementation, abi.encodeWithSelector(DaimoNameRegistry.init.selector, initOwner)
         );
         registry = DaimoNameRegistry(address(proxy));
     }

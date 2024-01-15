@@ -12,7 +12,6 @@ import {
 } from '@my/ui'
 import { IconQRCode } from 'app/components/icons'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { useUser } from 'app/utils/useUser'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -66,7 +65,6 @@ const suggestions = [
 ]
 
 export function ActivityScreen() {
-  const user = useUser()
   const form = useForm<SearchSchema>()
   async function onSearch({ search }: SearchSchema) {
     console.log('TODO: search', search)

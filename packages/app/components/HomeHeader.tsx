@@ -6,6 +6,7 @@ import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from './icons'
 
+// TODO: this should probably named HomeTopNav
 export function HomeHeader({ children }: { children: string }) {
   const [nav, setNavParam] = useNav()
   const handleHomeBottomSheet = () => {

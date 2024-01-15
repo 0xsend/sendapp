@@ -4,9 +4,6 @@ import { act, render } from '@testing-library/react-native'
 import { OnboardingScreen } from './screen'
 
 // TODO: handle the root provider in a better way
-import { Provider } from 'app/provider'
-
-// TODO: handle the root provider in a better way
 jest.mock('solito/router', () => ({
   useRouter: jest.fn().mockReturnValue(
     jest.fn().mockReturnValue({

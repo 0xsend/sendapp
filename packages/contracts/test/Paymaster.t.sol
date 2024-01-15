@@ -19,11 +19,7 @@ contract PaymasterTest is Test {
     function setUp() public {
         entryPoint = new EntryPoint();
         owner = 0x2222222222222222222222222222222222222222;
-        paymaster = new DaimoPaymaster(
-            entryPoint,
-            owner,
-            IMetaPaymaster(address(0))
-        );
+        paymaster = new DaimoPaymaster(entryPoint, owner, IMetaPaymaster(address(0)));
         (apiSigner, apiSignerPk) = makeAddrAndKey("alice");
     }
 
@@ -58,16 +54,9 @@ contract PaymasterTest is Test {
 
         // try self call, should pass
         DaimoAccount.Call[] memory dummyCalls = new DaimoAccount.Call[](1);
-        dummyCalls[0] = DaimoAccount.Call({
-            dest: senderAddress,
-            value: 0,
-            data: hex""
-        });
+        dummyCalls[0] = DaimoAccount.Call({dest: senderAddress, value: 0, data: hex""});
 
-        bytes memory dummyCalldata = abi.encodeWithSelector(
-            DaimoAccount.executeBatch.selector,
-            dummyCalls
-        );
+        bytes memory dummyCalldata = abi.encodeWithSelector(DaimoAccount.executeBatch.selector, dummyCalls);
 
         // dummy op
         UserOperation memory op = UserOperation({
@@ -93,11 +82,7 @@ contract PaymasterTest is Test {
         bytes32 hash = entryPoint.getUserOpHash(op);
 
         vm.expectRevert("DaimoPaymaster: invalid ticket length");
-        (, uint256 validationData) = paymaster.validatePaymasterUserOp(
-            op,
-            hash,
-            500000
-        );
+        (, uint256 validationData) = paymaster.validatePaymasterUserOp(op, hash, 500000);
 
         // paymaster + ticket. should pass
         uint48 validUntil = 0xffffffff; // far future
@@ -106,39 +91,23 @@ contract PaymasterTest is Test {
         bytes memory ticket = abi.encodePacked(v, r, s, validUntil);
         op.paymasterAndData = abi.encodePacked(address(paymaster), ticket);
 
-        (, validationData) = paymaster.validatePaymasterUserOp(
-            op,
-            hash,
-            500000
-        );
+        (, validationData) = paymaster.validatePaymasterUserOp(op, hash, 500000);
         bool sigFailed = uint160(validationData) == 1;
         assertEq(sigFailed, false);
 
         // try without any calls, should fail
-        dummyCalldata = abi.encodeWithSelector(
-            DaimoAccount.executeBatch.selector,
-            new DaimoAccount.Call[](0)
-        );
+        dummyCalldata = abi.encodeWithSelector(DaimoAccount.executeBatch.selector, new DaimoAccount.Call[](0));
         op.callData = dummyCalldata;
 
         vm.expectRevert("DaimoPaymaster: no calls");
         paymaster.validatePaymasterUserOp(op, hash, 500000);
 
         // try with a call to a non-whitelisted address, should fail
-        dummyCalls[0] = DaimoAccount.Call({
-            dest: 0x6666666666666666666666666666666666666666,
-            value: 0,
-            data: hex""
-        });
+        dummyCalls[0] = DaimoAccount.Call({dest: 0x6666666666666666666666666666666666666666, value: 0, data: hex""});
 
-        dummyCalldata = abi.encodeWithSelector(
-            DaimoAccount.executeBatch.selector,
-            dummyCalls
-        );
+        dummyCalldata = abi.encodeWithSelector(DaimoAccount.executeBatch.selector, dummyCalls);
         op.callData = dummyCalldata;
-        vm.expectRevert(
-            "DaimoPaymaster: call dest not whitelisted and not self"
-        );
+        vm.expectRevert("DaimoPaymaster: call dest not whitelisted and not self");
         paymaster.validatePaymasterUserOp(op, hash, 500000);
 
         vm.stopPrank();
@@ -152,11 +121,7 @@ contract PaymasterTest is Test {
         vm.startPrank(address(entryPoint));
 
         // should pass now
-        (, validationData) = paymaster.validatePaymasterUserOp(
-            op,
-            hash,
-            500000
-        );
+        (, validationData) = paymaster.validatePaymasterUserOp(op, hash, 500000);
         sigFailed = uint160(validationData) == 1;
         assertEq(sigFailed, false);
         vm.stopPrank();

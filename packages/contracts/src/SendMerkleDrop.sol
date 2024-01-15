@@ -162,6 +162,7 @@ contract SendMerkleDrop is Ownable {
     function _setClaimed(uint256 _tranche, uint256 _index) private {
         uint256 claimedWordIndex = _index / 256;
         uint256 claimedBitIndex = _index % 256;
+        // solhint-disable-next-line
         claimedBitmaps[_tranche][claimedWordIndex] = claimedBitmaps[_tranche][claimedWordIndex] | (1 << claimedBitIndex);
     }
 
