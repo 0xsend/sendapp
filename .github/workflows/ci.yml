@@ -47,6 +47,9 @@ jobs:
       - name: Tilt CI
         shell: bash
         run: tilt ci unit-tests:tests
+      - name: All Changes Committed
+        shell: bash
+        run: git diff --exit-code
       # this is on purpose so we get github annotations
       - name: Playwright Tests
         shell: bash
