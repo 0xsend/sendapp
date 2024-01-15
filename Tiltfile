@@ -35,6 +35,12 @@ local_resource(
     ],
 )
 
+local_resource(
+    "biome:check",
+    "yarn biome check --changed" if not CI else "yarn biome ci .",
+    labels = labels,
+)
+
 if CI and os.getenv("INSTALL_PLAYWRIGHT_DEPS") != None:
     local_resource("yarn:install:playwright-deps", "yarnx playwright install --with-deps", labels = labels)
 
@@ -427,6 +433,29 @@ local_resource(
 )
 
 local_resource(
+    "distributor:web",
+    allow_parallel = True,
+    labels = labels,
+    links = ["http://localhost:3050"],
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/",
+            port = 3050,
+        ),
+        period_secs = 15,
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "supabase",
+        "supabase:generate",
+        "wagmi:generate",
+    ],
+    serve_cmd =
+        "yarn run distributor start" if CI else "yarn run distributor dev",
+)
+
+local_resource(
     "caddy:web",
     labels = labels,
     serve_cmd = "caddy run --watch --config Caddyfile.dev",
@@ -435,11 +464,14 @@ local_resource(
     ],
 )
 
+# TESTS
+labels = ["test"]
+
 local_resource(
     "app:test",
     "yarn workspace app test",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = [
         "yarn:install",
         "aa_bundler:base",  # TODO: remove once bundler tests are moved to playwright
@@ -471,7 +503,7 @@ local_resource(
     "webauthn-authenticator:test",
     "yarn workspace @0xsend/webauthn-authenticator test:coverage --run",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = ["yarn:install"],
     deps =
         files_matching(
@@ -485,7 +517,7 @@ local_resource(
     "yarn playwright test",
     allow_parallel = True,
     auto_init = CI == True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = ["next:web"],
     deps = files_matching(
         os.path.join("packages", "playwright"),
@@ -494,33 +526,10 @@ local_resource(
 )
 
 local_resource(
-    "distributor:web",
-    allow_parallel = True,
-    labels = labels,
-    links = ["http://localhost:3050"],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = 3050,
-        ),
-        period_secs = 15,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:mainnet",
-        "supabase",
-        "supabase:generate",
-        "wagmi:generate",
-    ],
-    serve_cmd =
-        "yarn run distributor start" if CI else "yarn run distributor dev",
-)
-
-local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = [
         "yarn:install",
         "anvil:mainnet",
@@ -539,7 +548,7 @@ local_resource(
     "supabase:test",
     "yarn supabase test",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = ["supabase"],
     deps = files_matching(
         os.path.join("supabase", "tests"),
@@ -551,11 +560,28 @@ local_resource(
     "contracts:test",
     "yarn contracts test -vvv",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = [
         "yarn:install",
         "contracts:build",
     ],
     deps = contract_files,
+)
+
+local_resource(
+    "unit-tests:tests",
+    "echo 🥳",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        # messy but create a single resource that runs all the tests
+        "app:test",
+        "biome:check",
+        "webauthn-authenticator:test",
+        "distributor:test",
+        "supabase:test",
+        "contracts:test",
+        "next:web",
+    ],
 )
 

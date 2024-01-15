@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "yarn with-env next dev",
-    "build": "cd ../.. && yarn build && cd apps/next && yarn next:build",
+    "build": "yarn next:build",
     "next:build": "yarn with-env next build",
     "start": "yarn with-env next start",
     "serve": "NODE_ENV=production yarn with-env next start --port 8151",
@@ -36,9 +36,11 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",
+    "@next/eslint-plugin-next": "^14.0.4",
     "@tamagui/next-plugin": "^1.85.8",
-    "@types/node": "^18.6.4",
+    "@types/node": "^20.11.0",
     "@welldone-software/why-did-you-render": "^7.0.1",
-    "dotenv-cli": "^6.0.0"
+    "dotenv-cli": "^6.0.0",
+    "eslint-config-next": "^14.0.4"
   }
 }

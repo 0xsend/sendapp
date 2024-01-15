@@ -1,9 +1,9 @@
+import { join } from 'path'
+import { Database } from '@my/supabase/database.types'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { createClient } from '@supabase/supabase-js'
-import { Database } from '@my/supabase/database.types'
-import { config } from 'dotenv'
-import { join } from 'path'
 import debug from 'debug'
+import { config } from 'dotenv'
 
 const log = debug('contracts:script:gen-merkle-tree')
 

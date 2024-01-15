@@ -1,25 +1,24 @@
 import { expect, test } from '@jest/globals'
 
-import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
+import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from 'app/utils/viem/client'
 import debug from 'debug'
 
 const log = debug('app:features:onboarding:screen')
 import crypto from 'node:crypto'
 import {
+  ContractFunctionExecutionError,
+  ContractFunctionRevertedError,
   Hex,
   PublicClient,
   bytesToHex,
   concat,
   encodeAbiParameters,
+  formatEther,
   getAbiItem,
   hexToBytes,
-  ContractFunctionExecutionError,
-  ContractFunctionRevertedError,
   parseEther,
-  formatEther,
 } from 'viem'
 
-import { numberToBytes } from 'viem'
 import { daimoAccountABI, iEntryPointABI } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import {
@@ -32,6 +31,7 @@ import {
   testClient,
   verifier,
 } from 'app/utils/userop'
+import { numberToBytes } from 'viem'
 
 jest.mock('@daimo/expo-passkeys', () => ({
   createPasskey: jest.fn(),

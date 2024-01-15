@@ -2,7 +2,6 @@ import { OnboardingScreen } from 'app/features/onboarding/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from './_app'
-import { GetServerSidePropsContext } from 'next'
 
 export const Page: NextPageWithLayout = () => {
   return (

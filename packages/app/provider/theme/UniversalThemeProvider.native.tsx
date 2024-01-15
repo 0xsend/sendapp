@@ -61,6 +61,7 @@ export const useThemeSetting: typeof next_useThemeSetting = () => {
   const outputContext: ReturnType<typeof next_useThemeSetting> = {
     ...context,
     systemTheme: context.systemTheme as 'light' | 'dark',
+    // biome-ignore lint/style/noNonNullAssertion: context.themes should always defined
     themes: context.themes!,
     current: context.current ?? 'system',
     resolvedTheme: context.current === 'system' ? context.systemTheme : context.current ?? 'system',

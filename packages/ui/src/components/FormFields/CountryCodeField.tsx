@@ -1,23 +1,23 @@
+import { LinearGradient } from '@tamagui/linear-gradient'
+import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { useThemeSetting } from '@tamagui/next-theme'
+import { useTsController } from '@ts-react/form'
+import { countries } from 'app/utils/country'
+import { useGeoIp } from 'app/utils/useGeoIp'
+import { useEffect, useState } from 'react'
 import {
-  Select,
   Adapt,
+  Fieldset,
+  Select,
+  SelectProps,
   Sheet,
+  Spinner,
+  Text,
+  Theme,
   XStack,
   YStack,
   useThemeName,
-  Fieldset,
-  Theme,
-  Text,
-  SelectProps,
-  Spinner,
 } from 'tamagui'
-import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
-import { useGeoIp } from 'app/utils/useGeoIp'
-import { countries } from 'app/utils/country'
-import { LinearGradient } from '@tamagui/linear-gradient'
-import { useEffect, useState } from 'react'
-import { useTsController } from '@ts-react/form'
-import { useThemeSetting } from '@tamagui/next-theme'
 
 type SelectItem = {
   value: string
@@ -79,7 +79,6 @@ export const CountryCodeField = ({
             borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
             color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
-
           >
             {country ? (
               <Text
@@ -115,7 +114,10 @@ export const CountryCodeField = ({
               width="100%"
             >
               <YStack zIndex={10}>
-                <ChevronUp size={30} color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'} />
+                <ChevronUp
+                  size={30}
+                  color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+                />
               </YStack>
               <LinearGradient
                 start={[0, 0]}
@@ -129,8 +131,9 @@ export const CountryCodeField = ({
             <Select.Viewport>
               <XStack>
                 <Select.Group space="$0">
-                  <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
-                  >Select Country</Select.Label>
+                  <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}>
+                    Select Country
+                  </Select.Label>
                   {countries?.map((country, i) => {
                     return (
                       <Select.Item
@@ -140,9 +143,10 @@ export const CountryCodeField = ({
                         value={country.name}
                         cursor="pointer"
                         theme={themeName}
-                        color={"white"}
+                        color={'white'}
                       >
-                        <Select.ItemText color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+                        <Select.ItemText
+                          color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
                         >
                           {country.flag}&nbsp;{country.dialCode} {isOpen && country.name}
                         </Select.ItemText>
@@ -164,7 +168,10 @@ export const CountryCodeField = ({
               height="$3"
             >
               <YStack zIndex={10}>
-                <ChevronDown size={30} color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'} />
+                <ChevronDown
+                  size={30}
+                  color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+                />
               </YStack>
               <LinearGradient
                 start={[0, 0]}

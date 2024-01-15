@@ -2,6 +2,9 @@ import { Variable } from '@tamagui/web'
 import {
   blue,
   blueDark,
+  brandColors,
+  gold,
+  goldDark,
   gray,
   grayDark,
   green,
@@ -14,13 +17,10 @@ import {
   purpleDark,
   red,
   redDark,
+  send,
+  sendDark,
   yellow,
   yellowDark,
-  gold,
-  goldDark,
-  brandColors,
-  sendDark,
-  send
 } from './colors'
 
 export {
@@ -43,7 +43,7 @@ export const colorTokens = {
     red: red,
     yellow: yellow,
     gold: gold,
-    send: send
+    send: send,
   },
   dark: {
     blue: blueDark,
@@ -69,7 +69,7 @@ export const darkColors = {
   ...colorTokens.dark.red,
   ...colorTokens.dark.yellow,
   ...colorTokens.dark.gold,
-  ...colorTokens.dark.send
+  ...colorTokens.dark.send,
 }
 
 export const lightColors = {
@@ -82,7 +82,7 @@ export const lightColors = {
   ...colorTokens.light.red,
   ...colorTokens.light.yellow,
   ...colorTokens.light.gold,
-  ...colorTokens.dark.send
+  ...colorTokens.dark.send,
 }
 
 export const color = {
@@ -95,7 +95,7 @@ function postfixObjKeys<A extends { [key: string]: Variable<string> | string }, 
   obj: A,
   postfix: B
 ): {
-    [Key in `${keyof A extends string ? keyof A : never}${B}`]: Variable<string> | string
-  } {
+  [Key in `${keyof A extends string ? keyof A : never}${B}`]: Variable<string> | string
+} {
   return Object.fromEntries(Object.entries(obj).map(([k, v]) => [`${k}${postfix}`, v])) as never
 }

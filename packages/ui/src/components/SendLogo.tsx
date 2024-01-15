@@ -1,6 +1,5 @@
+import { Circle, Defs, G, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 import { useThemeName } from 'tamagui'
-import { Svg, Path, Defs, G, LinearGradient, Stop, Circle } from 'react-native-svg'
-
 
 // remove this line when there are more types
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -15,12 +14,7 @@ export const SendLogo: React.FC<SendLogoProps> = ({ stroke }: SendLogoProps) => 
     stroke = isDark ? 'white' : 'black'
   }
   return (
-    <Svg
-      width="371"
-      height="356"
-      viewBox="0 0 371 356"
-      fill="none"
-    >
+    <Svg width="371" height="356" viewBox="0 0 371 356" fill="none">
       <G opacity="0.45" filter="url(#filter0_f_1167_8120)">
         <Circle cx="185.5" cy="170.5" r="101.5" fill="#383532" />
       </G>
@@ -64,12 +58,7 @@ export const SendLogo: React.FC<SendLogoProps> = ({ stroke }: SendLogoProps) => 
 
 export const SendLogoLight: React.FC<SendLogoProps> = ({ stroke }: SendLogoProps) => {
   return (
-    <Svg
-      width="112"
-      height="86"
-      viewBox="0 0 112 86"
-      fill="none"
-    >
+    <Svg width="112" height="86" viewBox="0 0 112 86" fill="none">
       <Path
         d="M107.118 19.3027H23.3802H23.3596V28.8541C23.3596 30.7641 23.9848 32.0375 24.5894 32.6746C25.8399 33.9479 27.0908 33.9479 28.3622 33.9479H89.0025C92.7547 33.9479 96.5069 34.5846 99.0087 35.8584C102.135 37.1317 104.012 38.4051 105.867 40.3155C107.743 42.2256 108.994 44.7727 110.244 47.3198C110.87 49.8666 111.495 53.0504 111.495 56.2342V63.2385C111.495 66.4223 110.87 68.969 110.244 71.5161C109.014 74.0632 107.743 76.6104 105.867 78.5204C104.012 81.0675 102.115 82.3409 99.0087 83.6143C96.5069 84.888 92.7547 85.5247 89.0025 85.5247H21.1672C10.9688 85.5247 2.70135 77.2573 2.70135 67.0589H84.3668C88.4109 67.0589 91.6893 63.7805 91.6893 59.7361C91.6893 55.6921 88.4109 52.4137 84.3664 52.4137H22.7339H19.9694C9.41942 52.4137 0.866943 43.8614 0.866943 33.3112V19.3027H23.3596H23.3802V0.836914H88.6935C98.8851 0.836914 107.141 9.11114 107.118 19.3027Z"
         fill="#212121"
@@ -241,12 +230,7 @@ export const SendLogoCompleteLight: React.FC<SendLogoProps> = ({ stroke }: SendL
   }
 
   return (
-    <Svg
-      width="154"
-      height="26"
-      viewBox="0 0 154 26"
-      fill="none"
-    >
+    <Svg width="154" height="26" viewBox="0 0 154 26" fill="none">
       <Path
         d="M145.029 20.3243C145.602 20.3243 145.984 20.1288 146.365 19.7378C146.747 19.3469 146.938 18.9559 146.938 18.3694V7.81955C146.938 7.23308 146.747 6.64662 146.365 6.25564C145.984 5.86466 145.602 5.66917 145.029 5.66917H120.222V25.9935H127.284V0H145.984C147.129 0 148.083 0.390977 149.038 0.781955C149.992 1.17293 150.946 1.7594 151.71 2.54135C152.473 3.12782 153.046 4.10526 153.428 5.08271C153.809 6.06015 154 7.03759 154 8.21053V17.985C154 19.1579 153.809 20.1353 153.428 21.1128C153.046 22.0902 152.473 22.8722 151.71 23.6541C150.946 24.4361 149.992 25.0226 149.038 25.4135C148.083 25.8045 147.129 26 145.984 26H134.156L128.621 20.3308H145.029V20.3243Z"
         fill="#212121"

@@ -1,7 +1,7 @@
-import { test as base, type BrowserContext } from '@playwright/test'
+import { type BrowserContext, test as base } from '@playwright/test'
+import debug from 'debug'
 import { launchChromiumWithMetamask } from './install'
 import { MetaMaskPage } from './page'
-import debug from 'debug'
 
 const log = debug('test:fixtures:metamask:test')
 
@@ -13,6 +13,7 @@ export const test = base.extend<{
 }>({
   // Override context fixture to reuse same worker scoped context
   // eslint-disable-next-line no-empty-pattern
+  // biome-ignore lint/correctness/noEmptyPattern: playwright/test requires this
   context: async ({}, use) => {
     log('creating context')
     // Use parallelIndex as a unique identifier for each worker.
@@ -37,6 +38,7 @@ export const test = base.extend<{
       background = await context.waitForEvent('serviceworker');
     */
 
+    // biome-ignore lint/style/noNonNullAssertion: we know background url format is correct
     const extensionId = background.url().split('/')[2]!
     await use(extensionId)
   },

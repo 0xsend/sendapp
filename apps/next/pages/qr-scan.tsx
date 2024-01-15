@@ -1,18 +1,14 @@
 import { QRScreen } from 'app/features/send/screens/qrscan'
 import Head from 'next/head'
-import { NextPageWithLayout } from './_app'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
+import { NextPageWithLayout } from './_app'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
         <title>QRScan</title>
-        <meta
-          name="description"
-          content="QRScan"
-          key="desc"
-        />
+        <meta name="description" content="QRScan" key="desc" />
       </Head>
       <QRScreen />
     </>

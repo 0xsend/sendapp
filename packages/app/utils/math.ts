@@ -5,13 +5,13 @@
  * @returns - The number floored to the desired precision.
  */
 export function floor(num: number, precision = 0): number {
-  const factor = Math.pow(10, precision)
+  const factor = 10 ** precision
   if (precision < 0) {
     // For negative precision, get the absolute value of the precision.
     const absolutePrecision = Math.abs(precision)
 
     // Calculate a rounding factor that is 10 to the power of the absolute precision.
-    const roundingFactor = Math.pow(10, absolutePrecision)
+    const roundingFactor = 10 ** absolutePrecision
 
     // Divide the number by the rounding factor, floor it, then multiply it back.
     return Math.floor(num / roundingFactor) * roundingFactor

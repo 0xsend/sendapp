@@ -145,6 +145,5 @@ export const componentThemeDefinitions = {
       mask: 'identity',
       ...maskOptions.component,
     },
-
-  ]
+  ],
 }

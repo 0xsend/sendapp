@@ -1,6 +1,4 @@
-import { useBalance, useChainId, useContractRead, usePrepareContractWrite } from 'wagmi'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { Tables, Views } from '@my/supabase/database.types'
 import {
   sendAddress,
   sendAirdropsSafeAddress,
@@ -8,9 +6,11 @@ import {
   sendMerkleDropAddress,
   sendUniswapV3PoolAddress,
 } from '@my/wagmi'
-import { Tables, Views } from '@my/supabase/database.types'
-import { api } from './api'
 import { PostgrestError } from '@supabase/supabase-js'
+import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useBalance, useChainId, useContractRead, usePrepareContractWrite } from 'wagmi'
+import { api } from './api'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
@@ -33,7 +33,7 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
     queryFn: async () => {
       const { data, error } = await supabase
         .from('distributions')
-        .select(`*, distribution_shares(*), distribution_verifications_summary(*)`)
+        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
 
       if (error) {
         throw error
@@ -135,6 +135,7 @@ export const useSendMerkleDropIsClaimed = (tranche: bigint, index?: bigint) => {
     abi: sendMerkleDropABI,
     functionName: 'isClaimed',
     address: sendMerkleDropAddress[chainId],
+    // biome-ignore lint/style/noNonNullAssertion: we know index is defined when enabled is true
     args: [tranche, index!],
     enabled: index !== undefined,
   })
@@ -180,7 +181,8 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     //     bytes32[] memory _merkleProof
     // )
     args: enabled
-      ? [address!, BigInt(distribution.number - 1), BigInt(index!), BigInt(amount!), merkleProof!]
+      ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
+        [address!, BigInt(distribution.number - 1), BigInt(index!), BigInt(amount!), merkleProof!]
       : undefined,
   })
 }

@@ -1,15 +1,15 @@
-import { QRScanScreen } from './qr-scan';
-import { QRMyCodeScreen } from './qr-mycode';
-import { QRAmountScreen } from './qr-amount';
-import { QRShareScreen } from './qr-share';
+import { QRAmountScreen } from './qr-amount'
+import { QRMyCodeScreen } from './qr-mycode'
+import { QRScanScreen } from './qr-scan'
+import { QRShareScreen } from './qr-share'
 
-import { QRScreenType } from 'app/features/send/types';
-import { AnimationLayout } from 'app/components/layout/animation-layout';
+import { AnimationLayout } from 'app/components/layout/animation-layout'
 import {
-  TransferProvider,
   SubScreenProvider,
-  useSubScreenContext
-} from 'app/features/send/providers';
+  TransferProvider,
+  useSubScreenContext,
+} from 'app/features/send/providers'
+import { QRScreenType } from 'app/features/send/types'
 
 const screens = {
   home: QRScanScreen,
@@ -17,12 +17,12 @@ const screens = {
   'qr-mycode': QRMyCodeScreen,
   'qr-amount': QRAmountScreen,
   'qr-share': QRShareScreen,
-};
+}
 
 const Screen = () => {
   const { currentComponent, direction } = useSubScreenContext()
 
-  const ScreenComponent = screens[currentComponent as QRScreenType];
+  const ScreenComponent = screens[currentComponent as QRScreenType]
 
   return (
     <TransferProvider>
@@ -30,7 +30,11 @@ const Screen = () => {
         <ScreenComponent />
       </AnimationLayout>
     </TransferProvider>
-  );
-};
+  )
+}
 
-export const QRScreen = () => <SubScreenProvider><Screen /></SubScreenProvider>
+export const QRScreen = () => (
+  <SubScreenProvider>
+    <Screen />
+  </SubScreenProvider>
+)

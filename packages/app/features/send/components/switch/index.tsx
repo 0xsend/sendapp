@@ -1,5 +1,5 @@
-import { Button, SizableText, XStack } from "@my/ui"
-import { useThemeSetting } from "@tamagui/next-theme"
+import { Button, SizableText, XStack } from '@my/ui'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export interface ISwitchProps {
   leftText: string
@@ -10,19 +10,23 @@ export interface ISwitchProps {
 }
 
 export const Switch = ({
-  leftText, rightText, leftHandler, rightHandler, active
+  leftText,
+  rightText,
+  leftHandler,
+  rightHandler,
+  active,
 }: ISwitchProps) => {
   const { resolvedTheme } = useThemeSetting()
 
   const buttonInactiveProps = {
-    backgroundColor: resolvedTheme === 'dark' ? '$black' : '$primary'
+    backgroundColor: resolvedTheme === 'dark' ? '$black' : '$primary',
   }
   const textInactiveProps = {
-    color: '$white'
+    color: '$white',
   }
   const textActiveProps = {
     color: resolvedTheme === 'dark' ? '$primary' : '$color12',
-    fontWeight: '700'
+    fontWeight: '700',
   }
 
   return (
@@ -40,9 +44,7 @@ export const Switch = ({
         onPress={leftHandler}
         focusable={false}
       >
-        <SizableText
-          {...(active === 'left' ? textActiveProps : textInactiveProps)}
-        >
+        <SizableText {...(active === 'left' ? textActiveProps : textInactiveProps)}>
           {leftText}
         </SizableText>
       </Button>
@@ -55,9 +57,7 @@ export const Switch = ({
         onPress={rightHandler}
         focusable={false}
       >
-        <SizableText
-          {...(active === 'right' ? textActiveProps : textInactiveProps)}
-        >
+        <SizableText {...(active === 'right' ? textActiveProps : textInactiveProps)}>
           {rightText}
         </SizableText>
       </Button>

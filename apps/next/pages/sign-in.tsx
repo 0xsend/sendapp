@@ -1,7 +1,7 @@
 import { SignInScreen } from 'app/features/auth/sign-in-screen'
 import Head from 'next/head'
-import { NextPageWithLayout } from './_app'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
+import { NextPageWithLayout } from './_app'
 
 export const Page: NextPageWithLayout = () => {
   return (

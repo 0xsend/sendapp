@@ -1,4 +1,4 @@
-import { Button, YStack, TooltipSimple, Paragraph, Anchor } from '@my/ui'
+import { Anchor, Button, Paragraph, TooltipSimple, YStack } from '@my/ui'
 import {
   UseDistributionsResultData,
   usePrepareSendMerkleDropClaimTrancheWrite,
@@ -103,7 +103,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <TooltipSimple
         contentProps={{ maw: 200 }}
-        label={`You are eligible for this distribution, but the tranche is inactive. Please wait for it to be created.`}
+        label={
+          'You are eligible for this distribution, but the tranche is inactive. Please wait for it to be created.'
+        }
       >
         <YStack ai="center" w="100%" mx="auto">
           <Button disabled f={1} w="100%">

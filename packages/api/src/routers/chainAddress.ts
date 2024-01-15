@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { z } from 'zod'
+import { verifyAddressMsg } from 'app/features/checkout/screen'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { verifyMessage } from 'viem'
-import { verifyAddressMsg } from 'app/features/checkout/screen'
+import { z } from 'zod'
+import { createTRPCRouter, protectedProcedure } from '../trpc'
 
 export const chainAddressRouter = createTRPCRouter({
   verify: protectedProcedure
@@ -34,7 +34,7 @@ export const chainAddressRouter = createTRPCRouter({
       if (error) {
         if (error.message.includes('duplicate key value violates unique constraint'))
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'Address already exists.' })
-        else throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
       }
 
       return results

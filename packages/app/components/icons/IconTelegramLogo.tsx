@@ -1,5 +1,5 @@
 import { ColorTokens } from '@my/ui/types'
-import { themed, IconProps } from '@tamagui/helpers-icon'
+import { IconProps, themed } from '@tamagui/helpers-icon'
 import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
@@ -12,10 +12,10 @@ const TelegramLogo = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       width={size}
       height={size}
-      fillRule='evenodd'
-      clipRule='evenodd'
-      strokeLinejoin='round'
-      strokeMiterlimit='1.41421'
+      fillRule="evenodd"
+      clipRule="evenodd"
+      strokeLinejoin="round"
+      strokeMiterlimit="1.41421"
       {...rest}
     >
       <Path

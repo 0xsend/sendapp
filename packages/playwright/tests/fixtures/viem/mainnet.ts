@@ -1,4 +1,4 @@
-import { createTestClient, http } from 'viem'
+import { http, createTestClient } from 'viem'
 import { foundry } from 'viem/chains'
 
 if (!process.env.NEXT_PUBLIC_MAINNET_RPC_URL) {
