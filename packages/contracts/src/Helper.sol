@@ -63,17 +63,17 @@ abstract contract Helper is Script {
      * Send Account Verifier
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_VERIFIER = 0x90ebcFFfc78297a5039491CFCb7B1675a4618BAc;
+    address constant SEND_VERIFIER = 0x63637Dd8e9586eA50a28b117bc9ce9E5f17984a2;
     /**
      * Send Account Verifier Proxy
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_VERIFIER_PROXY = 0x5ccF3633f2018D836db449071262B57e3882A762;
+    address constant SEND_VERIFIER_PROXY = 0x5F0Fd3e14e41E31890BeE3740A14e51A23129706;
     /**
      * Send Account Factory
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_ACCOUNT_FACTORY = 0xb722912027054bb1145c711426d404016a90BBF0;
+    address constant SEND_ACCOUNT_FACTORY = 0x754ADB349777994F666A788a6bbE4B9DDEBED6A8;
     /**
      *
      * Account-Abstraction (EIP-4337) v0.6.0 singleton EntryPoint implementation.

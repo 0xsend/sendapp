@@ -354,7 +354,7 @@ export const daimoAccountFactoryABI = [
  *
  */
 export const daimoAccountFactoryAddress = {
-  845337: '0xb722912027054bb1145c711426d404016a90BBF0',
+  845337: '0x754ADB349777994F666A788a6bbE4B9DDEBED6A8',
 } as const
 
 /**
@@ -940,7 +940,7 @@ export const daimoVerifierABI = [
  *
  */
 export const daimoVerifierAddress = {
-  845337: '0x90ebcFFfc78297a5039491CFCb7B1675a4618BAc',
+  845337: '0x63637Dd8e9586eA50a28b117bc9ce9E5f17984a2',
 } as const
 
 /**
@@ -993,7 +993,7 @@ export const daimoVerifierProxyABI = [
  *
  */
 export const daimoVerifierProxyAddress = {
-  845337: '0x5ccF3633f2018D836db449071262B57e3882A762',
+  845337: '0x5F0Fd3e14e41E31890BeE3740A14e51A23129706',
 } as const
 
 /**

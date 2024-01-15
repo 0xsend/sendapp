@@ -10,7 +10,8 @@
         "!.next/cache/**",
         "build/**",
         "node_modules/.cache/metro/**",
-        "dist/**"
+        "dist/**",
+        "contracts/out/**"
       ]
     },
     "dev": {
