@@ -11,7 +11,7 @@ const MainFooter = () => {
       width="100%"
       height={'$10'}
       $shorter={{
-        height: '$8'
+        height: '$10'
       }}
     >
       <YStack height={'100%'}>

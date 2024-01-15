@@ -17,6 +17,7 @@ import { countries } from 'app/utils/country'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { useEffect, useState } from 'react'
 import { useTsController } from '@ts-react/form'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 type SelectItem = {
   value: string
@@ -35,6 +36,7 @@ export const CountryCodeField = ({
   const { data: geoData, isLoading } = useGeoIp()
   const { field, error } = useTsController<string>()
   const themeName = useThemeName()
+  const { resolvedTheme } = useThemeSetting()
 
   // set the country code based on geoip
   useEffect(() => {
@@ -50,7 +52,6 @@ export const CountryCodeField = ({
     if (!country) return
     field.onChange(country.dialCode)
   }, [country, field])
-
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
@@ -77,14 +78,13 @@ export const CountryCodeField = ({
             }}
             borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
+            color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+
           >
-            {isLoading ? (
-              <Spinner color="$color" size="small" />
-            ) : country ? (
+            {country ? (
               <Text
                 fontSize="$1"
                 fontWeight="bold"
-                color="$text"
                 style={{
                   textTransform: 'uppercase',
                 }}
@@ -115,7 +115,7 @@ export const CountryCodeField = ({
               width="100%"
             >
               <YStack zIndex={10}>
-                <ChevronUp size={44} />
+                <ChevronUp size={30} color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'} />
               </YStack>
               <LinearGradient
                 start={[0, 0]}
@@ -129,8 +129,9 @@ export const CountryCodeField = ({
             <Select.Viewport>
               <XStack>
                 <Select.Group space="$0">
-                  <Select.Label>Country</Select.Label>
-                  {countries.map((country, i) => {
+                  <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+                  >Select Country</Select.Label>
+                  {countries?.map((country, i) => {
                     return (
                       <Select.Item
                         id={`dialCode-${country.code}`}
@@ -138,8 +139,11 @@ export const CountryCodeField = ({
                         key={country.name}
                         value={country.name}
                         cursor="pointer"
+                        theme={themeName}
+                        color={"white"}
                       >
-                        <Select.ItemText>
+                        <Select.ItemText color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
+                        >
                           {country.flag}&nbsp;{country.dialCode} {isOpen && country.name}
                         </Select.ItemText>
                         <Select.ItemIndicator marginLeft="auto">
@@ -160,7 +164,7 @@ export const CountryCodeField = ({
               height="$3"
             >
               <YStack zIndex={10}>
-                <ChevronDown size={20} />
+                <ChevronDown size={30} color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'} />
               </YStack>
               <LinearGradient
                 start={[0, 0]}

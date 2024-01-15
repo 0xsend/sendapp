@@ -4,7 +4,7 @@ export const radius = {
   2: 5,
   3: 7,
   4: 9,
-  true: 9,
+  true: 16,
   5: 10,
   6: 16,
   7: 19,
