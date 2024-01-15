@@ -51,7 +51,7 @@ const themesBuilder = createThemeBuilder()
     pink: colorThemeDefinition('pink'),
     red: colorThemeDefinition('red'),
     gold: colorThemeDefinition('gold'),
-    send: colorThemeDefinition('send')
+    send: colorThemeDefinition('send'),
   })
   .addChildThemes({
     alt1: {

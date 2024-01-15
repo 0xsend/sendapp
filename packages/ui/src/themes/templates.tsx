@@ -33,7 +33,7 @@ export const { templates, maskOptions } = (() => {
     backgroundFocus: 2,
     backgroundStrong: 1,
     backgroundTransparent: 0,
-    color: 1,
+    color: -1,
     colorHover: -2,
     colorPress: -1,
     colorFocus: -2,

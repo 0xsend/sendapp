@@ -10,10 +10,10 @@ import {
   FormProps,
   FormWrapper,
   NumberField,
+  OTPField,
   SelectField,
   TextAreaField,
   TextField,
-  OTPField,
   Theme,
 } from '@my/ui'
 import { ComponentProps } from 'react'
@@ -81,11 +81,13 @@ export const SchemaForm: typeof _SchemaForm = ({ ...props }) => {
 
   return (
     <_SchemaForm {...props} renderAfter={renderAfter}>
-      {(fields) => (
-        <FormWrapper.Body>
-          {props.children ? props.children(fields) : Object.values(fields)}
-        </FormWrapper.Body>
-      )}
+      {(fields) =>
+        props.children ? (
+          props.children(fields) // render children if provided allowing full customization of the form body and fields
+        ) : (
+          <FormWrapper.Body>{Object.values(fields)}</FormWrapper.Body>
+        )
+      }
     </_SchemaForm>
   )
 }

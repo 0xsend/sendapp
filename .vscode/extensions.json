@@ -3,6 +3,7 @@
     "JuanBlanco.solidity",
     "biomejs.biome",
     "ms-playwright.playwright",
-    "tilt-dev.tiltfile"
+    "tilt-dev.tiltfile",
+    "yoavbls.pretty-ts-errors"
   ]
 }

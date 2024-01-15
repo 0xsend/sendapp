@@ -1,9 +1,9 @@
+import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
 import { Fieldset, Input, InputProps, Label, Theme, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
-import { useThemeSetting } from '@tamagui/next-theme'
 
 export const TextField = (props: InputProps) => {
   const {
@@ -35,7 +35,7 @@ export const TextField = (props: InputProps) => {
             spellCheck={isEmail ? false : undefined}
             autoCapitalize={isEmail ? 'none' : undefined}
             keyboardType={isEmail ? 'email-address' : undefined}
-            value={field.value ? field.value : undefined}
+            value={field.value ?? ''}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
             ref={field.ref}

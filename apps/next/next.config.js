@@ -34,6 +34,25 @@ const plugins = [
 module.exports = () => {
   /** @type {import('next').NextConfig} */
   let config = {
+    images: {
+      remotePatterns: [
+        {
+          hostname: '*-0xsend.vercel.app',
+        },
+        {
+          hostname: 'ugqtoulexhvahevsysuq.supabase.co', // staging
+        },
+        {
+          hostname: 'fjswgwdweohwejbrmiil.supabase.co', // production
+        },
+        {
+          hostname: 'ui-avatars.com',
+        },
+        {
+          hostname: 'localhost',
+        },
+      ],
+    },
     typescript: {
       ignoreBuildErrors: true,
     },
