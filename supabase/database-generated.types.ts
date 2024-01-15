@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export interface Database {
   public: {
@@ -21,11 +27,11 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'chain_addresses_user_id_fkey'
-            columns: ['user_id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "chain_addresses_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       distribution_shares: {
@@ -70,17 +76,17 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'distribution_shares_distribution_id_fkey'
-            columns: ['distribution_id']
-            referencedRelation: 'distributions'
-            referencedColumns: ['id']
+            foreignKeyName: "distribution_shares_distribution_id_fkey"
+            columns: ["distribution_id"]
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'distribution_shares_user_id_fkey'
-            columns: ['user_id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "distribution_shares_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       distribution_verification_values: {
@@ -89,7 +95,7 @@ export interface Database {
           created_at: string
           distribution_id: number
           fixed_value: number
-          type: Database['public']['Enums']['verification_type']
+          type: Database["public"]["Enums"]["verification_type"]
           updated_at: string
         }
         Insert: {
@@ -97,7 +103,7 @@ export interface Database {
           created_at?: string
           distribution_id: number
           fixed_value: number
-          type: Database['public']['Enums']['verification_type']
+          type: Database["public"]["Enums"]["verification_type"]
           updated_at?: string
         }
         Update: {
@@ -105,16 +111,16 @@ export interface Database {
           created_at?: string
           distribution_id?: number
           fixed_value?: number
-          type?: Database['public']['Enums']['verification_type']
+          type?: Database["public"]["Enums"]["verification_type"]
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'distribution_verification_values_distribution_id_fkey'
-            columns: ['distribution_id']
-            referencedRelation: 'distributions'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
+            columns: ["distribution_id"]
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          }
         ]
       }
       distribution_verifications: {
@@ -123,7 +129,7 @@ export interface Database {
           distribution_id: number
           id: number
           metadata: Json | null
-          type: Database['public']['Enums']['verification_type']
+          type: Database["public"]["Enums"]["verification_type"]
           user_id: string
         }
         Insert: {
@@ -131,7 +137,7 @@ export interface Database {
           distribution_id: number
           id?: number
           metadata?: Json | null
-          type: Database['public']['Enums']['verification_type']
+          type: Database["public"]["Enums"]["verification_type"]
           user_id: string
         }
         Update: {
@@ -139,22 +145,22 @@ export interface Database {
           distribution_id?: number
           id?: number
           metadata?: Json | null
-          type?: Database['public']['Enums']['verification_type']
+          type?: Database["public"]["Enums"]["verification_type"]
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'distribution_verifications_distribution_id_fkey'
-            columns: ['distribution_id']
-            referencedRelation: 'distributions'
-            referencedColumns: ['id']
+            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            columns: ["distribution_id"]
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'distribution_verifications_user_id_fkey'
-            columns: ['user_id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "distribution_verifications_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       distributions: {
@@ -235,11 +241,11 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'profiles_id_fkey'
-            columns: ['id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       receipts: {
@@ -260,11 +266,11 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'receipts_user_id_fkey'
-            columns: ['user_id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "receipts_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       referrals: {
@@ -288,23 +294,97 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'referrals_referred_id_fkey'
-            columns: ['referred_id']
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'referrals_referrer_id_fkey'
-            columns: ['referrer_id']
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'referrals_tag_fkey'
-            columns: ['tag']
-            referencedRelation: 'tags'
-            referencedColumns: ['name']
+            foreignKeyName: "referrals_tag_fkey"
+            columns: ["tag"]
+            referencedRelation: "tags"
+            referencedColumns: ["name"]
+          }
+        ]
+      }
+      send_account_credentials: {
+        Row: {
+          account_id: string
+          created_at: string | null
+          credential_id: string
+          key_slot: number
+        }
+        Insert: {
+          account_id: string
+          created_at?: string | null
+          credential_id: string
+          key_slot: number
+        }
+        Update: {
+          account_id?: string
+          created_at?: string | null
+          credential_id?: string
+          key_slot?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_credentials_account_id_fkey"
+            columns: ["account_id"]
+            referencedRelation: "send_accounts"
+            referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "account_credentials_credential_id_fkey"
+            columns: ["credential_id"]
+            referencedRelation: "webauthn_credentials"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      send_accounts: {
+        Row: {
+          address: string
+          chain_id: number
+          created_at: string
+          deleted_at: string | null
+          id: string
+          init_code: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          chain_id: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          init_code: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          address?: string
+          chain_id?: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          init_code?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_accounts_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
       send_transfer_logs: {
@@ -358,17 +438,17 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'tag_receipts_hash_fkey'
-            columns: ['hash']
-            referencedRelation: 'receipts'
-            referencedColumns: ['hash']
+            foreignKeyName: "tag_receipts_hash_fkey"
+            columns: ["hash"]
+            referencedRelation: "receipts"
+            referencedColumns: ["hash"]
           },
           {
-            foreignKeyName: 'tag_receipts_tag_name_fkey'
-            columns: ['tag_name']
-            referencedRelation: 'tags'
-            referencedColumns: ['name']
-          },
+            foreignKeyName: "tag_receipts_tag_name_fkey"
+            columns: ["tag_name"]
+            referencedRelation: "tags"
+            referencedColumns: ["name"]
+          }
         ]
       }
       tag_reservations: {
@@ -393,28 +473,80 @@ export interface Database {
         Row: {
           created_at: string
           name: string
-          status: Database['public']['Enums']['tag_status']
+          status: Database["public"]["Enums"]["tag_status"]
           user_id: string
         }
         Insert: {
           created_at?: string
           name: string
-          status?: Database['public']['Enums']['tag_status']
+          status?: Database["public"]["Enums"]["tag_status"]
           user_id?: string
         }
         Update: {
           created_at?: string
           name?: string
-          status?: Database['public']['Enums']['tag_status']
+          status?: Database["public"]["Enums"]["tag_status"]
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'tags_user_id_fkey'
-            columns: ['user_id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "tags_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      webauthn_credentials: {
+        Row: {
+          attestation_object: string
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attestation_object: string
+          created_at?: string
+          deleted_at?: string | null
+          display_name: string
+          id?: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          attestation_object?: string
+          created_at?: string
+          deleted_at?: string | null
+          display_name?: string
+          id?: string
+          key_type?: Database["public"]["Enums"]["key_type_enum"]
+          name?: string
+          public_key?: string
+          raw_credential_id?: string
+          sign_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webauthn_credentials_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
     }
@@ -428,17 +560,17 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'distribution_verifications_distribution_id_fkey'
-            columns: ['distribution_id']
-            referencedRelation: 'distributions'
-            referencedColumns: ['id']
+            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            columns: ["distribution_id"]
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'distribution_verifications_user_id_fkey'
-            columns: ['user_id']
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
+            foreignKeyName: "distribution_verifications_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
         ]
       }
     }
@@ -446,49 +578,49 @@ export interface Database {
       citext:
         | {
             Args: {
-              '': string
+              "": string
             }
             Returns: string
           }
         | {
             Args: {
-              '': boolean
+              "": boolean
             }
             Returns: string
           }
         | {
             Args: {
-              '': unknown
+              "": unknown
             }
             Returns: string
           }
       citext_hash: {
         Args: {
-          '': string
+          "": string
         }
         Returns: number
       }
       citextin: {
         Args: {
-          '': unknown
+          "": unknown
         }
         Returns: string
       }
       citextout: {
         Args: {
-          '': string
+          "": string
         }
         Returns: unknown
       }
       citextrecv: {
         Args: {
-          '': unknown
+          "": unknown
         }
         Returns: string
       }
       citextsend: {
         Args: {
-          '': string
+          "": string
         }
         Returns: string
       }
@@ -499,6 +631,14 @@ export interface Database {
           referral_code_input: string
         }
         Returns: undefined
+      }
+      create_send_account: {
+        Args: {
+          send_account: unknown
+          webauthn_credential: unknown
+          key_slot: number
+        }
+        Returns: Json
       }
       distribution_hodler_addresses: {
         Args: {
@@ -539,11 +679,13 @@ export interface Database {
       }
     }
     Enums: {
-      tag_status: 'pending' | 'confirmed'
-      verification_type: 'tag_registration' | 'tag_referral'
+      key_type_enum: "ES256"
+      tag_status: "pending" | "confirmed"
+      verification_type: "tag_registration" | "tag_referral"
     }
     CompositeTypes: {
       [_ in never]: never
     }
   }
 }
+
