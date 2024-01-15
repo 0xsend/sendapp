@@ -35,7 +35,7 @@ const IconSendTokenDark = (_props: IconProps) => {
       color={color as ColorTokens | undefined}
       width={size ?? 20}
       height={size ?? 20}
-      viewBox="0 0 20 20"
+      viewBox="0 0 22 20"
       fill="none"
       {...props}
     >

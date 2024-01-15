@@ -13,7 +13,12 @@ export const SendTagsCard = () => {
     href: getXPostHref(user?.profile?.referral_code ?? ''),
   })
   return (
-    <Card theme="gold" f={1} width="100%" $gtMd={{ minWidth: 200, flex: 1, flexBasis: 0 }}>
+    <Card
+      f={1}
+      width="100%"
+      $theme-dark={{ backgroundColor: '#2F2F2F' }}
+      $gtMd={{ minWidth: 200, flex: 1, flexBasis: 0, br: '$6' }}
+    >
       <Card.Header f={1} jc="space-between">
         <H6 fontWeight="400" size="$4" theme="alt2">
           Send Tags
