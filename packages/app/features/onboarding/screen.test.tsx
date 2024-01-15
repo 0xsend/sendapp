@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
+import { TamaguiProvider, config } from '@my/ui'
 import { act, render } from '@testing-library/react-native'
 import { OnboardingScreen } from './screen'
-import { TamaguiProvider, config } from '@my/ui'
 
 // TODO: handle the root provider in a better way
 import { Provider } from 'app/provider'

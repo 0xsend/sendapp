@@ -1,5 +1,5 @@
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { useId, useState, useRef, useEffect } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   Fieldset,
   Input,
@@ -7,8 +7,8 @@ import {
   Label,
   TamaguiElement,
   Theme,
-  useThemeName,
   XStack,
+  useThemeName,
 } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
@@ -26,7 +26,7 @@ export const OTPField = (props: InputProps) => {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
 
   const onChangeText = (text, index) => {
-    let temp = otp
+    const temp = otp
     otp[index] = text
     setOtp(temp)
     field.onChange(otp.join(''))
@@ -35,18 +35,18 @@ export const OTPField = (props: InputProps) => {
   const onChange = async (event, index) => {
     let nextIndex = index
     // @ts-ignore
-    if (event.nativeEvent.inputType == 'deleteContentBackward' && index > 0) {
+    if (event.nativeEvent.inputType === 'deleteContentBackward' && index > 0) {
       nextIndex = index - 1
       // @ts-ignore
-    } else if (event.nativeEvent.inputType != 'deleteContentBackward' && index < 6) {
+    } else if (event.nativeEvent.inputType !== 'deleteContentBackward' && index < 6) {
       nextIndex = index + 1
     }
-    if (event.nativeEvent.inputType == 'insertFromPaste') {
+    if (event.nativeEvent.inputType === 'insertFromPaste') {
       //fetch the last copied element from clipboard
-      let d = await navigator.clipboard.readText()
-      if (typeof d == 'string') {
+      const d = await navigator.clipboard.readText()
+      if (typeof d === 'string') {
         setOtp(d.split('').slice(0, 6))
-        let length = d.length
+        const length = d.length
         nextIndex = Math.min(5, length)
       }
     }
@@ -60,7 +60,7 @@ export const OTPField = (props: InputProps) => {
   }
 
   const onKeyPress = (event, index) => {
-    if (event?.key == 'Backspace' && event.target?.value == '' && index > 0) {
+    if (event?.key === 'Backspace' && event.target?.value === '' && index > 0) {
       const elementWithTabIndex = document.querySelector(
         `[data-selector="otp-${index - 1}"]`
       ) as HTMLElement | null
@@ -77,7 +77,7 @@ export const OTPField = (props: InputProps) => {
           <Fieldset flex={1}>
             {!!label && (
               <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
-                {label} {isOptional && `(Optional)`}
+                {label} {isOptional && '(Optional)'}
               </Label>
             )}
             <Shake shakeKey={error?.errorMessage}>

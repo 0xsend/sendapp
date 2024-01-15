@@ -1,11 +1,11 @@
+import { YStack, styled } from '@my/ui'
 import { AnimatePresence } from '@tamagui/animate-presence'
-import { YStack, styled } from '@my/ui';
 
 type AnimationLayoutProps = {
-  children: React.ReactNode;
-  currentKey: string; // Unique identifier for the current screen or content
-  direction: number;
-};
+  children: React.ReactNode
+  currentKey: string // Unique identifier for the current screen or content
+  direction: number
+}
 
 const YStackEnterable = styled(YStack, {
   variants: {
@@ -24,5 +24,5 @@ export const AnimationLayout = ({ children, currentKey, direction }: AnimationLa
         {children}
       </YStackEnterable>
     </AnimatePresence>
-  );
-};
+  )
+}

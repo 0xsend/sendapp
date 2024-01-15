@@ -41,18 +41,18 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
               supabaseClient: supabase,
             }
           : error
-          ? {
-              error,
-              isLoading: false,
-              session: null,
-              supabaseClient: supabase,
-            }
-          : {
-              error: null,
-              isLoading,
-              session: null,
-              supabaseClient: supabase,
-            }
+            ? {
+                error,
+                isLoading: false,
+                session: null,
+                supabaseClient: supabase,
+              }
+            : {
+                error: null,
+                isLoading,
+                session: null,
+                supabaseClient: supabase,
+              }
       }
     >
       <AuthStateChangeHandler />

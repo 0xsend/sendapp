@@ -1,34 +1,34 @@
 import {
-  Paragraph,
+  Accordion,
+  Anchor,
   Card,
+  H4,
   H6,
+  KVTable,
+  Paragraph,
+  Separator,
+  SizableText,
+  Spinner,
+  Square,
+  TooltipSimple,
   XStack,
   YStack,
-  TooltipSimple,
-  KVTable,
-  SizableText,
-  Separator,
-  H4,
-  Accordion,
-  Square,
-  Spinner,
-  Anchor,
 } from '@my/ui'
 import { PostgrestError } from '@supabase/supabase-js'
+import { ChevronDown } from '@tamagui/lucide-icons'
 import {
   UseDistributionsResultData,
   useDistributions,
   useSendSellCountDuringDistribution,
 } from 'app/utils/distributions'
-import { DistributionsStatCard } from './distribution-stat-cards'
 import formatAmount from 'app/utils/formatAmount'
-import { ChevronDown } from '@tamagui/lucide-icons'
-import { DistributionClaimButton } from './DistributionClaimButton'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
-import { useSendBalanceOfAt, useSendBalance } from 'app/utils/useSendBalance'
 import { shorten } from 'app/utils/strings'
-import { formatUnits } from 'viem'
+import { useChainAddresses } from 'app/utils/useChainAddresses'
+import { useSendBalance, useSendBalanceOfAt } from 'app/utils/useSendBalance'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
+import { formatUnits } from 'viem'
+import { DistributionClaimButton } from './DistributionClaimButton'
+import { DistributionsStatCard } from './distribution-stat-cards'
 
 export const DistributionsTable = () => {
   const { data: distributions, isLoading, error } = useDistributions()
@@ -264,14 +264,14 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
                         ) : sells && sells.length > 0 ? (
                           `${sells.length} made during distribution. Ineligible for rewards. 😿 Use a different wallet next time.`
                         ) : (
-                          `0 made during distribution. 😺`
+                          '0 made during distribution. 😺'
                         )}
                       </SizableText>
                       <YStack>
                         {sells?.map(({ tx_hash }) => (
                           <Anchor
                             key={tx_hash}
-                            href={'https://etherscan.io/tx/' + tx_hash}
+                            href={`https://etherscan.io/tx/${tx_hash}`}
                             target="_blank"
                           >
                             {shorten(tx_hash, 8, 3)}

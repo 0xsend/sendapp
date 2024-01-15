@@ -1,6 +1,6 @@
+import * as path from 'path'
 import express, { Request, Response, Router } from 'express'
 import pino from 'pino'
-import * as path from 'path'
 import { DistributorWorker } from './distributor'
 
 const logger = pino({

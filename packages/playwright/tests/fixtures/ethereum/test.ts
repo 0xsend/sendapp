@@ -1,8 +1,8 @@
-import { testMainnetClient } from '../viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { testMainnetClient } from '../viem'
 
-import { test as base, mergeTests } from '@playwright/test'
-import { injectHeadlessWeb3Provider, Web3ProviderBackend } from 'headless-web3-provider'
+import { mergeTests, test as base } from '@playwright/test'
+import { Web3ProviderBackend, injectHeadlessWeb3Provider } from 'headless-web3-provider'
 import { Account, parseEther } from 'viem'
 
 if (!process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID) {

@@ -1,6 +1,5 @@
-import { XStack } from '@my/ui'
 import { ColorTokens } from '@my/ui/types'
-import { themed, IconProps } from '@tamagui/helpers-icon'
+import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Defs, G, Path, Rect, Svg } from 'react-native-svg'
 
@@ -15,7 +14,10 @@ const Ethereum = (props: IconProps) => {
       {...rest}
     >
       <G clip-path="url(#clip0_563_1431)">
-        <Path d="M27.8293 38.4061C37.9939 34.0831 42.7295 22.3385 38.4065 12.1739C34.0835 2.00935 22.339 -2.72621 12.1743 1.59678C2.00975 5.91978 -2.72581 17.6643 1.59719 27.8289C5.92018 37.9935 17.6647 42.729 27.8293 38.4061Z" fill="#101010" />
+        <Path
+          d="M27.8293 38.4061C37.9939 34.0831 42.7295 22.3385 38.4065 12.1739C34.0835 2.00935 22.339 -2.72621 12.1743 1.59678C2.00975 5.91978 -2.72581 17.6643 1.59719 27.8289C5.92018 37.9935 17.6647 42.729 27.8293 38.4061Z"
+          fill="#101010"
+        />
         <Path d="M20.6247 5.00269V16.0891L29.9946 20.277L20.6247 5.00269Z" fill="#C8C8C8" />
         <Path d="M20.6247 5.00269L11.2493 20.277L20.6247 16.0891V5.00269Z" fill="white" />
         <Path d="M20.6247 27.4633V34.9973L30 22.0206L20.6247 27.4633Z" fill="#C8C8C8" />

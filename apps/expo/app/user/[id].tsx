@@ -8,7 +8,6 @@ export default function Screen() {
           title: 'User',
         }}
       />
-
     </>
   )
 }

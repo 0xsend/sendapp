@@ -1,9 +1,9 @@
-import { H1, SizableText, XStack, YStack } from "@my/ui"
-import { NumpadButton } from "./numpad-button"
+import { H1, SizableText, XStack, YStack } from '@my/ui'
 import { Select } from 'app/features/send/components/select'
-import { INumPadProps } from "app/features/send/types"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
-import formatNumpadInput from "app/utils/formatNumpadInput"
+import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { INumPadProps } from 'app/features/send/types'
+import formatNumpadInput from 'app/utils/formatNumpadInput'
+import { NumpadButton } from './numpad-button'
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {
   const { balance, tokens, currentToken, setCurrentToken } = useTransferContext()
@@ -21,11 +21,11 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
     <YStack>
       <XStack jc={'center'}>
         <H1
-          size={value.length > 4 ? value.length > 8 ? '$10' : '$12' : '$14'}
+          size={value.length > 4 ? (value.length > 8 ? '$10' : '$12') : '$14'}
           minHeight={'$10'}
           $shorter={{
-            size: value.length > 4 ? value.length > 8 ? '$10' : '$11' : '$12',
-            minHeight: '$7'
+            size: value.length > 4 ? (value.length > 8 ? '$10' : '$11') : '$12',
+            minHeight: '$7',
           }}
         >
           {Number(value).toLocaleString('en-US', { maximumFractionDigits: 20 })}
@@ -42,7 +42,7 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
           borderColor={'$backgroundFocus'}
           $shorter={{
             px: '$4',
-            py: '$2'
+            py: '$2',
           }}
         >
           <SizableText theme={'alt2'}>Bal</SizableText>
@@ -66,7 +66,11 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
           <NumpadButton pressHandler={numpadpressHandler} value={'9'} num />
         </XStack>
         <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
-          <NumpadButton pressHandler={numpadpressHandler} value={'.'} disabled={value.includes('.')} />
+          <NumpadButton
+            pressHandler={numpadpressHandler}
+            value={'.'}
+            disabled={value.includes('.')}
+          />
           <NumpadButton pressHandler={numpadpressHandler} value={'0'} num />
           <NumpadButton pressHandler={numpadpressHandler} value={'<'} />
         </XStack>

@@ -1,7 +1,7 @@
-import { test as base, type BrowserContext } from '@playwright/test'
+import { type BrowserContext, test as base } from '@playwright/test'
+import debug from 'debug'
 import { launchChromiumWithMetamask } from './install'
 import { MetaMaskPage } from './page'
-import debug from 'debug'
 
 const log = debug('test:fixtures:metamask:test')
 

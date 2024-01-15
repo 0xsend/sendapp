@@ -1,17 +1,17 @@
 import crypto from 'crypto'
+import { CreateResult, SignResult } from '@daimo/expo-passkeys'
 import { describe, it } from '@jest/globals'
+import { p256 } from '@noble/curves/p256'
 import { base64 } from '@scure/base'
 import { Hex, bytesToHex, hexToBytes } from 'viem'
 import {
   contractFriendlyKeyToDER,
+  createResponseToDER,
   derKeytoContractFriendlyKey,
   parseAndNormalizeSig,
-  createResponseToDER,
-  parseSignResponse,
   parseCreateResponse,
+  parseSignResponse,
 } from './passkeys'
-import { CreateResult, SignResult } from '@daimo/expo-passkeys'
-import { p256 } from '@noble/curves/p256'
 
 type ExpectedCreateResult = {
   expectedDer: Hex

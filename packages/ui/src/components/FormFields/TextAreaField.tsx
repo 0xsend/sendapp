@@ -1,6 +1,6 @@
 import { useFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
-import { Label, TextArea, TextAreaProps, Theme, Fieldset, useThemeName } from 'tamagui'
+import { Fieldset, Label, TextArea, TextAreaProps, Theme, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
 
@@ -20,7 +20,7 @@ export const TextAreaField = (props: Pick<TextAreaProps, 'size' | 'autoFocus'>) 
       <Fieldset>
         {!!label && (
           <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
-            {label} {isOptional && `(Optional)`}
+            {label} {isOptional && '(Optional)'}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>

@@ -1,11 +1,11 @@
-import { chromium, type BrowserContext } from '@playwright/test'
-import path from 'path'
 import fs from 'fs'
-import { access } from 'fs/promises'
+import path from 'path'
 import { Readable } from 'stream'
-import { finished } from 'stream/promises'
-import extract from 'extract-zip'
+import { type BrowserContext, chromium } from '@playwright/test'
 import debug from 'debug'
+import extract from 'extract-zip'
+import { access } from 'fs/promises'
+import { finished } from 'stream/promises'
 import { MetaMaskPage } from './page'
 
 const log = debug('test:fixtures:metamask:install')
@@ -99,7 +99,7 @@ export async function launchChromiumWithMetamask(userDataDir = ''): Promise<Brow
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
     args: [
-      !process.env.HEADFULL ? `--headless=new` : '',
+      !process.env.HEADFULL ? '--headless=new' : '',
       `--disable-extensions-except=${pathToExtension}`,
       `--load-extension=${pathToExtension}`,
     ].filter(Boolean),

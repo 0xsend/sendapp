@@ -1,18 +1,25 @@
-import { Adapt, Select as TamaguiSelect, SelectProps, Sheet, YStack, getFontSize, XStack } from "@my/ui"
-import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons"
+import {
+  Adapt,
+  Select as TamaguiSelect,
+  SelectProps,
+  Sheet,
+  XStack,
+  YStack,
+  getFontSize,
+} from '@my/ui'
 import { LinearGradient } from '@tamagui/linear-gradient'
-import { IconTriangleDown } from "app/components/icons/IconTriangleDown"
-import { useMemo } from "react"
-import { IToken } from "app/features/send/types"
+import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { IconTriangleDown } from 'app/components/icons/IconTriangleDown'
+import { IToken } from 'app/features/send/types'
+import { useMemo } from 'react'
 
-export function Select({ items, currentItem, ...props }: SelectProps & { items: Array<IToken>, currentItem: IToken }) {
-
+export function Select({
+  items,
+  currentItem,
+  ...props
+}: SelectProps & { items: Array<IToken>; currentItem: IToken }) {
   return (
-    <TamaguiSelect
-      value={currentItem.name.toLowerCase()}
-      disablePreventBodyScroll
-      {...props}
-    >
+    <TamaguiSelect value={currentItem.name.toLowerCase()} disablePreventBodyScroll {...props}>
       <TamaguiSelect.Trigger
         w="auto"
         px={'$3.5'}
@@ -21,7 +28,7 @@ export function Select({ items, currentItem, ...props }: SelectProps & { items: 
         $shorter={{
           minHeight: '$3.5',
           px: '$2.5',
-          py: '$2'
+          py: '$2',
         }}
       >
         <XStack space={'$1.5'} ai={'center'}>
@@ -47,11 +54,7 @@ export function Select({ items, currentItem, ...props }: SelectProps & { items: 
               <Adapt.Contents />
             </Sheet.ScrollView>
           </Sheet.Frame>
-          <Sheet.Overlay
-            animation="lazy"
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
+          <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
         </Sheet>
       </Adapt>
 
@@ -97,12 +100,8 @@ export function Select({ items, currentItem, ...props }: SelectProps & { items: 
                       value={item.name.toLowerCase()}
                     >
                       <XStack space={'$2'} ai={'center'}>
-                        <TamaguiSelect.Icon>
-                          {item.icon}
-                        </TamaguiSelect.Icon>
-                        <TamaguiSelect.ItemText>
-                          {item.name}
-                        </TamaguiSelect.ItemText>
+                        <TamaguiSelect.Icon>{item.icon}</TamaguiSelect.Icon>
+                        <TamaguiSelect.ItemText>{item.name}</TamaguiSelect.ItemText>
                       </XStack>
                       <TamaguiSelect.ItemIndicator marginLeft="auto">
                         <Check size={16} />

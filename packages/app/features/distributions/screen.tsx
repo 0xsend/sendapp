@@ -1,19 +1,19 @@
-import { XStack, YStack, Button, Container, ScrollView, H4, Theme } from '@my/ui'
+import { Button, Container, H4, ScrollView, Theme, XStack, YStack } from '@my/ui'
+import { sendAirdropsSafeAddress } from '@my/wagmi'
+import { ArrowRight } from '@tamagui/lucide-icons'
+import { HomeHeader } from 'app/components/HomeHeader'
+import React from 'react'
+import { useLink } from 'solito/link'
+import { DistributionsTable } from './components/DistributionsTable'
 import {
   DistributionProgressCard,
   DistributionTimeCard,
 } from './components/distribution-stat-cards'
-import React from 'react'
-import { ArrowRight } from '@tamagui/lucide-icons'
-import { useLink } from 'solito/link'
-import { sendAirdropsSafeAddress } from '@my/wagmi'
-import { DistributionsTable } from './components/DistributionsTable'
-import { HomeHeader } from 'app/components/HomeHeader'
 
 export function DistributionsScreen() {
   return (
     <Container>
-      <ScrollView f={3} fb={0} backgroundColor={"$backgroundHover"}>
+      <ScrollView f={3} fb={0} backgroundColor={'$backgroundHover'}>
         <YStack gap="$6" pt="$5" pb="$8">
           <YStack gap="$8">
             <HomeHeader>Distributions</HomeHeader>

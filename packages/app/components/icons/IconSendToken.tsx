@@ -1,10 +1,10 @@
+import { ColorTokens } from '@my/ui/types'
 import { themed } from '@tamagui/helpers-icon'
 import type { IconProps } from '@tamagui/helpers-icon'
-import * as React from 'react'
-import { Svg, Path, LinearGradient, Circle, Defs, Stop } from 'react-native-svg'
-import { memo } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { ColorTokens } from '@my/ui/types'
+import * as React from 'react'
+import { memo } from 'react'
+import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 
 const IconSendTokenLight = (_props: IconProps) => {
   const { size, color, ...props } = _props

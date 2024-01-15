@@ -1,51 +1,51 @@
 import {
-  Anchor,
-  Dialog,
   Adapt,
+  Anchor,
   AnimatePresence,
   Button,
+  Dialog,
+  Fieldset,
+  Label,
+  Paragraph,
+  ScrollView,
+  Sheet,
   Spinner,
   Theme,
   TooltipSimple,
-  Paragraph,
-  YStack,
-  XStack,
-  Fieldset,
-  Label,
-  ScrollView,
   Unspaced,
+  XStack,
+  YStack,
   YStackProps,
-  Sheet,
 } from '@my/ui'
 import { sendRevenueSafeAddress } from '@my/wagmi'
-import { useUser } from 'app/utils/useUser'
 import { CheckCircle, X } from '@tamagui/lucide-icons'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'
+import { getXPostHref } from 'app/utils/getReferralLink'
 import { shorten } from 'app/utils/strings'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useMounted } from 'app/utils/useMounted'
 import { useReceipts } from 'app/utils/useReceipts'
-import { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react'
+import { useUser } from 'app/utils/useUser'
+import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useLink } from 'solito/link'
 import { formatEther } from 'viem'
 import {
   useAccount,
-  useConnect,
-  usePublicClient,
-  useNetwork,
-  useSwitchNetwork,
-  useSignMessage,
-  useQueryClient,
-  useWaitForTransaction,
-  usePrepareSendTransaction,
-  useSendTransaction,
   useBlockNumber,
+  useConnect,
+  useNetwork,
+  usePrepareSendTransaction,
+  usePublicClient,
+  useQueryClient,
+  useSendTransaction,
+  useSignMessage,
+  useSwitchNetwork,
+  useWaitForTransaction,
 } from 'wagmi'
-import { verifyAddressMsg, getPriceInWei, getSenderSafeReceivedEvents } from '../screen'
-import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
-import { useLink } from 'solito/link'
-import { getXPostHref } from 'app/utils/getReferralLink'
+import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../screen'
 
 export interface ConfirmContextType {
   open: boolean
@@ -538,10 +538,9 @@ export function ConfirmWithSignTransaction() {
             }
             setError(err.message)
             return
-          } else {
-            console.error(err)
-            setError('Something went wrong')
           }
+          console.error(err)
+          setError('Something went wrong')
         })
     }
   }, [

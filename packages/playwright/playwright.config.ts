@@ -1,5 +1,5 @@
-import { defineConfig, devices } from '@playwright/test'
 import path from 'path'
+import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv-flow'
 
 // @ts-expect-error - set global __DEV__ variable to handle app react native imports

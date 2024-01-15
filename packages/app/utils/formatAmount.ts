@@ -44,7 +44,7 @@ function abbreviateNumber(
   const suffix = symbols[tier]
   if (!suffix) throw new RangeError()
 
-  const scale = Math.pow(10, tier * 3)
+  const scale = 10 ** (tier * 3)
 
   // scale the number
   const scaled = num / scale
@@ -90,23 +90,22 @@ export default function formatAmount(
 
   const digits = amount.toString().split('.', 2)
   // eslint-disable-next-line prefer-const
-  let [integers = 0, decimals = 0] = digits.map((s) => Number(s))
+  const [integers = 0, decimals = 0] = digits.map((s) => Number(s))
   const [integersLength = 0] = digits.map((s) => s.length)
 
-  if ((digits[0] && isNaN(integers)) || (digits[1] && isNaN(decimals))) {
+  if ((digits[0] && Number.isNaN(integers)) || (digits[1] && Number.isNaN(decimals))) {
     return abbreviateNumber(0, maxDecimals)
   }
 
   if (integersLength > maxIntegers) {
     const flooredAmount = floor(Number(amount), maxIntegers + maxDecimals - integersLength)
-    const flooredIntegersLength = flooredAmount.toString().split('.')[0]!.length
+    const flooredIntegersLength = flooredAmount.toString().split('.')[0]?.length
     if (flooredIntegersLength >= integersLength) {
       // This means the number has moved to a different tier after flooring,
       // so we abbreviate without flooring.
       return abbreviateNumber(Number(amount), maxDecimals)
-    } else {
-      return abbreviateNumber(flooredAmount, maxDecimals)
     }
+    return abbreviateNumber(flooredAmount, maxDecimals)
   }
 
   return Number(floor(Number(amount), maxDecimals)).toLocaleString(undefined, {

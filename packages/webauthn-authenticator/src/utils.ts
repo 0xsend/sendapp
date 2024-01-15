@@ -1,11 +1,11 @@
+import { base64urlnopad } from '@scure/base'
 import cbor from 'cbor'
 import { AAGUID } from './aaguid'
 import type {
-  PublicKeyCredentialAttestationSerialized,
   Attestation,
   PublicKeyCredentialAssertionSerialized,
+  PublicKeyCredentialAttestationSerialized,
 } from './types'
-import { base64urlnopad } from '@scure/base'
 
 export function bufferToBase64URL(buffer: Buffer | Uint8Array) {
   return base64urlnopad.encode(buffer)

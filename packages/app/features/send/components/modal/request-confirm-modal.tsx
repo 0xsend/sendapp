@@ -11,12 +11,12 @@ import {
   XStack,
   YStack,
   styled,
-} from "@my/ui"
-import { useThemeSetting } from "@tamagui/next-theme"
-import { IConfirmModalProps } from "app/features/send/types"
-import { IconClose } from "app/components/icons"
-import { GradientButton } from "./GradientButton"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
+} from '@my/ui'
+import { useThemeSetting } from '@tamagui/next-theme'
+import { IconClose } from 'app/components/icons'
+import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { IConfirmModalProps } from 'app/features/send/types'
+import { GradientButton } from './GradientButton'
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -27,7 +27,7 @@ const CustomInput = styled(Input, {
   fontSize: '$3',
   fontStyle: 'italic',
   width: '100%',
-  height: '$4.5'
+  height: '$4.5',
 })
 
 export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps) => {
@@ -94,7 +94,9 @@ export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalPr
           >
             <XStack>
               <Dialog.Title>
-                <SizableText fontSize={'$9'} fontWeight={'700'}>Request 📌</SizableText>
+                <SizableText fontSize={'$9'} fontWeight={'700'}>
+                  Request 📌
+                </SizableText>
               </Dialog.Title>
             </XStack>
             <YStack gap={'$6'} separator={<Separator />}>
@@ -106,7 +108,8 @@ export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalPr
                 <XStack jc={'space-between'}>
                   <SizableText theme={'alt2'}>Amount</SizableText>
                   <SizableText fontWeight={'700'}>
-                    {requestAmount} {currentToken.name} (${Number(requestAmount) * currentToken.price})
+                    {requestAmount} {currentToken.name} ($
+                    {Number(requestAmount) * currentToken.price})
                   </SizableText>
                 </XStack>
                 <XStack jc={'space-between'}>
@@ -121,7 +124,9 @@ export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalPr
                 </YStack>
                 <YStack fg={1} jc={'flex-end'}>
                   <GradientButton>
-                    <SizableText size={'$6'} fontWeight={'700'} color={'white'}>Send Request</SizableText>
+                    <SizableText size={'$6'} fontWeight={'700'} color={'white'}>
+                      Send Request
+                    </SizableText>
                   </GradientButton>
                 </YStack>
               </YStack>
@@ -141,6 +146,6 @@ export const RequestConfirmModal = ({ showModal, setShowModal }: IConfirmModalPr
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog>
-    </Theme >
+    </Theme>
   )
 }

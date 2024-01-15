@@ -1,4 +1,5 @@
 import '../public/reset.css'
+
 import '@tamagui/font-inter/css/400.css'
 import '@tamagui/font-inter/css/700.css'
 import 'raf/polyfill'
@@ -13,7 +14,6 @@ import Head from 'next/head'
 import 'raf/polyfill'
 import { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
-
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -53,11 +53,9 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {getLayout(
-            <Component {...pageProps} />
-          )}
+          {getLayout(<Component {...pageProps} />)}
         </Provider>
-      </NextThemeProvider >
+      </NextThemeProvider>
     </>
   )
 }
