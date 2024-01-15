@@ -22,8 +22,8 @@ if (!process.env.SUPABASE_SERVICE_ROLE) {
  * only meant to be used on the server side.
  */
 export const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE,
   { auth: { persistSession: false } }
 )
 
@@ -164,6 +164,7 @@ export class DistributorWorker {
     }
     const { timestamp } = await client.getBlock({ blockHash })
     this.blockTimestamps.set(blockHash, timestamp)
+    // biome-ignore lint/style/noNonNullAssertion: we know timestamp is defined
     return this.blockTimestamps.get(blockHash)!
   }
 

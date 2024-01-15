@@ -54,7 +54,9 @@ export interface ConfirmContextType {
   onConfirmed: () => void
 }
 
-export const ConfirmContext = createContext<ConfirmContextType>(null!)
+export const ConfirmContext = createContext<ConfirmContextType>(
+  null as unknown as ConfirmContextType
+)
 
 const Provider = ({
   children,
@@ -359,6 +361,7 @@ export function ConfirmWithVerifiedAddress() {
   const savedAddress = useMemo(() => addresses?.[0]?.address, [addresses])
   const [error, setError] = useState<string>()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run when connectedAddress changes
   useEffect(() => {
     setError(undefined)
   }, [connectedAddress])
@@ -545,11 +548,8 @@ export function ConfirmWithSignTransaction() {
     }
   }, [
     mounted,
-    txReceipt,
-    setError,
     confirmed,
     paidOrFree,
-    queryClient,
     submitted,
     isLoadingTags,
     isFree,
@@ -564,6 +564,7 @@ export function ConfirmWithSignTransaction() {
     reset,
   ])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run when confirmed and submitted changes
   useEffect(() => {
     if (confirmed) {
       setCloseable(true)
@@ -730,6 +731,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
   }, [receipts, publicClient, address, ethAmount, onSent, isLoadingReceipts, receiptHashes])
 
   // watch for new receipts
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run when block changes
   useEffect(() => {
     lookupSafeReceivedEvent()
   }, [block, lookupSafeReceivedEvent])

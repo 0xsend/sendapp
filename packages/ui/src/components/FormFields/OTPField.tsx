@@ -97,7 +97,7 @@ export const OTPField = (props: InputProps) => {
                 tabIndex={index}
                 onChangeText={(text) => onChangeText(text, index)}
                 onChange={(event) => onChange(event, index)}
-                onKeyPress={(event: any) => onKeyPress(event, index)}
+                onKeyPress={(event) => onKeyPress(event, index)}
                 onBlur={field.onBlur}
                 ref={field.ref}
                 placeholder={placeholder}

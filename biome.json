@@ -10,7 +10,10 @@
       "package.json",
       "**/generated.ts",
       "**/database-generated.types.ts",
-      "**/theme-generated.ts"
+      "**/theme-generated.ts",
+      "packages/ui/types/**",
+      "./apps/expo/ios/**",
+      "./apps/expo/android/**"
     ]
   },
   "organizeImports": {

@@ -22,6 +22,7 @@ export const useSendBalanceOfAt = ({
     abi: sendABI,
     functionName: 'balanceOfAt',
     address: sendAddress[chainId],
+    // biome-ignore lint/style/noNonNullAssertion: we know address and snapshot are defined when enabled is true
     args: [address!, snapshot!],
     enabled: !!address && !!snapshot,
   })

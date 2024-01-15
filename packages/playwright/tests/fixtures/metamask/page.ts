@@ -10,6 +10,7 @@ export class MetaMaskPage {
   public readonly extensionId: string
 
   constructor(public readonly page: Page) {
+    // biome-ignore lint/style/noNonNullAssertion: we know background url format is correct
     this.extensionId = page.url().split('/')[2]!
   }
 

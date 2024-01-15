@@ -18,6 +18,7 @@ function abbreviateNumber(
 ): string {
   // Previous options style
   if (Array.isArray(options)) {
+    // biome-ignore lint/style/noParameterAssign: this is a legacy function
     options = { symbols: options }
   }
 
@@ -25,6 +26,7 @@ function abbreviateNumber(
 
   // handle negatives
   const sign = Math.sign(num) >= 0
+  // biome-ignore lint/style/noParameterAssign: this is a legacy function
   num = Math.abs(num)
 
   // what tier? (determines SI symbol)
@@ -85,6 +87,7 @@ export default function formatAmount(
 
   // remove commas
   if (typeof amount === 'string') {
+    // biome-ignore lint/style/noParameterAssign: this is a legacy function
     amount = amount.split(',').join('')
   }
 
@@ -100,7 +103,7 @@ export default function formatAmount(
   if (integersLength > maxIntegers) {
     const flooredAmount = floor(Number(amount), maxIntegers + maxDecimals - integersLength)
     const flooredIntegersLength = flooredAmount.toString().split('.')[0]?.length
-    if (flooredIntegersLength >= integersLength) {
+    if (flooredIntegersLength && flooredIntegersLength >= integersLength) {
       // This means the number has moved to a different tier after flooring,
       // so we abbreviate without flooring.
       return abbreviateNumber(Number(amount), maxDecimals)

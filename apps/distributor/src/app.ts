@@ -31,7 +31,7 @@ distributorRouter.get('/', async (req: Request, res: Response) => {
 })
 
 // Middleware for checking authorization
-const checkAuthorization = (req: Request, res: Response, next: Function) => {
+const checkAuthorization = (req: Request, res: Response, next: () => void) => {
   if (!req.headers.authorization?.includes(process.env.SUPABASE_SERVICE_ROLE as string)) {
     res.status(401).json('Unauthorized')
     return

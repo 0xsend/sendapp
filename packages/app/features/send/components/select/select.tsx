@@ -124,7 +124,8 @@ export function Select({
               width={'$4'}
               pointerEvents="none"
             >
-              <ChevronDown size={getFontSize((props.size ?? '$true') as any)} />
+              {/* @ts-expect-error FIXME: size do not map 1-1 for font sizes */}
+              <ChevronDown size={getFontSize(props.size ?? '$true')} />
             </YStack>
           )}
         </TamaguiSelect.Viewport>

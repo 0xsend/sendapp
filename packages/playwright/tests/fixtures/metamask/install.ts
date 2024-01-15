@@ -107,6 +107,7 @@ export async function launchChromiumWithMetamask(userDataDir = ''): Promise<Brow
   // extension is after the blank ghost page
   // see issue https://github.com/microsoft/playwright-python/issues/689
   if (context.pages().length < 2) await context.waitForEvent('page')
+  // biome-ignore lint/style/noNonNullAssertion: we know there are at least 2 pages
   const extensionPage = context.pages()[1]!
 
   // setup metamask
