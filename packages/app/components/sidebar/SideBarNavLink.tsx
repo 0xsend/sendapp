@@ -1,15 +1,13 @@
 import { Button, ButtonIcon, ButtonText, Link, type LinkProps } from '@my/ui'
+import { usePathname } from 'app/utils/usePathname'
 import { type ReactElement } from 'react'
 
 export function SideBarNavLink({
   icon,
   text,
-  location,
   ...props
-}: { icon?: ReactElement; text: string; location: string } & Omit<
-  LinkProps,
-  'children'
->): ReactElement {
+}: { icon?: ReactElement; text: string } & Omit<LinkProps, 'children'>): ReactElement {
+  const location = usePathname()
   const isActiveRoute = location === props.href
 
   return (

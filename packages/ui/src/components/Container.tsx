@@ -7,6 +7,7 @@ export type ContainerProps = {
 export const Container: React.FC<ContainerProps> = (props) => {
   return (
     <XStack
+      px="$6"
       $gtSm={{
         maxWidth: 768,
       }}
@@ -15,6 +16,7 @@ export const Container: React.FC<ContainerProps> = (props) => {
       }}
       $gtLg={{
         maxWidth: 1200,
+        px: '$8',
       }}
       $gtXl={{
         maxWidth: 1440,
