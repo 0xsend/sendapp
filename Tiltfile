@@ -576,6 +576,7 @@ local_resource(
     resource_deps = [
         # messy but create a single resource that runs all the tests
         "app:test",
+        "biome:check",
         "webauthn-authenticator:test",
         "distributor:test",
         "supabase:test",
