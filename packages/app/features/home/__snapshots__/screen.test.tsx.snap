@@ -1,8 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`HomeScreen 1`] = `
-<RCTScrollView
-  scrollEnabled={true}
+<View
   style={
     {
       "alignItems": "stretch",
@@ -34,7 +33,6 @@ exports[`HomeScreen 1`] = `
       }
     >
       <View
-
         style={
           {
             "alignItems": "center",
@@ -2695,7 +2693,6 @@ exports[`HomeScreen 1`] = `
                     }
                     propList={
                       [
-
                         "fill",
                       ]
                     }
@@ -2817,7 +2814,6 @@ exports[`HomeScreen 1`] = `
                     "borderRightWidth": 1,
                     "borderStyle": "solid",
                     "borderTopColor": "transparent",
-
                     "borderTopLeftRadius": 16,
                     "borderTopRightRadius": 16,
                     "borderTopWidth": 1,
@@ -2878,7 +2874,6 @@ exports[`HomeScreen 1`] = `
                       }
                       propList={
                         [
-
                           "fill",
                         ]
                       }
@@ -3137,5 +3132,5 @@ exports[`HomeScreen 1`] = `
       </View>
     </View>
   </View>
-</RCTScrollView>
+</View>
 `;
