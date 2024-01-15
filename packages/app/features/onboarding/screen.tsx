@@ -71,7 +71,7 @@ export function OnboardingScreen() {
 
   return (
     <Container>
-      <YStack space="$6" maxWidth={600} py="$6">
+      <YStack space="$6" maxWidth={600} py="$6" marginHorizontal="auto">
         <H1>Welcome to Send</H1>
         <Paragraph>
           Start by creating a Passkey below. Send uses passkeys to secure your account. Press the

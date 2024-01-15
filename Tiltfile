@@ -88,6 +88,18 @@ local_resource(
     ),
 )
 
+ui_theme_dir = os.path.join("packages", "ui", "src", "themes")
+
+ui_theme_files = files_matching(
+    ui_theme_dir,
+    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and f.find("generated.ts") == -1,
+)
+
+ui_files = files_matching(
+    os.path.join("packages", "ui", "src"),
+    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and (f.find("generated.ts") == -1 and f.find(ui_theme_dir) == -1),
+)
+
 local_resource(
     "ui:build",
     "yarn workspace @my/ui build",
@@ -96,10 +108,18 @@ local_resource(
     resource_deps = [
         "yarn:install",
     ],
-    deps = files_matching(
-        os.path.join("packages", "ui", "src"),
-        lambda f: f.endswith(".tsx") or f.endswith(".ts") and f.find("generated.ts") == -1,
-    ),
+    deps = ui_files,
+)
+
+local_resource(
+    "ui:generate-theme",
+    "yarn workspace @my/ui generate-theme",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+    deps = ui_theme_files,
 )
 
 local_resource(
@@ -112,7 +132,7 @@ local_resource(
     ],
     deps = files_matching(
                os.path.join("packages", "daimo-expo-passkeys", "src"),
-               lambda f: f.endswith(".tsx") or f.endswith(".ts"),
+               lambda f: (f.endswith(".tsx") or f.endswith(".ts")),
            ) +
            files_matching(
                os.path.join("packages", "daimo-expo-passkeys", "ios"),

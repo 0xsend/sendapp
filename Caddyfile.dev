@@ -25,3 +25,7 @@ eth.otterscan.localhost {
 base.otterscan.localhost {
 	reverse_proxy http://localhost:5101
 }
+
+bundler.rpc.localhost {
+	reverse_proxy http://localhost:3030
+}
