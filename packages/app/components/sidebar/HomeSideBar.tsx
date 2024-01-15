@@ -40,7 +40,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
         </Button>
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="flex-start" justifyContent="center">
+        <YStack gap={'$4'} alignItems="stretch" justifyContent="center" w={'100%'} f={1}>
           <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
           <SideBarNavLink
             icon={<IconActivity size={'$2'} />}
@@ -101,10 +101,10 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
         </Button>
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="flex-start" justifyContent="center">
+        <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
           <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
           <SideBarNavLink
-            icon={<IconDashboard size={'$2'} />}
+            icon={<IconActivity size={'$2'} />}
             text={'Activity'}
             href={'/activity'}
           />
