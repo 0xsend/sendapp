@@ -5,11 +5,29 @@
     "build": {
       "env": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM"],
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "build/**", "node_modules/.cache/metro/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "build/**",
+        "node_modules/.cache/metro/**",
+        "dist/**",
+        "contracts/out/**"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "//#biome:check": {},
+    "//#biome:check:fix": {},
+    "lint": {
+      "dependsOn": ["^//#biome:check"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^//#biome:check:fix"]
+    },
+    "clean": {
+      "cache": false
     }
   }
 }

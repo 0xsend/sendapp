@@ -39,7 +39,6 @@ import {
   useNetwork,
   usePrepareSendTransaction,
   usePublicClient,
-  useQueryClient,
   useSendTransaction,
   useSignMessage,
   useSwitchNetwork,
@@ -467,7 +466,6 @@ export function ConfirmWithVerifiedAddress() {
 }
 
 export function ConfirmWithSignTransaction() {
-  const queryClient = useQueryClient()
   const { isLoadingTags, updateProfile, profile } = useUser()
   const pendingTags = usePendingTags()
   const confirmedTags = useConfirmedTags()

@@ -45,19 +45,19 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
             icon={<IconDashboard size={'$2'} />}
             text={'Dashboard'}
             href={'/'}
-            isActive={pathName === '/'}
+            location={pathName}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
             text={'Distributions'}
             href={'/distributions'}
-            isActive={pathName.includes('/distributions')}
+            location={pathName}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
             href={'/leaderboard'}
-            isActive={pathName.includes('/leaderboard')}
+            location={pathName}
             disabled={true}
             hoverStyle={{ cursor: 'not-allowed' }}
           />
@@ -109,19 +109,19 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
             icon={<IconDashboard size={'$2'} />}
             text={'Dashboard'}
             href={'/'}
-            isActive={pathName === '/'}
+            location={pathName}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
             text={'Distributions'}
             href={'/distributions'}
-            isActive={pathName.includes('/distributions')}
+            location={pathName}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
             href={'/leaderboard'}
-            isActive={pathName.includes('/leaderboard')}
+            location={pathName}
             disabled={true}
             hoverStyle={{ cursor: 'not-allowed' }}
           />

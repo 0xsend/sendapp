@@ -36,9 +36,22 @@ local_resource(
 )
 
 local_resource(
-    "biome:check",
-    "yarn biome check --changed" if not CI else "yarn biome ci .",
+    "lint",
+    "yarn lint",
+    allow_parallel = True,
     labels = labels,
+)
+
+cmd_button(
+    "lint:fix",
+    argv = [
+        "yarn",
+        "lint:fix",
+    ],
+    icon_name = "handyman",
+    location = location.RESOURCE,
+    resource = "lint",
+    text = "yarn lint:fix",
 )
 
 if CI and os.getenv("INSTALL_PLAYWRIGHT_DEPS") != None:
@@ -576,7 +589,7 @@ local_resource(
     resource_deps = [
         # messy but create a single resource that runs all the tests
         "app:test",
-        "biome:check",
+        "lint",
         "webauthn-authenticator:test",
         "distributor:test",
         "supabase:test",

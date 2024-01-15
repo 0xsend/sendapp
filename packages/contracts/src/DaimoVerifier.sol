@@ -9,10 +9,7 @@ import "p256-verifier/WebAuthn.sol";
 
 /// Proxy using the UUPSUpgradeable pattern. Named for Etherscan verification.
 contract DaimoVerifierProxy is ERC1967Proxy {
-    constructor(
-        address _logic,
-        bytes memory _data
-    ) ERC1967Proxy(_logic, _data) {}
+    constructor(address _logic, bytes memory _data) ERC1967Proxy(_logic, _data) {}
 }
 
 struct Signature {
@@ -40,9 +37,7 @@ contract DaimoVerifier is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /// UUPSUpsgradeable: only allow owner to upgrade
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal view override onlyOwner {
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
         (newImplementation); // No-op; silence unused parameter warning
     }
 
@@ -51,26 +46,24 @@ contract DaimoVerifier is OwnableUpgradeable, UUPSUpgradeable {
         return _getImplementation();
     }
 
-    function verifySignature(
-        bytes memory message,
-        bytes calldata signature,
-        uint256 x,
-        uint256 y
-    ) public view returns (bool) {
+    function verifySignature(bytes memory message, bytes calldata signature, uint256 x, uint256 y)
+        public
+        view
+        returns (bool)
+    {
         Signature memory sig = abi.decode(signature[1:], (Signature));
 
-        return
-            WebAuthn.verifySignature({
-                challenge: message,
-                authenticatorData: sig.authenticatorData,
-                requireUserVerification: false,
-                clientDataJSON: sig.clientDataJSON,
-                challengeLocation: sig.challengeLocation,
-                responseTypeLocation: sig.responseTypeLocation,
-                r: sig.r,
-                s: sig.s,
-                x: x,
-                y: y
-            });
+        return WebAuthn.verifySignature({
+            challenge: message,
+            authenticatorData: sig.authenticatorData,
+            requireUserVerification: false,
+            clientDataJSON: sig.clientDataJSON,
+            challengeLocation: sig.challengeLocation,
+            responseTypeLocation: sig.responseTypeLocation,
+            r: sig.r,
+            s: sig.s,
+            x: x,
+            y: y
+        });
     }
 }

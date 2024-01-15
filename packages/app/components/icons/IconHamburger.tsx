@@ -7,7 +7,7 @@
 import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Line, Path, Svg } from 'react-native-svg'
+import { Line, Svg } from 'react-native-svg'
 
 const Hamburger = (props: IconProps) => {
   const { size, strokeWidth, color, ...rest } = props

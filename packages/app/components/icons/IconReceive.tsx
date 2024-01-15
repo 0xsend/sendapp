@@ -1,10 +1,9 @@
-import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Circle, Defs, Path, Stop, Svg } from 'react-native-svg'
+import { Path, Svg } from 'react-native-svg'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Receive = (props: IconProps) => {
-  const { size, color, ...rest } = props
   return (
     <Svg width="42" height="42" viewBox="0 0 42 42" fill="none">
       <Path

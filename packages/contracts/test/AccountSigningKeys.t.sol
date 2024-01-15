@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
+// solhint-disable-next-line
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
 import "../src/DaimoAccount.sol";
@@ -21,17 +22,9 @@ contract AccountSigningKeysTest is Test {
         factory = new DaimoAccountFactory(entryPoint, verifier);
     }
 
-    event SigningKeyAdded(
-        IAccount indexed account,
-        uint8 keySlot,
-        bytes32[2] key
-    );
+    event SigningKeyAdded(IAccount indexed account, uint8 keySlot, bytes32[2] key);
 
-    event SigningKeyRemoved(
-        IAccount indexed account,
-        uint8 keySlot,
-        bytes32[2] key
-    );
+    event SigningKeyRemoved(IAccount indexed account, uint8 keySlot, bytes32[2] key);
 
     function testAddingAndRemovingKeys() public {
         // hardcoded from swift playground
@@ -48,6 +41,7 @@ contract AccountSigningKeysTest is Test {
 
         DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
         DaimoAccount acc = factory.createAccount(0, key1, calls, 42);
+        // solhint-disable-next-line
         console.log("new account address:", address(acc));
         assertTrue(acc.numActiveKeys() == uint8(1));
 

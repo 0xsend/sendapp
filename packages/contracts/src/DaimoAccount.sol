@@ -44,18 +44,10 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     event AccountInitialized(IEntryPoint indexed entryPoint);
 
     /// Emitted after adding a new signing key (add device).
-    event SigningKeyAdded(
-        IAccount indexed account,
-        uint8 keySlot,
-        bytes32[2] key
-    );
+    event SigningKeyAdded(IAccount indexed account, uint8 keySlot, bytes32[2] key);
 
     /// Emitted after removing a signing key (remove device).
-    event SigningKeyRemoved(
-        IAccount indexed account,
-        uint8 keySlot,
-        bytes32[2] key
-    );
+    event SigningKeyRemoved(IAccount indexed account, uint8 keySlot, bytes32[2] key);
 
     modifier onlySelf() {
         require(msg.sender == address(this), "only self");
@@ -82,11 +74,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     /// @param slot the empty slot to use. Settable in case we need to use slot to signal key type.
     /// @param key the initial signing key. All future calls and key rotations must be signed.
     /// @param initCalls contract calls to execute during initialization.
-    function initialize(
-        uint8 slot,
-        bytes32[2] calldata key,
-        Call[] calldata initCalls
-    ) public virtual initializer {
+    function initialize(uint8 slot, bytes32[2] calldata key, Call[] calldata initCalls) public virtual initializer {
         keys[slot] = key;
         numActiveKeys = 1;
 
@@ -130,11 +118,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     //                     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
     //
     /// ERC4337: validate userop by verifying a P256 signature.
-    function validateUserOp(
-        UserOperation calldata userOp,
-        bytes32 userOpHash,
-        uint256 missingAccountFunds
-    )
+    function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
         external
         virtual
         override
@@ -155,10 +139,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     // - keySlot: 0-255
     // - signature: abi.encode form of Signature struct
     /// Validate any Daimo account signature, whether for a userop or ERC1271 user sig.
-    function _validateSignature(
-        bytes memory message,
-        bytes calldata signature
-    ) private view returns (bool) {
+    function _validateSignature(bytes memory message, bytes calldata signature) private view returns (bool) {
         if (signature.length < 1) return false;
 
         // First bit identifies the keySlot
@@ -173,10 +154,12 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
 
     /// ERC1271: validate a user signature, verifying a valid Daimo account
     /// signature.
-    function isValidSignature(
-        bytes32 message,
-        bytes calldata signature
-    ) external view override returns (bytes4 magicValue) {
+    function isValidSignature(bytes32 message, bytes calldata signature)
+        external
+        view
+        override
+        returns (bytes4 magicValue)
+    {
         if (_validateSignature(abi.encodePacked(message), signature)) {
             return IERC1271(this).isValidSignature.selector;
         }
@@ -184,10 +167,11 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     }
 
     /// Validate userop by verifying a Daimo account signature.
-    function _validateUseropSignature(
-        UserOperation calldata userOp,
-        bytes32 userOpHash
-    ) private view returns (uint256 validationData) {
+    function _validateUseropSignature(UserOperation calldata userOp, bytes32 userOpHash)
+        private
+        view
+        returns (uint256 validationData)
+    {
         // TODO: version 2, allow key rotation replay across chains
         // Special case userOp.callData calling `executeKeyRotation`
         // Require nonce key = magic val, so that nonce sequence forces order
@@ -230,10 +214,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     /// Prefund the entrypoint (msg.sender) gas for this transaction.
     function _payPrefund(uint256 missingAccountFunds) private {
         if (missingAccountFunds != 0) {
-            (bool success, ) = payable(msg.sender).call{
-                value: missingAccountFunds,
-                gas: type(uint256).max
-            }("");
+            (bool success,) = payable(msg.sender).call{value: missingAccountFunds, gas: type(uint256).max}("");
             (success); // no-op; silence unused variable warning
         }
     }
@@ -249,9 +230,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     }
 
     /// UUPSUpsgradeable: only allow self-upgrade.
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal view override onlySelf {
+    function _authorizeUpgrade(address newImplementation) internal view override onlySelf {
         (newImplementation); // No-op; silence unused parameter warning
     }
 
@@ -259,14 +238,11 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     function getActiveSigningKeys()
         public
         view
-        returns (
-            bytes32[2][] memory activeSigningKeys,
-            uint8[] memory activeSigningKeySlots
-        )
+        returns (bytes32[2][] memory activeSigningKeys, uint8[] memory activeSigningKeySlots)
     {
         activeSigningKeys = new bytes32[2][](numActiveKeys);
         activeSigningKeySlots = new uint8[](numActiveKeys);
-        uint activeKeyIdx = 0;
+        uint256 activeKeyIdx = 0;
         for (uint256 i = 0; i < 256; i++) {
             uint8 slot = uint8(i);
             if (keys[slot][0] != bytes32(0)) {

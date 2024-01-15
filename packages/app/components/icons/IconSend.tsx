@@ -1,11 +1,9 @@
-import { XStack } from '@my/ui'
-import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
 
 const Send = (props: IconProps) => {
-  const { size, color, ...rest } = props
+  const { size } = props
   return (
     <Svg width={size ?? 40} height={size ?? 40} viewBox="0 0 40 40" fill="none">
       <G clip-path="url(#clip0_563_1426)">

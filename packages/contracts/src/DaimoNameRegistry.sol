@@ -27,9 +27,7 @@ contract DaimoNameRegistry is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /// UUPSUpsgradeable: only allow owner to upgrade
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal view override onlyOwner {
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
         (newImplementation); // No-op; silence unused parameter warning
     }
 

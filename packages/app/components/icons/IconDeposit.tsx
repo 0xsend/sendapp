@@ -1,10 +1,9 @@
-import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Circle, Defs, Path, Stop, Svg } from 'react-native-svg'
+import { Circle, Path, Svg } from 'react-native-svg'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Deposit = (props: IconProps) => {
-  const { size, color, ...rest } = props
   return (
     <Svg width="40" height="40" viewBox="0 0 40 40" fill="none">
       <Circle

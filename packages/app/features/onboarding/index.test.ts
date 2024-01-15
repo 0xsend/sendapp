@@ -9,7 +9,6 @@ import {
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
   Hex,
-  PublicClient,
   bytesToHex,
   concat,
   encodeAbiParameters,
@@ -238,11 +237,11 @@ test('can get gas user operation gas prices', async () => {
 //   await waitForTx(publicClient as PublicClient, depositTxHash)
 // }
 
-async function waitForTx(publicClient: PublicClient, hash: Hex) {
-  const receipt = await publicClient.waitForTransactionReceipt({
-    hash,
-    timeout: 30000,
-    confirmations: 3,
-  })
-  console.log(`...status: ${receipt.status}`)
-}
+// async function waitForTx(publicClient: PublicClient, hash: Hex) {
+//   const receipt = await publicClient.waitForTransactionReceipt({
+//     hash,
+//     timeout: 30000,
+//     confirmations: 3,
+//   })
+//   console.log(`...status: ${receipt.status}`)
+// }

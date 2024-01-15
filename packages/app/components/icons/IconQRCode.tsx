@@ -1,4 +1,3 @@
-import { XStack } from '@my/ui'
 import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'

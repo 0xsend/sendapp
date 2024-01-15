@@ -185,11 +185,7 @@ function CreateSendAccount() {
  * Send a Send Account user operation to the bundler
  */
 function SendAccountUserOp() {
-  const {
-    data: sendAccts,
-    error: sendAcctsError,
-    isLoading: sendAcctsIsLoading,
-  } = useSendAccounts()
+  const { data: sendAccts } = useSendAccounts()
 
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)

@@ -5,7 +5,7 @@ export const SideBarWrapper = ({
   children,
   sidebar,
   ...props
-}: { children?: ReactElement; sidebar: ReactElement<YStackProps> } & XStackProps) => {
+}: { children?: React.ReactNode; sidebar: ReactElement<YStackProps> } & XStackProps) => {
   return (
     <XStack {...props}>
       {sidebar}

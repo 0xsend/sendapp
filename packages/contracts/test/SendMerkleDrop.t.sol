@@ -2,7 +2,6 @@
 pragma solidity ^0.8.10;
 
 import "forge-std/Test.sol";
-import "forge-std/console2.sol";
 import {Send} from "../src/Send.sol";
 import {SendMerkleDrop} from "../src/SendMerkleDrop.sol";
 import {Helper} from "../src/Helper.sol";

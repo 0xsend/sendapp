@@ -3,7 +3,7 @@ import { CreateResult, SignResult } from '@daimo/expo-passkeys'
 import { describe, it } from '@jest/globals'
 import { p256 } from '@noble/curves/p256'
 import { base64 } from '@scure/base'
-import { Hex, bytesToHex, hexToBytes } from 'viem'
+import { Hex, bytesToHex } from 'viem'
 import {
   contractFriendlyKeyToDER,
   createResponseToDER,
@@ -213,6 +213,7 @@ describe('contractFriendlyKeyToDER', () => {
 })
 
 const createResult = {
+  credentialIDB64: 'y5p83Ze+tE9+X1GsNFxK2w==',
   rawAttestationObjectB64:
     'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYizwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsRdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFI6/XGQDoO+69ZA1ZDSqXMU1A8q2pQECAyYgASFYILbo5B0aQxUxtm2tq4VU9VILS61c4ZSqXLXFEBdgbo61Ilgg4Lme/b/dEoIbWLn85MlpREPQLp82agWlpoaOLVgTgsQ=',
   rawClientDataJSONB64:

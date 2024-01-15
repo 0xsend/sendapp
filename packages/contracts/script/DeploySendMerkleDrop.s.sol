@@ -17,6 +17,7 @@ contract DeploySendMerkleDropScript is Script, Helper {
         bytes memory args = abi.encode(IERC20(SEND_TOKEN), SEND_AIRDROPS_SAFE);
         address contractAddress = computeCreate2Address(salt, hashInitCode(type(SendMerkleDrop).creationCode, args));
 
+        // solhint-disable-next-line
         console2.log("Deploying SendMerkleDrop contract to address: %s", contractAddress);
 
         vm.startBroadcast();

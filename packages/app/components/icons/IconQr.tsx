@@ -2,8 +2,8 @@ import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const QrLogo = (props: IconProps) => {
-  const { size, color, ...rest } = props
   return (
     <Svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <Path
