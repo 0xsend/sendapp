@@ -197,7 +197,7 @@ export function HomeScreen() {
                   width={'100%'}
                   height={'100%'}
                   backgroundColor={
-                    resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,0.1)' : 'rgb(255,255,255,0.1'
+                    resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,0.1)' : 'rgb(255,255,255,0.1)'
                   }
                   style={{ backdropFilter: 'blur(15px)' }}
                   zIndex={3}
