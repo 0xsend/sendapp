@@ -64,7 +64,7 @@ export const EditProfile = () => {
           Edit Profile
         </Paragraph>
         <XStack onPress={() => router.push('/account')}>
-          <IconClose color={'white'} />
+          <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
         </XStack>
       </XStack>
       <SchemaForm

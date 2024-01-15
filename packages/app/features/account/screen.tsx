@@ -65,7 +65,7 @@ export function AccountScreen() {
                 Account
               </Paragraph>
               <XStack onPress={() => router.push('/')}>
-                <IconClose color={'white'} />
+                <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
               </XStack>
             </XStack>
             <XStack w={'90%'} ai={'center'} jc={'space-between'} zIndex={4}>

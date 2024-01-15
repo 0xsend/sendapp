@@ -226,7 +226,7 @@ export const brandColors = {
 }
 export const sendDark = {
   send1: '#C3AB8E',
-  send2: 'hsl(357, 34.4%, 12.0%)',
+  send2: '#FFFFFF',
   send3: '#1D1D20',
   send4: '#151515',
   send5: '#1D1D20',
