@@ -1,20 +1,19 @@
 import { Button, ButtonIcon, ButtonText, Link, type LinkProps } from '@my/ui'
+import { usePathname } from 'app/utils/usePathname'
 import { type ReactElement } from 'react'
 
 export function SideBarNavLink({
   icon,
   text,
-  location,
   ...props
-}: { icon?: ReactElement; text: string; location: string } & Omit<
-  LinkProps,
-  'children'
->): ReactElement {
+}: { icon?: ReactElement; text: string } & Omit<LinkProps, 'children'>): ReactElement {
+  const location = usePathname()
   const isActiveRoute = location === props.href
 
   return (
     <Link {...props} href={props.disabled ? '' : props.href}>
       <Button
+        width={'100%'}
         disabled={props.disabled}
         color={isActiveRoute ? '$white' : '$gold10'}
         bg={isActiveRoute ? '$gold7' : 'transparent'}
@@ -23,7 +22,9 @@ export function SideBarNavLink({
         fontFamily={'$heading'}
       >
         <ButtonIcon>{icon}</ButtonIcon>
-        <ButtonText fontWeight={isActiveRoute ? 'bold' : 'normal'}>{text}</ButtonText>
+        <ButtonText f={1} fontWeight={isActiveRoute ? 'bold' : 'normal'}>
+          {text}
+        </ButtonText>
       </Button>
     </Link>
   )

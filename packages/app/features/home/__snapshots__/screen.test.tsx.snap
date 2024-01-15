@@ -321,6 +321,8 @@ exports[`HomeScreen 1`] = `
               "alignSelf": "center",
               "flex": 1,
               "flexDirection": "row",
+              "paddingLeft": 32,
+              "paddingRight": 32,
               "width": "100%",
             }
           }

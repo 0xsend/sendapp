@@ -13,6 +13,7 @@ import {
 } from '@my/ui'
 import { Link } from '@my/ui'
 import {
+  IconActivity,
   IconDashboard,
   IconDistributions,
   IconSLogo,
@@ -28,7 +29,6 @@ import { usePathname } from 'app/utils/usePathname'
 import { useNav } from 'app/routers/params'
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
-  const pathName = usePathname()
   return (
     <SideBar {...props}>
       <Link href={'/'} marginTop={'$10'}>
@@ -40,24 +40,22 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
         </Button>
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="flex-start" justifyContent="center">
+        <YStack gap={'$4'} alignItems="stretch" justifyContent="center" w={'100%'} f={1}>
+          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
           <SideBarNavLink
-            icon={<IconDashboard size={'$2'} />}
-            text={'Dashboard'}
-            href={'/'}
-            location={pathName}
+            icon={<IconActivity size={'$2'} />}
+            text={'Activity'}
+            href={'/activity'}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
             text={'Distributions'}
             href={'/distributions'}
-            location={pathName}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
             href={'/leaderboard'}
-            location={pathName}
             disabled={true}
             hoverStyle={{ cursor: 'not-allowed' }}
           />
@@ -92,7 +90,6 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
     else setNavParam(undefined, { webBehavior: 'replace' })
   }
 
-  const pathName = usePathname()
   return (
     <BottomSheet open={nav === 'home'} onOpenChange={onOpenChange}>
       <Link href={'/'} marginTop={'$4'}>
@@ -104,24 +101,22 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
         </Button>
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="flex-start" justifyContent="center">
+        <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
+          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
           <SideBarNavLink
-            icon={<IconDashboard size={'$2'} />}
-            text={'Dashboard'}
-            href={'/'}
-            location={pathName}
+            icon={<IconActivity size={'$2'} />}
+            text={'Activity'}
+            href={'/activity'}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
             text={'Distributions'}
             href={'/distributions'}
-            location={pathName}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
             href={'/leaderboard'}
-            location={pathName}
             disabled={true}
             hoverStyle={{ cursor: 'not-allowed' }}
           />

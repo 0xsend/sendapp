@@ -14,7 +14,7 @@ export function HomeHeader({ children }: { children: string }) {
   }
 
   return (
-    <Header w="100%" $gtSm={{ miw: 804 }}>
+    <Header w="100%">
       <XStack jc="space-between" fd="row" ai="center">
         <H1 fontWeight={'100'}>{children}</H1>
         <XStack $lg={{ display: 'none' }} ai="center" space="$2" height="$4" $gtSm={{ fd: 'row' }}>
