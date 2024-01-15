@@ -14,7 +14,6 @@ contract Send is ERC20("Send Token", "send"), ERC20Snapshot {
      * + Constructor          +
      *
      */
-
     constructor(address multisig, address manager, address[] memory knownBots, uint256 initialMaxBuy) {
         _manager = manager;
         _maxBuy = initialMaxBuy;
@@ -38,7 +37,6 @@ contract Send is ERC20("Send Token", "send"), ERC20Snapshot {
      * + Globals           +
      *
      */
-
     uint256 public _totalSupply = 100000000000;
     uint256 public _maxBuy;
     address public _manager;
@@ -57,7 +55,6 @@ contract Send is ERC20("Send Token", "send"), ERC20Snapshot {
      * + Distribution logic   +
      *
      */
-
     function activateBotDefenceOnce() external onlyManager {
         if (_botDefenceActivatedOnce) {
             return;
@@ -109,7 +106,6 @@ contract Send is ERC20("Send Token", "send"), ERC20Snapshot {
      * + Management          +
      *
      */
-
     modifier onlyManager() {
         require(msg.sender == _manager, "Only the manager can call this");
         _;
