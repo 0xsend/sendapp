@@ -673,6 +673,10 @@ export interface Database {
         }
         Returns: undefined
       }
+      user_referrals_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       key_type_enum: "ES256"

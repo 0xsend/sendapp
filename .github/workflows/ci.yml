@@ -46,7 +46,7 @@ jobs:
           version: nightly
       - name: Tilt CI
         shell: bash
-        run: tilt ci app:test contracts:test distributor:test supabase:test next:web
+        run: tilt ci unit-tests:tests
       # this is on purpose so we get github annotations
       - name: Playwright Tests
         shell: bash

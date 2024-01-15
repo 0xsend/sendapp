@@ -11,8 +11,8 @@
   "scripts": {
     "test": "yarn _with-env yarn vitest",
     "_with-env": "dotenv -e ../../.env -c -- ",
-    "start": " yarn _with-env bun run ./src/server.ts",
-    "dev": "yarn _with-env bun run --watch ./src/server.ts"
+    "start": " yarn _with-env bun --bun run ./src/server.ts",
+    "dev": "yarn _with-env bun --bun run --watch ./src/server.ts"
   },
   "keywords": [],
   "author": "BigBoss <bigboss@metalrodeo.xyz>",

@@ -6,12 +6,13 @@
       "build/**",
       ".snaplet/**",
       "packages/contracts/lib/**",
+      "packages/ui/types/**",
+      "packages/playwright/test-results/**",
       "coverage/**",
       "package.json",
       "**/generated.ts",
       "**/database-generated.types.ts",
       "**/theme-generated.ts",
-      "packages/ui/types/**",
       "./apps/expo/ios/**",
       "./apps/expo/android/**"
     ]
