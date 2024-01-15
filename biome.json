@@ -1,7 +1,17 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["dist/**", "build/**", ".snaplet/**", "packages/contracts/lib/**", "coverage/**"]
+    "ignore": [
+      "dist/**",
+      "build/**",
+      ".snaplet/**",
+      "packages/contracts/lib/**",
+      "coverage/**",
+      "package.json",
+      "**/generated.ts",
+      "**/database-generated.types.ts",
+      "**/theme-generated.ts"
+    ]
   },
   "organizeImports": {
     "enabled": true
@@ -34,6 +44,7 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
   }
 }

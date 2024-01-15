@@ -11,12 +11,12 @@ import {
   XStack,
   YStack,
   styled,
-} from "@my/ui"
-import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { IConfirmModalProps } from "app/features/send/types"
-import { useThemeSetting } from "@tamagui/next-theme"
-import { IconClose } from "app/components/icons"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
+} from '@my/ui'
+import { useThemeSetting } from '@tamagui/next-theme'
+import { IconClose } from 'app/components/icons'
+import { SendButton } from 'app/components/layout/footer/components/SendButton'
+import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { IConfirmModalProps } from 'app/features/send/types'
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -27,13 +27,11 @@ const CustomInput = styled(Input, {
   fontSize: '$3',
   fontStyle: 'italic',
   width: '100%',
-  height: '$4.5'
+  height: '$4.5',
 })
 
 export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps) => {
-  const { transferState } = useTransferContext()
-
-  const { sendAmount, sendTo, currentToken } = transferState
+  const { sendAmount, sendTo, currentToken } = useTransferContext()
 
   const { resolvedTheme } = useThemeSetting()
 
@@ -96,7 +94,9 @@ export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps
           >
             <XStack>
               <Dialog.Title>
-                <SizableText fontSize={'$9'} fontWeight={'700'}>Send it 🚀</SizableText>
+                <SizableText fontSize={'$9'} fontWeight={'700'}>
+                  Send it 🚀
+                </SizableText>
               </Dialog.Title>
             </XStack>
             <YStack gap={'$6'} separator={<Separator />}>
@@ -141,6 +141,6 @@ export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog>
-    </Theme >
+    </Theme>
   )
 }

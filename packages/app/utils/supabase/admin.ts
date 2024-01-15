@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { Database } from '@my/supabase/database.types'
+import { createClient } from '@supabase/supabase-js'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(

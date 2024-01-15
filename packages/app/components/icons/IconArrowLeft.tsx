@@ -1,5 +1,5 @@
 import { ColorTokens } from '@my/ui/types'
-import { themed, IconProps } from '@tamagui/helpers-icon'
+import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
@@ -7,10 +7,10 @@ const ArrowLeft = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 24 16"
       color={color as ColorTokens | undefined}
       width={size ?? 24}
-      height={size ?? 24}
+      height={size ?? 16}
       fill={'none'}
       {...rest}
     >

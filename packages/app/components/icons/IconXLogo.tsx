@@ -1,5 +1,5 @@
 import { ColorTokens } from '@my/ui/types'
-import { themed, IconProps } from '@tamagui/helpers-icon'
+import { IconProps, themed } from '@tamagui/helpers-icon'
 import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'

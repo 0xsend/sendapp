@@ -21,21 +21,14 @@ import {
   TextArea,
   YStack,
 } from '@my/ui'
-import { parseCreateResponse, COSEECDHAtoXY } from 'app/utils/passkeys'
-import React, { useEffect, useState } from 'react'
-import {
-  bytesToHex,
-  concat,
-  Hex,
-  hexToBytes,
-  numberToBytes,
-  ContractFunctionExecutionError,
-  ContractFunctionRevertedError,
-  parseEther,
-} from 'viem'
-import { baseMainnetClient, baseMainnetBundlerClient as bundlerClient } from 'app/utils/viem/client'
 import { iEntryPointABI } from '@my/wagmi'
-import { UserOperation, getSenderAddress } from 'permissionless'
+import { base16, base64 } from '@scure/base'
+import { assert } from 'app/utils/assert'
+import { base64ToBase16 } from 'app/utils/base64ToBase16'
+import { COSEECDHAtoXY, parseCreateResponse } from 'app/utils/passkeys'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useSendAccounts } from 'app/utils/useSendAccounts'
+import { useUser } from 'app/utils/useUser'
 import {
   USEROP_KEY_SLOT,
   USEROP_VALID_UNTIL,
@@ -47,14 +40,21 @@ import {
   receiverAccount,
   verifier,
 } from 'app/utils/userop'
-import { signChallenge, generateChallenge } from 'app/utils/userop'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { base16, base64 } from '@scure/base'
-import { useUser } from 'app/utils/useUser'
-import { assert } from 'app/utils/assert'
-import { useSendAccounts } from 'app/utils/useSendAccounts'
-import { base64ToBase16 } from 'app/utils/base64ToBase16'
+import { generateChallenge, signChallenge } from 'app/utils/userop'
+import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from 'app/utils/viem/client'
 import * as Device from 'expo-device'
+import { UserOperation, getSenderAddress } from 'permissionless'
+import React, { useEffect, useState } from 'react'
+import {
+  ContractFunctionExecutionError,
+  ContractFunctionRevertedError,
+  Hex,
+  bytesToHex,
+  concat,
+  hexToBytes,
+  numberToBytes,
+  parseEther,
+} from 'viem'
 import { testBaseClient } from '../../../playwright/tests/fixtures/viem/base'
 
 export function OnboardingScreen() {
@@ -219,6 +219,7 @@ function SendAccountUserOp() {
     if (!publicKey) {
       return
     }
+    // eslint-disable-next-line no-extra-semi
     ;(async () => {
       const { userOp: _userOp, userOpHash: _userOpHash } = await generateUserOp(publicKey)
 

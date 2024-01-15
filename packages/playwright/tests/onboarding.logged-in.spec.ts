@@ -4,29 +4,23 @@
  * Currently, Playwright browsers do no support WebAuthn, so we mock the call to the WebAuthn API.
  */
 
-import { testBaseClient, baseMainnetClient } from './fixtures/viem/base'
-import { test, expect } from './fixtures/auth'
-import { Hex, parseEther } from 'viem'
-import { assert } from 'app/utils/assert'
-import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
 import { Attestation } from '@0xsend/webauthn-authenticator/types'
+import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
+import { assert } from 'app/utils/assert'
 import cbor from 'cbor'
+import { Hex, parseEther } from 'viem'
+import { expect, test } from './fixtures/auth'
+import { OnboardingPage } from './fixtures/send-accounts'
+import { baseMainnetClient, testBaseClient } from './fixtures/viem/base'
 
-// TODO: consider creating an onboarding page fixture
-test('can visit onboarding page', async ({ page, credentialsStore, supabase, authSession }) => {
-  await page.goto('/onboarding')
-  expect(page).toHaveURL('/onboarding')
-
-  // choose a random account name
-  const acctName = `test-${Math.floor(Math.random() * 1000000)}`
-  await page.getByRole('textbox', { name: 'Account name:' }).fill(acctName)
-  await expect(page.getByLabel('Account name:')).toHaveValue(acctName)
-
-  await page.getByRole('button', { name: 'Create' }).click()
+test('can visit onboarding page', async ({ page, supabase, authSession, authenticator }) => {
+  const onboardingPage = new OnboardingPage(page)
+  await onboardingPage.completeOnboarding(expect)
 
   // assert passkey was created
-  expect(Object.values(credentialsStore).length).toBe(1)
-  const credential = Object.values(credentialsStore)[0]
+  const credentials = authenticator.credentials
+  expect(Object.values(credentials).length).toBe(1)
+  const credential = Object.values(credentials)[0]
   assert(!!credential, 'Missing credential')
   expect(credential.attestations.length).toBe(1)
 
@@ -59,7 +53,7 @@ test('can visit onboarding page', async ({ page, credentialsStore, supabase, aut
   // verify webauthn credential
   const webAuthnCred = sendAcct.webauthn_credentials[0]
   assert(!!webAuthnCred, 'Missing webauthn credential')
-  expect(webAuthnCred.display_name).toBe(acctName)
+  expect(webAuthnCred.display_name).toBe(onboardingPage.accountName)
   expect(webAuthnCred.name).toBe(`${authSession.decoded.sub}.0`)
   expect(webAuthnCred.raw_credential_id).toBe(`\\x${credential.id.toString('hex')}`)
   assert(!!attestation, 'Missing credential attestation')

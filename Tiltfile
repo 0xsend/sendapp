@@ -213,6 +213,34 @@ local_resource(
     ],
 )
 
+local_resource(
+    "otterscan:mainnet",
+    allow_parallel = True,
+    auto_init = False,
+    labels = labels,
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/",
+            port = 5100,
+        ),
+        period_secs = 15,
+        timeout_secs = 5,
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:base",
+    ],
+    serve_cmd = """
+    docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs docker rm -f
+    docker run --rm \
+        --name otterscan-mainnet \
+        -p 5100:80 \
+        --add-host=host.docker.internal:host-gateway \
+        --env ERIGON_URL="http://host.docker.internal:8545" \
+        otterscan/otterscan:v2.3.0
+    """,
+)
+
 base_fork_block_number = str(local(
     "cat packages/contracts/foundry.toml | yj -tj | jq .profile.base.fork_block_number",
     echo_off = True,
@@ -279,6 +307,7 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
+    docker ps -a | grep aa-bundler | awk '{print $1}' | xargs docker rm -f
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
@@ -320,6 +349,34 @@ local_resource(
 #     ],
 #     serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --uopool-mode unsafe --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
 # )
+
+local_resource(
+    "otterscan:base",
+    allow_parallel = True,
+    auto_init = False,
+    labels = labels,
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/",
+            port = 5101,
+        ),
+        period_secs = 15,
+        timeout_secs = 5,
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:base",
+    ],
+    serve_cmd = """
+    docker ps -a | grep otterscan-base | awk '{print $1}' | xargs docker rm -f
+    docker run --rm \
+        --name otterscan-base \
+        -p 5101:80 \
+        --add-host=host.docker.internal:host-gateway \
+        --env ERIGON_URL="http://host.docker.internal:8546" \
+        otterscan/otterscan:v2.3.0
+    """,
+)
 
 # APPS
 labels = ["apps"]
@@ -407,6 +464,7 @@ local_resource(
     "playwright:test",
     "yarn playwright test",
     allow_parallel = True,
+    auto_init = CI == True,
     labels = ["test"],
     resource_deps = ["next:web"],
     deps = files_matching(

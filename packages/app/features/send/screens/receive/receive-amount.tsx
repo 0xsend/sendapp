@@ -1,29 +1,14 @@
-import { useState } from 'react'
-import {
-  Button,
-  Image,
-  Paragraph,
-  SizableText,
-  XStack,
-  YStack,
-} from '@my/ui'
-import { Link } from '@my/ui/src/components'
+import { Button, Image, Link, Paragraph, SizableText, XStack, YStack } from '@my/ui'
 import { IconClose } from 'app/components/icons'
-import { IReceiveScreenProps } from 'app/features/send/types'
-import { NumPad } from 'app/features/send/components/numpad'
 import { RequestConfirmModal } from 'app/features/send/components/modal'
+import { NumPad } from 'app/features/send/components/numpad'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { useState } from 'react'
 
-export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { requestAmount, requestTo } = transferState
+export const ReceiveAmountScreen = () => {
+  const { requestAmount, requestTo, setRequestAmount } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
-
-  const setRequestAmount = (val: string) => {
-    updateTransferContext({ requestAmount: val })
-  }
 
   return (
     <>
@@ -36,7 +21,7 @@ export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) =
         fullscreen
         $shorter={{
           pt: '$8',
-          pb: '$6'
+          pb: '$6',
         }}
       >
         <XStack alignSelf={'flex-start'} ai={'center'} gap={'$2'}>
@@ -47,7 +32,9 @@ export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) =
             borderRadius={'$3'}
             mr={'$2.5'}
           />
-          <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>Request</SizableText>
+          <SizableText fontSize={'$8'} $shorter={{ fontSize: '$6' }}>
+            Request
+          </SizableText>
           <SizableText
             color={'$primary'}
             fontSize={'$8'}
@@ -70,7 +57,7 @@ export const ReceiveAmountScreen = ({ setCurrentScreen }: IReceiveScreenProps) =
               $shorter={{
                 maw: '$18',
                 py: '$5',
-                br: '$7'
+                br: '$7',
               }}
               onPress={() => setShowModal(true)}
             >

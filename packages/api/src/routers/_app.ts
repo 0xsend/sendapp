@@ -1,9 +1,9 @@
 import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { createTRPCRouter } from '../trpc'
-import { chainAddressRouter } from './chainAddress'
-import { tagRouter } from './tag'
 import { authRouter } from './auth'
+import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
+import { tagRouter } from './tag'
 
 export const appRouter = createTRPCRouter({
   chainAddress: chainAddressRouter,

@@ -6,188 +6,24 @@
  */
 
 import crypto from 'crypto'
+import { base64urlnopad } from '@scure/base'
 import cbor from 'cbor'
+import debug from 'debug'
+import { AAGUID } from './aaguid'
 import {
+  Attestation,
   CreateWebauthnCredentialOptions,
   CredentialCreationOptionsSerialized,
-  PublicKeyCredentialAttestationSerialized,
   CredentialRequestOptionsSerialized,
-  PublicKeyCredentialAssertionSerialized,
-  WebauthnCredential,
-  Attestation,
   GetWebAuthnCredentialQuery,
+  PublicKeyCredentialAssertionSerialized,
+  PublicKeyCredentialAttestationSerialized,
+  WebauthnCredential,
 } from './types'
-import { AAGUID } from './aaguid'
-import { base64, base64urlnopad } from '@scure/base'
+
+const log = debug('webauthn-authenticator')
 
 export const COSE_PUB_KEY_ALG = -7 // ECDSA w/ SHA-256
-
-// TODO: encapsulate this in a class and add a method to reset the store, optionally allow to pass a store
-export const CredentialsStore: {
-  [key: string]: WebauthnCredential
-} = {}
-
-/**
- * Creates a new public key credential to be used for WebAuthn attestations and assertions.
- */
-function createWebauthnCredential({
-  rpId = 'localhost',
-  userHandle = null,
-}: CreateWebauthnCredentialOptions): WebauthnCredential {
-  const id: Buffer = crypto.randomBytes(16)
-  const signCounter = 0
-  const { publicKey, privateKey } = crypto.generateKeyPairSync('ec', {
-    namedCurve: 'prime256v1',
-    publicKeyEncoding: { type: 'spki', format: 'der' },
-    privateKeyEncoding: { type: 'sec1', format: 'pem' },
-  })
-  const cred: WebauthnCredential = {
-    id,
-    publicKey,
-    privateKey,
-    signCounter,
-    rpId,
-    userHandle,
-    assertions: [],
-    attestations: [],
-  }
-  CredentialsStore[id.toString('base64url')] = cred
-  return cred
-}
-
-/**
- * Gets a public key credential for WebAuthn assertions.
- */
-function getWebauthnCredential({
-  credentialId,
-  rpId = 'localhost',
-}: GetWebAuthnCredentialQuery): WebauthnCredential | null {
-  if (credentialId !== undefined) {
-    return CredentialsStore[credentialId] || null
-  }
-  // find by rpId, multiple credentials can be registered for the same rpId and would require a user to select
-  return Object.values(CredentialsStore).find((c) => c.rpId === rpId) || null
-}
-
-/**
- * Creates a new public key credential for WebAuthn compatible with navigator.credentials.create.
- * This version returns a serialized version of the credential instead of array buffers.
- * This is useful when mocking the WebAuthn API in a browser and is meant to be used in Playwright tests exposed via
- * context.exposeFunction or page.exposeFunction.
- * @see https://www.w3.org/TR/webauthn-2/#sctn-createCredential
- * @see https://www.w3.org/TR/webauthn-2/#sctn-generating-an-attestation-object
- */
-export async function createPublicKeyCredential(
-  credentialOptions: CredentialCreationOptionsSerialized
-): Promise<PublicKeyCredentialAttestationSerialized> {
-  const credOptsPubKey = credentialOptions.publicKey
-  if (
-    !credOptsPubKey ||
-    credOptsPubKey.pubKeyCredParams.length === 0 ||
-    credOptsPubKey.pubKeyCredParams.some((p) => p.alg !== COSE_PUB_KEY_ALG)
-  ) {
-    throw new Error('Unsupported algorithm')
-  }
-  const clientDataJSON = Buffer.from(
-    new TextEncoder().encode(
-      JSON.stringify({
-        challenge: credOptsPubKey.challenge,
-        origin: credOptsPubKey.rp.id,
-        type: 'webauthn.create',
-      })
-    )
-  )
-  const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataJSON))
-  const rpId = credOptsPubKey.rp.id || 'localhost'
-  const userHandle = base64urlnopad.decode(credOptsPubKey.user.id) || null
-  const cred = createWebauthnCredential({
-    rpId,
-    userHandle,
-  })
-  const { id: credentialId, publicKey, privateKey, signCounter } = cred
-  const attestedCredentialData = generateAttestedCredentialData(credentialId, publicKey)
-  const authData = generateAuthenticatorData(rpId, signCounter, attestedCredentialData)
-  cred.signCounter++ // increment counter on each "access" to the authenticator
-  const attestationObject = generateAttestionObject(authData, clientDataHash, privateKey)
-
-  // save response to cred for inspection
-  const response = {
-    attestationObject,
-    clientDataJSON,
-  }
-  cred.attestations.push(response)
-
-  const credentialResponse: PublicKeyCredentialAttestationSerialized = {
-    id: base64urlnopad.encode(credentialId),
-    rawId: base64urlnopad.encode(credentialId),
-    authenticatorAttachment: 'platform',
-    response: {
-      attestationObject: base64urlnopad.encode(attestationObject),
-      clientDataJSON: base64urlnopad.encode(clientDataJSON),
-    },
-    type: 'public-key',
-  } as PublicKeyCredentialAttestationSerialized
-  return credentialResponse
-}
-
-/**
- * Gets a public key credential for WebAuthn compatible with navigator.credentials.get.
- * This version returns a serialized version of the credential instead of array buffers.
- * This is useful when mocking the WebAuthn API in a browser and is meant to be used in Playwright tests exposed via
- * context.exposeFunction or page.exposeFunction.
- * @see https://www.w3.org/TR/webauthn-2/#sctn-getCredential
- * @see https://www.w3.org/TR/webauthn-2/#sctn-verifying-assertion
- */
-export async function getPublicKeyCredential(
-  credentialRequestOptions: CredentialRequestOptionsSerialized
-) {
-  const challenge = credentialRequestOptions.publicKey.challenge // base64url encoded challenge
-  const credReqOptsPubKey = credentialRequestOptions.publicKey
-  const clientDataJSON = {
-    type: 'webauthn.get',
-    challenge: credentialRequestOptions.publicKey.challenge,
-    origin: credentialRequestOptions.publicKey.rpId,
-  }
-  const clientDataBuffer = Buffer.from(new TextEncoder().encode(JSON.stringify(clientDataJSON)))
-  const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataBuffer))
-  const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
-  const credQuery: GetWebAuthnCredentialQuery = {
-    credentialId: credReqOptsPubKey?.allowCredentials?.[0]?.id,
-    rpId,
-  }
-  const cred = getWebauthnCredential(credQuery)
-  if (!cred) {
-    throw new Error('Credential not found')
-  }
-  const { id: credentialId, publicKey, privateKey, signCounter } = cred
-
-  const authData = generateAuthenticatorData(rpId, signCounter, null)
-  cred.signCounter++ // increment counter on each "access" to the authenticator
-  const assertionObject = generateAssertionObject(authData, clientDataHash, privateKey)
-  const response: AuthenticatorAssertionResponse = {
-    authenticatorData: authData,
-    clientDataJSON: clientDataBuffer,
-    signature: assertionObject,
-    userHandle: cred.userHandle,
-  }
-
-  // save response to cred for inspection
-  cred.assertions.push(response)
-
-  const credentialResponse = {
-    id: base64urlnopad.encode(credentialId),
-    rawId: base64urlnopad.encode(credentialId),
-    response: {
-      authenticatorData: base64urlnopad.encode(Buffer.from(authData)),
-      clientDataJSON: base64urlnopad.encode(Buffer.from(clientDataBuffer)),
-      signature: base64urlnopad.encode(Buffer.from(assertionObject)),
-      userHandle: cred.userHandle ? base64urlnopad.encode(Buffer.from(cred.userHandle)) : null,
-    },
-    type: 'public-key',
-  } as PublicKeyCredentialAssertionSerialized
-
-  return credentialResponse
-}
 
 /**
  * Generate authenticator data is a variable-length byte array added to the authenticator data when generating an
@@ -285,4 +121,169 @@ function generateAssertionObject(
 ): Buffer {
   const assertion = Buffer.concat([authData, clientDataJSON])
   return crypto.createSign('sha256').update(assertion).sign(privateKey)
+}
+
+export class Authenticator {
+  public readonly credentials: Record<string, WebauthnCredential> = {}
+
+  /**
+   * Creates a new public key credential to be used for WebAuthn attestations and assertions.
+   */
+  private createWebauthnCredential({
+    rpId = 'localhost',
+    userHandle = null,
+  }: CreateWebauthnCredentialOptions): WebauthnCredential {
+    const id: Buffer = crypto.randomBytes(16)
+    const signCounter = 0
+    const { publicKey, privateKey } = crypto.generateKeyPairSync('ec', {
+      namedCurve: 'prime256v1',
+      publicKeyEncoding: { type: 'spki', format: 'der' },
+      privateKeyEncoding: { type: 'sec1', format: 'pem' },
+    })
+    const cred: WebauthnCredential = {
+      id,
+      publicKey,
+      privateKey,
+      signCounter,
+      rpId,
+      userHandle,
+      assertions: [],
+      attestations: [],
+    }
+    this.credentials[id.toString('base64url')] = cred
+    return cred
+  }
+
+  /**
+   * Gets a public key credential for WebAuthn assertions.
+   */
+  private getWebauthnCredential({
+    credentialId,
+    rpId = 'localhost',
+  }: GetWebAuthnCredentialQuery): WebauthnCredential | null {
+    if (credentialId !== undefined) {
+      return this.credentials[credentialId] || null
+    }
+    // find by rpId, multiple credentials can be registered for the same rpId and would require a user to select
+    return Object.values(this.credentials).find((c) => c.rpId === rpId) || null
+  }
+
+  /**
+   * Creates a new public key credential for WebAuthn compatible with navigator.credentials.create.
+   * This version returns a serialized version of the credential instead of array buffers.
+   * This is useful when mocking the WebAuthn API in a browser and is meant to be used in Playwright tests exposed via
+   * context.exposeFunction or page.exposeFunction.
+   * @see https://www.w3.org/TR/webauthn-2/#sctn-createCredential
+   * @see https://www.w3.org/TR/webauthn-2/#sctn-generating-an-attestation-object
+   */
+  async createPublicKeyCredential(
+    credentialOptions: CredentialCreationOptionsSerialized
+  ): Promise<PublicKeyCredentialAttestationSerialized> {
+    log('createPublicKeyCredential', credentialOptions)
+    const credOptsPubKey = credentialOptions.publicKey
+    if (
+      !credOptsPubKey ||
+      credOptsPubKey.pubKeyCredParams.length === 0 ||
+      credOptsPubKey.pubKeyCredParams.some((p) => p.alg !== COSE_PUB_KEY_ALG)
+    ) {
+      throw new Error('Unsupported algorithm')
+    }
+    const clientDataJSON = Buffer.from(
+      new TextEncoder().encode(
+        JSON.stringify({
+          challenge: credOptsPubKey.challenge,
+          origin: credOptsPubKey.rp.id,
+          type: 'webauthn.create',
+        })
+      )
+    )
+    const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataJSON))
+    const rpId = credOptsPubKey.rp.id || 'localhost'
+    const userHandle = base64urlnopad.decode(credOptsPubKey.user.id) || null
+    const cred = this.createWebauthnCredential({
+      rpId,
+      userHandle,
+    })
+    const { id: credentialId, publicKey, privateKey, signCounter } = cred
+    const attestedCredentialData = generateAttestedCredentialData(credentialId, publicKey)
+    const authData = generateAuthenticatorData(rpId, signCounter, attestedCredentialData)
+    cred.signCounter++ // increment counter on each "access" to the authenticator
+    const attestationObject = generateAttestionObject(authData, clientDataHash, privateKey)
+
+    // save response to cred for inspection
+    const response = {
+      attestationObject,
+      clientDataJSON,
+    }
+    cred.attestations.push(response)
+
+    const credentialResponse: PublicKeyCredentialAttestationSerialized = {
+      id: base64urlnopad.encode(credentialId),
+      rawId: base64urlnopad.encode(credentialId),
+      authenticatorAttachment: 'platform',
+      response: {
+        attestationObject: base64urlnopad.encode(attestationObject),
+        clientDataJSON: base64urlnopad.encode(clientDataJSON),
+      },
+      type: 'public-key',
+    } as PublicKeyCredentialAttestationSerialized
+    return credentialResponse
+  }
+
+  /**
+   * Gets a public key credential for WebAuthn compatible with navigator.credentials.get.
+   * This version returns a serialized version of the credential instead of array buffers.
+   * This is useful when mocking the WebAuthn API in a browser and is meant to be used in Playwright tests exposed via
+   * context.exposeFunction or page.exposeFunction.
+   * @see https://www.w3.org/TR/webauthn-2/#sctn-getCredential
+   * @see https://www.w3.org/TR/webauthn-2/#sctn-verifying-assertion
+   */
+  async getPublicKeyCredential(credentialRequestOptions: CredentialRequestOptionsSerialized) {
+    log('getPublicKeyCredential', credentialRequestOptions)
+    const credReqOptsPubKey = credentialRequestOptions.publicKey
+    const clientDataJSON = {
+      type: 'webauthn.get',
+      challenge: credentialRequestOptions.publicKey.challenge,
+      origin: credentialRequestOptions.publicKey.rpId,
+    }
+    const clientDataBuffer = Buffer.from(new TextEncoder().encode(JSON.stringify(clientDataJSON)))
+    const clientDataHash = Buffer.from(await crypto.subtle.digest('SHA-256', clientDataBuffer))
+    const rpId = credentialRequestOptions.publicKey.rpId || 'localhost'
+    const credQuery: GetWebAuthnCredentialQuery = {
+      credentialId: credReqOptsPubKey?.allowCredentials?.[0]?.id,
+      rpId,
+    }
+    const cred = this.getWebauthnCredential(credQuery)
+    if (!cred) {
+      throw new Error('Credential not found')
+    }
+    const { id: credentialId, publicKey, privateKey, signCounter } = cred
+
+    const authData = generateAuthenticatorData(rpId, signCounter, null)
+    cred.signCounter++ // increment counter on each "access" to the authenticator
+    const assertionObject = generateAssertionObject(authData, clientDataHash, privateKey)
+    const response: AuthenticatorAssertionResponse = {
+      authenticatorData: authData,
+      clientDataJSON: clientDataBuffer,
+      signature: assertionObject,
+      userHandle: cred.userHandle,
+    }
+
+    // save response to cred for inspection
+    cred.assertions.push(response)
+
+    const credentialResponse = {
+      id: base64urlnopad.encode(credentialId),
+      rawId: base64urlnopad.encode(credentialId),
+      response: {
+        authenticatorData: base64urlnopad.encode(Buffer.from(authData)),
+        clientDataJSON: base64urlnopad.encode(Buffer.from(clientDataBuffer)),
+        signature: base64urlnopad.encode(Buffer.from(assertionObject)),
+        userHandle: cred.userHandle ? base64urlnopad.encode(Buffer.from(cred.userHandle)) : null,
+      },
+      type: 'public-key',
+    } as PublicKeyCredentialAssertionSerialized
+
+    return credentialResponse
+  }
 }

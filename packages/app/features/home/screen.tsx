@@ -29,6 +29,7 @@ import {
 import { MainLayout } from 'app/components/layout'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { useState } from 'react'
+import { useRouter } from 'solito/router'
 import { Square } from 'tamagui'
 
 export function HomeScreen() {
@@ -41,8 +42,8 @@ export function HomeScreen() {
 
   const actionButtons = [
     { label: 'Deposit', iconPNGPath: <IconDeposit />, href: '/' },
-    { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/' },
-    { label: 'Send', iconPNGPath: <IconSendTile />, href: '/checkout' },
+    { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/receive' },
+    { label: 'Send', iconPNGPath: <IconSendTile />, href: '/send' },
   ]
   const balanceViewButtons = [
     { label: 'Ethereum', onPress: () => {} },
@@ -50,6 +51,7 @@ export function HomeScreen() {
   ]
   const transactions = [
     {
+      id: 1,
       user: {
         sendTag: 'ethantree',
       },
@@ -70,6 +72,7 @@ export function HomeScreen() {
       created_on: '',
     },
     {
+      id: 2,
       user: {
         sendTag: 'You',
       },
@@ -80,6 +83,7 @@ export function HomeScreen() {
       created_on: '',
     },
     {
+      id: 3,
       user: {
         sendTag: 'You',
       },
@@ -117,6 +121,10 @@ export function HomeScreen() {
       balance: 2.0,
     },
   ]
+  const navigateToScreen = (href: string) => {
+    window.location.href = href
+  }
+
   return (
     <>
       <MainLayout scrollable={true}>
@@ -154,12 +162,12 @@ export function HomeScreen() {
                         Total Balance
                       </Paragraph>
                       <XStack style={{ color: 'white' }}>
-                        <Paragraph color={'$light'} fontSize={'$6'} zIndex={1}>
+                        <Paragraph color={'white'} fontSize={'$6'} zIndex={1}>
                           {'$'}
                         </Paragraph>
                         <Paragraph
                           fontWeight={'700'}
-                          color={'$light'}
+                          color={'white'}
                           fontSize={'$10'}
                           lineHeight={'$8'}
                           zIndex={1}
@@ -167,7 +175,7 @@ export function HomeScreen() {
                         >
                           {USDollar.format(6990).replace('$', '').split('.')[0]}
                         </Paragraph>
-                        <Paragraph color={'$light'} fontSize={'$6'} zIndex={1}>
+                        <Paragraph color={'white'} fontSize={'$6'} zIndex={1}>
                           {'.00'}
                         </Paragraph>
                       </XStack>
@@ -189,7 +197,7 @@ export function HomeScreen() {
                   width={'100%'}
                   height={'100%'}
                   backgroundColor={
-                    resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,0.1)' : 'rgb(255,255,255,0.1'
+                    resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,0.1)' : 'rgb(255,255,255,0.1)'
                   }
                   style={{ backdropFilter: 'blur(15px)' }}
                   zIndex={3}
@@ -267,7 +275,7 @@ export function HomeScreen() {
               {/* D-R-S Buttons */}
               <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$4'}>
                 {actionButtons.map((actionButton) => (
-                  <YStack f={1} w={'inherit'} gap={'$2'}>
+                  <YStack f={1} w={'inherit'} gap={'$2'} key={actionButton.label}>
                     <Card
                       f={1}
                       h={'$12'}
@@ -277,6 +285,7 @@ export function HomeScreen() {
                       shadowOffset={{ width: 0, height: 4 }}
                       shadowRadius={8}
                       shadowOpacity={0.1}
+                      onPress={() => navigateToScreen(actionButton.href)}
                     >
                       <XStack f={1} alignItems={'center'} justifyContent={'center'} zIndex={2}>
                         {actionButton.iconPNGPath}
@@ -289,7 +298,7 @@ export function HomeScreen() {
                     </Card>
                     <Paragraph
                       textAlign={'center'}
-                      color={resolvedTheme?.startsWith('dark') ? '$primary' : ''}
+                      color={resolvedTheme?.startsWith('dark') ? '$primary' : '#050505'}
                     >
                       {actionButton.label}
                     </Paragraph>
@@ -301,6 +310,7 @@ export function HomeScreen() {
                 {balanceViewButtons.map((balanceViewButton) => {
                   return (
                     <Button
+                      key={balanceViewButton.label}
                       f={1}
                       br={'$radius.true'}
                       bw={'$0.5'}
@@ -327,6 +337,7 @@ export function HomeScreen() {
                 </XStack>
                 {transactions.map((transaction) => (
                   <Card
+                    key={transaction.id}
                     h={'$6'}
                     borderRadius={'$4'}
                     shadowColor={'rgba(0, 0, 0, 0.1)'}

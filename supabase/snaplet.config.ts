@@ -44,11 +44,23 @@ export default defineConfig({
   transform: {
     auth: {
       users({ row }) {
+        let phone: string
+        if (row.phone !== null) {
+          phone = `1${copycat.phoneNumber(row.phone?.slice(1), {
+            min: 10000000000,
+            max: 99999999999,
+          })}`
+          // supabase does not store the + in the phone number
+          phone = phone.replace('+', '')
+        } else {
+          phone = copycat.phoneNumber(row.phone)
+        }
+
         return {
           email: copycat.email(row.email, {
             limit: 255,
           }),
-          phone: `1${copycat.phoneNumber(row.phone).replace('+', '')}`, // supabase does not store the + in the phone number
+          phone,
           password: false,
         }
       },
@@ -79,9 +91,9 @@ export default defineConfig({
           return {}
         }
 
-        const { metadata } = row as any
+        const { metadata } = row as { metadata: { [key: string]: string } }
 
-        if (metadata.tag) {
+        if (metadata.tag !== undefined) {
           metadata.tag = tagName(metadata.tag)
         }
 

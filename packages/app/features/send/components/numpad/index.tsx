@@ -1,40 +1,38 @@
-import { H1, SizableText, XStack, YStack } from "@my/ui"
-import { NumpadButton } from "./numpad-button"
+import { H1, SizableText, XStack, YStack } from '@my/ui'
 import { Select } from 'app/features/send/components/select'
-import { INumPadProps } from "app/features/send/types"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
-import formatNumpadInput from "app/utils/formatNumpadInput"
+import { useTransferContext } from 'app/features/send/providers/transfer-provider'
+import { INumPadProps } from 'app/features/send/types'
+import formatNumpadInput from 'app/utils/formatNumpadInput'
+import { NumpadButton } from './numpad-button'
 
 export const NumPad = ({ value, setValue }: INumPadProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { balance, tokens, currentToken } = transferState
+  const { balance, tokens, currentToken, setCurrentToken } = useTransferContext()
 
   const numpadpressHandler = (input: string) => {
     setValue(formatNumpadInput(value, input, balance))
   }
 
-  const setCurrentToken = (value: string) => {
+  const updateCurrentToken = (value: string) => {
     const token = tokens.filter((tok) => tok.name.toLowerCase() === value)[0]
-    updateTransferContext({ currentToken: token })
+    setCurrentToken(token ?? currentToken)
   }
 
   return (
     <YStack>
       <XStack jc={'center'}>
         <H1
-          size={value.length > 4 ? value.length > 8 ? '$10' : '$12' : '$14'}
+          size={value.length > 4 ? (value.length > 8 ? '$10' : '$12') : '$14'}
           minHeight={'$10'}
           $shorter={{
-            size: value.length > 4 ? value.length > 8 ? '$10' : '$11' : '$12',
-            minHeight: '$7'
+            size: value.length > 4 ? (value.length > 8 ? '$10' : '$11') : '$12',
+            minHeight: '$7',
           }}
         >
           {Number(value).toLocaleString('en-US', { maximumFractionDigits: 20 })}
         </H1>
       </XStack>
       <XStack jc={'space-between'} mt={'$2'}>
-        <Select items={tokens} currentItem={currentToken} onValueChange={setCurrentToken} />
+        <Select items={tokens} currentItem={currentToken} onValueChange={updateCurrentToken} />
         <XStack
           px={'$5'}
           py={'$2.5'}
@@ -44,7 +42,7 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
           borderColor={'$backgroundFocus'}
           $shorter={{
             px: '$4',
-            py: '$2'
+            py: '$2',
           }}
         >
           <SizableText theme={'alt2'}>Bal</SizableText>
@@ -68,7 +66,11 @@ export const NumPad = ({ value, setValue }: INumPadProps) => {
           <NumpadButton pressHandler={numpadpressHandler} value={'9'} num />
         </XStack>
         <XStack jc={'center'} space={'$6'} $shorter={{ space: '$4' }}>
-          <NumpadButton pressHandler={numpadpressHandler} value={'.'} disabled={value.includes('.')} />
+          <NumpadButton
+            pressHandler={numpadpressHandler}
+            value={'.'}
+            disabled={value.includes('.')}
+          />
           <NumpadButton pressHandler={numpadpressHandler} value={'0'} num />
           <NumpadButton pressHandler={numpadpressHandler} value={'<'} />
         </XStack>

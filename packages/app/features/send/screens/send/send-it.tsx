@@ -1,19 +1,10 @@
-import {
-  Button,
-  Image,
-  Input,
-  SizableText,
-  XStack,
-  YStack,
-  styled,
-} from "@my/ui"
-import { useState } from "react"
-import { Link } from '@my/ui/src/components'
-import { IconBack, IconClose } from "app/components/icons"
-import { SendButton } from "app/components/layout/footer/components/SendButton"
-import { SendConfirmModal } from "app/features/send/components/modal"
-import { ISendScreenProps } from "app/features/send/types"
-import { useTransferContext } from "app/features/send/providers/transfer-provider"
+import { Button, Image, Input, Link, SizableText, XStack, YStack, styled } from '@my/ui'
+import { IconBack, IconClose } from 'app/components/icons'
+import { SendButton } from 'app/components/layout/footer/components/SendButton'
+import { SendConfirmModal } from 'app/features/send/components/modal'
+import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
+import { ANIMATE_DIRECTION_LEFT, SendScreen } from 'app/features/send/types'
+import { useState } from 'react'
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -24,13 +15,12 @@ const CustomInput = styled(Input, {
   fontSize: '$3',
   fontStyle: 'italic',
   width: '100%',
-  height: '$4.5'
+  height: '$4.5',
 })
 
-export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
-  const { transferState, updateTransferContext } = useTransferContext()
-
-  const { currentToken, sendAmount, sendTo } = transferState
+export const SendItScreen = () => {
+  const { setCurrentComponent } = useSubScreenContext()
+  const { currentToken, sendAmount, sendTo } = useTransferContext()
 
   const [showModal, setShowModal] = useState(false)
 
@@ -43,15 +33,11 @@ export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
         fullscreen
         $shorter={{
           pt: '$8',
-          pb: '$6'
+          pb: '$6',
         }}
       >
         <XStack jc={'center'}>
-          <SizableText
-            fontSize={'$9'}
-            fontWeight={'700'}
-            $shorter={{ fontSize: '$8' }}
-          >
+          <SizableText fontSize={'$9'} fontWeight={'700'} $shorter={{ fontSize: '$8' }}>
             Send it 🚀
           </SizableText>
         </XStack>
@@ -65,15 +51,21 @@ export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
                 height={'$4.5'}
                 borderRadius={'$6'}
               />
-              <SizableText fontSize={'$8'} fontWeight={'700'} color={'$primary'}>{sendTo?.name}</SizableText>
+              <SizableText fontSize={'$8'} fontWeight={'700'} color={'$primary'}>
+                {sendTo?.name}
+              </SizableText>
             </XStack>
           </YStack>
           <YStack gap={'$5'}>
             <SizableText theme={'alt2'}>Amount</SizableText>
             <XStack ai={'center'}>
               {currentToken?.icon}
-              <SizableText fontSize={'$9'} ml={'$1.5'}>{currentToken?.name}</SizableText>
-              <SizableText fontSize={'$9'} fontWeight={'700'} ml={'$2'}>{sendAmount}</SizableText>
+              <SizableText fontSize={'$9'} ml={'$1.5'}>
+                {currentToken?.name}
+              </SizableText>
+              <SizableText fontSize={'$9'} fontWeight={'700'} ml={'$2'}>
+                {sendAmount}
+              </SizableText>
             </XStack>
           </YStack>
           <YStack gap={'$5'}>
@@ -93,7 +85,7 @@ export const SendItScreen = ({ setCurrentScreen }: ISendScreenProps) => {
           circular
           bg={'$backgroundTransparent'}
           $shorter={{ top: '$size.4' }}
-          onPress={() => setCurrentScreen(['send-tag', -1])}
+          onPress={() => setCurrentComponent([SendScreen.SEND_TAG, ANIMATE_DIRECTION_LEFT])}
         >
           <IconBack />
         </Button>

@@ -134,4 +134,16 @@ export const componentThemeDefinitions = {
       ...maskOptions.component,
     },
   ],
+  SideBar: [
+    {
+      parent: 'light',
+      mask: 'strengthen',
+      ...maskOptions.component,
+    },
+    {
+      parent: 'dark',
+      mask: 'identity',
+      ...maskOptions.component,
+    },
+  ],
 }

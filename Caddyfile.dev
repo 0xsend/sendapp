@@ -17,3 +17,11 @@ eth.rpc.localhost {
 base.rpc.localhost {
 	reverse_proxy http://127.0.0.1:8546
 }
+
+eth.otterscan.localhost {
+	reverse_proxy http://localhost:5100
+}
+
+base.otterscan.localhost {
+	reverse_proxy http://localhost:5101
+}
