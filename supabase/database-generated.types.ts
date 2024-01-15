@@ -533,6 +533,10 @@ export interface Database {
         }
         Returns: undefined
       }
+      user_referrals_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       tag_status: 'pending' | 'confirmed'

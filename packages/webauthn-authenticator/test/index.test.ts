@@ -1,11 +1,11 @@
+import * as crypto from 'crypto'
+import * as cbor from 'cbor'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   COSE_PUB_KEY_ALG,
-  CredentialRequestOptionsSerialized,
   type CredentialCreationOptionsSerialized,
+  CredentialRequestOptionsSerialized,
 } from '../src'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import * as cbor from 'cbor'
-import * as crypto from 'crypto'
 
 describe('Webauthn Credential Functions', () => {
   describe('createPublicKeyCredential', () => {
@@ -48,11 +48,12 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
 
       it('should create and get a credential with mock', async () => {
         const {
-          createPublicKeyCredential,
-          getPublicKeyCredential,
+          Authenticator,
           deserializePublicKeyCredentialAttestion,
           deserializePublicKeyCredentialAssertion,
         } = await import('../src')
+
+        const authenticator = new Authenticator()
 
         const attestationChallenge = Buffer.from('test challenge').toString('base64url')
 
@@ -78,7 +79,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           },
         } as CredentialCreationOptionsSerialized
 
-        const credSer = await createPublicKeyCredential(credOptSer)
+        const credSer = await authenticator.createPublicKeyCredential(credOptSer)
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
@@ -100,7 +101,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           },
         } as CredentialRequestOptionsSerialized
 
-        const credSer2 = await getPublicKeyCredential(credReqOptsSer)
+        const credSer2 = await authenticator.getPublicKeyCredential(credReqOptsSer)
         const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
 
         verifyAssertion({ cred: cred2, testBytes, keyPair })
@@ -140,12 +141,11 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
       })
       it('should create a credential', async () => {
         const {
-          createPublicKeyCredential,
+          Authenticator,
           deserializePublicKeyCredentialAttestion,
-          getPublicKeyCredential,
           deserializePublicKeyCredentialAssertion,
         } = await import('../src')
-
+        const authenticator = new Authenticator()
         const attestationChallenge = Buffer.from('test challenge').toString('base64url')
 
         const credOptSer = {
@@ -170,7 +170,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           },
         } as CredentialCreationOptionsSerialized
 
-        const credSer = await createPublicKeyCredential(credOptSer)
+        const credSer = await authenticator.createPublicKeyCredential(credOptSer)
 
         const cred = deserializePublicKeyCredentialAttestion(credSer)
 
@@ -191,7 +191,7 @@ M2r/eobZPWzLAuuKhc4rKm6jQJtExXSvmg==
           },
         } as CredentialRequestOptionsSerialized
 
-        const credSer2 = await getPublicKeyCredential(credReqOptsSer)
+        const credSer2 = await authenticator.getPublicKeyCredential(credReqOptsSer)
         const cred2 = deserializePublicKeyCredentialAssertion(credSer2)
 
         verifyAssertion({ cred: cred2, testBytes, keyPair })

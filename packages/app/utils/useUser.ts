@@ -50,7 +50,7 @@ export const useUser = () => {
     },
   })
 
-  const avatarUrl = (function () {
+  const avatarUrl = (() => {
     if (profile?.avatar_url) return profile.avatar_url
     if (typeof user?.user_metadata.avatar_url === 'string') return user.user_metadata.avatar_url
 
@@ -67,7 +67,10 @@ export const useUser = () => {
     profile,
     avatarUrl,
     tags,
-    updateProfile: () => refetch().then(() => refetchTags()),
+    updateProfile: () =>
+      refetch().then(() => {
+        refetchTags()
+      }),
     isLoadingSession,
     isLoadingProfile,
     isLoadingTags,
