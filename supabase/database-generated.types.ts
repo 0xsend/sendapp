@@ -222,6 +222,7 @@ export interface Database {
           about: string | null
           avatar_url: string | null
           id: string
+          is_public: boolean | null
           name: string | null
           referral_code: string | null
         }
@@ -229,6 +230,7 @@ export interface Database {
           about?: string | null
           avatar_url?: string | null
           id: string
+          is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
         }
@@ -236,6 +238,7 @@ export interface Database {
           about?: string | null
           avatar_url?: string | null
           id?: string
+          is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
         }
@@ -665,6 +668,15 @@ export interface Database {
           _send_transfer_logs: unknown[]
         }
         Returns: undefined
+      }
+      tag_search: {
+        Args: {
+          q: string
+        }
+        Returns: {
+          avatar_url: string
+          tag_name: string
+        }[]
       }
       update_distribution_shares: {
         Args: {
