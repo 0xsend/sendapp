@@ -1,13 +1,13 @@
-import { Card, CardProps, Paragraph, Progress, Spinner, XStack, YStack, H6 } from '@my/ui'
-import { useActiveDistribution } from 'app/utils/distributions'
-import React, { useEffect, useState } from 'react'
+import { Card, CardProps, H6, Paragraph, Progress, Spinner, XStack, YStack } from '@my/ui'
 import { ServerCrash } from '@tamagui/lucide-icons'
-import {
-  useSendDistributionCurrentPoolTotal,
-  DISTRIBUTION_INITIAL_POOL_AMOUNT,
-} from 'app/utils/distributions'
 import { IconSendToken } from 'app/components/icons/IconSendToken'
+import { useActiveDistribution } from 'app/utils/distributions'
+import {
+  DISTRIBUTION_INITIAL_POOL_AMOUNT,
+  useSendDistributionCurrentPoolTotal,
+} from 'app/utils/distributions'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
+import React, { useEffect, useState } from 'react'
 import { DistributionClaimButton } from './DistributionClaimButton'
 
 export function DistributionsStatCard(cardProps: CardProps) {
@@ -117,12 +117,12 @@ export function DistributionTimeCard(props: CardProps) {
     isLoading
       ? new Date()
       : isBeforeQualification
-      ? distribution?.qualification_start
-      : isDuringQualification
-      ? distribution?.qualification_end
-      : isClaimable
-      ? distribution?.claim_end
-      : new Date()
+        ? distribution?.qualification_start
+        : isDuringQualification
+          ? distribution?.qualification_end
+          : isClaimable
+            ? distribution?.claim_end
+            : new Date()
   )
 
   if (isLoading) {

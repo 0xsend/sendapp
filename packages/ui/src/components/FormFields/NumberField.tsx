@@ -19,7 +19,7 @@ export const NumberField = (props: Pick<InputProps, 'size' | 'autoFocus'>) => {
       <Fieldset>
         {!!label && (
           <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
-            {label} {isOptional && `(Optional)`}
+            {label} {isOptional && '(Optional)'}
           </Label>
         )}
         <Shake shakeKey={error?.errorMessage}>
@@ -30,7 +30,7 @@ export const NumberField = (props: Pick<InputProps, 'size' | 'autoFocus'>) => {
             value={field.value?.toString() || '0'}
             onChangeText={(text) => {
               const num = Number(text)
-              if (isNaN(num)) {
+              if (Number.isNaN(num)) {
                 if (!field.value) {
                   field.onChange(defaultValue || 0)
                 }

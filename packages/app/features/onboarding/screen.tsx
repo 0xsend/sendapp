@@ -71,7 +71,7 @@ export function OnboardingScreen() {
 
   return (
     <Container>
-      <YStack space="$6" maxWidth={600} py="$6">
+      <YStack space="$6" maxWidth={600} py="$6" marginHorizontal="auto">
         <H1>Welcome to Send</H1>
         <Paragraph>
           Start by creating a Passkey below. Send uses passkeys to secure your account. Press the
@@ -185,11 +185,7 @@ function CreateSendAccount() {
  * Send a Send Account user operation to the bundler
  */
 function SendAccountUserOp() {
-  const {
-    data: sendAccts,
-    error: sendAcctsError,
-    isLoading: sendAcctsIsLoading,
-  } = useSendAccounts()
+  const { data: sendAccts } = useSendAccounts()
 
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)

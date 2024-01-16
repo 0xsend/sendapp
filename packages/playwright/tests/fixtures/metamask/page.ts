@@ -1,5 +1,5 @@
-import type { BrowserContext, Locator, Page } from '@playwright/test'
 import path from 'path'
+import type { BrowserContext, Locator, Page } from '@playwright/test'
 import debug from 'debug'
 
 const log = debug('test:fixtures:metamask:page')
@@ -10,6 +10,7 @@ export class MetaMaskPage {
   public readonly extensionId: string
 
   constructor(public readonly page: Page) {
+    // biome-ignore lint/style/noNonNullAssertion: we know background url format is correct
     this.extensionId = page.url().split('/')[2]!
   }
 
@@ -45,8 +46,8 @@ export class MetaMaskPage {
 
   async unlockWallet() {
     log('unlockWallet')
-    const passwordField = this.page.getByTestId(`unlock-password`)
-    const submitButton = this.page.getByTestId(`unlock-submit`)
+    const passwordField = this.page.getByTestId('unlock-password')
+    const submitButton = this.page.getByTestId('unlock-submit')
     await this.waitForAlert()
     if (await passwordField.isVisible()) {
       log('unlockWallet: entering password')
@@ -60,11 +61,11 @@ export class MetaMaskPage {
     log('setupWallet')
     await this.gotoHome()
 
-    await this.page.getByTestId(`onboarding-terms-checkbox`).click()
+    await this.page.getByTestId('onboarding-terms-checkbox').click()
     await this.waitForAlert()
-    await this.page.getByTestId(`onboarding-import-wallet`).click()
+    await this.page.getByTestId('onboarding-import-wallet').click()
     await this.waitForAlert()
-    await this.page.getByTestId(`metametrics-no-thanks`).click()
+    await this.page.getByTestId('metametrics-no-thanks').click()
     await this.waitForAlert()
 
     // Enter the seed phrase
@@ -72,22 +73,22 @@ export class MetaMaskPage {
     for (let i = 0; i < seeds.length; i++) {
       await this.page.getByTestId(`import-srp__srp-word-${i}`).fill(seeds[i])
     }
-    await this.page.getByTestId(`import-srp-confirm`).click()
+    await this.page.getByTestId('import-srp-confirm').click()
     await this.waitForAlert()
 
     // Enter the password
-    await this.page.getByTestId(`create-password-new`).fill(WALLET_PASSWORD)
-    await this.page.getByTestId(`create-password-confirm`).fill(WALLET_PASSWORD)
-    await this.page.getByTestId(`create-password-terms`).click()
-    await this.page.getByTestId(`create-password-import`).click()
+    await this.page.getByTestId('create-password-new').fill(WALLET_PASSWORD)
+    await this.page.getByTestId('create-password-confirm').fill(WALLET_PASSWORD)
+    await this.page.getByTestId('create-password-terms').click()
+    await this.page.getByTestId('create-password-import').click()
     await this.waitForAlert()
 
     // Finish onboarding
-    await this.page.getByTestId(`onboarding-complete-done`).click()
+    await this.page.getByTestId('onboarding-complete-done').click()
     await this.waitForAlert()
-    await this.page.getByTestId(`pin-extension-next`).click()
+    await this.page.getByTestId('pin-extension-next').click()
     await this.waitForAlert()
-    await this.page.getByTestId(`pin-extension-done`).click()
+    await this.page.getByTestId('pin-extension-done').click()
     await this.waitForAlert()
   }
 
@@ -152,7 +153,7 @@ export class MetaMaskPage {
 
   async closePopover() {
     log('closePopover')
-    const closeButton = this.page.getByTestId(`popover-close`)
+    const closeButton = this.page.getByTestId('popover-close')
     if (await closeButton.isVisible()) {
       await closeButton.click()
     }

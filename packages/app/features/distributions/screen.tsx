@@ -1,4 +1,4 @@
-import { Button, Container, H4, ScrollView, Theme, XStack, YStack } from '@my/ui'
+import { Button, Container, ScrollView, Theme, XStack, YStack } from '@my/ui'
 import { sendAirdropsSafeAddress } from '@my/wagmi'
 import { ArrowRight } from '@tamagui/lucide-icons'
 import { HomeHeader } from 'app/components/HomeHeader'

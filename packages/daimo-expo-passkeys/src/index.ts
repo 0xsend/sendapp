@@ -4,6 +4,7 @@ import { base64 } from '@scure/base'
 import { Platform } from 'react-native'
 
 import ExpoPasskeysModule from './ExpoPasskeysModule'
+import type ExpoPasskeysModuleWeb from './ExpoPasskeysModule.web'
 import {
   CreateRequest,
   CreateResult,
@@ -13,7 +14,6 @@ import {
   toAndroidSignRequest,
   toBase64,
 } from './utils'
-import type ExpoPasskeysModuleWeb from './ExpoPasskeysModule.web'
 
 export type { CreateRequest, CreateResult, SignRequest, SignResult }
 

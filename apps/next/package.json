@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "yarn with-env next dev",
-    "build": "cd ../.. && yarn build && cd apps/next && yarn next:build",
+    "build": "yarn next:build",
     "next:build": "yarn with-env next build",
     "start": "yarn with-env next start",
     "serve": "NODE_ENV=production yarn with-env next start --port 8151",
@@ -16,7 +16,7 @@
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
     "@supabase/supabase-js": "^2.38.5",
-    "@tamagui/next-theme": "^1.79.7",
+    "@tamagui/next-theme": "^1.85.8",
     "@tanstack/react-query": "4.18.0",
     "@trpc/client": "^10.38.2",
     "@trpc/next": "^10.38.2",
@@ -36,9 +36,11 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",
-    "@tamagui/next-plugin": "^1.79.7",
-    "@types/node": "^18.6.4",
+    "@next/eslint-plugin-next": "^14.0.4",
+    "@tamagui/next-plugin": "^1.85.8",
+    "@types/node": "^20.11.0",
     "@welldone-software/why-did-you-render": "^7.0.1",
-    "dotenv-cli": "^6.0.0"
+    "dotenv-cli": "^6.0.0",
+    "eslint-config-next": "^14.0.4"
   }
 }

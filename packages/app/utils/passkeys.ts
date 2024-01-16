@@ -1,8 +1,8 @@
+import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
 import { p256 } from '@noble/curves/p256'
-import { Hex, bytesToBigInt, hexToBytes, bytesToHex } from 'viem'
 import { base64 } from '@scure/base'
 import cbor from 'cbor'
-import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
+import { Hex, bytesToBigInt, bytesToHex, hexToBytes } from 'viem'
 import { assert } from './assert'
 
 /**

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "forge-std/console2.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import "../src/DaimoEphemeralNotes.sol";
@@ -21,8 +20,7 @@ contract TestDAI is ERC20 {
 contract EphemeralNotesTest is Test {
     TestDAI public token;
     DaimoEphemeralNotes public notes;
-    uint256 private constant ephemeralPrivateKey =
-        0x1010101010101010101010101010101010101010101010101010101010101010;
+    uint256 private constant ephemeralPrivateKey = 0x1010101010101010101010101010101010101010101010101010101010101010;
     address private ephemeralAddress = vm.addr(ephemeralPrivateKey);
     address constant ALICE = address(0x123);
     address constant BOB = address(0x456);
@@ -36,29 +34,17 @@ contract EphemeralNotesTest is Test {
     }
 
     // This is equivalent to what the users have to run on client side using ethers.js or equivalent
-    function createEphemeralSignature(
-        address redeemer
-    ) internal pure returns (bytes memory) {
-        bytes32 messageHash = ECDSA.toEthSignedMessageHash(
-            keccak256(abi.encodePacked(redeemer))
-        );
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            ephemeralPrivateKey,
-            messageHash
-        );
+    function createEphemeralSignature(address redeemer) internal pure returns (bytes memory) {
+        bytes32 messageHash = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(redeemer)));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(ephemeralPrivateKey, messageHash);
 
         bytes memory signature = abi.encodePacked(r, s, v);
         return signature;
     }
 
     function testECDSA() public {
-        bytes32 messageHash = ECDSA.toEthSignedMessageHash(
-            keccak256(abi.encodePacked(ALICE))
-        );
-        assertTrue(
-            ECDSA.recover(messageHash, createEphemeralSignature(ALICE)) ==
-                ephemeralAddress
-        );
+        bytes32 messageHash = ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(ALICE)));
+        assertTrue(ECDSA.recover(messageHash, createEphemeralSignature(ALICE)) == ephemeralAddress);
     }
 
     function createAliceNote() internal {
@@ -67,11 +53,7 @@ contract EphemeralNotesTest is Test {
         vm.startPrank(ALICE, ALICE);
         token.approve(address(notes), 501);
         vm.expectEmit(false, false, false, false);
-        Note memory expectedNote = Note({
-            ephemeralOwner: ephemeralAddress,
-            from: ALICE,
-            amount: 500
-        });
+        Note memory expectedNote = Note({ephemeralOwner: ephemeralAddress, from: ALICE, amount: 500});
         emit NoteCreated(expectedNote);
         notes.createNote(ephemeralAddress, 500);
         vm.stopPrank();
@@ -84,11 +66,7 @@ contract EphemeralNotesTest is Test {
         // Bob uses ephemeralAddress to sign his own address and redeem the note
         vm.startPrank(BOB, BOB);
         vm.expectEmit(false, false, false, false);
-        Note memory expectedNote = Note({
-            ephemeralOwner: ephemeralAddress,
-            from: ALICE,
-            amount: 500
-        });
+        Note memory expectedNote = Note({ephemeralOwner: ephemeralAddress, from: ALICE, amount: 500});
         emit NoteRedeemed(expectedNote, BOB);
         notes.claimNote(ephemeralAddress, createEphemeralSignature(BOB));
         vm.stopPrank();
@@ -106,10 +84,7 @@ contract EphemeralNotesTest is Test {
         // Bob uses ephemeralAddress to sign wrong address and redeem the note
         vm.startPrank(BOB, BOB);
         vm.expectRevert("EphemeralNotes: invalid signature and not creator");
-        notes.claimNote(
-            ephemeralAddress,
-            createEphemeralSignature(address(0x789))
-        );
+        notes.claimNote(ephemeralAddress, createEphemeralSignature(address(0x789)));
         vm.stopPrank();
 
         // Check transfer failed

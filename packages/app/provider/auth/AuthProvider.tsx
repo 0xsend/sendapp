@@ -1,8 +1,8 @@
+import { Database } from '@my/supabase/database.types'
 import { Session, createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 import { AuthStateChangeHandler } from './AuthStateChangeHandler'
-import { Database } from '@my/supabase/database.types'
 
 export type AuthProviderProps = {
   initialSession?: Session | null

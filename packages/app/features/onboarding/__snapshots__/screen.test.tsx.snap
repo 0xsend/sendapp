@@ -4,19 +4,21 @@ exports[`OnboardingScreen 1`] = `
 <View
   style={
     {
-      "alignItems": "stretch",
       "alignSelf": "center",
       "flex": 1,
       "flexDirection": "row",
-      "maxWidth": 1480,
+      "paddingLeft": 32,
+      "paddingRight": 32,
+      "width": "100%",
     }
   }
 >
   <View
     style={
       {
-        "alignItems": "stretch",
         "flexDirection": "column",
+        "marginLeft": "auto",
+        "marginRight": "auto",
         "maxWidth": 600,
         "paddingBottom": 32,
         "paddingTop": 32,
@@ -28,7 +30,7 @@ exports[`OnboardingScreen 1`] = `
       selectable={true}
       style={
         {
-          "color": "#101010",
+          "color": "rgba(241, 241, 238, 1)",
           "fontFamily": "System",
           "fontSize": 46,
           "fontWeight": "700",
@@ -48,7 +50,6 @@ exports[`OnboardingScreen 1`] = `
       pointerEvents="none"
       style={
         {
-          "alignItems": "stretch",
           "height": 32,
           "minHeight": 32,
           "minWidth": 32,
@@ -60,7 +61,7 @@ exports[`OnboardingScreen 1`] = `
       selectable={true}
       style={
         {
-          "color": "#101010",
+          "color": "rgba(241, 241, 238, 1)",
           "fontFamily": "System",
           "fontSize": 16.8,
           "fontWeight": "400",
@@ -75,7 +76,6 @@ exports[`OnboardingScreen 1`] = `
       pointerEvents="none"
       style={
         {
-          "alignItems": "stretch",
           "height": 32,
           "minHeight": 32,
           "minWidth": 32,
@@ -86,7 +86,6 @@ exports[`OnboardingScreen 1`] = `
     <View
       style={
         {
-          "alignItems": "stretch",
           "flexDirection": "column",
         }
       }
@@ -96,7 +95,7 @@ exports[`OnboardingScreen 1`] = `
         selectable={true}
         style={
           {
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "fontFamily": "System",
             "fontSize": 30,
             "fontWeight": "700",
@@ -116,7 +115,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -142,7 +140,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -159,7 +157,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -168,10 +165,11 @@ exports[`OnboardingScreen 1`] = `
         }
       />
       <TextInput
-        editable={true}
         focusable={true}
         id="sendTo"
+        onBlur={[Function]}
         onChangeText={[Function]}
+        onFocus={[Function]}
         outlineWidth={0}
         placeholderTextColor="#545454"
         style={
@@ -190,7 +188,7 @@ exports[`OnboardingScreen 1`] = `
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
@@ -206,7 +204,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -232,7 +229,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -249,7 +246,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -258,10 +254,11 @@ exports[`OnboardingScreen 1`] = `
         }
       />
       <TextInput
-        editable={true}
         focusable={true}
         id="sendAmount"
+        onBlur={[Function]}
         onChangeText={[Function]}
+        onFocus={[Function]}
         outlineWidth={0}
         placeholderTextColor="#545454"
         style={
@@ -280,7 +277,7 @@ exports[`OnboardingScreen 1`] = `
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
@@ -296,7 +293,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -349,7 +345,7 @@ exports[`OnboardingScreen 1`] = `
           numberOfLines={1}
           style={
             {
-              "color": "#101010",
+              "color": "rgba(241, 241, 238, 1)",
               "flexGrow": 0,
               "flexShrink": 1,
               "fontFamily": "System",
@@ -368,7 +364,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -394,7 +389,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -411,7 +406,6 @@ exports[`OnboardingScreen 1`] = `
         pointerEvents="none"
         style={
           {
-            "alignItems": "stretch",
             "height": 18,
             "minHeight": 18,
             "minWidth": 18,
@@ -420,12 +414,13 @@ exports[`OnboardingScreen 1`] = `
         }
       />
       <TextInput
-        editable={true}
         focusable={true}
         id="sendResult"
         multiline={true}
         numberOfLines={4}
+        onBlur={[Function]}
         onChangeText={[Function]}
+        onFocus={[Function]}
         outlineWidth={0}
         placeholderTextColor="#545454"
         style={
@@ -444,7 +439,7 @@ exports[`OnboardingScreen 1`] = `
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "#101010",
+            "color": "rgba(241, 241, 238, 1)",
             "fontFamily": "monospace",
             "fontSize": 16.8,
             "fontWeight": "400",

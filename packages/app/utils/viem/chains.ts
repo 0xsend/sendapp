@@ -1,5 +1,5 @@
 import { Chain, defineChain } from 'viem'
-import { localhost, base as baseMainnetViem, mainnet as mainnetViem } from 'viem/chains'
+import { base as baseMainnetViem, localhost, mainnet as mainnetViem } from 'viem/chains'
 
 const stagingMainnet: Chain = defineChain({
   id: 8008,
@@ -57,10 +57,10 @@ export const mainnet = (function mainnetFromEnv() {
 })()
 export const baseMainnet: typeof baseMainnetViem | typeof baseLocal =
   (function baseMainnetFromEnv() {
-    if (process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID) {
-      const chain = appChains[process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID]
+    if (process.env.NEXT_PUBLIC_BASE_CHAIN_ID) {
+      const chain = appChains[process.env.NEXT_PUBLIC_BASE_CHAIN_ID]
       if (!chain) {
-        throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID}`)
+        throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_BASE_CHAIN_ID}`)
       }
       return chain
     }

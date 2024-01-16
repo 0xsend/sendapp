@@ -8,6 +8,7 @@
     "build": "forge build",
     "test": "forge test",
     "lint": "forge fmt --check && solhint {script,src,test}/**/*.sol",
+    "lint:fix": "forge fmt && solhint --fix {script,src,test}/**/*.sol",
     "dev:deploy-send-merkle-drop": "forge script ./packages/contracts/script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript -vvvv --fork-url http://localhost:8545 --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast",
     "dev:create-tranche": "echo Not implemented yet && exit 1",
     "dev:anvil-add-send-merkle-drop-fixtures": "bun run ./script/anvil-add-send-merkle-drop-fixtures.ts",

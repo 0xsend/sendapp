@@ -1,7 +1,7 @@
 import { ColorTokens } from '@my/ui/types'
-import { themed, IconProps } from '@tamagui/helpers-icon'
+import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Svg, Path, Defs, LinearGradient, Stop } from 'react-native-svg'
+import { Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 
 const Home = (props: IconProps) => {
   const { size, color, ...rest } = props

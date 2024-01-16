@@ -28,7 +28,6 @@ function MyApp({
 }: SolitoAppProps<{ initialSession: AuthProviderProps['initialSession'] }>) {
   // reference: https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts
   const getLayout = Component.getLayout || ((page) => page)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_theme, setTheme] = useRootTheme()
 
   return (

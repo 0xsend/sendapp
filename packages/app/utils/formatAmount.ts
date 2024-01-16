@@ -18,6 +18,7 @@ function abbreviateNumber(
 ): string {
   // Previous options style
   if (Array.isArray(options)) {
+    // biome-ignore lint/style/noParameterAssign: this is a legacy function
     options = { symbols: options }
   }
 
@@ -25,6 +26,7 @@ function abbreviateNumber(
 
   // handle negatives
   const sign = Math.sign(num) >= 0
+  // biome-ignore lint/style/noParameterAssign: this is a legacy function
   num = Math.abs(num)
 
   // what tier? (determines SI symbol)
@@ -44,7 +46,7 @@ function abbreviateNumber(
   const suffix = symbols[tier]
   if (!suffix) throw new RangeError()
 
-  const scale = Math.pow(10, tier * 3)
+  const scale = 10 ** (tier * 3)
 
   // scale the number
   const scaled = num / scale
@@ -85,28 +87,28 @@ export default function formatAmount(
 
   // remove commas
   if (typeof amount === 'string') {
+    // biome-ignore lint/style/noParameterAssign: this is a legacy function
     amount = amount.split(',').join('')
   }
 
   const digits = amount.toString().split('.', 2)
   // eslint-disable-next-line prefer-const
-  let [integers = 0, decimals = 0] = digits.map((s) => Number(s))
+  const [integers = 0, decimals = 0] = digits.map((s) => Number(s))
   const [integersLength = 0] = digits.map((s) => s.length)
 
-  if ((digits[0] && isNaN(integers)) || (digits[1] && isNaN(decimals))) {
+  if ((digits[0] && Number.isNaN(integers)) || (digits[1] && Number.isNaN(decimals))) {
     return abbreviateNumber(0, maxDecimals)
   }
 
   if (integersLength > maxIntegers) {
     const flooredAmount = floor(Number(amount), maxIntegers + maxDecimals - integersLength)
-    const flooredIntegersLength = flooredAmount.toString().split('.')[0]!.length
-    if (flooredIntegersLength >= integersLength) {
+    const flooredIntegersLength = flooredAmount.toString().split('.')[0]?.length
+    if (flooredIntegersLength && flooredIntegersLength >= integersLength) {
       // This means the number has moved to a different tier after flooring,
       // so we abbreviate without flooring.
       return abbreviateNumber(Number(amount), maxDecimals)
-    } else {
-      return abbreviateNumber(flooredAmount, maxDecimals)
     }
+    return abbreviateNumber(flooredAmount, maxDecimals)
   }
 
   return Number(floor(Number(amount), maxDecimals)).toLocaleString(undefined, {

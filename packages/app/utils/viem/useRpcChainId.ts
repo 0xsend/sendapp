@@ -11,7 +11,7 @@ export const useRpcChainId = () => {
 
   useEffect(() => {
     publicClient.getChainId().then(setChainId).catch(setError)
-  }, [publicClient, setError])
+  }, [publicClient])
 
   return {
     data: chainId,

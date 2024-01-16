@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "./BaseGoerliForkTest.sol";
+// solhint-disable-next-line
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
 import "../src/DaimoAccount.sol";
@@ -24,8 +25,10 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
         entryPoint = new EntryPoint();
         verifier = new DaimoVerifier();
         factory = new DaimoAccountFactory(entryPoint, verifier);
+        /* solhint-disable */
         console.log("entryPoint address:", address(entryPoint));
         console.log("factory address:", address(factory));
+        /* solhint-enable */
     }
 
     /**
@@ -37,7 +40,8 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
      * @param nonce - the nonce value from the request.
      * @param success - true if the sender transaction succeeded, false if reverted.
      * @param actualGasCost - actual amount paid (by account or paymaster) for this UserOperation.
-     * @param actualGasUsed - total gas used by this UserOperation (including preVerification, creation, validation and execution).
+     * @param actualGasUsed - total gas used by this UserOperation including preVerification,
+     *  creation, validation and execution.
      */
     event UserOperationEvent(
         bytes32 indexed userOpHash,
@@ -77,6 +81,7 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
 
         DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
         DaimoAccount acc = factory.createAccount(0, key, calls, 42);
+        // solhint-disable-next-line
         console.log("new account address:", address(acc));
         vm.deal(address(acc), 1 ether);
 
@@ -96,7 +101,9 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
         });
 
         bytes32 hash = entryPoint.getUserOpHash(op);
+        // solhint-disable-next-line
         console2.log("op hash: ");
+        // solhint-disable-next-line
         console2.logBytes32(hash);
         assertEq(expectedUserOpHash, hash);
 
@@ -174,7 +181,9 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
 
         // userop hash
         bytes32 hash = entryPoint.getUserOpHash(op);
+        // solhint-disable-next-line
         console2.log("op hash: ");
+        // solhint-disable-next-line
         console2.logBytes32(hash);
         assertEq(expectedUserOpHash, hash);
 

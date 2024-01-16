@@ -1,20 +1,20 @@
-import { createPublicClient, getContract, http } from 'viem'
-import { mainnet } from 'viem/chains'
-import { sendAddress as sendTokenAddress, sendABI as sendTokenABI } from '@my/wagmi'
-import { createClient } from '@supabase/supabase-js'
-import { Database, Functions, Tables } from '@my/supabase/database.types'
 import { cpus } from 'os'
+import { Database, Functions, Tables } from '@my/supabase/database.types'
+import { sendABI as sendTokenABI, sendAddress as sendTokenAddress } from '@my/wagmi'
+import { createClient } from '@supabase/supabase-js'
 import { LRUCache } from 'lru-cache'
 import type { Logger } from 'pino'
+import { http, createPublicClient, getContract } from 'viem'
+import { mainnet } from 'viem/chains'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
-    `NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.`
+    'NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.'
   )
 }
 if (!process.env.SUPABASE_SERVICE_ROLE) {
   throw new Error(
-    `SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.`
+    'SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.'
   )
 }
 
@@ -22,8 +22,8 @@ if (!process.env.SUPABASE_SERVICE_ROLE) {
  * only meant to be used on the server side.
  */
 export const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE,
   { auth: { persistSession: false } }
 )
 
@@ -99,7 +99,7 @@ export class DistributorWorker {
     })
 
     if (transfers.length === 0) {
-      this.log.debug(`No transfers found.`)
+      this.log.debug('No transfers found.')
       return
     }
 
@@ -140,7 +140,7 @@ export class DistributorWorker {
     }
 
     if (rows.length === 0) {
-      this.log.debug(`No transfers found.`)
+      this.log.debug('No transfers found.')
       return []
     }
 
@@ -164,6 +164,7 @@ export class DistributorWorker {
     }
     const { timestamp } = await client.getBlock({ blockHash })
     this.blockTimestamps.set(blockHash, timestamp)
+    // biome-ignore lint/style/noNonNullAssertion: we know timestamp is defined
     return this.blockTimestamps.get(blockHash)!
   }
 
@@ -171,7 +172,7 @@ export class DistributorWorker {
    * Calculates distribution shares for distributions in qualification period.
    */
   private async calculateDistributions() {
-    this.log.info(`Calculating distributions`)
+    this.log.info('Calculating distributions')
 
     const { data: distributions, error } = await supabaseAdmin
       .from('distributions')
@@ -190,7 +191,7 @@ export class DistributorWorker {
     this.log.debug({ distributions }, `Found ${distributions.length} distributions.`)
 
     if (distributions.length === 0) {
-      this.log.info(`No distributions found.`)
+      this.log.info('No distributions found.')
       return
     }
 
@@ -267,11 +268,14 @@ export class DistributorWorker {
         { fixedValue?: bigint; bipsValue?: bigint }
       >
     )
-    const verificationsByUserId = verifications.reduce((acc, verification) => {
-      acc[verification.user_id] = acc[verification.user_id] || []
-      acc[verification.user_id]!.push(verification)
-      return acc
-    }, {} as Record<string, Database['public']['Tables']['distribution_verifications']['Row'][]>)
+    const verificationsByUserId = verifications.reduce(
+      (acc, verification) => {
+        acc[verification.user_id] = acc[verification.user_id] || []
+        acc[verification.user_id]?.push(verification)
+        return acc
+      },
+      {} as Record<string, Database['public']['Tables']['distribution_verifications']['Row'][]>
+    )
 
     this.log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
     this.log.debug({ verificationsByUserId })
@@ -309,14 +313,20 @@ export class DistributorWorker {
       return _hodlerAddresses
     })()
 
-    const hodlerAddressesByUserId = hodlerAddresses.reduce((acc, address) => {
-      acc[address.user_id] = address
-      return acc
-    }, {} as Record<string, Database['public']['Tables']['chain_addresses']['Row']>)
-    const hodlerUserIdByAddress = hodlerAddresses.reduce((acc, address) => {
-      acc[address.address] = address.user_id
-      return acc
-    }, {} as Record<string, string>)
+    const hodlerAddressesByUserId = hodlerAddresses.reduce(
+      (acc, address) => {
+        acc[address.user_id] = address
+        return acc
+      },
+      {} as Record<string, Database['public']['Tables']['chain_addresses']['Row']>
+    )
+    const hodlerUserIdByAddress = hodlerAddresses.reduce(
+      (acc, address) => {
+        acc[address.address] = address.user_id
+        return acc
+      },
+      {} as Record<string, string>
+    )
 
     this.log.info(`Found ${hodlerAddresses.length} addresses.`)
     this.log.debug({ hodlerAddresses })
@@ -391,7 +401,7 @@ export class DistributorWorker {
     this.log.debug({ poolWeights })
 
     if (totalWeight === 0n) {
-      this.log.warn(`Total weight is 0. Skipping distribution.`)
+      this.log.warn('Total weight is 0. Skipping distribution.')
       return
     }
 
@@ -415,7 +425,7 @@ export class DistributorWorker {
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]
       if (!hodler || !hodler.address) {
-        this.log.debug({ userId }, `Hodler not found for user Skipping verification.`)
+        this.log.debug({ userId }, 'Hodler not found for user Skipping verification.')
         continue
       }
       const { address } = hodler
@@ -440,20 +450,20 @@ export class DistributorWorker {
     }
 
     const hodlerShares = Object.values(sharesObj)
-    let totalAmount = 0n,
-      totalHodlerPoolAmount = 0n,
-      totalBonusPoolAmount = 0n,
-      totalFixedPoolAmount = 0n
+    let totalAmount = 0n
+    let totalHodlerPoolAmount = 0n
+    let totalBonusPoolAmount = 0n
+    let totalFixedPoolAmount = 0n
 
     this.log.info(
       {
         maxBonusPoolBips,
       },
-      `Calculated fixed & bonus pool amounts.`
+      'Calculated fixed & bonus pool amounts.'
     )
     this.log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
 
-    let shares = hodlerShares
+    const shares = hodlerShares
       .map((share) => {
         const userId = hodlerUserIdByAddress[share.address]
         const bonusBips = bonusPoolBipsByAddress[share.address] || 0n
@@ -466,7 +476,7 @@ export class DistributorWorker {
         totalFixedPoolAmount += fixedPoolAmount
 
         if (!userId) {
-          this.log.debug({ share }, `Hodler not found for address. Skipping share.`)
+          this.log.debug({ share }, 'Hodler not found for address. Skipping share.')
           return null
         }
 
@@ -505,7 +515,7 @@ export class DistributorWorker {
         name: distribution.name,
         shares: shares.length,
       },
-      `Distribution totals`
+      'Distribution totals'
     )
     this.log.info(`Calculated ${shares.length} shares.`)
     this.log.debug({ shares })
@@ -524,7 +534,7 @@ export class DistributorWorker {
     this.log.info('Starting distributor...', { id: this.id })
 
     // lookup last block number
-    let { data: latestTransfer, error } = await supabaseAdmin
+    const { data: latestTransfer, error } = await supabaseAdmin
       .from('send_transfer_logs')
       .select('*')
       .order('block_number', { ascending: false })

@@ -1,8 +1,8 @@
-import { TRPCError } from '@trpc/server'
-import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { z } from 'zod'
-import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
+import { TRPCError } from '@trpc/server'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { z } from 'zod'
+import { createTRPCRouter, protectedProcedure } from '../trpc'
 
 export const distributionRouter = createTRPCRouter({
   proof: protectedProcedure
@@ -15,7 +15,7 @@ export const distributionRouter = createTRPCRouter({
       // lookup active distribution shares
       const { data: shares, error } = await supabaseAdmin
         .from('distribution_shares')
-        .select(`index, address, amount, user_id`)
+        .select('index, address, amount, user_id')
         .eq('distribution_id', distributionId)
         .order('index', { ascending: true })
 

@@ -16,7 +16,6 @@ contract SendMerkleDrop is Ownable {
      * + Constructor          +
      *
      */
-
     constructor(IERC20 _token, address _owner) {
         token = _token;
         transferOwnership(_owner);
@@ -27,7 +26,6 @@ contract SendMerkleDrop is Ownable {
      * + Globals              +
      *
      */
-
     IERC20 public token;
     mapping(uint256 => bytes32) public merkleRoots;
     mapping(uint256 => mapping(uint256 => uint256)) private claimedBitmaps;
@@ -40,7 +38,6 @@ contract SendMerkleDrop is Ownable {
      * + Events               +
      *
      */
-
     event Claimed(address claimer, uint256 tranche, uint256 amount);
     event TrancheAdded(uint256 tranche, bytes32 merkleRoot, uint256 totalAmount);
     event TrancheExpired(uint256 tranche);
@@ -50,7 +47,6 @@ contract SendMerkleDrop is Ownable {
      * + Management          +
      *
      */
-
     function addTranche(bytes32 _merkleRoot, uint256 _amount) external onlyOwner returns (uint256 trancheId) {
         token.safeTransferFrom(msg.sender, address(this), _amount);
 
@@ -88,7 +84,6 @@ contract SendMerkleDrop is Ownable {
      * + Claiming Logic               +
      *
      */
-
     function claimTranche(
         address _address,
         uint256 _tranche,
@@ -158,10 +153,10 @@ contract SendMerkleDrop is Ownable {
      * + Private              +
      *
      */
-
     function _setClaimed(uint256 _tranche, uint256 _index) private {
         uint256 claimedWordIndex = _index / 256;
         uint256 claimedBitIndex = _index % 256;
+        // solhint-disable-next-line
         claimedBitmaps[_tranche][claimedWordIndex] = claimedBitmaps[_tranche][claimedWordIndex] | (1 << claimedBitIndex);
     }
 

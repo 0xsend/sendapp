@@ -35,7 +35,7 @@ export const TextField = (props: InputProps) => {
             spellCheck={isEmail ? false : undefined}
             autoCapitalize={isEmail ? 'none' : undefined}
             keyboardType={isEmail ? 'email-address' : undefined}
-            value={field.value ? field.value : undefined}
+            value={field.value ?? ''}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
             ref={field.ref}

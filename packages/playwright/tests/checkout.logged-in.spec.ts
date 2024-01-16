@@ -1,8 +1,8 @@
-import type { Page } from '@playwright/test'
-import { getAuthSessionFromContext } from './fixtures/auth'
-import { test, expect } from './fixtures/checkout'
-import debug from 'debug'
 import { faker } from '@faker-js/faker'
+import type { Page } from '@playwright/test'
+import debug from 'debug'
+import { getAuthSessionFromContext } from './fixtures/auth'
+import { expect, test } from './fixtures/checkout'
 
 let log: debug.Debugger | undefined
 

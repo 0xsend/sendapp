@@ -35,6 +35,25 @@ local_resource(
     ],
 )
 
+local_resource(
+    "lint",
+    "yarn lint",
+    allow_parallel = True,
+    labels = labels,
+)
+
+cmd_button(
+    "lint:fix",
+    argv = [
+        "yarn",
+        "lint:fix",
+    ],
+    icon_name = "handyman",
+    location = location.RESOURCE,
+    resource = "lint",
+    text = "yarn lint:fix",
+)
+
 if CI and os.getenv("INSTALL_PLAYWRIGHT_DEPS") != None:
     local_resource("yarn:install:playwright-deps", "yarnx playwright install --with-deps", labels = labels)
 
@@ -88,6 +107,18 @@ local_resource(
     ),
 )
 
+ui_theme_dir = os.path.join("packages", "ui", "src", "themes")
+
+ui_theme_files = files_matching(
+    ui_theme_dir,
+    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and f.find("generated.ts") == -1,
+)
+
+ui_files = files_matching(
+    os.path.join("packages", "ui", "src"),
+    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and (f.find("generated.ts") == -1 and f.find(ui_theme_dir) == -1),
+)
+
 local_resource(
     "ui:build",
     "yarn workspace @my/ui build",
@@ -96,10 +127,18 @@ local_resource(
     resource_deps = [
         "yarn:install",
     ],
-    deps = files_matching(
-        os.path.join("packages", "ui", "src"),
-        lambda f: f.endswith(".tsx") or f.endswith(".ts") and f.find("generated.ts") == -1,
-    ),
+    deps = ui_files,
+)
+
+local_resource(
+    "ui:generate-theme",
+    "yarn workspace @my/ui generate-theme",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+    deps = ui_theme_files,
 )
 
 local_resource(
@@ -112,7 +151,7 @@ local_resource(
     ],
     deps = files_matching(
                os.path.join("packages", "daimo-expo-passkeys", "src"),
-               lambda f: f.endswith(".tsx") or f.endswith(".ts"),
+               lambda f: (f.endswith(".tsx") or f.endswith(".ts")),
            ) +
            files_matching(
                os.path.join("packages", "daimo-expo-passkeys", "ios"),
@@ -396,14 +435,37 @@ local_resource(
     ),
     resource_deps = [
         "yarn:install",
-        "anvil:mainnet",
+        # "anvil:mainnet",
         "supabase",
         "supabase:generate",
-        "wagmi:generate",
+        # "wagmi:generate",
         "ui:build",
     ],
     serve_cmd =
         "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
+)
+
+local_resource(
+    "distributor:web",
+    allow_parallel = True,
+    labels = labels,
+    links = ["http://localhost:3050"],
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/",
+            port = 3050,
+        ),
+        period_secs = 15,
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "supabase",
+        "supabase:generate",
+        "wagmi:generate",
+    ],
+    serve_cmd =
+        "yarn run distributor start" if CI else "yarn run distributor dev",
 )
 
 local_resource(
@@ -415,11 +477,14 @@ local_resource(
     ],
 )
 
+# TESTS
+labels = ["test"]
+
 local_resource(
     "app:test",
     "yarn workspace app test",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = [
         "yarn:install",
         "aa_bundler:base",  # TODO: remove once bundler tests are moved to playwright
@@ -451,7 +516,7 @@ local_resource(
     "webauthn-authenticator:test",
     "yarn workspace @0xsend/webauthn-authenticator test:coverage --run",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = ["yarn:install"],
     deps =
         files_matching(
@@ -465,7 +530,7 @@ local_resource(
     "yarn playwright test",
     allow_parallel = True,
     auto_init = CI == True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = ["next:web"],
     deps = files_matching(
         os.path.join("packages", "playwright"),
@@ -474,33 +539,10 @@ local_resource(
 )
 
 local_resource(
-    "distributor:web",
-    allow_parallel = True,
-    labels = labels,
-    links = ["http://localhost:3050"],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = 3050,
-        ),
-        period_secs = 15,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:mainnet",
-        "supabase",
-        "supabase:generate",
-        "wagmi:generate",
-    ],
-    serve_cmd =
-        "yarn run distributor start" if CI else "yarn run distributor dev",
-)
-
-local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = [
         "yarn:install",
         "anvil:mainnet",
@@ -519,7 +561,7 @@ local_resource(
     "supabase:test",
     "yarn supabase test",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = ["supabase"],
     deps = files_matching(
         os.path.join("supabase", "tests"),
@@ -531,11 +573,28 @@ local_resource(
     "contracts:test",
     "yarn contracts test -vvv",
     allow_parallel = True,
-    labels = ["test"],
+    labels = labels,
     resource_deps = [
         "yarn:install",
         "contracts:build",
     ],
     deps = contract_files,
+)
+
+local_resource(
+    "unit-tests:tests",
+    "echo 🥳",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        # messy but create a single resource that runs all the tests
+        "app:test",
+        "lint",
+        "webauthn-authenticator:test",
+        "distributor:test",
+        "supabase:test",
+        "contracts:test",
+        "next:web",
+    ],
 )
 
