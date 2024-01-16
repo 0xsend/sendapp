@@ -172,7 +172,7 @@ export function AccountScreen() {
             >
               <YStack h={'inherit'} padding={'$5'}>
                 {accountSettings.map((account) => (
-                  <XStack jc={'space-between'} paddingBottom={20}>
+                  <XStack jc={'space-between'} paddingBottom={20} key={account.label}>
                     <XStack>
                       {account.icon}
                       <Paragraph paddingLeft={'$3'} fontSize={16} theme={'alt1'} fontWeight={'400'}>
