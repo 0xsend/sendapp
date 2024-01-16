@@ -1,4 +1,4 @@
-import { Button, Card, Container, Image, Paragraph, Theme, XStack, YStack } from '@my/ui'
+import { Button, Card, Container, Image, Link, Paragraph, Theme, XStack, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import {
   IconClose,
@@ -13,7 +13,6 @@ import {
 } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { useState } from 'react'
-import { useRouter } from 'solito/router'
 import { Square } from 'tamagui'
 
 export function AccountScreen() {
@@ -23,7 +22,6 @@ export function AccountScreen() {
   const about = profile?.about
   const avatar_url = profile?.avatar_url
   const { resolvedTheme } = useThemeSetting()
-  const router = useRouter()
   const accountSettings = [
     {
       icon: <IconPersonal />,
@@ -63,9 +61,11 @@ export function AccountScreen() {
             <Paragraph size={'$9'} theme={'alt1'} fontWeight={'700'}>
               Account
             </Paragraph>
-            <XStack onPress={() => router.push('/')}>
-              <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
-            </XStack>
+            <Link href={'/'}>
+              <XStack>
+                <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
+              </XStack>
+            </Link>
           </XStack>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} zIndex={4}>
             <Card
@@ -106,24 +106,24 @@ export function AccountScreen() {
                   <Paragraph fontSize={13} theme={'alt1'} fontWeight={'400'} opacity={0.6}>
                     {about}
                   </Paragraph>
-                  <Button
-                    f={1}
-                    br={'$radius.true'}
-                    bw={'$0.5'}
-                    borderColor={'#C3AB8E'}
-                    bg={'transparent'}
-                    shadowColor={'rgba(0, 0, 0, 0.1)'}
-                    shadowOffset={{ width: 0, height: 4 }}
-                    shadowRadius={8}
-                    shadowOpacity={0.1}
-                    marginTop={'$5'}
-                    w={'60%'}
-                    onPress={() => router.push('/editProfile')}
-                  >
-                    <Paragraph color={'$primary'} fontWeight={'700'}>
-                      Edit Profile
-                    </Paragraph>
-                  </Button>
+                  <Link href={'/editProfile'} w={'100%'}>
+                    <Button
+                      f={1}
+                      br={'$radius.true'}
+                      bw={'$0.5'}
+                      borderColor={'#C3AB8E'}
+                      bg={'transparent'}
+                      shadowColor={'rgba(0, 0, 0, 0.1)'}
+                      shadowOffset={{ width: 0, height: 4 }}
+                      shadowRadius={8}
+                      shadowOpacity={0.1}
+                      marginTop={'$5'}
+                    >
+                      <Paragraph color={'$primary'} fontWeight={'700'}>
+                        Edit Profile
+                      </Paragraph>
+                    </Button>
+                  </Link>
                 </YStack>
               </YStack>
             </Card>

@@ -1,15 +1,4 @@
-import {
-  Avatar,
-  Button,
-  Container,
-  Image,
-  Paragraph,
-  SubmitButton,
-  Theme,
-  XStack,
-  YStack,
-  useToastController,
-} from '@my/ui'
+import { Avatar, Button, Container, Image, Link, Paragraph, Theme, XStack, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconClose } from 'app/components/icons'
@@ -17,7 +6,6 @@ import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { UploadAvatar } from '../uploadProfileImage/screen'
 // import { SolitoImage } from 'solito/image'
@@ -37,7 +25,6 @@ export const EditProfile = () => {
   const queryClient = useQueryClient()
   const form = useForm<z.infer<typeof ProfileSchema>>()
   const { resolvedTheme } = useThemeSetting()
-  const router = useRouter()
   const mutation = useMutation({
     async mutationFn(data: z.infer<typeof ProfileSchema>) {
       await supabase
@@ -47,7 +34,7 @@ export const EditProfile = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['profile'])
-      router.back()
+      window.location.href = '/account'
     },
   })
 
@@ -59,9 +46,11 @@ export const EditProfile = () => {
             <Paragraph size={'$9'} theme={'alt1'} fontWeight={'700'}>
               Edit Profile
             </Paragraph>
-            <XStack paddingTop={'$2'} onPress={() => router.push('/account')}>
-              <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
-            </XStack>
+            <Link href={'/account'}>
+              <XStack paddingTop={'$2'}>
+                <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
+              </XStack>
+            </Link>
           </XStack>
           <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
             <SchemaForm

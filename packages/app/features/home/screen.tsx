@@ -91,26 +91,31 @@ export function HomeScreen() {
   ]
   const balanceDetails = [
     {
+      id: 1,
       currency: 'Ethereum',
       symbol: 'eth',
       balance: 1.45,
     },
     {
+      id: 2,
       currency: 'USDC',
       symbol: 'usdc',
       balance: 125,
     },
     {
+      id: 3,
       currency: 'SEND',
       symbol: 'send',
       balance: 71454457,
     },
     {
+      id: 4,
       currency: 'SEND',
       symbol: 'send',
       balance: 4412,
     },
     {
+      id: 5,
       currency: 'USDC',
       symbol: 'usdc',
       balance: 2.0,
@@ -213,7 +218,7 @@ export function HomeScreen() {
                   <ScrollView zi={4} bc={'transparent'}>
                     <YStack m={'$1'}>
                       {balanceDetails.map((balance) => (
-                        <ListItem key={balance.balance} bc={'transparent'}>
+                        <ListItem key={balance.id} bc={'transparent'}>
                           <XStack
                             f={1}
                             h={'100%'}
