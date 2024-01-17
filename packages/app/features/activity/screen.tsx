@@ -7,6 +7,7 @@ import {
   Paragraph,
   ScrollView,
   Spinner,
+  Stack,
   Text,
   XStack,
   YStack,
@@ -69,18 +70,10 @@ export function ActivityScreen() {
     <Container>
       <TagSearchProvider>
         <YStack f={1} width={'100%'} py="$4" space="$4">
-          <YStack
-            alignItems="center"
-            width={'100%'}
-            $gtSm={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <H1>Activity</H1>
+          <XStack alignItems="center" width={'100%'} gap="$6">
             <Search />
             <IconQRCode />
-          </YStack>
+          </XStack>
 
           <ActivityBody />
         </YStack>
@@ -90,13 +83,7 @@ export function ActivityScreen() {
 }
 
 function ActivityBody() {
-  const { form, isLoading, results, error } = useTagSearch()
-  const query = form.watch('query', '')
-
-  console.log('results', results)
-  console.log('error', error)
-  console.log('isLoading', isLoading)
-  console.log('query', query)
+  const { isLoading, results, error } = useTagSearch()
 
   return (
     <AnimatePresence>
@@ -143,6 +130,7 @@ function SearchResults() {
 
   return (
     <YStack
+      testID="searchResults"
       key="searchResults"
       animation="quick"
       space="$4"
@@ -243,8 +231,12 @@ function Search() {
         schema={SearchSchema}
         props={{
           query: {
-            placeholder: 'Search...',
+            placeholder: 'Search',
           },
+        }}
+        formProps={{
+          width: '100%',
+          f: 1,
         }}
       >
         {({ query }) => query}

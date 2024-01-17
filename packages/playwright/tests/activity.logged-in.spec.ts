@@ -33,7 +33,9 @@ test('can search on activity page', async ({ page, context }) => {
     })
   })
 
-  await expect(page.getByRole('heading', { name: 'Activity', exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Activity', exact: true }).and(page.getByText('Activity'))
+  ).toBeVisible()
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
   await page.getByRole('textbox', { name: 'Search' }).fill('test')
   await expect(page.getByRole('textbox', { name: 'Search' })).toHaveValue('test')
