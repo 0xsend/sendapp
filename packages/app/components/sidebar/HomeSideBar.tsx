@@ -24,7 +24,6 @@ import {
 import { SideBarFooterLink } from 'app/components/sidebar/SideBarFooterLink'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 import { telegram as telegramSocial, twitter as twitterSocial } from 'app/data/socialLinks'
-import { usePathname } from 'app/utils/usePathname'
 
 import { useNav } from 'app/routers/params'
 
