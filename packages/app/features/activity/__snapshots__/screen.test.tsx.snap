@@ -39,6 +39,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
         onSubmit={[Function]}
         style={
           {
+            "alignSelf": "center",
             "flex": 1,
             "flexDirection": "column",
             "gap": 18,
@@ -2383,6 +2384,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         onSubmit={[Function]}
         style={
           {
+            "alignSelf": "center",
             "flex": 1,
             "flexDirection": "column",
             "gap": 18,

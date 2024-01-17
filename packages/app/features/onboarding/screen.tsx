@@ -60,14 +60,9 @@ import { testBaseClient } from '../../../playwright/tests/fixtures/viem/base'
 export function OnboardingScreen() {
   const {
     data: sendAccts,
-    error: sendAcctsError,
-    isLoading: sendAcctsIsLoading,
+    // error: sendAcctsError,
+    // isLoading: sendAcctsIsLoading,
   } = useSendAccounts()
-
-  // TODO: remove me
-  useEffect(() => {
-    console.log('send accounts', { sendAccts, sendAcctsError, sendAcctsIsLoading })
-  }, [sendAccts, sendAcctsError, sendAcctsIsLoading])
 
   return (
     <Container>

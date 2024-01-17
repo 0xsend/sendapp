@@ -1,5 +1,4 @@
 import { Functions } from '@my/supabase/database.types'
-import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'

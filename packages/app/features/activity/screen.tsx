@@ -2,12 +2,10 @@ import {
   AnimatePresence,
   Avatar,
   Container,
-  H1,
   H4,
   Paragraph,
   ScrollView,
   Spinner,
-  Stack,
   Text,
   XStack,
   YStack,
@@ -237,6 +235,10 @@ function Search() {
         formProps={{
           width: '100%',
           f: 1,
+          als: 'center',
+          $gtSm: {
+            maxWidth: '100%',
+          },
         }}
       >
         {({ query }) => query}
