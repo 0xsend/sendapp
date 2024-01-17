@@ -5,6 +5,7 @@
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import { expect, test } from './fixtures/send-accounts'
 import debug from 'debug'
+import { Page } from '@playwright/test'
 
 let log: debug.Debugger
 
@@ -12,10 +13,13 @@ test.beforeEach(() => {
   log = debug(`test:activity:logged-in:${test.info().parallelIndex}`)
 })
 
+const activityHeading = (page: Page) =>
+  page.getByRole('heading', { name: 'Activity', exact: true }).and(page.getByText('Activity'))
+
 test('can visit activity page', async ({ page }) => {
   await page.goto('/activity')
   log('beforeEach', `url=${page.url()}`)
-  await expect(page.getByRole('heading', { name: 'Activity', exact: true })).toBeVisible()
+  await expect(activityHeading(page)).toBeVisible()
 })
 
 test('can search on activity page', async ({ page, context }) => {
@@ -33,9 +37,7 @@ test('can search on activity page', async ({ page, context }) => {
     })
   })
 
-  await expect(
-    page.getByRole('heading', { name: 'Activity', exact: true }).and(page.getByText('Activity'))
-  ).toBeVisible()
+  await expect(activityHeading(page)).toBeVisible()
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
   await page.getByRole('textbox', { name: 'Search' }).fill('test')
   await expect(page.getByRole('textbox', { name: 'Search' })).toHaveValue('test')
