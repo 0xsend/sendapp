@@ -13,7 +13,7 @@ export class OnboardingPage {
     // choose a random account name
     const acctName = this.accountName
     await this.page.getByRole('textbox', { name: 'Passkey name:' }).fill(acctName)
-    await expect(this.page.getByLabel('Account name:')).toHaveValue(acctName)
+    await expect(this.page.getByLabel('Passkey name:')).toHaveValue(acctName)
 
     await this.page.getByRole('button', { name: 'Create' }).click()
     await this.page.getByRole('button', { name: 'Create' }).waitFor({ state: 'detached' })

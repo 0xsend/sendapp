@@ -671,7 +671,7 @@ export interface Database {
       }
       tag_search: {
         Args: {
-          q: string
+          query: string
         }
         Returns: {
           avatar_url: string

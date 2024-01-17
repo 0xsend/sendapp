@@ -1,20 +1,20 @@
 import {
+  AnimatePresence,
   Avatar,
   Container,
   H1,
   H4,
   Paragraph,
   ScrollView,
+  Spinner,
   Text,
   XStack,
   YStack,
-  useDebounce,
 } from '@my/ui'
 import { IconQRCode } from 'app/components/icons'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { useEffect } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { SchemaForm } from 'app/utils/SchemaForm'
+import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
+import { FormProvider } from 'react-hook-form'
 
 const activities = [
   {
@@ -65,64 +65,157 @@ const suggestions = [
 ]
 
 export function ActivityScreen() {
-  const form = useForm<SearchSchema>()
-  async function onSearch({ search }: SearchSchema) {
-    console.log('TODO: search', search)
-  }
-  const debouncedSearch = useDebounce((args: SearchSchema) => onSearch(args), 300)
-  const search = form.watch('search')
-
-  useEffect(() => {
-    debouncedSearch({ search })
-  }, [search, debouncedSearch])
-
   return (
     <Container>
-      <YStack f={1} width={'100%'} py="$4" space="$4">
-        <YStack
-          alignItems="center"
-          width={'100%'}
-          $gtSm={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}
-        >
-          <H1>Activity</H1>
-          <Search form={form} />
-          <IconQRCode />
-        </YStack>
-        <YStack space="$2">
-          <H4 theme={'alt2'}>Suggested...</H4>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {/* TODO: Replace with dynamic list */}
-            {suggestions.map((user) => (
-              <XStack key={user.username} ai="center" mx="$4" space="$2">
-                <Avatar size="$4" br="$4" space="$2">
-                  <Avatar.Image src={user.avatar} />
-                  <Avatar.Fallback bc="red" />
-                </Avatar>
-                <Paragraph>@{user.username}</Paragraph>
-              </XStack>
-            ))}
-          </ScrollView>
-        </YStack>
+      <TagSearchProvider>
+        <YStack f={1} width={'100%'} py="$4" space="$4">
+          <YStack
+            alignItems="center"
+            width={'100%'}
+            $gtSm={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
+          >
+            <H1>Activity</H1>
+            <Search />
+            <IconQRCode />
+          </YStack>
 
-        <RecentActivity />
-      </YStack>
+          <ActivityBody />
+        </YStack>
+      </TagSearchProvider>
     </Container>
   )
 }
 
+function ActivityBody() {
+  const { form, isLoading, results, error } = useTagSearch()
+  const query = form.watch('query', '')
+
+  console.log('results', results)
+  console.log('error', error)
+  console.log('isLoading', isLoading)
+  console.log('query', query)
+
+  return (
+    <AnimatePresence>
+      {isLoading && (
+        <YStack key="loading" space="$4" mb="$4">
+          <Spinner size="large" color="$send1" />
+        </YStack>
+      )}
+
+      {error && (
+        <YStack key="error" space="$4" mb="$4">
+          <H4 theme={'alt2'}>Error</H4>
+          <Text>{error.message}</Text>
+        </YStack>
+      )}
+
+      <SearchResults />
+      {results === null && !isLoading && !error && (
+        <YStack
+          key="suggestions"
+          animation="quick"
+          space="$4"
+          mb="$4"
+          exitStyle={{
+            opacity: 0,
+            y: 10,
+          }}
+        >
+          <Suggestions />
+          <RecentActivity />
+        </YStack>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function SearchResults() {
+  const { form, results, isLoading, error } = useTagSearch()
+  const query = form.watch('query', '')
+
+  if (!results || isLoading || error) {
+    return null
+  }
+
+  return (
+    <YStack
+      key="searchResults"
+      animation="quick"
+      space="$4"
+      mb="$4"
+      enterStyle={{
+        opacity: 0,
+        y: -10,
+      }}
+    >
+      <H4 theme={'alt2'}>Results</H4>
+      {results.length === 0 && <Text>No results for {query}... 😢</Text>}
+      {results.map((result) => (
+        <XStack
+          testID={`tag-search-${result.tag_name}`}
+          key={result.tag_name}
+          ai="center"
+          space="$4"
+        >
+          <Avatar size="$4" br="$4" space="$2">
+            <Avatar.Image src={result.avatar_url} />
+            <Avatar.Fallback>
+              <Avatar>
+                <Avatar.Image
+                  src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
+                />
+                <Avatar.Fallback>
+                  <Paragraph>??</Paragraph>
+                </Avatar.Fallback>
+              </Avatar>
+            </Avatar.Fallback>
+          </Avatar>
+          <YStack space="$1">
+            <Text>{result.tag_name}</Text>
+          </YStack>
+        </XStack>
+      ))}
+    </YStack>
+  )
+}
+// TODO: Replace with dynamic list
+function Suggestions() {
+  return (
+    <YStack space="$2">
+      <H4 theme={'alt2'}>Suggested...</H4>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {suggestions.map((user) => (
+          <XStack key={user.username} ai="center" mx="$4" space="$2">
+            <Avatar size="$4" br="$4" space="$2">
+              <Avatar.Image src={user.avatar} />
+              <Avatar.Fallback jc="center">
+                <Spinner size="small" color="$send1" />
+              </Avatar.Fallback>
+            </Avatar>
+            <Paragraph>@{user.username}</Paragraph>
+          </XStack>
+        ))}
+      </ScrollView>
+    </YStack>
+  )
+}
+
+// TODO: Replace with dynamic list
 function RecentActivity() {
   return (
     <YStack space="$4" mb="$4">
       <H4 theme={'alt2'}>Recent Activity</H4>
-      {/* TODO: Replace with dynamic list */}
       {activities.map((activity) => (
         <XStack key={activity.time} ai="center" space="$4">
           <Avatar size="$4" br="$4" space="$2">
             <Avatar.Image src={activity.avatar} />
-            <Avatar.Fallback bc="red" />
+            <Avatar.Fallback jc="center">
+              <Spinner size="small" color="$send1" />
+            </Avatar.Fallback>
           </Avatar>
           <YStack space="$1">
             <Text>{activity.username}</Text>
@@ -137,27 +230,24 @@ function RecentActivity() {
   )
 }
 
-const SearchSchema = z.object({
-  search: formFields.text,
-})
-type SearchSchema = z.infer<typeof SearchSchema>
-function Search({ form }: { form: ReturnType<typeof useForm<SearchSchema>> }) {
+function Search() {
+  const { form } = useTagSearch()
   return (
     <FormProvider {...form}>
       <SchemaForm
         form={form}
-        defaultValues={{ search: '' }}
+        defaultValues={{ query: '' }}
         onSubmit={() => {
           // noop
         }}
         schema={SearchSchema}
         props={{
-          search: {
+          query: {
             placeholder: 'Search...',
           },
         }}
       >
-        {({ search }) => search}
+        {({ query }) => query}
       </SchemaForm>
     </FormProvider>
   )
