@@ -78,7 +78,7 @@ export default defineConfig({
         return {
           name: copycat.fullName(row.name),
           about: copycat.sentence(row.about),
-          referral_code: copycat.hex(row.referral_code),
+          referral_code: copycat.scramble(row.referral_code),
         }
       },
       tags({ row }) {

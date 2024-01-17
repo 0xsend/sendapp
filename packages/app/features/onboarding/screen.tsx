@@ -174,7 +174,7 @@ function CreateSendAccount() {
   return (
     // TODO: turn into a form
     <YStack space="$4">
-      <Label htmlFor="accountName">Account name:</Label>
+      <Label htmlFor="accountName">Passkey name:</Label>
       <Input id="accountName" onChangeText={setAccountName} value={accountName} />
       <Button onPress={createAccount}>Create</Button>
     </YStack>

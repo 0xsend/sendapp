@@ -6,7 +6,7 @@ project_id = "send"
 port = 54321
 schemas = ["public", "storage"]
 extra_search_path = ["public", "extensions"]
-max_rows = 1000
+max_rows = 100
 
 [db]
 # Port to use for the local database URL.
