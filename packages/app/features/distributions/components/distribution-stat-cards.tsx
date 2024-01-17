@@ -219,8 +219,7 @@ export function DistributionTimeCard(props: CardProps) {
               h="$8"
               maw={'$10'}
               zIndex={1}
-              $theme-dark={{ bc: '#292929' }}
-              $theme-light={{ bc: '#F0EEE9' }}
+              bc="$background05"
               bordered
               br={'$6'}
               $gtXs={{
@@ -262,8 +261,7 @@ export function DistributionTimeCard(props: CardProps) {
               h="$8"
               maw={'$10'}
               zIndex={1}
-              $theme-dark={{ bc: '#292929' }}
-              $theme-light={{ bc: '#F0EEE9' }}
+              bc="$background05"
               bordered
               br={'$6'}
               $gtXs={{
@@ -311,8 +309,7 @@ export function DistributionTimeCard(props: CardProps) {
               h="$8"
               maw={'$10'}
               zIndex={1}
-              $theme-dark={{ bc: '#292929' }}
-              $theme-light={{ bc: '#F0EEE9' }}
+              bc="$background05"
               bordered
               br={'$6'}
               $gtXs={{
@@ -360,8 +357,7 @@ export function DistributionTimeCard(props: CardProps) {
               h="$8"
               maw={'$10'}
               zIndex={1}
-              $theme-dark={{ bc: '#292929' }}
-              $theme-light={{ bc: '#F0EEE9' }}
+              bc="$background05"
               bordered
               br={'$6'}
               $gtXs={{
