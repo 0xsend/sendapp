@@ -55,7 +55,6 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
             href={'/leaderboard'}
-            disabled={true}
             hoverStyle={{ cursor: 'not-allowed' }}
           />
         </YStack>
