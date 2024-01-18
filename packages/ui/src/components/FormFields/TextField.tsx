@@ -22,7 +22,7 @@ export const TextField = (props: InputProps) => {
       {/* flex 1 is needed to make the input fill the width of the parent in the case of a being in a container with flex direction row */}
       <Fieldset f={1}>
         {!!label && (
-          <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
+          <Label size={props.size || '$3'} htmlFor={id}>
             {label} {isOptional && '(Optional)'}
           </Label>
         )}

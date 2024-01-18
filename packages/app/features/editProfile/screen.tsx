@@ -6,9 +6,9 @@ import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { useForm } from 'react-hook-form'
+import { SolitoImage } from 'solito/image'
 import { z } from 'zod'
 import { UploadAvatar } from '../uploadProfileImage/screen'
-// import { SolitoImage } from 'solito/image'
 
 const ProfileSchema = z.object({
   name: formFields.text.describe('Name'),
@@ -34,7 +34,7 @@ export const EditProfile = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['profile'])
-      window.location.href = '/account'
+      window.location.href = '/profile'
     },
   })
 
@@ -42,15 +42,15 @@ export const EditProfile = () => {
     <Theme name="send">
       <Container>
         <YStack w={'100%'} ai={'center'}>
-          <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'} paddingTop={'$6'}>
-            <Paragraph size={'$9'} theme={'alt1'} fontWeight={'700'}>
+          <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'}>
+            <Paragraph size={'$9'} fontWeight={'700'}>
               Edit Profile
             </Paragraph>
-            <Link href={'/account'}>
+            {/* <Link href={'/profile'}>
               <XStack paddingTop={'$2'}>
                 <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
               </XStack>
-            </Link>
+            </Link> */}
           </XStack>
           <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
             <SchemaForm
@@ -103,13 +103,14 @@ export const EditProfile = () => {
               {(fields) => (
                 <>
                   <YStack>
-                    <Paragraph theme={'alt1'} fontWeight={'400'} marginBottom={'$5'}>
+                    <Paragraph fontWeight={'400'} marginBottom={'$5'}>
                       Image
                     </Paragraph>
                     <UploadAvatar>
                       <Avatar circular size={128}>
-                        <Image
-                          source={{ uri: avatar_url ? avatar_url : '' }}
+                        <SolitoImage
+                          src={avatar_url ? avatar_url : ''}
+                          alt="your avatar"
                           width={128}
                           height={128}
                         />

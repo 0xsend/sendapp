@@ -9,8 +9,8 @@ const Next = (props: IconProps) => {
       <Path
         d="M7.79999 19.2L16.8 12L7.79999 4.79995"
         stroke="#C3AB8E"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </Svg>
   )

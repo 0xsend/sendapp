@@ -1,4 +1,4 @@
-import { Avatar, Image, Link, Paragraph, ScrollView, Theme, XStack, YStack } from '@my/ui'
+import { Avatar, Image, Link, Paragraph, ScrollView, Spinner, Theme, XStack, YStack } from '@my/ui'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconQr } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
@@ -22,12 +22,12 @@ const MainLayout = ({
             marginHorizontal={'5%'}
             paddingTop={'$6'}
           >
-            <Link href={'/account'}>
+            <Link href={'/profile'}>
               <Avatar br={'$6'} size={'$4.5'}>
                 {avatar_url ? (
                   <Image source={{ uri: avatar_url }} width={48} height={48} />
                 ) : (
-                  <Square size={'$4'} backgroundColor="$color" elevation="$4" />
+                  <Spinner size="large" color="$primary" />
                 )}
               </Avatar>
             </Link>

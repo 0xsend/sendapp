@@ -1,7 +1,6 @@
 import { Button, Card, Container, Image, Link, Paragraph, Theme, XStack, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import {
-  IconClose,
   IconDownlod,
   IconNext,
   IconNotification,
@@ -12,7 +11,6 @@ import {
   IconSupport,
 } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { useState } from 'react'
 import { Square } from 'tamagui'
 
 export function AccountScreen() {
@@ -44,11 +42,11 @@ export function AccountScreen() {
     <>
       <Theme name="send">
         <YStack
-          $gtLg={{ width: 600 }}
-          $sm={{ width: '100vw' }}
-          $gtSm={{ width: '100vw' }}
+          $gtLg={{ width: '100%' }}
+          $sm={{ width: '100%' }}
+          $gtSm={{ width: '100%' }}
           ai={'center'}
-          paddingTop={'$6'}
+          // paddingTop={'$6'}
           gap={'$space.6'}
         >
           <XStack
@@ -56,16 +54,16 @@ export function AccountScreen() {
             ai={'center'}
             jc={'space-between'}
             marginHorizontal={'5%'}
-            paddingTop={'$6'}
+            // paddingTop={'$6'}
           >
-            <Paragraph size={'$9'} theme={'alt1'} fontWeight={'700'}>
+            <Paragraph size={'$9'} fontWeight={'700'}>
               Account
             </Paragraph>
-            <Link href={'/'}>
+            {/* <Link href={'/'}>
               <XStack>
                 <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
               </XStack>
-            </Link>
+            </Link> */}
           </XStack>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} zIndex={4}>
             <Card
@@ -96,17 +94,17 @@ export function AccountScreen() {
                     <Square
                       size={'$11'}
                       borderRadius={'$8'}
-                      backgroundColor="$color"
+                      backgroundColor="$primary"
                       elevation="$4"
                     />
                   )}
-                  <Paragraph fontSize={20} theme={'alt1'} fontWeight={'700'} marginTop={'$3'}>
+                  <Paragraph fontSize={20} fontWeight={'700'} marginTop={'$3'}>
                     {name ? name : 'No Name'}
                   </Paragraph>
-                  <Paragraph fontSize={13} theme={'alt1'} fontWeight={'400'} opacity={0.6}>
+                  <Paragraph fontSize={13} fontWeight={'400'} opacity={0.6}>
                     {about}
                   </Paragraph>
-                  <Link href={'/editProfile'} w={'100%'}>
+                  <Link href={'/profile/edit'} w={'100%'}>
                     <Button
                       f={1}
                       br={'$radius.true'}
@@ -143,12 +141,12 @@ export function AccountScreen() {
                 <IconReferral />
                 <YStack f={1}>
                   <XStack f={1} h={'Inherit'} paddingLeft={'$3'}>
-                    <Paragraph fontSize={20} theme={'alt1'} fontWeight={'400'}>
+                    <Paragraph fontSize={20} fontWeight={'400'}>
                       Referral Link
                     </Paragraph>
                   </XStack>
                   <XStack f={1} h={'Inherit'} paddingLeft={'$3'}>
-                    <Paragraph fontSize={16} theme={'alt1'} fontWeight={'400'} opacity={0.6}>
+                    <Paragraph fontSize={16} fontWeight={'400'} opacity={0.6}>
                       {code}
                     </Paragraph>
                   </XStack>
@@ -157,7 +155,7 @@ export function AccountScreen() {
             </Card>
           </XStack>
           <YStack w={'90%'} jc={'space-between'} zIndex={4} mb={'$7'}>
-            <Paragraph fontSize={16} theme={'alt1'} fontWeight={'400'} opacity={0.6} mb={'$5'}>
+            <Paragraph fontSize={16} fontWeight={'400'} opacity={0.6} mb={'$5'}>
               ACCOUNT & SETTINGS
             </Paragraph>
             <Card
@@ -175,7 +173,7 @@ export function AccountScreen() {
                   <XStack jc={'space-between'} paddingBottom={20} key={account.label}>
                     <XStack>
                       {account.icon}
-                      <Paragraph paddingLeft={'$3'} fontSize={16} theme={'alt1'} fontWeight={'400'}>
+                      <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
                         {account.label}
                       </Paragraph>
                     </XStack>
