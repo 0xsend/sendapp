@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { TamaguiProvider, config } from '@my/ui'
+import { TamaguiProvider, View as MockView, config } from '@my/ui'
 import { render, screen, fireEvent } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
 
@@ -17,6 +17,12 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
       }),
     }),
   }),
+}))
+
+jest.mock('solito/link', () => ({
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <MockView dataSet={{ href }}>{children}</MockView>
+  ),
 }))
 
 test('ActivityScreen', () => {

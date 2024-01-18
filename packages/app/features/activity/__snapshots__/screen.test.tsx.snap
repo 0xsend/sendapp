@@ -2926,199 +2926,204 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         }
       />
       <View
-        style={
-          {
-            "alignItems": "center",
-            "flexDirection": "row",
-          }
-        }
-        testID="tag-search-test"
+        data-href="/profile/test"
+        style={{}}
       >
         <View
           style={
             {
               "alignItems": "center",
-              "borderBottomLeftRadius": 9,
-              "borderBottomRightRadius": 9,
-              "borderTopLeftRadius": 9,
-              "borderTopRightRadius": 9,
-              "flexDirection": "column",
-              "height": 44,
-              "justifyContent": "center",
-              "maxHeight": 44,
-              "maxWidth": 44,
-              "minHeight": 44,
-              "minWidth": 44,
-              "overflow": "hidden",
-              "position": "relative",
-              "width": 44,
+              "flexDirection": "row",
             }
           }
+          testID="tag-search-test"
         >
           <View
             style={
               {
-                "bottom": 0,
+                "alignItems": "center",
+                "borderBottomLeftRadius": 9,
+                "borderBottomRightRadius": 9,
+                "borderTopLeftRadius": 9,
+                "borderTopRightRadius": 9,
                 "flexDirection": "column",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-                "zIndex": 1,
-              }
-            }
-          >
-            <Image
-              fullscreen={true}
-              onError={[Function]}
-              onLoad={[Function]}
-              source={
-                {
-                  "uri": "https://avatars.githubusercontent.com/u/123",
-                }
-              }
-              style={
-                {
-                  "height": 44,
-                  "position": "relative",
-                  "width": 44,
-                }
-              }
-            />
-          </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 7,
-                "minHeight": 7,
-                "minWidth": 7,
-                "width": 7,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "bottom": 0,
-                "flexDirection": "column",
-                "left": 0,
-                "position": "absolute",
-                "right": 0,
-                "top": 0,
-                "zIndex": 0,
+                "height": 44,
+                "justifyContent": "center",
+                "maxHeight": 44,
+                "maxWidth": 44,
+                "minHeight": 44,
+                "minWidth": 44,
+                "overflow": "hidden",
+                "position": "relative",
+                "width": 44,
               }
             }
           >
             <View
               style={
                 {
-                  "alignItems": "center",
+                  "bottom": 0,
                   "flexDirection": "column",
-                  "height": 44,
-                  "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
-                  "overflow": "hidden",
-                  "position": "relative",
-                  "width": 44,
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "zIndex": 1,
+                }
+              }
+            >
+              <Image
+                fullscreen={true}
+                onError={[Function]}
+                onLoad={[Function]}
+                source={
+                  {
+                    "uri": "https://avatars.githubusercontent.com/u/123",
+                  }
+                }
+                style={
+                  {
+                    "height": 44,
+                    "position": "relative",
+                    "width": 44,
+                  }
+                }
+              />
+            </View>
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "height": 7,
+                  "minHeight": 7,
+                  "minWidth": 7,
+                  "width": 7,
+                }
+              }
+            />
+            <View
+              style={
+                {
+                  "bottom": 0,
+                  "flexDirection": "column",
+                  "left": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "zIndex": 0,
                 }
               }
             >
               <View
                 style={
                   {
-                    "bottom": 0,
+                    "alignItems": "center",
                     "flexDirection": "column",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                    "zIndex": 1,
+                    "height": 44,
+                    "justifyContent": "center",
+                    "maxHeight": 44,
+                    "maxWidth": 44,
+                    "minHeight": 44,
+                    "minWidth": 44,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 44,
                   }
                 }
               >
-                <Image
-                  fullscreen={true}
-                  onError={[Function]}
-                  onLoad={[Function]}
-                  source={
-                    {
-                      "uri": "https://ui-avatars.com/api.jpg?name=test&size=256",
-                    }
-                  }
+                <View
                   style={
                     {
-                      "height": 44,
-                      "position": "relative",
-                      "width": 44,
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
                     }
                   }
-                />
-              </View>
-              <View
-                style={
-                  {
-                    "bottom": 0,
-                    "flexDirection": "column",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                    "zIndex": 0,
-                  }
-                }
-              >
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "rgba(241, 241, 238, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "400",
-                      "lineHeight": 19,
-                    }
-                  }
-                  suppressHighlighting={true}
                 >
-                  ??
-                </Text>
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    source={
+                      {
+                        "uri": "https://ui-avatars.com/api.jpg?name=test&size=256",
+                      }
+                    }
+                    style={
+                      {
+                        "height": 44,
+                        "position": "relative",
+                        "width": 44,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <Text
+                    selectable={true}
+                    style={
+                      {
+                        "color": "rgba(241, 241, 238, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "400",
+                        "lineHeight": 19,
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    ??
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
-        <View
-          style={
-            {
-              "flexDirection": "column",
-            }
-          }
-        >
-          <Text
+          <View
+            pointerEvents="none"
             style={
               {
-                "color": "rgba(241, 241, 238, 1)",
-                "fontFamily": "System",
+                "height": 18,
+                "minHeight": 18,
+                "minWidth": 18,
+                "width": 18,
               }
             }
-            suppressHighlighting={true}
+          />
+          <View
+            style={
+              {
+                "flexDirection": "column",
+              }
+            }
           >
-            test
-          </Text>
+            <Text
+              style={
+                {
+                  "color": "rgba(241, 241, 238, 1)",
+                  "fontFamily": "System",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              test
+            </Text>
+          </View>
         </View>
       </View>
     </View>

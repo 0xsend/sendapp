@@ -16,7 +16,7 @@ export default class Document extends NextDocument {
     AppRegistry.registerComponent('Main', () => Main)
     const page = await ctx.renderPage()
 
-    // @ts-ignore
+    // @ts-expect-error: getApplication is not in the types
     const { getStyleElement } = AppRegistry.getApplication('Main')
 
     /**
