@@ -38,7 +38,7 @@ export function SettingsScreen() {
   const about = profile?.about
   const avatar_url = profile?.avatar_url
   const supabase = useSupabase()
-  const { resolvedTheme, toggle, current } = useThemeSetting()
+  const { toggle, current } = useThemeSetting()
   const [mode, setMode] = useState('')
 
   useEffect(() => {
@@ -103,16 +103,9 @@ export function SettingsScreen() {
           $sm={{ width: '100%' }}
           $gtSm={{ width: '100%' }}
           ai={'center'}
-          // paddingTop={'$6'}
           gap={'$space.6'}
         >
-          <XStack
-            w={'90%'}
-            ai={'center'}
-            jc={'space-between'}
-            marginHorizontal={'5%'}
-            // paddingTop={'$6'}
-          >
+          <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'}>
             <Paragraph size={'$9'} fontWeight={'700'}>
               Account
             </Paragraph>
@@ -217,7 +210,6 @@ export function SettingsScreen() {
             <Card
               cur={'pointer'}
               w={'100%'}
-              // h={'$16'}
               borderRadius={'$8'}
               shadowColor={'rgba(0, 0, 0, 0.1)'}
               shadowOffset={{ width: 0, height: 4 }}
