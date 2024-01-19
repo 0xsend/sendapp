@@ -1,4 +1,15 @@
-import { Button, Container, KVTable, Paragraph, XStack, YStack } from '@my/ui'
+import {
+  Button,
+  Container,
+  KVTable,
+  Paragraph,
+  XStack,
+  YStack,
+  useMedia,
+  useToastController,
+} from '@my/ui'
+import { IconCopy } from 'app/components/icons'
+import { getReferralHref } from 'app/utils/getReferralLink'
 
 const users = [
   {
@@ -6,78 +17,72 @@ const users = [
     sendTag: '0xUser',
     points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 2,
-    sendTag: '0xUser1',
-    points: 90,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 3,
-    sendTag: '0xUser2',
-    points: 80,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 4,
-    sendTag: '0xUser3',
-    points: 70,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 5,
-    sendTag: '0xUser4',
-    points: 60,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 6,
-    sendTag: '0xUser5',
-    points: 50,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 7,
-    sendTag: '0xUser6',
-    points: 40,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
   {
     rank: 8,
-    sendTag: '0xUser7',
-    points: 30,
+    sendTag: '0xUser',
+    points: 100,
     referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 9,
-    sendTag: '0xUser8',
-    points: 20,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 10,
-    sendTag: '0xUser9',
-    points: 10,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 11,
-    sendTag: '0xUser10',
-    points: 5,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 12,
-    sendTag: '0xUser11',
-    points: 5,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 13,
-    sendTag: '0xUser12',
-    points: 5,
-    referralLink: 'send.it/referral/132442314',
+    profile: {
+      referral_code: '132442314',
+    },
   },
 ]
 
@@ -92,10 +97,16 @@ export function LeaderboardScreen() {
 }
 
 function LeaderboardSection() {
+  const media = useMedia()
   return (
-    <YStack gap="$6" p="$8" br="$8" bg="$backgroundStrong">
-      <LeaderBoardHeader />
-      <LeaderboardList />
+    <YStack gap="$6" $gtSm={{ p: '$8', bg: '$backgroundStrong' }} br="$8">
+      {media.gtSm ? (
+        <>
+          <LeaderBoardHeader /> <LeaderboardListWide />
+        </>
+      ) : (
+        <LeaderboardListNarrow />
+      )}
     </YStack>
   )
 }
@@ -119,21 +130,87 @@ function LeaderBoardHeader() {
   )
 }
 
-function LeaderboardList() {
-  return users.map((user) => (
-    <XStack gap="$3" ai="center" jc={'center'} key={user.sendTag}>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4">
-        {user.rank}
-      </Paragraph>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" ta="center">
-        {user.sendTag}
-      </Paragraph>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" ta="center">
-        {user.points}
-      </Paragraph>
-      <Paragraph w="20%" f={2} mb="0" size="$6" lineHeight="$4" ta="right" color={'$gold8'}>
-        {user.referralLink}
-      </Paragraph>
-    </XStack>
-  ))
+function LeaderboardListWide() {
+  const toast = useToastController()
+
+  return users.map((user) => {
+    const referralHref = getReferralHref(user?.profile?.referral_code ?? '')
+    return (
+      <XStack gap="$3" ai="center" jc={'center'} key={user.sendTag}>
+        <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4">
+          {user.rank}
+        </Paragraph>
+        <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" ta="center">
+          {user.sendTag}
+        </Paragraph>
+        <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" ta="center">
+          {user.points}
+        </Paragraph>
+        <Paragraph
+          w="20%"
+          f={2}
+          mb="0"
+          size="$6"
+          lineHeight="$4"
+          ta="right"
+          color={'$gold8'}
+          onPress={() => {
+            if (user?.profile?.referral_code) {
+              try {
+                // write the referral link to clipboard
+                // @TODO: implement a native clipboard solution
+                navigator.clipboard.writeText(referralHref)
+              } catch (e) {
+                console.warn(e)
+                prompt('Copy to clipboard: Ctrl+C, Enter', referralHref)
+              }
+              toast.show('Copied your referral link to clipboard')
+            }
+          }}
+        >
+          {user.referralLink}
+        </Paragraph>
+      </XStack>
+    )
+  })
+}
+
+function LeaderboardListNarrow() {
+  const toast = useToastController()
+
+  return users.map((user) => {
+    const referralHref = getReferralHref(user?.profile?.referral_code ?? '')
+    return (
+      <XStack
+        gap="$3"
+        ai="center"
+        jc={'center'}
+        key={user.sendTag}
+        onPress={() => {
+          if (user?.profile?.referral_code) {
+            try {
+              // write the referral link to clipboard
+              // @TODO: implement a native clipboard solution
+              navigator.clipboard.writeText(referralHref)
+            } catch (e) {
+              console.warn(e)
+              prompt('Copy to clipboard: Ctrl+C, Enter', referralHref)
+            }
+            toast.show('Copied referral link to clipboard')
+          }
+        }}
+      >
+        <Paragraph mb="0" size="$9" lineHeight="$4" fontWeight={'bold'}>
+          {user.rank}
+        </Paragraph>
+        <Paragraph f={1} mb="0" size="$6" lineHeight="$4" ta="center">
+          {user.sendTag}
+        </Paragraph>
+        <Paragraph mb="0" size="$6" lineHeight="$4" ta="center">
+          {user.points}
+        </Paragraph>
+        <Button mx={0} px={0} icon={<IconCopy />} bg={'$backgroundTransparent'} />
+      </XStack>
+    )
+  })
 }
