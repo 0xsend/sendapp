@@ -5,7 +5,7 @@ import { Path, Svg } from 'react-native-svg'
 const Notification = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
-    <Svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+    <Svg width="16" height="28" viewBox="0 0 16 20" fill="none">
       <Path
         fillRule="evenodd"
         clipRule="evenodd"

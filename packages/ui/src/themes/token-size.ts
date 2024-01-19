@@ -42,6 +42,7 @@ export const size = {
   $19: 264,
   $20: 284,
   $21: 374,
+  $22: 424,
 }
 export type SizeKeysIn = keyof typeof size
 export type Sizes = {

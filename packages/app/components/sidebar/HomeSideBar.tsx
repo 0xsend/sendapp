@@ -54,8 +54,8 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
-            text={'Account'}
-            href={'/profile'}
+            text={'Settings'}
+            href={'/settings'}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
@@ -120,8 +120,8 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
-            text={'Account'}
-            href={'/profile'}
+            text={'Settings'}
+            href={'/settings'}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
@@ -155,8 +155,6 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
 
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
-
-  console.log('==== meta =====', media)
 
   if (media.gtLg)
     return (

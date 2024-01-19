@@ -1,29 +1,54 @@
-import { Button, Card, Container, Image, Link, Paragraph, Theme, XStack, YStack } from '@my/ui'
+import {
+  Button,
+  Card,
+  Container,
+  Image,
+  Link,
+  Paragraph,
+  Separator,
+  Theme,
+  XStack,
+  YStack,
+} from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import {
   IconDownlod,
+  IconLogout,
   IconNext,
   IconNotification,
+  IconOur,
   IconPersonal,
+  IconPhone,
   IconQr,
   IconReferral,
   IconSecurity,
   IconSupport,
+  IconTelegram,
+  IconTheme,
 } from 'app/components/icons'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
+import { useEffect, useState } from 'react'
 import { Square } from 'tamagui'
 
-export function AccountScreen() {
-  const { profile } = useUser()
+export function SettingsScreen() {
+  const { profile, user } = useUser()
   const name = profile?.name
   const code = profile?.referral_code
   const about = profile?.about
   const avatar_url = profile?.avatar_url
-  const { resolvedTheme } = useThemeSetting()
+  const supabase = useSupabase()
+  const { resolvedTheme, toggle, current } = useThemeSetting()
+  const [mode, setMode] = useState('')
+
+  useEffect(() => {
+    setMode(current ? current : '')
+  }, [current])
+
   const accountSettings = [
     {
-      icon: <IconPersonal />,
-      label: 'Personal',
+      icon: <IconPhone />,
+      label: 'Change Phone',
     },
     {
       icon: <IconSecurity />,
@@ -33,11 +58,43 @@ export function AccountScreen() {
       icon: <IconNotification />,
       label: 'Notifications',
     },
+  ]
+
+  const accountSocialMedia = [
+    {
+      icon: <IconOur />,
+      label: 'Our X',
+      href: 'https://x.com/send',
+    },
+    {
+      icon: <IconTelegram />,
+      label: 'Our Telegram',
+      href: 'https://go.send.it/tg',
+    },
+  ]
+
+  const accountTheme = [
+    {
+      icon: <IconTheme />,
+      label: 'Theme',
+      action: () => toggle(),
+    },
     {
       icon: <IconSupport />,
       label: 'Support',
+      action: () => console.log('Support'),
+    },
+    {
+      icon: <IconLogout />,
+      label: 'Log Out',
+      action: () => supabase.auth.signOut(),
     },
   ]
+
+  const navigateToScreen = (href: string) => {
+    window.location.href = href
+  }
+
   return (
     <>
       <Theme name="send">
@@ -59,17 +116,12 @@ export function AccountScreen() {
             <Paragraph size={'$9'} fontWeight={'700'}>
               Account
             </Paragraph>
-            {/* <Link href={'/'}>
-              <XStack>
-                <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
-              </XStack>
-            </Link> */}
           </XStack>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} zIndex={4}>
             <Card
               cur={'pointer'}
               w={'100%'}
-              h={'$21'}
+              h={'$22'}
               borderRadius={'$8'}
               shadowColor={'rgba(0, 0, 0, 0.1)'}
               shadowOffset={{ width: 0, height: 4 }}
@@ -101,9 +153,13 @@ export function AccountScreen() {
                   <Paragraph fontSize={20} fontWeight={'700'} marginTop={'$3'}>
                     {name ? name : 'No Name'}
                   </Paragraph>
+                  <Paragraph fontSize={14} fontWeight={'700'} marginTop={'$2'}>
+                    {user?.phone}
+                  </Paragraph>
                   <Paragraph fontSize={13} fontWeight={'400'} opacity={0.6}>
                     {about}
                   </Paragraph>
+
                   <Link href={'/profile/edit'} w={'100%'}>
                     <Button
                       f={1}
@@ -161,7 +217,7 @@ export function AccountScreen() {
             <Card
               cur={'pointer'}
               w={'100%'}
-              h={'$16'}
+              // h={'$16'}
               borderRadius={'$8'}
               shadowColor={'rgba(0, 0, 0, 0.1)'}
               shadowOffset={{ width: 0, height: 4 }}
@@ -170,7 +226,7 @@ export function AccountScreen() {
             >
               <YStack h={'inherit'} padding={'$5'}>
                 {accountSettings.map((account) => (
-                  <XStack jc={'space-between'} paddingBottom={20} key={account.label}>
+                  <XStack jc={'space-between'} marginBottom={20} key={account.label}>
                     <XStack>
                       {account.icon}
                       <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
@@ -179,6 +235,67 @@ export function AccountScreen() {
                     </XStack>
                     <XStack>
                       <IconNext />
+                    </XStack>
+                  </XStack>
+                ))}
+                <Separator
+                  marginBottom={20}
+                  backgroundColor={'#C3AB8E'}
+                  borderColor={'#C3AB8E'}
+                  opacity={0.3}
+                />
+                {accountSocialMedia.map((account) => (
+                  <XStack
+                    jc={'space-between'}
+                    marginBottom={20}
+                    key={account.label}
+                    onPress={() => navigateToScreen(account.href)}
+                  >
+                    <XStack>
+                      {account.icon}
+                      <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
+                        {account.label}
+                      </Paragraph>
+                    </XStack>
+                    <XStack>
+                      <IconNext />
+                    </XStack>
+                  </XStack>
+                ))}
+                <Separator
+                  marginBottom={20}
+                  backgroundColor={'#C3AB8E'}
+                  borderColor={'#C3AB8E'}
+                  opacity={0.3}
+                />
+                {accountTheme.map((account) => (
+                  <XStack
+                    jc={'space-between'}
+                    marginBottom={20}
+                    key={account.label}
+                    onPress={() => account.action()}
+                  >
+                    <XStack>
+                      {account.icon}
+                      <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
+                        {account.label}
+                      </Paragraph>
+                    </XStack>
+                    <XStack>
+                      {account.label !== 'Theme' ? (
+                        <IconNext />
+                      ) : (
+                        <Paragraph
+                          fontWeight={'700'}
+                          borderRadius={'$6'}
+                          borderWidth={1}
+                          borderColor={'#C3AB8E'}
+                          paddingLeft={20}
+                          paddingRight={20}
+                        >
+                          {mode?.toUpperCase()}
+                        </Paragraph>
+                      )}
                     </XStack>
                   </XStack>
                 ))}

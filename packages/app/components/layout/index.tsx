@@ -22,7 +22,7 @@ const MainLayout = ({
             marginHorizontal={'5%'}
             paddingTop={'$6'}
           >
-            <Link href={'/profile'}>
+            <Link href={'/settings'}>
               <Avatar br={'$6'} size={'$4.5'}>
                 {avatar_url ? (
                   <Image source={{ uri: avatar_url }} width={48} height={48} />

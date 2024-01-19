@@ -34,7 +34,7 @@ export const EditProfile = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['profile'])
-      window.location.href = '/profile'
+      window.location.href = '/settings'
     },
   })
 

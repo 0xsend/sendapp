@@ -5,7 +5,7 @@ import { Path, Svg } from 'react-native-svg'
 const Security = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
-    <Svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+    <Svg width="16" height="28" viewBox="0 0 18 20" fill="none">
       <Path
         fillRule="evenodd"
         clipRule="evenodd"
