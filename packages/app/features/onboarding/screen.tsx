@@ -60,14 +60,9 @@ import { testBaseClient } from '../../../playwright/tests/fixtures/viem/base'
 export function OnboardingScreen() {
   const {
     data: sendAccts,
-    error: sendAcctsError,
-    isLoading: sendAcctsIsLoading,
+    // error: sendAcctsError,
+    // isLoading: sendAcctsIsLoading,
   } = useSendAccounts()
-
-  // TODO: remove me
-  useEffect(() => {
-    console.log('send accounts', { sendAccts, sendAcctsError, sendAcctsIsLoading })
-  }, [sendAccts, sendAcctsError, sendAcctsIsLoading])
 
   return (
     <Container>
@@ -174,7 +169,7 @@ function CreateSendAccount() {
   return (
     // TODO: turn into a form
     <YStack space="$4">
-      <Label htmlFor="accountName">Account name:</Label>
+      <Label htmlFor="accountName">Passkey name:</Label>
       <Input id="accountName" onChangeText={setAccountName} value={accountName} />
       <Button onPress={createAccount}>Create</Button>
     </YStack>

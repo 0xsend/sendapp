@@ -17,6 +17,6 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
-Page.getLayout = (children) => <HomeLayout>{children}</HomeLayout>
+Page.getLayout = (children) => <HomeLayout header="Activity">{children}</HomeLayout>
 
 export default Page

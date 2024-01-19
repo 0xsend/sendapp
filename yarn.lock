@@ -9201,9 +9201,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react-native@npm:^12.4.1":
-  version: 12.4.1
-  resolution: "@testing-library/react-native@npm:12.4.1"
+"@testing-library/react-native@npm:^12.4.3":
+  version: 12.4.3
+  resolution: "@testing-library/react-native@npm:12.4.3"
   dependencies:
     jest-matcher-utils: "npm:^29.7.0"
     pretty-format: "npm:^29.7.0"
@@ -9216,7 +9216,7 @@ __metadata:
   peerDependenciesMeta:
     jest:
       optional: true
-  checksum: c83c8014192bd09eec0fc892fda2f15c6a8238dea697032b5bba2a7f42ca6aa20464b7cb892aac531897ee13be47257f08ebbbd2c2e9572b0082ca7180e359a9
+  checksum: f60b6158c63aa32470e6e40016c823917b7de3e8cc4aac8b7c906153a6edae40727092ae3e2750c468182ad84cb39ccb2329e8e03e13563c920f18b5485c754a
   languageName: node
   linkType: hard
 
@@ -9891,15 +9891,6 @@ __metadata:
   dependencies:
     "@types/react": "npm:*"
   checksum: cf93c17099f6322f7a5e4b2a191c496647883dfc15e0ef23a3c476ffe41730522019f18731da73a186db1407ac83cb6ef42126e50d5fc8c927b34a771942f7a1
-  languageName: node
-  linkType: hard
-
-"@types/react-test-renderer@npm:^18.0.7":
-  version: 18.0.7
-  resolution: "@types/react-test-renderer@npm:18.0.7"
-  dependencies:
-    "@types/react": "npm:*"
-  checksum: 701d7d815fe7b921712ebdb2c4434e99b92403d37c51b33a01ce1b62fed7d1efbf9f749971d9031a5b137c6d5e194249c378106768aa69725a01f150fef0ec7f
   languageName: node
   linkType: hard
 
@@ -12008,10 +11999,9 @@ __metadata:
     "@tamagui/shorthands": "npm:^1.85.8"
     "@tamagui/themes": "npm:^1.85.8"
     "@tanstack/react-query": "npm:4.18.0"
-    "@testing-library/react-native": "npm:^12.4.1"
+    "@testing-library/react-native": "npm:^12.4.3"
     "@trpc/client": "npm:^10.38.2"
     "@types/react": "npm:^18.2.15"
-    "@types/react-test-renderer": "npm:^18.0.7"
     "@vonovak/react-native-theme-control": "npm:^5.0.1"
     "@wagmi/chains": "npm:^1.8.0"
     babel-preset-expo: "npm:9.5.2"

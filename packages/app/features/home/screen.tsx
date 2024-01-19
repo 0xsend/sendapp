@@ -57,16 +57,6 @@ export function HomeScreen() {
       created_on: '',
     },
     {
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-    {
       id: 2,
       user: {
         sendTag: 'You',
@@ -79,6 +69,17 @@ export function HomeScreen() {
     },
     {
       id: 3,
+      user: {
+        sendTag: 'You',
+      },
+      type: 'outbound',
+      amount: 1,
+      currency: 'ETH',
+      amountInUSD: 1985.56,
+      created_on: '',
+    },
+    {
+      id: 4,
       user: {
         sendTag: 'You',
       },

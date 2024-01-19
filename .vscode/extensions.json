@@ -4,6 +4,7 @@
     "biomejs.biome",
     "ms-playwright.playwright",
     "tilt-dev.tiltfile",
-    "yoavbls.pretty-ts-errors"
+    "yoavbls.pretty-ts-errors",
+    "dbaeumer.vscode-eslint"
   ]
 }

@@ -225,13 +225,14 @@ export class DistributorWorker {
       const _verifications: Tables<'distribution_verifications'>[] = []
       let page = 0
       let totalCount: number | null = null
+      const pageSize = 100
 
       do {
         const { data, count, error } = await supabaseAdmin
           .from('distribution_verifications')
           .select('*', { count: 'exact' })
           .eq('distribution_id', distribution.id)
-          .range(page, page + 1000)
+          .range(page, page + pageSize)
 
         if (error) {
           this.log.error(
@@ -246,7 +247,7 @@ export class DistributorWorker {
         }
 
         _verifications.push(...data)
-        page += 1000
+        page += pageSize
       } while (totalCount && _verifications.length < totalCount)
 
       return _verifications
@@ -284,6 +285,7 @@ export class DistributorWorker {
       const _hodlerAddresses: Functions<'distribution_hodler_addresses'> = []
       let page = 0
       let totalCount: number | null = null
+      const pageSize = 100
 
       do {
         const { data, count, error } = await supabaseAdmin
@@ -295,7 +297,7 @@ export class DistributorWorker {
             { count: 'exact' }
           )
           .select('*')
-          .range(page, page + 1000)
+          .range(page, page + pageSize)
 
         if (error) {
           this.log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
@@ -307,7 +309,7 @@ export class DistributorWorker {
         }
 
         _hodlerAddresses.push(...data)
-        page += 1000
+        page += pageSize
       } while (totalCount && _hodlerAddresses.length < totalCount)
 
       return _hodlerAddresses
@@ -560,7 +562,10 @@ export class DistributorWorker {
 
     this.log.info(`Using last block number ${this.lastBlockNumber}.`)
 
-    let latestBlockNumber = await client.getBlockNumber()
+    let latestBlockNumber = await client.getBlockNumber().catch((error) => {
+      this.log.error(error, 'Error fetching latest block number.')
+      process.exit(1)
+    })
     const cancel = client.watchBlocks({
       onBlock: async (block) => {
         if (block.number <= this.lastBlockNumber) {

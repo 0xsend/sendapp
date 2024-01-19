@@ -12,8 +12,8 @@ const Wrapper = forwardRef<TamaguiElement, YStackProps>(function Wrapper(props, 
       flex={1}
       jc="center"
       $gtSm={{
-        width: '100%',
         maxWidth: 600,
+        width: '100%',
         als: 'center',
       }}
       // $gtSm={{ width: 500, mx: 'auto' }}
