@@ -674,7 +674,6 @@ export interface Database {
           tag: string
         }
         Returns: {
-          id: string
           avatar_url: string
           name: string
           about: string
@@ -682,7 +681,6 @@ export interface Database {
           tag_name: string
           address: string
           chain_id: number
-          is_public: boolean
         }[]
       }
       tag_search: {

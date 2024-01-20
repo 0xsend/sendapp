@@ -1,0 +1,13 @@
+import { expect, test } from '@jest/globals'
+import { TamaguiProvider, config } from '@my/ui'
+import { render } from '@testing-library/react-native'
+import { ReferralsScreen } from './screen'
+
+test('ReferralScreen', () => {
+  const tree = render(
+    <TamaguiProvider defaultTheme={'dark'} config={config}>
+      <ReferralsScreen />
+    </TamaguiProvider>
+  ).toJSON()
+  expect(tree).toMatchSnapshot()
+})
