@@ -1,0 +1,2469 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HomeScreen 1`] = `
+<View
+  style={
+    {
+      "alignSelf": "center",
+      "flex": 1,
+      "flexDirection": "row",
+      "paddingLeft": 32,
+      "paddingRight": 32,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flex": 1,
+        "flexDirection": "column",
+        "paddingBottom": 18,
+        "paddingTop": 18,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "borderBottomLeftRadius": 22,
+          "borderBottomRightRadius": 22,
+          "borderTopLeftRadius": 22,
+          "borderTopRightRadius": 22,
+          "flexDirection": "column",
+          "gap": 32,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "width": "20%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Rank
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "width": "20%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Send Tag
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+              "width": "20%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Points
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          1
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          2
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser...ing
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          3
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser2
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          4
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser3
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          5
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser4
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          6
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser5
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          7
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser6
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          8
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser7
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`LeaderboardScreen 1`] = `
+<View
+  style={
+    {
+      "alignSelf": "center",
+      "flex": 1,
+      "flexDirection": "row",
+      "paddingLeft": 32,
+      "paddingRight": 32,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flex": 1,
+        "flexDirection": "column",
+        "paddingBottom": 18,
+        "paddingTop": 18,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "borderBottomLeftRadius": 22,
+          "borderBottomRightRadius": 22,
+          "borderTopLeftRadius": 22,
+          "borderTopRightRadius": 22,
+          "flexDirection": "column",
+          "gap": 32,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "width": "20%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Rank
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "width": "20%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Send Tag
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+              "width": "20%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Points
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          1
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          2
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser...ing
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          3
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser2
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          4
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser3
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          5
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser4
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          6
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser5
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          7
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser6
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "lineHeight": 19,
+              "marginBottom": "0",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          8
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "center",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 2,
+                "maxWidth": 284,
+                "width": "90%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://avatars.githubusercontent.com/u/132442314?v=4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "flex": 1,
+                  "fontFamily": "System",
+                  "fontSize": 21.599999999999998,
+                  "fontWeight": "600",
+                  "lineHeight": 19,
+                  "marginBottom": "0",
+                  "textAlign": "left",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0xUser7
+            </Text>
+          </View>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 21.599999999999998,
+              "fontWeight": "600",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          100
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
