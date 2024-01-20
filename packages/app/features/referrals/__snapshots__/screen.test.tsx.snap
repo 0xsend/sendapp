@@ -1,0 +1,635 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReferralScreen 1`] = `
+<View
+  style={
+    {
+      "alignSelf": "center",
+      "flex": 1,
+      "flexDirection": "row",
+      "paddingLeft": 32,
+      "paddingRight": 32,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flex": 1,
+        "flexDirection": "column",
+        "paddingBottom": 18,
+        "paddingTop": 18,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "gap": 32,
+          "justifyContent": "space-between",
+          "width": "100%",
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(112, 22%, 59%, 1)",
+            "fontFamily": "System",
+            "fontSize": 23,
+            "fontWeight": "bold",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Referral Rewards
+      </Text>
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(112, 22%, 59%, 1)",
+            "fontFamily": "System",
+            "fontSize": 23,
+            "fontWeight": "bold",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Check Rewards
+      </Text>
+    </View>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      selectable={true}
+      style={
+        {
+          "color": "hsla(112, 22%, 59%, 1)",
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
+          "paddingBottom": 7,
+          "paddingTop": 7,
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Share your unique link, and when someone joins or makes a purchase using it, you earn rewards in SEND token. Our system tracks referrals, ensuring you receive rewards. It's a win-win as you support us and enjoy the benefits. Thanks for being part of our community!
+    </Text>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignItems": "flex-start",
+          "flexDirection": "row",
+          "flexWrap": "wrap",
+          "gap": 46,
+          "justifyContent": "space-between",
+          "marginBottom": 18,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "position": "relative",
+            "width": "20%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "flexDirection": "column",
+              "marginBottom": "auto",
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "paddingTop": 18,
+              "zIndex": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Total Referrals
+          </Text>
+        </View>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 20,
+              "fontWeight": "700",
+              "lineHeight": 24,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "paddingBottom": 13,
+              "paddingLeft": 18,
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          1000
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "position": "relative",
+            "width": "20%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "flexDirection": "column",
+              "marginBottom": "auto",
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "paddingTop": 18,
+              "zIndex": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Transactions
+          </Text>
+        </View>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 20,
+              "fontWeight": "700",
+              "lineHeight": 24,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "paddingBottom": 13,
+              "paddingLeft": 18,
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          1000
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "position": "relative",
+            "width": "20%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "flexDirection": "column",
+              "marginBottom": "auto",
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "paddingTop": 18,
+              "zIndex": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Total Rewards
+          </Text>
+        </View>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 20,
+              "fontWeight": "700",
+              "lineHeight": 24,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "paddingBottom": 13,
+              "paddingLeft": 18,
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          1000
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "position": "relative",
+            "width": "20%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "backgroundColor": "transparent",
+              "flexDirection": "column",
+              "marginBottom": "auto",
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+              "paddingTop": 18,
+              "zIndex": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Claimable Rewards
+          </Text>
+        </View>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 20,
+              "fontWeight": "700",
+              "lineHeight": 24,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "paddingBottom": 13,
+              "paddingLeft": 18,
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          1000
+        </Text>
+      </View>
+    </View>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "column",
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 32,
+            "justifyContent": "space-between",
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 23,
+              "fontWeight": "normal",
+              "lineHeight": 27,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Referral History
+        </Text>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 23,
+              "fontWeight": "bold",
+              "lineHeight": 27,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          See All
+        </Text>
+      </View>
+      <View
+        pointerEvents="none"
+        style={
+          {
+            "height": 18,
+            "minHeight": 18,
+            "minWidth": 18,
+            "width": 18,
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomLeftRadius": 22,
+            "borderBottomRightRadius": 22,
+            "borderTopLeftRadius": 22,
+            "borderTopRightRadius": 22,
+            "flex": 1,
+            "flexDirection": "column",
+            "paddingBottom": 32,
+            "paddingLeft": 32,
+            "paddingRight": 32,
+            "paddingTop": 32,
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 13,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "marginBottom": "0",
+                "width": "12%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            #
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "marginBottom": "0",
+                "textAlign": "center",
+                "width": "12%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Date
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "marginBottom": "0",
+                "textAlign": "center",
+                "width": "12%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Wallet
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "marginBottom": "0",
+                "textAlign": "center",
+                "width": "12%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Referral rewards
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "marginBottom": "0",
+                "textAlign": "center",
+                "width": "12%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Status
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "flex": 1,
+                "fontFamily": "System",
+                "fontSize": 19.2,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "marginBottom": "0",
+                "textAlign": "right",
+                "width": "12%",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Details
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

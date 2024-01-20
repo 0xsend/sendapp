@@ -669,20 +669,6 @@ export interface Database {
         }
         Returns: undefined
       }
-      profile_lookup: {
-        Args: {
-          tag: string
-        }
-        Returns: {
-          avatar_url: string
-          name: string
-          about: string
-          referral_code: string
-          tag_name: string
-          address: string
-          chain_id: number
-        }[]
-      }
       tag_search: {
         Args: {
           query: string
