@@ -1,15 +1,7 @@
-import path from 'path'
 import { defineConfig, devices } from '@playwright/test'
-import dotenv from 'dotenv-flow'
 
 // @ts-expect-error - set global __DEV__ variable to handle app react native imports
 globalThis.__DEV__ = false
-
-// load env vars
-dotenv.config({
-  path: path.resolve(__dirname, '..', '..'),
-  silent: true,
-})
 
 // validate environment ensuring we aren't talking to prod or staging or something
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('localhost')) {
@@ -21,7 +13,7 @@ NEXT_PUBLIC_SUPABASE_URL is ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Please upda
   throw new Error('Tests are only allowed to run against a local supabase instance')
 }
 
-const port = process.env.CI ? 8151 : 3000
+const baseURL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -50,7 +42,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: `http://127.0.0.1:${port}`,
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -98,9 +90,12 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI
-      ? 'yarn workspace next-app run serve'
-      : `yarn workspace next-app run dev --port ${port}`,
-    url: `http://127.0.0.1:${port}`,
+      ? 'yarn workspace next-app run serve --port 3000'
+      : 'yarn workspace next-app run dev',
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
+    stderr: 'pipe',
+    stdout: 'pipe',
+    ignoreHTTPSErrors: false,
   },
 })

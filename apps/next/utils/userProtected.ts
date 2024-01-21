@@ -11,7 +11,6 @@ const log = debug('next:utils:userProtected')
  * getServerSideProps for auth pages - will redirect authenticated users - pass your own function as the only arg
  */
 export function userProtectedGetSSP<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // biome-ignore lint/suspicious/noExplicitAny: any is required here
   Props extends { [key: string]: any } = { [key: string]: any },
   Params extends ParsedUrlQuery = ParsedUrlQuery,

@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProfileScreen: ProfileScreen 1`] = `
+<View
+  style={
+    {
+      "alignSelf": "center",
+      "flex": 1,
+      "flexDirection": "row",
+      "paddingLeft": 32,
+      "paddingRight": 32,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "rgba(241, 241, 238, 1)",
+          "fontFamily": "System",
+          "fontSize": 46,
+          "fontWeight": "700",
+          "lineHeight": 50,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Profile: 
+      test
+    </Text>
+  </View>
+</View>
+`;

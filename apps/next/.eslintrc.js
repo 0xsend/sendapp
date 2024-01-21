@@ -1,4 +1,5 @@
+/** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: 'next',
-  root: true,
+  extends: ['custom'],
+  plugins: ['@next/next'],
 }
