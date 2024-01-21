@@ -5612,9 +5612,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/supabase@workspace:supabase"
   dependencies:
-    "@snaplet/copycat": "npm:^1.1.0"
+    "@snaplet/copycat": "npm:^2.0.0"
     dotenv-cli: "npm:^6.0.0"
-    snaplet: "npm:^0.77.2"
+    snaplet: "npm:^0.84.0"
     supabase: "npm:^1.99.0"
     type-fest: "npm:^4.3.1"
   languageName: unknown
@@ -7115,14 +7115,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snaplet/copycat@npm:1.1.0, @snaplet/copycat@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@snaplet/copycat@npm:1.1.0"
+"@snaplet/copycat@npm:2.0.0, @snaplet/copycat@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@snaplet/copycat@npm:2.0.0"
   dependencies:
     "@faker-js/faker": "npm:^8.0.2"
-    fictional: "npm:^0.10.1"
+    fictional: "npm:^1.0.0"
     uuid: "npm:^8.3.2"
-  checksum: fb8264afcd4527457add75a04d54a53674dccdeb6ff5c1e1df41fafe3935df7d2ae733ce99f723a49736bb97b5a822be2e9cf507cdf713cf253e0ae2641d7837
+  checksum: d7990b389982fb82776afd993ae12cbf29a05f9a4159d31bf4986f38156daa47d7c01dd896ac9ad971dafccda2f26ca746838c8b0f4cd42b9886f3a96a2f72c1
   languageName: node
   linkType: hard
 
@@ -12332,6 +12332,15 @@ __metadata:
   version: 3.1.1
   resolution: "async-sema@npm:3.1.1"
   checksum: ee0225c2e7b72ae76d66157499f61a881a050824019edc54fa6ec789313076790729557556fbbe237af0083173c66fb2edf1c9cc45c522c5f846b66c0a94ddb3
+  languageName: node
+  linkType: hard
+
+"async@npm:^2.6.4":
+  version: 2.6.4
+  resolution: "async@npm:2.6.4"
+  dependencies:
+    lodash: "npm:^4.17.14"
+  checksum: df8e52817d74677ab50c438d618633b9450aff26deb274da6dfedb8014130909482acdc7753bce9b72e6171ce9a9f6a92566c4ced34c3cb3714d57421d58ad27
   languageName: node
   linkType: hard
 
@@ -18214,15 +18223,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fictional@npm:^0.10.1":
-  version: 0.10.1
-  resolution: "fictional@npm:0.10.1"
+"fictional@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "fictional@npm:1.0.0"
   dependencies:
     decimal.js: "npm:^10.4.0"
     fast-json-stable-stringify: "npm:^2.1.0"
     fnv-plus: "npm:^1.3.1"
     siphash: "npm:^1.1.0"
-  checksum: 7ca7e5dfe633f8f9b4c833ef61699f97aa3da6ababb79b796bc3f5322a8e4c40e52da198236cdbb26b6023e7fbbc7d76aea0dedb85c801657b34633e34ca57f7
+  checksum: 2cb4532530d5450344668976632ad6244e9ddf7e7ae941b205672406ba13a907f862332aa02c52a33505f7292033ddd7b56c754126dcf448fe03535b8d0df8c9
   languageName: node
   linkType: hard
 
@@ -22760,7 +22769,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4, lodash@npm:^4.17.13, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
+"lodash@npm:4.17.21, lodash@npm:^4, lodash@npm:^4.17.13, lodash@npm:^4.17.14, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532
@@ -24250,7 +24259,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:^0.5.1, mkdirp@npm:~0.5.1":
+"mkdirp@npm:^0.5.1, mkdirp@npm:^0.5.6, mkdirp@npm:~0.5.1":
   version: 0.5.6
   resolution: "mkdirp@npm:0.5.6"
   dependencies:
@@ -26249,6 +26258,17 @@ __metadata:
     style-value-types: "npm:5.0.0"
     tslib: "npm:^2.1.0"
   checksum: d2b6f16536b093d6106ab4caff105b1b4a8bb260e1deb316ca4fe81997c2ca1fc9e2d7747cee08dc2ce34d23ef7be8fd096efa7bc7f6908479da9d16343e1f63
+  languageName: node
+  linkType: hard
+
+"portfinder@npm:1.0.32":
+  version: 1.0.32
+  resolution: "portfinder@npm:1.0.32"
+  dependencies:
+    async: "npm:^2.6.4"
+    debug: "npm:^3.2.7"
+    mkdirp: "npm:^0.5.6"
+  checksum: 842058052fb3c3da829589f3f44b13369cf504b16f6ab72fedec78a9438ac3fc53047f5c88a771511b17d6a94f50f83a94cef5fa625027b675d8f7241f7f2185
   languageName: node
   linkType: hard
 
@@ -29124,9 +29144,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"snaplet@npm:^0.77.2":
-  version: 0.77.2
-  resolution: "snaplet@npm:0.77.2"
+"snaplet@npm:^0.84.0":
+  version: 0.84.0
+  resolution: "snaplet@npm:0.84.0"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -29142,7 +29162,7 @@ __metadata:
     "@scaleleap/pg-format": "npm:1.0.0"
     "@sentry/integrations": "npm:7.48.0"
     "@sentry/node": "npm:7.48.0"
-    "@snaplet/copycat": "npm:1.1.0"
+    "@snaplet/copycat": "npm:2.0.0"
     "@trpc/client": "npm:10.29.1"
     "@trpc/server": "npm:10.29.1"
     ansi-colors: "npm:4.1.3"
@@ -29184,6 +29204,7 @@ __metadata:
     pg-copy-streams: "npm:6.0.5"
     pg-protocol: "npm:1.6.0"
     pg-query-stream: "npm:4.5.0"
+    portfinder: "npm:1.0.32"
     postgres-array: "npm:3.0.2"
     postgresql-client: "npm:2.5.5"
     posthog-node: "npm:3.1.2"
@@ -29207,7 +29228,7 @@ __metadata:
     zod-validation-error: "npm:1.5.0"
   bin:
     snaplet: bin/snaplet.js
-  checksum: 8ae7531c375c585478abea6a0ee4818e571578d3c075e574def384b51e887f2e0fba60deefdd1e11ae6f4599c5601a52ead4b4f859a02a5b4711dfa387e633c1
+  checksum: 3dd8d29b4f912b30a832fd18de9d64700bf15b39018269765cb4722d349051c482192a15e954ba4a455d3e81813e4ae46d8a052c42e4e8b56c7bebb291110183
   languageName: node
   linkType: hard
 

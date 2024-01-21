@@ -3,13 +3,14 @@ import { test as ethereumTest } from '../ethereum'
 import { test as webauthnTest } from '../webauthn'
 
 import { Database } from '@my/supabase/database.types'
-import { SupabaseClient, createClient } from '@supabase/supabase-js'
+import { Session, SupabaseClient, User, createClient } from '@supabase/supabase-js'
 import { countries } from 'app/utils/country'
 import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
 import { assert } from 'app/utils/assert'
+import { faker } from '@faker-js/faker'
 
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
@@ -42,38 +43,19 @@ const authTest = base.extend<{
   context: BrowserContext
   supabase: SupabaseClient<Database>
   authSession: { token: string; decoded: JwtPayload }
+  userId: string
+  profile: { name: string; about: string; avatar_url: string }
+  user: {
+    user: User
+    session: Session
+  }
 }>({
-  context: async ({ context }, use) => {
+  context: async ({ context, user: { user, session } }, use) => {
     const { parallelIndex } = test.info()
-    const randomNumber = Math.floor(Math.random() * 1e9)
-    const country = randomCountry()
-    const { data, error } = await supabaseAdmin.auth.signUp({
-      phone: `+${country.dialCode}${randomNumber}`,
-      password: 'changeme',
-    })
-
-    if (error) {
-      log('error creating user', `id=${parallelIndex}`, error)
-      throw error
-    }
-
-    if (!data?.user) {
-      throw new Error('user not created')
-    }
-
-    if (!data?.session) {
-      throw new Error('session not created')
-    }
-
-    const { user } = data
-    const { session } = data
-    const { access_token, refresh_token } = session
-
-    log('created user', `id=${parallelIndex}`, `user=${user.id}`)
-
     if (!config?.use?.baseURL) {
       throw new Error('config.use.baseURL not defined')
     }
+    const { access_token, refresh_token } = session
 
     // @note see how Supabase does it here: https://github.com/supabase/supabase-js/blob/f6bf008d8017ae013450ecd3fa806acad735bacc/src/SupabaseClient.ts#L95
     const subdomain = new URL(SUPABASE_URL).hostname.split('.')[0]
@@ -103,12 +85,56 @@ const authTest = base.extend<{
     await use(context)
 
     // delete the user
-    await supabaseAdmin.auth.admin.deleteUser(data.user.id).then(({ error }) => {
+    await supabaseAdmin.auth.admin.deleteUser(user.id).then(({ error }) => {
       if (error) {
         log('error deleting user', `id=${parallelIndex}`, `user=${user.id}`, error)
         throw error
       }
     })
+  },
+  user: async ({ profile }, use) => {
+    const { parallelIndex } = test.info()
+    const randomNumber = Math.floor(Math.random() * 1e9)
+    const country = randomCountry()
+    const { data, error } = await supabaseAdmin.auth.signUp({
+      phone: `+${country.dialCode}${randomNumber}`,
+      password: 'changeme',
+    })
+
+    if (error) {
+      log('error creating user', `id=${parallelIndex}`, error)
+      throw error
+    }
+
+    assert(!!data.user, 'user not found')
+    assert(!!data.session, 'session not found')
+
+    const { user } = data
+    const { session } = data
+
+    log('created user', `id=${parallelIndex}`, `user=${user.id}`)
+
+    // update profile
+    await supabaseAdmin
+      .from('profiles')
+      .update(profile)
+      .eq('id', user.id)
+      .then(({ error }) => {
+        if (error) {
+          log('error updating profile', `id=${parallelIndex}`, `user=${user.id}`, error)
+          throw error
+        }
+      })
+    await use({ user, session })
+  },
+  // biome-ignore lint/correctness/noEmptyPattern: playwright/test requires an empty pattern
+  profile: async ({}, use) => {
+    const profile = {
+      name: faker.person.fullName(),
+      about: faker.lorem.sentence(),
+      avatar_url: faker.image.avatar(),
+    }
+    await use(profile)
   },
   authSession: async ({ context }, use) => {
     const { token, decoded } = await getAuthSessionFromContext(context)

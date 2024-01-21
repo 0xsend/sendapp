@@ -17,10 +17,10 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps =
-  userProtectedGetSSP(
-    // TODO: implement getServerSideProps for looking up user profile by tag
-  )
+// export const getServerSideProps =
+//   userProtectedGetSSP(
+//     // TODO: implement getServerSideProps for looking up user profile by tag
+//   )
 
 Page.getLayout = (children) => <HomeLayout header="">{children}</HomeLayout>
 

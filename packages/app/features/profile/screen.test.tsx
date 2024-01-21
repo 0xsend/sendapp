@@ -34,6 +34,14 @@ jest.mock('app/utils/useProfileLookup', () => ({
   }),
 }))
 
+jest.mock('app/utils/useUser', () => ({
+  useUser: jest.fn().mockReturnValue({
+    user: {
+      id: '1',
+    },
+  }),
+}))
+
 test('ProfileScreen', () => {
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>

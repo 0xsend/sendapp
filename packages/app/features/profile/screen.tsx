@@ -1,10 +1,12 @@
 import { Avatar, Button, Container, H1, H2, Paragraph, Spinner, Text, XStack, YStack } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { useUser } from 'app/utils/useUser'
 import { createParam } from 'solito'
 
 const { useParam } = createParam<{ tag: string }>()
 
 export function ProfileScreen() {
+  const { user } = useUser()
   const [tag] = useParam('tag')
   const { data: profile, isLoading, error } = useProfileLookup(tag)
 
@@ -32,27 +34,29 @@ export function ProfileScreen() {
             <H2 theme="alt1">@{tag}</H2>
             <Paragraph mb="$4">{profile.about}</Paragraph>
 
-            <XStack jc="space-around" gap="$6" maxWidth={600}>
-              <Button
-                f={1}
-                width={'100%'}
-                onPress={() => {
-                  console.log('Send', profile.address)
-                }}
-                theme="accent"
-              >
-                Send
-              </Button>
-              <Button
-                f={1}
-                width={'100%'}
-                onPress={() => {
-                  console.log('Request', profile.address)
-                }}
-              >
-                Request
-              </Button>
-            </XStack>
+            {profile && user?.id !== profile?.id ? (
+              <XStack jc="space-around" gap="$6" maxWidth={600}>
+                <Button
+                  f={1}
+                  width={'100%'}
+                  onPress={() => {
+                    console.log('Send', profile.address)
+                  }}
+                  theme="accent"
+                >
+                  Send
+                </Button>
+                <Button
+                  f={1}
+                  width={'100%'}
+                  onPress={() => {
+                    console.log('Request', profile.address)
+                  }}
+                >
+                  Request
+                </Button>
+              </XStack>
+            ) : null}
           </YStack>
         )}
       </YStack>

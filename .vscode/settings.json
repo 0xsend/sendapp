@@ -45,5 +45,9 @@
     "@openzeppelin/contracts/=packages/contracts/lib/openzeppelin-contracts/contracts/",
     "openzeppelin-contracts-upgradeable/=packages/contracts/lib/openzeppelin-contracts-upgradeable/",
     "p256-verifier/=packages/contracts/lib/p256-verifier/src/"
-  ]
+  ],
+  "[sql]": {
+    "editor.defaultFormatter": "bradymholt.pgformatter"
+  },
+  "pgFormatter.keywordCase": "lowercase"
 }

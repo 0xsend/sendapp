@@ -674,6 +674,7 @@ export interface Database {
           tag: string
         }
         Returns: {
+          id: string
           avatar_url: string
           name: string
           about: string

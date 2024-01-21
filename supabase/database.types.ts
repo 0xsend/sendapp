@@ -72,6 +72,18 @@ export type Database = MergeDeep<
             user_id: string
           }[]
         }
+        profile_lookup: {
+          Returns: {
+            id: string | null
+            avatar_url: string
+            name: string
+            about: string
+            referral_code: string
+            tag_name: string
+            address: string
+            chain_id: number
+          }[]
+        }
       }
     }
   }
