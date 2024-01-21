@@ -53,7 +53,7 @@ const SignInSideBar = ({ ...props }: YStackProps) => {
     }
   }
   return (
-    <SideBar width="28%" {...props}>
+    <SideBar width="28%" maw="405px" {...props}>
       <Stack href={'/'} f={1} jc="center">
         <IconSendLogo />
       </Stack>
