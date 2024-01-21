@@ -2890,6 +2890,32 @@ exports[`HomeScreen 1`] = `
                           ]
                         }
                       />
+                      <RNSVGDefs>
+                        <RNSVGClipPath
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          name="sendlogoA"
+                        >
+                          <RNSVGPath
+                            d="M0 0h166v60H0z"
+                            fill={
+                              {
+                                "payload": 4287016319,
+                                "type": 0,
+                              }
+                            }
+                            propList={
+                              [
+                                "fill",
+                              ]
+                            }
+                          />
+                        </RNSVGClipPath>
+                      </RNSVGDefs>
                     </RNSVGGroup>
                   </RNSVGSvgView>
                 </View>

@@ -1,7 +1,7 @@
 import { ColorTokens } from '@my/ui'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Path, Svg } from 'react-native-svg'
+import { ClipPath, Defs, Path, Svg } from 'react-native-svg'
 
 const SendLogo = (props: IconProps) => {
   const { size, color, ...rest } = props
@@ -30,6 +30,11 @@ const SendLogo = (props: IconProps) => {
         d="M112.583 26V8.4842C112.583 7.32932 112.201 6.36691 111.819 5.4045C111.444 4.4421 110.865 3.47969 110.108 2.70977C109.344 2.13232 108.581 1.55488 107.627 1.16992C106.672 0.784956 105.527 0.399994 104.573 0.399994H85.8735V5.98195H103.618C104.191 5.98195 104.573 6.17443 104.954 6.55939C105.336 6.94435 105.527 7.5218 105.527 8.09924V25.9936H112.589L112.583 26ZM78.8049 5.98836V26H85.8672V5.98836H78.8049Z"
         fill={'currentColor'}
       />
+      <Defs>
+        <ClipPath id="sendlogoA">
+          <Path fill={color ?? 'white'} d="M0 0h166v60H0z" />
+        </ClipPath>
+      </Defs>
     </Svg>
   )
 }
