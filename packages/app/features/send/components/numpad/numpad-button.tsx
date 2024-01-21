@@ -10,7 +10,7 @@ const CustomButton = styled(Button, {
   variants: {
     num: {
       true: {
-        backgroundColor: '$backgroundHover',
+        backgroundColor: '$background05',
       },
     },
   },

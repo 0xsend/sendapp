@@ -17,7 +17,7 @@ export const ProfileQRModal = ({ showModal, setShowModal, to }: IProfileQRModalP
       >
         <Adapt when="sm" platform="touch">
           <Sheet animation="medium" zIndex={200000} modal snapPoints={[100]}>
-            <Sheet.Frame p={'$5'} backgroundColor={'$backgroundTransparent'} jc={'center'}>
+            <Sheet.Frame p={'$5'} backgroundColor={'$background05'} jc={'center'}>
               <Adapt.Contents />
             </Sheet.Frame>
             <Sheet.Overlay

@@ -16,7 +16,7 @@
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
     "@supabase/supabase-js": "^2.38.5",
-    "@tamagui/next-theme": "^1.85.8",
+    "@tamagui/next-theme": "^1.88.2",
     "@tanstack/react-query": "4.18.0",
     "@trpc/client": "^10.38.2",
     "@trpc/next": "^10.38.2",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",
     "@next/eslint-plugin-next": "^14.0.4",
-    "@tamagui/next-plugin": "^1.85.8",
+    "@tamagui/next-plugin": "^1.88.2",
     "@types/node": "^20.11.0",
     "@welldone-software/why-did-you-render": "^7.0.1",
     "dotenv-cli": "^6.0.0",

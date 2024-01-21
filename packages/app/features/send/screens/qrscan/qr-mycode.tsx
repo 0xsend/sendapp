@@ -51,7 +51,7 @@ export const QRMyCodeScreen = () => {
         left={'$5'}
         size="$2.5"
         circular
-        bg={'$backgroundTransparent'}
+        bg={'$background05'}
         $shorter={{ top: '$size.4' }}
       >
         <Link href={'/'} display={'flex'}>

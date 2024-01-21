@@ -124,7 +124,7 @@ export function HomeScreen() {
   return (
     <>
       <MainLayout scrollable={true}>
-        <Theme name="send">
+        <Theme name="accent">
           <Container>
             <YStack
               $gtLg={{ width: 600 }}
@@ -345,7 +345,7 @@ export function HomeScreen() {
                     <XStack h={'inherit'} ai="center" padding={'$2'} paddingRight={'$3'}>
                       <Avatar br={'$4'} size={'$4.5'}>
                         <Square size={'$2'} backgroundColor="$color" elevation="$4" />
-                        <Avatar.Fallback theme={'send'} />
+                        <Avatar.Fallback theme={'accent'} />
                       </Avatar>
                       <YStack f={1}>
                         <XStack

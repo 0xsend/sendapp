@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { TamaguiProvider, View as MockView, config } from '@my/ui'
-import { render, screen, fireEvent } from '@testing-library/react-native'
+import { act, render, screen, fireEvent } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
 
 jest.mock('app/utils/supabase/useSupabase', () => ({
@@ -35,6 +35,7 @@ test('ActivityScreen', () => {
 })
 
 test('ActivityScreen: search', async () => {
+  jest.useFakeTimers()
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <ActivityScreen />
@@ -42,6 +43,9 @@ test('ActivityScreen: search', async () => {
   )
   const searchInput = screen.getByPlaceholderText('Search')
   fireEvent.changeText(searchInput, 'test')
+  act(() => {
+    jest.runAllTimers()
+  })
   expect(searchInput.props.value).toBe('test')
   const searchResults = await screen.findByTestId('tag-search-test')
   expect(searchResults).toHaveTextContent('??test')

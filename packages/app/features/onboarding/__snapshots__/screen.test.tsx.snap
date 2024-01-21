@@ -30,7 +30,7 @@ exports[`OnboardingScreen 1`] = `
       selectable={true}
       style={
         {
-          "color": "rgba(241, 241, 238, 1)",
+          "color": "hsla(112, 22%, 59%, 1)",
           "fontFamily": "System",
           "fontSize": 46,
           "fontWeight": "700",
@@ -61,7 +61,7 @@ exports[`OnboardingScreen 1`] = `
       selectable={true}
       style={
         {
-          "color": "rgba(241, 241, 238, 1)",
+          "color": "hsla(112, 22%, 59%, 1)",
           "fontFamily": "System",
           "fontSize": 16.8,
           "fontWeight": "400",
@@ -95,7 +95,7 @@ exports[`OnboardingScreen 1`] = `
         selectable={true}
         style={
           {
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
             "fontSize": 30,
             "fontWeight": "700",
@@ -140,7 +140,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -171,24 +171,24 @@ exports[`OnboardingScreen 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         outlineWidth={0}
-        placeholderTextColor="#545454"
+        placeholderTextColor="hsla(191, 32%, 50%, 1)"
         style={
           {
-            "backgroundColor": "#151515",
-            "borderBottomColor": "#151515",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderBottomWidth": 1,
-            "borderLeftColor": "#151515",
+            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
             "borderLeftWidth": 1,
-            "borderRightColor": "#151515",
+            "borderRightColor": "hsla(191, 32%, 32%, 1)",
             "borderRightWidth": 1,
             "borderStyle": "solid",
-            "borderTopColor": "#151515",
+            "borderTopColor": "hsla(191, 32%, 32%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
@@ -229,7 +229,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -260,24 +260,24 @@ exports[`OnboardingScreen 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         outlineWidth={0}
-        placeholderTextColor="#545454"
+        placeholderTextColor="hsla(191, 32%, 50%, 1)"
         style={
           {
-            "backgroundColor": "#151515",
-            "borderBottomColor": "#151515",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderBottomWidth": 1,
-            "borderLeftColor": "#151515",
+            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
             "borderLeftWidth": 1,
-            "borderRightColor": "#151515",
+            "borderRightColor": "hsla(191, 32%, 32%, 1)",
             "borderRightWidth": 1,
             "borderStyle": "solid",
-            "borderTopColor": "#151515",
+            "borderTopColor": "hsla(191, 32%, 32%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
@@ -316,7 +316,7 @@ exports[`OnboardingScreen 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#212121",
+            "backgroundColor": "hsla(191, 32%, 19%, 1)",
             "borderBottomColor": "transparent",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
@@ -345,7 +345,7 @@ exports[`OnboardingScreen 1`] = `
           numberOfLines={1}
           style={
             {
-              "color": "rgba(241, 241, 238, 1)",
+              "color": "hsla(112, 22%, 59%, 1)",
               "flexGrow": 0,
               "flexShrink": 1,
               "fontFamily": "System",
@@ -389,7 +389,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -422,24 +422,24 @@ exports[`OnboardingScreen 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         outlineWidth={0}
-        placeholderTextColor="#545454"
+        placeholderTextColor="hsla(191, 32%, 50%, 1)"
         style={
           {
-            "backgroundColor": "#151515",
-            "borderBottomColor": "#151515",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderBottomWidth": 1,
-            "borderLeftColor": "#151515",
+            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
             "borderLeftWidth": 1,
-            "borderRightColor": "#151515",
+            "borderRightColor": "hsla(191, 32%, 32%, 1)",
             "borderRightWidth": 1,
             "borderStyle": "solid",
-            "borderTopColor": "#151515",
+            "borderTopColor": "hsla(191, 32%, 32%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "rgba(241, 241, 238, 1)",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "monospace",
             "fontSize": 16.8,
             "fontWeight": "400",

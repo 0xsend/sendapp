@@ -8,6 +8,7 @@
       "packages/contracts/lib/**",
       "packages/ui/types/**",
       "packages/playwright/test-results/**",
+      "packages/playwright/playwright-report/**",
       "coverage/**",
       "package.json",
       "**/generated.ts",

@@ -133,7 +133,7 @@ export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps
                 right={'$4.5'}
                 size="$2.5"
                 circular
-                bg={'$backgroundTransparent'}
+                bg={'$background05'}
               >
                 <IconClose />
               </Button>
