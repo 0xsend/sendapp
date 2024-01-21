@@ -13,6 +13,7 @@ import Head from 'next/head'
 
 import { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
+import Favicons from './favicons'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -43,7 +44,7 @@ function MyApp({
           name="viewport"
           content="width=320, initial-scale=1, minimum-scale=1, maximum-scale=1"
         />
-        <link rel="icon" href="/favicon.svg" />
+        <Favicons />
         <meta property="og:image" content="https://0xsend.github.io/assets/sendtags.png" />
       </Head>
       <NextThemeProvider
