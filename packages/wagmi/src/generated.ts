@@ -2853,7 +2853,7 @@ export function writeDaimoNameRegistry<TFunctionName extends string>(
  */
 export function prepareWriteDaimoNameRegistry<
   TAbi extends readonly unknown[] = typeof daimoNameRegistryABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoNameRegistryABI,
@@ -3229,7 +3229,7 @@ export function getSend(
  */
 export function readSend<
   TAbi extends readonly unknown[] = typeof sendABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendAddress
@@ -3251,7 +3251,7 @@ export function readSend<
 export function writeSend<
   TFunctionName extends string,
   TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof sendAddress,
+  TChainId extends number = keyof typeof sendAddress
 >(
   config:
     | (Omit<WriteContractPreparedArgs<typeof sendABI, TFunctionName>, 'abi' | 'address'> & {
@@ -3278,7 +3278,7 @@ export function writeSend<
  */
 export function prepareWriteSend<
   TAbi extends readonly unknown[] = typeof sendABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendAddress
@@ -3349,7 +3349,7 @@ export function getSendMerkleDrop(
  */
 export function readSendMerkleDrop<
   TAbi extends readonly unknown[] = typeof sendMerkleDropABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendMerkleDropAddress
@@ -3371,7 +3371,7 @@ export function readSendMerkleDrop<
 export function writeSendMerkleDrop<
   TFunctionName extends string,
   TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof sendMerkleDropAddress,
+  TChainId extends number = keyof typeof sendMerkleDropAddress
 >(
   config:
     | (Omit<
@@ -3404,7 +3404,7 @@ export function writeSendMerkleDrop<
  */
 export function prepareWriteSendMerkleDrop<
   TAbi extends readonly unknown[] = typeof sendMerkleDropABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof sendMerkleDropAddress
@@ -3475,7 +3475,7 @@ export function writeSenderCreator<TFunctionName extends string>(
  */
 export function prepareWriteSenderCreator<
   TAbi extends readonly unknown[] = typeof senderCreatorABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: senderCreatorABI,
@@ -3495,7 +3495,7 @@ export function getTestUsdc(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readTestUsdc<
   TAbi extends readonly unknown[] = typeof testUsdcABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: testUsdcABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3522,7 +3522,7 @@ export function writeTestUsdc<TFunctionName extends string>(
  */
 export function prepareWriteTestUsdc<
   TAbi extends readonly unknown[] = typeof testUsdcABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: testUsdcABI,
