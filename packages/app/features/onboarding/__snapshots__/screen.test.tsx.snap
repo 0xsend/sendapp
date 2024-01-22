@@ -30,7 +30,7 @@ exports[`OnboardingScreen 1`] = `
       selectable={true}
       style={
         {
-          "color": "#101010",
+          "color": "hsla(112, 22%, 59%, 1)",
           "fontFamily": "System",
           "fontSize": 46,
           "fontWeight": "700",
@@ -61,7 +61,7 @@ exports[`OnboardingScreen 1`] = `
       selectable={true}
       style={
         {
-          "color": "#101010",
+          "color": "hsla(112, 22%, 59%, 1)",
           "fontFamily": "System",
           "fontSize": 16.8,
           "fontWeight": "400",
@@ -95,7 +95,7 @@ exports[`OnboardingScreen 1`] = `
         selectable={true}
         style={
           {
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
             "fontSize": 30,
             "fontWeight": "700",
@@ -140,7 +140,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -188,7 +188,7 @@ exports[`OnboardingScreen 1`] = `
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
@@ -229,7 +229,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -277,7 +277,7 @@ exports[`OnboardingScreen 1`] = `
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
@@ -345,7 +345,7 @@ exports[`OnboardingScreen 1`] = `
           numberOfLines={1}
           style={
             {
-              "color": "#101010",
+              "color": "hsla(112, 22%, 59%, 1)",
               "flexGrow": 0,
               "flexShrink": 1,
               "fontFamily": "System",
@@ -389,7 +389,7 @@ exports[`OnboardingScreen 1`] = `
           {
             "alignItems": "center",
             "backgroundColor": "transparent",
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
@@ -439,7 +439,7 @@ exports[`OnboardingScreen 1`] = `
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
-            "color": "#101010",
+            "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "monospace",
             "fontSize": 16.8,
             "fontWeight": "400",
