@@ -91,10 +91,6 @@ export function SettingsScreen() {
     },
   ]
 
-  const navigateToScreen = (href: string) => {
-    window.location.href = href
-  }
-
   return (
     <>
       <Theme name="send">
@@ -237,8 +233,8 @@ export function SettingsScreen() {
                   opacity={0.3}
                 />
                 {accountSocialMedia.map((account) => (
-                  <Link href={account.href}>
-                    <XStack jc={'space-between'} marginBottom={20} key={account.label}>
+                  <Link href={account.href} key={account.label}>
+                    <XStack jc={'space-between'} marginBottom={20}>
                       <XStack>
                         {account.icon}
                         <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
