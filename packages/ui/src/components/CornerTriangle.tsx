@@ -28,7 +28,7 @@ export const CornerTriangle = (props: StackProps & CornerProp) => (
     bbw={0}
     blw={0}
     brc={'transparent'}
-    btc={(props.borderTopColor || props.btc) ?? '$background'}
+    btc={(props.borderTopColor || props.btc) ?? '$backgroundHover'}
     transform={transformCorner(props.corner)}
     {...props}
   />
