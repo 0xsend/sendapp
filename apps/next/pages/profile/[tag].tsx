@@ -1,4 +1,4 @@
-import { ProfileScreen } from 'app/features/profile/screen'
+import { SettingsScreen } from 'app/features/settings/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -12,7 +12,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Send | Profile</title>
       </Head>
-      <ProfileScreen />
+      <SettingsScreen />
     </>
   )
 }
