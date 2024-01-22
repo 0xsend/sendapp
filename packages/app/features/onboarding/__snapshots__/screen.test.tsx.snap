@@ -171,20 +171,20 @@ exports[`OnboardingScreen 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         outlineWidth={0}
-        placeholderTextColor="#545454"
+        placeholderTextColor="hsla(191, 32%, 50%, 1)"
         style={
           {
-            "backgroundColor": "#151515",
-            "borderBottomColor": "#151515",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderBottomWidth": 1,
-            "borderLeftColor": "#151515",
+            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
             "borderLeftWidth": 1,
-            "borderRightColor": "#151515",
+            "borderRightColor": "hsla(191, 32%, 32%, 1)",
             "borderRightWidth": 1,
             "borderStyle": "solid",
-            "borderTopColor": "#151515",
+            "borderTopColor": "hsla(191, 32%, 32%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
@@ -260,20 +260,20 @@ exports[`OnboardingScreen 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         outlineWidth={0}
-        placeholderTextColor="#545454"
+        placeholderTextColor="hsla(191, 32%, 50%, 1)"
         style={
           {
-            "backgroundColor": "#151515",
-            "borderBottomColor": "#151515",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderBottomWidth": 1,
-            "borderLeftColor": "#151515",
+            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
             "borderLeftWidth": 1,
-            "borderRightColor": "#151515",
+            "borderRightColor": "hsla(191, 32%, 32%, 1)",
             "borderRightWidth": 1,
             "borderStyle": "solid",
-            "borderTopColor": "#151515",
+            "borderTopColor": "hsla(191, 32%, 32%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
@@ -316,7 +316,7 @@ exports[`OnboardingScreen 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#212121",
+            "backgroundColor": "hsla(191, 32%, 19%, 1)",
             "borderBottomColor": "transparent",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
@@ -422,20 +422,20 @@ exports[`OnboardingScreen 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         outlineWidth={0}
-        placeholderTextColor="#545454"
+        placeholderTextColor="hsla(191, 32%, 50%, 1)"
         style={
           {
-            "backgroundColor": "#151515",
-            "borderBottomColor": "#151515",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderBottomWidth": 1,
-            "borderLeftColor": "#151515",
+            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
             "borderLeftWidth": 1,
-            "borderRightColor": "#151515",
+            "borderRightColor": "hsla(191, 32%, 32%, 1)",
             "borderRightWidth": 1,
             "borderStyle": "solid",
-            "borderTopColor": "#151515",
+            "borderTopColor": "hsla(191, 32%, 32%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "borderTopWidth": 1,
