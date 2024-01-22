@@ -63,7 +63,7 @@ export function SettingsScreen() {
   const accountSocialMedia = [
     {
       icon: <IconOur />,
-      label: 'Our X',
+      label: 'Our',
       href: 'https://x.com/send',
     },
     {
