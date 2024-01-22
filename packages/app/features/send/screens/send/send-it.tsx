@@ -83,7 +83,7 @@ export const SendItScreen = () => {
           left={'$5'}
           size="$2.5"
           circular
-          bg={'$backgroundTransparent'}
+          bg={'$background05'}
           $shorter={{ top: '$size.4' }}
           onPress={() => setCurrentComponent([SendScreen.SEND_TAG, ANIMATE_DIRECTION_LEFT])}
         >
@@ -95,7 +95,7 @@ export const SendItScreen = () => {
           right={'$5'}
           size="$2.5"
           circular
-          bg={'$backgroundTransparent'}
+          bg={'$background05'}
           $shorter={{ top: '$size.4' }}
         >
           <Link href={'/'} display={'flex'}>

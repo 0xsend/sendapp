@@ -58,8 +58,47 @@ export const darkPalette = [
   lightTransparent,
 ]
 
+export const accent = {
+  accent1: 'hsla(125, 96%, 40%, 0.5)',
+  accent2: 'hsla(125, 96%, 40%, 0.75)',
+  accent3: 'hsla(125, 96%, 40%, 1)',
+  accent4: 'hsla(125, 96%, 42%, 1)',
+  accent5: 'hsla(125, 96%, 45%, 1)',
+  accent6: 'hsla(125, 96%, 47%, 1)',
+  accent7: 'hsla(125, 96%, 50%, 1)',
+  accent8: 'hsla(125, 96%, 52%, 1)',
+  accent9: 'hsla(125, 96%, 55%, 1)',
+  accent10: 'hsla(125, 96%, 57%, 1)',
+  accent11: 'hsla(125, 96%, 59%, 1)',
+  accent12: 'hsla(125, 96%, 62%, 1)',
+}
+
+export const accentLight = [
+  'hsla(125, 96%, 40%, 0)',
+  'hsla(125, 96%, 40%, 0.25)',
+  ...Object.values(accent),
+
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 33%, 10%, 0.75)',
+  'hsla(191, 33%, 10%, 0.5)',
+  'hsla(191, 33%, 10%, 0.25)',
+  'hsla(191, 33%, 10%, 0)',
+]
+export const accentDark = [
+  'hsla(125, 96%, 40%, 0)',
+  'hsla(125, 96%, 40%, 0.25)',
+  ...Object.values(accent),
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 33%, 10%, 0.75)',
+  'hsla(191, 33%, 10%, 0.5)',
+  'hsla(191, 33%, 10%, 0.25)',
+  'hsla(191, 33%, 10%, 0)',
+]
+
 export const brandColors = {
-  primary: '#C3AB8E',
+  primary: '#40FB50',
   white: '#FFFFFF',
   black: '#000000',
   gray50: '#F5F6FC',
@@ -223,33 +262,5 @@ export const brandColors = {
   khaki900: '#9f7750',
   khaki: '#C3B29E',
   cinereous: '#1D1D20',
-}
-export const sendDark = {
-  send1: '#C3AB8E',
-  send2: 'hsl(357, 34.4%, 12.0%)',
-  send3: '#1D1D20',
-  send4: '#151515',
-  send5: '#1D1D20',
-  send6: '#C3AB8E',
-  send7: '#5E4A31',
-  send8: '#352A1C',
-  send9: '#282015',
-  send10: '#1B150E',
-  send11: 'hsl(358, 100%, 69.5%)',
-  send12: 'hsl(351, 89.0%, 96.0%)',
-}
-
-export const send = {
-  send1: '#C3AB8E',
-  send2: 'hsl(357, 34.4%, 12.0%)',
-  send3: '#fff',
-  send4: '#151515',
-  send5: '#1D1D20',
-  send6: '#C3AB8E',
-  send7: '#5E4A31',
-  send8: '#352A1C',
-  send9: '#282015',
-  send10: '#1B150E',
-  send11: 'hsl(358, 100%, 69.5%)',
-  send12: 'hsl(351, 89.0%, 96.0%)',
+  olive: '#86AE80',
 }

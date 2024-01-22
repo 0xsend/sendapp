@@ -48,7 +48,7 @@ export const QRShareScreen = () => {
         left={'$5'}
         size="$2.5"
         circular
-        bg={'$backgroundTransparent'}
+        bg={'$background05'}
         ai={'center'}
         $shorter={{ top: '$size.4' }}
         onPress={() => setCurrentComponent([QRScreen.QR_SCAN, ANIMATE_DIRECTION_LEFT])}

@@ -123,7 +123,7 @@ export const CountryCodeField = ({
                 start={[0, 0]}
                 end={[0, 1]}
                 fullscreen
-                colors={['$background', '$backgroundTransparent']}
+                colors={['$background', '$backgroundHover']}
                 borderRadius="$4"
               />
             </Select.ScrollUpButton>
@@ -177,7 +177,7 @@ export const CountryCodeField = ({
                 start={[0, 0]}
                 end={[0, 1]}
                 fullscreen
-                colors={['$backgroundTransparent', '$background']}
+                colors={['$backgroundHover', '$background']}
                 borderRadius="$4"
               />
             </Select.ScrollDownButton>

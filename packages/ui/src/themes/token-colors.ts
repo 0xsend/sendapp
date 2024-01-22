@@ -17,8 +17,7 @@ import {
   purpleDark,
   red,
   redDark,
-  send,
-  sendDark,
+  accent,
   yellow,
   yellowDark,
 } from './colors'
@@ -43,7 +42,7 @@ export const colorTokens = {
     red: red,
     yellow: yellow,
     gold: gold,
-    send: send,
+    accent: accent,
   },
   dark: {
     blue: blueDark,
@@ -55,7 +54,7 @@ export const colorTokens = {
     red: redDark,
     yellow: yellowDark,
     gold: goldDark,
-    send: sendDark,
+    accent: accent,
   },
 }
 
@@ -69,7 +68,7 @@ export const darkColors = {
   ...colorTokens.dark.red,
   ...colorTokens.dark.yellow,
   ...colorTokens.dark.gold,
-  ...colorTokens.dark.send,
+  ...colorTokens.dark.accent,
 }
 
 export const lightColors = {
@@ -82,7 +81,7 @@ export const lightColors = {
   ...colorTokens.light.red,
   ...colorTokens.light.yellow,
   ...colorTokens.light.gold,
-  ...colorTokens.dark.send,
+  ...colorTokens.dark.accent,
 }
 
 export const color = {

@@ -58,7 +58,7 @@ export const QRAmountScreen = () => {
             <Button
               py={'$6'}
               br={'$9'}
-              bc={'$backgroundTransparent'}
+              bc={'$background05'}
               boc={'$borderColorFocus'}
               width={'100%'}
               maw={304}
@@ -81,7 +81,7 @@ export const QRAmountScreen = () => {
           right={'$5'}
           size="$2.5"
           circular
-          bg={'$backgroundTransparent'}
+          bg={'$background05'}
           $shorter={{ top: '$size.4' }}
           onPress={() => setCurrentComponent([QRScreen.QR_SCAN, ANIMATE_DIRECTION_LEFT])}
         >
