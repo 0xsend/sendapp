@@ -13,6 +13,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('can visit profile edit page', async ({ page }) => {
-  await page.goto('/profile/edit')
-  await expect(page).toHaveURL('/profile/edit')
+  await page.goto('/settings/profile')
+  await expect(page).toHaveURL('/settings/profile')
 })

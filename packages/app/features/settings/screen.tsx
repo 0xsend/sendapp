@@ -153,7 +153,7 @@ export function SettingsScreen() {
                     {about}
                   </Paragraph>
 
-                  <Link href={'/profile/edit'} w={'100%'}>
+                  <Link href={'/settings/profile'} w={'100%'}>
                     <Button
                       f={1}
                       br={'$radius.true'}
@@ -237,22 +237,19 @@ export function SettingsScreen() {
                   opacity={0.3}
                 />
                 {accountSocialMedia.map((account) => (
-                  <XStack
-                    jc={'space-between'}
-                    marginBottom={20}
-                    key={account.label}
-                    onPress={() => navigateToScreen(account.href)}
-                  >
-                    <XStack>
-                      {account.icon}
-                      <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
-                        {account.label}
-                      </Paragraph>
+                  <Link href={account.href}>
+                    <XStack jc={'space-between'} marginBottom={20} key={account.label}>
+                      <XStack>
+                        {account.icon}
+                        <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
+                          {account.label}
+                        </Paragraph>
+                      </XStack>
+                      <XStack>
+                        <IconNext />
+                      </XStack>
                     </XStack>
-                    <XStack>
-                      <IconNext />
-                    </XStack>
-                  </XStack>
+                  </Link>
                 ))}
                 <Separator
                   marginBottom={20}

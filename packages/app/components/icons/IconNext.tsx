@@ -8,7 +8,7 @@ const Next = (props: IconProps) => {
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
       <Path
         d="M7.79999 19.2L16.8 12L7.79999 4.79995"
-        stroke="#C3AB8E"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       />

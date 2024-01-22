@@ -16,7 +16,7 @@ const Theme = (props: IconProps) => {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <Path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="#C3AB8E" />
+      <Path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" />
     </Svg>
   )
 }

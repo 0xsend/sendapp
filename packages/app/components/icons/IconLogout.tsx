@@ -28,15 +28,15 @@ const Icon = (props) => {
       height={'28'}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#C3AB8E"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       {...otherProps}
     >
-      <Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" fill="#C3AB8E" />
-      <Polyline points="16 17 21 12 16 7" fill="#C3AB8E" />
-      <Line x1="21" x2="9" y1="12" y2="12" fill="#C3AB8E" />
+      <Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" fill="currentColor" />
+      <Polyline points="16 17 21 12 16 7" fill="currentColor" />
+      <Line x1="21" x2="9" y1="12" y2="12" fill="currentColor" />
     </Svg>
   )
 }
