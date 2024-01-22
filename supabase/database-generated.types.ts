@@ -222,6 +222,7 @@ export interface Database {
           about: string | null
           avatar_url: string | null
           id: string
+          is_public: boolean | null
           name: string | null
           referral_code: string | null
         }
@@ -229,6 +230,7 @@ export interface Database {
           about?: string | null
           avatar_url?: string | null
           id: string
+          is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
         }
@@ -236,6 +238,7 @@ export interface Database {
           about?: string | null
           avatar_url?: string | null
           id?: string
+          is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
         }
@@ -310,6 +313,80 @@ export interface Database {
             columns: ["tag"]
             referencedRelation: "tags"
             referencedColumns: ["name"]
+          }
+        ]
+      }
+      send_account_credentials: {
+        Row: {
+          account_id: string
+          created_at: string | null
+          credential_id: string
+          key_slot: number
+        }
+        Insert: {
+          account_id: string
+          created_at?: string | null
+          credential_id: string
+          key_slot: number
+        }
+        Update: {
+          account_id?: string
+          created_at?: string | null
+          credential_id?: string
+          key_slot?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_credentials_account_id_fkey"
+            columns: ["account_id"]
+            referencedRelation: "send_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_credentials_credential_id_fkey"
+            columns: ["credential_id"]
+            referencedRelation: "webauthn_credentials"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      send_accounts: {
+        Row: {
+          address: string
+          chain_id: number
+          created_at: string
+          deleted_at: string | null
+          id: string
+          init_code: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          chain_id: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          init_code: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          address?: string
+          chain_id?: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          init_code?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_accounts_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           }
         ]
       }
@@ -423,6 +500,58 @@ export interface Database {
           }
         ]
       }
+      webauthn_credentials: {
+        Row: {
+          attestation_object: string
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attestation_object: string
+          created_at?: string
+          deleted_at?: string | null
+          display_name: string
+          id?: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          attestation_object?: string
+          created_at?: string
+          deleted_at?: string | null
+          display_name?: string
+          id?: string
+          key_type?: Database["public"]["Enums"]["key_type_enum"]
+          name?: string
+          public_key?: string
+          raw_credential_id?: string
+          sign_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webauthn_credentials_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       distribution_verifications_summary: {
@@ -506,6 +635,14 @@ export interface Database {
         }
         Returns: undefined
       }
+      create_send_account: {
+        Args: {
+          send_account: unknown
+          webauthn_credential: unknown
+          key_slot: number
+        }
+        Returns: Json
+      }
       distribution_hodler_addresses: {
         Args: {
           distribution_id: number
@@ -532,6 +669,29 @@ export interface Database {
         }
         Returns: undefined
       }
+      profile_lookup: {
+        Args: {
+          tag: string
+        }
+        Returns: {
+          avatar_url: string
+          name: string
+          about: string
+          referral_code: string
+          tag_name: string
+          address: string
+          chain_id: number
+        }[]
+      }
+      tag_search: {
+        Args: {
+          query: string
+        }
+        Returns: {
+          avatar_url: string
+          tag_name: string
+        }[]
+      }
       update_distribution_shares: {
         Args: {
           distribution_id: number
@@ -539,8 +699,13 @@ export interface Database {
         }
         Returns: undefined
       }
+      user_referrals_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
+      key_type_enum: "ES256"
       tag_status: "pending" | "confirmed"
       verification_type: "tag_registration" | "tag_referral"
     }
@@ -549,4 +714,3 @@ export interface Database {
     }
   }
 }
-
