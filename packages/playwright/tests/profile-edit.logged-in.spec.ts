@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
   // TODO: Make user eligible for distributions
 })
 
-test('can visit profile page', async ({ page }) => {
-  await page.goto('/profile')
-  await expect(page).toHaveURL('/profile')
+test('can visit profile edit page', async ({ page }) => {
+  await page.goto('/profile/edit')
+  await expect(page).toHaveURL('/profile/edit')
 })

@@ -18,7 +18,7 @@ export const MainScreen = () => {
               my={'$5'}
               py={'$6'}
               br={'$9'}
-              bc={'$backgroundTransparent'}
+              bc={'$background05'}
               boc={'$borderColorFocus'}
               width={'100%'}
               maw={304}

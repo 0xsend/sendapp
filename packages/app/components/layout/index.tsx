@@ -25,9 +25,11 @@ const MainLayout = ({
             <Link href={'/settings'}>
               <Avatar br={'$6'} size={'$4.5'}>
                 {avatar_url ? (
-                  <Image source={{ uri: avatar_url }} width={48} height={48} />
+                  <Avatar.Image src={avatar_url} width={48} height={48} />
                 ) : (
-                  <Spinner size="large" color="$primary" />
+                  <Avatar.Fallback>
+                    <Spinner size="large" color="$primary" />
+                  </Avatar.Fallback>
                 )}
               </Avatar>
             </Link>
@@ -45,7 +47,7 @@ const MainLayout = ({
               end={[0, 0]}
               width={'100%'}
               height={'$6'}
-              colors={['$background', '$backgroundTransparent']}
+              colors={['$background', '$background05']}
               pos={'absolute'}
               pointerEvents={'none'}
               b={'$size.10'}

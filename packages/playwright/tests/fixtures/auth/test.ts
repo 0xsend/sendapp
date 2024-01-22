@@ -9,19 +9,20 @@ import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
+import { assert } from 'app/utils/assert'
 
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
 const log = debug('test:fixtures:auth:test')
 
-const SB_AUTH_COOKIE = 'sb-localhost-auth-token'
+const supabaseCookieRegex = /sb-[a-z0-9]+-auth-token/
 
 export const getAuthSessionFromContext = async (context: BrowserContext) => {
   const cookies = await context.cookies()
-  const authCookie = cookies.find((cookie) => cookie.name === SB_AUTH_COOKIE)?.value
+  const authCookie = cookies.find((cookie) => cookie.name.match(supabaseCookieRegex))?.value
   if (!authCookie) {
-    throw new Error('${SB_AUTH_COOKIE} cookie not found')
+    throw new Error('Supabase auth cookie not found')
   }
 
   // grab auth session from jwt
@@ -31,7 +32,7 @@ export const getAuthSessionFromContext = async (context: BrowserContext) => {
   const decoded = jwt.decode(token) as JwtPayload
 
   if (!decoded || !decoded.sub) {
-    throw new Error(`could not decode user jwt from ${SB_AUTH_COOKIE} cookie`)
+    throw new Error('could not decode user jwt from cookie')
   }
 
   return { token, decoded }
@@ -74,12 +75,27 @@ const authTest = base.extend<{
       throw new Error('config.use.baseURL not defined')
     }
 
+    // @note see how Supabase does it here: https://github.com/supabase/supabase-js/blob/f6bf008d8017ae013450ecd3fa806acad735bacc/src/SupabaseClient.ts#L95
+    const subdomain = new URL(SUPABASE_URL).hostname.split('.')[0]
+    assert(!!subdomain, 'subdomain not found')
+    const name = `sb-${subdomain}-auth-token`
+    const domain = new URL(config.use.baseURL).hostname
+    assert(!!domain, 'domain not found')
+
+    log(
+      'setting auth cookie',
+      `id=${parallelIndex}`,
+      `user=${user.id}`,
+      `domain=${domain}`,
+      `name=${name}`
+    )
+
     // set auth session cookie
     await context.addCookies([
       {
-        name: SB_AUTH_COOKIE,
+        name,
         value: encodeURIComponent(JSON.stringify([access_token, refresh_token, null, null, null])),
-        domain: new URL(config.use.baseURL).hostname,
+        domain,
         path: '/',
       },
     ])

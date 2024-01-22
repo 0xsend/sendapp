@@ -19,7 +19,7 @@ export {
   goldDark,
 } from '@tamagui/themes'
 
-export const lightColor = 'rgba(241, 241, 238, 1)'
+export const lightColor = '#101010'
 export const darkColor = 'rgba(22, 22, 25, 1)'
 export const lightTransparent = 'rgba(22, 22, 25, 0)'
 export const darkTransparent = 'rgba(241, 241, 238, 0)'
@@ -58,8 +58,47 @@ export const darkPalette = [
   lightTransparent,
 ]
 
+export const accent = {
+  accent1: 'hsla(125, 96%, 40%, 0.5)',
+  accent2: 'hsla(125, 96%, 40%, 0.75)',
+  accent3: 'hsla(125, 96%, 40%, 1)',
+  accent4: 'hsla(125, 96%, 42%, 1)',
+  accent5: 'hsla(125, 96%, 45%, 1)',
+  accent6: 'hsla(125, 96%, 47%, 1)',
+  accent7: 'hsla(125, 96%, 50%, 1)',
+  accent8: 'hsla(125, 96%, 52%, 1)',
+  accent9: 'hsla(125, 96%, 55%, 1)',
+  accent10: 'hsla(125, 96%, 57%, 1)',
+  accent11: 'hsla(125, 96%, 59%, 1)',
+  accent12: 'hsla(125, 96%, 62%, 1)',
+}
+
+export const accentLight = [
+  'hsla(125, 96%, 40%, 0)',
+  'hsla(125, 96%, 40%, 0.25)',
+  ...Object.values(accent),
+
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 33%, 10%, 0.75)',
+  'hsla(191, 33%, 10%, 0.5)',
+  'hsla(191, 33%, 10%, 0.25)',
+  'hsla(191, 33%, 10%, 0)',
+]
+export const accentDark = [
+  'hsla(125, 96%, 40%, 0)',
+  'hsla(125, 96%, 40%, 0.25)',
+  ...Object.values(accent),
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 32%, 10%, 1)',
+  'hsla(191, 33%, 10%, 0.75)',
+  'hsla(191, 33%, 10%, 0.5)',
+  'hsla(191, 33%, 10%, 0.25)',
+  'hsla(191, 33%, 10%, 0)',
+]
+
 export const brandColors = {
-  primary: '#C3AB8E',
+  primary: '#40FB50',
   white: '#FFFFFF',
   black: '#000000',
   gray50: '#F5F6FC',
@@ -223,6 +262,7 @@ export const brandColors = {
   khaki900: '#9f7750',
   khaki: '#C3B29E',
   cinereous: '#1D1D20',
+  olive: '#86AE80',
 }
 export const sendDark = {
   send1: '#C3AB8E',

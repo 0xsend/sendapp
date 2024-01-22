@@ -10,7 +10,6 @@ import { api } from 'app/utils/api'
 import { NextPage } from 'next'
 import Head from 'next/head'
 
-import 'raf/polyfill'
 import { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
 
@@ -28,7 +27,8 @@ function MyApp({
 }: SolitoAppProps<{ initialSession: AuthProviderProps['initialSession'] }>) {
   // reference: https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts
   const getLayout = Component.getLayout || ((page) => page)
-  const [_theme, setTheme] = useRootTheme()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [theme, setTheme] = useRootTheme()
 
   return (
     <>

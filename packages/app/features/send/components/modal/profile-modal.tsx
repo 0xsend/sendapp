@@ -35,7 +35,7 @@ export const ProfileModal = ({ showModal, setShowModal, tag }: IProfileModalProp
         >
           <Adapt when="sm" platform="touch">
             <Sheet animation="medium" zIndex={200000} modal snapPoints={[100]}>
-              <Sheet.Frame p={'$5'} backgroundColor={'$backgroundTransparent'} jc={'center'}>
+              <Sheet.Frame p={'$5'} backgroundColor={'$background05'} jc={'center'}>
                 <Adapt.Contents />
               </Sheet.Frame>
               <Sheet.Overlay
@@ -107,7 +107,7 @@ export const ProfileModal = ({ showModal, setShowModal, tag }: IProfileModalProp
                     <Button
                       height={'$5'}
                       br={'$6'}
-                      bc={'$backgroundTransparent'}
+                      bc={'$background05'}
                       boc={'$primary'}
                       width={'100%'}
                       $shorter={{

@@ -14,6 +14,7 @@ import { IconQRCode } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { FormProvider } from 'react-hook-form'
+import { Link } from 'solito/link'
 
 const activities = [
   {
@@ -141,29 +142,26 @@ function SearchResults() {
       <H4 theme={'alt2'}>Results</H4>
       {results.length === 0 && <Text>No results for {query}... 😢</Text>}
       {results.map((result) => (
-        <XStack
-          testID={`tag-search-${result.tag_name}`}
-          key={result.tag_name}
-          ai="center"
-          space="$4"
-        >
-          <Avatar size="$4" br="$4" space="$2">
-            <Avatar.Image src={result.avatar_url} />
-            <Avatar.Fallback>
-              <Avatar>
-                <Avatar.Image
-                  src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
-                />
-                <Avatar.Fallback>
-                  <Paragraph>??</Paragraph>
-                </Avatar.Fallback>
-              </Avatar>
-            </Avatar.Fallback>
-          </Avatar>
-          <YStack space="$1">
-            <Text>{result.tag_name}</Text>
-          </YStack>
-        </XStack>
+        <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
+          <XStack testID={`tag-search-${result.tag_name}`} ai="center" space="$4">
+            <Avatar size="$4" br="$4" space="$2">
+              <Avatar.Image src={result.avatar_url} />
+              <Avatar.Fallback>
+                <Avatar>
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
+                  />
+                  <Avatar.Fallback>
+                    <Paragraph>??</Paragraph>
+                  </Avatar.Fallback>
+                </Avatar>
+              </Avatar.Fallback>
+            </Avatar>
+            <YStack space="$1">
+              <Text>{result.tag_name}</Text>
+            </YStack>
+          </XStack>
+        </Link>
       ))}
     </YStack>
   )

@@ -1,10 +1,6 @@
-import { XStack } from 'tamagui'
+import { XStack, XStackProps } from 'tamagui'
 
-export type ContainerProps = {
-  children: React.ReactNode
-}
-
-export const Container: React.FC<ContainerProps> = (props) => {
+export const Container: React.FC<XStackProps> = (props: XStackProps) => {
   return (
     <XStack
       px="$6"
@@ -24,6 +20,7 @@ export const Container: React.FC<ContainerProps> = (props) => {
       als="center"
       f={1}
       width={'100%'}
+      {...props}
     >
       {props.children}
     </XStack>
