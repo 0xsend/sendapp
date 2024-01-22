@@ -16,7 +16,7 @@ const Back = (props: IconProps) => {
     >
       <Path
         d="M16.2 19.2002L7.19995 12.0002L16.2 4.8002"
-        stroke="#C3AB8E"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       />
