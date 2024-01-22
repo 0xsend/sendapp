@@ -2642,7 +2642,7 @@ export function getDaimoAccount(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoAccount<
   TAbi extends readonly unknown[] = typeof daimoAccountABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoAccountABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2669,7 +2669,7 @@ export function writeDaimoAccount<TFunctionName extends string>(
  */
 export function prepareWriteDaimoAccount<
   TAbi extends readonly unknown[] = typeof daimoAccountABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoAccountABI,
@@ -2701,7 +2701,7 @@ export function getDaimoAccountFactory(
  */
 export function readDaimoAccountFactory<
   TAbi extends readonly unknown[] = typeof daimoAccountFactoryABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof daimoAccountFactoryAddress
@@ -2722,7 +2722,7 @@ export function readDaimoAccountFactory<
 export function writeDaimoAccountFactory<
   TFunctionName extends string,
   TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof daimoAccountFactoryAddress,
+  TChainId extends number = keyof typeof daimoAccountFactoryAddress
 >(
   config:
     | (Omit<
@@ -2754,7 +2754,7 @@ export function writeDaimoAccountFactory<
  */
 export function prepareWriteDaimoAccountFactory<
   TAbi extends readonly unknown[] = typeof daimoAccountFactoryABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof daimoAccountFactoryAddress
@@ -2779,7 +2779,7 @@ export function getDaimoEphemeralNotes(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoEphemeralNotes<
   TAbi extends readonly unknown[] = typeof daimoEphemeralNotesABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoEphemeralNotesABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2806,7 +2806,7 @@ export function writeDaimoEphemeralNotes<TFunctionName extends string>(
  */
 export function prepareWriteDaimoEphemeralNotes<
   TAbi extends readonly unknown[] = typeof daimoEphemeralNotesABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoEphemeralNotesABI,
@@ -2826,7 +2826,7 @@ export function getDaimoNameRegistry(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoNameRegistry<
   TAbi extends readonly unknown[] = typeof daimoNameRegistryABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoNameRegistryABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2880,7 +2880,7 @@ export function getDaimoPaymaster(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readDaimoPaymaster<
   TAbi extends readonly unknown[] = typeof daimoPaymasterABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: daimoPaymasterABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -2907,7 +2907,7 @@ export function writeDaimoPaymaster<TFunctionName extends string>(
  */
 export function prepareWriteDaimoPaymaster<
   TAbi extends readonly unknown[] = typeof daimoPaymasterABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: daimoPaymasterABI,
@@ -2933,7 +2933,7 @@ export function getDaimoVerifier(
  */
 export function readDaimoVerifier<
   TAbi extends readonly unknown[] = typeof daimoVerifierABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof daimoVerifierAddress
@@ -2954,7 +2954,7 @@ export function readDaimoVerifier<
 export function writeDaimoVerifier<
   TFunctionName extends string,
   TMode extends WriteContractMode,
-  TChainId extends number = keyof typeof daimoVerifierAddress,
+  TChainId extends number = keyof typeof daimoVerifierAddress
 >(
   config:
     | (Omit<
@@ -2986,7 +2986,7 @@ export function writeDaimoVerifier<
  */
 export function prepareWriteDaimoVerifier<
   TAbi extends readonly unknown[] = typeof daimoVerifierABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(
   config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi' | 'address'> & {
     chainId?: keyof typeof daimoVerifierAddress
@@ -3042,7 +3042,7 @@ export function getErc20(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readErc20<
   TAbi extends readonly unknown[] = typeof erc20ABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: erc20ABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3069,7 +3069,7 @@ export function writeErc20<TFunctionName extends string>(
  */
 export function prepareWriteErc20<
   TAbi extends readonly unknown[] = typeof erc20ABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({ abi: erc20ABI, ...config } as unknown as PrepareWriteContractConfig<
     TAbi,
@@ -3089,7 +3089,7 @@ export function getErc20Snapshot(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readErc20Snapshot<
   TAbi extends readonly unknown[] = typeof erc20SnapshotABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: erc20SnapshotABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3116,7 +3116,7 @@ export function writeErc20Snapshot<TFunctionName extends string>(
  */
 export function prepareWriteErc20Snapshot<
   TAbi extends readonly unknown[] = typeof erc20SnapshotABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: erc20SnapshotABI,
@@ -3136,7 +3136,7 @@ export function getIEntryPoint(config: Omit<GetContractArgs, 'abi'>) {
  */
 export function readIEntryPoint<
   TAbi extends readonly unknown[] = typeof iEntryPointABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<ReadContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return readContract({ abi: iEntryPointABI, ...config } as unknown as ReadContractConfig<
     TAbi,
@@ -3163,7 +3163,7 @@ export function writeIEntryPoint<TFunctionName extends string>(
  */
 export function prepareWriteIEntryPoint<
   TAbi extends readonly unknown[] = typeof iEntryPointABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: iEntryPointABI,
@@ -3197,7 +3197,7 @@ export function writeIMetaPaymaster<TFunctionName extends string>(
  */
 export function prepareWriteIMetaPaymaster<
   TAbi extends readonly unknown[] = typeof iMetaPaymasterABI,
-  TFunctionName extends string = string,
+  TFunctionName extends string = string
 >(config: Omit<PrepareWriteContractConfig<TAbi, TFunctionName>, 'abi'>) {
   return prepareWriteContract({
     abi: iMetaPaymasterABI,
