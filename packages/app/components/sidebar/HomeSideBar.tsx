@@ -52,6 +52,11 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
             href={'/distributions'}
           />
           <SideBarNavLink
+            icon={<IconDistributions size={'$2'} />}
+            text={'Settings'}
+            href={'/settings'}
+          />
+          <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
             href={'/leaderboard'}
@@ -111,6 +116,11 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
             icon={<IconDistributions size={'$2'} />}
             text={'Distributions'}
             href={'/distributions'}
+          />
+          <SideBarNavLink
+            icon={<IconDistributions size={'$2'} />}
+            text={'Settings'}
+            href={'/settings'}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
