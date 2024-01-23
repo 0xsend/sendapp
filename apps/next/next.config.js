@@ -69,6 +69,7 @@ module.exports = () => {
       'expo-constants',
       'expo-modules-core',
       'expo-device',
+      'expo-image-picker',
     ],
     experimental: {
       scrollRestoration: true,

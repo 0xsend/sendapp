@@ -1,6 +1,7 @@
 import {
   Anchor,
   Card,
+  Container,
   H4,
   Paragraph,
   SendLogo,
@@ -77,171 +78,176 @@ export const SignInScreen = () => {
   }
 
   return (
-    <>
-      <Card
-        bg={resolvedTheme}
-        jc={'center'}
-        ac={'center'}
-        fw={'wrap'}
-        pb={calculateMarginBottom()}
-        mt={calculateMarginTop()}
-        $sm={{
-          marginBottom: '',
-          paddingBottom: resolvedTheme?.startsWith('dark') ? '' : '$12',
-          height: resolvedTheme?.startsWith('dark') ? '$18' : '$12',
-        }}
-      >
-        {logoTop()}
-      </Card>
-      <FormProvider {...form}>
-        {form.formState.isSubmitSuccessful ? (
-          <VerifyCode
-            phone={`${form.getValues().countrycode}${form.getValues().phone}`}
-            onSuccess={() => {
-              router.push('/')
-            }}
-          />
-        ) : (
-          <SchemaForm
-            flex={1}
-            form={form}
-            schema={SignInSchema}
-            onSubmit={signInWithPhone}
-            defaultValues={{ phone: '', countrycode: '' }}
-            props={{
-              countrycode: {
-                // @ts-expect-error unsure how to get web props to work with tamagui
-                'aria-label': 'Country Code',
-                height: '$3',
-              },
-              phone: {
-                'aria-label': 'Phone number',
-                borderColor: 'rgba(195, 171, 142, 0.6)',
-                borderWidth: 1,
-                placeholder: 'Phone Number',
-                width: '100%',
-              },
-            }}
-            renderAfter={({ submit }) => (
-              <>
-                <Theme inverse>
-                  <XStack
-                    jc={'space-between'}
-                    ai={'center'}
-                    $lg={{ flexDirection: 'column' }}
-                    $gtLg={{ flexDirection: 'row' }}
-                  >
-                    <SubmitButton
-                      onPress={() => submit()}
-                      borderRadius="$4"
-                      backgroundColor={'$primary'}
-                      width={'$12'}
-                      $sm={{ width: '$10' }}
+    <Container>
+      <YStack w={'100%'} ai={'center'}>
+        <Card
+          bg={resolvedTheme}
+          jc={'center'}
+          ac={'center'}
+          fw={'wrap'}
+          pb={calculateMarginBottom()}
+          mt={calculateMarginTop()}
+          $sm={{
+            marginBottom: '',
+            paddingBottom: resolvedTheme?.startsWith('dark') ? '' : '$12',
+            height: resolvedTheme?.startsWith('dark') ? '$18' : '$12',
+          }}
+        >
+          {logoTop()}
+        </Card>
+        <FormProvider {...form}>
+          {form.formState.isSubmitSuccessful ? (
+            <VerifyCode
+              phone={`${form.getValues().countrycode}${form.getValues().phone}`}
+              onSuccess={() => {
+                router.push('/')
+              }}
+            />
+          ) : (
+            <SchemaForm
+              flex={1}
+              form={form}
+              schema={SignInSchema}
+              onSubmit={signInWithPhone}
+              defaultValues={{ phone: '', countrycode: '' }}
+              props={{
+                countrycode: {
+                  // @ts-expect-error unsure how to get web props to work with tamagui
+                  'aria-label': 'Country Code',
+                  height: '$3',
+                },
+                phone: {
+                  'aria-label': 'Phone number',
+                  borderColor: 'rgba(195, 171, 142, 0.6)',
+                  borderWidth: 1,
+                  placeholder: 'Phone Number',
+                  width: '100%',
+                },
+              }}
+              renderAfter={({ submit }) => (
+                <>
+                  <Theme inverse>
+                    <XStack
+                      jc={'space-between'}
+                      ai={'center'}
+                      $lg={{ flexDirection: 'column' }}
+                      $gtLg={{ flexDirection: 'row' }}
                     >
-                      <Paragraph
-                        size={'$1'}
-                        textAlign={'center'}
-                        fontWeight={'700'}
-                        padding={'unset'}
-                        margin={'unset'}
-                        // theme={resolvedTheme?.startsWith('dark') ?? 'light'}
+                      <SubmitButton
+                        onPress={() => submit()}
+                        borderRadius="$4"
+                        backgroundColor={'$primary'}
+                        width={'$12'}
+                        $sm={{ width: '$10' }}
                       >
-                        {'SEND IT!'}
-                      </Paragraph>
-                    </SubmitButton>
-                    <Anchor href={'https://send.it'} target={'_blank'}>
-                      <Paragraph
-                        textAlign="center"
-                        color={'$primary'}
-                        size={'$1'}
-                        fontWeight={'700'}
-                      >
-                        Learn More about SEND
-                      </Paragraph>
-                    </Anchor>
-                  </XStack>
-                </Theme>
-              </>
-            )}
-          >
-            {(fields) => (
-              <>
-                <YStack gap="$3" mb="$4">
-                  <H4
-                    $sm={{ size: '$8' }}
+                        <Paragraph
+                          size={'$1'}
+                          textAlign={'center'}
+                          fontWeight={'700'}
+                          padding={'unset'}
+                          margin={'unset'}
+                          // theme={resolvedTheme?.startsWith('dark') ?? 'light'}
+                        >
+                          {'SEND IT!'}
+                        </Paragraph>
+                      </SubmitButton>
+                      <Anchor href={'https://send.it'} target={'_blank'}>
+                        <Paragraph
+                          textAlign="center"
+                          color={'$primary'}
+                          size={'$1'}
+                          fontWeight={'700'}
+                        >
+                          Learn More about SEND
+                        </Paragraph>
+                      </Anchor>
+                    </XStack>
+                  </Theme>
+                </>
+              )}
+            >
+              {(fields) => (
+                <>
+                  <YStack gap="$3" mb="$4">
+                    <H4
+                      $sm={{ size: '$8' }}
+                      color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
+                    >
+                      Welcome to Send
+                    </H4>
+                    <Paragraph
+                      theme="alt1"
+                      size={'$1'}
+                      color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}
+                    >
+                      Sign up or Sign in with your phone number
+                    </Paragraph>
+                  </YStack>
+                  <Paragraph
+                    size={'$1'}
+                    fontWeight={'500'}
                     color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
                   >
-                    Welcome to Send
-                  </H4>
-                  <Paragraph
-                    theme="alt1"
-                    size={'$1'}
-                    color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}
-                  >
-                    Sign up or Sign in with your phone number
+                    Your Phone
                   </Paragraph>
-                </YStack>
-                <Paragraph
-                  size={'$1'}
-                  fontWeight={'500'}
-                  color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
-                >
-                  Your Phone
-                </Paragraph>
-                <XStack gap="$2">{Object.values(fields)}</XStack>
-              </>
-            )}
-          </SchemaForm>
-        )}
-      </FormProvider>
-      <Card
-        bg={resolvedTheme}
-        jc={'center'}
-        ac={'center'}
-        fw={'wrap'}
-        fd="column"
-        mt={'$20'}
-        $sm={{
-          marginTop: resolvedTheme?.startsWith('dark') ? '$12' : '$10',
-          paddingTop: resolvedTheme?.startsWith('dark') ? '' : '$3',
-        }}
-      >
-        {logoBottom()}
-        <XStack
-          mt={'$3'}
-          $sm={{ marginTop: '$3' }}
-          gap={'$2'}
-          alignItems={'center'}
-          justifyContent={'center'}
+                  <XStack gap="$2">{Object.values(fields)}</XStack>
+                </>
+              )}
+            </SchemaForm>
+          )}
+        </FormProvider>
+        <Card
+          bg={resolvedTheme}
+          jc={'center'}
           ac={'center'}
+          fw={'wrap'}
+          fd="column"
+          mt={'$20'}
+          $sm={{
+            marginTop: resolvedTheme?.startsWith('dark') ? '$12' : '$10',
+            paddingTop: resolvedTheme?.startsWith('dark') ? '' : '$3',
+          }}
         >
-          <Paragraph size={'$1'} color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}>
-            Connect with us{' '}
-          </Paragraph>
-          <XStack gap={'$2'} mt={'$2'}>
-            <Anchor
-              href={'https://x.com/Send'}
-              target={'_blank'}
-              style={{ backgroundColor: '$color.gold10Dark' }}
+          {logoBottom()}
+          <XStack
+            mt={'$3'}
+            $sm={{ marginTop: '$3' }}
+            gap={'$2'}
+            alignItems={'center'}
+            justifyContent={'center'}
+            ac={'center'}
+          >
+            <Paragraph
+              size={'$1'}
+              color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
             >
-              <IconXLogo
-                size="$1"
-                color={
-                  resolvedTheme?.startsWith('dark') ? '$color.gold10Light' : '$color.gold10Dark'
-                }
-              />
-            </Anchor>
-            <Anchor href={'https://t.me/send_app'} target={'_blank'}>
-              <IconTelegramLogo
-                size="$1"
-                color={
-                  resolvedTheme?.startsWith('dark') ? '$color.gold10Light' : '$color.gold10Dark'
-                }
-              />
-            </Anchor>
+              Connect with us{' '}
+            </Paragraph>
+            <XStack gap={'$2'} mt={'$2'}>
+              <Anchor
+                href={'https://x.com/Send'}
+                target={'_blank'}
+                style={{ backgroundColor: '$color.gold10Dark' }}
+              >
+                <IconXLogo
+                  size="$1"
+                  color={
+                    resolvedTheme?.startsWith('dark') ? '$color.gold10Light' : '$color.gold10Dark'
+                  }
+                />
+              </Anchor>
+              <Anchor href={'https://t.me/send_app'} target={'_blank'}>
+                <IconTelegramLogo
+                  size="$1"
+                  color={
+                    resolvedTheme?.startsWith('dark') ? '$color.gold10Light' : '$color.gold10Dark'
+                  }
+                />
+              </Anchor>
+            </XStack>
           </XStack>
-        </XStack>
-      </Card>
-    </>
+        </Card>
+      </YStack>
+    </Container>
   )
 }
