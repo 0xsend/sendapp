@@ -47,7 +47,6 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           token: {
             'aria-label': 'One-time Password',
             placeholder: 'Code',
-            borderColor: 'rgba(195, 171, 142, 0.6)',
             borderWidth: 1,
           },
         }}

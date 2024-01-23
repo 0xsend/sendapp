@@ -73,10 +73,6 @@ export const CountryCodeField = ({
             paddingTop={'unset'}
             paddingBottom={'unset'}
             space="$1"
-            style={{
-              border: '1px solid rgba(195, 171, 142, 0.6)',
-            }}
-            borderColor={'rgba(195, 171, 142, 0.6)'}
             borderWidth={1}
             color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
           >

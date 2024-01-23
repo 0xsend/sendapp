@@ -461,7 +461,7 @@ exports[`HomeScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "#40FB50",
+                        "color": "hsla(112, 22%, 59%, 1)",
                         "fontFamily": "System",
                         "fontSize": 16.8,
                         "fontWeight": "400",
@@ -750,7 +750,7 @@ exports[`HomeScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#050505",
+                    "color": "hsla(112, 22%, 59%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -913,7 +913,7 @@ exports[`HomeScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#050505",
+                    "color": "hsla(112, 22%, 59%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1076,7 +1076,7 @@ exports[`HomeScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#050505",
+                    "color": "hsla(112, 22%, 59%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1152,7 +1152,7 @@ exports[`HomeScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#40FB50",
+                    "color": "hsla(112, 22%, 59%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "700",
@@ -1215,7 +1215,7 @@ exports[`HomeScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#40FB50",
+                    "color": "hsla(112, 22%, 59%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "700",
@@ -1274,7 +1274,7 @@ exports[`HomeScreen 1`] = `
                 onPressOut={[Function]}
                 style={
                   {
-                    "color": "#40FB50",
+                    "color": "hsla(112, 22%, 59%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1413,7 +1413,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "#40FB50",
+                            "color": "hsla(112, 22%, 59%, 1)",
                             "fontFamily": "System",
                             "fontSize": 16.8,
                             "fontWeight": "400",
@@ -1686,7 +1686,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "#40FB50",
+                            "color": "hsla(112, 22%, 59%, 1)",
                             "fontFamily": "System",
                             "fontSize": 16.8,
                             "fontWeight": "400",
@@ -1959,7 +1959,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "#40FB50",
+                            "color": "hsla(112, 22%, 59%, 1)",
                             "fontFamily": "System",
                             "fontSize": 16.8,
                             "fontWeight": "400",
@@ -2232,7 +2232,7 @@ exports[`HomeScreen 1`] = `
                         selectable={true}
                         style={
                           {
-                            "color": "#40FB50",
+                            "color": "hsla(112, 22%, 59%, 1)",
                             "fontFamily": "System",
                             "fontSize": 16.8,
                             "fontWeight": "400",

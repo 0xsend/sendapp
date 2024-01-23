@@ -14,31 +14,29 @@ const MainLayout = ({
   return (
     <YStack>
       <YStack height={'100vh'} pb={'$size.10'} $shorter={{ pb: '$size.8' }}>
-        <Theme name={'send'}>
-          <XStack
-            w={'90%'}
-            ai={'center'}
-            jc={'space-between'}
-            marginHorizontal={'5%'}
-            paddingTop={'$6'}
-          >
-            <Link href={'/settings'}>
-              <Avatar br={'$6'} size={'$4.5'}>
-                {avatar_url ? (
-                  <Avatar.Image src={avatar_url} width={48} height={48} />
-                ) : (
-                  <Avatar.Fallback>
-                    <Spinner size="large" color="$primary" />
-                  </Avatar.Fallback>
-                )}
-              </Avatar>
-            </Link>
-            <Paragraph size={'$9'} fontWeight={'700'}>
-              Money
-            </Paragraph>
-            <IconQr />
-          </XStack>
-        </Theme>
+        <XStack
+          w={'90%'}
+          ai={'center'}
+          jc={'space-between'}
+          marginHorizontal={'5%'}
+          paddingTop={'$6'}
+        >
+          <Link href={'/settings'}>
+            <Avatar br={'$6'} size={'$4.5'}>
+              {avatar_url ? (
+                <Avatar.Image src={avatar_url} width={48} height={48} />
+              ) : (
+                <Avatar.Fallback>
+                  <Spinner size="large" color="$color" />
+                </Avatar.Fallback>
+              )}
+            </Avatar>
+          </Link>
+          <Paragraph size={'$9'} fontWeight={'700'}>
+            Money
+          </Paragraph>
+          <IconQr />
+        </XStack>
         {scrollable ? (
           <>
             <ScrollView>{children}</ScrollView>
