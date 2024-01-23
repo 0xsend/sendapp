@@ -1,4 +1,15 @@
-import { Avatar, Button, Container, Image, Link, Paragraph, Theme, XStack, YStack } from '@my/ui'
+import {
+  Avatar,
+  Button,
+  Container,
+  Image,
+  Link,
+  Paragraph,
+  Theme,
+  XStack,
+  YStack,
+  Label,
+} from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconClose } from 'app/components/icons'
@@ -39,91 +50,67 @@ export const EditProfile = () => {
   })
 
   return (
-    <Theme name="send">
-      <Container>
-        <YStack w={'100%'} ai={'center'}>
-          <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'}>
-            <Paragraph size={'$9'} fontWeight={'700'}>
-              Edit Profile
-            </Paragraph>
-            {/* <Link href={'/profile'}>
-              <XStack paddingTop={'$2'}>
-                <IconClose color={resolvedTheme?.startsWith('dark') ? 'white' : 'black'} />
+    <Container>
+      <YStack w={'100%'} ai={'center'}>
+        <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'}>
+          <Paragraph size={'$9'} fontWeight={'700'}>
+            Edit Profile
+          </Paragraph>
+        </XStack>
+        <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
+          <SchemaForm
+            schema={ProfileSchema}
+            props={{
+              name: {
+                'aria-label': 'Name',
+                borderWidth: 1,
+              },
+              about: {
+                'aria-label': 'About',
+                borderWidth: 1,
+              },
+            }}
+            defaultValues={{
+              name: name ?? '',
+              about: about ?? '',
+            }}
+            onSubmit={(values) => mutation.mutate(values)}
+            renderAfter={({ submit }) => (
+              <XStack
+                jc={'space-between'}
+                ai={'center'}
+                $lg={{ flexDirection: 'column' }}
+                $gtLg={{ flexDirection: 'row' }}
+              >
+                <Button f={1} marginTop={'$5'} onPress={() => submit()}>
+                  Update Profile
+                </Button>
               </XStack>
-            </Link> */}
-          </XStack>
-          <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
-            <SchemaForm
-              schema={ProfileSchema}
-              props={{
-                name: {
-                  autoFocus: !!name,
-                  borderColor: 'rgba(195, 171, 142, 0.6)',
-                  borderWidth: 1,
-                },
-                about: {
-                  autoFocus: !!about,
-                  borderColor: 'rgba(195, 171, 142, 0.6)',
-                  borderWidth: 1,
-                },
-              }}
-              defaultValues={{
-                name: name ?? '',
-                about: about ?? '',
-              }}
-              onSubmit={(values) => mutation.mutate(values)}
-              renderAfter={({ submit }) => (
-                <XStack
-                  jc={'space-between'}
-                  ai={'center'}
-                  $lg={{ flexDirection: 'column' }}
-                  $gtLg={{ flexDirection: 'row' }}
-                >
-                  <Button
-                    f={1}
-                    br={'$radius.true'}
-                    bw={'$0.5'}
-                    borderColor={'#C3AB8E'}
-                    bg={'transparent'}
-                    shadowColor={'rgba(0, 0, 0, 0.1)'}
-                    shadowOffset={{ width: 0, height: 4 }}
-                    shadowRadius={8}
-                    shadowOpacity={0.1}
-                    marginTop={'$5'}
-                    w={'60%'}
-                    onPress={() => submit()}
-                  >
-                    <Paragraph color={'$primary'} fontWeight={'700'}>
-                      Update Profile
-                    </Paragraph>
-                  </Button>
-                </XStack>
-              )}
-            >
-              {(fields) => (
-                <>
-                  <YStack>
-                    <Paragraph fontWeight={'400'} marginBottom={'$5'}>
-                      Image
-                    </Paragraph>
-                    <UploadAvatar>
-                      <Avatar circular size={128}>
-                        <SolitoImage
-                          src={avatar_url ? avatar_url : ''}
-                          alt="your avatar"
-                          width={128}
-                          height={128}
-                        />
-                      </Avatar>
-                    </UploadAvatar>
-                  </YStack>
-                  {Object.values(fields)}
-                </>
-              )}
-            </SchemaForm>
-          </XStack>
-        </YStack>
-      </Container>
-    </Theme>
+            )}
+          >
+            {(fields) => (
+              <>
+                <YStack>
+                  <Label size="$3" htmlFor="current-Image">
+                    Image
+                  </Label>
+                  <UploadAvatar>
+                    <Avatar circular size={128}>
+                      <SolitoImage
+                        src={avatar_url ? avatar_url : ''}
+                        alt="your avatar"
+                        width={128}
+                        height={128}
+                      />
+                    </Avatar>
+                  </UploadAvatar>
+                </YStack>
+                {Object.values(fields)}
+              </>
+            )}
+          </SchemaForm>
+        </XStack>
+      </YStack>
+    </Container>
   )
 }

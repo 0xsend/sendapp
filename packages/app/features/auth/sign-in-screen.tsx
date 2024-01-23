@@ -118,7 +118,6 @@ export const SignInScreen = () => {
                 },
                 phone: {
                   'aria-label': 'Phone number',
-                  borderColor: 'rgba(195, 171, 142, 0.6)',
                   borderWidth: 1,
                   placeholder: 'Phone Number',
                   width: '100%',
