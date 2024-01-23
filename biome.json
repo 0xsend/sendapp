@@ -15,7 +15,8 @@
       "**/database-generated.types.ts",
       "**/theme-generated.ts",
       "./apps/expo/ios/**",
-      "./apps/expo/android/**"
+      "./apps/expo/android/**",
+      "./packages/app/components/img/**"
     ]
   },
   "organizeImports": {

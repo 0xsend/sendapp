@@ -10,7 +10,7 @@ import {
   Path,
 } from 'react-native-svg'
 
-export interface ISvgProps extends SvgProps {
+interface ISvgProps extends SvgProps {
   xmlns?: string
   xmlnsXlink?: string
   xmlSpace?: string
@@ -20,8 +20,8 @@ export const InstantPayments = (props: ISvgProps) => {
   const { width, height, ...rest } = props
   return (
     <Svg
-      width={width}
-      height={height}
+      width={width || '100%'}
+      height={height || '100%'}
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
       fill="none"
