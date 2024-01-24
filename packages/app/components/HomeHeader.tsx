@@ -4,7 +4,7 @@ import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from './icons'
+import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 
 // TODO: this should probably named HomeTopNav
@@ -99,17 +99,8 @@ function PointsCount() {
         $theme-dark={{ bg: '$greenVibrant' }}
         $theme-light={{ bg: '$black' }}
       >
-        <IconStar
-          size={'$2'}
-          $theme-dark={{ color: '$background' }}
-          $theme-light={{ color: '$background' }}
-        />
-        <Text
-          $theme-dark={{ color: '$background' }}
-          $theme-light={{ color: '$background' }}
-          fontSize={'$1'}
-          fontWeight={'600'}
-        >
+        <IconStar size={'$2'} color="$background" />
+        <Text col="$background" fontSize={'$1'} fontWeight={'600'}>
           {points}
         </Text>
       </XStack>

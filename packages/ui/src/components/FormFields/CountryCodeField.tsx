@@ -143,7 +143,6 @@ export const CountryCodeField = ({
                         value={country.name}
                         cursor="pointer"
                         theme={themeName}
-                        color={'white'}
                       >
                         <Select.ItemText
                           color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
