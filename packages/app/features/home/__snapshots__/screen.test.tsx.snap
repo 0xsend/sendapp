@@ -49,9 +49,10 @@ exports[`HomeScreen 1`] = `
         align="xMidYMid"
         bbHeight="32"
         bbWidth="32"
+        color="hsla(112, 22%, 59%, 1)"
         fill="none"
         focusable={false}
-        height="32"
+        height={32}
         meetOrSlice={0}
         minX={0}
         minY={0}
@@ -68,9 +69,10 @@ exports[`HomeScreen 1`] = `
             },
           ]
         }
+        tintColor="hsla(112, 22%, 59%, 1)"
         vbHeight={32}
         vbWidth={32}
-        width="32"
+        width={32}
       >
         <RNSVGGroup
           fill={null}
@@ -343,9 +345,10 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="34"
                     bbWidth="34"
+                    color="hsla(112, 22%, 59%, 1)"
                     fill="none"
                     focusable={false}
-                    height="34"
+                    height={34}
                     meetOrSlice={0}
                     minX={0}
                     minY={0}
@@ -362,9 +365,10 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
+                    tintColor="hsla(112, 22%, 59%, 1)"
                     vbHeight={34}
                     vbWidth={34}
-                    width="34"
+                    width={34}
                   >
                     <RNSVGGroup
                       fill={null}
@@ -628,9 +632,10 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="40"
                     bbWidth="40"
+                    color="hsla(112, 22%, 59%, 1)"
                     fill="none"
                     focusable={false}
-                    height="40"
+                    height={40}
                     meetOrSlice={0}
                     minX={0}
                     minY={0}
@@ -647,9 +652,10 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
+                    tintColor="hsla(112, 22%, 59%, 1)"
                     vbHeight={40}
                     vbWidth={40}
-                    width="40"
+                    width={40}
                   >
                     <RNSVGGroup
                       fill={null}
@@ -818,9 +824,10 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="42"
                     bbWidth="42"
+                    color="hsla(112, 22%, 59%, 1)"
                     fill="none"
                     focusable={false}
-                    height="42"
+                    height={42}
                     meetOrSlice={0}
                     minX={0}
                     minY={0}
@@ -837,9 +844,10 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
+                    tintColor="hsla(112, 22%, 59%, 1)"
                     vbHeight={42}
                     vbWidth={42}
-                    width="42"
+                    width={42}
                   >
                     <RNSVGGroup
                       fill={null}
@@ -981,9 +989,10 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="42"
                     bbWidth="42"
+                    color="hsla(112, 22%, 59%, 1)"
                     fill="none"
                     focusable={false}
-                    height="42"
+                    height={42}
                     meetOrSlice={0}
                     minX={0}
                     minY={0}
@@ -1000,9 +1009,10 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
+                    tintColor="hsla(112, 22%, 59%, 1)"
                     vbHeight={42}
                     vbWidth={42}
-                    width="42"
+                    width={42}
                   >
                     <RNSVGGroup
                       fill={null}
@@ -1445,9 +1455,10 @@ exports[`HomeScreen 1`] = `
                           align="xMidYMid"
                           bbHeight="42"
                           bbWidth="42"
+                          color="hsla(112, 22%, 59%, 1)"
                           fill="none"
                           focusable={false}
-                          height="42"
+                          height={42}
                           meetOrSlice={0}
                           minX={0}
                           minY={0}
@@ -1464,9 +1475,10 @@ exports[`HomeScreen 1`] = `
                               },
                             ]
                           }
+                          tintColor="hsla(112, 22%, 59%, 1)"
                           vbHeight={42}
                           vbWidth={42}
-                          width="42"
+                          width={42}
                         >
                           <RNSVGGroup
                             fill={null}
@@ -1718,9 +1730,10 @@ exports[`HomeScreen 1`] = `
                           align="xMidYMid"
                           bbHeight="42"
                           bbWidth="42"
+                          color="hsla(112, 22%, 59%, 1)"
                           fill="none"
                           focusable={false}
-                          height="42"
+                          height={42}
                           meetOrSlice={0}
                           minX={0}
                           minY={0}
@@ -1737,9 +1750,10 @@ exports[`HomeScreen 1`] = `
                               },
                             ]
                           }
+                          tintColor="hsla(112, 22%, 59%, 1)"
                           vbHeight={42}
                           vbWidth={42}
-                          width="42"
+                          width={42}
                         >
                           <RNSVGGroup
                             fill={null}
@@ -1991,9 +2005,10 @@ exports[`HomeScreen 1`] = `
                           align="xMidYMid"
                           bbHeight="42"
                           bbWidth="42"
+                          color="hsla(112, 22%, 59%, 1)"
                           fill="none"
                           focusable={false}
-                          height="42"
+                          height={42}
                           meetOrSlice={0}
                           minX={0}
                           minY={0}
@@ -2010,9 +2025,10 @@ exports[`HomeScreen 1`] = `
                               },
                             ]
                           }
+                          tintColor="hsla(112, 22%, 59%, 1)"
                           vbHeight={42}
                           vbWidth={42}
-                          width="42"
+                          width={42}
                         >
                           <RNSVGGroup
                             fill={null}
@@ -2264,9 +2280,10 @@ exports[`HomeScreen 1`] = `
                           align="xMidYMid"
                           bbHeight="42"
                           bbWidth="42"
+                          color="hsla(112, 22%, 59%, 1)"
                           fill="none"
                           focusable={false}
-                          height="42"
+                          height={42}
                           meetOrSlice={0}
                           minX={0}
                           minY={0}
@@ -2283,9 +2300,10 @@ exports[`HomeScreen 1`] = `
                               },
                             ]
                           }
+                          tintColor="hsla(112, 22%, 59%, 1)"
                           vbHeight={42}
                           vbWidth={42}
-                          width="42"
+                          width={42}
                         >
                           <RNSVGGroup
                             fill={null}
@@ -2724,6 +2742,7 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="16"
                     bbWidth="95"
+                    color="hsla(112, 22%, 59%, 1)"
                     fill="none"
                     focusable={false}
                     height={16}
@@ -2743,6 +2762,7 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
+                    tintColor="hsla(112, 22%, 59%, 1)"
                     vbHeight={26}
                     vbWidth={154}
                     width={95}

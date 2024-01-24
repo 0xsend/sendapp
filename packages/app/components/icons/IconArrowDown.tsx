@@ -1,11 +1,20 @@
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
+import { ColorTokens } from '@my/ui/types'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ArrowDown = (props: IconProps) => {
+  const { size, color, ...rest } = props
+
   return (
-    <Svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+    <Svg
+      width={size ?? 34}
+      height={size ?? 34}
+      color={color as ColorTokens | undefined}
+      viewBox="0 0 34 34"
+      fill="none"
+    >
       <Circle cx="17" cy="17" r="16.5" fill="#161619" fill-opacity="0.4" />
       <Circle cx="17" cy="17" r="16.5" stroke="url(#paint0_linear_563_1349)" />
       <Path

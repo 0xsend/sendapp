@@ -155,7 +155,7 @@ export function HomeScreen() {
               >
                 <YStack m={'$3'}>
                   <XStack jc={'flex-end'} height={'$2.5'} zIndex={5}>
-                    {!expandBalance && <IconArrowDown />}
+                    {!expandBalance && <IconArrowDown size={34} />}
                   </XStack>
                   <YStack ai={'center'} jc={'center'}>
                     <Paragraph color={'$primary'} fontSize={'$4'} zIndex={1}>
