@@ -1,11 +1,19 @@
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
+import { ColorTokens } from '@my/ui/types'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SendTile = (props: IconProps) => {
+  const { size, color, ...rest } = props
   return (
-    <Svg width="42" height="42" viewBox="0 0 42 42" fill="none">
+    <Svg
+      width={size ?? 42}
+      height={size ?? 42}
+      color={color as ColorTokens | undefined}
+      viewBox="0 0 42 42"
+      fill="none"
+    >
       <Path
         d="M41 21C41 32.0457 32.0457 41 21 41C9.9543 41 1 32.0457 1 21C1 9.9543 9.9543 1 21 1"
         stroke="currentColor"

@@ -1,11 +1,18 @@
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
+import { ColorTokens } from '@my/ui/types'
 
 const Notification = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
-    <Svg width="16" height="28" viewBox="0 0 16 20" fill="none">
+    <Svg
+      width={size ?? 16}
+      height={size ?? 28}
+      color={color as ColorTokens | undefined}
+      viewBox="0 0 16 20"
+      fill="none"
+    >
       <Path
         fillRule="evenodd"
         clipRule="evenodd"

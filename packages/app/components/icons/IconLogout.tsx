@@ -19,13 +19,15 @@ import {
   Text as _Text,
   Use,
 } from 'react-native-svg'
+import { ColorTokens } from '@my/ui/types'
 
-const Icon = (props) => {
-  const { color = 'black', size = 24, ...otherProps } = props
+const Icon = (props: IconProps) => {
+  const { color, size, ...otherProps } = props
   return (
     <Svg
-      width={'16'}
-      height={'28'}
+      width={size ?? 16}
+      height={size ?? 28}
+      color={color as ColorTokens | undefined}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
