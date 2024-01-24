@@ -39,7 +39,7 @@ type Override = {
       avif_autodetection?: string;
       file_size_limit?: string;
       allowed_mime_types?: string;
-      owner_id?: string;
+      users?: string;
       objects?: string;
     };
   }
@@ -168,7 +168,6 @@ type Override = {
       metadata?: string;
       path_tokens?: string;
       version?: string;
-      owner_id?: string;
       buckets?: string;
     };
   }
@@ -336,6 +335,7 @@ type Override = {
       send_accounts?: string;
       tags?: string;
       webauthn_credentials?: string;
+      buckets?: string;
     };
   }
   webauthn_credentials?: {
@@ -390,6 +390,7 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     fileSizeLimit?: FingerprintNumberField;
+    userByOwner?: FingerprintRelationField;
     objects?: FingerprintRelationField;
   }
   chainAddresses?: {
@@ -550,6 +551,7 @@ export interface Fingerprint {
     sendAccounts?: FingerprintRelationField;
     tags?: FingerprintRelationField;
     webauthnCredentials?: FingerprintRelationField;
+    bucketsByOwner?: FingerprintRelationField;
   }
   webauthnCredentials?: {
     signCount?: FingerprintNumberField;

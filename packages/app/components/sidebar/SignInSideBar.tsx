@@ -173,13 +173,9 @@ const SignInSideBar = ({ ...props }: YStackProps) => {
 }
 
 export const SignInSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
-  const media = useMedia()
-
-  if (media.gtLg)
-    return (
-      <SideBarWrapper sidebar={<SignInSideBar backgroundColor={'$backgroundStrong'} />}>
-        {children}
-      </SideBarWrapper>
-    )
-  return children
+  return (
+    <SideBarWrapper sidebar={<SignInSideBar backgroundColor={'$backgroundStrong'} />}>
+      {children}
+    </SideBarWrapper>
+  )
 }

@@ -7,7 +7,6 @@ export const SideBar = ({
 }: { children?: React.ReactNode } & YStackProps) => {
   return (
     <YStack
-      $md={{ display: 'none' }}
       height={'100svh'}
       width={width || '20%'}
       py="$6"
@@ -22,4 +21,4 @@ export const SideBar = ({
   )
 }
 
-export * from './Wrapper'
+export { SideBarWrapper } from './Wrapper'
