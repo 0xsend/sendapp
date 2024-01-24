@@ -51,7 +51,7 @@ function ReferralCodeCard() {
           <Text color="$gray11" fontSize={'$2'}>
             Referral Link
           </Text>
-          <Text theme={'gold'} color="$gold11" fontWeight={'600'}>
+          <Text color="$gold11" fontWeight={'600'}>
             send.it/{user?.profile?.referral_code}
           </Text>
         </XStack>
