@@ -159,6 +159,7 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
+            selectable={true}
             style={
               {
                 "color": "hsla(112, 22%, 59%, 1)",
@@ -227,6 +228,7 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
+            selectable={true}
             style={
               {
                 "color": "hsla(112, 22%, 59%, 1)",
@@ -295,6 +297,7 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
+            selectable={true}
             style={
               {
                 "color": "hsla(112, 22%, 59%, 1)",
@@ -363,6 +366,7 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
+            selectable={true}
             style={
               {
                 "color": "hsla(112, 22%, 59%, 1)",

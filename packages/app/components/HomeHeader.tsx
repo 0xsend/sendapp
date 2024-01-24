@@ -4,7 +4,7 @@ import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from './icons'
+import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 
 // TODO: this should probably named HomeTopNav
@@ -49,10 +49,8 @@ function ReferralCodeCard() {
     <XStack ai="center" space="$2" bg="$background" h="100%" f={1} px={'$3'} br="$4">
       <Anchor href={referralHref} textDecorationLine="none">
         <XStack ai="center" space="$2" jc="space-around">
-          <Text color="$gray11" fontSize={'$2'}>
-            Referral Link
-          </Text>
-          <Text theme={'gold'} color="$gold11" fontWeight={'600'}>
+          <Text fontSize={'$2'}>Referral Link</Text>
+          <Text color="$backgroundAccent" fontWeight={'600'}>
             send.it/{user?.profile?.referral_code}
           </Text>
         </XStack>
@@ -99,17 +97,8 @@ function PointsCount() {
         $theme-dark={{ bg: '$greenVibrant' }}
         $theme-light={{ bg: '$black' }}
       >
-        <IconStar
-          size={'$2'}
-          $theme-dark={{ color: '$background' }}
-          $theme-light={{ color: '$background' }}
-        />
-        <Text
-          $theme-dark={{ color: '$background' }}
-          $theme-light={{ color: '$background' }}
-          fontSize={'$1'}
-          fontWeight={'600'}
-        >
+        <IconStar size={'$2'} color="$background" />
+        <Text col="$background" fontSize={'$1'} fontWeight={'600'}>
           {points}
         </Text>
       </XStack>

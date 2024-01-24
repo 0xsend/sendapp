@@ -1,4 +1,4 @@
-import { Card, CardHeader, Container, H3, H5, Paragraph, SizableText, XStack, YStack } from '@my/ui'
+import { Card, CardHeader, Container, H3, H5, Paragraph, XStack, YStack } from '@my/ui'
 
 const pageDescription =
   "Share your unique link, and when someone joins or makes a purchase using it, you earn rewards in SEND token. Our system tracks referrals, ensuring you receive rewards. It's a win-win as you support us and enjoy the benefits. Thanks for being part of our community!"
@@ -26,7 +26,7 @@ const StatsCards = () => {
     <XStack flexWrap="wrap" ai="flex-start" jc="space-between" gap="$8" mb="$4">
       <Card f={1} w={'20%'} bc={'$background'}>
         <CardHeader>
-          <SizableText>Total Referrals</SizableText>
+          <Paragraph>Total Referrals</Paragraph>
         </CardHeader>
         <H5 pl="$4" pb="$3" fontWeight="600" size={'$7'}>
           1000
@@ -34,7 +34,7 @@ const StatsCards = () => {
       </Card>
       <Card f={1} w={'20%'} bc={'$background'}>
         <CardHeader>
-          <SizableText>Transactions</SizableText>
+          <Paragraph>Transactions</Paragraph>
         </CardHeader>
         <H5 pl="$4" pb="$3" fontWeight="600" size={'$7'}>
           1000
@@ -42,7 +42,7 @@ const StatsCards = () => {
       </Card>
       <Card f={1} w={'20%'} bc={'$background'}>
         <CardHeader>
-          <SizableText>Total Rewards</SizableText>
+          <Paragraph>Total Rewards</Paragraph>
         </CardHeader>
         <H5 pl="$4" pb="$3" fontWeight="600" size={'$7'}>
           1000
@@ -50,7 +50,7 @@ const StatsCards = () => {
       </Card>
       <Card f={1} w={'20%'} bc={'$background'}>
         <CardHeader>
-          <SizableText>Claimable Rewards</SizableText>
+          <Paragraph>Claimable Rewards</Paragraph>
         </CardHeader>
         <H5 pl="$4" pb="$3" fontWeight="600" size={'$7'}>
           1000
