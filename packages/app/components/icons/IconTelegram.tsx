@@ -10,8 +10,8 @@ const TelegramLogo = (props: IconProps) => {
     <Svg
       viewBox="0 0 24 24"
       color={color as ColorTokens | undefined}
-      width={'16'}
-      height={'28'}
+      width={size ?? 16}
+      height={size ?? 28}
       {...rest}
     >
       <Path

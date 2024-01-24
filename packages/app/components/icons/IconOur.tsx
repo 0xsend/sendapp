@@ -9,8 +9,8 @@ const XLogo = (props: IconProps) => {
   return (
     <Svg
       color={color as ColorTokens | undefined}
-      width={'16'}
-      height={'28'}
+      width={size ?? 16}
+      height={size ?? 28}
       viewBox="0 0 24 24"
       {...rest}
     >

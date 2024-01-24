@@ -8,8 +8,9 @@ const Theme = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
-      width={'16'}
-      height={'28'}
+      width={size ?? 16}
+      height={size ?? 28}
+      color={color as ColorTokens | undefined}
       viewBox="0 0 24 24"
       fill="none"
       strokeWidth="2"

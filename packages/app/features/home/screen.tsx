@@ -26,7 +26,6 @@ import { MainLayout } from 'app/components/layout'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { useState } from 'react'
 import { Square } from 'tamagui'
-
 export function HomeScreen() {
   const { resolvedTheme } = useThemeSetting()
   const USDollar = new Intl.NumberFormat('en-US', {
@@ -34,7 +33,6 @@ export function HomeScreen() {
     currency: 'USD',
   })
   const [expandBalance, setExpandBalance] = useState(false)
-
   const actionButtons = [
     { label: 'Deposit', iconPNGPath: <IconDeposit />, href: '/' },
     { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/receive' },
@@ -125,7 +123,6 @@ export function HomeScreen() {
   const navigateToScreen = (href: string) => {
     window.location.href = href
   }
-
   return (
     <>
       <MainLayout scrollable={true}>
@@ -261,7 +258,6 @@ export function HomeScreen() {
               </YStack>
             </YStack>
           )}
-
           {/* D-R-S Buttons */}
           <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$4'}>
             {actionButtons.map((actionButton) => (

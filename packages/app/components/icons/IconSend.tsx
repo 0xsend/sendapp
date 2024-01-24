@@ -1,11 +1,18 @@
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
+import { ColorTokens } from '@my/ui/types'
 
 const Send = (props: IconProps) => {
-  const { size } = props
+  const { size, color } = props
   return (
-    <Svg width={size ?? 40} height={size ?? 40} viewBox="0 0 40 40" fill="none">
+    <Svg
+      width={size ?? 40}
+      height={size ?? 40}
+      color={color as ColorTokens | undefined}
+      viewBox="0 0 40 40"
+      fill="none"
+    >
       <G clip-path="url(#clip0_563_1426)">
         <Path
           d="M20 40C31.0864 40 40 31.0864 40 20C40 8.91363 31.0864 0 20 0C8.91363 0 0 8.91363 0 20C0 31.0864 8.91363 40 20 40Z"
