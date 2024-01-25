@@ -1,4 +1,4 @@
-import { EditProfile } from 'app/features/editProfile/screen'
+import { EditProfile } from 'app/features/settings/components/editProfile/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'

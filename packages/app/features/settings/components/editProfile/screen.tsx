@@ -19,7 +19,7 @@ import { useUser } from 'app/utils/useUser'
 import { useForm } from 'react-hook-form'
 import { SolitoImage } from 'solito/image'
 import { z } from 'zod'
-import { UploadAvatar } from '../settings/components/uploadProfileImage/screen'
+import { UploadAvatar } from '../uploadProfileImage/screen'
 
 const ProfileSchema = z.object({
   name: formFields.text.describe('Name'),
