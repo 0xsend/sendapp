@@ -264,32 +264,3 @@ export const brandColors = {
   cinereous: '#1D1D20',
   olive: '#86AE80',
 }
-export const sendDark = {
-  send1: '#C3AB8E',
-  send2: '#FFFFFF',
-  send3: '#1D1D20',
-  send4: '#151515',
-  send5: '#1D1D20',
-  send6: '#C3AB8E',
-  send7: '#5E4A31',
-  send8: '#352A1C',
-  send9: '#282015',
-  send10: '#1B150E',
-  send11: 'hsl(358, 100%, 69.5%)',
-  send12: 'hsl(351, 89.0%, 96.0%)',
-}
-
-export const send = {
-  send1: '#C3AB8E',
-  send2: 'hsl(357, 34.4%, 12.0%)',
-  send3: '#fff',
-  send4: '#151515',
-  send5: '#1D1D20',
-  send6: '#C3AB8E',
-  send7: '#5E4A31',
-  send8: '#352A1C',
-  send9: '#282015',
-  send10: '#1B150E',
-  send11: 'hsl(358, 100%, 69.5%)',
-  send12: 'hsl(351, 89.0%, 96.0%)',
-}
