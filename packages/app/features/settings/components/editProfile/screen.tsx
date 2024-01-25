@@ -64,11 +64,11 @@ export const EditProfile = () => {
             schema={ProfileSchema}
             props={{
               name: {
-                'aria-label': 'Name',
+                accessibilityLabel: 'Name',
                 borderWidth: 1,
               },
               about: {
-                'aria-label': 'About',
+                accessibilityLabel: 'About',
                 borderWidth: 1,
               },
             }}
