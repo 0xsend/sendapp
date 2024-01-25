@@ -27,7 +27,6 @@ export const InstantPayments = (props: ISvgProps) => {
       fill="none"
       viewBox="0 0 954 820"
       preserveAspectRatio="xMidYMin slice"
-      style={{ borderRadius: 33 }}
       {...rest}
     >
       <Path fill="url(#instantPaymentsA)" d="M90.86 0H0v820h954V0H90.86Z" />
