@@ -12,6 +12,7 @@ import {
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'solito/router'
 import { IconClose } from 'app/components/icons'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -29,6 +30,7 @@ const ProfileSchema = z.object({
 export const EditProfile = () => {
   const { profile, user } = useUser()
   const supabase = useSupabase()
+  const router = useRouter()
   const name = profile?.name
   const about = profile?.about
   const userID = user?.id
@@ -45,7 +47,7 @@ export const EditProfile = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['profile'])
-      window.location.href = '/settings'
+      router.push('/settings')
     },
   })
 
