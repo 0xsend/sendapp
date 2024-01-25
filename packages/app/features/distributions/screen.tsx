@@ -1,7 +1,6 @@
 import { Button, Container, ScrollView, Theme, XStack, YStack } from '@my/ui'
 import { sendAirdropsSafeAddress } from '@my/wagmi'
 import { ArrowRight } from '@tamagui/lucide-icons'
-import { HomeHeader } from 'app/components/HomeHeader'
 import React from 'react'
 import { useLink } from 'solito/link'
 import { DistributionsTable } from './components/DistributionsTable'
@@ -16,7 +15,6 @@ export function DistributionsScreen() {
       <ScrollView f={3} fb={0} backgroundColor={'$background05'}>
         <YStack gap="$6" pt="$5" pb="$8">
           <YStack gap="$8">
-            <HomeHeader>Distributions</HomeHeader>
             <DistributionSection />
           </YStack>
         </YStack>
@@ -26,7 +24,9 @@ export function DistributionsScreen() {
 }
 
 const DistributionSection = () => {
-  const etherscanLink = useLink({ href: `https://etherscan.io/address/${sendAirdropsSafeAddress}` })
+  const etherscanLink = useLink({
+    href: `https://etherscan.io/address/${sendAirdropsSafeAddress}`,
+  })
 
   return (
     <YStack gap="$4">

@@ -1,4 +1,4 @@
-import { Card, CardProps, H6, Paragraph, Progress, Spinner, XStack, YStack } from '@my/ui'
+import { Card, CardProps, H6, Paragraph, Progress, Spinner, Text, XStack, YStack } from '@my/ui'
 import { ServerCrash } from '@tamagui/lucide-icons'
 import { IconSendToken } from 'app/components/icons/IconSendToken'
 import { useActiveDistribution } from 'app/utils/distributions'
@@ -12,7 +12,7 @@ import { DistributionClaimButton } from './DistributionClaimButton'
 
 export function DistributionsStatCard(cardProps: CardProps) {
   return (
-    <Card theme="gold" f={1} $gtMd={{ minWidth: 240, flex: 1, flexBasis: 0 }} {...cardProps}>
+    <Card bg="$background" f={1} $gtMd={{ minWidth: 240, flex: 1, flexBasis: 0 }} {...cardProps}>
       {cardProps.children}
     </Card>
   )
@@ -32,13 +32,8 @@ export function DistributionProgressCard(props: CardProps) {
   }, [sendTotalDistPool])
 
   return (
-    <DistributionsStatCard size="$4" {...props}>
+    <DistributionsStatCard size="$4" br={'$8'} p="$2" {...props}>
       <Card.Header jc="space-between">
-        <H6 fontWeight="400" size="$4" theme="alt2">
-          Total Distributions
-        </H6>
-      </Card.Header>
-      <YStack px="$4" jc="flex-start" f={1} zIndex={1}>
         <XStack
           space="$4"
           mx="auto"
@@ -57,12 +52,14 @@ export function DistributionProgressCard(props: CardProps) {
               w: '50%',
             }}
           >
-            <Paragraph theme="alt1" f={3}>
+            <Paragraph theme="alt1" f={3} fontSize={'$5'}>
               Distributed
             </Paragraph>
             <XStack ai="center" space="$2">
               <IconSendToken size={20} />
-              <H6 size="$6">{distributed}</H6>
+              <H6 size="$7" fontWeight={'700'}>
+                {distributed}
+              </H6>
             </XStack>
           </YStack>
           <YStack
@@ -71,22 +68,27 @@ export function DistributionProgressCard(props: CardProps) {
             w="100%"
             $gtXs={{
               w: '$20',
+              alignItems: 'flex-end',
               als: 'flex-end',
             }}
           >
-            <Paragraph theme="alt1" f={3}>
+            <Paragraph theme="alt1" f={3} fontSize={'$5'}>
               Total for Send holders
             </Paragraph>
             <XStack ai="center" space="$2">
               <XStack w={20}>
                 <IconSendToken size={20} />
               </XStack>
-              <H6 size="$6">{DISTRIBUTION_INITIAL_POOL_AMOUNT.toLocaleString()}</H6>
+              <H6 size="$7" fontWeight={'700'}>
+                {DISTRIBUTION_INITIAL_POOL_AMOUNT.toLocaleString()}
+              </H6>
             </XStack>
           </YStack>
         </XStack>
-        <Progress backgroundColor={'$color3'} my="$4" direction="ltr" value={distributionProgress}>
-          <Progress.Indicator animation="quick" />
+      </Card.Header>
+      <YStack px="$4" jc="flex-start" f={1} zIndex={1}>
+        <Progress backgroundColor={'$gold4'} my="$4" direction="ltr" value={distributionProgress}>
+          <Progress.Indicator animation="quick" backgroundColor={'$gold9'} />
         </Progress>
         {isError ? (
           <H6 size="$4" f={6} color="$orange11">
@@ -115,14 +117,20 @@ export function DistributionTimeCard(props: CardProps) {
 
   const timeRemaining = useTimeRemaining(
     isLoading
-      ? new Date()
+      ? now
       : isBeforeQualification
         ? distribution?.qualification_start
         : isDuringQualification
           ? distribution?.qualification_end
           : isClaimable
             ? distribution?.claim_end
-            : new Date()
+            : now
+              ? distribution?.qualification_start
+              : isDuringQualification
+                ? distribution?.qualification_end
+                : isClaimable
+                  ? distribution?.claim_end
+                  : now
   )
 
   if (isLoading) {
@@ -175,42 +183,64 @@ export function DistributionTimeCard(props: CardProps) {
   return (
     <DistributionsStatCard
       accessibilityLabel={`${subHeader} ${dateToShow.toLocaleDateString()}`}
-      size="$4"
+      br={'$8'}
+      p="$2"
       disableOptimization
       {...props}
     >
       <Card.Header f={1} jc="space-between">
-        <H6 fontWeight="400" size="$4" theme="alt2">
-          Distribution {isLoading ? <Spinner color="$color" /> : distribution.number}
-        </H6>
-      </Card.Header>
-      <YStack px="$4" pb="$4" space="$2" jc="center" f={1} zIndex={1} bc="transparent">
         {hasDistribution ? (
-          <Paragraph>{subHeader}</Paragraph>
+          <Paragraph size={'$5'} theme="alt1">
+            {subHeader}
+          </Paragraph>
         ) : (
-          <Paragraph>No Active Distribution</Paragraph>
+          <Paragraph size={'$5'} theme="alt1">
+            No Active Distribution
+          </Paragraph>
         )}
-        <YStack space="$6">
-          <XStack f={1} space="$2" ai="center" w="100%">
+      </Card.Header>
+      <YStack
+        px="$2"
+        pb="$4"
+        space="$2"
+        jc="center"
+        f={1}
+        zIndex={1}
+        bc="transparent"
+        $gtXs={{ px: '$4' }}
+      >
+        <YStack space="$4">
+          <XStack f={1} space="$2" jc="center" ai="center" w="100%">
             {/* days */}
-            <Card f={1} py="$4" w="$6" h="$8" zIndex={1} bc="transparent" bordered>
-              <YStack ai="center" jc="center">
-                <Paragraph
+            <Card
+              f={1}
+              py="$9"
+              w="$6"
+              h="$8"
+              maw={'$10'}
+              zIndex={1}
+              bc="$background05"
+              bordered
+              br={'$6'}
+              $gtXs={{
+                br: '$8',
+              }}
+            >
+              <YStack ai="center" jc="center" h="100%" position="relative">
+                <Text
                   fontWeight="700"
                   f={6}
                   mb="0"
-                  size="$8"
-                  lineHeight="$4"
+                  fontSize="$9"
                   $gtXs={{
-                    size: '$8',
-                    lineHeight: '$4',
+                    fontSize: '$10',
                   }}
                 >
                   {String(timeRemaining.days).padStart(2, '0')}
-                </Paragraph>
+                </Text>
                 <Paragraph
                   f={3}
-                  mt="$2"
+                  color={'$gold9'}
                   size="$3"
                   $gtXs={{
                     size: '$4',
@@ -220,25 +250,39 @@ export function DistributionTimeCard(props: CardProps) {
                 </Paragraph>
               </YStack>
             </Card>
+            <Text mt="$2" fontSize={'$9'} fontWeight={'$16'}>
+              :
+            </Text>
             {/* hours */}
-            <Card f={1} py="$4" w="$6" h="$8" zIndex={1} bc="transparent" bordered>
-              <YStack ai="center" jc="center">
-                <Paragraph
+            <Card
+              f={1}
+              py="$9"
+              w="$6"
+              h="$8"
+              maw={'$10'}
+              zIndex={1}
+              bc="$background05"
+              bordered
+              br={'$6'}
+              $gtXs={{
+                br: '$8',
+              }}
+            >
+              <YStack ai="center" h="100%" jc="center">
+                <Text
                   fontWeight="700"
                   f={6}
                   mb="0"
-                  size="$8"
-                  lineHeight="$4"
+                  fontSize="$9"
                   $gtXs={{
-                    size: '$8',
-                    lineHeight: '$4',
+                    fontSize: '$10',
                   }}
                 >
                   {String(timeRemaining.hours).padStart(2, '0')}
-                </Paragraph>
+                </Text>
                 <Paragraph
                   f={3}
-                  mt="$2"
+                  color={'$gold9'}
                   size="$3"
                   $gtXs={{
                     size: '$4',
@@ -248,25 +292,45 @@ export function DistributionTimeCard(props: CardProps) {
                 </Paragraph>
               </YStack>
             </Card>
+            <Text
+              fontSize={'$7'}
+              fontWeight={'$16'}
+              $gtXs={{
+                fontSize: '$9',
+              }}
+            >
+              :
+            </Text>
             {/* mins */}
-            <Card f={1} py="$4" w="$6" h="$8" zIndex={1} bc="transparent" bordered>
-              <YStack ai="center" jc="center">
-                <Paragraph
+            <Card
+              f={1}
+              py="$9"
+              w="$6"
+              h="$8"
+              maw={'$10'}
+              zIndex={1}
+              bc="$background05"
+              bordered
+              br={'$6'}
+              $gtXs={{
+                br: '$8',
+              }}
+            >
+              <YStack ai="center" h="100%" jc="center">
+                <Text
                   fontWeight="700"
                   f={6}
                   mb="0"
-                  size="$8"
-                  lineHeight="$4"
+                  fontSize="$9"
                   $gtXs={{
-                    size: '$8',
-                    lineHeight: '$4',
+                    fontSize: '$10',
                   }}
                 >
                   {String(timeRemaining.minutes).padStart(2, '0')}
-                </Paragraph>
+                </Text>
                 <Paragraph
                   f={3}
-                  mt="$2"
+                  color={'$gold9'}
                   size="$3"
                   $gtXs={{
                     size: '$4',
@@ -276,25 +340,45 @@ export function DistributionTimeCard(props: CardProps) {
                 </Paragraph>
               </YStack>
             </Card>
+            <Text
+              fontSize={'$7'}
+              fontWeight={'$16'}
+              $gtXs={{
+                fontSize: '$9',
+              }}
+            >
+              :
+            </Text>
             {/* secs */}
-            <Card f={1} py="$4" w="$6" h="$8" zIndex={1} bc="transparent" bordered>
-              <YStack ai="center" jc="center">
-                <Paragraph
+            <Card
+              f={1}
+              py="$9"
+              w="$6"
+              h="$8"
+              maw={'$10'}
+              zIndex={1}
+              bc="$background05"
+              bordered
+              br={'$6'}
+              $gtXs={{
+                br: '$8',
+              }}
+            >
+              <YStack ai="center" h="100%" jc="center">
+                <Text
                   fontWeight="700"
                   f={6}
                   mb="0"
-                  size="$8"
-                  lineHeight="$4"
+                  fontSize="$9"
                   $gtXs={{
-                    size: '$8',
-                    lineHeight: '$4',
+                    fontSize: '$10',
                   }}
                 >
                   {String(timeRemaining.seconds).padStart(2, '0')}
-                </Paragraph>
+                </Text>
                 <Paragraph
                   f={3}
-                  mt="$2"
+                  color={'$gold9'}
                   size="$3"
                   $gtXs={{
                     size: '$4',
