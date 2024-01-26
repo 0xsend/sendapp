@@ -14,6 +14,7 @@ const ArrowDown = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       viewBox="0 0 34 34"
       fill="none"
+      {...rest}
     >
       <Circle cx="17" cy="17" r="16.5" fill="#161619" fill-opacity="0.4" />
       <Circle cx="17" cy="17" r="16.5" stroke="url(#paint0_linear_563_1349)" />

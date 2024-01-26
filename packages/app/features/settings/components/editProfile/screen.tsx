@@ -1,23 +1,9 @@
-import {
-  Avatar,
-  Button,
-  Container,
-  Image,
-  Link,
-  Paragraph,
-  Theme,
-  XStack,
-  YStack,
-  Label,
-} from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
+import { Avatar, Button, Container, Paragraph, XStack, YStack, Label } from '@my/ui'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'solito/router'
-import { IconClose } from 'app/components/icons'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
-import { useForm } from 'react-hook-form'
 import { SolitoImage } from 'solito/image'
 import { z } from 'zod'
 import { UploadAvatar } from '../uploadProfileImage/screen'
@@ -38,8 +24,6 @@ export const EditProfile = () => {
   const userID = user?.id
   const avatar_url = profile?.avatar_url
   const queryClient = useQueryClient()
-  const form = useForm<z.infer<typeof ProfileSchema>>()
-  const { resolvedTheme } = useThemeSetting()
   const mutation = useMutation({
     async mutationFn(data: z.infer<typeof ProfileSchema>) {
       await supabase

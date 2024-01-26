@@ -1,15 +1,4 @@
-import {
-  Button,
-  Card,
-  Container,
-  Image,
-  Link,
-  Paragraph,
-  Separator,
-  Theme,
-  XStack,
-  YStack,
-} from '@my/ui'
+import { Button, Card, Image, Link, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import {
   IconDownlod,
@@ -17,7 +6,6 @@ import {
   IconNext,
   IconNotification,
   IconOur,
-  IconPersonal,
   IconPhone,
   IconQr,
   IconReferral,

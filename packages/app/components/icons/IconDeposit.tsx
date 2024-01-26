@@ -13,6 +13,7 @@ const Deposit = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       viewBox="0 0 40 40"
       fill="none"
+      {...rest}
     >
       <Circle
         cx="19.9999"

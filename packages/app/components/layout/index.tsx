@@ -1,8 +1,7 @@
-import { Avatar, Image, Link, Paragraph, ScrollView, Spinner, Theme, XStack, YStack } from '@my/ui'
+import { Avatar, Link, Paragraph, ScrollView, Spinner, XStack, YStack } from '@my/ui'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconQr } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Square } from 'tamagui'
 import { MainFooter } from './footer'
 
 const MainLayout = ({

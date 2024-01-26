@@ -1,10 +1,7 @@
 import {
   Fieldset,
-  H2,
   Input,
   Label,
-  SubmitButton,
-  Theme,
   YStack,
   isWeb,
   useToastController,

@@ -1,4 +1,4 @@
-import { FormWrapper, H2, H4, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
+import { FormWrapper, H4, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
 import { MobileOtpType } from '@supabase/supabase-js'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
