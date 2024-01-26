@@ -1,6 +1,6 @@
 begin;
 select
-  plan(3);
+  plan(6);
 create extension "basejump-supabase_test_helpers";
 select
   tests.create_supabase_user('valid_tag_user');
@@ -40,6 +40,43 @@ select
 	public.profile_lookup('valid_tag') $$, $$
     values (null::uuid, null, null, null, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1,
       null::boolean) $$, 'Test valid tag lookup as anon');
+-- Start tests for is_public
+select
+  tests.authenticate_as_service_role();
+update
+  profiles
+set
+  is_public = false
+where
+  id = tests.get_supabase_uid('valid_tag_user');
+-- Test valid tag lookup as authenticated user
+select
+  tests.authenticate_as('valid_tag_user');
+select
+  results_eq($$
+    select
+      id::uuid, avatar_url, name, about, tag_name, address, chain_id, is_public from
+	public.profile_lookup('valid_tag') $$, $$
+    values (tests.get_supabase_uid('valid_tag_user'), null, null, null, 'valid_tag'::citext,
+      '0x1234567890abcdef1234567890abcdef12345678'::citext, 1, null::boolean) $$, 'Test valid tag lookup as authenticated user');
+-- Test valid tag lookup as service role
+select
+  tests.authenticate_as_service_role();
+select
+  results_eq($$
+    select
+      id::uuid, avatar_url, name, about, tag_name, address, chain_id, is_public from
+	public.profile_lookup('valid_tag') $$, $$
+    values (null::uuid, null, null, null, 'valid_tag'::citext, '0x1234567890abcdef1234567890abcdef12345678'::citext, 1,
+      false) $$, 'Test valid tag lookup as service role');
+-- Test invalid tag lookup as anon
+select
+  tests.clear_authentication();
+select
+  is_empty($$
+    select
+      id::uuid, avatar_url, name, about, tag_name, address, chain_id, is_public from
+	public.profile_lookup('invalid_tag') $$, 'Test invalid tag lookup as anon');
 select
   tests.authenticate_as('valid_tag_user');
 select

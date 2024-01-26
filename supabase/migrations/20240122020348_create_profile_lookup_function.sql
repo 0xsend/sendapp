@@ -36,9 +36,9 @@ begin
   where
     t.status = 'confirmed'::tag_status
     and t.name = tag
-    and(p.is_public
-      or auth.uid() is not null) -- allow public profiles to be returned
+    and(p.is_public -- allow public profiles to be returned
+      or auth.uid() is not null -- allow profiles to be returned if the user is authenticated
+      or current_setting('role')::text = 'service_role') -- allow public profiles to be returned to service role
   limit 1;
 end;
 $function$;
-

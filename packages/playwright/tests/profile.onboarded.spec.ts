@@ -3,6 +3,7 @@ import { test as sendAccountTest, expect } from '@my/playwright/fixtures/send-ac
 import { test as supawrightTest } from '@my/playwright/fixtures/supawright'
 import { debug, Debugger } from 'debug'
 import { createOtherUser } from './fixtures/supawright'
+import { assert } from 'app/utils/assert'
 
 const test = mergeTests(sendAccountTest, supawrightTest)
 
@@ -47,4 +48,33 @@ test('can visit my own profile', async ({
   await expect(page.getByAltText(profile.name)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Send' })).not.toBeVisible()
   await expect(page.getByRole('button', { name: 'Request' })).not.toBeVisible()
+})
+
+test('can visit private profile', async ({ page, supawright }) => {
+  const { otherUser, tag, profile } = await createOtherUser(supawright)
+  const { error } = await supawright
+    .supabase('public')
+    .from('profiles')
+    .update({
+      is_public: false,
+    })
+    .eq('id', otherUser.id)
+  assert(!error, error?.message)
+  const { data, error: updateError } = await supawright
+    .supabase('public')
+    .from('profiles')
+    .select('is_public')
+    .eq('id', otherUser.id)
+    .maybeSingle()
+  assert(!updateError, updateError?.message)
+  assert(data?.is_public === false, 'profile should be private')
+  await page.goto(`/profile/${tag.name}`)
+  const title = await page.title()
+  expect(title).toBe('Send | Profile')
+  await expect(page.getByRole('heading', { name: tag.name })).toBeVisible()
+  await expect(page.getByRole('heading', { name: profile.name })).toBeVisible()
+  await expect(page.getByText(profile.about, { exact: true })).toBeVisible()
+  await expect(page.getByAltText(profile.name)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Send' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Request' })).toBeVisible()
 })
