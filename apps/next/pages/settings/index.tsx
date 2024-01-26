@@ -1,5 +1,6 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import { SettingsScreen } from 'app/features/settings/screen'
+import { SettingsLayout } from 'app/features/settings/layout.web'
+import { GeneralSettingsScreen } from 'app/features/settings/general-screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../_app'
@@ -15,12 +16,16 @@ export const Page: NextPageWithLayout = () => {
           key="desc"
         />
       </Head>
-      <SettingsScreen />
+      <GeneralSettingsScreen />
     </>
   )
 }
 
 export const getServerSideProps = userProtectedGetSSP()
-Page.getLayout = (children) => <HomeLayout>{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout>
+    <SettingsLayout isSettingsHome>{children}</SettingsLayout>
+  </HomeLayout>
+)
 
 export default Page
