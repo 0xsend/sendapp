@@ -25,6 +25,7 @@ import { UploadAvatar } from '../uploadProfileImage/screen'
 const ProfileSchema = z.object({
   name: formFields.text.describe('Name'),
   about: formFields.textarea.describe('About'),
+  isPublic: formFields.boolean_checkbox.describe('IsPublic'),
 })
 
 export const EditProfile = () => {
@@ -33,6 +34,7 @@ export const EditProfile = () => {
   const router = useRouter()
   const name = profile?.name
   const about = profile?.about
+  const isPublic = profile?.is_public
   const userID = user?.id
   const avatar_url = profile?.avatar_url
   const queryClient = useQueryClient()
@@ -42,7 +44,11 @@ export const EditProfile = () => {
     async mutationFn(data: z.infer<typeof ProfileSchema>) {
       await supabase
         .from('profiles')
-        .update({ name: data.name, about: data.about })
+        .update({
+          name: data.name,
+          about: data.about,
+          is_public: data.isPublic,
+        })
         .eq('id', userID ? userID : '')
     },
     async onSuccess() {
@@ -71,10 +77,16 @@ export const EditProfile = () => {
                 accessibilityLabel: 'About',
                 borderWidth: 1,
               },
+              isPublic: {
+                accessibilityLabel: 'IsPublic',
+                borderWidth: 1,
+                defaultChecked: isPublic,
+              },
             }}
             defaultValues={{
               name: name ?? '',
               about: about ?? '',
+              isPublic: isPublic ?? false,
             }}
             onSubmit={(values) => mutation.mutate(values)}
             renderAfter={({ submit }) => (
