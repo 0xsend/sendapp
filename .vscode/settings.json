@@ -49,5 +49,7 @@
   "[sql]": {
     "editor.defaultFormatter": "bradymholt.pgformatter"
   },
-  "pgFormatter.keywordCase": "lowercase"
+  "pgFormatter.keywordCase": "lowercase",
+  "pgFormatter.wrapLimit": 100,
+  "pgFormatter.keepNewline": true
 }

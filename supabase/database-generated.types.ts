@@ -682,6 +682,7 @@ export interface Database {
           tag_name: string
           address: string
           chain_id: number
+          is_public: boolean
         }[]
       }
       tag_search: {

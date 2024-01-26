@@ -15,7 +15,7 @@ export function ProfileScreen() {
       <YStack f={1} gap="$6">
         {error && <Text color="$orange10">{error.message}</Text>}
         {isLoading && <Spinner size="large" color="$color10" />}
-        {profile && (
+        {profile ? (
           <YStack width="100%" gap="$2">
             <Avatar testID="avatar" size="$16" br="$4" gap="$2" mx="auto" $gtSm={{ mx: '0' }}>
               <Avatar.Image
@@ -58,7 +58,7 @@ export function ProfileScreen() {
               </XStack>
             ) : null}
           </YStack>
-        )}
+        ) : null}
       </YStack>
     </Container>
   )
