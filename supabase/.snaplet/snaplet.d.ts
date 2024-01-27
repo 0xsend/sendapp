@@ -6,12 +6,24 @@ type Enum_auth_aal_level = 'aal1' | 'aal2' | 'aal3';
 type Enum_auth_code_challenge_method = 'plain' | 's256';
 type Enum_auth_factor_status = 'unverified' | 'verified';
 type Enum_auth_factor_type = 'totp' | 'webauthn';
+type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgsodium_key_status = 'default' | 'expired' | 'invalid' | 'valid';
 type Enum_pgsodium_key_type = 'aead-det' | 'aead-ietf' | 'auth' | 'generichash' | 'hmacsha256' | 'hmacsha512' | 'kdf' | 'secretbox' | 'secretstream' | 'shorthash' | 'stream_xchacha20';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'passcheck';
+type Enum_public_key_type_enum = 'ES256';
 type Enum_public_tag_status = 'confirmed' | 'pending';
 type Enum_public_verification_type = 'tag_referral' | 'tag_registration';
+interface Table_net_http_response {
+  id: number | null;
+  status_code: number | null;
+  content_type: string | null;
+  headers: Json | null;
+  content: string | null;
+  timed_out: boolean | null;
+  error_msg: string | null;
+  created: string;
+}
 interface Table_auth_audit_log_entries {
   instance_id: string | null;
   id: string;
@@ -101,6 +113,21 @@ interface Table_auth_flow_state {
   updated_at: string | null;
   authentication_method: string;
 }
+interface Table_supabase_functions_hooks {
+  id: number;
+  hook_table_id: number;
+  hook_name: string;
+  created_at: string;
+  request_id: number | null;
+}
+interface Table_net_http_request_queue {
+  id: number;
+  method: string;
+  url: string;
+  headers: Json;
+  body: string | null;
+  timeout_milliseconds: number;
+}
 interface Table_auth_identities {
   id: string;
   user_id: string;
@@ -163,6 +190,10 @@ interface Table_storage_migrations {
   hash: string;
   executed_at: string | null;
 }
+interface Table_supabase_functions_migrations {
+  version: string;
+  inserted_at: string;
+}
 interface Table_storage_objects {
   id: string;
   bucket_id: string | null;
@@ -181,6 +212,7 @@ interface Table_public_profiles {
   name: string | null;
   about: string | null;
   referral_code: string | null;
+  is_public: boolean | null;
 }
 interface Table_public_receipts {
   hash: string;
@@ -242,6 +274,22 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
+}
+interface Table_public_send_account_credentials {
+  account_id: string;
+  credential_id: string;
+  key_slot: number;
+  created_at: string | null;
+}
+interface Table_public_send_accounts {
+  id: string;
+  user_id: string;
+  address: string;
+  chain_id: number;
+  init_code: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 interface Table_public_send_transfer_logs {
   from: string;
@@ -326,6 +374,26 @@ interface Table_auth_users {
   is_sso_user: boolean;
   deleted_at: string | null;
 }
+interface Table_public_webauthn_credentials {
+  id: string;
+  name: string;
+  display_name: string;
+  raw_credential_id: string;
+  user_id: string;
+  public_key: string;
+  key_type: Enum_public_key_type_enum;
+  sign_count: number;
+  attestation_object: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+interface Schema_analytics {
+
+}
+interface Schema_realtime {
+
+}
 interface Schema_auth {
   audit_log_entries: Table_auth_audit_log_entries;
   flow_state: Table_auth_flow_state;
@@ -355,6 +423,10 @@ interface Schema_graphql {
 interface Schema_graphql_public {
 
 }
+interface Schema_net {
+  _http_response: Table_net_http_response;
+  http_request_queue: Table_net_http_request_queue;
+}
 interface Schema_pgsodium {
   key: Table_pgsodium_key;
 }
@@ -373,10 +445,13 @@ interface Schema_public {
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
   referrals: Table_public_referrals;
+  send_account_credentials: Table_public_send_account_credentials;
+  send_accounts: Table_public_send_accounts;
   send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
   tags: Table_public_tags;
+  webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
 
@@ -386,6 +461,10 @@ interface Schema_storage {
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
 }
+interface Schema_supabase_functions {
+  hooks: Table_supabase_functions_hooks;
+  migrations: Table_supabase_functions_migrations;
+}
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
 }
@@ -393,27 +472,290 @@ interface Schema_vault {
   secrets: Table_vault_secrets;
 }
 interface Database {
+  _analytics: Schema__analytics;
+  _realtime: Schema__realtime;
   auth: Schema_auth;
   dbdev: Schema_dbdev;
   extensions: Schema_extensions;
   graphql: Schema_graphql;
   graphql_public: Schema_graphql_public;
+  net: Schema_net;
   pgsodium: Schema_pgsodium;
   pgsodium_masks: Schema_pgsodium_masks;
   pgtle: Schema_pgtle;
   public: Schema_public;
   realtime: Schema_realtime;
   storage: Schema_storage;
+  supabase_functions: Schema_supabase_functions;
   supabase_migrations: Schema_supabase_migrations;
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "pg_stat_statements" | "uuid-ossp" | "pgcrypto" | "pgjwt" | "http";
+  extensions: "uuid-ossp" | "pgcrypto" | "pgjwt" | "pg_trgm" | "pg_stat_statements" | "pg_net" | "http";
   graphql: "pg_graphql";
   pgsodium: "pgsodium";
   pgtle: "pg_tle";
   public: "supabase-dbdev" | "citext";
   vault: "supabase_vault";
+}
+interface Tables_relationships {
+  "storage.buckets": {
+    parent: {
+
+    };
+    children: {
+       objects_bucketId_fkey: "storage.objects";
+    };
+  };
+  "public.chain_addresses": {
+    parent: {
+       chain_addresses_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
+  "public.distribution_shares": {
+    parent: {
+       distribution_shares_user_id_fkey: "auth.users";
+       distribution_shares_distribution_id_fkey: "public.distributions";
+    };
+    children: {
+
+    };
+  };
+  "public.distribution_verification_values": {
+    parent: {
+       distribution_verification_values_distribution_id_fkey: "public.distributions";
+    };
+    children: {
+
+    };
+  };
+  "public.distribution_verifications": {
+    parent: {
+       distribution_verifications_user_id_fkey: "auth.users";
+       distribution_verifications_distribution_id_fkey: "public.distributions";
+    };
+    children: {
+
+    };
+  };
+  "public.distributions": {
+    parent: {
+
+    };
+    children: {
+       distribution_shares_distribution_id_fkey: "public.distribution_shares";
+       distribution_verification_values_distribution_id_fkey: "public.distribution_verification_values";
+       distribution_verifications_distribution_id_fkey: "public.distribution_verifications";
+    };
+  };
+  "auth.flow_state": {
+    parent: {
+
+    };
+    children: {
+       saml_relay_states_flow_state_id_fkey: "auth.saml_relay_states";
+    };
+  };
+  "auth.identities": {
+    parent: {
+       identities_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
+  "pgsodium.key": {
+    parent: {
+       key_parent_key_fkey: "pgsodium.key";
+    };
+    children: {
+       key_parent_key_fkey: "pgsodium.key";
+       secrets_key_id_fkey: "vault.secrets";
+    };
+  };
+  "auth.mfa_amr_claims": {
+    parent: {
+       mfa_amr_claims_session_id_fkey: "auth.sessions";
+    };
+    children: {
+
+    };
+  };
+  "auth.mfa_challenges": {
+    parent: {
+       mfa_challenges_auth_factor_id_fkey: "auth.mfa_factors";
+    };
+    children: {
+
+    };
+  };
+  "auth.mfa_factors": {
+    parent: {
+       mfa_factors_user_id_fkey: "auth.users";
+    };
+    children: {
+       mfa_challenges_auth_factor_id_fkey: "auth.mfa_challenges";
+    };
+  };
+  "storage.objects": {
+    parent: {
+       objects_bucketId_fkey: "storage.buckets";
+    };
+    children: {
+
+    };
+  };
+  "public.profiles": {
+    parent: {
+       profiles_id_fkey: "auth.users";
+    };
+    children: {
+       referrals_referred_id_fkey: "public.referrals";
+       referrals_referrer_id_fkey: "public.referrals";
+    };
+  };
+  "public.receipts": {
+    parent: {
+       receipts_user_id_fkey: "auth.users";
+    };
+    children: {
+       tag_receipts_hash_fkey: "public.tag_receipts";
+    };
+  };
+  "public.referrals": {
+    parent: {
+       referrals_referred_id_fkey: "public.profiles";
+       referrals_referrer_id_fkey: "public.profiles";
+       referrals_tag_fkey: "public.tags";
+    };
+    children: {
+
+    };
+  };
+  "auth.refresh_tokens": {
+    parent: {
+       refresh_tokens_session_id_fkey: "auth.sessions";
+    };
+    children: {
+
+    };
+  };
+  "auth.saml_providers": {
+    parent: {
+       saml_providers_sso_provider_id_fkey: "auth.sso_providers";
+    };
+    children: {
+
+    };
+  };
+  "auth.saml_relay_states": {
+    parent: {
+       saml_relay_states_flow_state_id_fkey: "auth.flow_state";
+       saml_relay_states_sso_provider_id_fkey: "auth.sso_providers";
+    };
+    children: {
+
+    };
+  };
+  "vault.secrets": {
+    parent: {
+       secrets_key_id_fkey: "pgsodium.key";
+    };
+    children: {
+
+    };
+  };
+  "public.send_account_credentials": {
+    parent: {
+       account_credentials_account_id_fkey: "public.send_accounts";
+       account_credentials_credential_id_fkey: "public.webauthn_credentials";
+    };
+    children: {
+
+    };
+  };
+  "public.send_accounts": {
+    parent: {
+       send_accounts_user_id_fkey: "auth.users";
+    };
+    children: {
+       account_credentials_account_id_fkey: "public.send_account_credentials";
+    };
+  };
+  "auth.sessions": {
+    parent: {
+       sessions_user_id_fkey: "auth.users";
+    };
+    children: {
+       mfa_amr_claims_session_id_fkey: "auth.mfa_amr_claims";
+       refresh_tokens_session_id_fkey: "auth.refresh_tokens";
+    };
+  };
+  "auth.sso_domains": {
+    parent: {
+       sso_domains_sso_provider_id_fkey: "auth.sso_providers";
+    };
+    children: {
+
+    };
+  };
+  "auth.sso_providers": {
+    parent: {
+
+    };
+    children: {
+       saml_providers_sso_provider_id_fkey: "auth.saml_providers";
+       saml_relay_states_sso_provider_id_fkey: "auth.saml_relay_states";
+       sso_domains_sso_provider_id_fkey: "auth.sso_domains";
+    };
+  };
+  "public.tag_receipts": {
+    parent: {
+       tag_receipts_hash_fkey: "public.receipts";
+       tag_receipts_tag_name_fkey: "public.tags";
+    };
+    children: {
+
+    };
+  };
+  "public.tags": {
+    parent: {
+       tags_user_id_fkey: "auth.users";
+    };
+    children: {
+       referrals_tag_fkey: "public.referrals";
+       tag_receipts_tag_name_fkey: "public.tag_receipts";
+    };
+  };
+  "auth.users": {
+    parent: {
+
+    };
+    children: {
+       identities_user_id_fkey: "auth.identities";
+       mfa_factors_user_id_fkey: "auth.mfa_factors";
+       sessions_user_id_fkey: "auth.sessions";
+       chain_addresses_user_id_fkey: "public.chain_addresses";
+       distribution_shares_user_id_fkey: "public.distribution_shares";
+       distribution_verifications_user_id_fkey: "public.distribution_verifications";
+       profiles_id_fkey: "public.profiles";
+       receipts_user_id_fkey: "public.receipts";
+       send_accounts_user_id_fkey: "public.send_accounts";
+       tags_user_id_fkey: "public.tags";
+       webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
+    };
+  };
+  "public.webauthn_credentials": {
+    parent: {
+       webauthn_credentials_user_id_fkey: "auth.users";
+    };
+    children: {
+       account_credentials_credential_id_fkey: "public.send_account_credentials";
+    };
+  };
 }
 //#endregion
 
@@ -631,6 +973,64 @@ type SubsetTarget<TSelectedTable extends SelectedTable> = {
   } & ExclusiveRowLimitPercent
 );
 
+type GetSelectedTableChildrenKeys<TTable extends keyof Tables_relationships> = keyof Tables_relationships[TTable]['children']
+type GetSelectedTableParentKeys<TTable extends keyof Tables_relationships> = keyof Tables_relationships[TTable]['parent']
+type GetSelectedTableRelationsKeys<TTable extends keyof Tables_relationships> = GetSelectedTableChildrenKeys<TTable> | GetSelectedTableParentKeys<TTable>
+type SelectedTablesWithRelationsIds<TSelectedTable extends SelectedTable['id']> = TSelectedTable extends keyof Tables_relationships ? TSelectedTable : never
+
+/**
+ * Represents the options to choose the followNullableRelations of subsetting.
+ */
+type FollowNullableRelationsOptions<TSelectedTable extends SelectedTable> =
+  // Type can be a global boolean definition
+  boolean
+  // Or can be a mix of $default and table specific definition
+  | { $default: boolean } & ({
+  // If it's a table specific definition and the table has relationships
+  [TTable in SelectedTablesWithRelationsIds<TSelectedTable["id"]>]?:
+    // It's either a boolean or a mix of $default and relationship specific definition
+    boolean |
+    {
+      [Key in GetSelectedTableRelationsKeys<TTable> | '$default']?:  boolean
+    }
+});
+
+
+/**
+ * Represents the options to choose the maxCyclesLoop of subsetting.
+ */
+type MaxCyclesLoopOptions<TSelectedTable extends SelectedTable> =
+// Type can be a global number definition
+number
+// Or can be a mix of $default and table specific definition
+| { $default: number } & ({
+  // If it's a table specific definition and the table has relationships
+  [TTable in SelectedTablesWithRelationsIds<TSelectedTable["id"]>]?:
+    // It's either a number or a mix of $default and relationship specific definition
+    number |
+    {
+      [Key in GetSelectedTableRelationsKeys<TTable> | '$default']?:  number
+    }
+});
+
+
+/**
+ * Represents the options to choose the maxChildrenPerNode of subsetting.
+ */
+type MaxChildrenPerNodeOptions<TSelectedTable extends SelectedTable> =
+// Type can be a global number definition
+number
+// Or can be a mix of $default and table specific definition
+| { $default: number } & ({
+  // If it's a table specific definition and the table has relationships
+  [TTable in SelectedTablesWithRelationsIds<TSelectedTable["id"]>]?:
+    // It's either a number or a mix of $default and relationship specific definition
+    number |
+    {
+      [Key in GetSelectedTableRelationsKeys<TTable> | '$default']?:  number
+    }
+});
+
 /**
  * Represents the configuration for subsetting the snapshot.
  */
@@ -665,18 +1065,19 @@ type SubsetConfig<TSelectedTable extends SelectedTable> = {
    * Specifies whether to follow nullable relations.
    * @defaultValue false
    */
-  followNullableRelations?: boolean;
+  followNullableRelations?: FollowNullableRelationsOptions<TSelectedTable>;
 
   /**
    *  Specifies the maximum number of children per node.
+   *  @defaultValue unlimited
    */
-  maxChildrenPerNode?: number;
+  maxChildrenPerNode?: MaxChildrenPerNodeOptions<TSelectedTable>;
 
   /**
    * Specifies the maximum number of cycles in a loop.
    * @defaultValue 10
    */
-  maxCyclesLoop?: number;
+  maxCyclesLoop?: MaxCyclesLoopOptions<TSelectedTable>;
 
   /**
    * Specifies the root targets for subsetting. Must be a non-empty array
@@ -737,12 +1138,11 @@ type TypedConfig<
   ? {
     /**
      * Parameter to configure the generation of data.
-     * {@link https://docs.snaplet.dev/core-concepts/generate}
+     * {@link https://docs.snaplet.dev/core-concepts/seed}
      */
-      generate?: {
+      seed?: {
         alias?: import("./snaplet-client").Alias;
-        models?: import("./snaplet-client").UserModels;
-        run: (snaplet: import("./snaplet-client").SnapletClient) => Promise<any>;
+        blueprint?: import("./snaplet-client").Blueprint;
       }
     /**
      * Parameter to configure the inclusion/exclusion of schemas and tables from the snapshot.
@@ -769,6 +1169,12 @@ type TypedConfig<
   : never;
 
 declare module "snaplet" {
+  class JsonNull {}
+  type JsonClass = typeof JsonNull;
+  /**
+   * Use this value to explicitely set a json or jsonb column to json null instead of the database NULL value.
+   */
+  export const jsonNull: InstanceType<JsonClass>;
   /**
   * Define the configuration for Snaplet capture process.
   * {@link https://docs.snaplet.dev/reference/configuration}

@@ -6,6 +6,7 @@
     "tilt-dev.tiltfile",
     "yoavbls.pretty-ts-errors",
     "dbaeumer.vscode-eslint",
-    "usernamehw.errorlens"
+    "usernamehw.errorlens",
+    "bradymholt.pgformatter"
   ]
 }

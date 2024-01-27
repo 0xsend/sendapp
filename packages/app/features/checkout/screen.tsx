@@ -23,7 +23,7 @@ import {
 } from '@my/ui'
 import { sendRevenueSafeAddress } from '@my/wagmi'
 import { AlertTriangle, Clock, Info, X, XCircle } from '@tamagui/lucide-icons'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
+import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
@@ -34,15 +34,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { PublicClient, formatEther, parseEther } from 'viem'
 import { z } from 'zod'
 import { ConfirmDialog } from './components/confirm-dialog'
-
-const CheckoutSchema = z.object({
-  name: formFields.text
-    .min(1)
-    .max(20)
-    // English alphabet, numbers, and underscore
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore')
-    .describe('Name // Your Send Tag name'),
-})
+import { CheckoutTagSchema } from './CheckoutTagSchema'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.`
@@ -112,7 +104,7 @@ export async function getSenderSafeReceivedEvents({
 
 export const CheckoutScreen = () => {
   const isTouch = useIsTouchDevice()
-  const form = useForm<z.infer<typeof CheckoutSchema>>()
+  const form = useForm<z.infer<typeof CheckoutTagSchema>>()
   const supabase = useSupabase()
   const toast = useToastController()
   const user = useUser()
@@ -124,7 +116,7 @@ export const CheckoutScreen = () => {
   const { data: addresses } = useChainAddresses()
   const [needsVerification, setNeedsVerification] = React.useState(false)
 
-  async function createSendTag({ name }: z.infer<typeof CheckoutSchema>) {
+  async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
     setNeedsVerification(false) // reset verification state
 
     if (!user.user) return console.error('No user')
@@ -200,7 +192,7 @@ export const CheckoutScreen = () => {
           <SchemaForm
             form={form}
             onSubmit={createSendTag}
-            schema={CheckoutSchema}
+            schema={CheckoutTagSchema}
             defaultValues={{
               name: '',
             }}
