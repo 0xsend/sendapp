@@ -72,13 +72,13 @@ export const SignInForm = () => {
           }}
           renderAfter={({ submit }) => (
             <>
-              <XStack jc={'flex-end'} ai={'center'}>
+              <XStack jc={'flex-end'} $sm={{ jc: 'center' }} ai={'center'}>
                 <SubmitButton
                   onPress={() => submit()}
                   br="$4"
                   bc={'$accent9Light'}
                   w={'$12'}
-                  $sm={{ width: '100%' }}
+                  $sm={{ width: '100%', maw: '200px' }}
                 >
                   <ButtonText
                     size={'$1'}

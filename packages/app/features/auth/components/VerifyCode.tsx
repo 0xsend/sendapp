@@ -53,13 +53,13 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         renderAfter={({ submit }) => (
           <>
             <Theme inverse>
-              <XStack jc={'space-between'} ai={'center'}>
+              <XStack jc={'space-between'} $sm={{ jc: 'center' }} ai={'center'}>
                 <SubmitButton
                   onPress={() => submit()}
                   borderRadius="$4"
                   backgroundColor={'$primary'}
                   width={'$12'}
-                  $sm={{ width: '$10' }}
+                  $sm={{ width: '100%', maw: '200px' }}
                 >
                   <Paragraph
                     size={'$1'}
