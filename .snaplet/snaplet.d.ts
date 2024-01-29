@@ -491,11 +491,11 @@ interface Database {
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "uuid-ossp" | "pgcrypto" | "pgjwt" | "pg_trgm" | "pg_stat_statements" | "pg_net" | "http";
+  extensions: "http" | "uuid-ossp" | "pgcrypto" | "pgjwt" | "pg_trgm" | "pg_stat_statements" | "pg_net";
   graphql: "pg_graphql";
   pgsodium: "pgsodium";
   pgtle: "pg_tle";
-  public: "supabase-dbdev" | "citext";
+  public: "citext" | "supabase-dbdev";
   vault: "supabase_vault";
 }
 interface Tables_relationships {
@@ -1142,7 +1142,7 @@ type TypedConfig<
      */
       seed?: {
         alias?: import("./snaplet-client").Alias;
-        blueprint?: import("./snaplet-client").Blueprint;
+        fingerprint?: import("./snaplet-client").Fingerprint;
       }
     /**
      * Parameter to configure the inclusion/exclusion of schemas and tables from the snapshot.

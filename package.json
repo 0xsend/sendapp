@@ -52,7 +52,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
-    "@biomejs/biome": "1.5.2",
+    "@biomejs/biome": "1.5.3",
     "lefthook": "^1.5.5"
   }
 }

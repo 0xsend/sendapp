@@ -16,16 +16,14 @@
     "migration:diff": "npx supabase db diff -f ",
     "start": "npx supabase start",
     "stop": "npx supabase stop",
-    "reset": "npx supabase db reset && npx snaplet snapshot restore --latest --no-reset && npx supabase start",
+    "reset": "npx supabase db reset && yarn workspace @my/snaplet snaplet snapshot restore --latest --no-reset && npx supabase start",
     "status": "npx supabase status",
     "_deploy": "yarn link-project && npx supabase db push",
     "deploy": "yarn _with-env yarn _deploy",
     "test": "npx supabase test db"
   },
   "devDependencies": {
-    "@snaplet/copycat": "^2.0.0",
     "dotenv-cli": "^6.0.0",
-    "snaplet": "^0.84.0",
     "supabase": "^1.99.0",
     "type-fest": "^4.3.1"
   }

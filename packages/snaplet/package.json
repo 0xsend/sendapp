@@ -1,0 +1,12 @@
+{
+  "name": "@my/snaplet",
+  "private": true,
+  "main": "src/index.ts",
+  "type": "module",
+  "packageManager": "yarn@4.0.2",
+  "devDependencies": {
+    "@snaplet/copycat": "^2.0.0",
+    "@snaplet/seed": "^0.85.0",
+    "snaplet": "^0.85.0"
+  }
+}
