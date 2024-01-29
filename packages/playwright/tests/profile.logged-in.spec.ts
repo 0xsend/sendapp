@@ -1,12 +1,11 @@
 import { expect, test as authTest } from './fixtures/auth'
-import { test as supawrightTest } from '@my/playwright/fixtures/supawright'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { debug, Debugger } from 'debug'
 import { OnboardingPage } from './fixtures/send-accounts'
 import { mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 
-const test = mergeTests(supawrightTest, snapletTest, authTest)
+const test = mergeTests(snapletTest, authTest)
 
 let log: Debugger
 
@@ -14,13 +13,17 @@ test.beforeAll(async () => {
   log = debug(`test:profile:anon:${test.info().workerIndex}`)
 })
 
-test('logged in user needs onboarding before visiting profile', async ({
-  page,
-  supawright,
-  seed,
-}) => {
-  // const { tag } = await createOtherUser(supawright)
-  const plan = await seed.tags([{ status: 'confirmed' }])
+test('logged in user needs onboarding before visiting profile', async ({ page, seed }) => {
+  const plan = await seed.users([
+    {
+      tags: [
+        {
+          status: 'confirmed',
+        },
+      ],
+      sendAccounts: [{}],
+    },
+  ])
   log(plan.tags)
   const tag = plan.tags[0]
   assert(!!tag, 'tag not found')

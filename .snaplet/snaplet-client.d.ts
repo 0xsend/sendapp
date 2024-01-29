@@ -27,16 +27,6 @@ type Override = {
       created?: string;
     };
   }
-  audit_log_entries?: {
-    name?: string;
-    fields?: {
-      instance_id?: string;
-      id?: string;
-      payload?: string;
-      created_at?: string;
-      ip_address?: string;
-    };
-  }
   buckets?: {
     name?: string;
     fields?: {
@@ -128,32 +118,6 @@ type Override = {
       distribution_verifications?: string;
     };
   }
-  feature_info?: {
-    name?: string;
-    fields?: {
-      feature?: string;
-      schema_name?: string;
-      proname?: string;
-      obj_identity?: string;
-    };
-  }
-  flow_state?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      user_id?: string;
-      auth_code?: string;
-      code_challenge_method?: string;
-      code_challenge?: string;
-      provider_type?: string;
-      provider_access_token?: string;
-      provider_refresh_token?: string;
-      created_at?: string;
-      updated_at?: string;
-      authentication_method?: string;
-      saml_relay_states?: string;
-    };
-  }
   hooks?: {
     name?: string;
     fields?: {
@@ -173,89 +137,6 @@ type Override = {
       headers?: string;
       body?: string;
       timeout_milliseconds?: string;
-    };
-  }
-  identities?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      user_id?: string;
-      identity_data?: string;
-      provider?: string;
-      last_sign_in_at?: string;
-      created_at?: string;
-      updated_at?: string;
-      email?: string;
-      users?: string;
-    };
-  }
-  instances?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      uuid?: string;
-      raw_base_config?: string;
-      created_at?: string;
-      updated_at?: string;
-    };
-  }
-  key?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      status?: string;
-      created?: string;
-      expires?: string;
-      key_type?: string;
-      key_id?: string;
-      key_context?: string;
-      name?: string;
-      associated_data?: string;
-      raw_key?: string;
-      raw_key_nonce?: string;
-      parent_key?: string;
-      comment?: string;
-      user_data?: string;
-      key?: string;
-      key?: string;
-      secrets?: string;
-    };
-  }
-  mfa_amr_claims?: {
-    name?: string;
-    fields?: {
-      session_id?: string;
-      created_at?: string;
-      updated_at?: string;
-      authentication_method?: string;
-      id?: string;
-      sessions?: string;
-    };
-  }
-  mfa_challenges?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      factor_id?: string;
-      created_at?: string;
-      verified_at?: string;
-      ip_address?: string;
-      mfa_factors?: string;
-    };
-  }
-  mfa_factors?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      user_id?: string;
-      friendly_name?: string;
-      factor_type?: string;
-      status?: string;
-      created_at?: string;
-      updated_at?: string;
-      secret?: string;
-      users?: string;
-      mfa_challenges?: string;
     };
   }
   storage_migrations?: {
@@ -327,51 +208,6 @@ type Override = {
       tags?: string;
     };
   }
-  refresh_tokens?: {
-    name?: string;
-    fields?: {
-      instance_id?: string;
-      id?: string;
-      token?: string;
-      user_id?: string;
-      revoked?: string;
-      created_at?: string;
-      updated_at?: string;
-      parent?: string;
-      session_id?: string;
-      sessions?: string;
-    };
-  }
-  saml_providers?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      sso_provider_id?: string;
-      entity_id?: string;
-      metadata_xml?: string;
-      metadata_url?: string;
-      attribute_mapping?: string;
-      created_at?: string;
-      updated_at?: string;
-      sso_providers?: string;
-    };
-  }
-  saml_relay_states?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      sso_provider_id?: string;
-      request_id?: string;
-      for_email?: string;
-      redirect_to?: string;
-      from_ip_address?: string;
-      created_at?: string;
-      updated_at?: string;
-      flow_state_id?: string;
-      flow_state?: string;
-      sso_providers?: string;
-    };
-  }
   auth_schema_migrations?: {
     name?: string;
     fields?: {
@@ -384,20 +220,6 @@ type Override = {
       version?: string;
       statements?: string;
       name?: string;
-    };
-  }
-  secrets?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      name?: string;
-      description?: string;
-      secret?: string;
-      key_id?: string;
-      nonce?: string;
-      created_at?: string;
-      updated_at?: string;
-      key?: string;
     };
   }
   send_account_credentials?: {
@@ -438,44 +260,6 @@ type Override = {
       tx_hash?: string;
       log_index?: string;
       created_at?: string;
-    };
-  }
-  sessions?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      user_id?: string;
-      created_at?: string;
-      updated_at?: string;
-      factor_id?: string;
-      aal?: string;
-      not_after?: string;
-      users?: string;
-      mfa_amr_claims?: string;
-      refresh_tokens?: string;
-    };
-  }
-  sso_domains?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      sso_provider_id?: string;
-      domain?: string;
-      created_at?: string;
-      updated_at?: string;
-      sso_providers?: string;
-    };
-  }
-  sso_providers?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      resource_id?: string;
-      created_at?: string;
-      updated_at?: string;
-      saml_providers?: string;
-      saml_relay_states?: string;
-      sso_domains?: string;
     };
   }
   tag_receipts?: {
@@ -544,9 +328,6 @@ type Override = {
       reauthentication_sent_at?: string;
       is_sso_user?: string;
       deleted_at?: string;
-      identities?: string;
-      mfa_factors?: string;
-      sessions?: string;
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
@@ -605,10 +386,6 @@ export interface Fingerprint {
     headers?: FingerprintJsonField;
     created?: FingerprintDateField;
   }
-  auditLogEntries?: {
-    payload?: FingerprintJsonField;
-    createdAt?: FingerprintDateField;
-  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
@@ -666,14 +443,6 @@ export interface Fingerprint {
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
   }
-  featureInfos?: {
-
-  }
-  flowStates?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    samlRelayStates?: FingerprintRelationField;
-  }
   hooks?: {
     id?: FingerprintNumberField;
     hookTableId?: FingerprintNumberField;
@@ -684,41 +453,6 @@ export interface Fingerprint {
     id?: FingerprintNumberField;
     headers?: FingerprintJsonField;
     timeoutMilliseconds?: FingerprintNumberField;
-  }
-  identities?: {
-    identityData?: FingerprintJsonField;
-    lastSignInAt?: FingerprintDateField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    user?: FingerprintRelationField;
-  }
-  instances?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-  }
-  keys?: {
-    created?: FingerprintDateField;
-    expires?: FingerprintDateField;
-    keyId?: FingerprintNumberField;
-    keysByParentKey?: FingerprintRelationField;
-    keysByParentKey?: FingerprintRelationField;
-    secrets?: FingerprintRelationField;
-  }
-  mfaAmrClaims?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    session?: FingerprintRelationField;
-  }
-  mfaChallenges?: {
-    createdAt?: FingerprintDateField;
-    verifiedAt?: FingerprintDateField;
-    factor?: FingerprintRelationField;
-  }
-  mfaFactors?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    user?: FingerprintRelationField;
-    mfaChallengesByFactorId?: FingerprintRelationField;
   }
   storageMigrations?: {
     id?: FingerprintNumberField;
@@ -750,34 +484,11 @@ export interface Fingerprint {
     referrer?: FingerprintRelationField;
     tagByTag?: FingerprintRelationField;
   }
-  refreshTokens?: {
-    id?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    session?: FingerprintRelationField;
-  }
-  samlProviders?: {
-    attributeMapping?: FingerprintJsonField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    ssoProvider?: FingerprintRelationField;
-  }
-  samlRelayStates?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    flowState?: FingerprintRelationField;
-    ssoProvider?: FingerprintRelationField;
-  }
   authSchemaMigrations?: {
 
   }
   supabaseMigrationsSchemaMigrations?: {
 
-  }
-  secrets?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    key?: FingerprintRelationField;
   }
   sendAccountCredentials?: {
     keySlot?: FingerprintNumberField;
@@ -799,26 +510,6 @@ export interface Fingerprint {
     blockTimestamp?: FingerprintDateField;
     logIndex?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
-  }
-  sessions?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    notAfter?: FingerprintDateField;
-    user?: FingerprintRelationField;
-    mfaAmrClaims?: FingerprintRelationField;
-    refreshTokens?: FingerprintRelationField;
-  }
-  ssoDomains?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    ssoProvider?: FingerprintRelationField;
-  }
-  ssoProviders?: {
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
-    samlProviders?: FingerprintRelationField;
-    samlRelayStates?: FingerprintRelationField;
-    ssoDomains?: FingerprintRelationField;
   }
   tagReceipts?: {
     ha?: FingerprintRelationField;
@@ -851,9 +542,6 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
-    identities?: FingerprintRelationField;
-    mfaFactors?: FingerprintRelationField;
-    sessions?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
