@@ -1,61 +1,18 @@
-import {
-  Avatar,
-  Button,
-  Container,
-  Image,
-  Link,
-  Paragraph,
-  Theme,
-  XStack,
-  YStack,
-  Label,
-} from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'solito/router'
-import { IconClose } from 'app/components/icons'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { Avatar, Button, Container, Paragraph, XStack, YStack, Label } from '@my/ui'
+import { SchemaForm } from 'app/utils/SchemaForm'
+import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
 import { useUser } from 'app/utils/useUser'
-import { useForm } from 'react-hook-form'
 import { SolitoImage } from 'solito/image'
-import { z } from 'zod'
 import { UploadAvatar } from '../uploadProfileImage/screen'
-
-const ProfileSchema = z.object({
-  name: formFields.text.describe('Name'),
-  about: formFields.textarea.describe('About'),
-  isPublic: formFields.boolean_checkbox.describe('IsPublic'),
-})
 
 export const EditProfile = () => {
   const { profile, user } = useUser()
-  const supabase = useSupabase()
-  const router = useRouter()
   const name = profile?.name
   const about = profile?.about
   const isPublic = profile?.is_public
   const userID = user?.id
   const avatar_url = profile?.avatar_url
-  const queryClient = useQueryClient()
-  const form = useForm<z.infer<typeof ProfileSchema>>()
-  const { resolvedTheme } = useThemeSetting()
-  const mutation = useMutation({
-    async mutationFn(data: z.infer<typeof ProfileSchema>) {
-      await supabase
-        .from('profiles')
-        .update({
-          name: data.name,
-          about: data.about,
-          is_public: data.isPublic,
-        })
-        .eq('id', userID ? userID : '')
-    },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['profile'])
-      router.push('/settings')
-    },
-  })
+  const mutation = useEditProfileMutation(userID)
 
   return (
     <Container>
