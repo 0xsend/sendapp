@@ -12,11 +12,11 @@
   },
   "chain_addresses": { "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } } },
   "distribution_shares": {
-    "id": { "options": { "min": 2371987, "max": 3852928 } },
+    "id": { "options": { "min": 1, "max": 5788463 } },
     "amount": { "options": { "min": 96237, "max": 74752954 } },
     "hodler_pool_amount": { "options": { "min": 96237, "max": 64914760 } },
     "bonus_pool_amount": { "options": { "min": 0, "max": 26161590 } },
-    "fixed_pool_amount": { "options": { "min": 10000, "max": 50000 } },
+    "fixed_pool_amount": { "options": { "min": 10000, "max": 60000 } },
     "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
     "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
   },
@@ -83,7 +83,7 @@
   "mfa_amr_claims": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
   "mfa_challenges": { "created_at": { "options": {} }, "verified_at": { "options": {} } },
   "mfa_factors": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
-  "storage_migrations": { "executed_at": { "options": { "minYear": 2023, "maxYear": 2023 } } },
+  "storage_migrations": { "executed_at": { "options": { "minYear": 2024, "maxYear": 2024 } } },
   "supabase_functions_migrations": {
     "inserted_at": { "options": { "minYear": 2024, "maxYear": 2024 } }
   },
@@ -141,7 +141,7 @@
   },
   "send_transfer_logs": {
     "value": { "options": { "min": 1, "max": 100000000000 } },
-    "block_number": { "options": { "min": 17579999, "max": 19020453 } },
+    "block_number": { "options": { "min": 17579999, "max": 19059449 } },
     "block_timestamp": { "options": { "minYear": 2023, "maxYear": 2024 } },
     "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
   },
@@ -196,7 +196,7 @@
     "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
     "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
     "phone_confirmed_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
-    "phone_change_sent_at": { "options": { "minYear": 2023, "maxYear": 2023 } },
+    "phone_change_sent_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
     "confirmed_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
     "email_change_confirm_status": { "options": { "min": 0, "max": 0 } },
     "banned_until": { "options": {} },
