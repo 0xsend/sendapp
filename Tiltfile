@@ -104,6 +104,21 @@ local_resource(
     ),
 )
 
+local_resource(
+    "snaplet:generate",
+    "npx snaplet generate",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "supabase",
+    ],
+    deps = files_matching(
+        os.path.join("supabase", "migrations"),
+        lambda f: f.endswith(".sql"),
+    ),
+)
+
 ui_theme_dir = os.path.join("packages", "ui", "src", "themes")
 
 ui_theme_files = files_matching(
