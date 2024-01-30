@@ -1,56 +1,51 @@
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.tags_before_insert_or_update_func()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$ BEGIN
-
-    RAISE NOTICE 'current role is %', current_setting('role')::text;
-
+create or replace function public.tags_before_insert_or_update_func()
+    returns trigger
+    language plpgsql
+    security definer
+    set search_path to 'public'
+    as $function$
+begin
     -- Ensure users can only insert or update their own tags
-    IF NEW.user_id <> auth.uid() THEN RAISE EXCEPTION 'Users can only create or modify tags for themselves';
+    if new.user_id <> auth.uid() then
+        raise exception 'Users can only create or modify tags for themselves';
 
-    END IF;
+    end if;
+    -- Ensure user is not changing their confirmed tag name
+    if new.status = 'confirmed'::public.tag_status and old.name <> new.name and
+	current_setting('role')::text = 'authenticated' then
+        raise exception 'Users cannot change the name of a confirmed tag';
 
--- Ensure user is not changing their confirmed tag name
-    IF NEW.status = 'confirmed'::public.tag_status
-        AND OLD.name <> NEW.name
-        AND current_setting('role')::text = 'authenticated' THEN RAISE EXCEPTION 'Users cannot change the name of a confirmed tag';
+    end if;
+    -- Ensure user is not confirming their own tag
+    if new.status = 'confirmed'::public.tag_status and current_setting('role')::text =
+	'authenticated' then
+        raise exception 'Users cannot confirm their own tags';
 
-    END IF;
+    end if;
+    -- Ensure no existing pending tag with same name within the last 30 minutes by another user
+    if exists(
+        select
+            1
+        from
+            public.tags
+        where
+            name = new.name
+            and status = 'pending'::public.tag_status
+            and(NOW() - created_at) < INTERVAL '30 minutes'
+            and user_id != new.user_id) then
+    raise exception 'Tag with same name already exists';
 
--- Ensure user is not confirming their own tag
-    IF NEW.status = 'confirmed'::public.tag_status
-        AND current_setting('role')::text = 'authenticated' THEN RAISE EXCEPTION 'Users cannot confirm their own tags';
+end if;
+    -- Delete older pending tags if they belong to the same user, to avoid duplicates
+    delete from public.tags
+    where name = new.name
+        and user_id != new.user_id
+        and status = 'pending'::public.tag_status;
+    -- Return the new record to be inserted or updated
+    return NEW;
 
-    END IF;
+end;
 
--- Ensure no existing pending tag with same name within the last 30 minutes by another user
-    IF EXISTS (
-        SELECT 1
-        FROM public.tags
-        WHERE name = NEW.name
-          AND status = 'pending'::public.tag_status
-          AND (NOW() - created_at) < INTERVAL '30 minutes'
-          AND user_id != NEW.user_id
-    ) THEN RAISE EXCEPTION 'Tag with same name already exists';
-
-    END IF;
-
--- Delete older pending tags if they belong to the same user, to avoid duplicates
-    DELETE FROM public.tags
-    WHERE name = NEW.name
-      AND user_id != NEW.user_id
-      AND status = 'pending'::public.tag_status;
-
--- Return the new record to be inserted or updated
-    RETURN NEW;
-
-END;
-
-$function$
-;
-
-
+$function$;
