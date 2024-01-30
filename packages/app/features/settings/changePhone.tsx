@@ -49,7 +49,7 @@ export const ChangePhoneScreen = () => {
       <YStack w={'100%'} ai={'center'}>
         <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'}>
           <Paragraph size={'$9'} fontWeight={'700'}>
-            Change Phone No
+            Change Phone Number
           </Paragraph>
         </XStack>
         <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
