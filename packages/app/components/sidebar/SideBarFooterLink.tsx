@@ -8,7 +8,7 @@ export const SideBarFooterLink = ({
 }: { icon?: ReactElement; text?: string } & Omit<LinkProps, 'children'>): ReactElement => {
   return (
     <Link {...props}>
-      <Button borderRadius={9999} backgroundColor={'$gold6'}>
+      <Button borderRadius={9999}>
         <ButtonIcon>{icon}</ButtonIcon>
       </Button>
     </Link>
