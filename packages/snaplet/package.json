@@ -7,9 +7,11 @@
   "devDependencies": {
     "@snaplet/copycat": "^2.0.0",
     "@snaplet/seed": "^0.85.0",
+    "@types/pg": "^8",
     "snaplet": "^0.85.0"
   },
   "dependencies": {
+    "pg": "^8.11.3",
     "viem": "^1.21.1"
   }
 }

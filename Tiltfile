@@ -221,12 +221,25 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "yarn workspace @my/supabase reset && yarn snaplet:seed && yarn workspace @my/supabase generate",
+        "yarn workspace @my/supabase reset && yarn workspace @my/supabase generate",
     ],
     icon_name = "restart_alt",
     location = location.NAV,
     resource = "supabase",
     text = "supabase db reset",
+)
+
+cmd_button(
+    "snaplet:seed",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn snaplet:seed",
+    ],
+    icon_name = "delete_forever",
+    location = location.NAV,
+    resource = "supabase",
+    text = "snaplet seed",
 )
 
 mainnet_fork_block_number = str(local(

@@ -5618,6 +5618,8 @@ __metadata:
   dependencies:
     "@snaplet/copycat": "npm:^2.0.0"
     "@snaplet/seed": "npm:^0.85.0"
+    "@types/pg": "npm:^8"
+    pg: "npm:^8.11.3"
     snaplet: "npm:^0.85.0"
     viem: "npm:^1.21.1"
   languageName: unknown
