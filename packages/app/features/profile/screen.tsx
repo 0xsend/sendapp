@@ -1,6 +1,7 @@
 import {
   Adapt,
   Avatar,
+  AvatarProps,
   Button,
   Container,
   Dialog,
@@ -19,10 +20,10 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { useState } from 'react'
 import { createParam } from 'solito'
-import { GradientButton, SendRequestModal } from '../send/components/modal'
+import { GradientButton } from '../send/components/modal'
 import { IconClose } from 'app/components/icons'
-import { SendButton } from 'app/components/layout/footer/components/SendButton'
-import { QRScreen, ANIMATE_DIRECTION_RIGHT } from '../send/types'
+import { TransferProvider, useTransferContext } from '../send/providers'
+import { NumPad } from '../send/components/numpad'
 
 const { useParam } = createParam<{ tag: string }>()
 
@@ -35,27 +36,13 @@ export function ProfileScreen() {
   return (
     <Container>
       <YStack f={1} gap="$6">
-        {error && <Text color="$orange10">{error.message}</Text>}
+        {error && <Text theme="error">{error.message}</Text>}
         {isLoading && <Spinner size="large" color="$color10" />}
         {profile ? (
           <YStack width="100%" gap="$2">
-            <Avatar testID="avatar" size="$16" br="$4" gap="$2" mx="auto" $gtSm={{ mx: '0' }}>
-              <Avatar.Image
-                testID="avatarImage"
-                accessibilityLabel={profile.name}
-                accessibilityRole="image"
-                accessible
-                src={
-                  profile.avatar_url ??
-                  `https://ui-avatars.com/api.jpg?name=${profile.name ?? '??'}&size=256`
-                }
-              />
-              <Avatar.Fallback bc="$background">??</Avatar.Fallback>
-            </Avatar>
-            <H1 nativeID="profileName">{profile.name}</H1>
+            <AvatarProfile profile={profile} /> <H1 nativeID="profileName">{profile.name}</H1>
             <H2 theme="alt1">@{tag}</H2>
             <Paragraph mb="$4">{profile.about}</Paragraph>
-
             {profile && user?.id !== profile?.id ? (
               <XStack jc="space-around" gap="$6" maxWidth={600}>
                 <Button
@@ -91,12 +78,34 @@ export function ProfileScreen() {
   )
 }
 
+type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
+
+function AvatarProfile({ profile, ...rest }: AvatarProps & { profile: ProfileProp }) {
+  return (
+    <Avatar testID="avatar" size="$8" br="$4" gap="$2" mx="auto" $gtSm={{ mx: '0' }} {...rest}>
+      <Avatar.Image
+        testID="avatarImage"
+        accessibilityLabel={profile.name ?? '??'}
+        accessibilityRole="image"
+        accessible
+        src={
+          profile.avatar_url ??
+          `https://ui-avatars.com/api.jpg?name=${profile.name ?? '??'}&size=256`
+        }
+      />
+      <Avatar.Fallback bc="$backgroundFocus" f={1} justifyContent="center" alignItems="center">
+        <SizableText size="$12">??</SizableText>
+      </Avatar.Fallback>
+    </Avatar>
+  )
+}
+
 function SendModal({
   profile,
   showModal,
   setShowModal,
 }: {
-  profile: NonNullable<ReturnType<typeof useProfileLookup>['data']>
+  profile: ProfileProp
   showModal: boolean
   setShowModal: (show: boolean) => void
 }) {
@@ -149,136 +158,69 @@ function SendModal({
           px={'$7'}
           fullscreen
         >
-          <YStack ai={'center'}>
-            <YStack
-              backgroundColor={'$background'}
-              p={'$7'}
-              borderRadius={'$10'}
-              $shorter={{
-                px: '$6',
-                py: '$5',
-              }}
-            >
-              <XStack jc={'space-between'}>
-                <Avatar
-                  width={'$12'}
-                  height={'$12'}
-                  borderRadius={'$6'}
-                  $shorter={{
-                    width: '$10',
-                    height: '$10',
-                  }}
-                >
-                  {profile.avatar_url ? (
-                    <Avatar.Image src={profile.avatar_url} />
-                  ) : (
-                    <Avatar.Fallback>??</Avatar.Fallback>
-                  )}
-                </Avatar>
-                {/* TODO: Place QR-Code img here instead of XStack */}
-                <XStack
-                  width={'$12'}
-                  height={'$12'}
-                  borderWidth={1}
-                  borderColor={'$primary'}
-                  borderRadius={'$6'}
-                  $shorter={{
-                    width: '$10',
-                    height: '$10',
-                  }}
-                />
-              </XStack>
-              <SizableText
-                mt={'$8'}
-                textAlign={'center'}
-                fontSize={'$9'}
-                fontWeight={'700'}
-                $shorter={{
-                  mt: '$5',
-                }}
-              >
-                {profile.name}
-              </SizableText>
-              <SizableText
-                mt={'$5'}
-                textAlign={'center'}
-                fontSize={'$6'}
-                color={'$primary'}
-                $shorter={{
-                  mt: '$3',
-                }}
-              >
-                @{profile.tag_name}
-              </SizableText>
-              <SizableText
-                mt={'$6'}
-                textAlign={'center'}
-                fontSize={'$3'}
-                theme={'alt1'}
-                fontWeight={'400'}
-                $shorter={{
-                  mt: '$4',
-                }}
-              >
-                {profile.about}
-              </SizableText>
-              <YStack
-                mt={'$7'}
-                gap={'$3.5'}
-                $shorter={{
-                  mt: '$5',
-                }}
-              >
-                <SendButton
-                  height={'$5'}
-                  borderRadius={'$6'}
-                  iconHeight={12}
-                  blackIcon
-                  // onPress={() =>
-                  // setCurrentComponent([QRScreen.QR_AMOUNT, ANIMATE_DIRECTION_RIGHT, 'Send'])
-                  // }
-                />
-                <GradientButton
-                  height={'$5'}
-                  borderRadius={'$6'}
-                  // onPress={() =>
-                  // setCurrentComponent([QRScreen.QR_AMOUNT, ANIMATE_DIRECTION_RIGHT, 'Request'])
-                  // }
-                >
-                  <SizableText
-                    size={'$5'}
-                    fontWeight={'700'}
-                    // color={resolvedTheme === 'dark' ? '$color2' : '$color12'}
-                  >
-                    Request
-                  </SizableText>
-                </GradientButton>
-                <Button
-                  height={'$5'}
-                  br={'$6'}
-                  bc={'$background05'}
-                  boc={'$primary'}
-                  width={'100%'}
-                  $shorter={{
-                    py: '$5',
-                    br: '$7',
-                  }}
-                  // onPress={() => setShowProfileModal(true)}
-                >
-                  <SizableText size={'$5'} fontWeight={'700'}>
-                    + Favorite
-                  </SizableText>
-                </Button>
-              </YStack>
-            </YStack>
-            <Dialog.Close asChild displayWhenAdapted>
-              <Button size="$2.5" circular bg={'unset'} pos={'absolute'} bottom={'$-9'}>
-                <IconClose opacity={0.5} />
-              </Button>
-            </Dialog.Close>
-          </YStack>
+          <TransferProvider>
+            <SendDialog profile={profile} />
+          </TransferProvider>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog>
+  )
+}
+
+function SendDialog({ profile }: { profile: ProfileProp }) {
+  const { currentToken, sendAmount, setSendAmount } = useTransferContext()
+
+  return (
+    <>
+      <Dialog.Close asChild displayWhenAdapted>
+        <Button size="$2.5" circular bg={'unset'} /* pos={'absolute'} bottom={'$-9'} */>
+          <IconClose opacity={0.5} />
+        </Button>
+      </Dialog.Close>
+      <YStack f={1} gap="$5">
+        <XStack jc="space-between" ai="center">
+          <XStack ai="center" gap="$2">
+            <Dialog.Title>
+              <SizableText size="$13" fontWeight="bold">
+                Send
+              </SizableText>
+            </Dialog.Title>
+          </XStack>
+          <GradientButton
+            onPress={() => {
+              // setCurrentComponent(QRScreen, ANIMATE_DIRECTION_RIGHT)
+            }}
+            // title="Next"
+          >
+            Next
+          </GradientButton>
+        </XStack>
+        <Dialog.Description>
+          <XStack ai="center" gap="$5">
+            <AvatarProfile profile={profile} />
+            <SizableText size="$12" fontWeight="bold">
+              {profile.name}
+            </SizableText>
+          </XStack>
+          <XStack ai="center" gap="$5">
+            <XStack ai="center" gap="$2">
+              {currentToken?.icon}
+              <SizableText size="$12" fontWeight="bold">
+                {currentToken?.name}
+              </SizableText>
+            </XStack>
+            <XStack ai="center" gap="$2">
+              <SizableText size="$12" fontWeight="bold">
+                {sendAmount}
+              </SizableText>
+              <SizableText size="$12" fontWeight="bold">
+                {currentToken?.name}
+              </SizableText>
+            </XStack>
+          </XStack>
+        </Dialog.Description>
+        <NumPad value={sendAmount} setValue={setSendAmount} />
+      </YStack>
+    </>
   )
 }

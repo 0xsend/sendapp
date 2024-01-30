@@ -42,17 +42,17 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
               "borderTopRightRadius": 9,
               "flexDirection": "column",
               "gap": 7,
-              "height": 224,
+              "height": 84,
               "justifyContent": "center",
               "marginLeft": "auto",
               "marginRight": "auto",
-              "maxHeight": 224,
-              "maxWidth": 224,
-              "minHeight": 224,
-              "minWidth": 224,
+              "maxHeight": 84,
+              "maxWidth": 84,
+              "minHeight": 84,
+              "minWidth": 84,
               "overflow": "hidden",
               "position": "relative",
-              "width": 224,
+              "width": 84,
             }
           }
           testID="avatar"
@@ -84,8 +84,8 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
               }
               style={
                 {
-                  "height": 224,
-                  "width": 224,
+                  "height": 84,
+                  "width": 84,
                 }
               }
               testID="avatarImage"
@@ -94,9 +94,12 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           <View
             style={
               {
-                "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                "alignItems": "center",
+                "backgroundColor": "hsla(191, 32%, 24%, 1)",
                 "bottom": 0,
+                "flex": 1,
                 "flexDirection": "column",
+                "justifyContent": "center",
                 "left": 0,
                 "position": "absolute",
                 "right": 0,
@@ -105,9 +108,23 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
               }
             }
           >
-            ??
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 59%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 74.39999999999999,
+                  "fontWeight": "600",
+                  "lineHeight": 67,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              ??
+            </Text>
           </View>
         </View>
+         
         <Text
           accessibilityRole="header"
           nativeID="profileName"
