@@ -4,7 +4,7 @@ import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
 import { ColorTokens } from '@my/ui/types'
 
 const Send = (props: IconProps) => {
-  const { size, color } = props
+  const { size, color, ...rest } = props
   return (
     <Svg
       width={size ?? 40}
@@ -12,6 +12,7 @@ const Send = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       viewBox="0 0 40 40"
       fill="none"
+      {...rest}
     >
       <G clip-path="url(#clip0_563_1426)">
         <Path

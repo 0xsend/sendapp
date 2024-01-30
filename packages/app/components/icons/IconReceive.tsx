@@ -13,6 +13,7 @@ const Receive = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       viewBox="0 0 42 42"
       fill="none"
+      {...rest}
     >
       <Path
         d="M41 21C41 32.0457 32.0457 41 21 41C9.9543 41 1 32.0457 1 21C1 9.9543 9.9543 1 21 1"

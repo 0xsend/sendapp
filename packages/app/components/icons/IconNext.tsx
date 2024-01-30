@@ -12,6 +12,7 @@ const Next = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       viewBox="0 0 24 24"
       fill="none"
+      {...rest}
     >
       <Path
         d="M7.79999 19.2L16.8 12L7.79999 4.79995"

@@ -12,6 +12,7 @@ const Security = (props: IconProps) => {
       color={color as ColorTokens | undefined}
       viewBox="0 0 18 20"
       fill="none"
+      {...rest}
     >
       <Path
         fillRule="evenodd"
