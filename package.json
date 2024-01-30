@@ -29,7 +29,8 @@
     "wagmi": "yarn workspace @my/wagmi",
     "next-app": "yarn workspace next-app",
     "playwright": "yarn workspace @my/playwright",
-    "distributor": "yarn workspace distributor"
+    "distributor": "yarn workspace distributor",
+    "snaplet:seed": "DRY=0 npx tsx ./packages/snaplet/seed.mts"
   },
   "resolutions": {
     "react": "^18.2.0",

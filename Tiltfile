@@ -221,7 +221,7 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "cd supabase && yarn run reset && yarn run generate",
+        "yarn workspace @my/supabase reset && yarn snaplet:seed && yarn workspace @my/supabase generate",
     ],
     icon_name = "restart_alt",
     location = location.NAV,

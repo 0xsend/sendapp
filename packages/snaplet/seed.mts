@@ -22,12 +22,30 @@ import { copycat } from '@snaplet/copycat'
 
   await seed.users([
     {
-      id: '00000000-0000-0000-0000-000000000000',
       tags: [
         {
+          name: 'jane',
+          status: 'confirmed',
+        },
+        {
+          name: '0xjane',
           status: 'confirmed',
         },
       ],
+      sendAccounts: [{}],
+    },
+    {
+      tags: [
+        {
+          name: 'john',
+          status: 'confirmed',
+        },
+        {
+          name: '0xjohn',
+          status: 'confirmed',
+        },
+      ],
+      sendAccounts: [{}],
     },
   ])
 
