@@ -63,9 +63,9 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
 
 export function useProtectedRoute(user: User | null) {
   const segments = useSegments()
-
+  const firstSegment = segments[0]
   useEffect(() => {
-    const inAuthGroup = segments[0] === '(auth)'
+    const inAuthGroup = firstSegment === '(auth)'
 
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
@@ -78,7 +78,7 @@ export function useProtectedRoute(user: User | null) {
       // Redirect away from the sign-in page.
       replaceRoute('/')
     }
-  }, [user, segments])
+  }, [user, firstSegment])
 }
 
 /**

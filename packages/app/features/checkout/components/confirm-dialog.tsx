@@ -270,7 +270,7 @@ export function ConfirmFlow() {
   if (!isLoadingRpcChainId && rpcChainId !== publicClient.chain.id) {
     return (
       <ConfirmDialogContent>
-        <Dialog.Description theme="orange">
+        <Dialog.Description theme="error">
           😵 Tell a dev! This should not happen. RPC chain id {rpcChainId} does not match public
           client chain id: {publicClient.chain.id}.
         </Dialog.Description>
@@ -327,7 +327,7 @@ export function ConfirmFlow() {
         <Dialog.Description>
           Please switch to {publicClient.chain.name} in your wallet.
         </Dialog.Description>
-        <Theme name="orange">
+        <Theme name="error">
           <Button onPress={() => switchNetwork?.()}>Switch Network</Button>
         </Theme>
       </ConfirmDialogContent>
@@ -356,8 +356,8 @@ export function ConfirmWithVerifiedAddress() {
   const { signMessageAsync, error: signMsgErr } = useSignMessage({
     message: verifyAddressMsg(connectedAddress ?? ''),
   })
-  // this only works cause we limit to 1 address
-  const savedAddress = useMemo(() => addresses?.[0]?.address, [addresses])
+  const address = addresses?.[0]?.address // this only works cause we limit to 1 address
+  const savedAddress = useMemo(() => address, [address])
   const [error, setError] = useState<string>()
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: run when connectedAddress changes
