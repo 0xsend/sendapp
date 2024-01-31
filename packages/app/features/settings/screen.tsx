@@ -10,6 +10,7 @@ import {
   Theme,
   XStack,
   YStack,
+  useToastController,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import {
@@ -27,6 +28,7 @@ import {
   IconTelegram,
   IconTheme,
 } from 'app/components/icons'
+import { getReferralHref } from 'app/utils/getReferralLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { useEffect, useState } from 'react'
@@ -38,9 +40,11 @@ export function SettingsScreen() {
   const code = profile?.referral_code
   const about = profile?.about
   const avatar_url = profile?.avatar_url
+  const referralHref = getReferralHref(code ?? '')
   const supabase = useSupabase()
   const { toggle, current } = useThemeSetting()
   const [mode, setMode] = useState('')
+  const toast = useToastController()
 
   useEffect(() => {
     setMode(current ? current : '')
@@ -169,7 +173,25 @@ export function SettingsScreen() {
             shadowRadius={8}
             shadowOpacity={0.1}
           >
-            <XStack h={'inherit'} ai="center" padding={'$5'} paddingRight={'$3'}>
+            <XStack
+              h={'inherit'}
+              ai="center"
+              padding={'$5'}
+              paddingRight={'$3'}
+              onPress={() => {
+                if (code) {
+                  try {
+                    // write the referral link to clipboard
+                    // @TODO: implement a native clipboard solution
+                    navigator.clipboard.writeText(referralHref)
+                  } catch (e) {
+                    console.warn(e)
+                    prompt('Copy to clipboard: Ctrl+C, Enter', referralHref)
+                  }
+                  toast.show('Copied your referral link to clipboard')
+                }
+              }}
+            >
               <IconReferral />
               <YStack f={1}>
                 <XStack f={1} h={'Inherit'} paddingLeft={'$3'}>
