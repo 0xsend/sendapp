@@ -17,7 +17,7 @@ export const useEditProfileMutation = (userID: string | undefined) => {
 
   return useMutation({
     async mutationFn(data: z.infer<typeof ProfileSchema>) {
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({
           name: data.name,
@@ -25,6 +25,9 @@ export const useEditProfileMutation = (userID: string | undefined) => {
           is_public: data.isPublic,
         })
         .eq('id', userID ? userID : '')
+      if (error) {
+        console.error(error.message)
+      }
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['profile'])
