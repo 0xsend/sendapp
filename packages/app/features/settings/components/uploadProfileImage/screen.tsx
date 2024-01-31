@@ -64,19 +64,18 @@ export const UploadAvatar = ({ children }: { children: React.ReactNode }) => {
       // console.log(result.error)
       // throw new Error(result.error.message)
     }
-    try {
-      const publicUrlRes = await supabase.storage
-        .from('avatars')
-        .getPublicUrl(result.data.path.replace('avatars/', ''))
+    const publicUrlRes = await supabase.storage
+      .from('avatars')
+      .getPublicUrl(result.data.path.replace('avatars/', ''))
 
-      await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrlRes.data.publicUrl })
-        .eq('id', user.id)
-      await updateProfile()
-    } catch (err) {
-      console.error(err)
+    const { error: update_error } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrlRes.data.publicUrl })
+      .eq('id', user.id)
+    if (update_error) {
+      setErrMsg(update_error.message)
     }
+    await updateProfile()
   }
 
   return (
