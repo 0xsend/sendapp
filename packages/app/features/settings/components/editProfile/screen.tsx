@@ -1,4 +1,4 @@
-import { Avatar, Button, Container, Paragraph, XStack, YStack, Label } from '@my/ui'
+import { Avatar, Button, Container, Paragraph, XStack, YStack, Label, SubmitButton } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
 import { useUser } from 'app/utils/useUser'
@@ -53,9 +53,9 @@ export const EditProfile = () => {
                 $lg={{ flexDirection: 'column' }}
                 $gtLg={{ flexDirection: 'row' }}
               >
-                <Button f={1} marginTop={'$5'} onPress={() => submit()}>
+                <SubmitButton f={1} marginTop={'$5'} onPress={() => submit()}>
                   Update Profile
-                </Button>
+                </SubmitButton>
               </XStack>
             )}
           >

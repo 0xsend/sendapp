@@ -87,9 +87,9 @@ export const ChangePhoneScreen = () => {
                     $lg={{ flexDirection: 'column' }}
                     $gtLg={{ flexDirection: 'row' }}
                   >
-                    <Button f={1} marginTop={'$5'} onPress={() => submit()}>
+                    <SubmitButton f={1} marginTop={'$5'} onPress={() => submit()}>
                       Update Phone
-                    </Button>
+                    </SubmitButton>
                   </XStack>
                 )}
               >
