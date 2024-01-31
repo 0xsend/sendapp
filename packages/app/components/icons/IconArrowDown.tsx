@@ -3,7 +3,6 @@ import { memo } from 'react'
 import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 import { ColorTokens } from '@my/ui/types'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ArrowDown = (props: IconProps) => {
   const { size, color, ...rest } = props
 

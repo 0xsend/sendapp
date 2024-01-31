@@ -3,7 +3,6 @@ import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 import { ColorTokens } from '@my/ui/types'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Receive = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (

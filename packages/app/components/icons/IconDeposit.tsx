@@ -3,7 +3,6 @@ import { memo } from 'react'
 import { Circle, Path, Svg } from 'react-native-svg'
 import { ColorTokens } from '@my/ui/types'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Deposit = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
