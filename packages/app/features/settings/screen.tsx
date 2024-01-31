@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Card,
   Container,
@@ -96,13 +97,7 @@ export function SettingsScreen() {
 
   return (
     <>
-      <YStack
-        $gtLg={{ width: '100%' }}
-        $sm={{ width: '100%' }}
-        $gtSm={{ width: '100%' }}
-        ai={'center'}
-        gap={'$space.6'}
-      >
+      <YStack width={'100%'} ai={'center'} gap={'$space.6'}>
         <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'}>
           <Paragraph size={'$9'} fontWeight={'700'}>
             Account
@@ -132,7 +127,10 @@ export function SettingsScreen() {
               </XStack>
               <YStack ai={'center'} jc={'center'} marginTop={'$5'}>
                 {avatar_url ? (
-                  <Image source={{ uri: avatar_url }} width={128} height={128} />
+                  <Avatar size={'$11'}>
+                    <Avatar.Image accessibilityLabel="" src={avatar_url} />
+                    <Avatar.Fallback backgroundColor="$blue10" />
+                  </Avatar>
                 ) : (
                   <Square
                     size={'$11'}

@@ -17,26 +17,18 @@ export const useEditProfileMutation = (userID: string | undefined) => {
 
   return useMutation({
     async mutationFn(data: z.infer<typeof ProfileSchema>) {
-      try {
-        await supabase
-          .from('profiles')
-          .update({
-            name: data.name,
-            about: data.about,
-            is_public: data.isPublic,
-          })
-          .eq('id', userID ? userID : '')
-      } catch (err) {
-        console.error(err)
-      }
+      await supabase
+        .from('profiles')
+        .update({
+          name: data.name,
+          about: data.about,
+          is_public: data.isPublic,
+        })
+        .eq('id', userID ? userID : '')
     },
     async onSuccess() {
-      try {
-        await queryClient.invalidateQueries(['profile'])
-        router.push('/settings')
-      } catch (err) {
-        console.error(err)
-      }
+      await queryClient.invalidateQueries(['profile'])
+      router.push('/settings')
     },
   })
 }
