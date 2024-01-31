@@ -12,9 +12,9 @@ import {
   useMedia,
   Text,
   useWindowDimensions,
+  Image,
 } from '@my/ui'
 import { IconSLogo, IconSendLogoGreenSlash } from 'app/components/icons'
-import { InstantPayments, QRCodePayments, RealTimePayments } from 'app/components/img'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { SignInForm } from './sign-in-form'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
@@ -85,87 +85,6 @@ export const SignInScreen = () => {
   )
 }
 
-const carouselComponents = [
-  [
-    <InstantPayments key="instant" style={{ borderRadius: 33 }} />,
-    <>
-      <Text
-        fontSize="$8"
-        $gtMd={{ fontSize: '$13' }}
-        fontWeight={'bold'}
-        lineHeight="$5"
-        color="$white"
-      >
-        INSTANT
-      </Text>
-      <Sup super="TM" fontSize="$8" $gtMd={{ fontSize: '$13' }} color="$white" fontWeight={'bold'}>
-        PAYMENTS
-      </Sup>
-      <Text
-        fontSize="$2"
-        $gtMd={{ fontSize: '$8', maw: '55%' }}
-        fontWeight={'normal'}
-        maw="70%"
-        color="$green5Light"
-      >
-        INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS
-      </Text>
-    </>,
-  ],
-  [
-    <QRCodePayments key="qrcode" style={{ borderRadius: 33 }} />,
-    <>
-      <Text
-        fontSize="$8"
-        $gtMd={{ fontSize: '$13' }}
-        fontWeight={'bold'}
-        lineHeight="$5"
-        color="$white"
-      >
-        QRCODE
-      </Text>
-      <Text fontSize="$8" $gtMd={{ fontSize: '$13' }} color="$white" fontWeight={'bold'}>
-        PAYMENTS
-      </Text>
-      <Text
-        fontSize="$2"
-        $gtMd={{ fontSize: '$8', maw: '55%' }}
-        fontWeight={'normal'}
-        maw="70%"
-        color="$green5Light"
-      >
-        INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS
-      </Text>
-    </>,
-  ],
-  [
-    <RealTimePayments key="realtime" style={{ borderRadius: 33 }} />,
-    <>
-      <Text
-        fontWeight="bold"
-        fontSize="$8"
-        $gtMd={{ fontSize: '$13' }}
-        lineHeight="$5"
-        color="$white"
-      >
-        REAL TIME
-      </Text>
-      <Sup super="TM" fontSize="$8" $gtMd={{ fontSize: '$13' }} color="$white" fontWeight={'bold'}>
-        PAYMENTS
-      </Sup>
-      <Text
-        fontSize="$2"
-        $gtMd={{ fontSize: '$8', maw: '55%' }}
-        fontWeight={'normal'}
-        maw="70%"
-        color="$green5Light"
-      >
-        INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS
-      </Text>
-    </>,
-  ],
-]
-
 const ContinueButton = ({ incrementProgress }: { incrementProgress: () => void }) => (
   <XStack f={1} w="100%" jc="center" $gtMd={{ dsp: 'none' }} py="$5" gap="$2">
     <Button f={1} onPress={incrementProgress}>
@@ -197,6 +116,28 @@ const SignInButtons = ({
   </XStack>
 )
 
+const carouselComponents = [
+  {
+    uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/instant-payments.jpg',
+    line1: 'INSTANT',
+    line2: 'PAYMENTS',
+    description: 'INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS',
+  },
+  {
+    uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/qrcode-payments.jpg',
+
+    line1: 'QRCODE',
+    line2: 'PAYMENTS',
+    description: 'INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS',
+  },
+  {
+    uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/realtime-payments.jpg',
+    line1: 'REAL TIME',
+    line2: 'PAYMENTS',
+    description: 'INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS',
+  },
+]
+
 const SignInCarousel = ({
   signInProgress = 0,
   setSignInProgress,
@@ -205,6 +146,7 @@ const SignInCarousel = ({
   setSignInProgress?: Dispatch<SetStateAction<number>> | undefined
 }) => {
   const media = useMedia()
+  const [layoutHeight, setLayoutHeight] = useState(0)
 
   useEffect(() => {
     if (media.gtMd) {
@@ -215,13 +157,50 @@ const SignInCarousel = ({
     }
   }, [media, setSignInProgress])
 
+  const carouselComponent = carouselComponents.at(signInProgress)
+
   return (
-    <Stack pos="relative" h="100%" f={1} ai="center" jc="center">
+    <Stack
+      pos="relative"
+      h="100%"
+      f={1}
+      ai="center"
+      jc="center"
+      onLayout={(event) => {
+        setLayoutHeight(event.nativeEvent.layout.height)
+      }}
+    >
       <View pos="absolute" top={0} left={0} mt="auto" mb="auto" zIndex={-1} w="100%" h="100%">
-        <Stack mt="auto" mb="auto" w="100%" h="100%">
+        <Stack mt="auto" mb="auto" w="100%" h="100%" zIndex={1}>
           <CornerTriangle corner="topLeft" pos="absolute" top={0} left={0} btw={273} brw={90} />
           <YStack pos="absolute" bottom={'5%'} left={'5%'}>
-            {carouselComponents.at(signInProgress)?.at(1)}
+            <Text
+              fontSize="$8"
+              $gtMd={{ fontSize: '$13' }}
+              fontWeight={'bold'}
+              lineHeight="$5"
+              color="$white"
+            >
+              {carouselComponent?.line1}
+            </Text>
+            <Sup
+              super="TM"
+              fontSize="$8"
+              $gtMd={{ fontSize: '$13' }}
+              color="$white"
+              fontWeight={'bold'}
+            >
+              {carouselComponent?.line2}
+            </Sup>
+            <Text
+              fontSize="$2"
+              $gtMd={{ fontSize: '$8', maw: '55%' }}
+              fontWeight={'normal'}
+              maw="70%"
+              color="$green5Light"
+            >
+              {carouselComponent?.description}
+            </Text>
           </YStack>
           <CornerTriangle
             corner="bottomRight"
@@ -234,7 +213,15 @@ const SignInCarousel = ({
           <View position="absolute" bottom={'$0'} right={'$0'} dsp="none" $gtMd={{ dsp: 'none' }}>
             <IconSLogo size={'$4'} />
           </View>
-          {carouselComponents.at(signInProgress)?.at(0)}
+          <Image
+            width="100%"
+            height="100%"
+            source={{
+              height: layoutHeight,
+              uri: carouselComponent?.uri,
+            }}
+            style={{ borderRadius: 33, zIndex: -1 }}
+          />
         </Stack>
       </View>
     </Stack>
