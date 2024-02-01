@@ -559,6 +559,7 @@ local_resource(
         "anvil:base",
         "anvil:send-account-fixtures",
         "aa_bundler:base",
+        "snaplet:generate",
     ],
 )
 
