@@ -4,6 +4,7 @@ import { debug, Debugger } from 'debug'
 import { OnboardingPage } from './fixtures/send-accounts'
 import { mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'
+import { userOnboarded } from '@my/snaplet/src/models'
 
 const test = mergeTests(snapletTest, authTest)
 
@@ -14,17 +15,7 @@ test.beforeAll(async () => {
 })
 
 test('logged in user needs onboarding before visiting profile', async ({ page, seed }) => {
-  const plan = await seed.users([
-    {
-      profiles: [{}],
-      tags: [
-        {
-          status: 'confirmed',
-        },
-      ],
-      sendAccounts: [{}],
-    },
-  ])
+  const plan = await seed.users([userOnboarded])
   log(plan.tags)
   const tag = plan.tags[0]
   assert(!!tag, 'tag not found')
