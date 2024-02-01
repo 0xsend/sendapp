@@ -10,7 +10,7 @@ const test = mergeTests(snapletTest, authTest)
 let log: Debugger
 
 test.beforeAll(async () => {
-  log = debug(`test:profile:anon:${test.info().workerIndex}`)
+  log = debug(`test:profile:anon:${test.info().parallelIndex}`)
 })
 
 test('logged in user needs onboarding before visiting profile', async ({ page, seed }) => {

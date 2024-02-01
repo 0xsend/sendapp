@@ -10,7 +10,7 @@ const test = mergeTests(sendAccountTest, snapletTest)
 let log: Debugger
 
 test.beforeAll(async () => {
-  log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
+  log = debug(`test:profile:logged-in:${test.info().parallelIndex}`)
 })
 
 test('can visit other user profile', async ({ page, seed }) => {

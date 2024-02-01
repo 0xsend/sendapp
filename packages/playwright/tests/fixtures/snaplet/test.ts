@@ -11,7 +11,7 @@ type SeedClient = Awaited<ReturnType<typeof createSeedClient>>
 
 export const test = baseTest.extend<{ seed: SeedClient; pg: PgClient }>({
   seed: async ({ pg }, use) => {
-    const key = `test:fixtures:snaplet:${test.info().workerIndex}`
+    const key = `test:fixtures:snaplet:${test.info().parallelIndex}`
     log = debug(key)
 
     log('seed')
