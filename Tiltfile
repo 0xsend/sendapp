@@ -106,7 +106,7 @@ local_resource(
 
 local_resource(
     "snaplet:generate",
-    "npx snaplet generate",
+    "bunx snaplet generate",
     allow_parallel = True,
     labels = labels,
     resource_deps = [
