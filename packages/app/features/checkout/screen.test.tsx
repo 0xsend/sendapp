@@ -1,9 +1,9 @@
 import { test } from '@jest/globals'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { assert } from 'app/utils/assert'
-import debug from 'debug'
+// import debug from 'debug'
 
-const log = debug('test:CheckoutTagSchema')
+// const log = debug('test:CheckoutTagSchema')
 
 type CheckoutTagSchemaTestCase = {
   input: {
@@ -80,7 +80,7 @@ test('CheckoutTagSchema', () => {
     } else {
       assert(!result.success)
       expect(result.error).toBeDefined()
-      log(result.error)
+      // log(result.error)
     }
   }
 })

@@ -29,7 +29,8 @@
     "wagmi": "yarn workspace @my/wagmi",
     "next-app": "yarn workspace next-app",
     "playwright": "yarn workspace @my/playwright",
-    "distributor": "yarn workspace distributor"
+    "distributor": "yarn workspace distributor",
+    "snaplet:seed": "DRY=0 bun run ./packages/snaplet/seed.ts"
   },
   "resolutions": {
     "react": "^18.2.0",
@@ -52,7 +53,7 @@
   },
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
-    "@biomejs/biome": "1.5.2",
+    "@biomejs/biome": "1.5.3",
     "lefthook": "^1.5.5"
   }
 }

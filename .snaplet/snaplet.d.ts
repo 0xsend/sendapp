@@ -1142,7 +1142,7 @@ type TypedConfig<
      */
       seed?: {
         alias?: import("./snaplet-client").Alias;
-        blueprint?: import("./snaplet-client").Blueprint;
+        fingerprint?: import("./snaplet-client").Fingerprint;
       }
     /**
      * Parameter to configure the inclusion/exclusion of schemas and tables from the snapshot.

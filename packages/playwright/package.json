@@ -2,18 +2,20 @@
   "name": "@my/playwright",
   "devDependencies": {
     "@0xsend/webauthn-authenticator": "workspace:*",
+    "@biomejs/biome": "1.5.3",
     "@faker-js/faker": "^8.1.0",
+    "@my/snaplet": "workspace:*",
     "@my/supabase": "workspace:*",
     "@playwright/test": "^1.41.1",
     "@supabase/supabase-js": "^2.38.5",
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/pg": "^8",
     "app": "workspace:*",
     "debug": "^4.3.4",
     "dotenv-cli": "^6.0.0",
     "extract-zip": "^2.0.1",
     "headless-web3-provider": "^0.2.2",
     "jsonwebtoken": "^9.0.2",
-    "supawright": "^0.1.1",
     "viem": "^1.21.1"
   },
   "scripts": {
@@ -23,6 +25,7 @@
   },
   "dependencies": {
     "cbor": "^9.0.1",
-    "permissionless": "^0.0.21"
+    "permissionless": "^0.0.21",
+    "pg": "^8.11.3"
   }
 }

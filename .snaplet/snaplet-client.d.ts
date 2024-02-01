@@ -361,117 +361,201 @@ export type Alias = {
   inflection?: Inflection | boolean;
   override?: Override;
 };
-interface BlueprintRelationField {
+interface FingerprintRelationField {
   count?: number | MinMaxOption;
 }
-interface BlueprintJsonField {
+interface FingerprintJsonField {
   schema?: any;
 }
-interface BlueprintDateField {
+interface FingerprintDateField {
   options?: {
     minYear?: number;
     maxYear?: number;
   }
 }
-export interface Blueprint {
-  _http_response?: {
-    headers?: BlueprintJsonField;
+interface FingerprintNumberField {
+  options?: {
+    min?: number;
+    max?: number;
+  }
+}
+export interface Fingerprint {
+  HttpResponses?: {
+    id?: FingerprintNumberField;
+    statusCode?: FingerprintNumberField;
+    headers?: FingerprintJsonField;
+    created?: FingerprintDateField;
   }
   buckets?: {
-    objects?: BlueprintRelationField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    fileSizeLimit?: FingerprintNumberField;
+    objects?: FingerprintRelationField;
   }
-  chain_addresses?: {
-    users?: BlueprintRelationField;
+  chainAddresses?: {
+    createdAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
   }
-  distribution_shares?: {
-    users?: BlueprintRelationField;
-    distributions?: BlueprintRelationField;
+  distributionShares?: {
+    id?: FingerprintNumberField;
+    distributionId?: FingerprintNumberField;
+    amount?: FingerprintNumberField;
+    hodlerPoolAmount?: FingerprintNumberField;
+    bonusPoolAmount?: FingerprintNumberField;
+    fixedPoolAmount?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    index?: FingerprintNumberField;
+    user?: FingerprintRelationField;
+    distribution?: FingerprintRelationField;
   }
-  distribution_verification_values?: {
-    distributions?: BlueprintRelationField;
+  distributionVerificationValues?: {
+    fixedValue?: FingerprintNumberField;
+    bipsValue?: FingerprintNumberField;
+    distributionId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    distribution?: FingerprintRelationField;
   }
-  distribution_verifications?: {
-    metadata?: BlueprintJsonField;
-    users?: BlueprintRelationField;
-    distributions?: BlueprintRelationField;
+  distributionVerifications?: {
+    id?: FingerprintNumberField;
+    distributionId?: FingerprintNumberField;
+    metadata?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    distribution?: FingerprintRelationField;
   }
   distributions?: {
-    distribution_shares?: BlueprintRelationField;
-    distribution_verification_values?: BlueprintRelationField;
-    distribution_verifications?: BlueprintRelationField;
+    id?: FingerprintNumberField;
+    number?: FingerprintNumberField;
+    amount?: FingerprintNumberField;
+    hodlerPoolBips?: FingerprintNumberField;
+    bonusPoolBips?: FingerprintNumberField;
+    fixedPoolBips?: FingerprintNumberField;
+    qualificationStart?: FingerprintDateField;
+    qualificationEnd?: FingerprintDateField;
+    claimEnd?: FingerprintDateField;
+    snapshotId?: FingerprintNumberField;
+    hodlerMinBalance?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    distributionShares?: FingerprintRelationField;
+    distributionVerificationValues?: FingerprintRelationField;
+    distributionVerifications?: FingerprintRelationField;
   }
   hooks?: {
-
+    id?: FingerprintNumberField;
+    hookTableId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    requestId?: FingerprintNumberField;
   }
-  http_request_queue?: {
-    headers?: BlueprintJsonField;
+  httpRequestQueues?: {
+    id?: FingerprintNumberField;
+    headers?: FingerprintJsonField;
+    timeoutMilliseconds?: FingerprintNumberField;
   }
-  storage_migrations?: {
-
+  storageMigrations?: {
+    id?: FingerprintNumberField;
+    executedAt?: FingerprintDateField;
   }
-  supabase_functions_migrations?: {
-
+  supabaseFunctionsMigrations?: {
+    insertedAt?: FingerprintDateField;
   }
   objects?: {
-    metadata?: BlueprintJsonField;
-    buckets?: BlueprintRelationField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    lastAccessedAt?: FingerprintDateField;
+    metadata?: FingerprintJsonField;
+    bucket?: FingerprintRelationField;
   }
   profiles?: {
-    users?: BlueprintRelationField;
-    referrals_referrals_referred_idToprofiles?: BlueprintRelationField;
-    referrals_referrals_referrer_idToprofiles?: BlueprintRelationField;
+    i?: FingerprintRelationField;
+    referralsByReferredId?: FingerprintRelationField;
+    referralsByReferrerId?: FingerprintRelationField;
   }
   receipts?: {
-    users?: BlueprintRelationField;
-    tag_receipts?: BlueprintRelationField;
+    createdAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    tagReceipts?: FingerprintRelationField;
   }
   referrals?: {
-    profiles_referrals_referred_idToprofiles?: BlueprintRelationField;
-    profiles_referrals_referrer_idToprofiles?: BlueprintRelationField;
-    tags?: BlueprintRelationField;
+    id?: FingerprintNumberField;
+    referred?: FingerprintRelationField;
+    referrer?: FingerprintRelationField;
+    tagByTag?: FingerprintRelationField;
   }
-  auth_schema_migrations?: {
+  authSchemaMigrations?: {
 
   }
-  supabase_migrations_schema_migrations?: {
+  supabaseMigrationsSchemaMigrations?: {
 
   }
-  send_account_credentials?: {
-    send_accounts?: BlueprintRelationField;
-    webauthn_credentials?: BlueprintRelationField;
+  sendAccountCredentials?: {
+    keySlot?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    account?: FingerprintRelationField;
+    credential?: FingerprintRelationField;
   }
-  send_accounts?: {
-    users?: BlueprintRelationField;
-    send_account_credentials?: BlueprintRelationField;
+  sendAccounts?: {
+    chainId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    deletedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    sendAccountCredentialsByAccountId?: FingerprintRelationField;
   }
-  send_transfer_logs?: {
-
+  sendTransferLogs?: {
+    value?: FingerprintNumberField;
+    blockNumber?: FingerprintNumberField;
+    blockTimestamp?: FingerprintDateField;
+    logIndex?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
   }
-  tag_receipts?: {
-    receipts?: BlueprintRelationField;
-    tags?: BlueprintRelationField;
+  tagReceipts?: {
+    ha?: FingerprintRelationField;
+    tag?: FingerprintRelationField;
   }
-  tag_reservations?: {
-
+  tagReservations?: {
+    createdAt?: FingerprintDateField;
   }
   tags?: {
-    users?: BlueprintRelationField;
-    referrals?: BlueprintRelationField;
-    tag_receipts?: BlueprintRelationField;
+    createdAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    referralsByTag?: FingerprintRelationField;
+    tagReceipts?: FingerprintRelationField;
   }
   users?: {
-    raw_app_meta_data?: BlueprintJsonField;
-    raw_user_meta_data?: BlueprintJsonField;
-    chain_addresses?: BlueprintRelationField;
-    distribution_shares?: BlueprintRelationField;
-    distribution_verifications?: BlueprintRelationField;
-    profiles?: BlueprintRelationField;
-    receipts?: BlueprintRelationField;
-    send_accounts?: BlueprintRelationField;
-    tags?: BlueprintRelationField;
-    webauthn_credentials?: BlueprintRelationField;
+    emailConfirmedAt?: FingerprintDateField;
+    invitedAt?: FingerprintDateField;
+    confirmationSentAt?: FingerprintDateField;
+    recoverySentAt?: FingerprintDateField;
+    emailChangeSentAt?: FingerprintDateField;
+    lastSignInAt?: FingerprintDateField;
+    rawAppMetaData?: FingerprintJsonField;
+    rawUserMetaData?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    phoneConfirmedAt?: FingerprintDateField;
+    phoneChangeSentAt?: FingerprintDateField;
+    confirmedAt?: FingerprintDateField;
+    emailChangeConfirmStatus?: FingerprintNumberField;
+    bannedUntil?: FingerprintDateField;
+    reauthenticationSentAt?: FingerprintDateField;
+    deletedAt?: FingerprintDateField;
+    chainAddresses?: FingerprintRelationField;
+    distributionShares?: FingerprintRelationField;
+    distributionVerifications?: FingerprintRelationField;
+    profiles?: FingerprintRelationField;
+    receipts?: FingerprintRelationField;
+    sendAccounts?: FingerprintRelationField;
+    tags?: FingerprintRelationField;
+    webauthnCredentials?: FingerprintRelationField;
   }
-  webauthn_credentials?: {
-    users?: BlueprintRelationField;
-    send_account_credentials?: BlueprintRelationField;
+  webauthnCredentials?: {
+    signCount?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    deletedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    sendAccountCredentialsByCredentialId?: FingerprintRelationField;
   }}
