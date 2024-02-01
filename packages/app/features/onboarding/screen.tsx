@@ -10,16 +10,22 @@
 import { createPasskey } from '@daimo/expo-passkeys'
 import {
   Button,
-  Container,
-  H1,
+  Footer,
   H2,
-  H4,
   Input,
   Label,
   Paragraph,
-  Separator,
+  Stack,
   TextArea,
   YStack,
+  Link,
+  XStack,
+  CornerTriangle,
+  Image,
+  useWindowDimensions,
+  Theme,
+  useMedia,
+  Anchor,
 } from '@my/ui'
 import { iEntryPointAbi } from '@my/wagmi'
 import { base16, base64 } from '@scure/base'
@@ -56,8 +62,17 @@ import {
   parseEther,
 } from 'viem'
 import { testBaseClient } from '../../../playwright/tests/fixtures/viem/base'
+import {
+  IconSLogo,
+  IconSendLogoGreenSlash,
+  IconTelegramLogo,
+  IconXLogo,
+} from 'app/components/icons'
+import { telegram as telegramSocial, twitter as twitterSocial } from 'app/data/socialLinks'
 
 export function OnboardingScreen() {
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions()
+  const media = useMedia()
   const {
     data: sendAccts,
     // error: sendAcctsError,
@@ -65,41 +80,90 @@ export function OnboardingScreen() {
   } = useSendAccounts()
 
   return (
-    <Container>
-      <YStack space="$6" maxWidth={600} py="$6" marginHorizontal="auto">
-        <H1>Welcome to Send</H1>
-        <Paragraph>
-          Start by creating a Passkey below. Send uses passkeys to secure your account. Press the
-          button below to get started.
-        </Paragraph>
-
-        {sendAccts?.length === 0 && <CreateSendAccount />}
-
-        {sendAccts?.map((sendAcct) => (
-          <YStack key={sendAcct.id} space="$2">
-            <Label htmlFor="senderAddress">Your sender address:</Label>
-            <Input
-              id="senderAddress"
-              // @ts-expect-error setup monospace font
-              fontFamily={'monospace'}
-              value={sendAcct.address ? sendAcct.address : undefined}
-            />
-            <H4>Credentials</H4>
-            {sendAcct.webauthn_credentials.map((webauthnCred) => (
-              <YStack key={webauthnCred.id} space="$4">
-                <Paragraph>
-                  {webauthnCred.display_name} created on{' '}
-                  {new Date(webauthnCred.created_at).toLocaleString()}
-                </Paragraph>
-              </YStack>
-            ))}
-            <Separator />
-          </YStack>
-        ))}
-
-        <SendAccountUserOp />
+    <YStack
+      ai="center"
+      jc="space-between"
+      h={windowHeight * 0.95}
+      w={windowWidth * 0.95}
+      px="$6"
+      m="auto"
+    >
+      <Stack pos="absolute" top={0} left={0} mt="auto" mb="auto" zIndex={-1} w="100%" h="100%">
+        <Stack mt="auto" mb="auto" w="100%" h="100%" zIndex={1}>
+          <Stack
+            position="absolute"
+            bottom={'$0'}
+            right={'$0'}
+            dsp="none"
+            $gtMd={{ dsp: 'inherit' }}
+            zIndex={1}
+          >
+            <IconSLogo size={'$4'} />
+          </Stack>
+          <CornerTriangle
+            btc={'$background'}
+            corner="topLeft"
+            pos="absolute"
+            top={0}
+            left={0}
+            btw={273}
+            brw={90}
+          />
+          <Image
+            width="100%"
+            height="100%"
+            source={{
+              height: windowHeight * 0.95,
+              uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/setup-passkey.jpg',
+            }}
+            style={{ borderRadius: 33, zIndex: -1, opacity: 0.1 }}
+          />
+          <CornerTriangle
+            btc={'$background'}
+            corner="bottomRight"
+            pos="absolute"
+            bottom={0}
+            right={0}
+            btw={273}
+            brw={90}
+          />
+        </Stack>
+      </Stack>
+      <Stack f={1} jc="center">
+        <Theme inverse={true}>
+          <IconSendLogoGreenSlash size={media.gtMd ? '$14' : '$10'} color="$background" />
+        </Theme>
+      </Stack>
+      <YStack f={3} jc="center" maw={600} space="$4">
+        {sendAccts?.length === 0 ? (
+          <>
+            <YStack space="$4" f={1} jc={'flex-end'}>
+              <H2>Setup Passkey</H2>
+              <Paragraph>
+                Start by creating a Passkey below. Send uses passkeys to secure your account. Press
+                the button below to get started.
+              </Paragraph>
+            </YStack>
+            <CreateSendAccount />
+          </>
+        ) : (
+          <SendAccountUserOp />
+        )}
       </YStack>
-    </Container>
+      {media.gtMd && (
+        <Footer f={1} jc={'center'}>
+          <XStack gap="$4" ai="center" jc="center">
+            <Paragraph>Connect With Us</Paragraph>
+            <Link href={twitterSocial} target="_blank">
+              <Button borderRadius={9999} icon={IconXLogo} />
+            </Link>
+            <Link href={telegramSocial} target="_blank">
+              <Button borderRadius={9999} icon={IconTelegramLogo} />
+            </Link>
+          </XStack>
+        </Footer>
+      )}
+    </YStack>
   )
 }
 
@@ -111,6 +175,7 @@ function CreateSendAccount() {
   const supabase = useSupabase()
   const { user } = useUser()
   const { refetch: sendAcctsRefetch } = useSendAccounts()
+  const media = useMedia()
 
   // PASSKEY / ACCOUNT CREATION STATE
   const deviceName = Device.deviceName
@@ -168,10 +233,33 @@ function CreateSendAccount() {
 
   return (
     // TODO: turn into a form
-    <YStack space="$4">
+    <YStack space="$4" f={1}>
       <Label htmlFor="accountName">Passkey name:</Label>
       <Input id="accountName" onChangeText={setAccountName} value={accountName} />
-      <Button onPress={createAccount}>Create</Button>
+      {media.gtMd ? (
+        <XStack jc="space-between" ai="center" w="100%" px="$2">
+          <Anchor
+            col={'$accentBackground'}
+            href="https://info.send.it/send/mission-vision-and-values"
+            target="_blank"
+            dsp={'none'}
+            $gtMd={{ dsp: 'block' }}
+          >
+            Why Passkey?
+          </Anchor>
+          <Theme name={'accent_Button'}>
+            <Button onPress={createAccount} mt="0" als="flex-end" miw="$12">
+              Create
+            </Button>
+          </Theme>
+        </XStack>
+      ) : (
+        <Theme name={'accent_Button'}>
+          <Button onPress={createAccount} mt="auto" als="auto">
+            Create
+          </Button>
+        </Theme>
+      )}
     </YStack>
   )
 }
@@ -269,7 +357,7 @@ function SendAccountUserOp() {
     <YStack space="$4">
       <H2>Send it</H2>
       <Label htmlFor="sendTo">Sending to:</Label>
-      <Input id="sendTo" value={receiverAccount.address} />
+      <Input id="sendTo" aria-label="sendTo" value={receiverAccount.address} />
       <Label htmlFor="sendAmount">ETH Amount:</Label>
       <Input id="sendAmount" value="0.01" />
       <Button

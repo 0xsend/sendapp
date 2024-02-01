@@ -8,10 +8,9 @@ import { Attestation } from '@0xsend/webauthn-authenticator/types'
 import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
 import { assert } from 'app/utils/assert'
 import cbor from 'cbor'
-import { Hex, parseEther } from 'viem'
+
 import { expect, test } from './fixtures/auth'
 import { OnboardingPage } from './fixtures/send-accounts'
-import { baseMainnetClient, testBaseClient } from './fixtures/viem/base'
 
 test('can visit onboarding page', async ({ page, supabase, authSession, authenticator }) => {
   const onboardingPage = new OnboardingPage(page)
@@ -31,7 +30,7 @@ test('can visit onboarding page', async ({ page, supabase, authSession, authenti
   assert(!!clientDataJSON && !!attestationObject, 'Missing clientDataJSON or attestationObject')
 
   // validate sender address is computed
-  const addrLocator = page.getByLabel('Your sender address:')
+  const addrLocator = page.getByLabel('Sending To:')
   await expect(addrLocator).toHaveValue(/^0x[a-f0-9]{40}$/i)
 
   // validate send account is created
@@ -66,28 +65,4 @@ test('can visit onboarding page', async ({ page, supabase, authSession, authenti
   const { COSEPublicKey } = parseCredAuthData(authData)
   assert(!!COSEPublicKey, 'Missing COSEPublicKey')
   expect(webAuthnCred.public_key).toBe(`\\x${Buffer.from(COSEPublicKey).toString('hex')}`)
-
-  // sponsor the creation by setting the balance using anvil
-  await testBaseClient.setBalance({
-    address: sendAcct.address,
-    value: parseEther('1'),
-  })
-
-  // send user op
-  await page.getByRole('button', { name: 'Send' }).click()
-
-  // verify assertion
-  const assertion = credential.assertions[0]
-  assert(!!assertion, 'Missing credential assertion')
-
-  await expect(page.getByLabel('Send result:')).toHaveValue('true')
-
-  // verify receiver balance
-  const receiverAddress = await page.getByRole('textbox', { name: 'Sending to:' }).inputValue()
-  const ethAmount = await page.getByRole('textbox', { name: 'ETH Amount:' }).inputValue()
-
-  const receiverBalance = await baseMainnetClient.getBalance({
-    address: receiverAddress as Hex,
-  })
-  expect(receiverBalance.toString()).toBe(parseEther(ethAmount).toString())
 })

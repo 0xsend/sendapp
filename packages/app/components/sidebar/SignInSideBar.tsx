@@ -3,6 +3,7 @@ import {
   SideBar,
   SideBarWrapper,
   Stack,
+  Theme,
   XStack,
   YStack,
   YStackProps,
@@ -23,9 +24,11 @@ const SignInSideBar = ({ ...props }: YStackProps) => (
     </YStack>
     <YStack gap="$4" ai="center" f={1} jc="flex-end">
       <XStack gap="$2" ai="center">
-        <Paragraph size={'$1'} color={'$accentColor'}>
-          Connect with us
-        </Paragraph>
+        <Theme inverse={true}>
+          <Paragraph size={'$1'} color={'$background'}>
+            Connect with us
+          </Paragraph>
+        </Theme>
         <SideBarFooterLink
           icon={<IconXLogo />}
           href={twitterSocial}
