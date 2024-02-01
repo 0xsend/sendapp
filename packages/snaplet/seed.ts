@@ -8,6 +8,7 @@ import { createSeedClient } from '@snaplet/seed'
 import { models } from './src'
 import * as pg from 'pg'
 import { pravatar } from './src/utils'
+import { userOnboarded } from './src/models'
 
 // @ts-expect-error typescript is confused
 const { Client: PgClient } = pg.default as unknown as typeof pg
@@ -97,11 +98,7 @@ const pgClient = new PgClient({
       ],
       sendAccounts: [{}],
     },
-    ...Array(100).fill({
-      profiles: [{}],
-      tags: [{ status: 'confirmed' }],
-      sendAccounts: [{}],
-    }),
+    ...Array(100).fill(userOnboarded),
   ])
   await pgClient.end()
   console.log('Snaplet seed done!')
