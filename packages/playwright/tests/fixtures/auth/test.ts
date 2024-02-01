@@ -2,7 +2,7 @@ import { type BrowserContext, mergeTests, test as base } from '@playwright/test'
 import { test as ethereumTest } from '../ethereum'
 import { test as webauthnTest } from '../webauthn'
 
-import { Database } from '@my/supabase/database.types'
+import { Database, Tables } from '@my/supabase/database.types'
 import { Session, SupabaseClient, User, createClient } from '@supabase/supabase-js'
 import { countries } from 'app/utils/country'
 import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
@@ -15,7 +15,7 @@ import { faker } from '@faker-js/faker'
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
-const log = debug('test:fixtures:auth:test')
+let log: debug.Debugger
 
 const supabaseCookieRegex = /sb-[a-z0-9]+-auth-token/
 
@@ -44,14 +44,17 @@ const authTest = base.extend<{
   supabase: SupabaseClient<Database>
   authSession: { token: string; decoded: JwtPayload }
   userId: string
-  profile: { name: string; about: string; avatar_url: string }
   user: {
     user: User
     session: Session
+    profile: Tables<'profiles'>
   }
 }>({
   context: async ({ context, user: { user, session } }, use) => {
     const { parallelIndex } = test.info()
+
+    log = debug(`test:auth:${parallelIndex}`)
+
     if (!config?.use?.baseURL) {
       throw new Error('config.use.baseURL not defined')
     }
@@ -82,21 +85,32 @@ const authTest = base.extend<{
       },
     ])
 
-    await use(context)
-
-    // delete the user
-    await supabaseAdmin.auth.admin.deleteUser(user.id).then(({ error }) => {
-      if (error) {
-        log('error deleting user', `id=${parallelIndex}`, `user=${user.id}`, error)
-        throw error
-      }
-    })
+    try {
+      await use(context)
+    } finally {
+      // delete the user
+      await supabaseAdmin.auth.admin.deleteUser(user.id).then(({ error }) => {
+        if (error) {
+          log('error deleting user', `id=${parallelIndex}`, `user=${user.id}`, error?.message)
+        }
+      })
+    }
   },
-  user: async ({ profile }, use) => {
+
+  // biome-ignore lint/correctness/noEmptyPattern: playwright/test needs empty pattern
+  user: async ({}, use) => {
     const { parallelIndex } = test.info()
+    log = debug(`test:auth:${parallelIndex}`)
+
     const randomNumber = Math.floor(Math.random() * 1e9)
     const country = randomCountry()
     const { data, error } = await supabaseAdmin.auth.signUp({
+      options: {
+        data: {
+          parallelIndex,
+          workerIndex: test.info().workerIndex,
+        },
+      },
       phone: `+${country.dialCode}${randomNumber}`,
       password: 'changeme',
     })
@@ -117,7 +131,11 @@ const authTest = base.extend<{
     // update profile
     await supabaseAdmin
       .from('profiles')
-      .update(profile)
+      .update({
+        name: faker.person.fullName(),
+        about: faker.lorem.sentence(),
+        avatar_url: faker.image.avatar(),
+      })
       .eq('id', user.id)
       .then(({ error }) => {
         if (error) {
@@ -125,16 +143,20 @@ const authTest = base.extend<{
           throw error
         }
       })
-    await use({ user, session })
-  },
-  // biome-ignore lint/correctness/noEmptyPattern: playwright/test requires an empty pattern
-  profile: async ({}, use) => {
-    const profile = {
-      name: faker.person.fullName(),
-      about: faker.lorem.sentence(),
-      avatar_url: faker.image.avatar(),
-    }
-    await use(profile)
+
+    const profile = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error) {
+          log('error fetching profile', `id=${parallelIndex}`, `user=${user.id}`, error)
+          throw error
+        }
+        return data
+      })
+    await use({ user, session, profile })
   },
   authSession: async ({ context }, use) => {
     const { token, decoded } = await getAuthSessionFromContext(context)

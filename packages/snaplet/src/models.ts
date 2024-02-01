@@ -4,9 +4,11 @@ import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
 import { copycat } from '@snaplet/copycat'
 
 export const models: SeedClientOptions['models'] = {
+  users: {
+    data: {},
+  },
   profiles: {
     data: {
-      name: (ctx) => copycat.fullName(ctx.seed),
       avatarUrl: (ctx) => pravatar(copycat.fullName(ctx.seed)),
     },
   },

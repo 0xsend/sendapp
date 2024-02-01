@@ -6,9 +6,9 @@
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
     "@snaplet/copycat": "^2.0.0",
-    "@snaplet/seed": "^0.85.0",
+    "@snaplet/seed": "^0.86.3",
     "@types/pg": "^8",
-    "snaplet": "^0.85.0"
+    "snaplet": "^0.86.3"
   },
   "dependencies": {
     "pg": "^8.11.3",
