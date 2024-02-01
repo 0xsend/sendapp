@@ -7,6 +7,7 @@ import { copycat, faker } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
 import { models } from './src'
 import * as pg from 'pg'
+import { pravatar } from './src/utils'
 
 // @ts-expect-error typescript is confused
 const { Client: PgClient } = pg.default as unknown as typeof pg
@@ -22,9 +23,13 @@ const pgClient = new PgClient({
 // * For more on getting started with @snaplet/seed: https://docs.snaplet.dev/getting-started/quick-start/seed
 // * For a more detailed reference: https://docs.snaplet.dev/core-concepts/seed
 ;(async () => {
+  await pgClient.connect()
+  await pgClient.query('SET session_replication_role = replica;') // do not run any triggers
+
   const seed = await createSeedClient({
     dryRun,
     models,
+    client: pgClient,
   })
 
   console.log('Snaplet resetting database.', `dryRun=${dryRun}`)
@@ -36,6 +41,12 @@ const pgClient = new PgClient({
 
   await seed.users([
     {
+      profiles: [
+        {
+          name: 'Alice',
+          avatarUrl: pravatar('Alice'),
+        },
+      ],
       tags: [
         {
           name: 'alice',
@@ -49,6 +60,12 @@ const pgClient = new PgClient({
       sendAccounts: [{}],
     },
     {
+      profiles: [
+        {
+          name: 'Jane',
+          avatarUrl: pravatar('Jane'),
+        },
+      ],
       tags: [
         {
           name: 'jane',
@@ -62,6 +79,12 @@ const pgClient = new PgClient({
       sendAccounts: [{}],
     },
     {
+      profiles: [
+        {
+          name: 'John',
+          avatarUrl: pravatar('John'),
+        },
+      ],
       tags: [
         {
           name: 'john',
@@ -74,22 +97,12 @@ const pgClient = new PgClient({
       ],
       sendAccounts: [{}],
     },
+    ...Array(100).fill({
+      profiles: [{}],
+      tags: [{ status: 'confirmed' }],
+      sendAccounts: [{}],
+    }),
   ])
-
-  if (!dryRun) {
-    await pgClient.connect()
-    console.log('Updating user profiles')
-    for (const user of seed.$store.users) {
-      await pgClient.query(
-        `UPDATE profiles SET
-          avatar_url = $1,
-          name = $2,
-          about = $3
-         WHERE id = $4`,
-        [faker.image.avatar(), faker.person.fullName(), faker.lorem.paragraph(), user.id]
-      )
-    }
-  }
   await pgClient.end()
   console.log('Snaplet seed done!')
 })().catch((err) => {

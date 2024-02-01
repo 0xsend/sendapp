@@ -1,11 +1,18 @@
-import type { SeedClientOptions } from '@snaplet/seed'
-import { tagName } from './utils'
+import type { SeedClientOptions, usersInputs } from '@snaplet/seed'
+import { pravatar, tagName } from './utils'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
+import { copycat } from '@snaplet/copycat'
 
 export const models: SeedClientOptions['models'] = {
+  profiles: {
+    data: {
+      name: (ctx) => copycat.fullName(ctx.seed),
+      avatarUrl: (ctx) => pravatar(copycat.fullName(ctx.seed)),
+    },
+  },
   tags: {
     data: {
-      name: (ctx) => tagName(ctx.seed),
+      name: (ctx) => tagName(copycat.username(ctx.seed)),
     },
   },
   sendAccounts: {
@@ -13,4 +20,14 @@ export const models: SeedClientOptions['models'] = {
       address: () => privateKeyToAddress(generatePrivateKey()),
     },
   },
+}
+
+export const userOnboarded: usersInputs = {
+  profiles: [{}],
+  tags: [
+    {
+      status: 'confirmed',
+    },
+  ],
+  sendAccounts: [{}],
 }

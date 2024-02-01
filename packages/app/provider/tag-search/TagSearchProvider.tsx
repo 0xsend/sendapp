@@ -68,7 +68,7 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
   const query = form.watch('query', '')
 
   useEffect(() => {
-    if (query.length > 2) {
+    if (query.length >= 2) {
       onSearch({ query })
     } else {
       setIsLoading(false)

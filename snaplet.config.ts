@@ -5,7 +5,11 @@ import { copycat, faker } from '@snaplet/copycat'
 import { defineConfig } from 'snaplet'
 import { tagName } from '@my/snaplet'
 
-copycat.setHashKey('kWn8mdNrCuJSEJep')
+if (!process.env.SNAPLET_HASH_KEY) {
+  throw new Error('SNAPLET_HASH_KEY is required')
+}
+
+copycat.setHashKey(process.env.SNAPLET_HASH_KEY)
 
 export default defineConfig({
   select: {
@@ -87,7 +91,7 @@ export default defineConfig({
         const { metadata } = row as { metadata: { [key: string]: string } }
 
         if (metadata.tag !== undefined) {
-          metadata.tag = tagName(metadata.tag)
+          metadata.tag = tagName(copycat.username(metadata.tag))
         }
 
         return {

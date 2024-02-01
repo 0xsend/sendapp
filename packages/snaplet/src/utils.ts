@@ -5,10 +5,14 @@ export function strToTagName(str: string): string {
 }
 
 // replace all non-alphanumeric characters with a dash
-export function tagName(seed: string) {
-  const newTag = strToTagName(copycat.username(seed))
+export function tagName(name: string) {
+  const newTag = strToTagName(name)
   if (newTag.length > 20) {
     return newTag.substring(0, 20)
   }
   return newTag
+}
+
+export function pravatar(username: string) {
+  return `https://i.pravatar.cc/500?u=${username}`
 }

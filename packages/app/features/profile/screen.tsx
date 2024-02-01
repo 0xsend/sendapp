@@ -7,7 +7,6 @@ import {
   Dialog,
   H1,
   H2,
-  Image,
   Paragraph,
   Sheet,
   SizableText,

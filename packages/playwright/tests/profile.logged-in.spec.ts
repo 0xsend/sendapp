@@ -16,6 +16,7 @@ test.beforeAll(async () => {
 test('logged in user needs onboarding before visiting profile', async ({ page, seed }) => {
   const plan = await seed.users([
     {
+      profiles: [{}],
       tags: [
         {
           status: 'confirmed',
