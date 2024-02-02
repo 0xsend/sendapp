@@ -26,7 +26,7 @@ export const useEditProfileMutation = (userID: string | undefined) => {
         })
         .eq('id', userID ? userID : '')
       if (error) {
-        console.error(error.message)
+        throw new Error(error.message)
       }
     },
     async onSuccess() {
