@@ -7,12 +7,12 @@ ffi = true
 solc_version = "0.8.21"
 optimizer = true
 optimizer_runs = 999_999
-evm_version = "shanghai"
 
 [profile.deploy]
 via_ir = true
 
 [profile.mainnet]
+evm_version = "shanghai"
 # should be updated after releases
 fork_block_number = 19136812
 
