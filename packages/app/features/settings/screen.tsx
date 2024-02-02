@@ -91,6 +91,7 @@ export function SettingsScreen() {
       icon: <IconSupport />,
       label: 'Support',
       action: () => console.log('Support'),
+      href: 'https://info.send.it/',
     },
     {
       icon: <IconLogout />,
@@ -265,34 +266,36 @@ export function SettingsScreen() {
                 opacity={0.3}
               />
               {accountTheme.map((account) => (
-                <XStack
-                  jc={'space-between'}
-                  marginBottom={20}
-                  key={account.label}
-                  onPress={() => account.action()}
-                >
-                  <XStack>
-                    {account.icon}
-                    <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
-                      {account.label}
-                    </Paragraph>
-                  </XStack>
-                  <XStack>
-                    {account.label !== 'Theme' ? (
-                      <IconNext />
-                    ) : (
-                      <Paragraph
-                        fontWeight={'700'}
-                        borderRadius={'$6'}
-                        borderWidth={1}
-                        paddingLeft={20}
-                        paddingRight={20}
-                      >
-                        {mode?.toUpperCase()}
+                <Link href={account.href ?? '/'}>
+                  <XStack
+                    jc={'space-between'}
+                    marginBottom={20}
+                    key={account.label}
+                    onPress={() => account.action()}
+                  >
+                    <XStack>
+                      {account.icon}
+                      <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>
+                        {account.label}
                       </Paragraph>
-                    )}
+                    </XStack>
+                    <XStack>
+                      {account.label !== 'Theme' ? (
+                        <IconNext />
+                      ) : (
+                        <Paragraph
+                          fontWeight={'700'}
+                          borderRadius={'$6'}
+                          borderWidth={1}
+                          paddingLeft={20}
+                          paddingRight={20}
+                        >
+                          {mode?.toUpperCase()}
+                        </Paragraph>
+                      )}
+                    </XStack>
                   </XStack>
-                </XStack>
+                </Link>
               ))}
             </YStack>
           </Card>

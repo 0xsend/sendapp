@@ -73,7 +73,7 @@ export const UploadAvatar = ({ children }: { children: React.ReactNode }) => {
       .update({ avatar_url: publicUrlRes.data.publicUrl })
       .eq('id', user.id)
     if (update_error) {
-      setErrMsg(update_error.message)
+      return
     }
     await updateProfile()
   }
