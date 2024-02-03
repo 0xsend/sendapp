@@ -461,6 +461,7 @@ local_resource(
     resource_deps = [
         "yarn:install",
         "anvil:mainnet",
+        "anvil:base",
         "supabase",
         "supabase:generate",
         "wagmi:generate",
@@ -560,6 +561,7 @@ local_resource(
         "anvil:send-account-fixtures",
         "aa_bundler:base",
         "snaplet:generate",
+        "supabase",
     ],
 )
 

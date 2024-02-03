@@ -208,7 +208,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "white",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomColor": "hsla(191, 32%, 32%, 1)",
                   "borderBottomLeftRadius": 16,
                   "borderBottomRightRadius": 16,
@@ -222,7 +222,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "borderTopWidth": 1,
-                  "color": "black",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
@@ -2555,7 +2555,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "white",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomColor": "hsla(191, 32%, 32%, 1)",
                   "borderBottomLeftRadius": 16,
                   "borderBottomRightRadius": 16,
@@ -2569,7 +2569,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopLeftRadius": 16,
                   "borderTopRightRadius": 16,
                   "borderTopWidth": 1,
-                  "color": "black",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",

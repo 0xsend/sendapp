@@ -1,17 +1,4 @@
-import {
-  Adapt,
-  Button,
-  Container,
-  Dialog,
-  H1,
-  H2,
-  Paragraph,
-  Sheet,
-  Spinner,
-  Text,
-  XStack,
-  YStack,
-} from '@my/ui'
+import { Button, Container, H1, H2, Paragraph, Spinner, Text, XStack, YStack } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { useState } from 'react'

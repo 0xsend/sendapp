@@ -1,7 +1,7 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen } from '@testing-library/react-native'
+import { render, screen, userEvent, act } from '@testing-library/react-native'
 
 const mockedNavigate = jest.fn()
 const TAG_NAME = 'pip_test44677'
@@ -42,12 +42,39 @@ jest.mock('app/utils/useUser', () => ({
   }),
 }))
 
-test('ProfileScreen', () => {
+jest.mock('app/utils/useSendAccounts', () => ({
+  useSendAccounts: jest.fn().mockReturnValue({
+    data: [
+      {
+        webauthn_credentials: [
+          {
+            public_key: '0x1234567890',
+          },
+        ],
+      },
+    ],
+  }),
+}))
+
+jest.mock('@daimo/expo-passkeys', () => ({
+  createPasskey: jest.fn(),
+  signWithPasskey: jest.fn(),
+}))
+
+jest.mock('app/provider', () => ({
+  Provider: ({ children }: { children: React.ReactNode }) => children,
+}))
+
+test('ProfileScreen', async () => {
+  jest.useFakeTimers()
+
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <ProfileScreen />
     </TamaguiProvider>
   )
+
+  await act(() => jest.runAllTimers())
 
   const h1 = screen.getByText(PROFILE.name)
   expect(h1).toBeOnTheScreen()
@@ -67,4 +94,10 @@ test('ProfileScreen', () => {
   const button2 = screen.getByText('Request')
   expect(button2).toBeOnTheScreen()
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
+
+  const user = userEvent.setup()
+  await user.press(button1)
+  await act(() => jest.runAllTimers())
+  // @todo figure out why the dialog is not showing
+  expect(screen.toJSON()).toMatchSnapshot('SendDialog')
 })
