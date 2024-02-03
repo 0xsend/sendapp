@@ -114,14 +114,15 @@ export function OnboardingScreen() {
           <IconSendLogoGreenSlash size={media.gtMd ? '$14' : '$10'} color="$background" />
         </Theme>
       </Stack>
-      <YStack f={3} jc="center" maw="100%" $gtMd={{ maw: 600 }} space="$4">
+      <YStack f={3} jc="center" maw="100%" $gtMd={{ maw: 400 }} space="$4">
         {sendAccts?.length === 0 ? (
           <>
-            <YStack space="$4" f={1} jc={'flex-end'}>
-              <H2>Setup Passkey</H2>
+            <YStack pb="$4" space="$2" f={1} jc={'flex-end'}>
+              <Theme inverse={true}>
+                <H2 color={'$green100'}>Setup Passkey</H2>
+              </Theme>
               <Paragraph>
-                Start by creating a Passkey below. Send uses passkeys to secure your account. Press
-                the button below to get started.
+                Start by creating a Passkey below. Send uses passkeys to secure your account.
               </Paragraph>
             </YStack>
             <CreateSendAccount />
@@ -214,7 +215,7 @@ function CreateSendAccount() {
   return (
     // TODO: turn into a form
     <YStack space="$4" f={1}>
-      <Label htmlFor="accountName">Passkey name:</Label>
+      <Label htmlFor="accountName">Passkey name</Label>
       <Input id="accountName" onChangeText={setAccountName} value={accountName} />
       {media.gtMd ? (
         <XStack jc="space-between" ai="center" w="100%" px="$2">
