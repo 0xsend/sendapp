@@ -1,4 +1,4 @@
-import { expect, mergeTests } from '@playwright/test'
+import { expect } from '@playwright/test'
 import { test } from '@my/playwright/fixtures/snaplet'
 import { debug, Debugger } from 'debug'
 import { assert } from 'app/utils/assert'
@@ -7,7 +7,7 @@ import { userOnboarded } from '@my/snaplet/src/models'
 let log: Debugger
 
 test.beforeAll(async () => {
-  log = debug('test:profile:anon')
+  log = debug(`test:profile:anon:${test.info().parallelIndex}`)
 })
 
 test('anon user can visit public profile', async ({ page, seed }) => {
