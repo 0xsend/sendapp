@@ -38,6 +38,8 @@ jest.mock('app/utils/useUser', () => ({
   }),
 }))
 
+jest.mock('app/utils/send-accounts')
+
 test('ProfileScreen', async () => {
   jest.useFakeTimers()
 
@@ -62,15 +64,18 @@ test('ProfileScreen', async () => {
   expect(image.props.source).toStrictEqual({
     uri: PROFILE.avatar_url,
   })
-  const button1 = screen.getByText('Send')
+  const button1 = screen.getByTestId('openSendDialogButton')
   expect(button1).toBeOnTheScreen()
   const button2 = screen.getByText('Request')
   expect(button2).toBeOnTheScreen()
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
 
-  const user = userEvent.setup()
-  await user.press(button1)
-  await act(() => jest.runAllTimers())
+  await act(() => {
+    button1.props.onPress()
+    jest.runAllTimers()
+  })
   // @todo figure out why the dialog is not showing
   expect(screen.toJSON()).toMatchSnapshot('SendDialog')
+  const dialog = screen.getByTestId('sendDialogContainer')
+  expect(dialog).toBeOnTheScreen()
 })

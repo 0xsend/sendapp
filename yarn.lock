@@ -28944,6 +28944,7 @@ __metadata:
     "@nderscore/tamagui-typescript-plugin": "npm:^0.6.0"
     check-dependency-version-consistency: "npm:^3.0.3"
     eslint: "npm:^8.46.0"
+    jest: "npm:^29.7.0"
     lefthook: "npm:^1.5.5"
     node-gyp: "npm:^9.3.1"
     pierre: "npm:^2.0.0-alpha.8"

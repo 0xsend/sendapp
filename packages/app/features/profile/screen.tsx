@@ -1,4 +1,15 @@
-import { Button, Container, H1, H2, Paragraph, Spinner, Text, XStack, YStack } from '@my/ui'
+import {
+  Button,
+  Container,
+  H1,
+  H2,
+  Paragraph,
+  Spinner,
+  Text,
+  XStack,
+  YStack,
+  useToastController,
+} from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { useState } from 'react'
@@ -13,6 +24,7 @@ export function ProfileScreen() {
   const [tag] = useParam('tag')
   const { data: profile, isLoading, error } = useProfileLookup(tag)
   const [showSendModal, setShowSendModal] = useState(false)
+  const toast = useToastController()
 
   return (
     <Container>
@@ -27,6 +39,7 @@ export function ProfileScreen() {
             {profile && user?.id !== profile?.id ? (
               <XStack jc="space-around" gap="$6" maxWidth={600}>
                 <Button
+                  testID="openSendDialogButton"
                   f={1}
                   width={'100%'}
                   onPress={() => {
@@ -41,6 +54,7 @@ export function ProfileScreen() {
                   width={'100%'}
                   onPress={() => {
                     console.log('Request', profile.address)
+                    toast.show('TODO: Request')
                   }}
                 >
                   Request

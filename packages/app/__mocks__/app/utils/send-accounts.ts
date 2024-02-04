@@ -12,4 +12,6 @@ const mockSendAccounts = {
   }),
 }
 
+export const useSendAccounts = mockSendAccounts.useSendAccounts
+
 export default mockSendAccounts
