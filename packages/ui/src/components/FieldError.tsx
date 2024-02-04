@@ -15,7 +15,6 @@ export const FieldError = ({ message }: FieldErrorProps) => {
           key="error"
           animation="200ms"
           mt="$2"
-          theme="alt2"
           enterStyle={{
             y: -4,
             scaleY: 0.2,

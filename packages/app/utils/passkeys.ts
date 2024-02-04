@@ -9,15 +9,18 @@ import { assert } from './assert'
  * DER-encoded public key prefix
  * ASN.1 SubjectPublicKeyInfo structure for EC public keys
  */
-const derPrefix = '0x3059301306072a8648ce3d020106082a8648ce3d03010703420004'
+const DER_ECPUBKEY_PREFIX = '0x3059301306072a8648ce3d020106082a8648ce3d03010703420004'
 
 export function isDERPubKey(pubKeyHex: Hex): boolean {
-  return pubKeyHex.startsWith(derPrefix) && pubKeyHex.length === derPrefix.length + 128
+  return (
+    pubKeyHex.startsWith(DER_ECPUBKEY_PREFIX) &&
+    pubKeyHex.length === DER_ECPUBKEY_PREFIX.length + 128
+  )
 }
 
 export function derKeytoContractFriendlyKey(pubKeyHex: Hex): [Hex, Hex] {
   assert(isDERPubKey(pubKeyHex), 'Invalid DER public key')
-  const pubKey = pubKeyHex.substring(derPrefix.length)
+  const pubKey = pubKeyHex.substring(DER_ECPUBKEY_PREFIX.length)
   assert(pubKey.length === 128)
 
   const key1 = `0x${pubKey.substring(0, 64)}` as Hex
@@ -26,7 +29,9 @@ export function derKeytoContractFriendlyKey(pubKeyHex: Hex): [Hex, Hex] {
 }
 
 export function contractFriendlyKeyToDER(accountPubkey: readonly [Hex, Hex]): Hex {
-  return (derPrefix + accountPubkey[0].substring(2) + accountPubkey[1].substring(2)) as Hex
+  return (DER_ECPUBKEY_PREFIX +
+    accountPubkey[0].substring(2) +
+    accountPubkey[1].substring(2)) as Hex
 }
 
 // Parse DER-encoded P256-SHA256 signature to contract-friendly signature

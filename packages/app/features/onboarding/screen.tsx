@@ -27,7 +27,7 @@ import { assert } from 'app/utils/assert'
 import { base64ToBase16 } from 'app/utils/base64ToBase16'
 import { COSEECDHAtoXY, parseCreateResponse } from 'app/utils/passkeys'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useSendAccounts } from 'app/utils/useSendAccounts'
+import { useSendAccounts } from 'app/utils/send-accounts'
 import { useUser } from 'app/utils/useUser'
 import {
   USEROP_KEY_SLOT,

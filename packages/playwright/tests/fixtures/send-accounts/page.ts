@@ -6,7 +6,6 @@ export class OnboardingPage {
   public readonly accountName = `test-${Math.floor(Math.random() * 1000000)}`
 
   async completeOnboarding(expect: Expect<OnboardingPage>) {
-    // TODO: create a send account directly with the API
     await this.page.goto('/')
     expect(this.page).toHaveURL('/onboarding') // no send accounts redirects to onboarding page
 
@@ -16,6 +15,7 @@ export class OnboardingPage {
     await expect(this.page.getByLabel('Passkey name:')).toHaveValue(acctName)
 
     await this.page.getByRole('button', { name: 'Create' }).click()
+    // @todo add a check for the success message
     await this.page.getByRole('button', { name: 'Create' }).waitFor({ state: 'detached' })
   }
 }
