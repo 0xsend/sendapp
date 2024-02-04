@@ -70,18 +70,10 @@ jobs:
           yarn playwright test
       - name: Playwright Report
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.playwright.outcome == 'failure'
         with:
           name: playwright-report
           path: packages/playwright/playwright-report/
-          retention-days: 30
-      # upload playwright test results if it fails
-      - name: Playwright Test Results
-        uses: actions/upload-artifact@v4
-        if: steps.playwright.outcome == 'failure'
-        with:
-          name: playwright-test-results
-          path: packages/playwright/test-results/
           retention-days: 30
 
   # TODO: add back when we decide where to deploy

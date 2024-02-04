@@ -48,7 +48,6 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     /* Configure the video recording. */
-    video: process.env.CI ? 'on-first-retry' : undefined,
     // video: {
     //   size: { width: 1920, height: 1080 },
     //   mode: 'on',

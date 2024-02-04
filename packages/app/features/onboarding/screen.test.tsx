@@ -79,7 +79,7 @@ jest.mock('app/utils/useWebauthnCredentials', () => ({
   }),
 }))
 
-jest.mock('app/utils/useSendAccounts', () => ({
+jest.mock('app/utils/send-accounts', () => ({
   useSendAccounts: jest.fn().mockReturnValue({
     data: null,
     error: null,

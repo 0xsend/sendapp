@@ -2,7 +2,7 @@ import { Button, Paragraph, SubmitButton, useToastController } from '@my/ui'
 import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useSendAccounts } from 'app/utils/send-accounts/useSendAccounts'
+import { useSendAccounts } from 'app/utils/send-accounts'
 import {
   generateUserOp,
   generateChallenge,
@@ -32,6 +32,7 @@ import { useState } from 'react'
 import { webauthnCredToXY } from 'app/utils/webauthn-creds'
 import { ProfileProp } from './SendDialog'
 
+// @todo add currency field
 const SendFormSchema = z.object({
   amount: formFields.number.describe('Amount'),
 })

@@ -3,7 +3,6 @@ import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, screen, userEvent, act } from '@testing-library/react-native'
 
-const mockedNavigate = jest.fn()
 const TAG_NAME = 'pip_test44677'
 const PROFILE = {
   avatar_url:
@@ -16,9 +15,6 @@ const PROFILE = {
   address: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
   chain_id: 845337,
 }
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({ navigate: mockedNavigate }),
-}))
 
 jest.mock('solito', () => ({
   useRoute: () => ({ params: { tag: TAG_NAME } }),
@@ -40,29 +36,6 @@ jest.mock('app/utils/useUser', () => ({
       id: '1',
     },
   }),
-}))
-
-jest.mock('app/utils/useSendAccounts', () => ({
-  useSendAccounts: jest.fn().mockReturnValue({
-    data: [
-      {
-        webauthn_credentials: [
-          {
-            public_key: '0x1234567890',
-          },
-        ],
-      },
-    ],
-  }),
-}))
-
-jest.mock('@daimo/expo-passkeys', () => ({
-  createPasskey: jest.fn(),
-  signWithPasskey: jest.fn(),
-}))
-
-jest.mock('app/provider', () => ({
-  Provider: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 test('ProfileScreen', async () => {
