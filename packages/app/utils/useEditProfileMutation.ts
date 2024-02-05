@@ -3,6 +3,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { formFields } from 'app/utils/SchemaForm'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
+import { useToastController } from '@my/ui'
 
 export const ProfileSchema = z.object({
   name: formFields.text.describe('Name'),
@@ -14,6 +15,7 @@ export const useEditProfileMutation = (userID: string | undefined) => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const router = useRouter()
+  const toast = useToastController()
 
   return useMutation({
     async mutationFn(data: z.infer<typeof ProfileSchema>) {
@@ -32,6 +34,7 @@ export const useEditProfileMutation = (userID: string | undefined) => {
     async onSuccess() {
       await queryClient.invalidateQueries(['profile'])
       router.push('/settings')
+      toast.show('Successfully updated')
     },
   })
 }

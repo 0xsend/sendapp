@@ -51,6 +51,12 @@ module.exports = () => {
         {
           hostname: 'localhost',
         },
+        {
+          hostname: 'avatars.githubusercontent.com',
+        },
+        {
+          hostname: 'cloudflare-ipfs.com',
+        },
       ],
     },
     typescript: {
