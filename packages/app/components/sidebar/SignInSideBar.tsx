@@ -17,7 +17,7 @@ import { SignInForm } from 'app/features/auth/sign-in-form'
 const SignInSideBar = ({ ...props }: YStackProps) => (
   <SideBar width="28%" minWidth={3} maw={405} px="$4" {...props}>
     <Stack f={1} jc="center">
-      <IconSendLogo size={'$13'} />
+      <IconSendLogo size={'$6'} />
     </Stack>
     <YStack f={1} gap="$4" ai="center" jc="center">
       <SignInForm />

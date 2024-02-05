@@ -62,7 +62,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
         </YStack>
       </Nav>
       <YStack gap="$4" alignItems="center">
-        <IconSendLogo />
+        <IconSendLogo size={'$4'} />
         <XStack gap="$2">
           <SideBarFooterLink
             icon={<IconXLogo />}
@@ -128,7 +128,7 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
         </YStack>
       </Nav>
       <YStack gap="$4" py="$4" alignItems="center">
-        <IconSendLogo />
+        <IconSendLogo size={'$4'} />
         <XStack gap="$2">
           <SideBarFooterLink
             icon={<IconXLogo />}

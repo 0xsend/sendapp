@@ -40,7 +40,7 @@ import * as Device from 'expo-device'
 import { concat } from 'viem'
 import {
   IconSLogo,
-  IconSendLogoGreenSlash,
+  IconSendLogo,
   IconTelegramLogo,
   IconXLogo,
   IconCopy,
@@ -111,7 +111,7 @@ export function OnboardingScreen() {
       </Stack>
       <Stack f={1} jc="center">
         <Theme inverse={true}>
-          <IconSendLogoGreenSlash size={media.gtMd ? '$14' : '$10'} color="$background" />
+          <IconSendLogo size={media.gtMd ? '$6' : '$4'} color="$background" />
         </Theme>
       </Stack>
       <YStack f={3} jc="center" maw="100%" $gtMd={{ maw: 400 }} space="$4">

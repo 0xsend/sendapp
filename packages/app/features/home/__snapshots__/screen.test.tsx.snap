@@ -2776,22 +2776,26 @@ exports[`HomeScreen 1`] = `
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
-                    bbHeight="60"
+                    bbWidth="NaN"
                     color="hsla(112, 22%, 59%, 1)"
                     focusable={false}
-                    height={60}
                     meetOrSlice={0}
                     minX={0}
                     minY={0}
+                    strokeWidth="2"
                     style={
-                      {
-                        "backgroundColor": "transparent",
-                        "borderWidth": 0,
-                      }
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {},
+                      ]
                     }
                     tintColor="hsla(112, 22%, 59%, 1)"
                     vbHeight={48}
                     vbWidth={132}
+                    width={NaN}
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <RNSVGGroup
@@ -2801,6 +2805,12 @@ exports[`HomeScreen 1`] = `
                           "type": 0,
                         }
                       }
+                      propList={
+                        [
+                          "strokeWidth",
+                        ]
+                      }
+                      strokeWidth="2"
                     >
                       <RNSVGGroup
                         clipPath="clip0_12_4001"
