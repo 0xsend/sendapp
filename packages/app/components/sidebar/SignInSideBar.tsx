@@ -1,11 +1,11 @@
 import {
+  ButtonText,
   H4,
   Paragraph,
   SideBar,
   SideBarWrapper,
   Stack,
   SubmitButton,
-  Theme,
   XStack,
   YStack,
   YStackProps,
@@ -108,39 +108,38 @@ const SignInForm = () => {
             },
             phone: {
               'aria-label': 'Phone number',
-              borderBottomColor: '$accentBackground',
+              borderBottomColor: '$accent9Light',
               borderWidth: 0,
               borderBottomWidth: 2,
               borderRadius: '$0',
               placeholder: 'Phone Number',
               width: '100%',
               backgroundColor: 'transparent',
+              outlineColor: '$background05',
             },
           }}
           renderAfter={({ submit }) => (
             <>
-              <Theme inverse>
-                <XStack jc={'flex-end'} ai={'center'}>
-                  <SubmitButton
-                    onPress={() => submit()}
-                    borderRadius="$4"
-                    backgroundColor={'$accentBackground'}
-                    width={'$12'}
-                    $sm={{ width: '$10' }}
+              <XStack jc={'flex-end'} ai={'center'}>
+                <SubmitButton
+                  onPress={() => submit()}
+                  br="$4"
+                  bc={'$accent9Light'}
+                  w={'$12'}
+                  $sm={{ width: '$10' }}
+                >
+                  <ButtonText
+                    size={'$1'}
+                    fontWeight={'700'}
+                    padding={'unset'}
+                    ta="center"
+                    margin={'unset'}
+                    col="black"
                   >
-                    <Paragraph
-                      size={'$1'}
-                      textAlign={'center'}
-                      fontWeight={'700'}
-                      padding={'unset'}
-                      margin={'unset'}
-                      // theme={resolvedTheme?.startsWith('dark') ?? 'light'}
-                    >
-                      {'/SEND IT!'}
-                    </Paragraph>
-                  </SubmitButton>
-                </XStack>
-              </Theme>
+                    {'/SEND IT!'}
+                  </ButtonText>
+                </SubmitButton>
+              </XStack>
             </>
           )}
         >
