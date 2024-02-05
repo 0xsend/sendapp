@@ -371,14 +371,16 @@ exports[`OnboardingScreen 1`] = `
         "flex": 3,
         "flexDirection": "column",
         "justifyContent": "center",
-        "maxWidth": 600,
+        "maxWidth": "100%",
       }
     }
   >
     <View
       style={
         {
+          "flex": 1,
           "flexDirection": "column",
+          "width": "100%",
         }
       }
     >
@@ -389,9 +391,9 @@ exports[`OnboardingScreen 1`] = `
           {
             "color": "hsla(112, 22%, 59%, 1)",
             "fontFamily": "System",
-            "fontSize": 30,
+            "fontSize": 23,
             "fontWeight": "700",
-            "lineHeight": 34,
+            "lineHeight": 27,
             "marginBottom": 0,
             "marginLeft": 0,
             "marginRight": 0,
@@ -401,7 +403,7 @@ exports[`OnboardingScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Send it
+        Congratulations on opening your first Send Account! 
       </Text>
       <View
         pointerEvents="none"
@@ -415,35 +417,19 @@ exports[`OnboardingScreen 1`] = `
         }
       />
       <Text
-        cancelable={true}
-        cursor="default"
-        focusable={true}
-        htmlFor="sendTo"
-        id=":r0:"
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
+        selectable={true}
         style={
           {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
             "color": "hsla(112, 22%, 59%, 1)",
-            "display": "flex",
             "fontFamily": "System",
             "fontSize": 16.8,
             "fontWeight": "400",
-            "lineHeight": 44,
+            "lineHeight": 19,
           }
         }
         suppressHighlighting={true}
-        userSelect="none"
       >
-        Sending to:
+        Let's get you sending
       </Text>
       <View
         pointerEvents="none"
@@ -456,296 +442,116 @@ exports[`OnboardingScreen 1`] = `
           }
         }
       />
-      <TextInput
-        accessibilityLabel="sendTo"
-        focusable={true}
-        id="sendTo"
-        onBlur={[Function]}
-        onChangeText={[Function]}
-        onFocus={[Function]}
-        outlineWidth={0}
-        placeholderTextColor="hsla(191, 32%, 50%, 1)"
-        style={
-          {
-            "backgroundColor": "hsla(191, 32%, 10%, 1)",
-            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
-            "borderLeftWidth": 1,
-            "borderRightColor": "hsla(191, 32%, 32%, 1)",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "hsla(191, 32%, 32%, 1)",
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "borderTopWidth": 1,
-            "color": "hsla(112, 22%, 59%, 1)",
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "height": 44,
-            "minWidth": 0,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-          }
-        }
-        value="0x123"
-      />
       <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <Text
-        cancelable={true}
-        cursor="default"
-        focusable={true}
-        htmlFor="sendAmount"
-        id=":r1:"
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "transparent",
-            "color": "hsla(112, 22%, 59%, 1)",
-            "display": "flex",
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "lineHeight": 44,
-          }
-        }
-        suppressHighlighting={true}
-        userSelect="none"
-      >
-        ETH Amount:
-      </Text>
-      <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <TextInput
-        focusable={true}
-        id="sendAmount"
-        onBlur={[Function]}
-        onChangeText={[Function]}
-        onFocus={[Function]}
-        outlineWidth={0}
-        placeholderTextColor="hsla(191, 32%, 50%, 1)"
-        style={
-          {
-            "backgroundColor": "hsla(191, 32%, 10%, 1)",
-            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
-            "borderLeftWidth": 1,
-            "borderRightColor": "hsla(191, 32%, 32%, 1)",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "hsla(191, 32%, 32%, 1)",
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "borderTopWidth": 1,
-            "color": "hsla(112, 22%, 59%, 1)",
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "height": 44,
-            "minWidth": 0,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-          }
-        }
-        value="0.01"
-      />
-      <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <View
-        accessibilityRole="button"
-        cancelable={true}
-        cursor="pointer"
-        focusable={[Function]}
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "hsla(191, 32%, 19%, 1)",
-            "borderBottomColor": "transparent",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "transparent",
-            "borderLeftWidth": 1,
-            "borderRightColor": "transparent",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "transparent",
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "borderTopWidth": 1,
-            "flexDirection": "row",
-            "flexWrap": "nowrap",
-            "height": 44,
+            "flex": 1,
             "justifyContent": "center",
-            "paddingLeft": 18,
-            "paddingRight": 18,
           }
         }
       >
         <Text
-          cursor="pointer"
-          lineBreakMode="clip"
-          numberOfLines={1}
+          selectable={true}
           style={
             {
               "color": "hsla(112, 22%, 59%, 1)",
-              "flexGrow": 0,
-              "flexShrink": 1,
               "fontFamily": "System",
               "fontSize": 16.8,
               "fontWeight": "400",
               "lineHeight": 19,
+              "textAlign": "center",
             }
           }
           suppressHighlighting={true}
-          userSelect="none"
         >
-          Send
+          First, fund your account by sending ETH here
         </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "bold",
+                "lineHeight": 19,
+                "textAlign": "center",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            $
+          </Text>
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight="16"
+            bbWidth="16"
+            color="hsla(112, 22%, 59%, 1)"
+            fill="none"
+            focusable={false}
+            height={16}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            strokeWidth="2"
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {},
+                {
+                  "flex": 0,
+                  "height": 16,
+                  "width": 16,
+                },
+              ]
+            }
+            tintColor="hsla(112, 22%, 59%, 1)"
+            vbHeight={16}
+            vbWidth={16}
+            width={16}
+          >
+            <RNSVGGroup
+              fill={null}
+              propList={
+                [
+                  "fill",
+                  "strokeWidth",
+                ]
+              }
+              strokeWidth="2"
+            >
+              <RNSVGPath
+                d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
+                fill={
+                  {
+                    "type": 2,
+                  }
+                }
+                propList={
+                  [
+                    "fill",
+                    "strokeWidth",
+                    "strokeLinecap",
+                  ]
+                }
+                strokeLinecap={1}
+                strokeWidth="2"
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
+        </View>
       </View>
-      <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <Text
-        cancelable={true}
-        cursor="default"
-        focusable={true}
-        htmlFor="sendResult"
-        id=":r2:"
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "color": "hsla(112, 22%, 59%, 1)",
-            "display": "flex",
-            "fontFamily": "System",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "lineHeight": 44,
-          }
-        }
-        suppressHighlighting={true}
-        userSelect="none"
-      >
-        Send result:
-      </Text>
-      <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <TextInput
-        focusable={true}
-        id="sendResult"
-        multiline={true}
-        numberOfLines={4}
-        onBlur={[Function]}
-        onChangeText={[Function]}
-        onFocus={[Function]}
-        outlineWidth={0}
-        placeholderTextColor="hsla(191, 32%, 50%, 1)"
-        style={
-          {
-            "backgroundColor": "hsla(191, 32%, 10%, 1)",
-            "borderBottomColor": "hsla(191, 32%, 32%, 1)",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "hsla(191, 32%, 32%, 1)",
-            "borderLeftWidth": 1,
-            "borderRightColor": "hsla(191, 32%, 32%, 1)",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "hsla(191, 32%, 32%, 1)",
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "borderTopWidth": 1,
-            "color": "hsla(112, 22%, 59%, 1)",
-            "fontFamily": "monospace",
-            "fontSize": 16.8,
-            "fontWeight": "400",
-            "height": 64,
-            "lineHeight": 19,
-            "minWidth": 0,
-            "paddingBottom": 13,
-            "paddingLeft": 16,
-            "paddingRight": 16,
-            "paddingTop": 13,
-          }
-        }
-      />
     </View>
   </View>
 </View>
