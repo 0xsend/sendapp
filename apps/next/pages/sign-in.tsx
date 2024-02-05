@@ -2,19 +2,25 @@ import { SignInScreen } from 'app/features/auth/sign-in-screen'
 import Head from 'next/head'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
 import { NextPageWithLayout } from './_app'
+import { SignInSideBarWrapper } from 'app/components/sidebar/SignInSideBar'
+import { ScrollView } from '@my/ui'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send</title>
+        <title>Send | Sign In</title>
         <meta
           name="description"
-          content="Send Tags simplify transactions by replacing long wallet addresses with memorable identifiers."
+          content="Infrastructure for Merchants and Stablecoin Transactions"
           key="desc"
         />
       </Head>
-      <SignInScreen />
+      <SignInSideBarWrapper>
+        <ScrollView f={3} fb={0} backgroundColor={'$backgroundHover'}>
+          <SignInScreen />
+        </ScrollView>
+      </SignInSideBarWrapper>
     </>
   )
 }

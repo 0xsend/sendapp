@@ -1,11 +1,14 @@
 import { YStack, YStackProps } from 'tamagui'
 
-export const SideBar = ({ children, ...props }: { children?: React.ReactNode } & YStackProps) => {
+export const SideBar = ({
+  children,
+  width,
+  ...props
+}: { children?: React.ReactNode } & YStackProps) => {
   return (
     <YStack
-      $md={{ display: 'none' }}
       height={'100svh'}
-      width={'20%'}
+      width={width || '20%'}
       py="$6"
       zIndex={1}
       justifyContent="space-around"
@@ -18,4 +21,4 @@ export const SideBar = ({ children, ...props }: { children?: React.ReactNode } &
   )
 }
 
-export * from './Wrapper'
+export { SideBarWrapper } from './Wrapper'

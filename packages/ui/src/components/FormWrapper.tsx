@@ -32,7 +32,7 @@ const Body = forwardRef<TamaguiElement, YStackProps>(function Body(props, ref) {
 })
 
 const Footer = forwardRef<TamaguiElement, YStackProps>(function Footer(props, ref) {
-  return <YStack ref={ref} pb="$4" px="$4" gap="$4" {...props} />
+  return <YStack ref={ref} pb="$4" gap="$4" {...props} />
 })
 
 export const FormWrapper = withStaticProperties(Wrapper, {

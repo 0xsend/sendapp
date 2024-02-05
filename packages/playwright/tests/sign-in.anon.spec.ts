@@ -47,7 +47,7 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
   await expect(page).toHaveURL('/sign-in')
   await ipPromise
 
-  await expect(page.getByText(`${country.dialCode} ${country.flag}`)).toBeVisible()
+  await expect(page.getByText(`${country.flag} +${country.dialCode}`)).toBeVisible()
   await page.getByLabel('Phone number').fill(phone)
 
   // ensure that auth api receives the correct country code

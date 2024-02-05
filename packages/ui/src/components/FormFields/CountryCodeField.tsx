@@ -67,31 +67,21 @@ export const CountryCodeField = ({
           value={country ? country.name : undefined}
           {...props}
         >
-          <Select.Trigger
-            f={1}
-            iconAfter={ChevronDown}
-            paddingTop={'unset'}
-            paddingBottom={'unset'}
-            space="$1"
-            style={{
-              border: '1px solid rgba(195, 171, 142, 0.6)',
-            }}
-            borderColor={'rgba(195, 171, 142, 0.6)'}
-            borderWidth={1}
-            color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}
-          >
+          <Select.Trigger f={1} iconAfter={ChevronDown} space="$3s">
             {country ? (
               <Text
-                fontSize="$1"
-                fontWeight="bold"
+                fontSize="$4"
+                fontWeight="normal"
                 style={{
                   textTransform: 'uppercase',
                 }}
               >
-                {country?.dialCode} {country?.flag}
+                {country?.flag} +{country?.dialCode}
               </Text>
             ) : (
-              'Country'
+              <Text fontSize="$2" fontWeight="normal">
+                Country
+              </Text>
             )}
           </Select.Trigger>
 
