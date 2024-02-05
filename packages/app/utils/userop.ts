@@ -26,6 +26,7 @@ import {
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
 import { baseMainnetClient } from './viem'
+import { assert } from './assert'
 
 // TODO: remove this wallet client and test client
 const privateKey = generatePrivateKey()
@@ -63,6 +64,27 @@ export const verifier = getContract({
   address: daimoVerifierAddress,
 })
 
+/**
+ * Verifies a signature against a challenge and public key onchain. Signature is encoded where the first byte is the
+ * key-slot and the rest is the encoded signature struct.
+ *
+ * @param challenge - The challenge to verify the signature against
+ * @param signature - The signature to verify
+ * @param publicKey - The public key to verify the signature against
+ * @returns A promise that resolves to a boolean indicating whether the signature is valid
+ *
+ * @see signChallenge
+ */
+export async function verifySignature(
+  challenge: Hex,
+  signature: Hex,
+  publicKey: [Hex, Hex]
+): Promise<boolean> {
+  const x = BigInt(publicKey[0])
+  const y = BigInt(publicKey[1])
+  return await verifier.read.verifySignature([challenge, signature, x, y])
+}
+
 export const USEROP_VERSION = 1
 export const USEROP_VALID_UNTIL = 0
 export const USEROP_KEY_SLOT = 0
@@ -80,6 +102,11 @@ export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
   })
 }
 
+// @todo needs to accept a send account and signature
+// @todo add logic for handling init code
+// @todo add logic for handling call data
+// @todo add logic for estimating gas
+// @todo add logic for paymaster and data
 export async function generateUserOp(publicKey: [Hex, Hex]) {
   const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(publicKey)])
 
@@ -140,6 +167,7 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     userOpHash,
   }
 }
+
 export function generateChallenge(_userOpHash: Hex): Hex {
   const version = numberToBytes(USEROP_VERSION, { size: 1 })
   const validUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
@@ -147,25 +175,25 @@ export function generateChallenge(_userOpHash: Hex): Hex {
   const challenge = bytesToHex(concat([version, validUntil, opHash]))
   return challenge
 }
+
+/**
+ * Signs a challenge using the user's passkey and returns the signature in a format that matches the ABI of a signature
+ * struct for the DaimoVerifier contract.
+ */
 export async function signChallenge(challenge: Hex) {
-  if (!challenge || challenge.length <= 0) {
-    throw new Error('No challenge to sign')
-  }
+  assert(challenge.length > 0, 'Invalid challenge length')
   const challengeBytes = hexToBytes(challenge)
   const challengeB64 = Buffer.from(challengeBytes).toString('base64')
-  if (!challengeB64) {
-    throw new Error('No challengeB64 to sign')
-  }
   const sign = await signWithPasskey({
     domain: window.location.hostname,
     challengeB64,
   })
-  const _signResult = parseSignResponse(sign)
-  const clientDataJSON = _signResult.clientDataJSON
-  const authenticatorData = bytesToHex(_signResult.rawAuthenticatorData)
+  const signResult = parseSignResponse(sign)
+  const clientDataJSON = signResult.clientDataJSON
+  const authenticatorData = bytesToHex(signResult.rawAuthenticatorData)
   const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
   const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":'))
-  const { r, s } = parseAndNormalizeSig(_signResult.derSig)
+  const { r, s } = parseAndNormalizeSig(signResult.derSig)
   const webauthnSig = {
     authenticatorData,
     clientDataJSON,
@@ -182,5 +210,6 @@ export async function signChallenge(challenge: Hex) {
     }).inputs,
     [webauthnSig]
   )
+  assert(encodedWebAuthnSig.length > 2, 'Invalid encodedWebAuthnSig')
   return encodedWebAuthnSig
 }

@@ -41,7 +41,6 @@ interface Table_storage_buckets {
   avif_autodetection: boolean | null;
   file_size_limit: number | null;
   allowed_mime_types: string[] | null;
-  owner_id: string | null;
 }
 interface Table_public_chain_addresses {
   address: string;
@@ -204,7 +203,6 @@ interface Table_storage_objects {
   last_accessed_at: string | null;
   metadata: Json | null;
   version: string | null;
-  owner_id: string | null;
 }
 interface Table_public_profiles {
   id: string;
@@ -491,17 +489,17 @@ interface Database {
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "uuid-ossp" | "pgcrypto" | "pgjwt" | "pg_trgm" | "pg_stat_statements" | "pg_net" | "http";
+  extensions: "http" | "uuid-ossp" | "pgcrypto" | "pgjwt" | "pg_trgm" | "pg_stat_statements" | "pg_net";
   graphql: "pg_graphql";
   pgsodium: "pgsodium";
   pgtle: "pg_tle";
-  public: "supabase-dbdev" | "citext";
+  public: "citext" | "supabase-dbdev";
   vault: "supabase_vault";
 }
 interface Tables_relationships {
   "storage.buckets": {
     parent: {
-
+       buckets_owner_fkey: "auth.users";
     };
     children: {
        objects_bucketId_fkey: "storage.objects";
@@ -746,6 +744,7 @@ interface Tables_relationships {
        send_accounts_user_id_fkey: "public.send_accounts";
        tags_user_id_fkey: "public.tags";
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
+       buckets_owner_fkey: "storage.buckets";
     };
   };
   "public.webauthn_credentials": {
@@ -1142,7 +1141,7 @@ type TypedConfig<
      */
       seed?: {
         alias?: import("./snaplet-client").Alias;
-        blueprint?: import("./snaplet-client").Blueprint;
+        fingerprint?: import("./snaplet-client").Fingerprint;
       }
     /**
      * Parameter to configure the inclusion/exclusion of schemas and tables from the snapshot.

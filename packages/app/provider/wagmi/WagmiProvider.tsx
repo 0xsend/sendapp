@@ -14,6 +14,7 @@ const config = createConfig({
       },
     }),
   ],
+  // @ts-expect-error no idea why this is happening
   publicClient: mainnetClient,
 })
 

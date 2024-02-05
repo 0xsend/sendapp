@@ -1,10 +1,22 @@
-import { Anchor, Button, H1, Header, Link, Text, XStack, YStack, useToastController } from '@my/ui'
+import {
+  Anchor,
+  Button,
+  H1,
+  Header,
+  Link,
+  Text,
+  View,
+  XStack,
+  YStack,
+  useToastController,
+} from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { IconClose, IconCopy, IconGear, IconHamburger, IconStar } from './icons'
+import { IconClose, IconCopy, IconGear, IconHamburger, IconStar } from 'app/components/icons'
+import { usePathname } from 'app/utils/usePathname'
 
 // TODO: this should probably named HomeTopNav
 export function HomeHeader({ children }: { children: string }) {
@@ -80,28 +92,50 @@ function ReferralCodeCard() {
 }
 
 function PointsCount() {
+  const pathname = usePathname()
   const { referralsCount, error } = useUserReferralsCount()
   const points = error ? '?' : referralsCount || 0
-
+  if (pathname === '/referrals') {
+    return (
+      <XStack
+        ai="center"
+        space="$2"
+        $gtSm={{ fd: 'row' }}
+        h="100%"
+        bw={2}
+        boc={'$greenVibrant'}
+        f={1}
+        px={'$3'}
+        br="$4"
+        $theme-dark={{ bg: '$greenVibrant' }}
+        $theme-light={{ bg: '$black' }}
+      >
+        <IconStar size={'$2'} color="$background" />
+        <Text col="$background" fontSize={'$1'} fontWeight={'600'}>
+          {points}
+        </Text>
+      </XStack>
+    )
+  }
   return (
-    <XStack
-      ai="center"
-      space="$2"
-      $gtSm={{ fd: 'row' }}
-      cursor="not-allowed"
-      bg="$background"
-      h="100%"
-      borderWidth={2}
-      boc={'$goldVibrant'}
-      f={1}
-      px={'$3'}
-      br="$4"
-    >
-      <IconStar size={'$2'} color={'$goldVibrant'} />
-      <Text color={'$goldVibrant'} fontSize={'$1'} fontWeight={'600'}>
-        {points}
-      </Text>
-    </XStack>
+    <View h="100%" $gtSm={{ fd: 'row' }} display="flex">
+      <Link
+        href="/referrals"
+        bg="$background"
+        borderWidth={2}
+        boc={'$backgroundAccent'}
+        px={'$3'}
+        h="100%"
+        br="$4"
+      >
+        <XStack ai="center" space="$2" h="100%">
+          <IconStar size={'$2'} color={'$backgroundAccent'} />
+          <Text color={'$backgroundAccent'} fontSize={'$1'} fontWeight={'600'}>
+            {points}
+          </Text>
+        </XStack>
+      </Link>
+    </View>
   )
 }
 

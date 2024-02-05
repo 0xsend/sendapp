@@ -104,6 +104,21 @@ local_resource(
     ),
 )
 
+local_resource(
+    "snaplet:generate",
+    "bunx snaplet generate",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "supabase",
+    ],
+    deps = files_matching(
+        os.path.join("supabase", "migrations"),
+        lambda f: f.endswith(".sql"),
+    ),
+)
+
 ui_theme_dir = os.path.join("packages", "ui", "src", "themes")
 
 ui_theme_files = files_matching(
@@ -206,12 +221,25 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "cd supabase && yarn run reset && yarn run generate",
+        "yarn workspace @my/supabase reset && yarn workspace @my/supabase generate",
     ],
     icon_name = "restart_alt",
     location = location.NAV,
     resource = "supabase",
     text = "supabase db reset",
+)
+
+cmd_button(
+    "snaplet:seed",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn snaplet:seed",
+    ],
+    icon_name = "delete_forever",
+    location = location.NAV,
+    resource = "supabase",
+    text = "snaplet seed",
 )
 
 mainnet_fork_block_number = str(local(
@@ -433,6 +461,7 @@ local_resource(
     resource_deps = [
         "yarn:install",
         "anvil:mainnet",
+        "anvil:base",
         "supabase",
         "supabase:generate",
         "wagmi:generate",
@@ -531,6 +560,8 @@ local_resource(
         "anvil:base",
         "anvil:send-account-fixtures",
         "aa_bundler:base",
+        "snaplet:generate",
+        "supabase",
     ],
 )
 

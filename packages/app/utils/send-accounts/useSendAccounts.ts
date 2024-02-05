@@ -1,8 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
-import { useSupabase } from './supabase/useSupabase'
-import { useUser } from './useUser'
+import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { useSupabase } from '../supabase/useSupabase'
+import { useUser } from '../useUser'
+import { Tables } from '@my/supabase/database.types'
 
-export const useSendAccounts = () => {
+type SendAccountQuery = Tables<'send_accounts'> & {
+  send_account_credentials: Tables<'send_account_credentials'>[]
+  webauthn_credentials: Tables<'webauthn_credentials'>[]
+}
+export function useSendAccounts(): UseQueryResult<SendAccountQuery[], Error> {
   const { user } = useUser()
   const supabase = useSupabase()
 

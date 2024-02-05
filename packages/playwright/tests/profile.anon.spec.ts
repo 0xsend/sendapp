@@ -1,17 +1,19 @@
-import { expect, mergeTests } from '@playwright/test'
-import { test } from '@my/playwright/fixtures/supawright'
+import { expect } from '@playwright/test'
+import { test } from '@my/playwright/fixtures/snaplet'
 import { debug, Debugger } from 'debug'
-import { createOtherUser } from './fixtures/supawright'
 import { assert } from 'app/utils/assert'
+import { userOnboarded } from '@my/snaplet/src/models'
 
 let log: Debugger
 
 test.beforeAll(async () => {
-  log = debug('test:profile:anon')
+  log = debug(`test:profile:anon:${test.info().parallelIndex}`)
 })
 
-test('anon user can visit public profile', async ({ page, supawright }) => {
-  const { tag } = await createOtherUser(supawright)
+test('anon user can visit public profile', async ({ page, seed }) => {
+  const plan = await seed.users([userOnboarded])
+  const tag = plan.tags[0]
+  assert(!!tag, 'tag not found')
   await page.goto(`/profile/${tag.name}`)
   const title = await page.title()
   expect(title).toBe('Send | Profile')
@@ -20,16 +22,10 @@ test('anon user can visit public profile', async ({ page, supawright }) => {
   await expect(page.getByRole('button', { name: 'Request' })).toBeVisible()
 })
 
-test('anon user cannot visit private profile', async ({ page, supawright }) => {
-  const { otherUser, tag } = await createOtherUser(supawright)
-  const { error } = await supawright
-    .supabase('public')
-    .from('profiles')
-    .update({
-      is_public: false,
-    })
-    .eq('id', otherUser.id)
-  assert(!error, error?.message)
+test('anon user cannot visit private profile', async ({ page, seed }) => {
+  const plan = await seed.users([{ ...userOnboarded, profiles: [{ isPublic: false }] }])
+  const tag = plan.tags[0]
+  assert(!!tag, 'tag not found')
   await page.goto(`/profile/${tag.name}`)
   const title = await page.title()
   expect(title).toBe('404 | Send')

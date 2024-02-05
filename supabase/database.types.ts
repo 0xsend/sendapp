@@ -75,9 +75,9 @@ export type Database = MergeDeep<
         profile_lookup: {
           Returns: {
             id: string | null
-            avatar_url: string
-            name: string
-            about: string
+            avatar_url: string | null
+            name: string | null
+            about: string | null
             referral_code: string
             tag_name: string
             address: string

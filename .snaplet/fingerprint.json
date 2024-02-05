@@ -1,0 +1,212 @@
+{
+  "_http_response": {
+    "id": { "options": {} },
+    "status_code": { "options": {} },
+    "created": { "options": {} }
+  },
+  "audit_log_entries": { "created_at": { "options": {} } },
+  "buckets": {
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2023 } },
+    "updated_at": { "options": { "minYear": 2023, "maxYear": 2023 } },
+    "file_size_limit": { "options": { "min": 2097152, "max": 2097152 } }
+  },
+  "chain_addresses": { "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } } },
+  "distribution_shares": {
+    "id": { "options": { "min": 1, "max": 5788463 } },
+    "amount": { "options": { "min": 96237, "max": 74752954 } },
+    "hodler_pool_amount": { "options": { "min": 96237, "max": 64914760 } },
+    "bonus_pool_amount": { "options": { "min": 0, "max": 26161590 } },
+    "fixed_pool_amount": { "options": { "min": 10000, "max": 60000 } },
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
+  },
+  "distribution_verification_values": {
+    "fixed_value": { "options": { "min": 0, "max": 10000 } },
+    "bips_value": { "options": { "min": 0, "max": 500 } },
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
+  },
+  "distribution_verifications": {
+    "metadata": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-06/schema#",
+        "$ref": "#/definitions/Metadata",
+        "definitions": {
+          "Metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "tag": { "type": "string" },
+              "referred_id": { "type": "string", "format": "uuid" }
+            },
+            "required": ["tag"],
+            "title": "Metadata"
+          }
+        }
+      }
+    },
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
+  },
+  "distributions": {
+    "number": { "options": { "min": 1, "max": 3 } },
+    "amount": { "options": { "min": 900000000, "max": 1000000000 } },
+    "hodler_pool_bips": { "options": { "min": 6500, "max": 6500 } },
+    "bonus_pool_bips": { "options": { "min": 3500, "max": 3500 } },
+    "fixed_pool_bips": { "options": { "min": 1000, "max": 1000 } },
+    "qualification_start": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "qualification_end": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "claim_end": { "options": { "minYear": 2024, "maxYear": 2024 } },
+    "snapshot_id": { "options": { "min": 1, "max": 2 } },
+    "hodler_min_balance": { "options": { "min": 1000000, "max": 2000000 } },
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
+  },
+  "feature_info": {},
+  "flow_state": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "hooks": {
+    "hook_table_id": { "options": {} },
+    "created_at": { "options": {} },
+    "request_id": { "options": {} }
+  },
+  "http_request_queue": { "id": { "options": {} }, "timeout_milliseconds": { "options": {} } },
+  "identities": {
+    "last_sign_in_at": { "options": {} },
+    "created_at": { "options": {} },
+    "updated_at": { "options": {} }
+  },
+  "instances": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "key": {
+    "created": { "options": {} },
+    "expires": { "options": {} },
+    "key_id": { "options": {} }
+  },
+  "mfa_amr_claims": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "mfa_challenges": { "created_at": { "options": {} }, "verified_at": { "options": {} } },
+  "mfa_factors": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "storage_migrations": { "executed_at": { "options": { "minYear": 2024, "maxYear": 2024 } } },
+  "supabase_functions_migrations": {
+    "inserted_at": { "options": { "minYear": 2024, "maxYear": 2024 } }
+  },
+  "objects": {
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "last_accessed_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "metadata": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-06/schema#",
+        "$ref": "#/definitions/Metadata",
+        "definitions": {
+          "Metadata": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "eTag": { "type": "string" },
+              "size": { "type": "integer" },
+              "mimetype": { "type": "string" },
+              "cacheControl": { "type": "string" },
+              "lastModified": { "type": "string", "format": "date-time" },
+              "contentLength": { "type": "integer" },
+              "httpStatusCode": { "type": "integer" }
+            },
+            "required": [
+              "cacheControl",
+              "contentLength",
+              "eTag",
+              "httpStatusCode",
+              "lastModified",
+              "mimetype",
+              "size"
+            ],
+            "title": "Metadata"
+          }
+        }
+      }
+    }
+  },
+  "profiles": {},
+  "receipts": { "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } } },
+  "referrals": {},
+  "refresh_tokens": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "saml_providers": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "saml_relay_states": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "auth_schema_migrations": {},
+  "supabase_migrations_schema_migrations": {},
+  "secrets": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "send_account_credentials": { "key_slot": { "options": {} }, "created_at": { "options": {} } },
+  "send_accounts": {
+    "chain_id": { "options": {} },
+    "created_at": { "options": {} },
+    "updated_at": { "options": {} },
+    "deleted_at": { "options": {} }
+  },
+  "send_transfer_logs": {
+    "value": { "options": { "min": 1, "max": 100000000000 } },
+    "block_number": { "options": { "min": 17579999, "max": 19059449 } },
+    "block_timestamp": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } }
+  },
+  "sessions": {
+    "created_at": { "options": {} },
+    "updated_at": { "options": {} },
+    "not_after": { "options": {} }
+  },
+  "sso_domains": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "sso_providers": { "created_at": { "options": {} }, "updated_at": { "options": {} } },
+  "tag_receipts": {},
+  "tag_reservations": { "created_at": { "options": { "minYear": 2023, "maxYear": 2023 } } },
+  "tags": { "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } } },
+  "users": {
+    "email_confirmed_at": { "options": {} },
+    "invited_at": { "options": {} },
+    "confirmation_sent_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "recovery_sent_at": { "options": {} },
+    "email_change_sent_at": { "options": {} },
+    "last_sign_in_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "raw_app_meta_data": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-06/schema#",
+        "$ref": "#/definitions/RawAppMetaData",
+        "definitions": {
+          "RawAppMetaData": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "provider": { "type": "string" },
+              "providers": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["provider", "providers"],
+            "title": "RawAppMetaData"
+          }
+        }
+      }
+    },
+    "raw_user_meta_data": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-06/schema#",
+        "$ref": "#/definitions/RawUserMetaData",
+        "definitions": {
+          "RawUserMetaData": {
+            "type": "object",
+            "additionalProperties": false,
+            "title": "RawUserMetaData"
+          }
+        }
+      }
+    },
+    "created_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "updated_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "phone_confirmed_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "phone_change_sent_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "confirmed_at": { "options": { "minYear": 2023, "maxYear": 2024 } },
+    "email_change_confirm_status": { "options": { "min": 0, "max": 0 } },
+    "banned_until": { "options": {} },
+    "reauthentication_sent_at": { "options": {} },
+    "deleted_at": { "options": {} }
+  },
+  "webauthn_credentials": {
+    "sign_count": { "options": {} },
+    "created_at": { "options": {} },
+    "updated_at": { "options": {} },
+    "deleted_at": { "options": {} }
+  }
+}

@@ -9,4 +9,6 @@ export * from './SendLogo'
 export * from './Container'
 export * from './KVTable'
 export * from './SideBar'
+
 export * from './BottomSheet'
+export * from './CornerTriangle'

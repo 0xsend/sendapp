@@ -1,21 +1,24 @@
 import { expect, test as authTest } from './fixtures/auth'
-import { test as supawrightTest } from '@my/playwright/fixtures/supawright'
+import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { debug, Debugger } from 'debug'
-import { createOtherUser } from './fixtures/supawright'
-import { assert } from 'app/utils/assert'
 import { OnboardingPage } from './fixtures/send-accounts'
 import { mergeTests } from '@playwright/test'
+import { assert } from 'app/utils/assert'
+import { userOnboarded } from '@my/snaplet/src/models'
 
-const test = mergeTests(supawrightTest, authTest)
+const test = mergeTests(snapletTest, authTest)
 
 let log: Debugger
 
 test.beforeAll(async () => {
-  log = debug('test:profile:anon')
+  log = debug(`test:profile:anon:${test.info().parallelIndex}`)
 })
 
-test('logged in user needs onboarding before visiting profile', async ({ page, supawright }) => {
-  const { tag } = await createOtherUser(supawright)
+test('logged in user needs onboarding before visiting profile', async ({ page, seed }) => {
+  const plan = await seed.users([userOnboarded])
+  log(plan.tags)
+  const tag = plan.tags[0]
+  assert(!!tag, 'tag not found')
   await page.goto(`/profile/${tag.name}`)
   expect(await page.title()).toBe('Send | Onboarding')
   await new OnboardingPage(page).completeOnboarding(expect)

@@ -1,10 +1,6 @@
 import '@testing-library/react-native/extend-expect'
 
-// console.log('jest.setup.ts')
-
-// jest.mock('@vonovak/react-native-theme-control', () => {
-//   return {
-//     setThemePreference: jest.fn(),
-//     useThemePreference: jest.fn(),
-//   }
-// })
+jest.mock('@react-navigation/native')
+jest.mock('@daimo/expo-passkeys')
+jest.mock('app/provider')
+jest.mock('app/utils/send-accounts')

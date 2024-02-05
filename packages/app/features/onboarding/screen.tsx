@@ -27,7 +27,7 @@ import { assert } from 'app/utils/assert'
 import { base64ToBase16 } from 'app/utils/base64ToBase16'
 import { COSEECDHAtoXY, parseCreateResponse } from 'app/utils/passkeys'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useSendAccounts } from 'app/utils/useSendAccounts'
+import { useSendAccounts } from 'app/utils/send-accounts'
 import { useUser } from 'app/utils/useUser'
 import {
   USEROP_KEY_SLOT,
@@ -181,6 +181,8 @@ function CreateSendAccount() {
  */
 function SendAccountUserOp() {
   const { data: sendAccts } = useSendAccounts()
+  const sendAcct = sendAccts?.[0]
+  const webauthnCred = sendAcct?.webauthn_credentials?.[0]
 
   const [publicKey, setPublicKey] = useState<[Hex, Hex] | null>(null)
   const [senderAddress, setSenderAddress] = useState<Hex | null>(null)
@@ -193,16 +195,14 @@ function SendAccountUserOp() {
 
   // monitor send accounts, automatically set the public key if there is one
   useEffect(() => {
-    if (!sendAccts?.length) {
+    if (!sendAcct) {
       return
     }
-    const sendAcct = sendAccts[0]
     assert(!!sendAcct, 'No send account')
-    const webauthnCred = sendAcct.webauthn_credentials[0]
     assert(!!webauthnCred, 'No send account credentials')
     setSenderAddress(sendAcct.address)
     setPublicKey(COSEECDHAtoXY(base16.decode(webauthnCred.public_key.slice(2).toUpperCase())))
-  }, [sendAccts])
+  }, [sendAcct, webauthnCred])
 
   // generate user op based on public key, and generate challenge from the user op hash
   // TODO: decouple generate user op from public key and instead only use sender address

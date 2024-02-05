@@ -1,9 +1,7 @@
-import { Button, Container, H1, H2, XStack, YStack } from '@my/ui'
-import { useUser } from 'app/utils/useUser'
+import { Button, Container, H1, H2, YStack } from '@my/ui'
 import { Link } from 'solito/link'
 
 export function UnknownScreen() {
-  const user = useUser()
   return (
     <Container>
       <YStack jc={'center'} alignItems="center" f={1} gap="$6">

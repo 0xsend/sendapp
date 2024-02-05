@@ -47,10 +47,14 @@ jobs:
       - name: All Changes Committed
         shell: bash
         run: git diff --exit-code
+      - name: Snaplet Login
+        shell: bash
+        run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
       # this is on purpose so we get github annotations
       - name: Playwright Tests
+        id: playwright
         shell: bash
         env:
           DEBUG: test:*,app:*
@@ -64,8 +68,9 @@ jobs:
           echo tilt is ready
           tilt wait --timeout 60s --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
-      - uses: actions/upload-artifact@v3
-        if: always()
+      - name: Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always() && steps.playwright.outcome == 'failure'
         with:
           name: playwright-report
           path: packages/playwright/playwright-report/

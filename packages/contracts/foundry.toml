@@ -12,12 +12,13 @@ optimizer_runs = 999_999
 via_ir = true
 
 [profile.mainnet]
+evm_version = "shanghai"
 # should be updated after releases
-fork_block_number = 18952309
+fork_block_number = 19136812
 
 [profile.base]
 # should be updated after releases
-fork_block_number = 8903308
+fork_block_number = 10020254
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 
