@@ -2,8 +2,7 @@ import { SignInScreen } from 'app/features/auth/sign-in-screen'
 import Head from 'next/head'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
 import { NextPageWithLayout } from './_app'
-import { SignInSideBarWrapper } from 'app/components/sidebar/SignInSideBar'
-import { ScrollView } from '@my/ui'
+import { AuthLayout } from 'app/features/auth/layout.web'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -16,15 +15,13 @@ export const Page: NextPageWithLayout = () => {
           key="desc"
         />
       </Head>
-      <SignInSideBarWrapper>
-        <ScrollView f={3} fb={0} backgroundColor={'$backgroundHover'}>
-          <SignInScreen />
-        </ScrollView>
-      </SignInSideBarWrapper>
+      <SignInScreen />
     </>
   )
 }
 
 export const getServerSideProps = guestOnlyGetSSP()
+
+Page.getLayout = (children) => <AuthLayout>{children}</AuthLayout>
 
 export default Page
