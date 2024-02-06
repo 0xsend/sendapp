@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { selectAll } from 'app/utils/supabase/selectAll'
 
 export const distributionRouter = createTRPCRouter({
   proof: protectedProcedure
@@ -13,15 +14,14 @@ export const distributionRouter = createTRPCRouter({
     )
     .query(async ({ ctx: { session }, input: { distributionId } }) => {
       // lookup active distribution shares
-      const { data: shares, error } = await supabaseAdmin
-        .from('distribution_shares')
-        .select('index, address, amount, user_id')
-        .eq('distribution_id', distributionId)
-        .order('index', { ascending: true })
+      const shares = await selectAll(
+        supabaseAdmin
+          .from('distribution_shares')
+          .select('index, address, amount, user_id', { count: 'exact' })
+          .eq('distribution_id', distributionId)
+          .order('index', { ascending: true })
+      )
 
-      if (error) {
-        throw new Error(error.message)
-      }
       const myShare = shares.find(({ user_id }) => user_id === session?.user.id)
 
       if (!shares || shares.length === 0 || !myShare) {
