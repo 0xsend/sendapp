@@ -8,9 +8,9 @@ export function useProfileLookup(
   tag?: string
 ): UseQueryResult<Functions<'profile_lookup'>[number], PostgrestError> {
   const supabase = useSupabase()
-  return useQuery(
-    ['profile', tag],
-    async () => {
+  return useQuery({
+    queryKey: ['profile', tag],
+    queryFn: async () => {
       assert(!!tag, 'tag is required')
       const { data, error } = await supabase.rpc('profile_lookup', { tag }).maybeSingle()
       if (error) {
@@ -18,8 +18,6 @@ export function useProfileLookup(
       }
       return data
     },
-    {
-      enabled: !!tag,
-    }
-  )
+    enabled: !!tag,
+  })
 }

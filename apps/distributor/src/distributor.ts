@@ -1,6 +1,6 @@
 import { cpus } from 'os'
 import { Database, Functions, Tables } from '@my/supabase/database.types'
-import { sendABI as sendTokenABI, sendAddress as sendTokenAddress } from '@my/wagmi'
+import { sendAbi as sendTokenAbi, sendAddress as sendTokenAddress } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
 import { LRUCache } from 'lru-cache'
 import type { Logger } from 'pino'
@@ -335,9 +335,9 @@ export class DistributorWorker {
 
     // lookup balances of all hodler addresses in qualification period
     const sendTokenContract = getContract({
-      abi: sendTokenABI,
+      abi: sendTokenAbi,
       address: sendTokenAddress[client.chain.id],
-      publicClient: client,
+      client,
     })
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
       return await Promise.all(

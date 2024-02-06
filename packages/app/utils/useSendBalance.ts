@@ -1,4 +1,4 @@
-import { sendABI, sendAddress } from '@my/wagmi'
+import { sendAbi, sendAddress } from '@my/wagmi'
 import { useBalance, useChainId, useContractRead } from 'wagmi'
 
 export const useSendBalance = (address?: `0x${string}`) => {
@@ -19,7 +19,7 @@ export const useSendBalanceOfAt = ({
 }) => {
   const chainId = useChainId() as keyof typeof sendAddress
   return useContractRead({
-    abi: sendABI,
+    abi: sendAbi,
     functionName: 'balanceOfAt',
     address: sendAddress[chainId],
     // biome-ignore lint/style/noNonNullAssertion: we know address and snapshot are defined when enabled is true

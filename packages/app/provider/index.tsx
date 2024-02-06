@@ -8,6 +8,8 @@ import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
 
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 export function Provider({
   initialSession,
   children,
@@ -17,7 +19,10 @@ export function Provider({
 }) {
   return (
     <AuthProvider initialSession={initialSession}>
-      <Providers>{children}</Providers>
+      <Providers>
+        {children}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </Providers>
     </AuthProvider>
   )
 }

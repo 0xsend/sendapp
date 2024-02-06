@@ -22,7 +22,8 @@ export const useReceipts = () => {
     isLoading,
     refetch,
     error,
-  } = useQuery(['receipts'], {
+  } = useQuery({
+    queryKey: ['receipts'],
     queryFn: async () => {
       if (!user?.id) return
       const { data, error } = await supabase.from('receipts').select('*')

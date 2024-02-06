@@ -7,14 +7,15 @@ import { getBaseUrl } from './getBaseUrl'
 export const api = createTRPCNext<AppRouter>({
   config() {
     return {
-      transformer: SuperJSON,
       links: [
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
+          transformer: SuperJSON,
         }),
       ],
     }
   },
+  transformer: SuperJSON,
   /**
    * @link https://trpc.io/docs/ssr
    **/

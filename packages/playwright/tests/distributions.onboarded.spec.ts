@@ -1,8 +1,6 @@
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import debug from 'debug'
-// import { Tables } from '@my/supabase/database.types'
 import { expect, test } from './fixtures/send-accounts'
-// import { Page } from '@playwright/test'
 
 let log: debug.Debugger
 
@@ -13,6 +11,11 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('can visit distributions page', async ({ page }) => {
+  await page.goto('/distributions')
+  await expect(page).toHaveURL('/distributions')
+})
+
+test('can claim distributions page', async ({ page }) => {
   await page.goto('/distributions')
   await expect(page).toHaveURL('/distributions')
 })

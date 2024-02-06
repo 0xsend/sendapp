@@ -1,7 +1,7 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen, userEvent, act } from '@testing-library/react-native'
+import { render, screen, act } from '@testing-library/react-native'
 
 const TAG_NAME = 'pip_test44677'
 const PROFILE = {

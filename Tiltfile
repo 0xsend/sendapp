@@ -242,6 +242,19 @@ cmd_button(
     text = "snaplet seed",
 )
 
+cmd_button(
+    "snaplet:snapshot:restore",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn snaplet:snapshot:restore",
+    ],
+    icon_name = "settings_backup_restore",
+    location = location.NAV,
+    resource = "supabase",
+    text = "snaplet snapshot restore",
+)
+
 mainnet_fork_block_number = str(local(
     "cat packages/contracts/foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
     echo_off = True,

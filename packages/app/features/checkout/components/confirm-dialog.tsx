@@ -36,15 +36,15 @@ import {
   useAccount,
   useBlockNumber,
   useConnect,
-  useNetwork,
-  usePrepareSendTransaction,
+  useEstimateGas,
   usePublicClient,
   useSendTransaction,
   useSignMessage,
-  useSwitchNetwork,
-  useWaitForTransaction,
+  useSwitchChain,
+  useWaitForTransactionReceipt,
 } from 'wagmi'
 import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../screen'
+import { assert } from 'app/utils/assert'
 
 export interface ConfirmContextType {
   open: boolean
@@ -250,12 +250,14 @@ export function ConfirmDialog({
 }
 
 export function ConfirmFlow() {
-  const { isConnected } = useAccount()
+  const { isConnected, chainId } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
   const publicClient = usePublicClient()
   const { data: rpcChainId, isLoading: isLoadingRpcChainId } = useRpcChainId()
-  const network = useNetwork()
-  const { switchNetwork } = useSwitchNetwork({ chainId: publicClient.chain.id })
+
+  assert(!!publicClient?.chain.id, 'publicClient.chain.id is required')
+
+  const { switchChain } = useSwitchChain()
   const { isLoadingTags } = useUser()
 
   if (isLoadingTags) {
@@ -287,6 +289,7 @@ export function ConfirmFlow() {
         <Button
           w="100%"
           onPress={() => {
+            assert(!!connectors[0], 'No connectors found')
             connect({ connector: connectors[0] })
           }}
         >
@@ -321,14 +324,21 @@ export function ConfirmFlow() {
     )
   }
 
-  if (publicClient.chain.id !== network.chain?.id) {
+  if (publicClient.chain.id !== chainId) {
     return (
       <ConfirmDialogContent>
         <Dialog.Description>
           Please switch to {publicClient.chain.name} in your wallet.
         </Dialog.Description>
         <Theme name="error">
-          <Button onPress={() => switchNetwork?.()}>Switch Network</Button>
+          <Button
+            onPress={() => {
+              assert(!!switchChain, 'switchChain is required')
+              switchChain({ chainId: publicClient.chain.id })
+            }}
+          >
+            Switch Network
+          </Button>
         </Theme>
       </ConfirmDialogContent>
     )
@@ -345,25 +355,17 @@ export function ConfirmWithVerifiedAddress() {
     isLoading: isLoadingAddresses,
     refetch: updateAddresses,
   } = useChainAddresses()
-  const { address: connectedAddress } = useAccount({
-    onConnect() {
-      setError(undefined)
-    },
-    onDisconnect() {
-      setError(undefined)
-    },
-  })
-  const { signMessageAsync, error: signMsgErr } = useSignMessage({
-    message: verifyAddressMsg(connectedAddress ?? ''),
-  })
+  const { address: connectedAddress, status } = useAccount()
+  const { signMessageAsync, error: signMsgErr } = useSignMessage()
   const address = addresses?.[0]?.address // this only works cause we limit to 1 address
   const savedAddress = useMemo(() => address, [address])
   const [error, setError] = useState<string>()
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: run when connectedAddress changes
   useEffect(() => {
-    setError(undefined)
-  }, [connectedAddress])
+    if (status === 'connected' || status === 'disconnected') {
+      setError(undefined)
+    }
+  }, [status])
 
   if (isLoadingAddresses || !connectedAddress) {
     return (
@@ -416,8 +418,10 @@ export function ConfirmWithVerifiedAddress() {
         </Paragraph>
         <Theme>
           <Button
-            onPress={() =>
-              signMessageAsync?.()
+            onPress={() => {
+              assert(!!signMessageAsync, 'signMessageAsync is required')
+              assert(!!connectedAddress, 'connectedAddress is required')
+              signMessageAsync({ message: verifyAddressMsg(connectedAddress) })
                 .then((signature) => verify.mutateAsync({ address: connectedAddress, signature }))
                 .then(() => updateAddresses())
                 .catch((e) => {
@@ -428,7 +432,7 @@ export function ConfirmWithVerifiedAddress() {
                     setError('Something went wrong')
                   }
                 })
-            }
+            }}
           >
             Sign Message
           </Button>
@@ -474,7 +478,7 @@ export function ConfirmWithSignTransaction() {
   const confirm = api.tag.confirm.useMutation()
   const publicClient = usePublicClient()
   const [sentTx, setSentTx] = useState<`0x${string}`>()
-  const { data: txReceipt, error: txWaitError } = useWaitForTransaction({
+  const { data: txReceipt, error: txWaitError } = useWaitForTransactionReceipt({
     hash: sentTx,
     confirmations: 2,
   })
@@ -575,6 +579,8 @@ export function ConfirmWithSignTransaction() {
       reset()
     }
   }, [open, reset])
+
+  assert(!!publicClient, 'publicClient is required')
 
   if (confirmed) {
     return (
@@ -698,18 +704,17 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
   const confirmedTags = useConfirmedTags()
   const ethAmount = getPriceInWei(pendingTags ?? [], confirmedTags ?? [])
 
-  const {
-    config,
-    error: sendTxErr,
-    isLoading,
-  } = usePrepareSendTransaction({
+  const tx = {
     to: sendRevenueSafeAddress,
     value: ethAmount,
-  })
-  const { sendTransactionAsync } = useSendTransaction(config)
+  } as const
+  const { data: txData, error: sendTxErr, isLoading } = useEstimateGas(tx)
+  const { sendTransactionAsync } = useSendTransaction()
   const [error, setError] = useState<string>()
   const receiptHashes = useMemo(() => receipts?.map((r) => r.hash) ?? [], [receipts])
   const { data: block } = useBlockNumber()
+
+  assert(!!publicClient, 'publicClient is required')
 
   const lookupSafeReceivedEvent = useCallback(async () => {
     if (!address) return
@@ -802,16 +807,20 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
             )}
           </AnimatePresence>
         }
-        onPress={() =>
-          sendTransactionAsync?.()
-            .then(({ hash }) => {
+        onPress={() => {
+          assert(!!sendTransactionAsync, 'sendTransactionAsync is required')
+          sendTransactionAsync({
+            gas: txData,
+            ...tx,
+          })
+            .then((hash) => {
               onSent(hash)
             })
             .catch((err) => {
               console.error(err)
               setError('Something went wrong')
             })
-        }
+        }}
       >
         Sign Transaction
       </Button>

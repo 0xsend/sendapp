@@ -2,14 +2,15 @@ import { Tables, Views } from '@my/supabase/database.types'
 import {
   sendAddress,
   sendAirdropsSafeAddress,
-  sendMerkleDropABI,
+  sendMerkleDropAbi,
   sendMerkleDropAddress,
   sendUniswapV3PoolAddress,
+  useReadSendMerkleDropTrancheActive,
 } from '@my/wagmi'
 import { PostgrestError } from '@supabase/supabase-js'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useBalance, useChainId, useContractRead, usePrepareContractWrite } from 'wagmi'
+import { useBalance, useChainId, useReadContract, useSimulateContract } from 'wagmi'
 import { api } from './api'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
@@ -29,7 +30,8 @@ export type UseDistributionsResultData = (UseDistributionResultDistribution & {
 
 export const useDistributions = (): UseQueryResult<UseDistributionsResultData, PostgrestError> => {
   const supabase = useSupabase()
-  return useQuery(['distributions'], {
+  return useQuery({
+    queryKey: ['distributions'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('distributions')
@@ -75,10 +77,11 @@ export const useActiveDistribution = () => {
 export const useSendTokenBalance = (address?: `0x${string}`) => {
   const chainId = useChainId() as keyof typeof sendAddress
   return useBalance({
-    watch: true,
     address,
     token: sendAddress[chainId],
-    enabled: !!address,
+    query: {
+      enabled: !!address,
+    },
   })
 }
 
@@ -89,7 +92,8 @@ export const useSendSellCountDuringDistribution = (
   distribution: UseDistributionsResultData[number]
 ): UseQueryResult<Tables<'send_transfer_logs'>[], Error> => {
   const supabase = useSupabase()
-  return useQuery(['distributions', 'send_transfer_logs', distribution.id], {
+  return useQuery({
+    queryKey: ['distributions', 'send_transfer_logs', distribution.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('send_transfer_logs')
@@ -116,8 +120,8 @@ export const useSendSellCountDuringDistribution = (
  */
 export const useSendMerkleDropTrancheActive = (tranche: bigint) => {
   const chainId = useChainId() as keyof typeof sendMerkleDropAddress
-  return useContractRead({
-    abi: sendMerkleDropABI,
+  return useReadContract({
+    abi: sendMerkleDropAbi,
     functionName: 'trancheActive',
     address: sendMerkleDropAddress[chainId],
     args: [tranche],
@@ -131,13 +135,15 @@ export const useSendMerkleDropTrancheActive = (tranche: bigint) => {
  */
 export const useSendMerkleDropIsClaimed = (tranche: bigint, index?: bigint) => {
   const chainId = useChainId() as keyof typeof sendMerkleDropAddress
-  return useContractRead({
-    abi: sendMerkleDropABI,
+  return useReadContract({
+    abi: sendMerkleDropAbi,
     functionName: 'isClaimed',
     address: sendMerkleDropAddress[chainId],
     // biome-ignore lint/style/noNonNullAssertion: we know index is defined when enabled is true
     args: [tranche, index!],
-    enabled: index !== undefined,
+    query: {
+      enabled: index !== undefined,
+    },
   })
 }
 
@@ -150,6 +156,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
   distribution,
   share,
 }: SendMerkleDropClaimTrancheArgs) => {
+  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = useChainId() as keyof typeof sendMerkleDropAddress
   // get the merkle proof from the database
   const {
@@ -158,21 +165,47 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     error: errorProof,
   } = api.distribution.proof.useQuery({ distributionId: distribution.id })
   const { address, amount, index } = share ?? {}
+
+  const {
+    data: isClaimed,
+    isLoading: isClaimedLoading,
+    error: isClaimedError,
+  } = useSendMerkleDropIsClaimed(
+    trancheId,
+    share?.index !== undefined ? BigInt(share.index) : undefined
+  )
+
+  const {
+    data: trancheActive,
+    isLoading: isLoadingTrancheActive,
+    error: errorTrancheActive,
+  } = useReadSendMerkleDropTrancheActive({ args: [trancheId] })
+
   const enabled =
     !isLoadingProof &&
     !errorProof &&
     merkleProof !== undefined &&
     index !== undefined &&
     amount !== undefined &&
-    address !== undefined
+    address !== undefined &&
+    !isClaimedLoading &&
+    !isClaimedError &&
+    isClaimed !== undefined &&
+    !isClaimed &&
+    !isLoadingTrancheActive &&
+    !errorTrancheActive &&
+    trancheActive !== undefined &&
+    trancheActive // tranche is onchain and active
 
-  return usePrepareContractWrite({
-    abi: sendMerkleDropABI,
+  return useSimulateContract({
+    abi: sendMerkleDropAbi,
     functionName: 'claimTranche',
     chainId,
     address: sendMerkleDropAddress[chainId],
     account: address,
-    enabled,
+    query: {
+      enabled,
+    },
     // claimTranche(
     //     address _address,
     //     uint256 _tranche,
@@ -182,7 +215,7 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
     // )
     args: enabled
       ? // biome-ignore lint/style/noNonNullAssertion: we know address, index, amount, and merkleProof are defined when enabled is true
-        [address!, BigInt(distribution.number - 1), BigInt(index!), BigInt(amount!), merkleProof!]
+        [address!, trancheId, BigInt(index!), BigInt(amount!), merkleProof!]
       : undefined,
   })
 }
