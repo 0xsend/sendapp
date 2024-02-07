@@ -26,7 +26,7 @@ export const QRCodePayments = (props: ISvgProps) => {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       fill="none"
       viewBox="0 0 954 820"
-      preserveAspectRatio="xMidYMin slice"
+      preserveAspectRatio="xMaxYMin slice"
       style={{ borderRadius: 33 }}
       {...rest}
     >

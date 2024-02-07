@@ -29,16 +29,16 @@ const SignInSchema = z.object({
 })
 
 const SignInSideBar = ({ ...props }: YStackProps) => (
-  <SideBar width="28%" maw="405px" {...props}>
-    <Stack href={'/'} f={1} jc="center">
-      <IconSendLogo />
+  <SideBar width="28%" minWidth={3} maw={405} px="$4" {...props}>
+    <Stack f={1} jc="center">
+      <IconSendLogo size={'$13'} />
     </Stack>
     <YStack f={1} gap="$4" ai="center" jc="center">
       <SignInForm />
     </YStack>
     <YStack gap="$4" ai="center" f={1} jc="flex-end">
       <XStack gap="$2" ai="center">
-        <Paragraph size={'$1'} color={'$gray11'}>
+        <Paragraph size={'$1'} color={'$accentColor'}>
           Connect with us
         </Paragraph>
 
@@ -177,9 +177,13 @@ const SignInForm = () => {
 }
 
 export const SignInSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
-  return (
-    <SideBarWrapper sidebar={<SignInSideBar backgroundColor={'$backgroundStrong'} />}>
-      {children}
-    </SideBarWrapper>
-  )
+  const media = useMedia()
+  if (media.gtMd) {
+    return (
+      <SideBarWrapper sidebar={<SignInSideBar backgroundColor={'$backgroundStrong'} />}>
+        {children}
+      </SideBarWrapper>
+    )
+  }
+  return children
 }
