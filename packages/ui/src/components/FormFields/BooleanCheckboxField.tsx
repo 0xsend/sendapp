@@ -1,6 +1,6 @@
 import { Check } from '@tamagui/lucide-icons'
 import { useFieldInfo, useTsController } from '@ts-react/form'
-import { useId } from 'react'
+import { useEffect, useState, useId } from 'react'
 import {
   Checkbox,
   CheckboxProps,
@@ -13,7 +13,9 @@ import {
 } from 'tamagui'
 import { FieldError } from '../FieldError'
 
-export const BooleanCheckboxField = (props: Pick<CheckboxProps, 'size' | 'native'>) => {
+export const BooleanCheckboxField = (
+  props: Pick<CheckboxProps, 'size' | 'native' | 'defaultChecked'>
+) => {
   const {
     field,
     error,
@@ -24,20 +26,28 @@ export const BooleanCheckboxField = (props: Pick<CheckboxProps, 'size' | 'native
   const themeName = useThemeName()
   const disabled = isSubmitting
 
+  const [isChecked, setIsChecked] = useState(props.defaultChecked)
+
+  useEffect(() => {
+    setIsChecked(props.defaultChecked)
+  }, [props.defaultChecked])
+
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
-        <XStack gap="$4">
+        <XStack gap="$4" ai={'center'}>
           {!!label && (
-            <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
+            <Label size={props.size || '$3'} htmlFor={id}>
               {label} {isOptional && '(Optional)'}
             </Label>
           )}
           <Checkbox
             disabled={disabled}
-            native
-            checked={field.value}
-            onCheckedChange={(checked) => field.onChange(checked)}
+            checked={isChecked}
+            onCheckedChange={(checked) => {
+              setIsChecked(checked)
+              field.onChange(checked)
+            }}
             ref={field.ref}
             id={id}
             {...props}

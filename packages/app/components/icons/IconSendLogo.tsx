@@ -7,9 +7,9 @@ const SendLogo = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
-      color={color as ColorTokens | undefined}
-      width={95}
+      width={size ?? 95}
       height={size ?? 16}
+      color={color as ColorTokens | undefined}
       viewBox="0 0 154 26"
       fill="none"
       {...rest}

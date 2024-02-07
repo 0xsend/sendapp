@@ -1,4 +1,4 @@
-import { FormWrapper, H4, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
+import { FormWrapper, H2, H4, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
 import { MobileOtpType } from '@supabase/supabase-js'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
@@ -47,6 +47,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           token: {
             'aria-label': 'One-time Password',
             placeholder: 'Code',
+            borderWidth: 1,
           },
         }}
         renderAfter={({ submit }) => (

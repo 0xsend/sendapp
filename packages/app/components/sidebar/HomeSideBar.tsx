@@ -16,6 +16,7 @@ import {
   IconActivity,
   IconDashboard,
   IconDistributions,
+  IconGear,
   IconSLogo,
   IconSendLogo,
   IconTelegramLogo,
@@ -51,6 +52,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
             text={'Distributions'}
             href={'/distributions'}
           />
+          <SideBarNavLink icon={<IconGear size={'$2'} />} text={'Settings'} href={'/settings'} />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
             text={'Leaderboard'}
@@ -110,6 +112,11 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
             icon={<IconDistributions size={'$2'} />}
             text={'Distributions'}
             href={'/distributions'}
+          />
+          <SideBarNavLink
+            icon={<IconDistributions size={'$2'} />}
+            text={'Settings'}
+            href={'/settings'}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}

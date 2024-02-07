@@ -19,7 +19,7 @@ export {
   goldDark,
 } from '@tamagui/themes'
 
-export const lightColor = 'rgba(241, 241, 238, 1)'
+export const lightColor = '#101010'
 export const darkColor = 'rgba(22, 22, 25, 1)'
 export const lightTransparent = 'rgba(22, 22, 25, 0)'
 export const darkTransparent = 'rgba(241, 241, 238, 0)'

@@ -51,6 +51,12 @@ module.exports = () => {
         {
           hostname: 'localhost',
         },
+        {
+          hostname: 'avatars.githubusercontent.com',
+        },
+        {
+          hostname: 'cloudflare-ipfs.com',
+        },
       ],
     },
     typescript: {
@@ -69,6 +75,7 @@ module.exports = () => {
       'expo-constants',
       'expo-modules-core',
       'expo-device',
+      'expo-image-picker',
     ],
     experimental: {
       scrollRestoration: true,

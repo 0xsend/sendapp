@@ -1,10 +1,21 @@
-import { Anchor, Button, H1, Header, Link, Text, View, XStack, useToastController } from '@my/ui'
+import {
+  Anchor,
+  Button,
+  H1,
+  Header,
+  Link,
+  Text,
+  View,
+  XStack,
+  YStack,
+  useToastController,
+} from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { IconClose, IconCopy, IconHamburger, IconSettings, IconStar } from 'app/components/icons'
+import { IconClose, IconCopy, IconGear, IconHamburger, IconStar } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 
 // TODO: this should probably named HomeTopNav
@@ -132,17 +143,19 @@ function SettingsButton() {
   return (
     <XStack
       ai="center"
+      jc="center"
       space="$2"
       $gtSm={{ fd: 'row' }}
-      cursor="not-allowed"
       bg="$background"
       h="100%"
       f={1}
       px={'$3'}
       br="$4"
     >
-      <Link href="" cursor="not-allowed" alignSelf="stretch">
-        <IconSettings size={'$2'} />
+      <Link href="/settings" alignSelf="stretch">
+        <YStack ai={'center'}>
+          <IconGear size={'$2'} />
+        </YStack>
       </Link>
     </XStack>
   )

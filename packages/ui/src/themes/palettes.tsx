@@ -44,7 +44,7 @@ export const palettes = (() => {
     darkTransparent,
   ]
 
-  const darkColor = 'rgba(241, 241, 238, 1)'
+  const darkColor = '#101010'
   const darkPalette = [
     darkTransparent,
     '#101010',
