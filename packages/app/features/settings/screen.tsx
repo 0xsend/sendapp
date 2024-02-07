@@ -266,13 +266,8 @@ export function SettingsScreen() {
                 opacity={0.3}
               />
               {accountTheme.map((account) => (
-                <Link href={account.href ?? '/'}>
-                  <XStack
-                    jc={'space-between'}
-                    marginBottom={20}
-                    key={account.label}
-                    onPress={() => account.action()}
-                  >
+                <Link href={account.href ?? '/'} key={account.label}>
+                  <XStack jc={'space-between'} marginBottom={20} onPress={() => account.action()}>
                     <XStack>
                       {account.icon}
                       <Paragraph paddingLeft={'$3'} fontSize={16} fontWeight={'400'}>

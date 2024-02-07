@@ -1,13 +1,14 @@
 import { expect, test } from './fixtures/send-accounts'
 
-test('can visit settings page', async ({ page }) => {
+test.beforeEach(async ({ page }) => {
   await page.goto('/settings')
+})
+
+test('can visit settings page', async ({ page }) => {
   await expect(page).toHaveURL('/settings')
 })
 
 test('can update profile', async ({ page, supabase }) => {
-  await page.goto('/settings')
-
   const editProfileButton = page.getByRole('button', { name: 'Edit Profile' })
   await editProfileButton.click()
 
