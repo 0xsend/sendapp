@@ -594,6 +594,33 @@ local_resource(
     ),
 )
 
+cmd_button(
+    "playwright:show-report",
+    argv = [
+        "yarn",
+        "playwright",
+        "playwright show-report",
+    ],
+    icon_name = "info",
+    location = location.RESOURCE,
+    resource = "playwright:test",
+    text = "playwright report",
+)
+
+cmd_button(
+    "playwright:test:ui",
+    argv = [
+        "yarn",
+        "playwright",
+        "test",
+        "--ui",
+    ],
+    icon_name = "bug_report",
+    location = location.RESOURCE,
+    resource = "playwright:test",
+    text = "playwright test --ui",
+)
+
 local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
