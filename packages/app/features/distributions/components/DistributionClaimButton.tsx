@@ -1,4 +1,5 @@
 import { Anchor, Button, Paragraph, TooltipSimple, YStack } from '@my/ui'
+import { assert } from 'app/utils/assert'
 import {
   UseDistributionsResultData,
   usePrepareSendMerkleDropClaimTrancheWrite,
@@ -10,11 +11,10 @@ import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
 import {
   useAccount,
   useConnect,
-  useContractWrite,
-  useNetwork,
+  useWriteContract,
   usePublicClient,
-  useSwitchNetwork,
-  useWaitForTransaction,
+  useSwitchChain,
+  useWaitForTransactionReceipt,
 } from 'wagmi'
 
 interface DistributionsClaimButtonProps {
@@ -42,25 +42,37 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     trancheId,
     share?.index !== undefined ? BigInt(share.index) : undefined
   )
-  const { isConnected, address: account } = useAccount()
+  const { isConnected, address: account, chain } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
   const publicClient = usePublicClient()
   const { data: rpcChainId, isLoading: isLoadingRpcChainId } = useRpcChainId()
-  const network = useNetwork()
-  const { switchNetwork } = useSwitchNetwork({ chainId: publicClient.chain.id })
-  const { config: claimWriteConfig, error: claimWriteConfigError } =
-    usePrepareSendMerkleDropClaimTrancheWrite({
-      distribution,
-      share,
-    })
-  const { data: claimWriteData, write: claimWrite } = useContractWrite(claimWriteConfig)
+  const { switchChain } = useSwitchChain()
   const {
-    isLoading: isClaimWriteLoading,
-    isSuccess: isClaimWriteSuccess,
-    error: claimWriteError,
-  } = useWaitForTransaction({
-    hash: claimWriteData?.hash,
+    data: claimWriteConfig,
+    error: claimWriteConfigError,
+    isPending: isClaimWritePending,
+  } = usePrepareSendMerkleDropClaimTrancheWrite({
+    distribution,
+    share,
   })
+
+  const {
+    data: claimWriteHash,
+    writeContract: writeClaim,
+    isPending: isClaimWriteSubmitted,
+    error: writeClaimError,
+  } = useWriteContract()
+
+  const { isSuccess: claimReceiptSuccess, error: claimReceiptError } = useWaitForTransactionReceipt(
+    {
+      hash: claimWriteHash,
+      query: {
+        enabled: !!claimWriteHash,
+      },
+    }
+  )
+
+  assert(!!publicClient, 'No public client found')
 
   if (!isClaimActive) {
     return null
@@ -90,7 +102,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         <Button disabled f={1} w="100%">
           Claim
         </Button>
-        <Paragraph size="$1" theme="alt2">
+        <Paragraph size="$1" theme="alt2" width={'100%'}>
           Error checking eligibility. Please try again later. {isTrancheActiveError?.message}
           {` ${isClaimedError?.message}`}
         </Paragraph>
@@ -124,13 +136,13 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <Paragraph size="$1" theme="alt2" mx="auto">
         Already claimed{' '}
-        {isClaimWriteSuccess && (
+        {claimReceiptSuccess && (
           <Paragraph size="$1" theme="alt2">
             <Anchor
               accessibilityLabel="View Claim on Etherscan"
-              href={`https://etherscan.io/tx/${claimWriteData?.hash}`}
+              href={`https://etherscan.io/tx/${claimWriteHash}`}
             >
-              {shorten(claimWriteData?.hash)}
+              {shorten(claimWriteHash)}
             </Anchor>
           </Paragraph>
         )}
@@ -147,6 +159,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         <Button
           w="100%"
           onPress={() => {
+            assert(!!connectors[0], 'No connectors found')
             connect({ connector: connectors[0] })
           }}
         >
@@ -208,13 +221,19 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     )
   }
 
-  if (publicClient.chain.id !== network.chain?.id) {
+  if (publicClient.chain.id !== chain?.id) {
     return (
       <YStack ai="center" w="100%" mx="auto">
         <Paragraph size="$1" theme="alt2">
-          Please switch to {network.chain?.name} to claim
+          Please switch to {chain?.name} to claim
         </Paragraph>
-        <Button w="100%" onPress={() => switchNetwork?.()}>
+        <Button
+          w="100%"
+          onPress={() => {
+            assert(!!switchChain, 'No switchChain found')
+            switchChain({ chainId: publicClient.chain.id })
+          }}
+        >
           Switch Network
         </Button>
       </YStack>
@@ -227,7 +246,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         <Button disabled f={1} w="100%">
           Claim
         </Button>
-        <Paragraph size="$1" theme="alt2">
+        <Paragraph size="$1" theme="alt2" width={'100%'}>
           Error preparing claim. Please try again later. {claimWriteConfigError.message}
         </Paragraph>
       </YStack>
@@ -239,27 +258,41 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     <YStack ai="center" w="100%" mx="auto">
       <Button
         w="100%"
-        disabled={!claimWrite || isClaimWriteLoading || isClaimWriteSuccess}
+        disabled={
+          !writeClaim ||
+          isClaimWritePending ||
+          isClaimWriteSubmitted ||
+          claimReceiptSuccess ||
+          !!claimWriteHash
+        }
         onPress={() => {
-          claimWrite?.()
-          refetchIsClaimed?.()
+          assert(!!writeClaim, 'No writeClaim found')
+          assert(!!claimWriteConfig, 'No claimWriteConfig found')
+          assert(!!refetchIsClaimed, 'No refetchIsClaimed found')
+          writeClaim(claimWriteConfig.request)
+          refetchIsClaimed()
         }}
       >
-        {isClaimWriteLoading ? 'Claiming...' : 'Claim'}
+        {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim'}
       </Button>
-      {claimWriteError && (
-        <Paragraph size="$1" theme="alt2">
-          Error claiming. Please try again later. {claimWriteError.message}
+      {claimReceiptError && (
+        <Paragraph size="$1" theme="alt2" width={'100%'}>
+          Error claiming. Please try again later. {claimReceiptError.message}
         </Paragraph>
       )}
-      {isClaimWriteSuccess && (
+      {writeClaimError && (
+        <Paragraph size="$1" theme="alt2" width={'100%'}>
+          Error claiming. Please try again later. {writeClaimError.message}
+        </Paragraph>
+      )}
+      {claimReceiptSuccess && (
         <Paragraph size="$1" theme="alt2">
           Claimed!{' '}
           <Anchor
             accessibilityLabel="View Claim on Etherscan"
-            href={`https://etherscan.io/tx/${claimWriteData?.hash}`}
+            href={`https://etherscan.io/tx/${claimWriteHash}`}
           >
-            {shorten(claimWriteData?.hash)}
+            {shorten(claimWriteHash)}
           </Anchor>
         </Paragraph>
       )}

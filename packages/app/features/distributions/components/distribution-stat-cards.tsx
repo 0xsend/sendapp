@@ -391,7 +391,7 @@ export function DistributionTimeCard(props: CardProps) {
           </XStack>
         </YStack>
       </YStack>
-      <YStack px="$4" pb="$4" justifyContent="center">
+      <YStack px="$4" pb="$4" justifyContent="center" maw={600}>
         <DistributionClaimButton distribution={distribution} />
       </YStack>
     </DistributionsStatCard>

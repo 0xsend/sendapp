@@ -17,7 +17,10 @@ const fetchGeoIp = async () => {
 }
 
 export const useGeoIp = () => {
-  const { data, error, isLoading } = useQuery(['geoIp'], fetchGeoIp)
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['geoIp'],
+    queryFn: fetchGeoIp,
+  })
 
   return {
     data,

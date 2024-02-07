@@ -6,7 +6,8 @@ export function useChainAddresses(): UseQueryResult<Tables<'chain_addresses'>[],
   const { user } = useUser()
   const supabase = useSupabase()
 
-  return useQuery(['chain_addresses'], {
+  return useQuery({
+    queryKey: ['chain_addresses'],
     queryFn: async () => {
       const { data, error } = await supabase.from('chain_addresses').select('*')
 

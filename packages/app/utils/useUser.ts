@@ -10,7 +10,8 @@ export const useUser = () => {
     data: profile,
     isLoading: isLoadingProfile,
     refetch,
-  } = useQuery(['profile'], {
+  } = useQuery({
+    queryKey: ['profile'],
     queryFn: async () => {
       if (!user?.id) return null
       const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
@@ -34,7 +35,8 @@ export const useUser = () => {
     data: tags,
     isLoading: isLoadingTags,
     refetch: refetchTags,
-  } = useQuery(['tags'], {
+  } = useQuery({
+    queryKey: ['tags'],
     queryFn: async () => {
       if (!user?.id) return null
       const { data, error } = await supabase.from('tags').select('*')

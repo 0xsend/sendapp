@@ -16,7 +16,7 @@
     "extract-zip": "^2.0.1",
     "headless-web3-provider": "^0.2.2",
     "jsonwebtoken": "^9.0.2",
-    "viem": "^1.21.1"
+    "viem": "^2.7.6"
   },
   "scripts": {
     "_with-env": "dotenv -e ../../.env -c -- ",

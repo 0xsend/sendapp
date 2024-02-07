@@ -242,6 +242,19 @@ cmd_button(
     text = "snaplet seed",
 )
 
+cmd_button(
+    "snaplet:snapshot:restore",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn snaplet:snapshot:restore",
+    ],
+    icon_name = "settings_backup_restore",
+    location = location.NAV,
+    resource = "supabase",
+    text = "snaplet snapshot restore",
+)
+
 mainnet_fork_block_number = str(local(
     "cat packages/contracts/foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
     echo_off = True,
@@ -579,6 +592,33 @@ local_resource(
         os.path.join("packages", "playwright"),
         lambda f: f.endswith(".ts"),
     ),
+)
+
+cmd_button(
+    "playwright:show-report",
+    argv = [
+        "yarn",
+        "playwright",
+        "playwright show-report",
+    ],
+    icon_name = "info",
+    location = location.RESOURCE,
+    resource = "playwright:test",
+    text = "playwright report",
+)
+
+cmd_button(
+    "playwright:test:ui",
+    argv = [
+        "yarn",
+        "playwright",
+        "test",
+        "--ui",
+    ],
+    icon_name = "bug_report",
+    location = location.RESOURCE,
+    resource = "playwright:test",
+    text = "playwright test --ui",
 )
 
 local_resource(

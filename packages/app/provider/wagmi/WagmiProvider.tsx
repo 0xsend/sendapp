@@ -1,21 +1,20 @@
 import { mainnet } from 'app/utils/viem/chains'
 import { mainnetClient } from 'app/utils/viem/client'
 import { type FC, type ReactNode } from 'react'
-import { WagmiConfig, createConfig } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WagmiProvider as OGWagmiProvider, createConfig } from 'wagmi'
+import { injected } from 'wagmi/connectors'
 
 const config = createConfig({
-  autoConnect: true,
+  chains: [mainnet],
   connectors: [
-    new InjectedConnector({
-      chains: [mainnet],
-      options: {
-        shimDisconnect: true,
-      },
+    injected({
+      shimDisconnect: true,
     }),
   ],
-  // @ts-expect-error no idea why this is happening
-  publicClient: mainnetClient,
+  client({ chain }) {
+    if (chain.id === mainnetClient.chain.id) return mainnetClient
+    throw new Error(`Invalid chain: ${chain.id}`)
+  },
 })
 
 export const WagmiProvider: FC<{ children: ReactNode }> = ({
@@ -23,5 +22,5 @@ export const WagmiProvider: FC<{ children: ReactNode }> = ({
 }: {
   children: ReactNode
 }) => {
-  return <WagmiConfig config={config}>{children}</WagmiConfig>
+  return <OGWagmiProvider config={config}>{children}</OGWagmiProvider>
 }

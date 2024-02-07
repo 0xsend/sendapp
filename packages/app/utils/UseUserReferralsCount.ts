@@ -16,7 +16,8 @@ export const useUserReferralsCount = () => {
     isLoading,
     refetch,
     error,
-  } = useQuery(['user_referrals_count'], {
+  } = useQuery({
+    queryKey: ['user_referrals_count'],
     queryFn: async () => {
       if (!user?.id) return
       const { data, error } = await supabase.rpc('user_referrals_count').select('*')

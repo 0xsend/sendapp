@@ -8,6 +8,7 @@ import {
   SizableText,
   XStack,
   YStack,
+  useMedia,
 } from '@my/ui'
 import { IconClose } from 'app/components/icons'
 import { AvatarProfile } from './AvatarProfile'
@@ -18,6 +19,7 @@ import { SendForm } from './SendForm'
 export type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
 export function SendDialog({ profile, ...props }: DialogProps & { profile: ProfileProp }) {
+  const media = useMedia()
   return (
     <Dialog modal {...props}>
       <Adapt when="sm" platform="touch">
@@ -59,9 +61,11 @@ export function SendDialog({ profile, ...props }: DialogProps & { profile: Profi
           enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
           exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
           px={'$7'}
-          fullscreen
+          fullscreen={media.sm}
+          maxHeight={media.sm ? '100%' : 600}
+          minHeight={media.sm ? '100%' : 600}
         >
-          <Container>
+          <Container testID="sendDialogContainer">
             <YStack f={1} gap="$5">
               <XStack jc="space-between" ai="center">
                 <XStack ai="center" gap="$2">
@@ -74,10 +78,10 @@ export function SendDialog({ profile, ...props }: DialogProps & { profile: Profi
                 </Dialog.Close>
               </XStack>
               <Dialog.Description>
-                <XStack ai="center" gap="$5">
+                <YStack ai="center" gap="$5">
                   <AvatarProfile profile={profile} />
                   <SizableText fontWeight="bold">{profile.name}</SizableText>
-                </XStack>
+                </YStack>
               </Dialog.Description>
               <Provider>
                 <SendForm profile={profile} />

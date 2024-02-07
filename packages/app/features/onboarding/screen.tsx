@@ -21,7 +21,7 @@ import {
   TextArea,
   YStack,
 } from '@my/ui'
-import { iEntryPointABI } from '@my/wagmi'
+import { iEntryPointAbi } from '@my/wagmi'
 import { base16, base64 } from '@scure/base'
 import { assert } from 'app/utils/assert'
 import { base64ToBase16 } from 'app/utils/base64ToBase16'
@@ -329,7 +329,7 @@ async function sendUserOp({
     .simulateContract({
       address: entrypoint.address,
       functionName: 'simulateValidation',
-      abi: iEntryPointABI,
+      abi: iEntryPointAbi,
       args: [_userOp],
     })
     .catch((e: ContractFunctionExecutionError) => {
@@ -350,7 +350,7 @@ async function sendUserOp({
     .simulateContract({
       address: entrypoint.address,
       functionName: 'simulateHandleOp',
-      abi: iEntryPointABI,
+      abi: iEntryPointAbi,
       args: [
         _userOp,
         '0x0000000000000000000000000000000000000000', // target address TODO: optionally return target address result

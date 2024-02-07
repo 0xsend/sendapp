@@ -1,5 +1,6 @@
 import { defineConfig } from '@wagmi/cli'
-import { actions, foundry } from '@wagmi/cli/plugins'
+import { react, actions, foundry } from '@wagmi/cli/plugins'
+import { pascalCase } from 'change-case'
 import { globby } from 'globby'
 
 const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
@@ -126,11 +127,47 @@ export default defineConfig({
       ],
     }),
     actions({
-      getContract: true,
-      readContract: true,
-      writeContract: true,
-      watchContractEvent: false,
-      // overridePackageName: '@wagmi/core',
+      getActionName: (() => {
+        const actionNames = new Set<string>()
+        return ({ contractName, type, itemName }) => {
+          const ContractName = pascalCase(contractName)
+          const ItemName = itemName ? pascalCase(itemName) : undefined
+
+          let actionName: string
+          if (type === 'simulate') {
+            actionName = `prepareWrite${ContractName}${ItemName ?? ''}`
+          } else {
+            actionName = `${type}${ContractName}${ItemName ?? ''}`
+            if (type === 'watch') actionName = `${actionName}Event`
+          }
+
+          if (actionNames.has(actionName)) {
+            actionName = `_${actionName}`
+          }
+
+          actionNames.add(actionName)
+
+          return actionName
+        }
+      })(),
+    }),
+    react({
+      getHookName: (() => {
+        const hookNames = new Set<string>()
+
+        return ({ contractName, type, itemName }) => {
+          const ContractName = pascalCase(contractName)
+          const ItemName = itemName ? pascalCase(itemName) : undefined
+
+          let hookName = `use${pascalCase(type)}${ContractName}${ItemName ?? ''}`
+          if (type === 'watch') hookName = `${hookName}Event`
+
+          if (hookNames.has(hookName)) hookName = `_${hookName}`
+
+          hookNames.add(hookName)
+          return hookName as `use${string}`
+        }
+      })(),
     }),
   ],
 })

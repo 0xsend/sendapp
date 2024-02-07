@@ -1,11 +1,11 @@
 import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
-  daimoAccountABI,
-  daimoAccountFactoryABI,
+  daimoAccountAbi,
+  daimoAccountFactoryAbi,
   daimoAccountFactoryAddress as daimoAccountFactoryAddresses,
-  daimoVerifierABI,
+  daimoVerifierAbi,
   daimoVerifierProxyAddress,
-  iEntryPointABI,
+  iEntryPointAbi,
 } from '@my/wagmi'
 import { UserOperation, getSenderAddress } from 'permissionless'
 import {
@@ -45,22 +45,22 @@ export const testClient = createTestClient({
 })
 
 export const daimoAccountFactory = getContract({
-  abi: daimoAccountFactoryABI,
+  abi: daimoAccountFactoryAbi,
   address: daimoAccountFactoryAddresses[845337], // TODO: use chain id
-  publicClient: baseMainnetClient,
+  client: baseMainnetClient,
 })
 
 export const entrypoint = getContract({
-  abi: [getAbiItem({ abi: iEntryPointABI, name: 'getUserOpHash' })],
-  publicClient: baseMainnetClient,
+  abi: [getAbiItem({ abi: iEntryPointAbi, name: 'getUserOpHash' })],
+  client: baseMainnetClient,
   address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
 })
 
 export const daimoVerifierAddress = daimoVerifierProxyAddress[845337] // TODO: use chain id
 
 export const verifier = getContract({
-  abi: daimoVerifierABI,
-  publicClient: baseMainnetClient,
+  abi: daimoVerifierAbi,
+  client: baseMainnetClient,
   address: daimoVerifierAddress,
 })
 
@@ -92,7 +92,7 @@ export const USEROP_SALT = 0n
 
 export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
   return encodeFunctionData({
-    abi: [getAbiItem({ abi: daimoAccountFactoryABI, name: 'createAccount' })],
+    abi: [getAbiItem({ abi: daimoAccountFactoryAbi, name: 'createAccount' })],
     args: [
       USEROP_KEY_SLOT, // key slot
       publicKey, // public key
@@ -133,7 +133,7 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
   const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
 
   const callData = encodeFunctionData({
-    abi: daimoAccountABI,
+    abi: daimoAccountAbi,
     functionName: 'executeBatch',
     args: [
       [
@@ -205,7 +205,7 @@ export async function signChallenge(challenge: Hex) {
 
   const encodedWebAuthnSig = encodeAbiParameters(
     getAbiItem({
-      abi: daimoAccountABI,
+      abi: daimoAccountAbi,
       name: 'signatureStruct',
     }).inputs,
     [webauthnSig]

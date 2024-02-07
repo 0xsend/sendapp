@@ -25,7 +25,7 @@ import {
   ContractFunctionRevertedError,
   parseEther,
 } from 'viem'
-import { iEntryPointABI } from '@my/wagmi'
+import { iEntryPointAbi } from '@my/wagmi'
 import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from 'app/utils/viem/client'
 import { assert } from 'app/utils/assert'
 import { useState } from 'react'
@@ -134,7 +134,7 @@ async function sendUserOp({
     .simulateContract({
       address: entrypoint.address,
       functionName: 'simulateValidation',
-      abi: iEntryPointABI,
+      abi: iEntryPointAbi,
       args: [_userOp],
     })
     .catch((e: ContractFunctionExecutionError) => {
@@ -155,7 +155,7 @@ async function sendUserOp({
     .simulateContract({
       address: entrypoint.address,
       functionName: 'simulateHandleOp',
-      abi: iEntryPointABI,
+      abi: iEntryPointAbi,
       args: [
         _userOp,
         '0x0000000000000000000000000000000000000000',

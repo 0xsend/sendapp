@@ -30,7 +30,8 @@
     "next-app": "yarn workspace next-app",
     "playwright": "yarn workspace @my/playwright",
     "distributor": "yarn workspace distributor",
-    "snaplet:seed": "DRY=0 bunx tsx ./packages/snaplet/seed.ts"
+    "snaplet:seed": "DRY=0 bunx tsx ./packages/snaplet/seed.ts",
+    "snaplet:snapshot:restore": "bunx snaplet snapshot restore --no-reset --latest"
   },
   "resolutions": {
     "react": "^18.2.0",
@@ -54,6 +55,7 @@
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
     "@biomejs/biome": "1.5.3",
+    "jest": "^29.7.0",
     "lefthook": "^1.5.5"
   }
 }

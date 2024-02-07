@@ -18,7 +18,7 @@ import {
   parseEther,
 } from 'viem'
 
-import { daimoAccountABI, iEntryPointABI } from '@my/wagmi'
+import { daimoAccountAbi, iEntryPointAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import {
   USEROP_VALID_UNTIL,
@@ -38,7 +38,7 @@ jest.mock('@daimo/expo-passkeys', () => ({
 }))
 
 const signatureStruct = getAbiItem({
-  abi: daimoAccountABI,
+  abi: daimoAccountAbi,
   name: 'signatureStruct',
 }).inputs
 
@@ -149,7 +149,7 @@ async function createAccountAndVerifySignature() {
     .simulateContract({
       address: entrypoint.address,
       functionName: 'simulateValidation',
-      abi: iEntryPointABI,
+      abi: iEntryPointAbi,
       args: [_userOp],
     })
     .catch((e: ContractFunctionExecutionError) => {
@@ -228,7 +228,7 @@ test('can get gas user operation gas prices', async () => {
 
 //   const depositTxHash = await walletClient.writeContract({
 //     address: entrypoint.address,
-//     abi: iEntryPointABI,
+//     abi: iEntryPointAbi,
 //     functionName: 'depositTo',
 //     args: [addr],
 //     value: parseEther('1'), // 0.01 ETH

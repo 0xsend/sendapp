@@ -6,7 +6,8 @@ export const useWebauthnCredentials = () => {
   const { user } = useUser()
   const supabase = useSupabase()
 
-  return useQuery(['webauthn_credentials'], {
+  return useQuery({
+    queryKey: ['webauthn_credentials'],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase.from('webauthn_credentials').select('*')

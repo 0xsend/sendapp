@@ -11,7 +11,8 @@ export function useSendAccounts(): UseQueryResult<SendAccountQuery[], Error> {
   const { user } = useUser()
   const supabase = useSupabase()
 
-  return useQuery(['send_accounts'], {
+  return useQuery({
+    queryKey: ['send_accounts'],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
