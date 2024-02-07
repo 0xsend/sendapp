@@ -56,9 +56,11 @@ jobs:
       - name: Playwright Tests
         id: playwright
         shell: bash
-        env:
-          DEBUG: test:*,app:*
         run: |
+          # set debug logs if runner.debug is set
+          if [ "${{runner.debug}}" == "1" ]; then
+            export DEBUG=test:*,app:*
+          fi
           nohup tilt up playwright:deps &
           echo waiting for tilt to be ready
           for i in {1..10}; do
