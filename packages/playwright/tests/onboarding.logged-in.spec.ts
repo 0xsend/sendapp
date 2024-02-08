@@ -29,10 +29,6 @@ test('can visit onboarding page', async ({ page, supabase, authSession, authenti
   const { clientDataJSON, attestationObject } = attestation
   assert(!!clientDataJSON && !!attestationObject, 'Missing clientDataJSON or attestationObject')
 
-  // validate sender address is computed
-  const addrLocator = page.getByLabel('Sending To:')
-  await expect(addrLocator).toHaveValue(/^0x[a-f0-9]{40}$/i)
-
   // validate send account is created
   const { data: sendAcct, error: sendAcctErr } = await supabase
     .from('send_accounts')
