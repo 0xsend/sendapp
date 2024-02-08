@@ -13,7 +13,7 @@ import {
   useWindowDimensions,
   Image,
 } from '@my/ui'
-import { IconSLogo, IconSendLogoGreenSlash } from 'app/components/icons'
+import { IconSLogo, IconSendLogo } from 'app/components/icons'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { SignInForm } from './sign-in-form'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
@@ -70,9 +70,9 @@ export const SignInScreen = () => {
           <SignInCarousel signInProgress={signInProgress} setSignInProgress={setSignInProgress} />
         ) : (
           <AnimationLayout currentKey={screens[signInProgress] || 'none'} direction={1}>
-            <Stack f={1} h="25%" py="$5" jc="flex-end" ai="center" $gtMd={{ dsp: 'none' }}>
+            <Stack py="$5" ai="center" $gtMd={{ dsp: 'none' }}>
               <Theme inverse={true}>
-                <IconSendLogoGreenSlash size={'$10'} color="$background" />
+                <IconSendLogo size={'$5'} color="$background" />
               </Theme>
             </Stack>
 

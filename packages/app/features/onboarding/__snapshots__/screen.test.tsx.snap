@@ -223,14 +223,15 @@ exports[`OnboardingScreen 1`] = `
   >
     <RNSVGSvgView
       align="xMidYMid"
-      bbHeight="60"
-      bbWidth="104"
+      bbHeight="44"
+      bbWidth="121"
       color="hsla(191, 32%, 99%, 1)"
       focusable={false}
-      height={60}
+      height={44}
       meetOrSlice={0}
       minX={0}
       minY={0}
+      strokeWidth="2"
       style={
         [
           {
@@ -238,16 +239,19 @@ exports[`OnboardingScreen 1`] = `
             "borderWidth": 0,
           },
           {
+            "color": "hsla(191, 32%, 99%, 1)",
+          },
+          {
             "flex": 0,
-            "height": 60,
-            "width": 104,
+            "height": 44,
+            "width": 121,
           },
         ]
       }
       tintColor="hsla(191, 32%, 99%, 1)"
       vbHeight={48}
       vbWidth={132}
-      width={104}
+      width={121}
       xmlns="http://www.w3.org/2000/svg"
     >
       <RNSVGGroup
@@ -257,6 +261,12 @@ exports[`OnboardingScreen 1`] = `
             "type": 0,
           }
         }
+        propList={
+          [
+            "strokeWidth",
+          ]
+        }
+        strokeWidth="2"
       >
         <RNSVGGroup
           clipPath="clip0_12_4001"
@@ -271,8 +281,7 @@ exports[`OnboardingScreen 1`] = `
             d="M0 48L13.7008 0H20.088L6.38718 48H0Z"
             fill={
               {
-                "payload": 4282448720,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={

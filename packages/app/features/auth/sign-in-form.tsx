@@ -67,12 +67,12 @@ export const SignInForm = () => {
               placeholder: 'Phone number',
               width: '100%',
               backgroundColor: 'transparent',
-              outlineColor: '$background05',
+              outlineColor: 'transparent',
             },
           }}
           renderAfter={({ submit }) => (
             <>
-              <XStack jc={'flex-end'} $sm={{ jc: 'center' }} ai={'center'}>
+              <XStack f={1} mt={'auto'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'center'}>
                 <SubmitButton
                   onPress={() => submit()}
                   br="$4"
@@ -96,31 +96,17 @@ export const SignInForm = () => {
           )}
         >
           {(fields) => (
-            <>
-              <YStack gap="$3" mb="$4">
-                <H4
-                  $sm={{ size: '$8' }}
-                  color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
-                >
-                  Welcome to Send
-                </H4>
-                <Paragraph
-                  theme="alt1"
-                  size={'$1'}
-                  color={resolvedTheme?.startsWith('dark') ? '#C3C3C3' : '#676767'}
-                >
-                  Sign up or Sign in with your phone number
-                </Paragraph>
-              </YStack>
-              <Paragraph
-                size={'$1'}
-                fontWeight={'500'}
-                color={resolvedTheme?.startsWith('dark') ? '#FFFFFF' : '#212121'}
-              >
+            <YStack f={1} gap="$3" jc="center">
+              <H4 $sm={{ size: '$8' }}>Welcome to Send</H4>
+              <Paragraph theme="alt1" size={'$1'}>
+                Sign up or Sign in with your phone number
+              </Paragraph>
+
+              <Paragraph size={'$1'} fontWeight={'500'}>
                 Your Phone
               </Paragraph>
               <XStack gap="$2">{Object.values(fields)}</XStack>
-            </>
+            </YStack>
           )}
         </SchemaForm>
       )}
