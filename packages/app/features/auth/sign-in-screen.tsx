@@ -6,7 +6,6 @@ import {
   CornerTriangle,
   Button,
   ButtonText,
-  Sup,
   Theme,
   XStack,
   useMedia,
@@ -119,22 +118,19 @@ const SignInButtons = ({
 const carouselComponents = [
   {
     uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/instant-payments.jpg',
-    line1: 'INSTANT',
-    line2: 'PAYMENTS',
-    description: 'INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS',
+    line1: 'LIKE CASH',
+    description: 'SEND AND RECEIVE MONEY GLOBALLY IN SECONDS',
   },
   {
     uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/qrcode-payments.jpg',
 
-    line1: 'QRCODE',
-    line2: 'PAYMENTS',
-    description: 'INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS',
+    line1: 'ALL YOURS',
+    description: 'ONLY YOU HAVE ACCESS TO YOUR FUNDS',
   },
   {
     uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/realtime-payments.jpg',
-    line1: 'REAL TIME',
-    line2: 'PAYMENTS',
-    description: 'INFRASTRUCTURE FOR MERCHANTS AND STABLECOIN TRANSACTIONS',
+    line1: 'SECURE',
+    description: 'PRIVACY FIRST WITH VERIFIED SIGN-IN AND TRANSACTIONS',
   },
 ]
 
@@ -174,27 +170,12 @@ const SignInCarousel = ({
         <Stack mt="auto" mb="auto" w="100%" h="100%" zIndex={1}>
           <CornerTriangle corner="topLeft" pos="absolute" top={0} left={0} btw={273} brw={90} />
           <YStack pos="absolute" bottom={'5%'} left={'5%'}>
-            <Text
-              fontSize="$8"
-              $gtMd={{ fontSize: '$13' }}
-              fontWeight={'bold'}
-              lineHeight="$5"
-              color="$white"
-            >
+            <Text fontSize="$8" $gtXs={{ fontSize: '$13' }} fontWeight={'bold'} color="$white">
               {carouselComponent?.line1}
             </Text>
-            <Sup
-              super="TM"
-              fontSize="$8"
-              $gtMd={{ fontSize: '$13' }}
-              color="$white"
-              fontWeight={'bold'}
-            >
-              {carouselComponent?.line2}
-            </Sup>
             <Text
               fontSize="$2"
-              $gtMd={{ fontSize: '$8', maw: '55%' }}
+              $gtXs={{ fontSize: '$8', maw: '55%' }}
               fontWeight={'normal'}
               maw="70%"
               color="$green5Light"
@@ -210,9 +191,6 @@ const SignInCarousel = ({
             btw={273}
             brw={90}
           />
-          <View position="absolute" bottom={'$0'} right={'$0'} dsp="none" $gtMd={{ dsp: 'none' }}>
-            <IconSLogo size={'$4'} />
-          </View>
           <Image
             width="100%"
             height="100%"
@@ -222,6 +200,15 @@ const SignInCarousel = ({
             }}
             style={{ borderRadius: 33, zIndex: -1 }}
           />
+          <View
+            position="absolute"
+            bottom={'$0'}
+            right={'$0'}
+            dsp="none"
+            $gtMd={{ dsp: 'inherit' }}
+          >
+            <IconSLogo size={'$4'} />
+          </View>
         </Stack>
       </View>
     </Stack>
