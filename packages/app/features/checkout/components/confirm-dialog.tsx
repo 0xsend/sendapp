@@ -31,7 +31,7 @@ import { useUser } from 'app/utils/useUser'
 import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useLink } from 'solito/link'
-import { formatEther } from 'viem'
+import { type PublicClient, formatEther } from 'viem'
 import {
   useAccount,
   useBlockNumber,
@@ -312,7 +312,7 @@ export function ConfirmFlow() {
               enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
               exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             >
-              <Paragraph maw="100%" color="orange">
+              <Paragraph maw="100%" theme="error">
                 {connectError.message.includes('Connector not found')
                   ? 'Please install a web3 wallet like MetaMask.'
                   : connectError.message}
@@ -455,7 +455,7 @@ export function ConfirmWithVerifiedAddress() {
               enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
               exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             >
-              <Paragraph maw="100%" color="orange">
+              <Paragraph maw="100%" theme="error">
                 {error ? `${error} ` : ''}
                 {signMsgErr && 'details' in signMsgErr ? signMsgErr?.details : signMsgErr?.message}
               </Paragraph>
@@ -509,7 +509,7 @@ export function ConfirmWithSignTransaction() {
     if (isLoadingTags) return
     if (!isFree && !sentTx) return
     if (!pendingTags || pendingTags.length === 0) return
-    if (confirm.isLoading) return
+    if (confirm.isPending) return
     if (paidOrFree) {
       setSubmitted(true)
       setAttempts((a) => a + 1)
@@ -657,8 +657,8 @@ export function ConfirmWithSignTransaction() {
         )}
         {!error && (
           <XStack space="$2" jc="center" ai="center">
-            {!confirm.isLoading && <Paragraph>Awaiting transaction confirmation...</Paragraph>}
-            {submitted && confirm.isLoading && <Paragraph>Confirming Send Tags...</Paragraph>}
+            {!confirm.isPending && <Paragraph>Awaiting transaction confirmation...</Paragraph>}
+            {submitted && confirm.isPending && <Paragraph>Confirming Send Tags...</Paragraph>}
             <Spinner color="$color10" />
           </XStack>
         )}
@@ -679,7 +679,7 @@ export function ConfirmWithSignTransaction() {
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
           >
-            <Paragraph maw="100%" color="orange">
+            <Paragraph maw="100%" theme="error">
               {error} {txWaitError?.message}
             </Paragraph>
             <Button
@@ -721,7 +721,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
     if (isLoadingReceipts) return
     if (receipts === undefined) return
     const events = await getSenderSafeReceivedEvents({
-      publicClient,
+      publicClient: publicClient as PublicClient,
       sender: address,
     })
     const event = events.filter(
@@ -842,7 +842,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             maw="100%"
           >
-            <Paragraph color="orange">
+            <Paragraph theme="error">
               {error ? `${error} ` : ''}
               {errorReceipts instanceof Error ? `${errorReceipts?.message} ` : ''}
               {sendTxErr && 'details' in sendTxErr ? sendTxErr?.details : sendTxErr?.message}

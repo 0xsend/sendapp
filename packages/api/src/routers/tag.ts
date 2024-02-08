@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { getPriceInWei, getSenderSafeReceivedEvents } from 'app/features/checkout/screen'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { mainnetClient } from 'app/utils/viem/client'
+import { mainnetClient } from '@my/wagmi'
 import debug from 'debug'
 import { isAddressEqual } from 'viem'
 import { z } from 'zod'

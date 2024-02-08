@@ -35,7 +35,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useUser } from 'app/utils/useUser'
 import { daimoAccountFactory, encodeCreateAccountData, entrypoint } from 'app/utils/userop'
-import { baseMainnetClient } from 'app/utils/viem/client'
+import { baseMainnetClient } from '@my/wagmi'
 import * as Device from 'expo-device'
 import { concat } from 'viem'
 import {

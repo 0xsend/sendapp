@@ -40,6 +40,37 @@ jest.mock('app/utils/useUser', () => ({
 
 jest.mock('app/utils/send-accounts')
 
+jest.mock('wagmi', () => ({
+  useChainId: jest.fn().mockReturnValue(845337),
+  createConfig: jest.fn().mockReturnValue({}),
+  useBalance: jest.fn().mockReturnValue({
+    data: {
+      decimals: 6,
+      formatted: '0',
+      symbol: 'USDC',
+      value: 0n,
+    },
+  }),
+}))
+
+jest.mock('@my/wagmi', () => {
+  const originalModule = jest.requireActual<typeof import('@my/wagmi')>('@my/wagmi')
+  return {
+    __esModule: true, // Use it when dealing with esModules
+    ...originalModule,
+    baseMainnetClient: {
+      transport: {
+        url: 'http://127.0.0.1',
+      },
+    },
+    baseMainnetBundlerClient: {
+      transport: {
+        url: 'http://127.0.0.1',
+      },
+    },
+  }
+})
+
 test('ProfileScreen', async () => {
   jest.useFakeTimers()
 

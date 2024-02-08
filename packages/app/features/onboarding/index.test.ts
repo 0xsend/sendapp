@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 
-import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from 'app/utils/viem/client'
+import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
 
 const log = debug('app:features:onboarding:screen')

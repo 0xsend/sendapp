@@ -1,10 +1,7 @@
 import debug from 'debug'
 import { bundlerActions } from 'permissionless'
 import { http, createClient, createPublicClient } from 'viem'
-import { mainnet } from './chains'
-import { baseMainnet } from './chains'
-
-// TODO: convert to wagmi/core https://wagmi.sh/core/providers/configuring-chains
+import { mainnet, baseMainnet } from './chains'
 
 const log = debug('app:utils:viem:client')
 

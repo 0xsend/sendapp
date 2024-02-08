@@ -1,4 +1,4 @@
-import { baseLocal } from 'app/utils/viem/chains'
+import { baseMainnet } from '@my/wagmi/chains'
 import { http, createPublicClient, createTestClient } from 'viem'
 
 if (!process.env.NEXT_PUBLIC_BASE_RPC_URL) {
@@ -7,12 +7,12 @@ if (!process.env.NEXT_PUBLIC_BASE_RPC_URL) {
 const NEXT_PUBLIC_BASE_RPC_URL = process.env.NEXT_PUBLIC_BASE_RPC_URL
 
 export const testBaseClient = createTestClient({
-  chain: baseLocal,
+  chain: baseMainnet,
   mode: 'anvil',
   transport: http(NEXT_PUBLIC_BASE_RPC_URL),
 })
 
 export const baseMainnetClient = createPublicClient({
-  chain: baseLocal,
+  chain: baseMainnet,
   transport: http(NEXT_PUBLIC_BASE_RPC_URL),
 })
