@@ -36,7 +36,7 @@ import { useBalance, useChainId } from 'wagmi'
 // @todo add currency field
 const SendFormSchema = z.object({
   amount: formFields.number.describe('Amount'),
-  token: formFields.select.describe('Token').optional(),
+  token: formFields.select.describe('Token'),
 })
 
 export function SendForm({ profile }: { profile: ProfileProp }) {
@@ -108,6 +108,9 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
               { name: 'USDC', value: usdcAddresses[chainId] },
             ],
           },
+        }}
+        defaultValues={{
+          token: '',
         }}
         renderAfter={({ submit }) =>
           sentUserOpHash ? (

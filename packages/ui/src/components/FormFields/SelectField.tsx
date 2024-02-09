@@ -61,8 +61,8 @@ export const SelectField = ({
             onValueChange={field.onChange}
             {...props}
           >
-            <Select.Trigger width={180} iconAfter={ChevronDown}>
-              <Select.Value placeholder="Something" />
+            <Select.Trigger testID={`${label}SelectTrigger`} width={180} iconAfter={ChevronDown}>
+              <Select.Value testID={`${label}SelectValue`} placeholder={label} />
             </Select.Trigger>
 
             <Adapt when="sm" platform="touch">

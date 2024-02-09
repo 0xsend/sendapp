@@ -1,7 +1,7 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen, act } from '@testing-library/react-native'
+import { render, screen, act, userEvent } from '@testing-library/react-native'
 
 const TAG_NAME = 'pip_test44677'
 const PROFILE = {
@@ -101,12 +101,36 @@ test('ProfileScreen', async () => {
   expect(button2).toBeOnTheScreen()
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
 
-  await act(() => {
+  const user = userEvent.setup()
+
+  await act(async () => {
+    // await user.press(button1) // @note this does not work
     button1.props.onPress()
     jest.runAllTimers()
   })
+
   // @todo figure out why the dialog is not showing
   expect(screen.toJSON()).toMatchSnapshot('SendDialog')
   const dialog = screen.getByTestId('sendDialogContainer')
   expect(dialog).toBeOnTheScreen()
+  const amount = screen.getByLabelText('Amount')
+  const token = screen.getByTestId('TokenSelectValue')
+  const submit = screen.getByTestId('SubmitButton')
+  expect(amount).toBeOnTheScreen()
+  expect(token).toHaveTextContent('Token') // this is the placeholder
+  expect(submit).toBeOnTheScreen()
+  await act(async () => {
+    await submit.props.onPress() // trigger validation
+    jest.runAllTimers()
+  })
+  expect(screen.getByText('Required')).toBeOnTheScreen()
+  expect(screen.toJSON()).toMatchSnapshot('SendForm: Error')
+  await act(async () => {
+    await user.type(amount, '123')
+    await user.press(token)
+    await user.press(screen.getByText('USDC')) // @todo also USDC
+    jest.runAllTimers()
+  })
+  expect(amount.props.value).toBe('123')
+  expect(screen.toJSON()).toMatchSnapshot('SendForm')
 })
