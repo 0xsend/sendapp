@@ -57,6 +57,11 @@ module.exports = () => {
         {
           hostname: 'cloudflare-ipfs.com',
         },
+        {
+          protocol: 'https',
+          hostname: 'github.com',
+          pathname: '/0xsend/assets/**',
+        },
       ],
     },
     typescript: {
