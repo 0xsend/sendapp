@@ -2,6 +2,9 @@ import { defineConfig } from '@wagmi/cli'
 import { react, actions, foundry } from '@wagmi/cli/plugins'
 import { pascalCase } from 'change-case'
 import { globby } from 'globby'
+import { erc20Abi } from 'viem'
+import { base, baseSepolia, mainnet } from 'viem/chains'
+import { localhost, baseLocal, stagingMainnet } from './src/chains'
 
 const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 const deployments = await broadcasts.reduce(async (accP, file) => {
@@ -100,7 +103,18 @@ export default defineConfig({
       address: '0x14F59C715C205002c6e3F36766D302c1a19bacC8',
       abi: [],
     },
-    // TODO add @my/contracts
+    {
+      name: 'USDC',
+      address: {
+        [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet
+        [localhost.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet localhost fork
+        [stagingMainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet staging fork
+        [baseLocal.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', //  base mainnet fork
+        [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // base mainnet
+        [baseSepolia.id]: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // base sepolia
+      },
+      abi: erc20Abi,
+    },
   ],
   plugins: [
     foundry({
@@ -110,6 +124,9 @@ export default defineConfig({
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+          [base.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base mainnet
+          [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
+          845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base localnet
         },
         SendMerkleDrop: {
           1: '0xB9310daE45E71c7a160A13D64204623071a8E347',

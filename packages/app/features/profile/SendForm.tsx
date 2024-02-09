@@ -25,24 +25,30 @@ import {
   ContractFunctionRevertedError,
   parseEther,
 } from 'viem'
-import { iEntryPointAbi } from '@my/wagmi'
-import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from 'app/utils/viem/client'
+import { iEntryPointAbi, usdcAddress as usdcAddresses } from '@my/wagmi'
+import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import { useState } from 'react'
 import { webauthnCredToXY } from 'app/utils/webauthn-creds'
 import { ProfileProp } from './SendDialog'
+import { useBalance, useChainId } from 'wagmi'
 
 // @todo add currency field
 const SendFormSchema = z.object({
   amount: formFields.number.describe('Amount'),
+  token: formFields.select.describe('Token').optional(),
 })
+
 export function SendForm({ profile }: { profile: ProfileProp }) {
+  const chainId = useChainId()
   const toast = useToastController()
   const form = useForm<z.infer<typeof SendFormSchema>>()
   const { data: sendAccts } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
   const webauthnCred = sendAcct?.webauthn_credentials?.[0]
   const [sentUserOpHash, setSentUserOpHash] = useState<Hex>()
+  const token = form.watch('token') as `0x${string}` | undefined
+  const balance = useBalance({ address: sendAcct?.address, token, query: { enabled: !!sendAcct } })
 
   // @todo split this method up
   // @todo move to utils
@@ -95,6 +101,14 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         form={form}
         schema={SendFormSchema}
         onSubmit={onSubmit}
+        props={{
+          token: {
+            options: [
+              { name: 'ETH', value: '' },
+              { name: 'USDC', value: usdcAddresses[chainId] },
+            ],
+          },
+        }}
         renderAfter={({ submit }) =>
           sentUserOpHash ? (
             <Paragraph>Sent user op: {sentUserOpHash}</Paragraph>

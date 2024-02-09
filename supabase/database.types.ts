@@ -80,7 +80,7 @@ export type Database = MergeDeep<
             about: string | null
             referral_code: string
             tag_name: string
-            address: string
+            address: `0x${string}`
             chain_id: number
             is_public: boolean | null
           }[]

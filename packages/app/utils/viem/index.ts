@@ -1,2 +1,2 @@
-export { baseMainnetClient, mainnetClient } from './client'
+export { baseMainnetClient, mainnetClient } from '@my/wagmi'
 export { useRpcChainId } from './useRpcChainId'

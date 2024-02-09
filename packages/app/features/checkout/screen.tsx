@@ -330,7 +330,7 @@ export const CheckoutScreen = () => {
               )
             }}
           </SchemaForm>
-          <Theme name="yellow">
+          <Theme name="accent">
             <AnimatePresence>
               <ConfirmDialog onConfirmed={onConfirmed} needsVerification={needsVerification} />
             </AnimatePresence>
@@ -353,7 +353,7 @@ function HoldingTime({ created }: { created: Date }) {
       <Tooltip>
         {diffInMs <= 0 && (
           <Tooltip.Trigger>
-            <XStack ai="center" jc="space-between" space="$1.5" theme="orange">
+            <XStack ai="center" jc="space-between" space="$1.5" theme="red">
               <AlertTriangle color="$orange11" />
               <Paragraph>Claimable</Paragraph>
             </XStack>
@@ -361,7 +361,7 @@ function HoldingTime({ created }: { created: Date }) {
         )}
         {diffInMs > 0 && (
           <Tooltip.Trigger>
-            <XStack ai="center" jc="space-between" space="$1.5" theme="orange">
+            <XStack ai="center" jc="space-between" space="$1.5" theme="red">
               <Clock />
               <Paragraph>
                 {minutes}m {seconds}s
