@@ -25,6 +25,7 @@
     "@trpc/server": "11.0.0-next-beta.264",
     "app": "workspace:*",
     "next": "13.4.19",
+    "plaiceholder": "^3.0.0",
     "raf": "^3.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -32,6 +33,7 @@
     "react-native-reanimated": "~3.3.0",
     "react-native-web": "~0.19.6",
     "react-native-web-lite": "^1.74.8",
+    "sharp": "^0.33.2",
     "vercel": "latest",
     "zod": "^3.22.4"
   },

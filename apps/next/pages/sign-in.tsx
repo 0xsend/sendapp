@@ -3,8 +3,12 @@ import Head from 'next/head'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
 import { NextPageWithLayout } from './_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
+import { InferGetServerSidePropsType } from 'next'
+import { getPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 
-export const Page: NextPageWithLayout = () => {
+export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  images,
+}) => {
   return (
     <>
       <Head>
@@ -15,12 +19,25 @@ export const Page: NextPageWithLayout = () => {
           key="desc"
         />
       </Head>
-      <SignInScreen />
+      <SignInScreen images={images} />
     </>
   )
 }
 
-export const getServerSideProps = guestOnlyGetSSP()
+export const getServerSideProps = guestOnlyGetSSP(async () => {
+  const remoteImagePath = 'https://github.com/0xsend/assets/blob/main/app_images'
+  const remoteImageQueryParams = '?raw=true'
+  const images = [
+    await getPlaiceholderImage(`${remoteImagePath}/auth_image_1.jpg${remoteImageQueryParams}`),
+    await getPlaiceholderImage(`${remoteImagePath}/auth_image_2.jpg${remoteImageQueryParams}`),
+    await getPlaiceholderImage(`${remoteImagePath}/auth_image_3.jpg${remoteImageQueryParams}`),
+  ]
+  return {
+    props: {
+      images,
+    },
+  }
+})
 
 Page.getLayout = (children) => <AuthLayout>{children}</AuthLayout>
 
