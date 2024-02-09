@@ -1,4 +1,4 @@
-import { Button, Paragraph, SubmitButton, useToastController } from '@my/ui'
+import { Button, FormWrapper, Paragraph, Spinner, SubmitButton, useToastController } from '@my/ui'
 import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -24,6 +24,7 @@ import {
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
   parseEther,
+  formatUnits,
 } from 'viem'
 import { iEntryPointAbi, usdcAddress as usdcAddresses } from '@my/wagmi'
 import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from '@my/wagmi'
@@ -32,11 +33,11 @@ import { useState } from 'react'
 import { webauthnCredToXY } from 'app/utils/webauthn-creds'
 import { ProfileProp } from './SendDialog'
 import { useBalance, useChainId } from 'wagmi'
+import formatAmount from 'app/utils/formatAmount'
 
 // @todo add currency field
 const SendFormSchema = z.object({
-  amount: formFields.number.describe('Amount'),
-  token: formFields.select.describe('Token'),
+  token_amount: formFields.token_amount,
 })
 
 export function SendForm({ profile }: { profile: ProfileProp }) {
@@ -47,8 +48,12 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
   const sendAcct = sendAccts?.[0]
   const webauthnCred = sendAcct?.webauthn_credentials?.[0]
   const [sentUserOpHash, setSentUserOpHash] = useState<Hex>()
-  const token = form.watch('token') as `0x${string}` | undefined
-  const balance = useBalance({ address: sendAcct?.address, token, query: { enabled: !!sendAcct } })
+  const token = form.watch('token_amount.token') as `0x${string}` | undefined
+  const { data: balance, isPending: balanceIsPending } = useBalance({
+    address: sendAcct?.address,
+    token,
+    query: { enabled: !!sendAcct },
+  })
 
   // @todo split this method up
   // @todo move to utils
@@ -121,7 +126,21 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
             </SubmitButton>
           )
         }
-      />
+      >
+        {({ amount, token }) => (
+          <FormWrapper.Body>
+            {balance ? (
+              <Paragraph>
+                Balance: {formatAmount(formatUnits(balance.value, balance.decimals))}
+              </Paragraph>
+            ) : balanceIsPending ? (
+              <Spinner size="small" />
+            ) : null}
+            {amount}
+            {token}
+          </FormWrapper.Body>
+        )}
+      </SchemaForm>
     </FormProvider>
   )
 }
