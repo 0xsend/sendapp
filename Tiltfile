@@ -475,6 +475,7 @@ local_resource(
         "yarn:install",
         "anvil:mainnet",
         "anvil:base",
+        "aa_bundler:base",
         "supabase",
         "supabase:generate",
         "wagmi:generate",

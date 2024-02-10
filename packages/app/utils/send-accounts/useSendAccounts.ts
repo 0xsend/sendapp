@@ -3,7 +3,7 @@ import { useSupabase } from '../supabase/useSupabase'
 import { useUser } from '../useUser'
 import { Tables } from '@my/supabase/database.types'
 
-type SendAccountQuery = Tables<'send_accounts'> & {
+export type SendAccountQuery = Tables<'send_accounts'> & {
   send_account_credentials: Tables<'send_account_credentials'>[]
   webauthn_credentials: Tables<'webauthn_credentials'>[]
 }

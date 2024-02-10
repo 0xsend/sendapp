@@ -2,7 +2,9 @@ import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, screen, act, userEvent } from '@testing-library/react-native'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
+const queryClient = new QueryClient()
 const TAG_NAME = 'pip_test44677'
 const PROFILE = {
   avatar_url:
@@ -51,6 +53,11 @@ jest.mock('wagmi', () => ({
       value: 0n,
     },
   }),
+  useBytecode: jest.fn().mockReturnValue({
+    data: '0x123',
+    isLoading: false,
+    error: null,
+  }),
 }))
 
 jest.mock('@my/wagmi', () => {
@@ -75,9 +82,11 @@ test('ProfileScreen', async () => {
   jest.useFakeTimers()
 
   render(
-    <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <ProfileScreen />
-    </TamaguiProvider>
+    <QueryClientProvider client={queryClient}>
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ProfileScreen />
+      </TamaguiProvider>
+    </QueryClientProvider>
   )
 
   await act(() => jest.runAllTimers())
