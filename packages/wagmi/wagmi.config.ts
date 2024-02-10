@@ -5,6 +5,7 @@ import { globby } from 'globby'
 import { erc20Abi } from 'viem'
 import { base, baseSepolia, mainnet } from 'viem/chains'
 import { localhost, baseLocal, stagingMainnet } from './src/chains'
+import { iEntryPointAbi } from './src'
 
 const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
 const deployments = await broadcasts.reduce(async (accP, file) => {
@@ -115,6 +116,18 @@ export default defineConfig({
       },
       abi: erc20Abi,
     },
+    {
+      name: 'EntryPoint',
+      address: {
+        [mainnet.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        [localhost.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        [stagingMainnet.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        [baseLocal.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        [base.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        [baseSepolia.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+      },
+      abi: iEntryPointAbi,
+    },
   ],
   plugins: [
     foundry({
@@ -135,13 +148,7 @@ export default defineConfig({
         },
         ...deployments,
       },
-      include: [
-        'Send*.sol/*',
-        'Daimo*.sol/*',
-        'ERC*.sol/*',
-        'Entrypoint*.sol/*',
-        'IEntryPoint*.sol/*',
-      ],
+      include: ['Send*.sol/*', 'Daimo*.sol/*', 'ERC*.sol/*', 'IEntryPoint*.sol/*'],
     }),
     actions({
       getActionName: (() => {

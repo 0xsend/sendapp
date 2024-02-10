@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
+import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { SendAccountQuery } from './send-accounts/useSendAccounts'
 import { useBytecode } from 'wagmi'
 import { assert } from './assert'
+import { isHex } from 'viem'
 
 /**
  * Given a Send Account, returns the init code for the account or null if the account is already initialized.
@@ -10,7 +11,7 @@ export function useSendAccountInitCode({
   sendAccount,
 }: {
   sendAccount?: SendAccountQuery
-}) {
+}): UseQueryResult<`0x${string}`> {
   const {
     data: byteCode,
     isFetched: byteCodeIsFetched,
@@ -35,9 +36,11 @@ export function useSendAccountInitCode({
       if (byteCode === null && isFetched) {
         // uninitialized account
         assert(!!sendAccount?.init_code, 'No init code for uninitialized account')
-        return sendAccount.init_code
+        const initCode = `0x${sendAccount.init_code.slice(2)}`
+        assert(isHex(initCode), 'Invalid init code')
+        return initCode
       }
-      return null // initialized account
+      return '0x' // initialized account
     },
   })
 }

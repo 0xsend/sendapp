@@ -29,6 +29,7 @@ import {
   daimoAccountFactory,
   encodeCreateAccountData,
   entrypoint,
+  generateChallenge,
   receiverAccount,
   testClient,
   verifier,
@@ -124,9 +125,11 @@ async function createAccountAndVerifySignature() {
 
   const bVersion = numberToBytes(USEROP_VERSION, { size: 1 })
   const bValidUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
-  const bOpHash = hexToBytes(userOpHash)
-  const bMsg = concat([bVersion, bValidUntil, bOpHash])
-  const challenge = bytesToHex(bMsg)
+  const { challenge } = generateChallenge({
+    userOpHash,
+    version: USEROP_VERSION,
+    validUntil: USEROP_VALID_UNTIL,
+  })
   const { keySlot, encodedSig: sig } = await signer(challenge)
   const bKeySlot = numberToBytes(keySlot, { size: 1 })
   const opSig = bytesToHex(concat([bVersion, bValidUntil, bKeySlot, hexToBytes(sig)]))
@@ -225,7 +228,6 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
 
   // get userop hash
   const userOpHash = await entrypoint.read.getUserOpHash([userOp])
-
   return {
     userOp,
     userOpHash,

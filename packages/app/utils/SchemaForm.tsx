@@ -48,10 +48,6 @@ export const formFields = {
    */
   countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
   otp: createUniqueFieldSchema(z.string(), 'otp'),
-  token_amount: createUniqueFieldSchema(
-    z.object({ amount: z.number(), token: z.string() }),
-    'token_amount'
-  ),
 }
 
 const mapping = [
@@ -64,7 +60,6 @@ const mapping = [
   [formFields.select, SelectField] as const,
   [formFields.countrycode, CountryCodeField] as const,
   [formFields.otp, OTPField] as const,
-  [formFields.token_amount, TextField],
 ] as const
 
 const FormComponent = (props: FormProps) => {

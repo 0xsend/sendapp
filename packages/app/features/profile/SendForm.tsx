@@ -1,4 +1,4 @@
-import { Button, FormWrapper, Paragraph, Spinner, SubmitButton, useToastController } from '@my/ui'
+import { Button, Paragraph, Spinner, SubmitButton, useToastController } from '@my/ui'
 import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -7,9 +7,6 @@ import {
   generateUserOp,
   generateChallenge,
   signChallenge,
-  USEROP_VERSION,
-  USEROP_VALID_UNTIL,
-  USEROP_KEY_SLOT,
   entrypoint,
   testClient as testBaseClient,
   verifySignature,
@@ -37,22 +34,23 @@ import formatAmount from 'app/utils/formatAmount'
 
 // @todo add currency field
 const SendFormSchema = z.object({
-  token_amount: formFields.token_amount,
+  amount: formFields.number.describe('Amount'),
+  token: formFields.select.describe('Token'),
 })
 
 export function SendForm({ profile }: { profile: ProfileProp }) {
   const chainId = useChainId()
   const toast = useToastController()
   const form = useForm<z.infer<typeof SendFormSchema>>()
-  const { data: sendAccts } = useSendAccounts()
-  const sendAcct = sendAccts?.[0]
-  const webauthnCred = sendAcct?.webauthn_credentials?.[0]
+  const { data: sendAccounts } = useSendAccounts()
+  const sendAccount = sendAccounts?.[0]
+  const webauthnCred = sendAccount?.webauthn_credentials?.[0]
   const [sentUserOpHash, setSentUserOpHash] = useState<Hex>()
-  const token = form.watch('token_amount.token') as `0x${string}` | undefined
+  const token = form.watch('token') as `0x${string}` | undefined
   const { data: balance, isPending: balanceIsPending } = useBalance({
-    address: sendAcct?.address,
+    address: sendAccount?.address,
     token,
-    query: { enabled: !!sendAcct },
+    query: { enabled: !!sendAccount },
   })
 
   // @todo split this method up
@@ -61,22 +59,24 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
     const { address, chain_id } = profile
     assert(!!address, 'No address')
     assert(!!chain_id, 'No chain_id')
-    assert(!!sendAcct, 'No send account')
+    assert(!!sendAccount, 'No send account')
     assert(!!webauthnCred, 'No send account credentials')
 
     const pubKeyXY = webauthnCredToXY(webauthnCred)
 
     const { userOp, userOpHash } = await generateUserOp(pubKeyXY)
-    const challenge = generateChallenge(userOpHash)
+    const { challenge, validUntilBytes, versionBytes } = generateChallenge({
+      userOpHash: userOpHash,
+    })
     assert(!!challenge?.length, 'No challenge')
     assert(!!userOpHash, 'No userOpHash')
 
-    const encodedWebAuthnSig = await signChallenge(challenge)
+    const { encodedWebAuthnSig, keySlot } = await signChallenge(challenge)
 
     const signature = concat([
-      numberToBytes(USEROP_VERSION, { size: 1 }),
-      numberToBytes(USEROP_VALID_UNTIL, { size: 6 }),
-      numberToBytes(USEROP_KEY_SLOT, { size: 1 }),
+      versionBytes,
+      validUntilBytes,
+      numberToBytes(keySlot, { size: 1 }),
       hexToBytes(encodedWebAuthnSig),
     ])
     assert(
@@ -128,17 +128,18 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         }
       >
         {({ amount, token }) => (
-          <FormWrapper.Body>
+          <>
             {balance ? (
               <Paragraph>
-                Balance: {formatAmount(formatUnits(balance.value, balance.decimals))}
+                {balance.symbol} Balance:{' '}
+                {formatAmount(formatUnits(balance.value, balance.decimals))}
               </Paragraph>
             ) : balanceIsPending ? (
               <Spinner size="small" />
             ) : null}
             {amount}
             {token}
-          </FormWrapper.Body>
+          </>
         )}
       </SchemaForm>
     </FormProvider>

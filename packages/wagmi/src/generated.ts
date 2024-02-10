@@ -1348,6 +1348,498 @@ export const erc20SnapshotAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EntryPoint
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const entryPointAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: '_unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'depositTo',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'getDepositInfo',
+    outputs: [
+      {
+        name: 'info',
+        internalType: 'struct IStakeManager.DepositInfo',
+        type: 'tuple',
+        components: [
+          { name: 'deposit', internalType: 'uint112', type: 'uint112' },
+          { name: 'staked', internalType: 'bool', type: 'bool' },
+          { name: 'stake', internalType: 'uint112', type: 'uint112' },
+          { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
+          { name: 'withdrawTime', internalType: 'uint48', type: 'uint48' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'key', internalType: 'uint192', type: 'uint192' },
+    ],
+    name: 'getNonce',
+    outputs: [{ name: 'nonce', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'initCode', internalType: 'bytes', type: 'bytes' }],
+    name: 'getSenderAddress',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'getUserOpHash',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'opsPerAggregator',
+        internalType: 'struct IEntryPoint.UserOpsPerAggregator[]',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'userOps',
+            internalType: 'struct UserOperation[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'sender', internalType: 'address', type: 'address' },
+              { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+              { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+              { name: 'callData', internalType: 'bytes', type: 'bytes' },
+              { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+              { name: 'signature', internalType: 'bytes', type: 'bytes' },
+            ],
+          },
+          { name: 'aggregator', internalType: 'contract IAggregator', type: 'address' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleAggregatedOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'ops',
+        internalType: 'struct UserOperation[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'uint192', type: 'uint192' }],
+    name: 'incrementNonce',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'op',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'targetCallData', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'simulateHandleOp',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'simulateValidation',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'withdrawAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'factory', internalType: 'address', type: 'address', indexed: false },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AccountDeployed',
+  },
+  { type: 'event', anonymous: false, inputs: [], name: 'BeforeExecution' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalDeposit', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Deposited',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address', indexed: true }],
+    name: 'SignatureAggregatorChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalStaked', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeLocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawTime', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeUnlocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeWithdrawn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'success', internalType: 'bool', type: 'bool', indexed: false },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'actualGasUsed', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationEvent',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'UserOperationRevertReason',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Withdrawn',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+      { name: 'paid', internalType: 'uint256', type: 'uint256' },
+      { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+      { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+      { name: 'targetSuccess', internalType: 'bool', type: 'bool' },
+      { name: 'targetResult', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'ExecutionResult',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+    ],
+    name: 'FailedOp',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'SenderAddressResult',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address' }],
+    name: 'SignatureValidationFailed',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: 'returnInfo',
+        internalType: 'struct IEntryPoint.ReturnInfo',
+        type: 'tuple',
+        components: [
+          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
+          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      {
+        name: 'senderInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'factoryInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'paymasterInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    name: 'ValidationResult',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: 'returnInfo',
+        internalType: 'struct IEntryPoint.ReturnInfo',
+        type: 'tuple',
+        components: [
+          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
+          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      {
+        name: 'senderInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'factoryInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'paymasterInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'aggregatorInfo',
+        internalType: 'struct IEntryPoint.AggregatorStakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'aggregator', internalType: 'address', type: 'address' },
+          {
+            name: 'stakeInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+        ],
+      },
+    ],
+    name: 'ValidationResultWithAggregation',
+  },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const entryPointAddress = {
+  1: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  1337: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  8008: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  8453: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  84532: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  845337: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const entryPointConfig = { address: entryPointAddress, abi: entryPointAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IEntryPoint
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -4479,6 +4971,561 @@ export const watchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createWatchContract
 export const watchErc20SnapshotTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: erc20SnapshotAbi,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPoint = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getDepositInfo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointGetDepositInfo = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getDepositInfo',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointGetNonce = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getUserOpHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointGetUserOpHash = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getUserOpHash',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPoint = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointAddStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointDepositTo = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointGetSenderAddress = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointHandleAggregatedOps = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointHandleOps = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointIncrementNonce = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointSimulateHandleOp = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointSimulateValidation = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointUnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointWithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointWithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPoint = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointAddStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointDepositTo = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointGetSenderAddress = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointHandleOps = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointIncrementNonce = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointSimulateHandleOp = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointSimulateValidation = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointUnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointWithdrawStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointWithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"AccountDeployed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointAccountDeployedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'AccountDeployed',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"BeforeExecution"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'BeforeExecution',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Deposited"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointDepositedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Deposited',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeLocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointStakeLockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeLocked',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeUnlocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeUnlocked',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeWithdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeWithdrawn',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationEvent"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointUserOperationEventEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'UserOperationEvent',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointUserOperationRevertReasonEvent = /*#__PURE__*/ createWatchContractEvent(
+  { abi: entryPointAbi, address: entryPointAddress, eventName: 'UserOperationRevertReason' }
+)
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Withdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Withdrawn',
 })
 
 /**
@@ -8128,6 +9175,564 @@ export const useWatchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createUseWatchCo
 export const useWatchErc20SnapshotTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: erc20SnapshotAbi,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getDepositInfo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointGetDepositInfo = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getDepositInfo',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointGetNonce = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getUserOpHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointGetUserOpHash = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getUserOpHash',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPoint = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointAddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointDepositTo = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointGetSenderAddress = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointHandleOps = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointIncrementNonce = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointSimulateHandleOp = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointSimulateValidation = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointUnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointWithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointWithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPoint = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointAddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointDepositTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointGetSenderAddress = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointHandleOps = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointIncrementNonce = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointSimulateHandleOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointSimulateValidation = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointUnlockStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointWithdrawStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"AccountDeployed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointAccountDeployedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'AccountDeployed',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"BeforeExecution"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'BeforeExecution',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Deposited"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointDepositedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Deposited',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeLocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointStakeLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeLocked',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeUnlocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeUnlocked',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeWithdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeWithdrawn',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationEvent"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointUserOperationEventEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'UserOperationEvent',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointUserOperationRevertReasonEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'UserOperationRevertReason',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Withdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Withdrawn',
 })
 
 /**
