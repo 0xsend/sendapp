@@ -3,6 +3,7 @@ import { SendAccountQuery } from './send-accounts/useSendAccounts'
 import { useBytecode } from 'wagmi'
 import { assert } from './assert'
 import { isHex } from 'viem'
+import { baseMainnet } from '@my/wagmi/chains'
 
 /**
  * Given a Send Account, returns the init code for the account or null if the account is already initialized.
@@ -22,6 +23,7 @@ export function useSendAccountInitCode({
     query: {
       enabled: !!sendAccount?.address,
     },
+    chainId: baseMainnet.id,
   })
 
   const isFetched = Boolean(sendAccount?.address && byteCodeIsFetched && byteCodeIsSuccess)
