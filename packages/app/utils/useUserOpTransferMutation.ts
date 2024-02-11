@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
-import { SendAccountQuery } from './send-accounts/useSendAccounts'
-import { useSendAccountInitCode } from './useSendAccountInitCode'
 import { assert } from './assert'
 import {
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
+  Hex,
   encodeFunctionData,
+  erc20Abi,
   isAddress,
   isHex,
 } from 'viem'
@@ -19,67 +19,89 @@ import {
 import { UserOperation, getUserOperationHash } from 'permissionless'
 import { USEROP_VALID_UNTIL, USEROP_VERSION, signUserOp } from './userop'
 
+export type UseUserOpTransferMutationArgs = {
+  sender: Hex
+  token?: Hex
+  amount: bigint
+  to: Hex
+  validUntil?: number
+  initCode: Hex
+  nonce: bigint
+}
+
 /**
  * Given a Send Account, token, and amount, returns a mutation to send a user op ERC20 or native transfer.
  *
  * @note An undefined token value indicates the native currency.
  *
- * @param sendAccount The send account to use for the transfer.
+ * @param sender The sender of the transfer.
  * @param token The token to transfer, or falsy value for the native currency.
  * @param amount The amount to transfer in the smallest unit of the token.
  * @param to The address to transfer to.
  * @param validUntil The valid until timestamp for the user op.
+ * @param initCode The init code for the send account or 0x if account is already initialized.
+ * @param nonce The nonce for the user op.
  */
 export function useUserOpTransferMutation({
-  sendAccount,
+  sender,
   token,
   amount,
   to,
   validUntil = USEROP_VALID_UNTIL,
-}: {
-  sendAccount: SendAccountQuery
-  token: `0x${string}` | undefined
-  amount: bigint
-  to: `0x${string}`
-  validUntil?: number
-}) {
-  // need init code in case this is a new account
-  const { data: initCode, isSuccess: initCodeIsSuccess } = useSendAccountInitCode({ sendAccount })
-
-  // GENERATE THE CALLDATA
-  let callData: `0x${string}` | undefined
-  if (!token) {
-    callData = encodeFunctionData({
-      abi: daimoAccountAbi,
-      functionName: 'executeBatch',
-      args: [
-        [
-          {
-            dest: to,
-            value: amount,
-            data: '0x',
-          },
-        ],
-      ],
-    })
-  } else {
-    // @todo implement ERC20 transfer
-  }
-
+  initCode,
+  nonce,
+}: UseUserOpTransferMutationArgs) {
   return useMutation({
     mutationFn: async () => {
-      assert(isAddress(sendAccount.address), 'Invalid send account address')
-      assert(initCodeIsSuccess && isHex(initCode), 'Invalid init code')
-      assert(isHex(callData), 'Invalid call data')
-      assert(!!amount && amount > 0n, 'No amount')
+      assert(isAddress(sender), 'Invalid send account address')
       assert(isAddress(to), 'Invalid to address')
+      assert(!token || isAddress(token), 'Invalid token address')
+      assert(isHex(initCode), 'Invalid init code')
+      assert(typeof amount === 'bigint' && amount > 0n, 'Invalid amount')
+      assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
+      assert(nonce === 0n && initCode.length > 2, 'Nonce must be 0 for new account')
 
-      // @todo lookup nonce
+      // GENERATE THE CALLDATA
+      let callData: Hex | undefined
+      if (!token) {
+        callData = encodeFunctionData({
+          abi: daimoAccountAbi,
+          functionName: 'executeBatch',
+          args: [
+            [
+              {
+                dest: to,
+                value: amount,
+                data: '0x',
+              },
+            ],
+          ],
+        })
+      } else {
+        callData = encodeFunctionData({
+          abi: daimoAccountAbi,
+          functionName: 'executeBatch',
+          args: [
+            [
+              {
+                dest: token,
+                value: amount,
+                data: encodeFunctionData({
+                  abi: erc20Abi,
+                  functionName: 'transfer',
+                  args: [to, amount],
+                }),
+              },
+            ],
+          ],
+        })
+      }
+
       // @todo implement gas estimation
       // @todo implement paymaster and data
       const userOp: UserOperation = {
-        sender: sendAccount?.address,
-        nonce: 0n,
+        sender,
+        nonce,
         initCode,
         callData,
         callGasLimit: 300000n,
@@ -99,7 +121,7 @@ export function useUserOpTransferMutation({
         chainId,
       })
 
-      const signature = await signUserOp({
+      userOp.signature = await signUserOp({
         userOpHash,
         version: USEROP_VERSION,
         validUntil,
@@ -146,7 +168,7 @@ export function useUserOpTransferMutation({
               throw new Error('Handle op failed')
             }
             // console.log('ExecutionResult', data)
-            // TODO: use to estimate gas
+            // @todo use to estimate gas
             return data
           }
           throw e
@@ -157,9 +179,7 @@ export function useUserOpTransferMutation({
         entryPoint,
       })
       const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
-      if (receipt.success !== true) {
-        throw new Error('Failed to send userOp')
-      }
+      assert(receipt.success === true, 'Failed to send userOp')
       return receipt.success
     },
   })

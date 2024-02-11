@@ -53,6 +53,23 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
     query: { enabled: !!sendAccount },
   })
 
+  // need init code in case this is a new account
+  // const {
+  //   data: initCode,
+  //   isSuccess: initCodeIsSuccess,
+  //   error: initCodeError,
+  // } = useSendAccountInitCode({ sendAccount })
+  // need nonce to send transaction
+  // const {
+  //   data: nonce,
+  //   isSuccess: nonceIsSuccess,
+  //   error: nonceError,
+  // } = useTransactionCount({
+  //   address: sendAccount?.address,
+  //   query: { enabled: !!sendAccount.address },
+  //   chainId: baseMainnet.id,
+  // })
+
   // @todo split this method up
   // @todo move to utils
   async function genSignAndSendUserOp({ amount }: z.infer<typeof SendFormSchema>) {
