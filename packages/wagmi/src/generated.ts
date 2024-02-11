@@ -453,6 +453,101 @@ export const daimoEphemeralNotesAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoEphemeralNotesV2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoEphemeralNotesV2Abi = [
+  {
+    type: 'constructor',
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: '_signature', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'claimNoteRecipient',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_ephemeralOwner', internalType: 'address', type: 'address' }],
+    name: 'claimNoteSelf',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'createNote',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'notes',
+    outputs: [
+      { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'token',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'note',
+        internalType: 'struct Note',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'NoteCreated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'note',
+        internalType: 'struct Note',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+      { name: 'redeemer', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'NoteRedeemed',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoNameRegistry
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -644,16 +739,15 @@ export const daimoNameRegistryProxyAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoPaymaster
+// DaimoPaymasterV2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const daimoPaymasterAbi = [
+export const daimoPaymasterV2Abi = [
   {
     type: 'constructor',
     inputs: [
       { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
       { name: '_owner', internalType: 'address', type: 'address' },
-      { name: '_metaPaymaster', internalType: 'contract IMetaPaymaster', type: 'address' },
     ],
     stateMutability: 'nonpayable',
   },
@@ -664,14 +758,14 @@ export const daimoPaymasterAbi = [
     outputs: [],
     stateMutability: 'payable',
   },
-  { type: 'function', inputs: [], name: 'deposit', outputs: [], stateMutability: 'payable' },
   {
     type: 'function',
     inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'destWhitelist',
+    name: 'bundlerWhitelist',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view',
   },
+  { type: 'function', inputs: [], name: 'deposit', outputs: [], stateMutability: 'payable' },
   {
     type: 'function',
     inputs: [],
@@ -724,23 +818,16 @@ export const daimoPaymasterAbi = [
       { name: 'addresses', internalType: 'address[]', type: 'address[]' },
       { name: 'isWhitelisted', internalType: 'bool', type: 'bool' },
     ],
-    name: 'setDestAddressWhitelist',
+    name: 'setBundlerWhitelist',
     outputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    inputs: [{ name: '_ticketSigner', internalType: 'address', type: 'address' }],
-    name: 'setTicketSigner',
+    inputs: [{ name: '_metaPaymaster', internalType: 'contract IMetaPaymaster', type: 'address' }],
+    name: 'setMetaPaymaster',
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'ticketSigner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -1346,6 +1433,498 @@ export const erc20SnapshotAbi = [
     name: 'Transfer',
   },
 ] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EntryPoint
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const entryPointAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: '_unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'depositTo',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'getDepositInfo',
+    outputs: [
+      {
+        name: 'info',
+        internalType: 'struct IStakeManager.DepositInfo',
+        type: 'tuple',
+        components: [
+          { name: 'deposit', internalType: 'uint112', type: 'uint112' },
+          { name: 'staked', internalType: 'bool', type: 'bool' },
+          { name: 'stake', internalType: 'uint112', type: 'uint112' },
+          { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
+          { name: 'withdrawTime', internalType: 'uint48', type: 'uint48' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'key', internalType: 'uint192', type: 'uint192' },
+    ],
+    name: 'getNonce',
+    outputs: [{ name: 'nonce', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'initCode', internalType: 'bytes', type: 'bytes' }],
+    name: 'getSenderAddress',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'getUserOpHash',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'opsPerAggregator',
+        internalType: 'struct IEntryPoint.UserOpsPerAggregator[]',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'userOps',
+            internalType: 'struct UserOperation[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'sender', internalType: 'address', type: 'address' },
+              { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+              { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+              { name: 'callData', internalType: 'bytes', type: 'bytes' },
+              { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+              { name: 'signature', internalType: 'bytes', type: 'bytes' },
+            ],
+          },
+          { name: 'aggregator', internalType: 'contract IAggregator', type: 'address' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleAggregatedOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'ops',
+        internalType: 'struct UserOperation[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'uint192', type: 'uint192' }],
+    name: 'incrementNonce',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'op',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'targetCallData', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'simulateHandleOp',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'simulateValidation',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'withdrawAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'factory', internalType: 'address', type: 'address', indexed: false },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AccountDeployed',
+  },
+  { type: 'event', anonymous: false, inputs: [], name: 'BeforeExecution' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalDeposit', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Deposited',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address', indexed: true }],
+    name: 'SignatureAggregatorChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalStaked', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeLocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawTime', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeUnlocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeWithdrawn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'success', internalType: 'bool', type: 'bool', indexed: false },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'actualGasUsed', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationEvent',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'UserOperationRevertReason',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Withdrawn',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+      { name: 'paid', internalType: 'uint256', type: 'uint256' },
+      { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+      { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+      { name: 'targetSuccess', internalType: 'bool', type: 'bool' },
+      { name: 'targetResult', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'ExecutionResult',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+    ],
+    name: 'FailedOp',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'SenderAddressResult',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address' }],
+    name: 'SignatureValidationFailed',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: 'returnInfo',
+        internalType: 'struct IEntryPoint.ReturnInfo',
+        type: 'tuple',
+        components: [
+          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
+          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      {
+        name: 'senderInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'factoryInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'paymasterInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    name: 'ValidationResult',
+  },
+  {
+    type: 'error',
+    inputs: [
+      {
+        name: 'returnInfo',
+        internalType: 'struct IEntryPoint.ReturnInfo',
+        type: 'tuple',
+        components: [
+          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
+          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
+          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
+          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      {
+        name: 'senderInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'factoryInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'paymasterInfo',
+        internalType: 'struct IStakeManager.StakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'stake', internalType: 'uint256', type: 'uint256' },
+          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: 'aggregatorInfo',
+        internalType: 'struct IEntryPoint.AggregatorStakeInfo',
+        type: 'tuple',
+        components: [
+          { name: 'aggregator', internalType: 'address', type: 'address' },
+          {
+            name: 'stakeInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+        ],
+      },
+    ],
+    name: 'ValidationResultWithAggregation',
+  },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const entryPointAddress = {
+  1: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  1337: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  8008: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  8453: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  84532: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+  845337: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const entryPointConfig = { address: entryPointAddress, abi: entryPointAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IEntryPoint
@@ -3230,6 +3809,115 @@ export const watchDaimoEphemeralNotesNoteRedeemedEvent = /*#__PURE__*/ createWat
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const readDaimoEphemeralNotesV2 = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"notes"`
+ */
+export const readDaimoEphemeralNotesV2Notes = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'notes',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"token"`
+ */
+export const readDaimoEphemeralNotesV2Token = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const writeDaimoEphemeralNotesV2 = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const writeDaimoEphemeralNotesV2ClaimNoteRecipient = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteRecipient',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const writeDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteSelf',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const writeDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const prepareWriteDaimoEphemeralNotesV2 = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const prepareWriteDaimoEphemeralNotesV2ClaimNoteRecipient =
+  /*#__PURE__*/ createSimulateContract({
+    abi: daimoEphemeralNotesV2Abi,
+    functionName: 'claimNoteRecipient',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const prepareWriteDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteSelf',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const prepareWriteDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const watchDaimoEphemeralNotesV2Event = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteCreated"`
+ */
+export const watchDaimoEphemeralNotesV2NoteCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+  eventName: 'NoteCreated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteRedeemed"`
+ */
+export const watchDaimoEphemeralNotesV2NoteRedeemedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+  eventName: 'NoteRedeemed',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
  */
 export const readDaimoNameRegistry = /*#__PURE__*/ createReadContract({ abi: daimoNameRegistryAbi })
@@ -3505,269 +4193,260 @@ export const watchDaimoNameRegistryProxyUpgradedEvent = /*#__PURE__*/ createWatc
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const readDaimoPaymaster = /*#__PURE__*/ createReadContract({ abi: daimoPaymasterAbi })
+export const readDaimoPaymasterV2 = /*#__PURE__*/ createReadContract({ abi: daimoPaymasterV2Abi })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"destWhitelist"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"bundlerWhitelist"`
  */
-export const readDaimoPaymasterDestWhitelist = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'destWhitelist',
+export const readDaimoPaymasterV2BundlerWhitelist = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'bundlerWhitelist',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"entryPoint"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"entryPoint"`
  */
-export const readDaimoPaymasterEntryPoint = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterAbi,
+export const readDaimoPaymasterV2EntryPoint = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'entryPoint',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"getDeposit"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"getDeposit"`
  */
-export const readDaimoPaymasterGetDeposit = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterAbi,
+export const readDaimoPaymasterV2GetDeposit = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'getDeposit',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"metaPaymaster"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"metaPaymaster"`
  */
-export const readDaimoPaymasterMetaPaymaster = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterAbi,
+export const readDaimoPaymasterV2MetaPaymaster = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'metaPaymaster',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"owner"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"owner"`
  */
-export const readDaimoPaymasterOwner = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterAbi,
+export const readDaimoPaymasterV2Owner = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'owner',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"ticketSigner"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const readDaimoPaymasterTicketSigner = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'ticketSigner',
-})
+export const writeDaimoPaymasterV2 = /*#__PURE__*/ createWriteContract({ abi: daimoPaymasterV2Abi })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
  */
-export const writeDaimoPaymaster = /*#__PURE__*/ createWriteContract({ abi: daimoPaymasterAbi })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"addStake"`
- */
-export const writeDaimoPaymasterAddStake = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2AddStake = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
  */
-export const writeDaimoPaymasterDeposit = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2Deposit = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"postOp"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
  */
-export const writeDaimoPaymasterPostOp = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2PostOp = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'postOp',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const writeDaimoPaymasterRenounceOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'renounceOwnership',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setDestAddressWhitelist"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
  */
-export const writeDaimoPaymasterSetDestAddressWhitelist = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'setDestAddressWhitelist',
+export const writeDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setBundlerWhitelist',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setTicketSigner"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
  */
-export const writeDaimoPaymasterSetTicketSigner = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'setTicketSigner',
+export const writeDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
  */
-export const writeDaimoPaymasterTransferOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'transferOwnership',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
  */
-export const writeDaimoPaymasterUnlockStake = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
  */
-export const writeDaimoPaymasterValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2ValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'validatePaymasterUserOp',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
  */
-export const writeDaimoPaymasterWithdrawStake = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
  */
-export const writeDaimoPaymasterWithdrawTo = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterAbi,
+export const writeDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const prepareWriteDaimoPaymaster = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2 = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"addStake"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
  */
-export const prepareWriteDaimoPaymasterAddStake = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2AddStake = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
  */
-export const prepareWriteDaimoPaymasterDeposit = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2Deposit = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"postOp"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
  */
-export const prepareWriteDaimoPaymasterPostOp = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2PostOp = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'postOp',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const prepareWriteDaimoPaymasterRenounceOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'renounceOwnership',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setDestAddressWhitelist"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
  */
-export const prepareWriteDaimoPaymasterSetDestAddressWhitelist =
-  /*#__PURE__*/ createSimulateContract({
-    abi: daimoPaymasterAbi,
-    functionName: 'setDestAddressWhitelist',
-  })
+export const prepareWriteDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createSimulateContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'setBundlerWhitelist' }
+)
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setTicketSigner"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
  */
-export const prepareWriteDaimoPaymasterSetTicketSigner = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'setTicketSigner',
+export const prepareWriteDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
  */
-export const prepareWriteDaimoPaymasterTransferOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'transferOwnership',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
  */
-export const prepareWriteDaimoPaymasterUnlockStake = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
  */
-export const prepareWriteDaimoPaymasterValidatePaymasterUserOp =
+export const prepareWriteDaimoPaymasterV2ValidatePaymasterUserOp =
   /*#__PURE__*/ createSimulateContract({
-    abi: daimoPaymasterAbi,
+    abi: daimoPaymasterV2Abi,
     functionName: 'validatePaymasterUserOp',
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
  */
-export const prepareWriteDaimoPaymasterWithdrawStake = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawStake',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
  */
-export const prepareWriteDaimoPaymasterWithdrawTo = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterAbi,
+export const prepareWriteDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const watchDaimoPaymasterEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoPaymasterAbi,
+export const watchDaimoPaymasterV2Event = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoPaymasterV2Abi,
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"OwnershipTransferred"`
  */
-export const watchDaimoPaymasterOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoPaymasterAbi,
-  eventName: 'OwnershipTransferred',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `eventName` set to `"UserOperationSponsored"`
- */
-export const watchDaimoPaymasterUserOperationSponsoredEvent =
+export const watchDaimoPaymasterV2OwnershipTransferredEvent =
   /*#__PURE__*/ createWatchContractEvent({
-    abi: daimoPaymasterAbi,
+    abi: daimoPaymasterV2Abi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"UserOperationSponsored"`
+ */
+export const watchDaimoPaymasterV2UserOperationSponsoredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: daimoPaymasterV2Abi,
     eventName: 'UserOperationSponsored',
   })
 
@@ -4479,6 +5158,561 @@ export const watchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createWatchContract
 export const watchErc20SnapshotTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: erc20SnapshotAbi,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPoint = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getDepositInfo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointGetDepositInfo = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getDepositInfo',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointGetNonce = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getUserOpHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const readEntryPointGetUserOpHash = /*#__PURE__*/ createReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getUserOpHash',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPoint = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointAddStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointDepositTo = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointGetSenderAddress = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointHandleAggregatedOps = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointHandleOps = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointIncrementNonce = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointSimulateHandleOp = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointSimulateValidation = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointUnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointWithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const writeEntryPointWithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPoint = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointAddStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointDepositTo = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointGetSenderAddress = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointHandleOps = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointIncrementNonce = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointSimulateHandleOp = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointSimulateValidation = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointUnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointWithdrawStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const prepareWriteEntryPointWithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"AccountDeployed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointAccountDeployedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'AccountDeployed',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"BeforeExecution"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'BeforeExecution',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Deposited"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointDepositedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Deposited',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeLocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointStakeLockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeLocked',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeUnlocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeUnlocked',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeWithdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeWithdrawn',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationEvent"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointUserOperationEventEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'UserOperationEvent',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointUserOperationRevertReasonEvent = /*#__PURE__*/ createWatchContractEvent(
+  { abi: entryPointAbi, address: entryPointAddress, eventName: 'UserOperationRevertReason' }
+)
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Withdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const watchEntryPointWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Withdrawn',
 })
 
 /**
@@ -6868,6 +8102,117 @@ export const useWatchDaimoEphemeralNotesNoteRedeemedEvent =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useReadDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"notes"`
+ */
+export const useReadDaimoEphemeralNotesV2Notes = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'notes',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"token"`
+ */
+export const useReadDaimoEphemeralNotesV2Token = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useWriteDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const useWriteDaimoEphemeralNotesV2ClaimNoteRecipient = /*#__PURE__*/ createUseWriteContract(
+  { abi: daimoEphemeralNotesV2Abi, functionName: 'claimNoteRecipient' }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const useWriteDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteSelf',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const useWriteDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useSimulateDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const useSimulateDaimoEphemeralNotesV2ClaimNoteRecipient =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoEphemeralNotesV2Abi,
+    functionName: 'claimNoteRecipient',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const useSimulateDaimoEphemeralNotesV2ClaimNoteSelf =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoEphemeralNotesV2Abi,
+    functionName: 'claimNoteSelf',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const useSimulateDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useWatchDaimoEphemeralNotesV2Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteCreated"`
+ */
+export const useWatchDaimoEphemeralNotesV2NoteCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoEphemeralNotesV2Abi,
+    eventName: 'NoteCreated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteRedeemed"`
+ */
+export const useWatchDaimoEphemeralNotesV2NoteRedeemedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoEphemeralNotesV2Abi,
+    eventName: 'NoteRedeemed',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
  */
 export const useReadDaimoNameRegistry = /*#__PURE__*/ createUseReadContract({
@@ -7148,272 +8493,263 @@ export const useWatchDaimoNameRegistryProxyUpgradedEvent =
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const useReadDaimoPaymaster = /*#__PURE__*/ createUseReadContract({ abi: daimoPaymasterAbi })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"destWhitelist"`
- */
-export const useReadDaimoPaymasterDestWhitelist = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'destWhitelist',
+export const useReadDaimoPaymasterV2 = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"entryPoint"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"bundlerWhitelist"`
  */
-export const useReadDaimoPaymasterEntryPoint = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterAbi,
+export const useReadDaimoPaymasterV2BundlerWhitelist = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'bundlerWhitelist',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"entryPoint"`
+ */
+export const useReadDaimoPaymasterV2EntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'entryPoint',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"getDeposit"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"getDeposit"`
  */
-export const useReadDaimoPaymasterGetDeposit = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterAbi,
+export const useReadDaimoPaymasterV2GetDeposit = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'getDeposit',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"metaPaymaster"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"metaPaymaster"`
  */
-export const useReadDaimoPaymasterMetaPaymaster = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterAbi,
+export const useReadDaimoPaymasterV2MetaPaymaster = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'metaPaymaster',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"owner"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"owner"`
  */
-export const useReadDaimoPaymasterOwner = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterAbi,
+export const useReadDaimoPaymasterV2Owner = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'owner',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"ticketSigner"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const useReadDaimoPaymasterTicketSigner = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'ticketSigner',
+export const useWriteDaimoPaymasterV2 = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
  */
-export const useWriteDaimoPaymaster = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"addStake"`
- */
-export const useWriteDaimoPaymasterAddStake = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2AddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
  */
-export const useWriteDaimoPaymasterDeposit = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2Deposit = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"postOp"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
  */
-export const useWriteDaimoPaymasterPostOp = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2PostOp = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'postOp',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const useWriteDaimoPaymasterRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'renounceOwnership',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setDestAddressWhitelist"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
  */
-export const useWriteDaimoPaymasterSetDestAddressWhitelist = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'setDestAddressWhitelist',
+export const useWriteDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setBundlerWhitelist',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setTicketSigner"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
  */
-export const useWriteDaimoPaymasterSetTicketSigner = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'setTicketSigner',
+export const useWriteDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
  */
-export const useWriteDaimoPaymasterTransferOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'transferOwnership',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
  */
-export const useWriteDaimoPaymasterUnlockStake = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
  */
-export const useWriteDaimoPaymasterValidatePaymasterUserOp = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'validatePaymasterUserOp',
-})
+export const useWriteDaimoPaymasterV2ValidatePaymasterUserOp = /*#__PURE__*/ createUseWriteContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'validatePaymasterUserOp' }
+)
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
  */
-export const useWriteDaimoPaymasterWithdrawStake = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawStake',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
  */
-export const useWriteDaimoPaymasterWithdrawTo = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterAbi,
+export const useWriteDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const useSimulateDaimoPaymaster = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2 = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"addStake"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
  */
-export const useSimulateDaimoPaymasterAddStake = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2AddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
  */
-export const useSimulateDaimoPaymasterDeposit = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2Deposit = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"postOp"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
  */
-export const useSimulateDaimoPaymasterPostOp = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2PostOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'postOp',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const useSimulateDaimoPaymasterRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'renounceOwnership',
-})
+export const useSimulateDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createUseSimulateContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'renounceOwnership' }
+)
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setDestAddressWhitelist"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
  */
-export const useSimulateDaimoPaymasterSetDestAddressWhitelist =
+export const useSimulateDaimoPaymasterV2SetBundlerWhitelist =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoPaymasterAbi,
-    functionName: 'setDestAddressWhitelist',
+    abi: daimoPaymasterV2Abi,
+    functionName: 'setBundlerWhitelist',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"setTicketSigner"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
  */
-export const useSimulateDaimoPaymasterSetTicketSigner = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'setTicketSigner',
+export const useSimulateDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
  */
-export const useSimulateDaimoPaymasterTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
-  functionName: 'transferOwnership',
-})
+export const useSimulateDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createUseSimulateContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'transferOwnership' }
+)
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
  */
-export const useSimulateDaimoPaymasterUnlockStake = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
  */
-export const useSimulateDaimoPaymasterValidatePaymasterUserOp =
+export const useSimulateDaimoPaymasterV2ValidatePaymasterUserOp =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoPaymasterAbi,
+    abi: daimoPaymasterV2Abi,
     functionName: 'validatePaymasterUserOp',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
  */
-export const useSimulateDaimoPaymasterWithdrawStake = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawStake',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
  */
-export const useSimulateDaimoPaymasterWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterAbi,
+export const useSimulateDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
   functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterAbi}__
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
  */
-export const useWatchDaimoPaymasterEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoPaymasterAbi,
+export const useWatchDaimoPaymasterV2Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoPaymasterV2Abi,
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"OwnershipTransferred"`
  */
-export const useWatchDaimoPaymasterOwnershipTransferredEvent =
+export const useWatchDaimoPaymasterV2OwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoPaymasterAbi,
+    abi: daimoPaymasterV2Abi,
     eventName: 'OwnershipTransferred',
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterAbi}__ and `eventName` set to `"UserOperationSponsored"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"UserOperationSponsored"`
  */
-export const useWatchDaimoPaymasterUserOperationSponsoredEvent =
+export const useWatchDaimoPaymasterV2UserOperationSponsoredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoPaymasterAbi,
+    abi: daimoPaymasterV2Abi,
     eventName: 'UserOperationSponsored',
   })
 
@@ -8128,6 +9464,564 @@ export const useWatchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createUseWatchCo
 export const useWatchErc20SnapshotTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: erc20SnapshotAbi,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getDepositInfo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointGetDepositInfo = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getDepositInfo',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointGetNonce = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getUserOpHash"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useReadEntryPointGetUserOpHash = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getUserOpHash',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPoint = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointAddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointDepositTo = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointGetSenderAddress = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointHandleOps = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointIncrementNonce = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointSimulateHandleOp = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointSimulateValidation = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointUnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointWithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWriteEntryPointWithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPoint = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointAddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointDepositTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointGetSenderAddress = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointHandleOps = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointIncrementNonce = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointSimulateHandleOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointSimulateValidation = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointUnlockStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointWithdrawStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useSimulateEntryPointWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"AccountDeployed"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointAccountDeployedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'AccountDeployed',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"BeforeExecution"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'BeforeExecution',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Deposited"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointDepositedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Deposited',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeLocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointStakeLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeLocked',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeUnlocked"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeUnlocked',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeWithdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'StakeWithdrawn',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationEvent"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointUserOperationEventEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'UserOperationEvent',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointUserOperationRevertReasonEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'UserOperationRevertReason',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Withdrawn"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ */
+export const useWatchEntryPointWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'Withdrawn',
 })
 
 /**

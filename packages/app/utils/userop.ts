@@ -22,6 +22,7 @@ import {
   hexToBytes,
   numberToBytes,
   parseEther,
+  isHex,
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
@@ -168,12 +169,29 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
   }
 }
 
-export function generateChallenge(_userOpHash: Hex): Hex {
-  const version = numberToBytes(USEROP_VERSION, { size: 1 })
-  const validUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
-  const opHash = hexToBytes(_userOpHash)
-  const challenge = bytesToHex(concat([version, validUntil, opHash]))
-  return challenge
+/**
+ * Generates a DaimoAccount challenge from a user operation hash.
+ */
+export function generateChallenge({
+  userOpHash,
+  version = USEROP_VERSION,
+  validUntil = USEROP_VALID_UNTIL,
+}: { userOpHash: Hex; version?: number; validUntil?: number }): {
+  challenge: Hex
+  versionBytes: Uint8Array
+  validUntilBytes: Uint8Array
+} {
+  const opHash = hexToBytes(userOpHash)
+  const versionBytes = numberToBytes(version, { size: 1 })
+  const validUntilBytes = numberToBytes(validUntil, { size: 6 })
+  // 1 byte version + 6 bytes validUntil + 32 bytes opHash
+  const challenge = bytesToHex(concat([versionBytes, validUntilBytes, opHash]))
+  assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
+  return {
+    challenge,
+    versionBytes,
+    validUntilBytes,
+  }
 }
 
 /**
@@ -181,7 +199,7 @@ export function generateChallenge(_userOpHash: Hex): Hex {
  * struct for the DaimoVerifier contract.
  */
 export async function signChallenge(challenge: Hex) {
-  assert(challenge.length > 0, 'Invalid challenge length')
+  assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
   const challengeBytes = hexToBytes(challenge)
   const challengeB64 = Buffer.from(challengeBytes).toString('base64')
   const sign = await signWithPasskey({
@@ -210,6 +228,37 @@ export async function signChallenge(challenge: Hex) {
     }).inputs,
     [webauthnSig]
   )
-  assert(encodedWebAuthnSig.length > 2, 'Invalid encodedWebAuthnSig')
-  return encodedWebAuthnSig
+  assert(isHex(encodedWebAuthnSig), 'Invalid encodedWebAuthnSig')
+  return {
+    keySlot: signResult.keySlot,
+    accountName: signResult.accountName,
+    encodedWebAuthnSig,
+  }
+}
+
+/**
+ * Signs a user operation hash and returns the signature in a format for the DaimoVerifier contract.
+ */
+export async function signUserOp({
+  userOpHash,
+  version,
+  validUntil,
+}: {
+  userOpHash: Hex
+  version: number
+  validUntil: number
+}) {
+  const { challenge, versionBytes, validUntilBytes } = generateChallenge({
+    userOpHash,
+    version,
+    validUntil,
+  })
+  const { encodedWebAuthnSig, keySlot } = await signChallenge(challenge)
+  const signature = concat([
+    versionBytes,
+    validUntilBytes,
+    numberToBytes(keySlot, { size: 1 }),
+    hexToBytes(encodedWebAuthnSig),
+  ])
+  return bytesToHex(signature)
 }

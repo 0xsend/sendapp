@@ -24,6 +24,7 @@ export const NumberField = (props: Pick<InputProps, 'size' | 'autoFocus'>) => {
         )}
         <Shake shakeKey={error?.errorMessage}>
           <Input
+            accessibilityLabel={label}
             disabled={disabled}
             placeholderTextColor="$color10"
             keyboardType="number-pad"

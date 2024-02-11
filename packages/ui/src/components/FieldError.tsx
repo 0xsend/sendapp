@@ -12,6 +12,7 @@ export const FieldError = ({ message }: FieldErrorProps) => {
     <AnimatePresence>
       {!!message && (
         <Paragraph
+          role="status"
           key="error"
           animation="200ms"
           mt="$2"

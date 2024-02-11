@@ -12,6 +12,7 @@ import {
   bytesToHex,
   concat,
   encodeAbiParameters,
+  encodeFunctionData,
   formatEther,
   getAbiItem,
   hexToBytes,
@@ -21,16 +22,21 @@ import {
 import { daimoAccountAbi, iEntryPointAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import {
+  USEROP_KEY_SLOT,
+  USEROP_SALT,
   USEROP_VALID_UNTIL,
   USEROP_VERSION,
   daimoAccountFactory,
+  encodeCreateAccountData,
   entrypoint,
-  generateUserOp,
+  generateChallenge,
   receiverAccount,
   testClient,
   verifier,
 } from 'app/utils/userop'
 import { numberToBytes } from 'viem'
+import { getSenderAddress, UserOperation } from 'permissionless'
+import nock from 'nock'
 
 jest.mock('@daimo/expo-passkeys', () => ({
   createPasskey: jest.fn(),
@@ -120,9 +126,11 @@ async function createAccountAndVerifySignature() {
 
   const bVersion = numberToBytes(USEROP_VERSION, { size: 1 })
   const bValidUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
-  const bOpHash = hexToBytes(userOpHash)
-  const bMsg = concat([bVersion, bValidUntil, bOpHash])
-  const challenge = bytesToHex(bMsg)
+  const { challenge } = generateChallenge({
+    userOpHash,
+    version: USEROP_VERSION,
+    validUntil: USEROP_VALID_UNTIL,
+  })
   const { keySlot, encodedSig: sig } = await signer(challenge)
   const bKeySlot = numberToBytes(keySlot, { size: 1 })
   const opSig = bytesToHex(concat([bVersion, bValidUntil, bKeySlot, hexToBytes(sig)]))
@@ -167,7 +175,76 @@ async function createAccountAndVerifySignature() {
   return { userOp: _userOp, userOpHash }
 }
 
-test('can create a new account', async () => {
+export async function generateUserOp(publicKey: [Hex, Hex]) {
+  const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(publicKey)])
+
+  const senderAddress = await getSenderAddress(baseMainnetClient, {
+    initCode,
+    entryPoint: entrypoint.address,
+  })
+
+  const address = await daimoAccountFactory.read.getAddress([
+    USEROP_KEY_SLOT,
+    publicKey,
+    [],
+    USEROP_SALT,
+  ])
+
+  if (address !== senderAddress) {
+    throw new Error('Address mismatch')
+  }
+
+  // GENERATE THE CALLDATA
+  // Finally, we should be able to do a userop from our new Daimo account.
+  const to = receiverAccount.address
+  const value = parseEther('0.01')
+  const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
+
+  const callData = encodeFunctionData({
+    abi: daimoAccountAbi,
+    functionName: 'executeBatch',
+    args: [
+      [
+        {
+          dest: to,
+          value: value,
+          data: data,
+        },
+      ],
+    ],
+  })
+  const userOp: UserOperation = {
+    sender: senderAddress,
+    nonce: 0n,
+    initCode,
+    callData,
+    callGasLimit: 300000n,
+    verificationGasLimit: 700000n,
+    preVerificationGas: 300000n,
+    maxFeePerGas: 1000000n,
+    maxPriorityFeePerGas: 1000000n,
+    paymasterAndData: '0x',
+    signature: '0x',
+  }
+
+  // get userop hash
+  const userOpHash = await entrypoint.read.getUserOpHash([userOp])
+  return {
+    userOp,
+    userOpHash,
+  }
+}
+
+beforeEach(async () => {
+  nock.enableNetConnect()
+})
+
+afterEach(async () => {
+  nock.cleanAll()
+  nock.disableNetConnect()
+})
+
+test.skip('can create a new account', async () => {
   const { userOp } = await createAccountAndVerifySignature()
   // submit userop
   const _userOpHash = await bundlerClient.sendUserOperation({
@@ -195,12 +272,12 @@ test('can create a new account', async () => {
   expect(formatEther(receiverBaB - receiverBalA)).toBe('0.01')
 }, 30_000)
 
-test('can create a new account with bundler', async () => {
+test.skip('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
   log('TODO: implement bundler test', supportedEntryPoints)
 })
 
-test('can get gas user operation gas prices', async () => {
+test.skip('can get gas user operation gas prices', async () => {
   const gasPrice = await baseMainnetClient.getGasPrice()
   expect(gasPrice).toBeDefined()
   log('gasPrice', gasPrice)

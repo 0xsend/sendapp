@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useUser } from './useUser'
 
 export type UserReferralsCount = {
   referralsCount: number | undefined
@@ -9,7 +8,6 @@ export type UserReferralsCount = {
   refetch: () => void
 }
 export const useUserReferralsCount = () => {
-  const { user } = useUser()
   const supabase = useSupabase()
   const {
     data: referralsCount,
@@ -19,7 +17,6 @@ export const useUserReferralsCount = () => {
   } = useQuery({
     queryKey: ['user_referrals_count'],
     queryFn: async () => {
-      if (!user?.id) return
       const { data, error } = await supabase.rpc('user_referrals_count').select('*')
       if (error) {
         // no rows in receipts table

@@ -1,8 +1,10 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen, act } from '@testing-library/react-native'
+import { render, screen, act, userEvent } from '@testing-library/react-native'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
+const queryClient = new QueryClient()
 const TAG_NAME = 'pip_test44677'
 const PROFILE = {
   avatar_url:
@@ -40,18 +42,7 @@ jest.mock('app/utils/useUser', () => ({
 
 jest.mock('app/utils/send-accounts')
 
-jest.mock('wagmi', () => ({
-  useChainId: jest.fn().mockReturnValue(845337),
-  createConfig: jest.fn().mockReturnValue({}),
-  useBalance: jest.fn().mockReturnValue({
-    data: {
-      decimals: 6,
-      formatted: '0',
-      symbol: 'USDC',
-      value: 0n,
-    },
-  }),
-}))
+jest.mock('wagmi')
 
 jest.mock('@my/wagmi', () => {
   const originalModule = jest.requireActual<typeof import('@my/wagmi')>('@my/wagmi')
@@ -75,9 +66,11 @@ test('ProfileScreen', async () => {
   jest.useFakeTimers()
 
   render(
-    <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <ProfileScreen />
-    </TamaguiProvider>
+    <QueryClientProvider client={queryClient}>
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ProfileScreen />
+      </TamaguiProvider>
+    </QueryClientProvider>
   )
 
   await act(() => jest.runAllTimers())
@@ -101,12 +94,12 @@ test('ProfileScreen', async () => {
   expect(button2).toBeOnTheScreen()
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
 
-  await act(() => {
+  await act(async () => {
+    // await user.press(button1) // @note this does not work
     button1.props.onPress()
     jest.runAllTimers()
   })
-  // @todo figure out why the dialog is not showing
-  expect(screen.toJSON()).toMatchSnapshot('SendDialog')
+
   const dialog = screen.getByTestId('sendDialogContainer')
   expect(dialog).toBeOnTheScreen()
 })

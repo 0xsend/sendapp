@@ -5947,11 +5947,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/snaplet@workspace:packages/snaplet"
   dependencies:
-    "@snaplet/copycat": "npm:^2.0.0"
-    "@snaplet/seed": "npm:^0.86.3"
+    "@snaplet/copycat": "npm:^4.1.0"
+    "@snaplet/seed": "npm:^0.87.1"
     "@types/pg": "npm:^8"
     pg: "npm:^8.11.3"
-    snaplet: "npm:^0.86.3"
+    snaplet: "npm:^0.87.1"
     viem: "npm:^2.7.6"
   languageName: unknown
   linkType: soft
@@ -7475,20 +7475,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snaplet/copycat@npm:2.0.0, @snaplet/copycat@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@snaplet/copycat@npm:2.0.0"
+"@snaplet/copycat@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@snaplet/copycat@npm:4.0.0"
   dependencies:
     "@faker-js/faker": "npm:^8.0.2"
     fictional: "npm:^1.0.0"
     uuid: "npm:^8.3.2"
-  checksum: d7990b389982fb82776afd993ae12cbf29a05f9a4159d31bf4986f38156daa47d7c01dd896ac9ad971dafccda2f26ca746838c8b0f4cd42b9886f3a96a2f72c1
+  checksum: d8d43a22155cdad34e9ad985c45f59de3cdcb5f0bbbccd4c231e4307d0848bf2b2be68916bb12dab536960fb02e648c2387b8663346fcb53a42cd3973fa2a20c
   languageName: node
   linkType: hard
 
-"@snaplet/sdk@npm:~0.86.3":
-  version: 0.86.3
-  resolution: "@snaplet/sdk@npm:0.86.3"
+"@snaplet/copycat@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "@snaplet/copycat@npm:4.1.0"
+  dependencies:
+    "@faker-js/faker": "npm:^8.0.2"
+    fictional: "npm:^1.0.0"
+    string-argv: "npm:^0.3.2"
+    uuid: "npm:^8.3.2"
+  checksum: 97824ab0e9785eecf0af488427b4f2095c69a32f6c28e0d5005bde609d60c4d2651ea57e3191fd89dcb2d7d9390ce6089aecb64debbc70492c41b4a0e94da461
+  languageName: node
+  linkType: hard
+
+"@snaplet/sdk@npm:~0.87.1":
+  version: 0.87.1
+  resolution: "@snaplet/sdk@npm:0.87.1"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -7502,7 +7514,7 @@ __metadata:
     "@faker-js/faker": "npm:8.0.2"
     "@loancrate/prisma-schema-parser": "npm:2.0.0"
     "@scaleleap/pg-format": "npm:1.0.0"
-    "@snaplet/copycat": "npm:2.0.0"
+    "@snaplet/copycat": "npm:4.0.0"
     ansi-colors: "npm:4.1.3"
     bcryptjs: "npm:2.4.3"
     ci-info: "npm:3.9.0"
@@ -7536,19 +7548,20 @@ __metadata:
     word-wrap: "npm:1.2.3"
     zod: "npm:3.22.4"
     zod-validation-error: "npm:1.5.0"
-  checksum: a750c8bd8dabac7b7cf06f0132d9c7f81521785cc46e426d81505e4d2b8f194a3de7850e32556833b0b8288f8ec06a0aa58e3ea8ae4aa099e0221dfd15ec226c
+  checksum: 84673f43e9a8e1ad30e55233a00279086307764bc7f4a4d253f7662313dd7b2b9651c9dbdc85442f9f7b6a5c6e2f6ff080cdcffefdc99eabef74d71e7503538d
   languageName: node
   linkType: hard
 
-"@snaplet/seed@npm:^0.86.3":
-  version: 0.86.3
-  resolution: "@snaplet/seed@npm:0.86.3"
+"@snaplet/seed@npm:^0.87.1":
+  version: 0.87.1
+  resolution: "@snaplet/seed@npm:0.87.1"
   dependencies:
-    "@snaplet/copycat": "npm:2.0.0"
-    "@snaplet/sdk": "npm:~0.86.3"
+    "@snaplet/sdk": "npm:~0.87.1"
     "@types/node": "npm:20.10.4"
     pg: "npm:8.10.0"
-  checksum: 6765db0a3984ad93d2a23c988b1613ede216b04198de273e373e651c3180f40bca1d8ba6db65e188102f198272203d549c7826e6c33777c88355faff70647fde
+  peerDependencies:
+    "@snaplet/copycat": ">=2.0.0"
+  checksum: f378951cc8a2bd8e13e493ed227ab6eb9b253851c315be9b985bc2e3947e1014044180e163978abb52e0432c3bb15bda35510651f457b9ca9c5501c606d9aa57
   languageName: node
   linkType: hard
 
@@ -9502,6 +9515,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/eslint-plugin-query@npm:^5.20.1":
+  version: 5.20.1
+  resolution: "@tanstack/eslint-plugin-query@npm:5.20.1"
+  dependencies:
+    "@typescript-eslint/utils": "npm:^6.20.0"
+  peerDependencies:
+    eslint: ^8.0.0
+  checksum: 7730ba24fb45f54186262813e48bf626cc875a74d906fc0260d7eb2d4df56b05d542766a64145b7a89f7f59a553b1e8c5dab5a2fcfd74a3ba40d0350e5e76164
+  languageName: node
+  linkType: hard
+
 "@tanstack/query-core@npm:5.18.1":
   version: 5.18.1
   resolution: "@tanstack/query-core@npm:5.18.1"
@@ -10720,6 +10744,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/scope-manager@npm:6.21.0":
+  version: 6.21.0
+  resolution: "@typescript-eslint/scope-manager@npm:6.21.0"
+  dependencies:
+    "@typescript-eslint/types": "npm:6.21.0"
+    "@typescript-eslint/visitor-keys": "npm:6.21.0"
+  checksum: fe91ac52ca8e09356a71dc1a2f2c326480f3cccfec6b2b6d9154c1a90651ab8ea270b07c67df5678956c3bbf0bbe7113ab68f68f21b20912ea528b1214197395
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/type-utils@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/type-utils@npm:5.62.0"
@@ -10799,6 +10833,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/types@npm:6.21.0":
+  version: 6.21.0
+  resolution: "@typescript-eslint/types@npm:6.21.0"
+  checksum: e26da86d6f36ca5b6ef6322619f8ec55aabcd7d43c840c977ae13ae2c964c3091fc92eb33730d8be08927c9de38466c5323e78bfb270a9ff1d3611fe821046c5
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/typescript-estree@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/typescript-estree@npm:5.62.0"
@@ -10872,6 +10913,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/typescript-estree@npm:6.21.0":
+  version: 6.21.0
+  resolution: "@typescript-eslint/typescript-estree@npm:6.21.0"
+  dependencies:
+    "@typescript-eslint/types": "npm:6.21.0"
+    "@typescript-eslint/visitor-keys": "npm:6.21.0"
+    debug: "npm:^4.3.4"
+    globby: "npm:^11.1.0"
+    is-glob: "npm:^4.0.3"
+    minimatch: "npm:9.0.3"
+    semver: "npm:^7.5.4"
+    ts-api-utils: "npm:^1.0.1"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: b32fa35fca2a229e0f5f06793e5359ff9269f63e9705e858df95d55ca2cd7fdb5b3e75b284095a992c48c5fc46a1431a1a4b6747ede2dd08929dc1cbacc589b8
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/utils@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/utils@npm:5.62.0"
@@ -10924,6 +10984,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/utils@npm:^6.20.0":
+  version: 6.21.0
+  resolution: "@typescript-eslint/utils@npm:6.21.0"
+  dependencies:
+    "@eslint-community/eslint-utils": "npm:^4.4.0"
+    "@types/json-schema": "npm:^7.0.12"
+    "@types/semver": "npm:^7.5.0"
+    "@typescript-eslint/scope-manager": "npm:6.21.0"
+    "@typescript-eslint/types": "npm:6.21.0"
+    "@typescript-eslint/typescript-estree": "npm:6.21.0"
+    semver: "npm:^7.5.4"
+  peerDependencies:
+    eslint: ^7.0.0 || ^8.0.0
+  checksum: b404a2c55a425a79d054346ae123087d30c7ecf7ed7abcf680c47bf70c1de4fabadc63434f3f460b2fa63df76bc9e4a0b9fa2383bb8a9fcd62733fb5c4e4f3e3
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/visitor-keys@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/visitor-keys@npm:5.62.0"
@@ -10961,6 +11038,16 @@ __metadata:
     "@typescript-eslint/types": "npm:6.19.0"
     eslint-visitor-keys: "npm:^3.4.1"
   checksum: 8d51c0b8d94c5df044fde958f62741cef55be97c6a3a16c47e4df9af7b2ff13aa1ee03ca5240777481dca53f3b7a9b00b329e50aff5e3ad829d96bc5f63ca2c3
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/visitor-keys@npm:6.21.0":
+  version: 6.21.0
+  resolution: "@typescript-eslint/visitor-keys@npm:6.21.0"
+  dependencies:
+    "@typescript-eslint/types": "npm:6.21.0"
+    eslint-visitor-keys: "npm:^3.4.1"
+  checksum: 30422cdc1e2ffad203df40351a031254b272f9c6f2b7e02e9bfa39e3fc2c7b1c6130333b0057412968deda17a3a68a578a78929a8139c6acef44d9d841dc72e1
   languageName: node
   linkType: hard
 
@@ -12257,6 +12344,7 @@ __metadata:
     "@tamagui/lucide-icons": "npm:^1.88.8"
     "@tamagui/shorthands": "npm:^1.88.8"
     "@tamagui/themes": "npm:^1.88.8"
+    "@tanstack/eslint-plugin-query": "npm:^5.20.1"
     "@tanstack/react-query": "npm:^5.18.1"
     "@testing-library/react-native": "npm:^12.4.3"
     "@trpc/client": "npm:11.0.0-next-beta.264"
@@ -12278,6 +12366,7 @@ __metadata:
     expo-secure-store: "npm:~12.3.1"
     jest: "npm:^29.7.0"
     jest-expo: "npm:^49.0.0"
+    nock: "npm:^14.0.0-beta.2"
     permissionless: "npm:^0.0.21"
     react-hook-form: "npm:^7.48.2"
     react-native-safe-area-context: "npm:4.6.3"
@@ -22264,6 +22353,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-stringify-safe@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "json-stringify-safe@npm:5.0.1"
+  checksum: 59169a081e4eeb6f9559ae1f938f656191c000e0512aa6df9f3c8b2437a4ab1823819c6b9fd1818a4e39593ccfd72e9a051fdd3e2d1e340ed913679e888ded8c
+  languageName: node
+  linkType: hard
+
 "json5@npm:^0.5.1":
   version: 0.5.1
   resolution: "json5@npm:0.5.1"
@@ -24962,6 +25058,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nock@npm:^14.0.0-beta.2":
+  version: 14.0.0-beta.2
+  resolution: "nock@npm:14.0.0-beta.2"
+  dependencies:
+    debug: "npm:^4.1.0"
+    json-stringify-safe: "npm:^5.0.1"
+    propagate: "npm:^2.0.0"
+  checksum: ac951d8ce427ba336d99a5b2745b64840af02af268ada3ae82683329f1540b97bbc141107cab8a9644732bc3809e25df9b671d264b1aca648750875b16e9ece2
+  languageName: node
+  linkType: hard
+
 "node-abi@npm:^3.3.0":
   version: 3.51.0
   resolution: "node-abi@npm:3.51.0"
@@ -27209,6 +27316,13 @@ __metadata:
     object-assign: "npm:^4.1.1"
     react-is: "npm:^16.13.1"
   checksum: 7d959caec002bc964c86cdc461ec93108b27337dabe6192fb97d69e16a0c799a03462713868b40749bfc1caf5f57ef80ac3e4ffad3effa636ee667582a75e2c0
+  languageName: node
+  linkType: hard
+
+"propagate@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "propagate@npm:2.0.1"
+  checksum: 8c761c16e8232f82f6d015d3e01e8bd4109f47ad804f904d950f6fe319813b448ca112246b6bfdc182b400424b155b0b7c4525a9bb009e6fa950200157569c14
   languageName: node
   linkType: hard
 
@@ -29613,9 +29727,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"snaplet@npm:^0.86.3":
-  version: 0.86.3
-  resolution: "snaplet@npm:0.86.3"
+"snaplet@npm:^0.87.1":
+  version: 0.87.1
+  resolution: "snaplet@npm:0.87.1"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -29631,7 +29745,7 @@ __metadata:
     "@scaleleap/pg-format": "npm:1.0.0"
     "@sentry/integrations": "npm:7.48.0"
     "@sentry/node": "npm:7.48.0"
-    "@snaplet/copycat": "npm:2.0.0"
+    "@snaplet/copycat": "npm:4.0.0"
     "@trpc/client": "npm:10.29.1"
     "@trpc/server": "npm:10.29.1"
     ansi-colors: "npm:4.1.3"
@@ -29697,7 +29811,7 @@ __metadata:
     zod-validation-error: "npm:1.5.0"
   bin:
     snaplet: bin/snaplet.js
-  checksum: 4dea4b8ff1daad5e4c3069fcb7bff85ab7cb48c782395412abb78994059793aefe89b3f5c1df206263458af3d520ad5eb0abb2e9782a14506e7abba75db983a5
+  checksum: cb04e3f7a1a076c3322373e670bb34fc9209bd9bf0a6189f45f01c4c71db34c1d5eeb9e9a8561aa648b7dec24d4dae135de2c28d61502872fd2ae8cafe619ddc
   languageName: node
   linkType: hard
 
@@ -30180,6 +30294,13 @@ __metadata:
   version: 2.0.0
   resolution: "strict-uri-encode@npm:2.0.0"
   checksum: eaac4cf978b6fbd480f1092cab8b233c9b949bcabfc9b598dd79a758f7243c28765ef7639c876fa72940dac687181b35486ea01ff7df3e65ce3848c64822c581
+  languageName: node
+  linkType: hard
+
+"string-argv@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "string-argv@npm:0.3.2"
+  checksum: f9d3addf887026b4b5f997a271149e93bf71efc8692e7dc0816e8807f960b18bcb9787b45beedf0f97ff459575ee389af3f189d8b649834cac602f2e857e75af
   languageName: node
   linkType: hard
 

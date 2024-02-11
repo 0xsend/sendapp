@@ -32,7 +32,7 @@ test('can send to user on profile', async ({ page, seed }) => {
   await expect(sendDialog).toBeVisible()
   const amountInput = sendDialog.getByLabel('Amount')
   await expect(amountInput).toBeVisible()
-  await amountInput.fill('1234')
+  await amountInput.fill('0.01')
   const sendDialogButton = sendDialog.getByRole('button', { name: 'Send' })
   expect(sendDialogButton).toBeVisible()
   await sendDialogButton.click()

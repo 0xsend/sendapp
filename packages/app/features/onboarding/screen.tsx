@@ -37,7 +37,7 @@ import { useUser } from 'app/utils/useUser'
 import { daimoAccountFactory, encodeCreateAccountData, entrypoint } from 'app/utils/userop'
 import { baseMainnetClient } from '@my/wagmi'
 import * as Device from 'expo-device'
-import { concat } from 'viem'
+import { concat, parseEther } from 'viem'
 import {
   IconSLogo,
   IconSendLogo,
@@ -49,6 +49,7 @@ import { telegram as telegramSocial, twitter as twitterSocial } from 'app/data/s
 import { useState } from 'react'
 import { getSenderAddress } from 'permissionless'
 import { shorten } from 'app/utils/strings'
+import { testClient } from 'app/utils/userop'
 
 export function OnboardingScreen() {
   const { height: windowHeight, width: windowWidth } = useWindowDimensions()
@@ -205,6 +206,14 @@ function CreateSendAccount() {
 
     if (error) {
       throw error
+    }
+
+    if (__DEV__) {
+      console.log('Funding sending address', senderAddress)
+      await testClient.setBalance({
+        address: senderAddress,
+        value: parseEther('1'),
+      })
     }
 
     await sendAcctsRefetch()

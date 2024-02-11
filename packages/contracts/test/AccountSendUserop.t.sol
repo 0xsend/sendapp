@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.13;
 
-import "./BaseGoerliForkTest.sol";
+import "./BaseSepoliaForkTest.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
@@ -13,7 +13,7 @@ import "account-abstraction/interfaces/IEntryPoint.sol";
 
 import "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-contract AccountSendUseropTest is BaseGoerliForkTest {
+contract AccountSendUseropTest is BaseSepoliaForkTest {
     using UserOperationLib for UserOperation;
 
     EntryPoint public entryPoint;
@@ -63,7 +63,7 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
 
         uint8 version = 1;
         uint48 validUntil = 0;
-        bytes32 expectedUserOpHash = hex"cef2863e6be232ac99eef76f754acda25d51cec80009102e0df7af9f9078cd61";
+        bytes32 expectedUserOpHash = hex"c09eff100c833882cd94bc6b5d2e0d45af6ec978eb7f4a2e5174696bfee87488";
         bytes memory challengeToSign = abi.encodePacked(version, validUntil, expectedUserOpHash);
 
         bytes memory ownerSig = abi.encodePacked(
@@ -73,8 +73,8 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
                     challenge: challengeToSign,
-                    r: 0x3e642fa939f04968b29630dddfe14d7b97c1589ac07d843174c7cf5f44493d2a,
-                    s: 0x73ae19f8113f338cf3944f1b7d59e13cf811bcb57e56013a46fc40a521caa2c3
+                    r: 0x2dec57c39ecd3a573bb35e4d1bc16d3db6d5ee8ab024605aa910631d38bee5fe,
+                    s: 0x6036d125bc72d63a29ff6ab63e25a5273acb9824b818e919d83ed0f883d6e941
                 })
             )
         );
@@ -144,7 +144,7 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
 
         uint8 version = 1;
         uint48 validUntil = 1e9; // validUntil unix timestamp 1e9
-        bytes32 expectedUserOpHash = hex"cef2863e6be232ac99eef76f754acda25d51cec80009102e0df7af9f9078cd61";
+        bytes32 expectedUserOpHash = hex"c09eff100c833882cd94bc6b5d2e0d45af6ec978eb7f4a2e5174696bfee87488";
         bytes memory challengeToSign = abi.encodePacked(version, validUntil, expectedUserOpHash);
 
         bytes memory ownerSig = abi.encodePacked(
@@ -154,8 +154,8 @@ contract AccountSendUseropTest is BaseGoerliForkTest {
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
                     challenge: challengeToSign,
-                    r: 0x899af9e296b35a479af395160b580772dfbaa10656f4a00a3a8edf29896c2a56,
-                    s: 0x43f87343e7ee7c305aaed9cfc0945997175f39ffa272cfc423ad1f3a74712b1c
+                    r: 0x07d134db93e31d80eed6d093fcd15ad0fbd337ea2e5394f355307378345e8197,
+                    s: 0x05d84f80617a5077c431a936762826f1145c5834b8e23dff6f3d8b41321a5815
                 })
             )
         );

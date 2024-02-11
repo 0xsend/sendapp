@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.13;
 
-import "./BaseGoerliForkTest.sol";
+import "./BaseSepoliaForkTest.sol";
 import "openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import "../src/DaimoVerifier.sol";
@@ -41,7 +41,7 @@ contract UpgradeableVerifierBrick is UUPSUpgradeable, OwnableUpgradeable {
     function test() public {}
 }
 
-contract VerifierTest is BaseGoerliForkTest {
+contract VerifierTest is BaseSepoliaForkTest {
     address public implementation;
     DaimoVerifier public verifier;
 

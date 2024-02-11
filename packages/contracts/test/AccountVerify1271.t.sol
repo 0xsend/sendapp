@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.13;
 
-import "./BaseGoerliForkTest.sol";
+import "./BaseSepoliaForkTest.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
@@ -10,7 +10,7 @@ import "./Utils.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
 
-contract AccountVerify1271Test is BaseGoerliForkTest {
+contract AccountVerify1271Test is BaseSepoliaForkTest {
     using UserOperationLib for UserOperation;
 
     EntryPoint public entryPoint;

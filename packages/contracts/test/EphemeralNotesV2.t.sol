@@ -6,7 +6,7 @@ import "forge-std/Test.sol";
 import "forge-std/console2.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
-import "../src/DaimoEphemeralNotes.sol";
+import "../src/DaimoEphemeralNotesV2.sol";
 
 contract TestDAI is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
@@ -19,9 +19,9 @@ contract TestDAI is ERC20 {
     function test() public {}
 }
 
-contract EphemeralNotesTest is Test {
+contract EphemeralNotesV2Test is Test {
     TestDAI public token;
-    DaimoEphemeralNotes public notes;
+    DaimoEphemeralNotesV2 public notes;
     uint256 private constant ephemeralPrivateKey = 0x1010101010101010101010101010101010101010101010101010101010101010;
     address private ephemeralAddress = vm.addr(ephemeralPrivateKey);
     address constant ALICE = address(0x123);
@@ -32,7 +32,7 @@ contract EphemeralNotesTest is Test {
 
     function setUp() public {
         token = new TestDAI("TestDAI", "DAI");
-        notes = new DaimoEphemeralNotes(token);
+        notes = new DaimoEphemeralNotesV2(token);
     }
 
     // This is equivalent to what the users have to run on client side using ethers.js or equivalent
@@ -70,7 +70,7 @@ contract EphemeralNotesTest is Test {
         vm.expectEmit(false, false, false, false);
         Note memory expectedNote = Note({ephemeralOwner: ephemeralAddress, from: ALICE, amount: 500});
         emit NoteRedeemed(expectedNote, BOB);
-        notes.claimNote(ephemeralAddress, createEphemeralSignature(BOB));
+        notes.claimNoteRecipient(ephemeralAddress, BOB, createEphemeralSignature(BOB));
         vm.stopPrank();
 
         // Check transfer went through correctly
@@ -85,8 +85,8 @@ contract EphemeralNotesTest is Test {
 
         // Bob uses ephemeralAddress to sign wrong address and redeem the note
         vm.startPrank(BOB, BOB);
-        vm.expectRevert("EphemeralNotes: invalid signature and not creator");
-        notes.claimNote(ephemeralAddress, createEphemeralSignature(address(0x789)));
+        vm.expectRevert("EphemeralNotes: invalid signature");
+        notes.claimNoteRecipient(ephemeralAddress, BOB, createEphemeralSignature(address(0x789)));
         vm.stopPrank();
 
         // Check transfer failed
@@ -102,11 +102,29 @@ contract EphemeralNotesTest is Test {
         // Alice short circuits and reverts the note to herself
         // She does not need a valid signature from ephemeralAddress to do this
         vm.startPrank(ALICE, ALICE);
-        notes.claimNote(ephemeralAddress, createEphemeralSignature(BOB));
+        notes.claimNoteSelf(ephemeralAddress);
         vm.stopPrank();
 
         // Check transfer went through correctly
         assertEq(token.balanceOf(ALICE), 1000);
         assertEq(token.balanceOf(address(notes)), 0);
+    }
+
+    function testWrongRevertFlow() public {
+        // Alice approves token contract and creates a new note to ephemeralAddress
+        createAliceNote();
+
+        // Bob tries to short circuit and reverts the note to himself
+        // He needs a valid signature from ephemeralAddress so it
+        // should fail
+        vm.startPrank(BOB, BOB);
+        vm.expectRevert("EphemeralNotes: not note sender");
+        notes.claimNoteSelf(ephemeralAddress);
+        vm.stopPrank();
+
+        // Check transfer failed
+        assertEq(token.balanceOf(ALICE), 500);
+        assertEq(token.balanceOf(BOB), 0);
+        assertEq(token.balanceOf(address(notes)), 500);
     }
 }

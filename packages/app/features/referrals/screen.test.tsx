@@ -3,7 +3,7 @@ import { TamaguiProvider, config } from '@my/ui'
 import { render } from '@testing-library/react-native'
 import { ReferralsScreen } from './screen'
 
-jest.mock('app/utils/UseUserReferralsCount', () => ({
+jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue({ referralsCount: 123, error: null }),
 }))
 

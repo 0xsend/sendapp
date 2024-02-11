@@ -37,7 +37,7 @@ jest.mock('solito/link', () => ({
   Link: jest.fn(),
 }))
 
-jest.mock('app/utils/UseUserReferralsCount', () => ({
+jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue(123),
 }))
 

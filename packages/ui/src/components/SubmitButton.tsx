@@ -19,6 +19,7 @@ export const SubmitButton = (props: ButtonProps) => {
 
   return (
     <Button
+      testID={'SubmitButton'}
       aria-busy={isSubmitting}
       iconAfter={
         <AnimatePresence>
