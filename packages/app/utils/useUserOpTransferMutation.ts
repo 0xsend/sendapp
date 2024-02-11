@@ -33,6 +33,7 @@ export type UseUserOpTransferMutationArgs = {
  * Given a Send Account, token, and amount, returns a mutation to send a user op ERC20 or native transfer.
  *
  * @note An undefined token value indicates the native currency.
+ * @todo split out the userop generation into a separate hook
  *
  * @param sender The sender of the transfer.
  * @param token The token to transfer, or falsy value for the native currency.
@@ -42,17 +43,17 @@ export type UseUserOpTransferMutationArgs = {
  * @param initCode The init code for the send account or 0x if account is already initialized.
  * @param nonce The nonce for the user op.
  */
-export function useUserOpTransferMutation({
-  sender,
-  token,
-  amount,
-  to,
-  validUntil = USEROP_VALID_UNTIL,
-  initCode,
-  nonce,
-}: UseUserOpTransferMutationArgs) {
+export function useUserOpTransferMutation() {
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({
+      sender,
+      token,
+      amount,
+      to,
+      validUntil = USEROP_VALID_UNTIL,
+      initCode,
+      nonce,
+    }: UseUserOpTransferMutationArgs) => {
       assert(isAddress(sender), 'Invalid send account address')
       assert(isAddress(to), 'Invalid to address')
       assert(!token || isAddress(token), 'Invalid token address')
@@ -180,7 +181,7 @@ export function useUserOpTransferMutation({
       })
       const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
       assert(receipt.success === true, 'Failed to send userOp')
-      return receipt.success
+      return receipt
     },
   })
 }

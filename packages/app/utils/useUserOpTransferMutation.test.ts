@@ -49,12 +49,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 1n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Nonce must be 0 for new account')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Nonce must be 0 for new account')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -106,13 +106,13 @@ describe('useUserOpTransferMutation', () => {
     // @ts-expect-error mock
     signUserOp.mockResolvedValue('0x123')
 
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
     await act(async () => {
-      await result.current.mutateAsync()
+      await result.current.mutateAsync(args)
       jest.runAllTimers()
     })
     expect(signUserOp).toHaveBeenCalledTimes(1)
@@ -171,13 +171,13 @@ describe('useUserOpTransferMutation', () => {
     // @ts-expect-error mock
     signUserOp.mockResolvedValue('0x123')
 
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
     await act(async () => {
-      await result.current.mutateAsync()
+      await result.current.mutateAsync(args)
       jest.runAllTimers()
     })
     expect(signUserOp).toHaveBeenCalledTimes(1)
@@ -195,12 +195,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 1,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid nonce')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid nonce')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -215,12 +215,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: -1n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid nonce')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid nonce')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -236,12 +236,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid amount')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid amount')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -256,12 +256,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid amount')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid amount')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -276,12 +276,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid send account address')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid send account address')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -296,12 +296,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid to address')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid to address')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -317,12 +317,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid init code')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid init code')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -337,12 +337,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid token address')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid token address')
     await act(async () => {
       jest.runAllTimers()
     })
@@ -357,12 +357,12 @@ describe('useUserOpTransferMutation', () => {
       nonce: 0n,
       initCode: '0x123',
     } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(args), {
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync()).rejects.toThrow('Invalid amount')
+    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid amount')
     await act(async () => {
       jest.runAllTimers()
     })
