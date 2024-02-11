@@ -1,6 +1,10 @@
+import { TamaguiProvider, config } from '@my/ui'
 import { QueryClient, QueryClientConfig, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 
+/**
+ * Wrapper for tests that use react-query and tamagui
+ */
 export function Wrapper({
   children,
   defaultOptions,
@@ -18,5 +22,11 @@ export function Wrapper({
         },
       })
   )
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        {children}
+      </TamaguiProvider>
+    </QueryClientProvider>
+  )
 }

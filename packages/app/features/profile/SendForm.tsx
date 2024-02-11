@@ -124,6 +124,9 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
             ],
           },
         }}
+        formProps={{
+          testID: 'SendForm',
+        }}
         defaultValues={{
           token: '',
         }}
@@ -140,7 +143,7 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         {({ amount, token }) => (
           <>
             {balance ? (
-              <Paragraph>
+              <Paragraph testID="SendFormBalance">
                 {balance.symbol} Balance:{' '}
                 {formatAmount(formatUnits(balance.value, balance.decimals))}
               </Paragraph>

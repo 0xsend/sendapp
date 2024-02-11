@@ -36,6 +36,7 @@ import {
 } from 'app/utils/userop'
 import { numberToBytes } from 'viem'
 import { getSenderAddress, UserOperation } from 'permissionless'
+import nock from 'nock'
 
 jest.mock('@daimo/expo-passkeys', () => ({
   createPasskey: jest.fn(),
@@ -233,6 +234,15 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     userOpHash,
   }
 }
+
+beforeEach(async () => {
+  nock.enableNetConnect()
+})
+
+afterEach(async () => {
+  nock.cleanAll()
+  nock.disableNetConnect()
+})
 
 test.skip('can create a new account', async () => {
   const { userOp } = await createAccountAndVerifySignature()

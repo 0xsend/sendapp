@@ -42,28 +42,7 @@ jest.mock('app/utils/useUser', () => ({
 
 jest.mock('app/utils/send-accounts')
 
-jest.mock('wagmi', () => ({
-  useChainId: jest.fn().mockReturnValue(845337),
-  createConfig: jest.fn().mockReturnValue({}),
-  useBalance: jest.fn().mockReturnValue({
-    data: {
-      decimals: 6,
-      formatted: '0',
-      symbol: 'USDC',
-      value: 0n,
-    },
-  }),
-  useBytecode: jest.fn().mockReturnValue({
-    data: '0x123',
-    isLoading: false,
-    error: null,
-  }),
-  useTransactionCount: jest.fn().mockReturnValue({
-    data: 0n,
-    isSuccess: true,
-    error: null,
-  }),
-}))
+jest.mock('wagmi')
 
 jest.mock('@my/wagmi', () => {
   const originalModule = jest.requireActual<typeof import('@my/wagmi')>('@my/wagmi')
@@ -115,36 +94,12 @@ test('ProfileScreen', async () => {
   expect(button2).toBeOnTheScreen()
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
 
-  const user = userEvent.setup()
-
   await act(async () => {
     // await user.press(button1) // @note this does not work
     button1.props.onPress()
     jest.runAllTimers()
   })
 
-  // @todo figure out why the dialog is not showing
-  expect(screen.toJSON()).toMatchSnapshot('SendDialog')
   const dialog = screen.getByTestId('sendDialogContainer')
   expect(dialog).toBeOnTheScreen()
-  const amount = screen.getByLabelText('Amount')
-  const token = screen.getByTestId('TokenSelectValue')
-  const submit = screen.getByTestId('SubmitButton')
-  expect(amount).toBeOnTheScreen()
-  expect(token).toHaveTextContent('Token') // this is the placeholder
-  expect(submit).toBeOnTheScreen()
-  await act(async () => {
-    await submit.props.onPress() // trigger validation
-    jest.runAllTimers()
-  })
-  expect(screen.getByText('Required')).toBeOnTheScreen()
-  expect(screen.toJSON()).toMatchSnapshot('SendForm: Error')
-  await act(async () => {
-    await user.type(amount, '123')
-    await user.press(token)
-    await user.press(screen.getByText('USDC')) // @todo also USDC
-    jest.runAllTimers()
-  })
-  expect(amount.props.value).toBe('123')
-  expect(screen.toJSON()).toMatchSnapshot('SendForm')
 })

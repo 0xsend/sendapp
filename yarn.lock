@@ -12366,6 +12366,7 @@ __metadata:
     expo-secure-store: "npm:~12.3.1"
     jest: "npm:^29.7.0"
     jest-expo: "npm:^49.0.0"
+    nock: "npm:^14.0.0-beta.2"
     permissionless: "npm:^0.0.21"
     react-hook-form: "npm:^7.48.2"
     react-native-safe-area-context: "npm:4.6.3"
@@ -22352,6 +22353,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-stringify-safe@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "json-stringify-safe@npm:5.0.1"
+  checksum: 59169a081e4eeb6f9559ae1f938f656191c000e0512aa6df9f3c8b2437a4ab1823819c6b9fd1818a4e39593ccfd72e9a051fdd3e2d1e340ed913679e888ded8c
+  languageName: node
+  linkType: hard
+
 "json5@npm:^0.5.1":
   version: 0.5.1
   resolution: "json5@npm:0.5.1"
@@ -25050,6 +25058,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nock@npm:^14.0.0-beta.2":
+  version: 14.0.0-beta.2
+  resolution: "nock@npm:14.0.0-beta.2"
+  dependencies:
+    debug: "npm:^4.1.0"
+    json-stringify-safe: "npm:^5.0.1"
+    propagate: "npm:^2.0.0"
+  checksum: ac951d8ce427ba336d99a5b2745b64840af02af268ada3ae82683329f1540b97bbc141107cab8a9644732bc3809e25df9b671d264b1aca648750875b16e9ece2
+  languageName: node
+  linkType: hard
+
 "node-abi@npm:^3.3.0":
   version: 3.51.0
   resolution: "node-abi@npm:3.51.0"
@@ -27297,6 +27316,13 @@ __metadata:
     object-assign: "npm:^4.1.1"
     react-is: "npm:^16.13.1"
   checksum: 7d959caec002bc964c86cdc461ec93108b27337dabe6192fb97d69e16a0c799a03462713868b40749bfc1caf5f57ef80ac3e4ffad3effa636ee667582a75e2c0
+  languageName: node
+  linkType: hard
+
+"propagate@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "propagate@npm:2.0.1"
+  checksum: 8c761c16e8232f82f6d015d3e01e8bd4109f47ad804f904d950f6fe319813b448ca112246b6bfdc182b400424b155b0b7c4525a9bb009e6fa950200157569c14
   languageName: node
   linkType: hard
 
