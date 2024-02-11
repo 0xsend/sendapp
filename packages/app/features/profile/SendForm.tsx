@@ -63,21 +63,6 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
     error: sendUserOpError,
     data: sendUserOpData,
   } = useUserOpTransferMutation()
-
-  // useEffect(() => {
-  //   if (__DEV__) {
-  //     if (sendAccount?.address) {
-  //       ;(async () => {
-  //         console.log('Funding sending address', sendAccount.address)
-  //         await testBaseClient.setBalance({
-  //           address: sendAccount.address,
-  //           value: parseEther('1'),
-  //         })
-  //       })()
-  //     }
-  //   }
-  // }, [sendAccount?.address])
-
   async function onSubmit({ token, amount: amountStr }: z.infer<typeof SendFormSchema>) {
     try {
       assert(!!balance, 'Balance is not available')
@@ -145,7 +130,7 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
             {balance ? (
               <Paragraph testID="SendFormBalance">
                 {balance.symbol} Balance:{' '}
-                {formatAmount(formatUnits(balance.value, balance.decimals))}
+                {formatAmount(formatUnits(balance.value, balance.decimals), undefined, 4)}
               </Paragraph>
             ) : balanceIsPending ? (
               <Spinner size="small" />
