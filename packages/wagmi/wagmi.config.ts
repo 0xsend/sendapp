@@ -149,6 +149,26 @@ export default defineConfig({
         ...deployments,
       },
       include: ['Send*.sol/*', 'Daimo*.sol/*', 'ERC*.sol/*', 'IEntryPoint*.sol/*'],
+      exclude: [
+        'Common.sol/**',
+        'Components.sol/**',
+        'Script.sol/**',
+        'StdAssertions.sol/**',
+        'StdInvariant.sol/**',
+        'StdError.sol/**',
+        'StdCheats.sol/**',
+        'StdMath.sol/**',
+        'StdJson.sol/**',
+        'StdStorage.sol/**',
+        'StdUtils.sol/**',
+        'Vm.sol/**',
+        'console.sol/**',
+        'console2.sol/**',
+        'test.sol/**',
+        '**.s.sol/*.json',
+        '**.t.sol/*.json',
+        'DaimoPaymaster.sol/**', // avoid duplicate IMetaPaymaster
+      ],
     }),
     actions({
       getActionName: (() => {
