@@ -12,6 +12,7 @@ export const useUser = () => {
     refetch,
   } = useQuery({
     queryKey: ['profile', user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')

@@ -54,7 +54,31 @@ describe('useUserOpTransferMutation', () => {
     })
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Nonce must be 0 for new account')
+    expect(result.current.mutateAsync(args)).rejects.toThrow(
+      'Init code must be 0x for existing account'
+    )
+    await act(async () => {
+      jest.runAllTimers()
+    })
+  })
+
+  test('should return error when nonce is 0 and initCode is not defined when uninitialized account', async () => {
+    const args = {
+      sender: `0x${'1'.repeat(40)}`,
+      amount: 1n,
+      token: undefined,
+      to: `0x${'2'.repeat(40)}`,
+      nonce: 0n,
+      initCode: '0x',
+    } as UseUserOpTransferMutationArgs
+    const { result } = renderHook(() => useUserOpTransferMutation(), {
+      wrapper: Wrapper,
+    })
+
+    expect(result.current).toBeDefined()
+    expect(result.current.mutateAsync(args)).rejects.toThrow(
+      'Must provide init code for new account'
+    )
     await act(async () => {
       jest.runAllTimers()
     })

@@ -295,6 +295,7 @@ local_resource(
     allow_parallel = True,
     auto_init = False,
     labels = labels,
+    links = [link("http://localhost:5100/", "Otterscan Mainnet")],
     readiness_probe = probe(
         http_get = http_get_action(
             path = "/",
@@ -432,6 +433,7 @@ local_resource(
     allow_parallel = True,
     auto_init = False,
     labels = labels,
+    links = [link("http://localhost:5101/", "Otterscan Base")],
     readiness_probe = probe(
         http_get = http_get_action(
             path = "/",

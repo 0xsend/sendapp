@@ -60,7 +60,14 @@ export function useUserOpTransferMutation() {
       assert(isHex(initCode), 'Invalid init code')
       assert(typeof amount === 'bigint' && amount > 0n, 'Invalid amount')
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
-      assert(nonce === 0n && initCode.length > 2, 'Nonce must be 0 for new account')
+
+      if (nonce === 0n) {
+        assert(initCode.length > 2, 'Must provide init code for new account')
+      }
+
+      if (nonce > 0n) {
+        assert(initCode === '0x', 'Init code must be 0x for existing account')
+      }
 
       // GENERATE THE CALLDATA
       let callData: Hex | undefined

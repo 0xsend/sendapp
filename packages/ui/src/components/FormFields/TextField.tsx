@@ -25,6 +25,7 @@ export const TextField = (props: InputProps) => {
         )}
         <Shake shakeKey={error?.errorMessage}>
           <Input
+            accessibilityLabel={label}
             disabled={disabled}
             maxLength={maxLength}
             placeholderTextColor="$color10"

@@ -58,6 +58,11 @@ jest.mock('wagmi', () => ({
     isLoading: false,
     error: null,
   }),
+  useTransactionCount: jest.fn().mockReturnValue({
+    data: 0n,
+    isSuccess: true,
+    error: null,
+  }),
 }))
 
 jest.mock('@my/wagmi', () => {
