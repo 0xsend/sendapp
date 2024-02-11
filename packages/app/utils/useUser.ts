@@ -11,10 +11,13 @@ export const useUser = () => {
     isLoading: isLoadingProfile,
     refetch,
   } = useQuery({
-    queryKey: ['profile'],
+    queryKey: ['profile', user?.id],
     queryFn: async () => {
-      if (!user?.id) return null
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id ?? '')
+        .single()
       if (error) {
         // no rows - edge case of user being deleted
         if (error.code === 'PGRST116') {
@@ -38,7 +41,6 @@ export const useUser = () => {
   } = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
-      if (!user?.id) return null
       const { data, error } = await supabase.from('tags').select('*')
 
       if (error) {

@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSupabase } from './supabase/useSupabase'
-import { useUser } from './useUser'
 
 export type Receipts = {
   receipts:
@@ -16,7 +15,6 @@ export type Receipts = {
 }
 export const useReceipts = () => {
   const supabase = useSupabase()
-  const { user } = useUser()
   const {
     data: receipts,
     isLoading,
@@ -25,7 +23,6 @@ export const useReceipts = () => {
   } = useQuery({
     queryKey: ['receipts'],
     queryFn: async () => {
-      if (!user?.id) return
       const { data, error } = await supabase.from('receipts').select('*')
       if (error) {
         // no rows in receipts table

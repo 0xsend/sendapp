@@ -1,6 +1,6 @@
 import { Card, CardHeader, Container, H3, H5, Paragraph, XStack, YStack } from '@my/ui'
 import { IconSendToken } from 'app/components/icons'
-import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
+import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
 const pageDescription =
   "Share your unique link, and when someone joins or makes a purchase using it, you earn rewards in SEND token. Our system tracks referrals, ensuring you receive rewards. It's a win-win as you support us and enjoy the benefits. Thanks for being part of our community!"

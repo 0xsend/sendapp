@@ -29,7 +29,7 @@ export function useSendAccountInitCode({
   const isFetched = Boolean(sendAccount?.address && byteCodeIsFetched && byteCodeIsSuccess)
 
   return useQuery({
-    queryKey: ['sendAccountInitCode', sendAccount?.address],
+    queryKey: ['sendAccountInitCode', sendAccount?.address, byteCodeError, isFetched, byteCode],
     enabled: !!byteCodeError || isFetched,
     queryFn: () => {
       if (byteCodeError) {

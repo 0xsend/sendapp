@@ -11,7 +11,7 @@ import {
   useToastController,
 } from '@my/ui'
 import { useNav } from 'app/routers/params'
-import { useUserReferralsCount } from 'app/utils/UseUserReferralsCount'
+import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
