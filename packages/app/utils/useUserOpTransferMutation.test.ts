@@ -162,7 +162,7 @@ describe('useUserOpTransferMutation', () => {
           [
             {
               dest: args.token,
-              value: args.amount,
+              value: 0n,
               data: encodeFunctionData({
                 abi: erc20Abi,
                 functionName: 'transfer',

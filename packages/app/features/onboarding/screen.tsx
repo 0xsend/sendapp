@@ -35,7 +35,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useUser } from 'app/utils/useUser'
 import { daimoAccountFactory, encodeCreateAccountData, entrypoint } from 'app/utils/userop'
-import { baseMainnetClient } from '@my/wagmi'
+import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 import * as Device from 'expo-device'
 import { concat, parseEther } from 'viem'
 import {
@@ -50,6 +50,7 @@ import { useState } from 'react'
 import { getSenderAddress } from 'permissionless'
 import { shorten } from 'app/utils/strings'
 import { testClient } from 'app/utils/userop'
+import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 
 export function OnboardingScreen() {
   const { height: windowHeight, width: windowWidth } = useWindowDimensions()
@@ -214,6 +215,12 @@ function CreateSendAccount() {
         address: senderAddress,
         value: parseEther('1'),
       })
+      await setERC20Balance({
+        client: testClient,
+        address: senderAddress,
+        tokenAddress: usdcAddress[baseMainnetClient.chain.id],
+        value: BigInt(100e6),
+      })
     }
 
     await sendAcctsRefetch()
@@ -260,7 +267,7 @@ function SendAccountCongratulations() {
   return (
     <YStack w="100%" space="$4" f={1}>
       <H3>Congratulations on opening your first Send Account! </H3>
-      <Paragraph>Let's get you sending</Paragraph>
+      <Paragraph>Let&apos;s get you sending</Paragraph>
       <Stack f={1} jc="center" ai="center">
         <Paragraph ta="center">First, fund your account by sending ETH here</Paragraph>
         <XStack>

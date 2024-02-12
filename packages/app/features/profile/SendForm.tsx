@@ -1,4 +1,4 @@
-import { Button, Paragraph, Spinner, SubmitButton, useToastController } from '@my/ui'
+import { Button, Paragraph, Spinner, SubmitButton, XStack, useToastController } from '@my/ui'
 import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -12,6 +12,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountInitCode } from 'app/utils/useSendAccountInitCode'
 import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { assert } from 'app/utils/assert'
+import { Link } from 'solito/link'
 
 // @todo add currency field
 const SendFormSchema = z.object({
@@ -25,9 +26,10 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
   const form = useForm<z.infer<typeof SendFormSchema>>()
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
-  const webauthnCred = sendAccount?.webauthn_credentials?.[0]
-  const [sentUserOpHash, setSentUserOpHash] = useState<Hex>()
+  // const webauthnCred = sendAccount?.webauthn_credentials?.[0]
+  const [sentUserOpTxHash, setSentUserOpTxHash] = useState<Hex>()
   const token = form.watch('token') as `0x${string}` | undefined
+  // need balance to check if user has enough to send
   const {
     data: balance,
     isPending: balanceIsPending,
@@ -38,30 +40,28 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
-
   // need init code in case this is a new account
   const {
     data: initCode,
-    isSuccess: initCodeIsSuccess,
+    // isSuccess: initCodeIsSuccess,
     error: initCodeError,
   } = useSendAccountInitCode({ sendAccount })
   // need nonce to send transaction
   const {
     data: nonce,
-    isSuccess: nonceIsSuccess,
+    // isSuccess: nonceIsSuccess,
     error: nonceError,
   } = useTransactionCount({
     address: sendAccount?.address,
     query: { enabled: !!sendAccount?.address },
     chainId: baseMainnet.id,
   })
-
   const {
     mutateAsync: sendUserOp,
-    isPending: isSendUserOpPending,
-    isError: isSendUserOpError,
-    error: sendUserOpError,
-    data: sendUserOpData,
+    // isPending: isSendUserOpPending,
+    // isError: isSendUserOpError,
+    // error: sendUserOpError,
+    // data: sendUserOpData,
   } = useUserOpTransferMutation()
   async function onSubmit({ token, amount: amountStr }: z.infer<typeof SendFormSchema>) {
     try {
@@ -85,13 +85,13 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         nonce: BigInt(nonce),
       })
       assert(receipt.success, 'Failed to send user op')
-      setSentUserOpHash(receipt.userOpHash)
-      toast.show(`Sent user op ${receipt.userOpHash}!`)
+      setSentUserOpTxHash(receipt.receipt.transactionHash)
+      toast.show(`Sent user op ${receipt.receipt.transactionHash}!`)
       balanceRefetch()
     } catch (e) {
       console.error(e)
       toast.show('Failed to send user op')
-      form.setError('amount', { type: 'custom', message: `Failed to send user op: ${e}` })
+      form.setError('amount', { type: 'custom', message: `${e}` })
     }
   }
 
@@ -116,12 +116,18 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
           token: '',
         }}
         renderAfter={({ submit }) =>
-          sentUserOpHash ? (
-            <Paragraph>Sent user op: {sentUserOpHash}</Paragraph>
+          sentUserOpTxHash ? (
+            <Link href={`${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`}>
+              <Button>
+                <Button.Text>View on {baseMainnet.blockExplorers.default.name}</Button.Text>
+              </Button>
+            </Link>
           ) : (
-            <SubmitButton onPress={submit}>
-              <Button.Text>Send</Button.Text>
-            </SubmitButton>
+            <XStack>
+              <SubmitButton theme="accent" onPress={submit}>
+                <Button.Text>Send</Button.Text>
+              </SubmitButton>
+            </XStack>
           )
         }
       >

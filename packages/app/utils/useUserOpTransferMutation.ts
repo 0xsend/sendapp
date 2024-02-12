@@ -93,7 +93,7 @@ export function useUserOpTransferMutation() {
             [
               {
                 dest: token,
-                value: amount,
+                value: 0n,
                 data: encodeFunctionData({
                   abi: erc20Abi,
                   functionName: 'transfer',
