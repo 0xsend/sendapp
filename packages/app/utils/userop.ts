@@ -23,6 +23,7 @@ import {
   numberToBytes,
   parseEther,
   isHex,
+  publicActions,
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
@@ -43,7 +44,7 @@ export const testClient = createTestClient({
   chain: baseMainnetClient.chain,
   transport: http(baseMainnetClient.transport.url),
   mode: 'anvil',
-})
+}).extend(publicActions)
 
 export const daimoAccountFactory = getContract({
   abi: daimoAccountFactoryAbi,

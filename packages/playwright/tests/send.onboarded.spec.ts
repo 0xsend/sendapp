@@ -14,7 +14,7 @@ test.beforeAll(async () => {
   log = debug(`test:send:logged-in:${test.info().workerIndex}`)
 })
 
-test('can send to user on profile', async ({ page, seed }) => {
+test('can send ETH to user on profile', async ({ page, seed }) => {
   test.slow() // Easy way to triple the default timeout
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
@@ -36,7 +36,39 @@ test('can send to user on profile', async ({ page, seed }) => {
   const sendDialogButton = sendDialog.getByRole('button', { name: 'Send' })
   expect(sendDialogButton).toBeVisible()
   await sendDialogButton.click()
-  await expect(sendDialog.getByText(/Sent user op: [0-9a-f]+/).first()).toBeVisible({
+  await expect(sendDialog.getByText(/Sent user op [0-9a-f]+/).first()).toBeVisible({
     timeout: 20000,
   })
+  await expect(sendDialog.getByRole('button', { name: 'View on Otterscan' })).toBeVisible()
+})
+
+test('can send USDC to user on profile', async ({ page, seed }) => {
+  test.slow() // Easy way to triple the default timeout
+  const plan = await seed.users([userOnboarded])
+  const tag = plan.tags[0]
+  const profile = plan.profiles[0]
+  assert(!!tag?.name, 'tag not found')
+  assert(!!profile?.name, 'profile name not found')
+  assert(!!profile?.about, 'profile about not found')
+  const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
+  await profilePage.visit(tag.name, expect)
+  await expect(profilePage.sendButton).toBeVisible()
+  await profilePage.sendButton.click()
+
+  // @todo create send form fixture
+  const sendDialog = page.getByRole('dialog', { name: 'Send' })
+  await expect(sendDialog).toBeVisible()
+  const amountInput = sendDialog.getByLabel('Amount')
+  await expect(amountInput).toBeVisible()
+  await amountInput.fill('5')
+  const tokenSelect = sendDialog.getByRole('combobox') // @todo when tamagui supports this , { name: 'Token' })
+  await expect(tokenSelect).toBeVisible()
+  await tokenSelect.selectOption('USDC')
+  const sendDialogButton = sendDialog.getByRole('button', { name: 'Send' })
+  expect(sendDialogButton).toBeVisible()
+  await sendDialogButton.click()
+  await expect(sendDialog.getByText(/Sent user op [0-9a-f]+/).first()).toBeVisible({
+    timeout: 20000,
+  })
+  await expect(sendDialog.getByRole('button', { name: 'View on Otterscan' })).toBeVisible()
 })

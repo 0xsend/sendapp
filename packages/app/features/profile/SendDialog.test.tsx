@@ -45,6 +45,9 @@ describe('SendDialog', () => {
     const mockMutateAsync = jest.fn().mockResolvedValue({
       hash: '0x123',
       success: true,
+      receipt: {
+        transactionHash: '0x123',
+      },
     })
     const mockBalanceRefetch = jest.fn()
     // @ts-expect-error mock

@@ -938,82 +938,90 @@ exports[`SendDialog it can send: SendForm 1`] = `
                 }
               >
                 <View
-                  accessibilityRole="button"
-                  accessibilityState={
-                    {
-                      "busy": false,
-                    }
-                  }
-                  cancelable={true}
-                  cursor="pointer"
-                  disabled={false}
-                  focusable={[Function]}
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
                   style={
                     {
-                      "alignItems": "center",
-                      "backgroundColor": "hsla(191, 32%, 19%, 1)",
-                      "borderBottomColor": "transparent",
-                      "borderBottomLeftRadius": 16,
-                      "borderBottomRightRadius": 16,
-                      "borderBottomWidth": 1,
-                      "borderLeftColor": "transparent",
-                      "borderLeftWidth": 1,
-                      "borderRightColor": "transparent",
-                      "borderRightWidth": 1,
-                      "borderStyle": "solid",
-                      "borderTopColor": "transparent",
-                      "borderTopLeftRadius": 16,
-                      "borderTopRightRadius": 16,
-                      "borderTopWidth": 1,
                       "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "height": 44,
-                      "justifyContent": "center",
-                      "paddingLeft": 18,
-                      "paddingRight": 18,
                     }
                   }
-                  testID="SubmitButton"
                 >
-                  <Text
-                    cursor="pointer"
-                    lineBreakMode="clip"
-                    numberOfLines={1}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 59%, 1)",
-                        "flexGrow": 0,
-                        "flexShrink": 1,
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                    userSelect="none"
-                  >
-                    Send
-                  </Text>
                   <View
-                    pointerEvents="none"
-                    style={
+                    accessibilityRole="button"
+                    accessibilityState={
                       {
-                        "height": 0,
-                        "minHeight": 0,
-                        "minWidth": 11.088000000000001,
-                        "width": 11.088000000000001,
+                        "busy": false,
                       }
                     }
-                  />
+                    cancelable={true}
+                    cursor="pointer"
+                    disabled={false}
+                    focusable={[Function]}
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                        "borderBottomColor": "transparent",
+                        "borderBottomLeftRadius": 16,
+                        "borderBottomRightRadius": 16,
+                        "borderBottomWidth": 1,
+                        "borderLeftColor": "transparent",
+                        "borderLeftWidth": 1,
+                        "borderRightColor": "transparent",
+                        "borderRightWidth": 1,
+                        "borderStyle": "solid",
+                        "borderTopColor": "transparent",
+                        "borderTopLeftRadius": 16,
+                        "borderTopRightRadius": 16,
+                        "borderTopWidth": 1,
+                        "flexDirection": "row",
+                        "flexWrap": "nowrap",
+                        "height": 44,
+                        "justifyContent": "center",
+                        "paddingLeft": 18,
+                        "paddingRight": 18,
+                      }
+                    }
+                    testID="SubmitButton"
+                  >
+                    <Text
+                      cursor="pointer"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "hsla(191, 32%, 10%, 1)",
+                          "flexGrow": 0,
+                          "flexShrink": 1,
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      userSelect="none"
+                    >
+                      Send
+                    </Text>
+                    <View
+                      pointerEvents="none"
+                      style={
+                        {
+                          "height": 0,
+                          "minHeight": 0,
+                          "minWidth": 11.088000000000001,
+                          "width": 11.088000000000001,
+                        }
+                      }
+                    />
+                  </View>
                 </View>
               </View>
             </View>
@@ -2390,112 +2398,120 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                 }
               >
                 <View
-                  accessibilityRole="button"
-                  accessibilityState={
-                    {
-                      "busy": false,
-                    }
-                  }
-                  cancelable={true}
-                  cursor="pointer"
-                  disabled={false}
-                  focusable={[Function]}
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
                   style={
                     {
-                      "alignItems": "center",
-                      "backgroundColor": "hsla(191, 32%, 19%, 1)",
-                      "borderBottomColor": "transparent",
-                      "borderBottomLeftRadius": 16,
-                      "borderBottomRightRadius": 16,
-                      "borderBottomWidth": 1,
-                      "borderLeftColor": "transparent",
-                      "borderLeftWidth": 1,
-                      "borderRightColor": "transparent",
-                      "borderRightWidth": 1,
-                      "borderStyle": "solid",
-                      "borderTopColor": "transparent",
-                      "borderTopLeftRadius": 16,
-                      "borderTopRightRadius": 16,
-                      "borderTopWidth": 1,
                       "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "height": 44,
-                      "justifyContent": "center",
-                      "paddingLeft": 18,
-                      "paddingRight": 18,
                     }
                   }
-                  testID="SubmitButton"
                 >
-                  <Text
+                  <View
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "busy": false,
+                      }
+                    }
+                    cancelable={true}
                     cursor="pointer"
-                    lineBreakMode="clip"
-                    numberOfLines={1}
+                    disabled={false}
+                    focusable={[Function]}
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
                     style={
                       {
-                        "color": "hsla(112, 22%, 59%, 1)",
-                        "flexGrow": 0,
-                        "flexShrink": 1,
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
+                        "alignItems": "center",
+                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                        "borderBottomColor": "transparent",
+                        "borderBottomLeftRadius": 16,
+                        "borderBottomRightRadius": 16,
+                        "borderBottomWidth": 1,
+                        "borderLeftColor": "transparent",
+                        "borderLeftWidth": 1,
+                        "borderRightColor": "transparent",
+                        "borderRightWidth": 1,
+                        "borderStyle": "solid",
+                        "borderTopColor": "transparent",
+                        "borderTopLeftRadius": 16,
+                        "borderTopRightRadius": 16,
+                        "borderTopWidth": 1,
+                        "flexDirection": "row",
+                        "flexWrap": "nowrap",
+                        "height": 44,
+                        "justifyContent": "center",
+                        "paddingLeft": 18,
+                        "paddingRight": 18,
                       }
                     }
-                    suppressHighlighting={true}
-                    userSelect="none"
+                    testID="SubmitButton"
                   >
-                    Send
-                  </Text>
-                  <View
-                    pointerEvents="none"
-                    style={
-                      {
-                        "height": 0,
-                        "minHeight": 0,
-                        "minWidth": 11.088000000000001,
-                        "width": 11.088000000000001,
+                    <Text
+                      cursor="pointer"
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "hsla(191, 32%, 10%, 1)",
+                          "flexGrow": 0,
+                          "flexShrink": 1,
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
                       }
-                    }
-                  />
-                  <View
-                    animatedStyle={
-                      {
-                        "value": {
+                      suppressHighlighting={true}
+                      userSelect="none"
+                    >
+                      Send
+                    </Text>
+                    <View
+                      pointerEvents="none"
+                      style={
+                        {
+                          "height": 0,
+                          "minHeight": 0,
+                          "minWidth": 11.088000000000001,
+                          "width": 11.088000000000001,
+                        }
+                      }
+                    />
+                    <View
+                      animatedStyle={
+                        {
+                          "value": {
+                            "opacity": 0,
+                            "transform": [
+                              {
+                                "translateY": 4,
+                              },
+                            ],
+                          },
+                        }
+                      }
+                      collapsable={false}
+                      forwardedRef={[Function]}
+                      style={
+                        {
+                          "flexDirection": "column",
                           "opacity": 0,
                           "transform": [
                             {
                               "translateY": 4,
                             },
                           ],
-                        },
+                        }
                       }
-                    }
-                    collapsable={false}
-                    forwardedRef={[Function]}
-                    style={
-                      {
-                        "flexDirection": "column",
-                        "opacity": 0,
-                        "transform": [
-                          {
-                            "translateY": 4,
-                          },
-                        ],
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color="hsla(112, 22%, 59%, 1)"
-                    />
+                    >
+                      <ActivityIndicator
+                        color="hsla(191, 32%, 10%, 1)"
+                      />
+                    </View>
                   </View>
                 </View>
               </View>
