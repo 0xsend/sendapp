@@ -180,6 +180,7 @@ export function HomeScreen() {
                 p={'$3.5'}
                 borderColor={'#343434'}
                 borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
+                key={coin.label}
               >
                 <XStack gap={'$2'}>
                   {coin.icon}
