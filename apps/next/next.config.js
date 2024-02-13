@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
-const { withTamagui } = require('@tamagui/next-plugin')
-const { join } = require('path')
+import tamaguiPlugin from '@tamagui/next-plugin'
+import { join } from 'path'
+import withPlaiceholder from '@plaiceholder/next'
 
 const boolVals = {
   true: true,
@@ -11,7 +12,8 @@ const disableExtraction =
   boolVals[process.env.DISABLE_EXTRACTION] ?? process.env.NODE_ENV === 'development'
 
 const plugins = [
-  withTamagui({
+  withPlaiceholder,
+  tamaguiPlugin.withTamagui({
     themeBuilder: {
       input: '../../packages/ui/src/themes/theme.ts',
       output: '../../packages/ui/src/themes/theme-generated.ts',
@@ -31,7 +33,7 @@ const plugins = [
   }),
 ]
 
-module.exports = () => {
+export default () => {
   /** @type {import('next').NextConfig} */
   let config = {
     images: {

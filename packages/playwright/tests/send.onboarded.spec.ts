@@ -22,7 +22,10 @@ test('can send ETH to user on profile', async ({ page, seed }) => {
   assert(!!tag?.name, 'tag not found')
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
-  const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
+  const profilePage = new ProfilePage(page, {
+    name: profile.name,
+    about: profile.about,
+  })
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).toBeVisible()
   await profilePage.sendButton.click()
@@ -50,7 +53,10 @@ test('can send USDC to user on profile', async ({ page, seed }) => {
   assert(!!tag?.name, 'tag not found')
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
-  const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
+  const profilePage = new ProfilePage(page, {
+    name: profile.name,
+    about: profile.about,
+  })
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).toBeVisible()
   await profilePage.sendButton.click()
