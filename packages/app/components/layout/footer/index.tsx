@@ -20,7 +20,9 @@ const MainFooter = () => {
                   <XStack h={'$2.5'} ai={'center'}>
                     <IconHome color={'$primary'} />
                   </XStack>
-                  <Paragraph color={'$primary'}>Home</Paragraph>
+                  <Paragraph color={'$primary'} fontSize={'$3'} lineHeight={'$1'}>
+                    Home
+                  </Paragraph>
                 </YStack>
               </Tabs.Tab>
               <Tabs.Tab flex={1} value="tab2" p={0} height="100%" opacity={0.7}>
@@ -33,7 +35,9 @@ const MainFooter = () => {
                   <XStack h={'$2.5'} ai={'center'}>
                     <IconActivity color={'$white'} />
                   </XStack>
-                  <Paragraph color={'$white'}>Activity</Paragraph>
+                  <Paragraph color={'$white'} fontSize={'$3'} lineHeight={'$1'}>
+                    Activity
+                  </Paragraph>
                 </YStack>
               </Tabs.Tab>
             </Tabs.List>
