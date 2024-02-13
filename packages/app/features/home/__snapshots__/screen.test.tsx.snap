@@ -1165,10 +1165,6 @@ exports[`HomeScreen 1`] = `
                   style={
                     {
                       "alignItems": "center",
-                      "borderBottomLeftRadius": 0,
-                      "borderBottomRightRadius": 0,
-                      "borderTopLeftRadius": 0,
-                      "borderTopRightRadius": 0,
                       "flexDirection": "column",
                       "width": 64,
                     }
