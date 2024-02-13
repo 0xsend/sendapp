@@ -7,8 +7,8 @@ const SLogo = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
-      width={size}
-      height={size}
+      width={size ?? 33}
+      height={size ?? 37}
       color={color as ColorTokens | undefined}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 116"
