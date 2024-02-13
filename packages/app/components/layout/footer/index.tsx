@@ -3,7 +3,16 @@ import { IconActivity, IconHome, IconSLogo } from 'app/components/icons'
 
 const MainFooter = () => {
   return (
-    <Footer pos={'absolute'} b={0} px={40} pt={'$3.5'} pb={'$5'} width="100%">
+    <Footer
+      pos={'absolute'}
+      b={0}
+      px={40}
+      pt={'$3.5'}
+      pb={'$5'}
+      width="100%"
+      borderColor={'#343434'}
+      borderTopWidth={1}
+    >
       <YStack height={'100%'}>
         <XStack pos="relative" fg={1} space="$3" bg="$background">
           <Tabs

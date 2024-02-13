@@ -132,7 +132,6 @@ export function HomeScreen() {
           $sm={{ width: '100vw' }}
           $gtSm={{ width: '100vw' }}
           ai={'center'}
-          paddingTop={'$6'}
         >
           {/* Balance Card */}
           <XStack w={'100%'} jc={'center'} borderColor={'#343434'} borderBottomWidth={1}>

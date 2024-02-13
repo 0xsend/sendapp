@@ -134,7 +134,6 @@ exports[`HomeScreen 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "column",
-              "paddingTop": 32,
               "width": "100vw",
             }
           }
@@ -1094,6 +1093,9 @@ exports[`HomeScreen 1`] = `
   <View
     style={
       {
+        "borderColor": "#343434",
+        "borderStyle": "solid",
+        "borderTopWidth": 1,
         "bottom": 0,
         "flexDirection": "column",
         "paddingBottom": 24,
