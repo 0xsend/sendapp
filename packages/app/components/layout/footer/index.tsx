@@ -14,14 +14,8 @@ const MainFooter = () => {
             overflow={'hidden'}
             space={'$10'}
           >
-            <Tabs.List
-              disablePassBorderRadius="bottom"
-              aria-label="Footer menu"
-              space={'$2.5'}
-              jc={'space-around'}
-              height={'100%'}
-            >
-              <Tabs.Tab flex={1} value="tab1" p={0} height="100%">
+            <Tabs.List aria-label="Footer menu" space={'$2.5'} jc={'space-around'} height={'100%'}>
+              <Tabs.Tab flex={1} value="tab1" p={0} height="100%" borderRadius={0}>
                 <YStack width={64} ai="center">
                   <XStack h={'$2.5'} ai={'center'}>
                     <IconHome color={'$primary'} />
@@ -34,7 +28,7 @@ const MainFooter = () => {
                   <IconSLogo color={'$white'} />
                 </YStack>
               </Tabs.Tab>
-              <Tabs.Tab flex={1} value="tab3" p={0} height="100%" opacity={0.7}>
+              <Tabs.Tab flex={1} value="tab3" p={0} height="100%" opacity={0.7} borderRadius={0}>
                 <YStack width={64} ai="center">
                   <XStack h={'$2.5'} ai={'center'}>
                     <IconActivity color={'$white'} />
