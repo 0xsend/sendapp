@@ -1,8 +1,7 @@
-import { Avatar, Image, Link, Paragraph, ScrollView, Spinner, Theme, XStack, YStack } from '@my/ui'
+import { Avatar, Link, ScrollView, Spinner, Theme, XStack, YStack } from '@my/ui'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconQr } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { Square } from 'tamagui'
 import { MainFooter } from './footer'
 
 const MainLayout = ({
@@ -14,28 +13,21 @@ const MainLayout = ({
   return (
     <YStack>
       <YStack height={'100vh'} pb={'$size.10'} $shorter={{ pb: '$size.8' }}>
-        <XStack
-          w={'90%'}
-          ai={'center'}
-          jc={'space-between'}
-          marginHorizontal={'5%'}
-          paddingTop={'$6'}
-        >
-          <Link href={'/settings'}>
-            <Avatar br={'$6'} size={'$4.5'}>
-              {avatar_url ? (
-                <Avatar.Image src={avatar_url} width={48} height={48} />
-              ) : (
-                <Avatar.Fallback>
-                  <Spinner size="large" color="$color" />
-                </Avatar.Fallback>
-              )}
-            </Avatar>
-          </Link>
-          <Paragraph size={'$9'} fontWeight={'700'}>
-            Money
-          </Paragraph>
-          <IconQr />
+        <XStack borderColor={'#343434'} borderBottomWidth={1} pt={'$6'}>
+          <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'} py={'$6'}>
+            <Link href={'/settings'}>
+              <Avatar br={'$6'} size={'$4.5'}>
+                {avatar_url ? (
+                  <Avatar.Image src={avatar_url} width={48} height={48} />
+                ) : (
+                  <Avatar.Fallback jc={'center'}>
+                    <Spinner size="large" color="$color" />
+                  </Avatar.Fallback>
+                )}
+              </Avatar>
+            </Link>
+            <IconQr color={'$primary'} />
+          </XStack>
         </XStack>
         {scrollable ? (
           <>
