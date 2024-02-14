@@ -1,5 +1,4 @@
-import { ButtonText, H4, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
+import { ButtonText, H1, H3, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { api } from 'app/utils/api'
@@ -15,7 +14,6 @@ export const SignInForm = () => {
   const form = useForm<z.infer<typeof SignInSchema>>()
   const signInWithOtp = api.auth.signInWithOtp.useMutation()
 
-  const { resolvedTheme } = useThemeSetting()
   const router = useRouter()
 
   async function signInWithPhone({ phone, countrycode }: z.infer<typeof SignInSchema>) {
@@ -71,41 +69,39 @@ export const SignInForm = () => {
             },
           }}
           renderAfter={({ submit }) => (
-            <>
-              <XStack f={1} mt={'auto'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'center'}>
-                <SubmitButton
-                  onPress={() => submit()}
-                  br="$4"
-                  bc={'$accent9Light'}
-                  w={'$12'}
-                  $sm={{ width: '100%', maw: '200px' }}
-                >
-                  <ButtonText
-                    size={'$1'}
-                    fontWeight={'700'}
-                    padding={'unset'}
-                    ta="center"
-                    margin={'unset'}
-                    col="black"
-                  >
-                    {'/SEND IT!'}
-                  </ButtonText>
-                </SubmitButton>
-              </XStack>
-            </>
+            <XStack f={1} mt={'0'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'flex-start'}>
+              <SubmitButton
+                onPress={() => submit()}
+                br="$3"
+                bc={'$accent9Light'}
+                w={'$12'}
+                $sm={{ dsp: form.getValues().phone?.length > 0 ? 'flex' : 'none' }}
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
+                  {'/SEND IT!'}
+                </ButtonText>
+              </SubmitButton>
+            </XStack>
           )}
         >
           {(fields) => (
-            <YStack f={1} gap="$3" jc="center">
-              <H4 $sm={{ size: '$8' }}>Welcome to Send</H4>
-              <Paragraph theme="alt1" size={'$1'}>
+            <YStack gap="$5" jc="center" p="$7" f={1}>
+              <Theme inverse={true}>
+                <H1 col="$background" size="$11">
+                  WELCOME TO SEND
+                </H1>
+              </Theme>
+              <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
                 Sign up or Sign in with your phone number
-              </Paragraph>
-
-              <Paragraph size={'$1'} fontWeight={'500'}>
-                Your Phone
-              </Paragraph>
-              <XStack gap="$2">{Object.values(fields)}</XStack>
+              </H3>
+              <YStack gap="$2">
+                <Theme inverse={true}>
+                  <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
+                    Your Phone
+                  </Paragraph>
+                </Theme>
+                <XStack gap="$2">{Object.values(fields)}</XStack>
+              </YStack>
             </YStack>
           )}
         </SchemaForm>
