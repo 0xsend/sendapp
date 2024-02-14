@@ -17,7 +17,7 @@ import { SignInForm } from './sign-in-form'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { AuthCarouselContext } from './AuthCarouselContext'
 
-const screens = ['screen1', 'screen2', 'screen3', 'onboarding'] as const
+const screens = ['screen1', 'screen2', 'screen3', 'signin'] as const
 
 export const SignInScreen = () => {
   const { height: windowHeight } = useWindowDimensions()
@@ -27,7 +27,7 @@ export const SignInScreen = () => {
     switch (true) {
       case page === 'screen1' || page === 'screen2' || page === 'screen3':
         return <SignInCarousel />
-      case page === 'onboarding':
+      case page === 'signin':
         return <SignInForm />
       default:
         return <SignInCarousel />

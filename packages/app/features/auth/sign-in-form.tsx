@@ -85,7 +85,7 @@ export const SignInForm = () => {
           )}
         >
           {(fields) => (
-            <YStack gap="$5" jc="center" p="$7" f={1}>
+            <YStack gap="$5" jc="center" p="$7">
               <Theme inverse={true}>
                 <H1 col="$background" size="$11">
                   WELCOME TO SEND
