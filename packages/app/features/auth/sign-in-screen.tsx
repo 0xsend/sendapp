@@ -1,18 +1,18 @@
 import {
   Stack,
-  View,
   YStack,
   Button,
   ButtonText,
   XStack,
   useMedia,
-  Text,
   useWindowDimensions,
   H1,
+  Progress,
+  Paragraph,
 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { SignInForm } from './sign-in-form'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { AuthCarouselContext } from './AuthCarouselContext'
@@ -25,10 +25,8 @@ export const SignInScreen = () => {
 
   const getSignInPage = (page: (typeof screens)[number] | undefined) => {
     switch (true) {
-      case page === 'screen1' || page === 'screen2':
-        return <SignInCarousel buttonRow={<ContinueButton />} />
-      case page === 'screen3':
-        return <SignInCarousel buttonRow={<SignInButtons />} />
+      case page === 'screen1' || page === 'screen2' || page === 'screen3':
+        return <SignInCarousel />
       case page === 'onboarding':
         return <SignInForm />
       default:
@@ -37,11 +35,11 @@ export const SignInScreen = () => {
   }
 
   return (
-    <YStack w="100%" h={windowHeight} jc="space-around" mb="auto" mt="auto">
+    <YStack w="100%" h={windowHeight} jc="flex-start" p="$7">
+      <Stack f={1} $gtMd={{ dsp: 'none' }}>
+        <IconSendLogo size={'$2'} color="$white" />
+      </Stack>
       <AnimationLayout currentKey={screens[carouselProgress] || 'none'} direction={1}>
-        <Stack pt="$10" pl="$3" $gtMd={{ dsp: 'none' }}>
-          <IconSendLogo size={'$2'} color="$white" />
-        </Stack>
         {getSignInPage(screens[carouselProgress])}
       </AnimationLayout>
     </YStack>
@@ -94,58 +92,88 @@ const SignInButtons = () => {
 
 const carouselItems = [
   {
-    line1: 'LIKE CASH',
+    title: 'LIKE CASH',
     description: 'SEND AND RECEIVE MONEY GLOBALLY IN SECONDS',
   },
   {
-    line1: 'ALL YOURS',
+    title: 'ALL YOURS',
     description: 'ONLY YOU HAVE ACCESS TO YOUR FUNDS',
   },
   {
-    line1: 'SECURE',
+    title: 'SECURE',
     description: 'PRIVACY FIRST WITH VERFIED SIGN-IN AND TRANSFERS',
   },
 ]
 
-const SignInCarousel = ({
-  buttonRow,
-}: {
-  buttonRow?: React.ReactNode
-}) => {
-  const media = useMedia()
+const CarouselProgress = () => {
   const { carouselProgress, setCarouselProgress } = useContext(AuthCarouselContext)
+  const [progressWidth, setProgressWidth] = useState(0)
 
   useEffect(() => {
-    if (media.gtMd) {
-      const interval = setInterval(() => {
+    const progressWidthInterval = setInterval(() => {
+      setProgressWidth((progressWidth) => {
+        return progressWidth >= 100 ? 0 : progressWidth + 1
+      })
+      if (progressWidth >= 100) {
         setCarouselProgress((progress) => (progress + 1) % carouselItems.length)
-      }, 7500)
-      return () => clearInterval(interval)
+      }
+    }, 50)
+
+    return () => {
+      clearInterval(progressWidthInterval)
     }
-  }, [media, setCarouselProgress])
+  }, [setCarouselProgress, progressWidth])
+
+  return (
+    <XStack w="100%" jc="center" py="$5" gap="$2">
+      {carouselItems.map(({ title }, i) => {
+        return (
+          <Progress
+            key={title}
+            f={1}
+            h={1}
+            backgroundColor={'$background'}
+            direction="ltr"
+            value={carouselProgress < i ? 0 : carouselProgress === i ? progressWidth : 100}
+          >
+            <Progress.Indicator animation="100ms" backgroundColor={'$white'} />
+          </Progress>
+        )
+      })}
+    </XStack>
+  )
+}
+
+const SignInCarousel = () => {
+  const { carouselProgress } = useContext(AuthCarouselContext)
+  const { gtMd } = useMedia()
 
   const item = carouselItems.at(carouselProgress)
 
   return (
-    <View pos="absolute" h={'100%'} w={'100%'} top={0} left={0} mt="auto" mb="auto" zIndex={-1}>
-      <Stack mt="auto" mb="auto" w="100%" h="100%">
-        <YStack jc="flex-end" h="100%" gap="$6">
-          <YStack gap="$3" maw="75%">
-            <H1 fontWeight={'bold'} color="$white">
-              {item?.line1}
-            </H1>
-            <Text
-              fontSize="$2"
-              $gtXs={{ fontSize: '$8', maw: '55%' }}
-              fontWeight={'normal'}
-              color="$green5Light"
-            >
-              {item?.description}
-            </Text>
-          </YStack>
-          {buttonRow}
-        </YStack>
+    <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} mx="auto" maw={738}>
+      <Stack fd="column" $gtMd={{ fd: 'row', jc: 'space-between', ai: 'center' }} gap="$3">
+        <H1 fontWeight={'bold'} color="$white">
+          {item?.title}
+        </H1>
+        <Paragraph
+          $gtMd={{ ta: 'right' }}
+          pr="$5"
+          fontSize="$2"
+          $gtXs={{ fontSize: '$4' }}
+          fontWeight={'normal'}
+          color="$white"
+        >
+          {item?.description}
+        </Paragraph>
       </Stack>
-    </View>
+      {gtMd ? (
+        <CarouselProgress />
+      ) : carouselProgress < carouselItems.length - 1 ? (
+        <ContinueButton />
+      ) : (
+        <SignInButtons />
+      )}
+    </YStack>
   )
 }

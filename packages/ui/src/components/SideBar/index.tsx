@@ -9,7 +9,7 @@ export const SideBar = ({
   return (
     <YStack
       height={dimensions.height - 80}
-      width={width || '20%'}
+      width={395}
       py="$6"
       ml="$7"
       my="auto"
