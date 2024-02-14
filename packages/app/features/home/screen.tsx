@@ -8,6 +8,7 @@ import {
   Paragraph,
   ScrollView,
   Theme,
+  ThemeName,
   XStack,
   YStack,
 } from '@my/ui'
@@ -29,6 +30,7 @@ import { useState } from 'react'
 import { Square } from 'tamagui'
 export function HomeScreen() {
   const { resolvedTheme } = useThemeSetting()
+  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -134,16 +136,21 @@ export function HomeScreen() {
           ai={'center'}
         >
           {/* Balance Card */}
-          <XStack w={'100%'} jc={'center'} borderColor={'#343434'} borderBottomWidth={1}>
+          <XStack w={'100%'} jc={'center'} borderColor={separatorColor} borderBottomWidth={1}>
             <XStack w={'90%'} zIndex={4}>
               <YStack mx={'$3'} py={'$11'}>
                 <YStack jc={'center'} gap={'$6'}>
-                  <Paragraph fontSize={'$4'} zIndex={1} color={'white'} textTransform={'uppercase'}>
+                  <Paragraph
+                    fontSize={'$4'}
+                    zIndex={1}
+                    color={'$color12'}
+                    textTransform={'uppercase'}
+                  >
                     [ Total Balance ]
                   </Paragraph>
                   <XStack style={{ color: 'white' }} gap={'$2.5'}>
                     <Paragraph
-                      color={'white'}
+                      color={'$color12'}
                       fontSize={96}
                       fontWeight={'500'}
                       lineHeight={'$12'}
@@ -151,7 +158,7 @@ export function HomeScreen() {
                     >
                       {USDollar.format(9489).replace('$', '').split('.')[0]}
                     </Paragraph>
-                    <Paragraph color={'white'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
+                    <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
                       {'USD'}
                     </Paragraph>
                   </XStack>
@@ -160,7 +167,13 @@ export function HomeScreen() {
             </XStack>
           </XStack>
           <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$4'} pt={'$7'}>
-            <Card px={'$3.5'} py={'$5'} width={'100%'} backgroundColor={'#40FB50'}>
+            <Card
+              px={'$3.5'}
+              py={'$5'}
+              width={'100%'}
+              backgroundColor={'$primary'}
+              borderRadius={'$4'}
+            >
               <XStack jc={'space-between'} ai={'center'}>
                 <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
                   Add Funds
@@ -177,7 +190,7 @@ export function HomeScreen() {
                 jc={'space-between'}
                 ai={'center'}
                 p={'$3.5'}
-                borderColor={'#343434'}
+                borderColor={separatorColor}
                 borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
                 key={coin.label}
               >
@@ -187,12 +200,12 @@ export function HomeScreen() {
                     fontSize={'$5'}
                     fontWeight={'500'}
                     textTransform={'uppercase'}
-                    color={'$white'}
+                    color={'$color12'}
                   >
                     {coin.label}
                   </Paragraph>
                 </XStack>
-                <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$white'}>
+                <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
                   {formatAmount(coin.balance, undefined, 3)}
                 </Paragraph>
               </XStack>

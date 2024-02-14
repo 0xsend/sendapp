@@ -3,6 +3,7 @@ import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconQr } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { MainFooter } from './footer'
+import { useThemeSetting } from 'app/provider/theme'
 
 const MainLayout = ({
   scrollable = false,
@@ -10,10 +11,13 @@ const MainLayout = ({
 }: { scrollable?: boolean; children?: React.ReactNode }) => {
   const { profile } = useUser()
   const avatar_url = profile?.avatar_url
+  const { resolvedTheme } = useThemeSetting()
+  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
   return (
     <YStack>
       <YStack height={'100vh'} pb={'$size.10'} $shorter={{ pb: '$size.8' }}>
-        <XStack borderColor={'#343434'} borderBottomWidth={1} pt={'$6'}>
+        <XStack borderColor={separatorColor} borderBottomWidth={1} pt={'$6'}>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'} py={'$6'}>
             <Link href={'/settings'}>
               <Avatar br={'$6'} size={'$4.5'}>
@@ -26,7 +30,7 @@ const MainLayout = ({
                 )}
               </Avatar>
             </Link>
-            <IconQr color={'$primary'} />
+            <IconQr color={iconColor} />
           </XStack>
         </XStack>
         {scrollable ? (

@@ -1,7 +1,11 @@
-import { Footer, Paragraph, Tabs, XStack, YStack } from '@my/ui'
+import { Footer, Paragraph, Tabs, Theme, ThemeName, XStack, YStack } from '@my/ui'
 import { IconActivity, IconHome, IconSLogo } from 'app/components/icons'
+import { useThemeSetting } from 'app/provider/theme'
 
 const MainFooter = () => {
+  const { resolvedTheme } = useThemeSetting()
+  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
   return (
     <Footer
       pos={'absolute'}
@@ -10,7 +14,7 @@ const MainFooter = () => {
       pt={'$3.5'}
       pb={'$5'}
       width="100%"
-      borderColor={'#343434'}
+      borderColor={separatorColor}
       borderTopWidth={1}
     >
       <YStack height={'100%'}>
@@ -27,24 +31,24 @@ const MainFooter = () => {
               <Tabs.Tab flex={1} value="tab1" p={0} height="100%" borderRadius={0}>
                 <YStack width={64} ai="center">
                   <XStack h={'$2.5'} ai={'center'}>
-                    <IconHome color={'$primary'} />
+                    <IconHome color={'$color12'} />
                   </XStack>
-                  <Paragraph color={'$primary'} fontSize={'$3'} lineHeight={'$1'}>
+                  <Paragraph color={'$color12'} fontSize={'$3'} lineHeight={'$1'}>
                     Home
                   </Paragraph>
                 </YStack>
               </Tabs.Tab>
               <Tabs.Tab flex={1} value="tab2" p={0} height="100%" opacity={0.7}>
                 <YStack width={64} ai="center">
-                  <IconSLogo color={'$white'} />
+                  <IconSLogo color={iconColor} />
                 </YStack>
               </Tabs.Tab>
               <Tabs.Tab flex={1} value="tab3" p={0} height="100%" opacity={0.7} borderRadius={0}>
                 <YStack width={64} ai="center">
                   <XStack h={'$2.5'} ai={'center'}>
-                    <IconActivity color={'$white'} />
+                    <IconActivity color={iconColor} />
                   </XStack>
-                  <Paragraph color={'$white'} fontSize={'$3'} lineHeight={'$1'}>
+                  <Paragraph color={iconColor} fontSize={'$3'} lineHeight={'$1'}>
                     Activity
                   </Paragraph>
                 </YStack>
