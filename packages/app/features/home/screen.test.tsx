@@ -41,6 +41,11 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue(123),
 }))
 
+// jest.mock('@vonovak/react-native-theme-control', () => ({
+//   useThemePreference: jest.fn().mockReturnValue('light'),
+//   setThemePreference: jest.fn(),
+// }))
+
 test('HomeScreen', () => {
   const tree = render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>

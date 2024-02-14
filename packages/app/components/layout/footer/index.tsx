@@ -1,6 +1,6 @@
-import { Footer, Paragraph, Tabs, Theme, ThemeName, XStack, YStack } from '@my/ui'
+import { Footer, Paragraph, Tabs, XStack, YStack } from '@my/ui'
 import { IconActivity, IconHome, IconSLogo } from 'app/components/icons'
-import { useThemeSetting } from 'app/provider/theme'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 const MainFooter = () => {
   const { resolvedTheme } = useThemeSetting()

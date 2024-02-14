@@ -7,8 +7,6 @@ import {
   ListItem,
   Paragraph,
   ScrollView,
-  Theme,
-  ThemeName,
   XStack,
   YStack,
 } from '@my/ui'
@@ -29,8 +27,6 @@ import formatAmount from 'app/utils/formatAmount'
 import { useState } from 'react'
 import { Square } from 'tamagui'
 export function HomeScreen() {
-  const { resolvedTheme } = useThemeSetting()
-  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -123,6 +119,9 @@ export function HomeScreen() {
       balance: 2.0,
     },
   ]
+  const { resolvedTheme } = useThemeSetting()
+  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+
   const navigateToScreen = (href: string) => {
     window.location.href = href
   }
