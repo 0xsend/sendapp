@@ -1,7 +1,7 @@
 import { ColorTokens } from '@my/ui/types'
 import { IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Defs, G, Path, Rect, Svg } from 'react-native-svg'
+import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
 
 const Ethereum = (props: IconProps) => {
   const { size, color, ...rest } = props
@@ -32,9 +32,9 @@ const Ethereum = (props: IconProps) => {
         <Path d="M8.8421 15.5411L15.9978 19.6525V12.3796L8.8421 15.5411Z" fill="#393939" />
       </G>
       <Defs>
-        <clipPath id="clip0_265_2608">
+        <ClipPath id="clip0_265_2608">
           <Rect width="14.3158" height="22.6667" fill="white" transform="translate(8.8421 4)" />
-        </clipPath>
+        </ClipPath>
       </Defs>
     </Svg>
   )
