@@ -23,18 +23,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      # No idea how homebrew bundle broke with tilt depending on python
+      # No idea how homebrew bundle broke with tilt depending on python so installing manually
+      - name: Install Tilt
+        run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
       - name: Brew Bundle
         id: brew-bundle
         run: |
-          # brew bundle # this is broken
-          brew install yj tilt
+          brew bundle
           brew cleanup
-      - name: Install Tilt
-        run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
