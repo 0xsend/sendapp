@@ -1,5 +1,5 @@
 import { Button, Container, Paragraph, YStack } from '@my/ui'
-import { MainLayout } from 'app/components/layout'
+import { MainLayout } from 'app/components/layout/index.native'
 import { NumPad } from 'app/features/send/components/numpad'
 import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
 import { ANIMATE_DIRECTION_RIGHT, SendScreen } from 'app/features/send/types'
