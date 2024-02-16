@@ -26,6 +26,7 @@ import {
   useMedia,
   Anchor,
   H3,
+  useToastController,
 } from '@my/ui'
 import { base16, base64 } from '@scure/base'
 import { assert } from 'app/utils/assert'
@@ -262,8 +263,10 @@ function CreateSendAccount() {
 }
 
 function SendAccountCongratulations() {
+  const toast = useToastController()
   const { data: sendAccts } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
+
   return (
     <YStack w="100%" space="$4" f={1}>
       <H3>Congratulations on opening your first Send Account! </H3>
@@ -276,6 +279,41 @@ function SendAccountCongratulations() {
           </Paragraph>
           <IconCopy />
         </XStack>
+
+        {__DEV__ && !!sendAcct && (
+          <Theme name="dim">
+            <YStack pt="$4" gap="$4">
+              <YStack gap="$2">
+                <Paragraph mx="auto">⭐️ Secret Shop ⭐️</Paragraph>
+                <Paragraph mx="auto">Available on Localnet/Testnet only.</Paragraph>
+              </YStack>
+              <Button
+                onPress={async () => {
+                  await testClient.setBalance({
+                    address: sendAcct.address,
+                    value: parseEther('10'),
+                  })
+                  toast.show('Funded with 10 ETH')
+                }}
+              >
+                Fund with 10 ETH
+              </Button>
+              <Button
+                onPress={async () => {
+                  await setERC20Balance({
+                    client: testClient,
+                    address: sendAcct.address,
+                    tokenAddress: usdcAddress[baseMainnetClient.chain.id],
+                    value: BigInt(100e6),
+                  })
+                  toast.show('Funded with 100 USDC')
+                }}
+              >
+                Fund with 100 USDC
+              </Button>
+            </YStack>
+          </Theme>
+        )}
       </Stack>
     </YStack>
   )
