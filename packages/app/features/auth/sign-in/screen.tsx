@@ -14,7 +14,7 @@ import { IconSendLogo } from 'app/components/icons'
 import { useContext, useEffect, useState } from 'react'
 import { SignInForm } from './sign-in-form'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
-import { AuthCarouselContext } from './AuthCarouselContext'
+import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 
 const screens = ['screen1', 'screen2', 'screen3', 'onboarding'] as const
 

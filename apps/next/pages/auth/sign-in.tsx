@@ -1,10 +1,10 @@
-import { SignInScreen } from 'app/features/auth/sign-in-screen'
+import { SignInScreen } from 'app/features/auth/sign-in/screen'
 import Head from 'next/head'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
-import { NextPageWithLayout } from './_app'
+import { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
-import { getPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { InferGetServerSidePropsType } from 'next'
+import { getRemoteAssets } from 'utils/getRemoteAssets'
 import { useContext, useEffect } from 'react'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 
@@ -33,18 +33,13 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
 }
 
 export const getServerSideProps = guestOnlyGetSSP(async () => {
-  const remoteImagePath = 'https://github.com/0xsend/assets/blob/main/app_images'
-  const remoteImageQueryParams = '?raw=true'
-  const images = [
-    await getPlaiceholderImage(`${remoteImagePath}/auth_image_1.jpg${remoteImageQueryParams}`),
-    await getPlaiceholderImage(`${remoteImagePath}/auth_image_2.jpg${remoteImageQueryParams}`),
-    await getPlaiceholderImage(`${remoteImagePath}/auth_image_3.jpg${remoteImageQueryParams}`),
+  const paths = [
+    'app_images/auth_image_1.jpg?raw=true',
+    'app_images/auth_image_2.jpg?raw=true',
+    'app_images/auth_image_3.jpg?raw=true',
   ]
-  return {
-    props: {
-      images,
-    },
-  }
+  const images = await getRemoteAssets(paths)
+  return { props: { images } }
 })
 
 Page.getLayout = (children) => <AuthLayout>{children}</AuthLayout>
