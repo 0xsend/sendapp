@@ -27,11 +27,9 @@ export function AuthLayout({ children }: { children: React.ReactNode; header?: s
               alt="sign-in-carousel"
             />
           )}
-          <Container>
+          <Container height={'100%'}>
             <YStack h={'100%'} f={1}>
-              <ScrollView f={3} fb={0} jc="center" backgroundColor={'$transparent'}>
-                {children}
-              </ScrollView>
+              {children}
             </YStack>
           </Container>
         </AuthSideBarWrapper>

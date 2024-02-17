@@ -22,9 +22,9 @@ test('can login', async ({ page, pg }) => {
   await expect(page).toHaveURL('/auth/sign-in')
   await page.getByLabel('Phone number').fill(phone)
   try {
-    await page.getByRole('button', { name: 'SEND IT!' }).click()
+    await page.getByRole('button', { name: '/SEND IT' }).click()
     await page.getByLabel('One-time Password').fill('123456')
-    await page.getByRole('button', { name: 'Verify' }).click()
+    await page.getByRole('button', { name: 'VERIFY ACCOUNT' }).click()
     await page.waitForLoadState()
     await expect(page).toHaveURL('/auth/onboarding')
   } finally {
@@ -60,9 +60,9 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
     })
   })
   try {
-    await page.getByRole('button', { name: 'SEND IT!' }).click()
+    await page.getByRole('button', { name: '/SEND IT' }).click()
     await page.getByLabel('One-time Password').fill('123456')
-    await page.getByRole('button', { name: 'Verify' }).click()
+    await page.getByRole('button', { name: 'VERIFY ACCOUNT' }).click()
     await page.waitForLoadState()
     await expect(page).toHaveURL('/auth/onboarding')
   } finally {

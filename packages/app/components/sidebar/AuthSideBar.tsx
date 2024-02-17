@@ -1,9 +1,10 @@
 import { SideBar, SideBarWrapper, Stack, Theme, YStack, YStackProps, useMedia } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
+import { OnboardingForm } from 'app/features/auth/onboarding/onboarding-form'
 import { usePathname } from 'app/utils/usePathname'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { CreateSendAccount, SendAccountCongratulations } from 'app/features/auth/onboarding/screen'
+import { SendAccountCongratulations } from 'app/features/auth/onboarding/screen'
 
 const AuthSideBar = ({ ...props }: YStackProps) => {
   const pathName = usePathname()
@@ -23,7 +24,7 @@ const AuthSideBar = ({ ...props }: YStackProps) => {
         {pathName.includes('/auth/sign-in') ? (
           <SignInForm />
         ) : pathName.includes('auth/onboarding') && sendAccts?.length === 0 ? (
-          <CreateSendAccount />
+          <OnboardingForm />
         ) : (
           <SendAccountCongratulations />
         )}

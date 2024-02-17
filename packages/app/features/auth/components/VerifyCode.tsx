@@ -2,9 +2,7 @@ import {
   ButtonText,
   FormWrapper,
   H1,
-  H2,
   H3,
-  H4,
   Paragraph,
   SubmitButton,
   Theme,
@@ -71,17 +69,23 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           },
         }}
         renderAfter={({ submit }) => (
-          <XStack f={1} mt={'0'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'flex-start'}>
-            <SubmitButton onPress={() => submit()} br="$3" bc={'$accent9Light'} w={'$12'}>
+          <XStack
+            f={1}
+            mt={'0'}
+            jc={'flex-end'}
+            $sm={{ jc: 'center', height: '100%' }}
+            ai={'flex-start'}
+          >
+            <SubmitButton onPress={() => submit()} br="$3" bc={'$accent9Light'} $sm={{ w: '100%' }}>
               <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                {'Verify Account'}
+                {'VERIFY ACCOUNT'}
               </ButtonText>
             </SubmitButton>
           </XStack>
         )}
       >
         {(fields) => (
-          <YStack gap="$5" jc="center" p="$7">
+          <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <Theme inverse={true}>
               <H1 col="$background" size="$11">
                 VERIFY ACCOUNT
