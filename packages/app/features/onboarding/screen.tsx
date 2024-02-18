@@ -21,7 +21,6 @@ import {
   XStack,
   CornerTriangle,
   Image,
-  useWindowDimensions,
   Theme,
   useMedia,
   Anchor,
@@ -54,7 +53,6 @@ import { testClient } from 'app/utils/userop'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 
 export function OnboardingScreen() {
-  const { height: windowHeight, width: windowWidth } = useWindowDimensions()
   const media = useMedia()
   const {
     data: sendAccts,
@@ -63,14 +61,7 @@ export function OnboardingScreen() {
   } = useSendAccounts()
 
   return (
-    <YStack
-      ai="center"
-      jc="space-between"
-      h={windowHeight * 0.95}
-      w={windowWidth * 0.95}
-      px="$6"
-      m="auto"
-    >
+    <YStack ai="center" jc="space-between" h={'95%'} w={'95%'} px="$6" m="auto">
       <Stack pos="absolute" top={0} left={0} mt="auto" mb="auto" zIndex={-1} w="100%" h="100%">
         <Stack mt="auto" mb="auto" w="100%" h="100%" zIndex={1}>
           <Stack
@@ -96,7 +87,6 @@ export function OnboardingScreen() {
             width="100%"
             height="100%"
             source={{
-              height: windowHeight * 0.95,
               uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/setup-passkey.jpg',
             }}
             style={{ borderRadius: 33, zIndex: -1, opacity: 0.1 }}

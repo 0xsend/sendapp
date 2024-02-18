@@ -1,15 +1,4 @@
-import {
-  Stack,
-  View,
-  YStack,
-  Button,
-  ButtonText,
-  XStack,
-  useMedia,
-  Text,
-  useWindowDimensions,
-  H1,
-} from '@my/ui'
+import { Stack, View, YStack, Button, ButtonText, XStack, useMedia, Text, H1 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 
 import { useContext, useEffect } from 'react'
@@ -20,7 +9,6 @@ import { AuthCarouselContext } from './AuthCarouselContext'
 const screens = ['screen1', 'screen2', 'screen3', 'onboarding'] as const
 
 export const SignInScreen = () => {
-  const { height: windowHeight } = useWindowDimensions()
   const { carouselProgress } = useContext(AuthCarouselContext)
 
   const getSignInPage = (page: (typeof screens)[number] | undefined) => {
@@ -37,7 +25,7 @@ export const SignInScreen = () => {
   }
 
   return (
-    <YStack w="100%" h={windowHeight} jc="space-around" mb="auto" mt="auto">
+    <YStack w="100%" h={'100%'} jc="space-around" mb="auto" mt="auto">
       <AnimationLayout currentKey={screens[carouselProgress] || 'none'} direction={1}>
         <Stack pt="$10" pl="$3" $gtMd={{ dsp: 'none' }}>
           <IconSendLogo size={'$2'} color="$white" />

@@ -1,14 +1,13 @@
-import { YStack, YStackProps, useWindowDimensions } from 'tamagui'
+import { YStack, YStackProps } from 'tamagui'
 
 export const SideBar = ({
   children,
   width,
   ...props
 }: { children?: React.ReactNode } & YStackProps) => {
-  const dimensions = useWindowDimensions()
   return (
     <YStack
-      height={dimensions.height - 80}
+      height={'95%'}
       width={width || '20%'}
       py="$6"
       ml="$7"
