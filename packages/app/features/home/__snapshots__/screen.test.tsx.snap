@@ -250,27 +250,47 @@ exports[`HomeScreen 1`] = `
               {
                 "alignItems": "center",
                 "flexDirection": "row",
-                "gap": 18,
-                "justifyContent": "space-evenly",
                 "paddingTop": 39,
                 "width": "90%",
               }
             }
           >
             <View
+              accessibilityRole="button"
+              cancelable={true}
+              cursor="pointer"
+              focusable={[Function]}
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
               style={
                 {
+                  "alignItems": "center",
                   "backgroundColor": "#40FB50",
+                  "borderBottomColor": "transparent",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
-                  "flexDirection": "column",
-                  "paddingBottom": 24,
+                  "borderTopWidth": 1,
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "height": 84,
+                  "justifyContent": "center",
                   "paddingLeft": 16,
                   "paddingRight": 16,
-                  "paddingTop": 24,
-                  "position": "relative",
                   "width": "100%",
                 }
               }
@@ -281,6 +301,7 @@ exports[`HomeScreen 1`] = `
                     "alignItems": "center",
                     "flexDirection": "row",
                     "justifyContent": "space-between",
+                    "width": "100%",
                   }
                 }
               >
@@ -365,6 +386,8 @@ exports[`HomeScreen 1`] = `
                         propList={
                           [
                             "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
                           ]
                         }
                         r="19"
@@ -373,6 +396,8 @@ exports[`HomeScreen 1`] = `
                             "type": 2,
                           }
                         }
+                        strokeLinecap={1}
+                        strokeWidth="2"
                       />
                       <RNSVGPath
                         d="M19.9997 12.5L19.9997 27.5"
@@ -385,6 +410,8 @@ exports[`HomeScreen 1`] = `
                         propList={
                           [
                             "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
                           ]
                         }
                         stroke={
@@ -392,6 +419,8 @@ exports[`HomeScreen 1`] = `
                             "type": 2,
                           }
                         }
+                        strokeLinecap={1}
+                        strokeWidth="2"
                       />
                       <RNSVGPath
                         d="M27.4997 20L12.4997 20"
@@ -404,6 +433,8 @@ exports[`HomeScreen 1`] = `
                         propList={
                           [
                             "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
                           ]
                         }
                         stroke={
@@ -411,6 +442,8 @@ exports[`HomeScreen 1`] = `
                             "type": 2,
                           }
                         }
+                        strokeLinecap={1}
+                        strokeWidth="2"
                       />
                     </RNSVGGroup>
                   </RNSVGSvgView>
@@ -790,8 +823,14 @@ exports[`HomeScreen 1`] = `
                       />
                     </RNSVGGroup>
                     <RNSVGDefs>
-                      <clipPath
-                        id="clip0_265_2608"
+                      <RNSVGClipPath
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        name="clip0_265_2608"
                       >
                         <RNSVGRect
                           fill={
@@ -820,7 +859,7 @@ exports[`HomeScreen 1`] = `
                           x="0"
                           y="0"
                         />
-                      </clipPath>
+                      </RNSVGClipPath>
                     </RNSVGDefs>
                   </RNSVGGroup>
                 </RNSVGSvgView>
@@ -1262,9 +1301,18 @@ exports[`HomeScreen 1`] = `
                         }
                         strokeWidth="2"
                       >
-                        <path
+                        <RNSVGPath
                           d="M2.83334 22H7.83334V13.6667H15.1667V22H20.1667V9L11.5 2.5L2.83334 9V22ZM0.833336 24V8L11.5 0L22.1667 8V24H13.1667V15.6667H9.83334V24H0.833336Z"
-                          fill="currentColor"
+                          fill={
+                            {
+                              "type": 2,
+                            }
+                          }
+                          propList={
+                            [
+                              "fill",
+                            ]
+                          }
                         />
                       </RNSVGGroup>
                     </RNSVGSvgView>
@@ -1332,7 +1380,7 @@ exports[`HomeScreen 1`] = `
                     "flexWrap": "nowrap",
                     "height": "100%",
                     "justifyContent": "center",
-                    "opacity": 0.7,
+                    "opacity": 0.5,
                     "paddingBottom": 0,
                     "paddingLeft": 0,
                     "paddingRight": 0,
@@ -1380,7 +1428,6 @@ exports[`HomeScreen 1`] = `
                     vbHeight={116}
                     vbWidth={100}
                     width={33}
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <RNSVGGroup
                       fill={
@@ -1498,7 +1545,7 @@ exports[`HomeScreen 1`] = `
                     "flexWrap": "nowrap",
                     "height": "100%",
                     "justifyContent": "center",
-                    "opacity": 0.7,
+                    "opacity": 0.5,
                     "paddingBottom": 0,
                     "paddingLeft": 0,
                     "paddingRight": 0,
