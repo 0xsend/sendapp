@@ -9,6 +9,7 @@ import {
   ScrollView,
   XStack,
   YStack,
+  useToastController,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import {
@@ -27,6 +28,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { useState } from 'react'
 import { Square } from 'tamagui'
 export function HomeScreen() {
+  const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -165,15 +167,18 @@ export function HomeScreen() {
               </YStack>
             </XStack>
           </XStack>
-          <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$4'} pt={'$7'}>
-            <Card
+          <XStack w={'90%'} ai={'center'} pt={'$7'}>
+            <Button
               px={'$3.5'}
-              py={'$5'}
+              h={'$8'}
               width={'100%'}
               backgroundColor={'$primary'}
               borderRadius={'$4'}
+              onPress={() => {
+                toast.show('TODO: Add Funds')
+              }}
             >
-              <XStack jc={'space-between'} ai={'center'}>
+              <XStack w={'100%'} jc={'space-between'} ai={'center'}>
                 <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
                   Add Funds
                 </Paragraph>
@@ -181,7 +186,7 @@ export function HomeScreen() {
                   <IconDeposit size={'$2.5'} color={'$black'} />
                 </XStack>
               </XStack>
-            </Card>
+            </Button>
           </XStack>
           <YStack width={'90%'} gap={'$3.5'} pt={'$6'} pb={'$12'}>
             {coins.map((coin, index) => (
