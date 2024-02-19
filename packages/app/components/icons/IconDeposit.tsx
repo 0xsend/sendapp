@@ -19,20 +19,20 @@ const Deposit = (props: IconProps) => {
         cy="20"
         r="19"
         stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
       <Path
         d="M19.9997 12.5L19.9997 27.5"
         stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
       <Path
         d="M27.4997 20L12.4997 20"
         stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </Svg>
   )
