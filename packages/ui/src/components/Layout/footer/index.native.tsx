@@ -31,24 +31,24 @@ const MainFooter = () => {
               <Tabs.Tab flex={1} value="tab1" p={0} height="100%" borderRadius={0}>
                 <YStack width={64} ai="center">
                   <XStack h={'$2.5'} ai={'center'}>
-                    <IconHome color={'$color12'} />
+                    <IconHome color={iconColor} />
                   </XStack>
-                  <Paragraph color={'$color12'} fontSize={'$3'} lineHeight={'$1'}>
+                  <Paragraph color={iconColor} fontSize={'$3'} lineHeight={'$1'}>
                     Home
                   </Paragraph>
                 </YStack>
               </Tabs.Tab>
-              <Tabs.Tab flex={1} value="tab2" p={0} height="100%" opacity={0.7}>
+              <Tabs.Tab flex={1} value="tab2" p={0} height="100%" opacity={0.5}>
                 <YStack width={64} ai="center">
-                  <IconSLogo color={iconColor} />
+                  <IconSLogo color={'$color12'} />
                 </YStack>
               </Tabs.Tab>
-              <Tabs.Tab flex={1} value="tab3" p={0} height="100%" opacity={0.7} borderRadius={0}>
+              <Tabs.Tab flex={1} value="tab3" p={0} height="100%" opacity={0.5} borderRadius={0}>
                 <YStack width={64} ai="center">
                   <XStack h={'$2.5'} ai={'center'}>
-                    <IconActivity color={iconColor} />
+                    <IconActivity color={'$color12'} />
                   </XStack>
-                  <Paragraph color={iconColor} fontSize={'$3'} lineHeight={'$1'}>
+                  <Paragraph color={'$color12'} fontSize={'$3'} lineHeight={'$1'}>
                     Activity
                   </Paragraph>
                 </YStack>
