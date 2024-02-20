@@ -1,7 +1,8 @@
-import { Avatar, Link, ScrollView, Spinner, Theme, XStack, YStack } from '@my/ui'
+import { Avatar, ScrollView, Spinner, XStack, YStack } from 'tamagui'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconQr } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
+import { Link } from '../Link'
 import { MainFooter } from './footer/index.native'
 import { useThemeSetting } from '@tamagui/next-theme'
 
