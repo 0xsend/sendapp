@@ -1,4 +1,4 @@
-import { Footer, Paragraph, Tabs, XStack, YStack } from '@my/ui'
+import { Footer, Paragraph, Tabs, XStack, YStack } from 'tamagui'
 import { IconActivity, IconHome, IconSLogo } from 'app/components/icons'
 import { useThemeSetting } from '@tamagui/next-theme'
 
