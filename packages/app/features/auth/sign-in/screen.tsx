@@ -11,9 +11,6 @@ export const SignInScreen = () => {
 
   return (
     <YStack w="100%" h={'100%'} jc="flex-start" py="$7">
-      <Stack f={1} $gtMd={{ dsp: 'none' }}>
-        <IconSendLogo size={'$2'} color="$white" />
-      </Stack>
       {media.gtMd ? (
         <YStack jc="flex-end" f={1} gap="$2" h="100%" $gtMd={{ pb: '$8' }} mx="auto" maw={738}>
           <Carousel />
@@ -88,7 +85,14 @@ const SignInScreensMobile = () => {
 
 const ContinueButton = ({ nextScreen }: { nextScreen: () => void }) => (
   <Stack w="100%" jc="center" py="$5" gap="$2">
-    <Button bg="transparent" bw={1} borderColor={'$accentBackground'} br="$5" onPress={nextScreen}>
+    <Button
+      bc="transparent"
+      hoverStyle={{ backgroundColor: '$transparent', boc: '$accentBackground' }}
+      bw={1}
+      boc={'$accentBackground'}
+      br="$5"
+      onPress={nextScreen}
+    >
       <ButtonText col={'$accentBackground'}>CONTINUE</ButtonText>
     </Button>
   </Stack>
