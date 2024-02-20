@@ -10,7 +10,7 @@ export const SignInScreen = () => {
   const media = useMedia()
 
   return (
-    <YStack w="100%" h={'100%'} jc="flex-start" py="$7">
+    <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
       {media.gtMd ? (
         <YStack jc="flex-end" f={1} gap="$2" h="100%" $gtMd={{ pb: '$8' }} mx="auto" maw={738}>
           <Carousel />
@@ -99,9 +99,9 @@ const ContinueButton = ({ nextScreen }: { nextScreen: () => void }) => (
 )
 
 const SignInButtons = ({ nextScreen }: { nextScreen: () => void }) => (
-  <XStack w="100%" jc="center" py="$5" gap="$2">
+  <XStack w="100%" jc="center" py="$5" gap="$4">
     <Button f={1} bg="$accentBackground" br="$5" onPress={nextScreen}>
-      <ButtonText col="$background">LOGIN</ButtonText>
+      <ButtonText col="$black">LOGIN</ButtonText>
     </Button>
     <Button
       bg="transparent"

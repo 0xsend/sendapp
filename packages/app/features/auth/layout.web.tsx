@@ -6,6 +6,7 @@ import { SolitoImage } from 'solito/image'
 import { type GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { usePathname } from 'app/utils/usePathname'
 import { AnimationLayout } from '../../components/layout/animation-layout'
+import { carouselImagePositions } from './components/Carousel'
 
 export function AuthLayout({
   children,
@@ -21,6 +22,7 @@ export function AuthLayout({
   const [carouselProgress, setCarouselProgress] = useState(0)
 
   const carouselImage = carouselImages[carouselProgress]
+  const mobileImagePosition = carouselImagePositions[carouselProgress]
 
   return useMemo(
     () => (
@@ -44,6 +46,7 @@ export function AuthLayout({
                 blurDataURL={carouselImage.base64}
                 src={carouselImage.img.src}
                 fill={true}
+                contentPosition={media.gtMd ? undefined : mobileImagePosition}
                 style={{ objectFit: 'cover' }}
                 alt="sign-in-carousel"
               />
@@ -51,7 +54,6 @@ export function AuthLayout({
                 pos="absolute"
                 w="100%"
                 h="100%"
-                opacity={0.8}
                 locations={media.gtMd ? [0.5, 1] : [0, 0.5, 1]}
                 colors={media.gtMd ? ['transparent', 'black'] : ['$black', 'transparent', '$black']}
               />
@@ -66,6 +68,14 @@ export function AuthLayout({
         </AuthSideBarWrapper>
       </AuthCarouselContext.Provider>
     ),
-    [carouselImage, carouselImages, carouselProgress, children, media.gtMd, isMobileOnboarding]
+    [
+      carouselImage,
+      carouselImages,
+      carouselProgress,
+      children,
+      media.gtMd,
+      isMobileOnboarding,
+      mobileImagePosition,
+    ]
   )
 }

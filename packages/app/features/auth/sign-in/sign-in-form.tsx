@@ -58,7 +58,12 @@ export const SignInForm = () => {
             },
             phone: {
               'aria-label': 'Phone number',
-              borderBottomColor: '$accent9Light',
+              '$theme-dark': {
+                borderBottomColor: '$accent9Light',
+              },
+              '$theme-light': {
+                borderBottomColor: '$black',
+              },
               borderWidth: 0,
               borderBottomWidth: 2,
               borderRadius: '$0',
@@ -96,9 +101,9 @@ export const SignInForm = () => {
                   WELCOME TO SEND
                 </H1>
               </Theme>
-              <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
-                Sign up or Sign in with your phone number
-              </H3>
+              <Paragraph fontWeight="normal" theme="active" $sm={{ size: '$5' }}>
+                Sign in with your phone number
+              </Paragraph>
               <YStack gap="$2">
                 <Theme inverse={true}>
                   <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
