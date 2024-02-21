@@ -25,108 +25,61 @@ import {
 import { MainLayout } from 'app/components/layout'
 import { CommentsTime } from 'app/utils/dateHelper'
 import formatAmount from 'app/utils/formatAmount'
+import { useSendAccounts } from 'app/utils/send-accounts'
 import { useState } from 'react'
 import { Square } from 'tamagui'
+import { useBalance, useChainId } from 'wagmi'
+import { usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
 export function HomeScreen() {
+  const chainId = useChainId()
+  const { data: sendAccounts } = useSendAccounts()
+  const sendAccount = sendAccounts?.[0]
+
+  const balances: {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    [key: string]: { balance: any; balanceIsPending: boolean; balanceRefetch: any }
+  } = {}
+  const tokens = [usdcAddresses[chainId], sendAddresses[chainId]]
+
+  for (const token of tokens) {
+    const {
+      data: balance,
+      isPending: balanceIsPending,
+      refetch: balanceRefetch,
+    } = useBalance({
+      address: sendAccount?.address,
+      token,
+      query: { enabled: !!sendAccount },
+      chainId: chainId,
+    })
+
+    // Assuming you're storing the balances in an object with chainId as key
+    balances[token] = { balance, balanceIsPending, balanceRefetch }
+  }
+
   const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   })
-  const [expandBalance, setExpandBalance] = useState(false)
-  const actionButtons = [
-    { label: 'Deposit', iconPNGPath: <IconDeposit />, href: '/' },
-    { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/receive' },
-    { label: 'Send', iconPNGPath: <IconSendTile />, href: '/send' },
-  ]
   const coins = [
-    { label: 'USDC', icon: <IconUSDC size={'$2.5'} />, balance: 3.4567 },
-    { label: 'Ethereum', icon: <IconEthereum size={'$2.5'} />, balance: 1.25696 },
-    { label: 'Send', icon: <IconSend size={'$2.5'} />, balance: 12500123 },
+    { label: 'USDC', token: usdcAddresses[chainId], icon: <IconUSDC size={'$2.5'} /> },
+    // { label: 'Ethereum', icon: <IconEthereum size={'$2.5'} /> },
+    { label: 'Send', token: sendAddresses[chainId], icon: <IconSend size={'$2.5'} /> },
   ]
-  const balanceViewButtons = [
-    { label: 'Ethereum', onPress: () => {} },
-    { label: 'Cards', onPress: () => {} },
-  ]
-  const transactions = [
-    {
-      id: 1,
-      user: {
-        sendTag: 'ethantree',
-      },
-      type: 'inbound',
-      amount: 200,
-      currency: 'USDT',
-      amountInUSD: 199.98,
-      created_on: '',
-    },
-    {
-      id: 2,
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-    {
-      id: 3,
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-    {
-      id: 4,
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-  ]
-  const balanceDetails = [
-    {
-      currency: 'Ethereum',
-      symbol: 'eth',
-      balance: 1.45,
-    },
-    {
-      currency: 'USDC',
-      symbol: 'usdc',
-      balance: 125,
-    },
-    {
-      currency: 'SEND',
-      symbol: 'send',
-      balance: 71454457,
-    },
-    {
-      currency: 'SEND',
-      symbol: 'send',
-      balance: 4412,
-    },
-    {
-      currency: 'USDC',
-      symbol: 'usdc',
-      balance: 2.0,
-    },
-  ]
+
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
-  const navigateToScreen = (href: string) => {
-    window.location.href = href
+  const totalBalance = () => {
+    let total = 0
+    for (const token of tokens) {
+      const tokenBalance = parseFloat(balances[token]?.balance?.formatted)
+      total += tokenBalance
+    }
+    return total
   }
+
   return (
     <>
       <MainLayout scrollable={true}>
@@ -157,7 +110,7 @@ export function HomeScreen() {
                       lineHeight={'$12'}
                       zIndex={1}
                     >
-                      {USDollar.format(9489).replace('$', '').split('.')[0]}
+                      {USDollar.format(totalBalance()).replace('$', '').split('.')[0]}
                     </Paragraph>
                     <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
                       {'USD'}
@@ -210,7 +163,7 @@ export function HomeScreen() {
                   </Paragraph>
                 </XStack>
                 <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
-                  {formatAmount(coin.balance, undefined, 3)}
+                  {formatAmount(balances[coin.token]?.balance?.formatted, undefined, 3)}
                 </Paragraph>
               </XStack>
             ))}
