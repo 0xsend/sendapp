@@ -9,7 +9,6 @@ import {
   ScrollView,
   XStack,
   YStack,
-  MainLayout,
   useToastController,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -23,6 +22,7 @@ import {
   IconSendTile,
   IconUSDC,
 } from 'app/components/icons'
+import { MainLayout } from 'app/components/layout'
 import { CommentsTime } from 'app/utils/dateHelper'
 import formatAmount from 'app/utils/formatAmount'
 import { useState } from 'react'
