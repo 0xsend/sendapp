@@ -3,12 +3,20 @@ import Head from 'next/head'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
 import { NextPageWithLayout } from './_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
-import { InferGetServerSidePropsType } from 'next'
 import { getPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
+import { InferGetServerSidePropsType } from 'next'
+import { useContext, useEffect } from 'react'
+import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
   images,
 }) => {
+  const { carouselImages, setCarouselImages } = useContext(AuthCarouselContext)
+
+  useEffect(() => {
+    if (carouselImages.length === 0) setCarouselImages(images)
+  }, [setCarouselImages, carouselImages, images])
+
   return (
     <>
       <Head>
@@ -19,7 +27,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
           key="desc"
         />
       </Head>
-      <SignInScreen images={images} />
+      <SignInScreen />
     </>
   )
 }
