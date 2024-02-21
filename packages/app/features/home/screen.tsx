@@ -22,41 +22,17 @@ import {
   IconSendTile,
   IconUSDC,
 } from 'app/components/icons'
-import { MainLayout } from 'app/components/layout'
+import { MainLayout } from 'app/components/layout/index.native'
 import { CommentsTime } from 'app/utils/dateHelper'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useState } from 'react'
 import { Square } from 'tamagui'
-import { usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
-import { useBalance, useChainId } from 'wagmi'
+import { baseMainnet, usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 export function HomeScreen() {
-  const chainId = useChainId()
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
-
-  const balances: {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    [key: string]: { balance: any; balanceIsPending: boolean; balanceRefetch: any }
-  } = {}
-  const tokens = [usdcAddresses[chainId], sendAddresses[chainId]]
-
-  for (const token of tokens) {
-    const {
-      data: balance,
-      isPending: balanceIsPending,
-      refetch: balanceRefetch,
-    } = useBalance({
-      address: sendAccount?.address,
-      token,
-      query: { enabled: !!sendAccount },
-      chainId: chainId,
-    })
-
-    // Assuming you're storing the balances in an object with chainId as key
-    balances[token] = { balance, balanceIsPending, balanceRefetch }
-  }
+  const { balances, totalBalance } = useSendAccountBalances()
 
   const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
@@ -64,22 +40,13 @@ export function HomeScreen() {
     currency: 'USD',
   })
   const coins = [
-    { label: 'USDC', token: usdcAddresses[chainId], icon: <IconUSDC size={'$2.5'} /> },
+    { label: 'USDC', token: usdcAddresses[baseMainnet.id], icon: <IconUSDC size={'$2.5'} /> },
     // { label: 'Ethereum', icon: <IconEthereum size={'$2.5'} /> },
-    { label: 'Send', token: sendAddresses[chainId], icon: <IconSend size={'$2.5'} /> },
+    { label: 'Send', token: sendAddresses[baseMainnet.id], icon: <IconSend size={'$2.5'} /> },
   ]
 
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
-
-  const totalBalance = () => {
-    let total = 0
-    for (const token of tokens) {
-      const tokenBalance = parseFloat(balances[token]?.balance?.formatted)
-      total += tokenBalance
-    }
-    return total
-  }
 
   return (
     <>
@@ -164,7 +131,7 @@ export function HomeScreen() {
                   </Paragraph>
                 </XStack>
                 <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
-                  {formatAmount(balances[coin.token]?.balance?.formatted, undefined, 3)}
+                  {formatAmount(balances[coin.token]?.data?.formatted, undefined, 3)}
                 </Paragraph>
               </XStack>
             ))}
