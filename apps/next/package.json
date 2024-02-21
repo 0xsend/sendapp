@@ -2,6 +2,7 @@
   "name": "next-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "yarn with-env next dev",
     "build": "yarn next:build",
@@ -13,6 +14,7 @@
     "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env -c --"
   },
   "dependencies": {
+    "@plaiceholder/next": "^3.0.0",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
     "@supabase/supabase-js": "^2.38.5",

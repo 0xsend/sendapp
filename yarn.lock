@@ -6593,6 +6593,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@plaiceholder/next@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@plaiceholder/next@npm:3.0.0"
+  peerDependencies:
+    next: ">= 10.0.0"
+    plaiceholder: ">=3.0.0"
+    sharp: ">= 0.30.6"
+  checksum: 0bf2bb19ebd48d075eeed966aa031255733b9dcc18f1c9481fe505bbd23993a96eac9254994fc6ceabbb75ce769903f2fcff1267668e4eb324a44b52517b6ebf
+  languageName: node
+  linkType: hard
+
 "@playwright/test@npm:^1.41.1":
   version: 1.41.1
   resolution: "@playwright/test@npm:1.41.1"
@@ -25134,6 +25145,7 @@ __metadata:
   dependencies:
     "@next/bundle-analyzer": "npm:^13.4.19"
     "@next/eslint-plugin-next": "npm:^14.0.4"
+    "@plaiceholder/next": "npm:^3.0.0"
     "@supabase/auth-helpers-react": "npm:^0.4.2"
     "@supabase/ssr": "npm:^0.0.9"
     "@supabase/supabase-js": "npm:^2.38.5"
