@@ -6133,10 +6133,10 @@ __metadata:
   resolution: "@my/snaplet@workspace:packages/snaplet"
   dependencies:
     "@snaplet/copycat": "npm:^4.1.0"
-    "@snaplet/seed": "npm:^0.87.1"
+    "@snaplet/seed": "npm:^0.88.0"
     "@types/pg": "npm:^8"
     pg: "npm:^8.11.3"
-    snaplet: "npm:^0.87.1"
+    snaplet: "npm:^0.88.0"
     viem: "npm:^2.7.6"
   languageName: unknown
   linkType: soft
@@ -7671,18 +7671,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snaplet/copycat@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@snaplet/copycat@npm:4.0.0"
-  dependencies:
-    "@faker-js/faker": "npm:^8.0.2"
-    fictional: "npm:^1.0.0"
-    uuid: "npm:^8.3.2"
-  checksum: d8d43a22155cdad34e9ad985c45f59de3cdcb5f0bbbccd4c231e4307d0848bf2b2be68916bb12dab536960fb02e648c2387b8663346fcb53a42cd3973fa2a20c
-  languageName: node
-  linkType: hard
-
-"@snaplet/copycat@npm:^4.1.0":
+"@snaplet/copycat@npm:4.1.0, @snaplet/copycat@npm:^4.1.0":
   version: 4.1.0
   resolution: "@snaplet/copycat@npm:4.1.0"
   dependencies:
@@ -7694,9 +7683,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snaplet/sdk@npm:~0.87.1":
-  version: 0.87.1
-  resolution: "@snaplet/sdk@npm:0.87.1"
+"@snaplet/sdk@npm:~0.88.0":
+  version: 0.88.0
+  resolution: "@snaplet/sdk@npm:0.88.0"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -7710,7 +7699,7 @@ __metadata:
     "@faker-js/faker": "npm:8.0.2"
     "@loancrate/prisma-schema-parser": "npm:2.0.0"
     "@scaleleap/pg-format": "npm:1.0.0"
-    "@snaplet/copycat": "npm:4.0.0"
+    "@snaplet/copycat": "npm:4.1.0"
     ansi-colors: "npm:4.1.3"
     bcryptjs: "npm:2.4.3"
     ci-info: "npm:3.9.0"
@@ -7744,20 +7733,20 @@ __metadata:
     word-wrap: "npm:1.2.3"
     zod: "npm:3.22.4"
     zod-validation-error: "npm:1.5.0"
-  checksum: 84673f43e9a8e1ad30e55233a00279086307764bc7f4a4d253f7662313dd7b2b9651c9dbdc85442f9f7b6a5c6e2f6ff080cdcffefdc99eabef74d71e7503538d
+  checksum: 14000a55a2af6d6af8178533922be4e16bf66faf09f0c231d7722f775aa9e4e679b42dba279f0e76fcf86a04bd62ef4b8c576a0c2319a4d387169f0e88b77f1b
   languageName: node
   linkType: hard
 
-"@snaplet/seed@npm:^0.87.1":
-  version: 0.87.1
-  resolution: "@snaplet/seed@npm:0.87.1"
+"@snaplet/seed@npm:^0.88.0":
+  version: 0.88.0
+  resolution: "@snaplet/seed@npm:0.88.0"
   dependencies:
-    "@snaplet/sdk": "npm:~0.87.1"
+    "@snaplet/sdk": "npm:~0.88.0"
     "@types/node": "npm:20.10.4"
     pg: "npm:8.10.0"
   peerDependencies:
-    "@snaplet/copycat": ">=2.0.0"
-  checksum: f378951cc8a2bd8e13e493ed227ab6eb9b253851c315be9b985bc2e3947e1014044180e163978abb52e0432c3bb15bda35510651f457b9ca9c5501c606d9aa57
+    "@snaplet/copycat": ">=4.1.0"
+  checksum: 855a434fd9b96be53cfec9fc15d3d62fecbe949b06ab34ec2b3e2b0bd9bdbae50b23e873509b13a9718ca7bdac313b3868d11d1ad2ae8e53a6be52827fe378b6
   languageName: node
   linkType: hard
 
@@ -30011,9 +30000,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"snaplet@npm:^0.87.1":
-  version: 0.87.1
-  resolution: "snaplet@npm:0.87.1"
+"snaplet@npm:^0.88.0":
+  version: 0.88.0
+  resolution: "snaplet@npm:0.88.0"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -30029,7 +30018,7 @@ __metadata:
     "@scaleleap/pg-format": "npm:1.0.0"
     "@sentry/integrations": "npm:7.48.0"
     "@sentry/node": "npm:7.48.0"
-    "@snaplet/copycat": "npm:4.0.0"
+    "@snaplet/copycat": "npm:4.1.0"
     "@trpc/client": "npm:10.29.1"
     "@trpc/server": "npm:10.29.1"
     ansi-colors: "npm:4.1.3"
@@ -30095,7 +30084,7 @@ __metadata:
     zod-validation-error: "npm:1.5.0"
   bin:
     snaplet: bin/snaplet.js
-  checksum: cb04e3f7a1a076c3322373e670bb34fc9209bd9bf0a6189f45f01c4c71db34c1d5eeb9e9a8561aa648b7dec24d4dae135de2c28d61502872fd2ae8cafe619ddc
+  checksum: 7bf2e1c54702aaecc97be4d04041ebc1908eb00c1a8f1d6bbcb1423894ef85fb54491d4019d6f4a5ac73fe294fff5f922acaf753f705053c939c1f04e57c2cdd
   languageName: node
   linkType: hard
 
