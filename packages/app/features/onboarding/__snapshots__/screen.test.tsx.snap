@@ -6,7 +6,7 @@ exports[`OnboardingScreen 1`] = `
     {
       "alignItems": "center",
       "flexDirection": "column",
-      "height": 0,
+      "height": "95%",
       "justifyContent": "space-between",
       "marginBottom": "auto",
       "marginLeft": "auto",
@@ -14,7 +14,7 @@ exports[`OnboardingScreen 1`] = `
       "marginTop": "auto",
       "paddingLeft": 32,
       "paddingRight": 32,
-      "width": 0,
+      "width": "95%",
     }
   }
 >
@@ -178,7 +178,6 @@ exports[`OnboardingScreen 1`] = `
       <Image
         source={
           {
-            "height": 0,
             "uri": "https://raw.githubusercontent.com/0xsend/assets/main/app_images/setup-passkey.jpg",
           }
         }

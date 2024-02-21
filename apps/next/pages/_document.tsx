@@ -41,11 +41,11 @@ export default class Document extends NextDocument {
 
   render() {
     return (
-      <Html>
+      <Html style={{ height: '100%' }}>
         <Head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         </Head>
-        <body>
+        <body style={{ height: '100%' }}>
           <Main />
           <NextScript />
         </body>

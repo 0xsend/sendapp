@@ -7,7 +7,7 @@ export const SideBarWrapper = ({
   ...props
 }: { children?: React.ReactNode; sidebar: ReactElement<YStackProps> } & XStackProps) => {
   return (
-    <XStack {...props}>
+    <XStack height={'100%'} {...props}>
       {sidebar}
       {children}
     </XStack>

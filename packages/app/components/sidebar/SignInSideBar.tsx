@@ -50,7 +50,7 @@ export const SignInSideBarWrapper = ({ children }: { children?: React.ReactNode 
   const media = useMedia()
   if (media.gtMd) {
     return (
-      <SideBarWrapper sidebar={<SignInSideBar bc={'$accentColor'} />}>{children}</SideBarWrapper>
+      <SideBarWrapper sidebar={<SignInSideBar bc={'$background'} />}>{children}</SideBarWrapper>
     )
   }
   return children

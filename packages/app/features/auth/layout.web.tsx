@@ -1,4 +1,4 @@
-import { ScrollView, YStack, useWindowDimensions } from '@my/ui'
+import { ScrollView, YStack } from '@my/ui'
 
 import { SignInSideBarWrapper } from 'app/components/sidebar/SignInSideBar'
 import { useMemo, useState } from 'react'
@@ -9,7 +9,6 @@ import { type GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 export function AuthLayout({ children }: { children: React.ReactNode; header?: string }) {
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
   const [carouselProgress, setCarouselProgress] = useState(0)
-  const { height: windowHeight } = useWindowDimensions()
 
   const carouselImage = carouselImages[carouselProgress]
 
@@ -29,7 +28,7 @@ export function AuthLayout({ children }: { children: React.ReactNode; header?: s
               alt="sign-in-carousel"
             />
           )}
-          <YStack h={windowHeight} f={1}>
+          <YStack h={'100%'} f={1}>
             <ScrollView f={3} fb={0} jc="center" backgroundColor={'$transparent'}>
               {children}
             </ScrollView>
@@ -37,6 +36,6 @@ export function AuthLayout({ children }: { children: React.ReactNode; header?: s
         </SignInSideBarWrapper>
       </AuthCarouselContext.Provider>
     ),
-    [carouselImage, carouselImages, carouselProgress, children, windowHeight]
+    [carouselImage, carouselImages, carouselProgress, children]
   )
 }
