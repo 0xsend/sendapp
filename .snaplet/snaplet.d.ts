@@ -491,11 +491,11 @@ interface Database {
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "uuid-ossp" | "pgcrypto" | "pgjwt" | "pg_trgm" | "pg_stat_statements" | "pg_net" | "http";
+  extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "uuid-ossp";
   graphql: "pg_graphql";
   pgsodium: "pgsodium";
   pgtle: "pg_tle";
-  public: "supabase-dbdev" | "citext";
+  public: "citext" | "supabase-dbdev";
   vault: "supabase_vault";
 }
 interface Tables_relationships {
