@@ -2,7 +2,7 @@ import { baseMainnet, usdcAddress as usdcAddresses, sendAddress as sendAddresses
 import { UseBalanceReturnType, useBalance } from 'wagmi'
 import { useSendAccounts } from './send-accounts'
 
-export const useSendAccountBalances = (address?: `0x${string}`) => {
+export const useSendAccountBalances = () => {
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
