@@ -1,2 +1,2 @@
-export * from './MainLayout'
-export * from './animation-layout'
+export { MainLayout } from './MainLayout'
+export { AnimationLayout } from './animation-layout'
