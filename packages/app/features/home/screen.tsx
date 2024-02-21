@@ -28,8 +28,9 @@ import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useState } from 'react'
 import { Square } from 'tamagui'
-import { useBalance, useChainId } from 'wagmi'
 import { usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
+import { useBalance, useChainId } from 'wagmi'
+
 export function HomeScreen() {
   const chainId = useChainId()
   const { data: sendAccounts } = useSendAccounts()

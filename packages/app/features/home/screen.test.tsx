@@ -17,6 +17,18 @@ jest.mock('app/routers/params', () => ({
 }))
 
 jest.mock('wagmi', () => ({
+  createConfig: jest.fn(),
+  useChainId: jest.fn().mockReturnValue(1337),
+  useBalance: jest.fn().mockReturnValue({
+    data: {
+      decimals: 6,
+      formatted: '0',
+      symbol: 'send',
+      value: 0n,
+    },
+    isPending: true,
+    refetch: jest.fn(),
+  }),
   useAccount: jest.fn().mockReturnValue({
     address: '0x123',
     isConnected: false,
