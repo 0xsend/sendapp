@@ -12,7 +12,6 @@ import {
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconClose } from 'app/components/icons'
-import { SendButton } from 'app/components/layout/footer/components/SendButton'
 import { useSubScreenContext } from 'app/features/send/providers'
 import { ANIMATE_DIRECTION_RIGHT, ISendRequestModalProps, QRScreen } from 'app/features/send/types'
 import { useState } from 'react'
@@ -150,11 +149,9 @@ export const SendRequestModal = ({ showModal, setShowModal, to }: ISendRequestMo
                       mt: '$5',
                     }}
                   >
-                    <SendButton
+                    <Button
                       height={'$5'}
                       borderRadius={'$6'}
-                      iconHeight={12}
-                      blackIcon
                       onPress={() =>
                         setCurrentComponent([QRScreen.QR_AMOUNT, ANIMATE_DIRECTION_RIGHT, 'Send'])
                       }
