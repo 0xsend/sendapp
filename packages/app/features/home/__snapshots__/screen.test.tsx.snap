@@ -639,9 +639,7 @@ exports[`HomeScreen 1`] = `
                   }
                 }
                 suppressHighlighting={true}
-              >
-                0
-              </Text>
+              />
             </View>
             <View
               style={
@@ -823,9 +821,7 @@ exports[`HomeScreen 1`] = `
                   }
                 }
                 suppressHighlighting={true}
-              >
-                0
-              </Text>
+              />
             </View>
           </View>
         </View>

@@ -53,6 +53,16 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue(123),
 }))
 
+jest.mock('app/utils/useSendAccountBalances', () => ({
+  useSendAccountBalances: jest.fn().mockReturnValue({
+    balances: {
+      '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A': {},
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': {},
+    },
+    totalBalance: () => 0,
+  }),
+}))
+
 // jest.mock('@vonovak/react-native-theme-control', () => ({
 //   useThemePreference: jest.fn().mockReturnValue('light'),
 //   setThemePreference: jest.fn(),

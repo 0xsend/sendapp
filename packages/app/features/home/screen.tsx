@@ -48,6 +48,8 @@ export function HomeScreen() {
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
+  console.log(balances)
+
   return (
     <>
       <MainLayout scrollable={true}>
