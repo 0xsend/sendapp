@@ -10,7 +10,7 @@ import "../src/DaimoAccount.sol";
 import "account-abstraction/core/EntryPoint.sol";
 
 contract AccountSigningKeysTest is Test {
-    using UserOperationLib for UserOperation;
+    using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
     DaimoVerifier public verifier;

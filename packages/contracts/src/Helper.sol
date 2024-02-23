@@ -63,23 +63,29 @@ abstract contract Helper is Script {
      * Send Account Verifier
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_VERIFIER = 0x63637Dd8e9586eA50a28b117bc9ce9E5f17984a2;
+    address constant SEND_VERIFIER = 0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F;
     /**
      * Send Account Verifier Proxy
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_VERIFIER_PROXY = 0x5F0Fd3e14e41E31890BeE3740A14e51A23129706;
+    address constant SEND_VERIFIER_PROXY = 0xdAAb03239f5CC5b3452837E557295F790D9ab319;
     /**
      * Send Account Factory
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_ACCOUNT_FACTORY = 0x754ADB349777994F666A788a6bbE4B9DDEBED6A8;
+    address constant SEND_ACCOUNT_FACTORY = 0xDC05a26aF432489D9B78D14408ec434409E07bE3;
     /**
      *
      * Account-Abstraction (EIP-4337) v0.6.0 singleton EntryPoint implementation.
      * https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789
      */
-    address constant AA_ENTRY_POINT = 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789;
+    address constant AA_ENTRY_POINT_V0_6 = 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789;
+    /**
+     *
+     * Account-Abstraction (EIP-4337) v0.7.0 singleton EntryPoint implementation.
+     * https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032
+     */
+    address constant AA_ENTRY_POINT_V0_7 = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
 
     function labels() public {
         vm.label(SEND_TOKEN, "SEND_TOKEN");
@@ -91,7 +97,8 @@ abstract contract Helper is Script {
         vm.label(SEND_CONTRIBUTOR_INCENTIVES_SAFE, "SEND_CONTRIBUTOR_INCENTIVES_SAFE");
         vm.label(SEND_MULTISIG_SIGNER_PAYOUTS_SAFE, "SEND_MULTISIG_SIGNER_PAYOUTS_SAFE");
         vm.label(SEND_MERKLE_DROP, "SEND_MERKLE_DROP");
-        vm.label(AA_ENTRY_POINT, "AA_ENTRY_POINT");
+        vm.label(AA_ENTRY_POINT_V0_6, "AA_ENTRY_POINT_V0_6");
+        vm.label(AA_ENTRY_POINT_V0_7, "AA_ENTRY_POINT_V0_7");
         vm.label(SEND_VERIFIER, "SEND_VERIFIER");
         vm.label(SEND_VERIFIER_PROXY, "SEND_VERIFIER_PROXY");
         vm.label(SEND_ACCOUNT_FACTORY, "SEND_ACCOUNT_FACTORY");

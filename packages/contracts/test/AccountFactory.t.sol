@@ -5,13 +5,13 @@ import "forge-std/Test.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
 import "../src/DaimoAccountFactory.sol";
-import "../src/DaimoAccount.sol";
-import "../src/DaimoVerifier.sol";
+import {DaimoAccount} from "../src/DaimoAccount.sol";
+import {DaimoVerifier} from "../src/DaimoVerifier.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
 
 contract AccountFactoryTest is Test {
-    using UserOperationLib for UserOperation;
+    using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
     DaimoAccountFactory public factory;

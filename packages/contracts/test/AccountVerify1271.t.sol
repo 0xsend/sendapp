@@ -11,7 +11,7 @@ import "./Utils.sol";
 import "account-abstraction/core/EntryPoint.sol";
 
 contract AccountVerify1271Test is BaseSepoliaForkTest {
-    using UserOperationLib for UserOperation;
+    using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
     DaimoVerifier public verifier;

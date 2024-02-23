@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.12;
 
-import "openzeppelin-contracts/contracts/interfaces/IERC1271.sol";
-
+import {IERC1271} from "openzeppelin-contracts/contracts/interfaces/IERC1271.sol";
+import {UUPSUpgradeable} from "openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {Initializable} from "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 import "account-abstraction/core/Helpers.sol";
 import "account-abstraction/interfaces/IAccount.sol";
 import "account-abstraction/interfaces/IEntryPoint.sol";
-
 import "p256-verifier/WebAuthn.sol";
-
-import "./DaimoVerifier.sol";
+import {DaimoVerifier, Signature} from "./DaimoVerifier.sol";
 
 /**
  * Daimo ERC-4337 contract account.
@@ -118,7 +117,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     //                     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
     //
     /// ERC4337: validate userop by verifying a P256 signature.
-    function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
+    function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
         external
         virtual
         override
@@ -167,7 +166,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     }
 
     /// Validate userop by verifying a Daimo account signature.
-    function _validateUseropSignature(UserOperation calldata userOp, bytes32 userOpHash)
+    function _validateUseropSignature(PackedUserOperation calldata userOp, bytes32 userOpHash)
         private
         view
         returns (uint256 validationData)

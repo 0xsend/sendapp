@@ -4,21 +4,18 @@ pragma solidity ^0.8.20;
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SendMerkleDrop is Ownable {
     using SafeERC20 for IERC20;
-    using SafeMath for uint256;
 
     /**
      *
      * + Constructor          +
      *
      */
-    constructor(IERC20 _token, address _owner) {
+    constructor(IERC20 _token, address _owner) Ownable(_owner) {
         token = _token;
-        transferOwnership(_owner);
     }
 
     /**
@@ -56,7 +53,7 @@ contract SendMerkleDrop is Ownable {
         trancheAmounts[trancheId] = _amount;
         trancheAmountsClaimed[trancheId] = 0;
 
-        trancheCursor = trancheCursor.add(1);
+        trancheCursor = trancheCursor + 1;
 
         emit TrancheAdded(trancheId, _merkleRoot, _amount);
     }
@@ -65,8 +62,8 @@ contract SendMerkleDrop is Ownable {
         bytes32 merkleRoot = merkleRoots[_trancheId];
         require(merkleRoot != bytes32(0), "Tranche has already been expired");
         merkleRoots[_trancheId] = bytes32(0);
-        if (trancheAmounts[_trancheId].sub(trancheAmountsClaimed[_trancheId]) > 0) {
-            token.safeTransfer(msg.sender, trancheAmounts[_trancheId].sub(trancheAmountsClaimed[_trancheId]));
+        if (trancheAmounts[_trancheId] - trancheAmountsClaimed[_trancheId] > 0) {
+            token.safeTransfer(msg.sender, trancheAmounts[_trancheId] - trancheAmountsClaimed[_trancheId]);
         }
         emit TrancheExpired(_trancheId);
     }
@@ -112,7 +109,7 @@ contract SendMerkleDrop is Ownable {
         for (uint256 i = 0; i < len; i++) {
             _claimTranche(_address, _tranches[i], _indexes[i], _amounts[i], _merkleProofs[i]);
 
-            totalAmount = totalAmount.add(_amounts[i]);
+            totalAmount = totalAmount - _amounts[i];
         }
 
         _disburse(_address, totalAmount);
@@ -172,7 +169,7 @@ contract SendMerkleDrop is Ownable {
         require(!isClaimed(_tranche, _index), "Address has already claimed");
 
         require(_verifyClaim(_address, _tranche, _index, _amount, _merkleProof), "Incorrect merkle proof");
-        trancheAmountsClaimed[_tranche] = trancheAmountsClaimed[_tranche].add(_amount);
+        trancheAmountsClaimed[_tranche] = trancheAmountsClaimed[_tranche] + _amount;
         _setClaimed(_tranche, _index);
 
         emit Claimed(_address, _tranche, _amount);
