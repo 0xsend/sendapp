@@ -73,7 +73,7 @@ abstract contract Helper is Script {
      * Send Account Factory
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_ACCOUNT_FACTORY = 0xDC05a26aF432489D9B78D14408ec434409E07bE3;
+    address constant SEND_ACCOUNT_FACTORY = 0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0;
     /**
      *
      * Account-Abstraction (EIP-4337) v0.6.0 singleton EntryPoint implementation.

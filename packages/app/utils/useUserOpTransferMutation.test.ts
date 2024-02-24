@@ -8,8 +8,10 @@ import { describe, test } from '@jest/globals'
 import { act } from '@testing-library/react-native'
 import { baseMainnetBundlerClient, daimoAccountAbi } from '@my/wagmi'
 import { signUserOp } from './userop'
-import { encodeFunctionData, erc20Abi, isAddress } from 'viem'
+import { encodeFunctionData, erc20Abi, isAddress, slice } from 'viem'
+
 import { assert } from './assert'
+
 jest.mock('./userop', () => ({
   signUserOp: jest.fn(),
 }))
@@ -47,7 +49,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 1n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -91,7 +93,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
       const callData = encodeFunctionData({
@@ -111,17 +113,20 @@ describe('useUserOpTransferMutation', () => {
         userOperation: {
           sender: args.sender,
           nonce: args.nonce,
-          initCode: args.initCode,
+          factory: slice(args.initCode, 0, 20),
+          factoryData: slice(args.initCode, 20),
           callData,
           callGasLimit: 300000n,
           verificationGasLimit: 700000n,
           preVerificationGas: 300000n,
           maxFeePerGas: 1000000n,
           maxPriorityFeePerGas: 1000000n,
-          paymasterAndData: '0x',
+          paymaster: undefined,
+          paymasterData: undefined,
+          paymasterPostOpGasLimit: undefined,
+          paymasterVerificationGasLimit: undefined,
           signature: '0x123',
         },
-        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
       })
       return Promise.resolve('0x123')
     })
@@ -151,7 +156,7 @@ describe('useUserOpTransferMutation', () => {
       token: `0x${'3'.repeat(40)}`,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
       assert(!!args.token && isAddress(args.token), 'Invalid token address')
@@ -176,17 +181,20 @@ describe('useUserOpTransferMutation', () => {
         userOperation: {
           sender: args.sender,
           nonce: args.nonce,
-          initCode: args.initCode,
+          factory: slice(args.initCode, 0, 20),
+          factoryData: slice(args.initCode, 20),
           callData,
           callGasLimit: 300000n,
           verificationGasLimit: 700000n,
           preVerificationGas: 300000n,
           maxFeePerGas: 1000000n,
           maxPriorityFeePerGas: 1000000n,
-          paymasterAndData: '0x',
+          paymaster: undefined,
+          paymasterData: undefined,
+          paymasterPostOpGasLimit: undefined,
+          paymasterVerificationGasLimit: undefined,
           signature: '0x123',
         },
-        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
       })
       return Promise.resolve('0x123')
     })
@@ -217,7 +225,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 1,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -237,7 +245,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: -1n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -258,7 +266,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -278,7 +286,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -298,7 +306,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -318,7 +326,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(39)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -359,7 +367,7 @@ describe('useUserOpTransferMutation', () => {
       token: `0x${'3'.repeat(39)}`,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,
@@ -379,7 +387,7 @@ describe('useUserOpTransferMutation', () => {
       token: undefined,
       to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
     } as UseUserOpTransferMutationArgs
     const { result } = renderHook(() => useUserOpTransferMutation(), {
       wrapper: Wrapper,

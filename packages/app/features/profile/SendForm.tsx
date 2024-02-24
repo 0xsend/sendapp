@@ -117,7 +117,7 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         }}
         renderAfter={({ submit }) =>
           sentUserOpTxHash ? (
-            <Link href={`${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`}>
+            <Link href={`${baseMainnet.blockExplorers.default.url}tx/${sentUserOpTxHash}`}>
               <Button>
                 <Button.Text>View on {baseMainnet.blockExplorers.default.name}</Button.Text>
               </Button>

@@ -1,5 +1,8 @@
 export * from './generated'
-export * from './constants'
+export {
+  entryPointSimulationsBytecode,
+  SEND_SNAPSHOT_1,
+} from './constants'
 export {
   mainnet,
   baseMainnet,

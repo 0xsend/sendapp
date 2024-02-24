@@ -119,12 +119,12 @@ export default defineConfig({
     {
       name: 'EntryPoint',
       address: {
-        [mainnet.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-        [localhost.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-        [stagingMainnet.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-        [baseLocal.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-        [base.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-        [baseSepolia.id]: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+        [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+        [localhost.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+        [stagingMainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+        [baseLocal.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+        [base.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+        [baseSepolia.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
       },
       abi: iEntryPointAbi,
     },
@@ -133,7 +133,7 @@ export default defineConfig({
     foundry({
       project: '../contracts',
       deployments: {
-        Send: {
+        SendToken: {
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
@@ -148,7 +148,13 @@ export default defineConfig({
         },
         ...deployments,
       },
-      include: ['Send*.sol/*', 'Daimo*.sol/*', 'ERC*.sol/*', 'IEntryPoint*.sol/*'],
+      include: [
+        'Send*.sol/*',
+        'Daimo*.sol/*',
+        'ERC*.sol/*',
+        'IEntryPoint*.sol/*',
+        'EntryPointSimulations.sol/*',
+      ],
       exclude: [
         'Common.sol/**',
         'Components.sol/**',
@@ -168,6 +174,7 @@ export default defineConfig({
         '**.s.sol/*.json',
         '**.t.sol/*.json',
         'DaimoPaymaster.sol/**', // avoid duplicate IMetaPaymaster
+        'DummyEntryPointSimulations.sol/**', // avoid dummies
       ],
     }),
     actions({

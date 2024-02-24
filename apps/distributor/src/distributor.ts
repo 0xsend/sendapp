@@ -1,6 +1,6 @@
 import { cpus } from 'os'
 import { Database, Functions, Tables } from '@my/supabase/database.types'
-import { sendAbi as sendTokenAbi, sendAddress as sendTokenAddress } from '@my/wagmi'
+import { sendTokenAbi, sendTokenAddress } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
 import { LRUCache } from 'lru-cache'
 import type { Logger } from 'pino'
@@ -339,17 +339,11 @@ export class DistributorWorker {
       address: sendTokenAddress[client.chain.id],
       client,
     })
+
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
       return await Promise.all(
         addresses.map(async ({ user_id, address }) => {
-          // use snapshot id if available
-          const balance =
-            distribution.snapshot_id !== null
-              ? await sendTokenContract.read.balanceOfAt([
-                  address as `0x${string}`,
-                  BigInt(distribution.snapshot_id),
-                ])
-              : await sendTokenContract.read.balanceOf([address as `0x${string}`])
+          const balance = await sendTokenContract.read.balanceOf([address as `0x${string}`])
           return {
             user_id,
             address: address as `0x${string}`,

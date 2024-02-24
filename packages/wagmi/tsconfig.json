@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "ESNext",
-    "target": "es2022"
+    "target": "es2022",
+    "resolveJsonModule": true
   },
   "include": ["src", "wagmi.config.ts"]
 }

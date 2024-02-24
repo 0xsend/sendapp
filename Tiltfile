@@ -394,12 +394,12 @@ local_resource(
         -v ./etc/aa-bundler:/app/etc/aa-bundler \
         -e "DEBUG=aa*" \
         -e "DEBUG_COLORS=true" \
-        0xbigboss/bundler \
+        docker.io/0xbigboss/bundler:0.7.0 \
         --port 3030 \
         --config /app/etc/aa-bundler/aa-bundler.config.json \
         --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --network http://host.docker.internal:8546 \
-        --entryPoint 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789 \
+        --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
     """,
@@ -490,6 +490,7 @@ local_resource(
 local_resource(
     "distributor:web",
     allow_parallel = True,
+    auto_init = False,  # @todo fix the test so it doesn't require so much block history
     labels = labels,
     links = ["http://localhost:3050"],
     readiness_probe = probe(
@@ -628,6 +629,7 @@ local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
+    auto_init = False,  # @todo fix the test so it doesn't require so much block history
     labels = labels,
     resource_deps = [
         "yarn:install",
