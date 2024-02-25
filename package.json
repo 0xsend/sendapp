@@ -1,11 +1,7 @@
 {
   "name": "sendapp",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "supabase"
-  ],
+  "workspaces": ["apps/*", "packages/*", "supabase"],
   "scripts": {
     "vercel:install": "yarn set version berry && yarn install",
     "native": "cd apps/expo && yarn start",
@@ -15,7 +11,7 @@
     "web:prod": "yarn workspace next-app build",
     "web:prod:serve": "yarn workspace next-app serve",
     "fix": "manypkg fix",
-    "postinstall": "yarn check-deps && yarn build",
+    "postinstall": "test -n \"$YARN_SKIP_POST_INSTALL\" || (yarn check-deps && yarn build)",
     "build": "yarn workspaces foreach --all --exclude next-app run build",
     "biome:check": "biome check .",
     "biome:check:fix": "biome check . --apply",

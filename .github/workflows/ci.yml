@@ -24,6 +24,7 @@ jobs:
           install-bun: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+          YARN_SKIP_POST_INSTALL: 1
 
   ci:
     runs-on: ubuntu-latest
