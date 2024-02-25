@@ -128,13 +128,13 @@ jobs:
           branch="${branch%-}"            # Remove trailing hyphen, if any
           branch="${branch#-}"            # Remove leading hyphen, if any
           echo "branch=${branch}" >> $GITHUB_OUTPUT
-          echo "public_url=https://sendapp-${branch}-0xsend.vercel.app" >> $GITHUB_OUTPUT
+          echo "public_hostname=https://sendapp-${branch}-0xsend.vercel.app" >> $GITHUB_OUTPUT
       - name: Vercel Deploy
         id: deploy
         uses: ./.github/actions/vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          public-url: ${{ steps.extract_branch.outputs.public_url }}
+          public-hostname: ${{ steps.extract_branch.outputs.public_public_hostname }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -143,4 +143,4 @@ jobs:
           message-id: vercel-preview-url
           message: |
             Vercel Unique URL: [${{ steps.deploy.outputs.deployment_url }}](${{ steps.deploy.outputs.deployment_url }})
-            Vercel Preview URL: [${{ steps.extract_branch.outputs.public_url }}](${{ steps.extract_branch.outputs.public_url }})
+            Vercel Preview URL: [${{ steps.extract_branch.outputs.public_hostname }}](https://${{ steps.extract_branch.outputs.public_hostname }}/)

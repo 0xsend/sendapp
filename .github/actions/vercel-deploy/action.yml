@@ -4,8 +4,8 @@ inputs:
   vercel-token:
     description: "The Vercel token to use for deployment."
     required: true
-  public-url:
-    description: "The public URL to use for the deployment."
+  public-hostname:
+    description: "The public hostname alias to use for the deployment."
     required: false
     default: ""
 outputs:
@@ -35,8 +35,8 @@ runs:
         echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
         echo ::notice::Deployment URL: $(cat deployment-url.txt)
     - name: Set Vercel Branch Alias
-      if: ${{ inputs.public-url != '' }}
+      if: ${{ inputs.public-hostname != '' }}
       shell: bash
       run: |
-        bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-url }}
-        echo ::notice:: Vercel Alias URL ${{ inputs.public-url }}
+        bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-hostname }}
+        echo ::notice:: Vercel Alias URL https://${{ inputs.public-hostname }}/
