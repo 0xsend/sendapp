@@ -11,7 +11,7 @@
     "web:prod": "yarn workspace next-app build",
     "web:prod:serve": "yarn workspace next-app serve",
     "fix": "manypkg fix",
-    "postinstall": "test -n \"$YARN_SKIP_POST_INSTALL\" || (yarn check-deps && yarn build)",
+    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && yarn build)",
     "build": "yarn workspaces foreach --all --exclude next-app run build",
     "biome:check": "biome check .",
     "biome:check:fix": "biome check . --apply",

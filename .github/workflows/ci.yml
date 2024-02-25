@@ -24,7 +24,7 @@ jobs:
           install-bun: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-          YARN_SKIP_POST_INSTALL: 1
+          SKIP_YARN_POST_INSTALL: 1
 
   ci:
     runs-on: ubuntu-latest
@@ -89,6 +89,7 @@ jobs:
           path: packages/playwright/playwright-report/
           retention-days: 30
 
+  # @todo create supabase branch https://supabase.com/docs/reference/cli/supabase-branches-update
   vercel-deploy-preview:
     # skip if on dev since it will be deployed with another workflow
     if: github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main'
