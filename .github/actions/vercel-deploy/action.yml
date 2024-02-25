@@ -1,0 +1,42 @@
+name: "Deploy Vercel"
+description: "Deploy the project to Vercel. Pulls environment information, builds the project, and deploys it to Vercel. Sets the Vercel alias."
+inputs:
+  vercel-token:
+    description: "The Vercel token to use for deployment."
+    required: true
+  public-hostname:
+    description: "The public hostname alias to use for the deployment."
+    required: false
+    default: ""
+outputs:
+  deployment-url:
+    description: "The URL of the deployment."
+    value: ${{ steps.deploy.outputs.deployment_url }}
+runs:
+  using: "composite"
+  steps:
+    - name: Mask Vercel Token
+      shell: bash
+      run: echo "::add-mask::${{ inputs.vercel-token }}"
+    - name: Switch to Vercel Send team
+      shell: bash
+      run: bunx vercel --token=${{ inputs.vercel-token }} team switch 0xsend
+    - name: Pull Vercel Environment Information
+      shell: bash
+      run: bunx vercel --token=${{ inputs.vercel-token }} pull --yes --environment=preview
+    - name: Build Project Artifacts
+      shell: bash
+      run: bunx vercel --token=${{ inputs.vercel-token }} build
+    - name: Deploy Project Artifacts to Vercel
+      id: deploy
+      shell: bash
+      run: |
+        bunx vercel --token=${{ inputs.vercel-token }} deploy --prebuilt > deployment-url.txt
+        echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+        echo ::notice::Deployment URL: $(cat deployment-url.txt)
+    - name: Set Vercel Branch Alias
+      if: ${{ inputs.public-hostname != '' }}
+      shell: bash
+      run: |
+        bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-hostname }}
+        echo ::notice::Vercel Alias URL https://${{ inputs.public-hostname }}/
