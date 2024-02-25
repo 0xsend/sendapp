@@ -7,7 +7,7 @@ import { Hex, formatUnits, parseUnits, isAddress, isHex } from 'viem'
 import { baseMainnet, usdcAddress as usdcAddresses } from '@my/wagmi'
 import { useState } from 'react'
 import { ProfileProp } from './SendDialog'
-import { useBalance, useChainId, useTransactionCount } from 'wagmi'
+import { useBalance, useTransactionCount } from 'wagmi'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountInitCode } from 'app/utils/useSendAccountInitCode'
 import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
@@ -21,7 +21,6 @@ const SendFormSchema = z.object({
 })
 
 export function SendForm({ profile }: { profile: ProfileProp }) {
-  const chainId = useChainId()
   const toast = useToastController()
   const form = useForm<z.infer<typeof SendFormSchema>>()
   const { data: sendAccounts } = useSendAccounts()
@@ -105,7 +104,7 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
           token: {
             options: [
               { name: 'ETH', value: '' },
-              { name: 'USDC', value: usdcAddresses[chainId] },
+              { name: 'USDC', value: usdcAddresses[baseMainnet.id] },
             ],
           },
         }}

@@ -490,7 +490,6 @@ local_resource(
 local_resource(
     "distributor:web",
     allow_parallel = True,
-    auto_init = False,  # @todo fix the test so it doesn't require so much block history
     labels = labels,
     links = ["http://localhost:3050"],
     readiness_probe = probe(
@@ -629,7 +628,6 @@ local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
-    auto_init = False,  # @todo fix the test so it doesn't require so much block history
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -679,10 +677,9 @@ local_resource(
         "app:test",
         "lint",
         "webauthn-authenticator:test",
-        "distributor:test",
         "supabase:test",
         "contracts:test",
         "next:web",
-    ],
+    ] + (["distributor:test"] if not CI else []),
 )
 

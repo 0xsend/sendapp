@@ -1,6 +1,7 @@
 import { Tables, Views } from '@my/supabase/database.types'
 import {
-  sendAddress,
+  mainnet,
+  sendTokenAddress,
   sendAirdropsSafeAddress,
   sendMerkleDropAbi,
   sendMerkleDropAddress,
@@ -75,10 +76,9 @@ export const useActiveDistribution = () => {
 }
 
 export const useSendTokenBalance = (address?: `0x${string}`) => {
-  const chainId = useChainId() as keyof typeof sendAddress
   return useBalance({
     address,
-    token: sendAddress[chainId],
+    token: sendTokenAddress[mainnet.id],
     query: {
       enabled: !!address,
     },
@@ -119,11 +119,10 @@ export const useSendSellCountDuringDistribution = (
  * @returns Whether the tranche is active.
  */
 export const useSendMerkleDropTrancheActive = (tranche: bigint) => {
-  const chainId = useChainId() as keyof typeof sendMerkleDropAddress
   return useReadContract({
     abi: sendMerkleDropAbi,
     functionName: 'trancheActive',
-    address: sendMerkleDropAddress[chainId],
+    address: sendMerkleDropAddress[mainnet.id],
     args: [tranche],
   })
 }
@@ -134,11 +133,10 @@ export const useSendMerkleDropTrancheActive = (tranche: bigint) => {
  * @returns Whether the claim has been claimed by the user.
  */
 export const useSendMerkleDropIsClaimed = (tranche: bigint, index?: bigint) => {
-  const chainId = useChainId() as keyof typeof sendMerkleDropAddress
   return useReadContract({
     abi: sendMerkleDropAbi,
     functionName: 'isClaimed',
-    address: sendMerkleDropAddress[chainId],
+    address: sendMerkleDropAddress[mainnet.id],
     // biome-ignore lint/style/noNonNullAssertion: we know index is defined when enabled is true
     args: [tranche, index!],
     query: {
@@ -157,7 +155,6 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
   share,
 }: SendMerkleDropClaimTrancheArgs) => {
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
-  const chainId = useChainId() as keyof typeof sendMerkleDropAddress
   // get the merkle proof from the database
   const {
     data: merkleProof,
@@ -200,8 +197,8 @@ export const usePrepareSendMerkleDropClaimTrancheWrite = ({
   return useSimulateContract({
     abi: sendMerkleDropAbi,
     functionName: 'claimTranche',
-    chainId,
-    address: sendMerkleDropAddress[chainId],
+    chainId: mainnet.id,
+    address: sendMerkleDropAddress[mainnet.id],
     account: address,
     query: {
       enabled,

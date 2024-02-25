@@ -1,12 +1,10 @@
-import { sendAbi, sendAddress } from '@my/wagmi'
-import { useBalance, useChainId, useContractRead } from 'wagmi'
+import { mainnet, sendTokenAddress } from '@my/wagmi'
+import { useBalance, useReadContract } from 'wagmi'
 
 export const useSendBalance = (address?: `0x${string}`) => {
-  const chainId = useChainId() as keyof typeof sendAddress
   return useBalance({
-    watch: true,
     address,
-    token: sendAddress[chainId],
+    token: sendTokenAddress[mainnet.id],
   })
 }
 
@@ -17,13 +15,25 @@ export const useSendBalanceOfAt = ({
   address?: `0x${string}`
   snapshot?: bigint
 }) => {
-  const chainId = useChainId() as keyof typeof sendAddress
-  return useContractRead({
-    abi: sendAbi,
+  return useReadContract({
+    abi: [
+      {
+        type: 'function',
+        inputs: [
+          { name: 'account', internalType: 'address', type: 'address' },
+          { name: 'snapshotId', internalType: 'uint256', type: 'uint256' },
+        ],
+        name: 'balanceOfAt',
+        outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+        stateMutability: 'view',
+      },
+    ],
     functionName: 'balanceOfAt',
-    address: sendAddress[chainId],
+    address: sendTokenAddress[mainnet.id],
     // biome-ignore lint/style/noNonNullAssertion: we know address and snapshot are defined when enabled is true
     args: [address!, snapshot!],
-    enabled: !!address && !!snapshot,
+    query: {
+      enabled: !!address && !!snapshot,
+    },
   })
 }
