@@ -11,9 +11,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
+  cache-deps:
     runs-on: ubuntu-latest
 
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Brew Bundle
+        id: brew-bundle
+        run: |
+          brew bundle
+          brew cleanup
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+
+  ci:
+    runs-on: ubuntu-latest
+    needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -34,16 +52,8 @@ jobs:
         run: |
           brew bundle
           brew cleanup
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: 'yarn'
-      - uses: oven-sh/setup-bun@v1
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
       - name: Tilt CI
         shell: bash
         run: tilt ci unit-tests:tests
@@ -85,35 +95,25 @@ jobs:
     # skip if on dev since it will be deployed with another workflow
     if: github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
+    needs: [cache-deps]
 
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      YARN_ENABLE_HARDENED_MODE: 0
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: 'yarn'
-      - uses: oven-sh/setup-bun@v1
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-      - name: Yarn Install
-        run: yarn install --immutable
-      - name: Install Vercel CLI
-        run: yarn global add vercel
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
       - name: Switch to Vercel Send team
-        run: vercel --token=${{ secrets.VERCEL_TOKEN }}  team switch 0xsend
+        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }}  team switch 0xsend
       - name: Pull Vercel Environment Information
-        run: vercel --token=${{ secrets.VERCEL_TOKEN }} pull --yes --environment=preview
+        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }} pull --yes --environment=preview
       - name: Build Project Artifacts
-        run: vercel --token=${{ secrets.VERCEL_TOKEN }} build
+        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }} build
       - name: Extract branch name
         shell: bash
         run: |
@@ -136,4 +136,4 @@ jobs:
             echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
           echo ::notice::Deployment URL: $(cat deployment-url.txt)
       - name: Set Vercel alias
-        run: vercel --token=${{ secrets.VERCEL_TOKEN }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ steps.extract_branch.outputs.public_url }}
+        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ steps.extract_branch.outputs.public_url }}
