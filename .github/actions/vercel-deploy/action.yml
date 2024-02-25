@@ -22,7 +22,7 @@ runs:
       run: bunx vercel --token=${{ inputs.vercel-token }} pull --yes --environment=preview
     - name: Build Project Artifacts
       shell: bash
-      run: yarn build && bunx vercel --token=${{ inputs.vercel-token }} build
+      run: bunx vercel --token=${{ inputs.vercel-token }} build
     - name: Extract branch name
       shell: bash
       run: |
