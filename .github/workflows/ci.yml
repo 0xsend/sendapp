@@ -142,5 +142,5 @@ jobs:
         with:
           message-id: vercel-preview-url
           message: |
-            Vercel Unique URL: [${{ steps.deploy.outputs.deployment_url }}](${{ steps.deploy.outputs.deployment_url }})
+            Vercel Unique URL: [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.extract_branch.outputs.public_hostname }}](https://${{ steps.extract_branch.outputs.public_hostname }}/)
