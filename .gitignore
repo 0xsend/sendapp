@@ -59,10 +59,5 @@ tmp
 
 .parcel-cache
 
-# Foundry stuff
-cache/
-out/
-broadcast
-
 # ignore for now
 Brewfile.lock.json
