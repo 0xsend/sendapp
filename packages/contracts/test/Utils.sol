@@ -4,14 +4,14 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
-import "../src/DaimoAccount.sol";
-import "../src/DaimoVerifier.sol";
+import {DaimoAccount} from "../src/DaimoAccount.sol";
+import {DaimoVerifier, Signature} from "../src/DaimoVerifier.sol";
 import "p256-verifier/utils/Base64URL.sol";
 
 library Utils {
     function rawSignatureToSignature(bytes memory challenge, uint256 r, uint256 s)
         public
-        view
+        pure
         returns (Signature memory)
     {
         string memory challengeb64url = Base64URL.encode(challenge);

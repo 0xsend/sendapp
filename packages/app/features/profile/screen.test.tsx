@@ -1,7 +1,7 @@
 import { test } from '@jest/globals'
 import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, screen, act, userEvent } from '@testing-library/react-native'
+import { render, screen, act } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const queryClient = new QueryClient()
@@ -52,6 +52,9 @@ jest.mock('@my/wagmi', () => {
     baseMainnetClient: {
       transport: {
         url: 'http://127.0.0.1',
+      },
+      chain: {
+        id: 845337,
       },
     },
     baseMainnetBundlerClient: {

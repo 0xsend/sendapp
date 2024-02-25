@@ -4,6 +4,7 @@ pragma solidity ^0.8.12;
 import "openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {ERC1967Utils} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 import "p256-verifier/WebAuthn.sol";
 
@@ -43,7 +44,11 @@ contract DaimoVerifier is OwnableUpgradeable, UUPSUpgradeable {
 
     /// UUPSUpgradeable: expose implementation
     function implementation() public view returns (address) {
-        return _getImplementation();
+        return ERC1967Utils.getImplementation();
+    }
+
+    function upgradeTo(address newImplementation) public {
+        upgradeToAndCall(newImplementation, bytes(""));
     }
 
     function verifySignature(bytes memory message, bytes calldata signature, uint256 x, uint256 y)

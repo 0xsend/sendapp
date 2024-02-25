@@ -24,7 +24,7 @@ const PROFILE = {
 jest.mock('app/utils/useUserOpTransferMutation')
 jest.mock('app/utils/useSendAccountInitCode', () => ({
   useSendAccountInitCode: jest.fn().mockReturnValue({
-    data: '0x123',
+    data: `0x${'3'.repeat(60)}`,
     isSuccess: true,
     isPending: false,
     error: null,
@@ -114,7 +114,7 @@ describe('SendDialog', () => {
       token: '',
       amount: 3500000000000000000n,
       to: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
-      initCode: '0x123',
+      initCode: `0x${'3'.repeat(60)}`,
       nonce: 0n,
     })
   })

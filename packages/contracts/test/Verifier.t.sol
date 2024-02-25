@@ -6,6 +6,7 @@ import "openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import "../src/DaimoVerifier.sol";
 import "./Utils.sol";
+import {ERC1967Utils} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 // Does nothing. Used to test upgradability.
 contract VerifierBrick {
@@ -26,6 +27,10 @@ contract UpgradeableVerifierBrick is UUPSUpgradeable, OwnableUpgradeable {
     /// UUPSUpsgradeable: only allow owner to upgrade
     function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
         (newImplementation); // No-op; silence unused parameter warning
+    }
+
+    function upgradeTo(address newImplementation) public {
+        upgradeToAndCall(newImplementation, bytes(""));
     }
 
     function verifySignature(bytes memory message, bytes calldata signature, uint256 x, uint256 y)
@@ -94,13 +99,13 @@ contract VerifierTest is BaseSepoliaForkTest {
         assertEq(verifier.owner(), newOwner);
 
         // Old owner can't upgrade
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, initOwner));
         vm.prank(initOwner);
-        verifier.upgradeTo(address(0x123));
+        verifier.upgradeToAndCall(address(0x123), bytes(""));
 
         // Using new owner, try bricking the contract. Can't, not UUPS.
         VerifierBrick brick = new VerifierBrick();
-        vm.expectRevert("ERC1967Upgrade: new implementation is not UUPS");
+        vm.expectRevert(abi.encodeWithSelector(ERC1967Utils.ERC1967InvalidImplementation.selector, address(brick)));
         vm.prank(newOwner);
         verifier.upgradeTo(address(brick));
 

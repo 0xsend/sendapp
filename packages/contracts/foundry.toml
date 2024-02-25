@@ -4,7 +4,7 @@ test = "test"
 out = "out"
 libs = ["lib"]
 ffi = true
-solc_version = "0.8.21"
+solc_version = "0.8.23"
 optimizer = true
 optimizer_runs = 999_999
 
@@ -14,11 +14,11 @@ via_ir = true
 [profile.mainnet]
 evm_version = "shanghai"
 # should be updated after releases
-fork_block_number = 19136812
+fork_block_number = 19299339
 
 [profile.base]
 # should be updated after releases
-fork_block_number = 10020254
+fork_block_number = 11005692
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 

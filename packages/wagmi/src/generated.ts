@@ -28,6 +28,13 @@ export const daimoAccountAbi = [
   { type: 'receive', stateMutability: 'payable' },
   {
     type: 'function',
+    inputs: [],
+    name: 'UPGRADE_INTERFACE_VERSION',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [
       { name: 'slot', internalType: 'uint8', type: 'uint8' },
       { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
@@ -162,13 +169,6 @@ export const daimoAccountAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'newImplementation', internalType: 'address', type: 'address' }],
-    name: 'upgradeTo',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
     inputs: [
       { name: 'newImplementation', internalType: 'address', type: 'address' },
       { name: 'data', internalType: 'bytes', type: 'bytes' },
@@ -182,18 +182,16 @@ export const daimoAccountAbi = [
     inputs: [
       {
         name: 'userOp',
-        internalType: 'struct UserOperation',
+        internalType: 'struct PackedUserOperation',
         type: 'tuple',
         components: [
           { name: 'sender', internalType: 'address', type: 'address' },
           { name: 'nonce', internalType: 'uint256', type: 'uint256' },
           { name: 'initCode', internalType: 'bytes', type: 'bytes' },
           { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
           { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
           { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
           { name: 'signature', internalType: 'bytes', type: 'bytes' },
         ],
@@ -223,22 +221,7 @@ export const daimoAccountAbi = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [
-      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
-      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'AdminChanged',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
-    name: 'BeaconUpgraded',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
     name: 'Initialized',
   },
   {
@@ -266,6 +249,26 @@ export const daimoAccountAbi = [
     anonymous: false,
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  { type: 'error', inputs: [], name: 'InvalidInitialization' },
+  { type: 'error', inputs: [], name: 'NotInitializing' },
+  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
+  {
+    type: 'error',
+    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'UUPSUnsupportedProxiableUUID',
   },
 ] as const
 
@@ -354,7 +357,7 @@ export const daimoAccountFactoryAbi = [
  *
  */
 export const daimoAccountFactoryAddress = {
-  845337: '0x754ADB349777994F666A788a6bbE4B9DDEBED6A8',
+  845337: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
 } as const
 
 /**
@@ -366,546 +369,6 @@ export const daimoAccountFactoryConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoEphemeralNotes
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const daimoEphemeralNotesAbi = [
-  {
-    type: 'constructor',
-    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
-      { name: '_signature', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'claimNote',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
-      { name: '_amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'createNote',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'notes',
-    outputs: [
-      { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'token',
-    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'note',
-        internalType: 'struct Note',
-        type: 'tuple',
-        components: [
-          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
-          { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
-        ],
-        indexed: false,
-      },
-    ],
-    name: 'NoteCreated',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'note',
-        internalType: 'struct Note',
-        type: 'tuple',
-        components: [
-          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
-          { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
-        ],
-        indexed: false,
-      },
-      { name: 'redeemer', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'NoteRedeemed',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoEphemeralNotesV2
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const daimoEphemeralNotesV2Abi = [
-  {
-    type: 'constructor',
-    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
-      { name: 'recipient', internalType: 'address', type: 'address' },
-      { name: '_signature', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'claimNoteRecipient',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_ephemeralOwner', internalType: 'address', type: 'address' }],
-    name: 'claimNoteSelf',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
-      { name: '_amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'createNote',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'notes',
-    outputs: [
-      { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'token',
-    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'note',
-        internalType: 'struct Note',
-        type: 'tuple',
-        components: [
-          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
-          { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
-        ],
-        indexed: false,
-      },
-    ],
-    name: 'NoteCreated',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'note',
-        internalType: 'struct Note',
-        type: 'tuple',
-        components: [
-          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
-          { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
-        ],
-        indexed: false,
-      },
-      { name: 'redeemer', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'NoteRedeemed',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoNameRegistry
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const daimoNameRegistryAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'addr', internalType: 'address', type: 'address' },
-    ],
-    name: 'forceRegister',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'implementation',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'initialOwner', internalType: 'address', type: 'address' }],
-    name: 'init',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'proxiableUUID',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'name', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'addr', internalType: 'address', type: 'address' },
-    ],
-    name: 'register',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'registerSelf',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'name', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'resolveAddr',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'addr', internalType: 'address', type: 'address' }],
-    name: 'resolveName',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newImplementation', internalType: 'address', type: 'address' }],
-    name: 'upgradeTo',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'newImplementation', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'upgradeToAndCall',
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
-      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'AdminChanged',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
-    name: 'BeaconUpgraded',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
-    name: 'Initialized',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
-    ],
-    name: 'OwnershipTransferred',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'name', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      { name: 'addr', internalType: 'address', type: 'address', indexed: true },
-    ],
-    name: 'Registered',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
-    name: 'Upgraded',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoNameRegistryProxy
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const daimoNameRegistryProxyAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: '_logic', internalType: 'address', type: 'address' },
-      { name: '_data', internalType: 'bytes', type: 'bytes' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  { type: 'fallback', stateMutability: 'payable' },
-  { type: 'receive', stateMutability: 'payable' },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
-      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'AdminChanged',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
-    name: 'BeaconUpgraded',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
-    name: 'Upgraded',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoPaymasterV2
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const daimoPaymasterV2Abi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
-      { name: '_owner', internalType: 'address', type: 'address' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
-    name: 'addStake',
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'bundlerWhitelist',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view',
-  },
-  { type: 'function', inputs: [], name: 'deposit', outputs: [], stateMutability: 'payable' },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'entryPoint',
-    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getDeposit',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'metaPaymaster',
-    outputs: [{ name: '', internalType: 'contract IMetaPaymaster', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'mode', internalType: 'enum IPaymaster.PostOpMode', type: 'uint8' },
-      { name: 'context', internalType: 'bytes', type: 'bytes' },
-      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'postOp',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'addresses', internalType: 'address[]', type: 'address[]' },
-      { name: 'isWhitelisted', internalType: 'bool', type: 'bool' },
-    ],
-    name: 'setBundlerWhitelist',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_metaPaymaster', internalType: 'contract IMetaPaymaster', type: 'address' }],
-    name: 'setMetaPaymaster',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'userOp',
-        internalType: 'struct UserOperation',
-        type: 'tuple',
-        components: [
-          { name: 'sender', internalType: 'address', type: 'address' },
-          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
-          { name: 'signature', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'maxCost', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'validatePaymasterUserOp',
-    outputs: [
-      { name: 'context', internalType: 'bytes', type: 'bytes' },
-      { name: 'validationData', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
-    name: 'withdrawStake',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'withdrawTo',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
-    ],
-    name: 'OwnershipTransferred',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      { name: 'requiredPreFund', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'UserOperationSponsored',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoVerifier
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -914,6 +377,13 @@ export const daimoPaymasterV2Abi = [
  */
 export const daimoVerifierAbi = [
   { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'UPGRADE_INTERFACE_VERSION',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
   {
     type: 'function',
     inputs: [],
@@ -988,22 +458,7 @@ export const daimoVerifierAbi = [
   {
     type: 'event',
     anonymous: false,
-    inputs: [
-      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
-      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'AdminChanged',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
-    name: 'BeaconUpgraded',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
+    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
     name: 'Initialized',
   },
   {
@@ -1021,13 +476,43 @@ export const daimoVerifierAbi = [
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
   },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  { type: 'error', inputs: [], name: 'InvalidInitialization' },
+  { type: 'error', inputs: [], name: 'NotInitializing' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
+  {
+    type: 'error',
+    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'UUPSUnsupportedProxiableUUID',
+  },
 ] as const
 
 /**
  *
  */
 export const daimoVerifierAddress = {
-  845337: '0x63637Dd8e9586eA50a28b117bc9ce9E5f17984a2',
+  845337: '0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F',
 } as const
 
 /**
@@ -1052,35 +537,31 @@ export const daimoVerifierProxyAbi = [
     stateMutability: 'nonpayable',
   },
   { type: 'fallback', stateMutability: 'payable' },
-  { type: 'receive', stateMutability: 'payable' },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
-      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'AdminChanged',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
-    name: 'BeaconUpgraded',
-  },
   {
     type: 'event',
     anonymous: false,
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
   },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
 ] as const
 
 /**
  *
  */
 export const daimoVerifierProxyAddress = {
-  845337: '0x5F0Fd3e14e41E31890BeE3740A14e51A23129706',
+  845337: '0xdAAb03239f5CC5b3452837E557295F790D9ab319',
 } as const
 
 /**
@@ -1092,6 +573,20 @@ export const daimoVerifierProxyConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC165
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc165Abi = [
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Proxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1099,41 +594,37 @@ export const erc1967ProxyAbi = [
   {
     type: 'constructor',
     inputs: [
-      { name: '_logic', internalType: 'address', type: 'address' },
+      { name: 'implementation', internalType: 'address', type: 'address' },
       { name: '_data', internalType: 'bytes', type: 'bytes' },
     ],
     stateMutability: 'payable',
   },
   { type: 'fallback', stateMutability: 'payable' },
-  { type: 'receive', stateMutability: 'payable' },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
-      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
-    ],
-    name: 'AdminChanged',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
-    name: 'BeaconUpgraded',
-  },
   {
     type: 'event',
     anonymous: false,
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
   },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ERC1967Upgrade
+// ERC1967Utils
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const erc1967UpgradeAbi = [
+export const erc1967UtilsAbi = [
   {
     type: 'event',
     anonymous: false,
@@ -1155,6 +646,22 @@ export const erc1967UpgradeAbi = [
     inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
     name: 'Upgraded',
   },
+  {
+    type: 'error',
+    inputs: [{ name: 'admin', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidAdmin',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'beacon', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidBeacon',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1163,14 +670,6 @@ export const erc1967UpgradeAbi = [
 
 export const erc20Abi = [
   {
-    type: 'constructor',
-    inputs: [
-      { name: 'name_', internalType: 'string', type: 'string' },
-      { name: 'symbol_', internalType: 'string', type: 'string' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
     type: 'function',
     inputs: [
       { name: 'owner', internalType: 'address', type: 'address' },
@@ -1184,7 +683,7 @@ export const erc20Abi = [
     type: 'function',
     inputs: [
       { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'approve',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -1203,26 +702,6 @@ export const erc20Abi = [
     name: 'decimals',
     outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
     stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'subtractedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'decreaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'addedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'increaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -1249,7 +728,7 @@ export const erc20Abi = [
     type: 'function',
     inputs: [
       { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'transfer',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -1260,7 +739,7 @@ export const erc20Abi = [
     inputs: [
       { name: 'from', internalType: 'address', type: 'address' },
       { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'transferFrom',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -1286,151 +765,43 @@ export const erc20Abi = [
     ],
     name: 'Transfer',
   },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ERC20Snapshot
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const erc20SnapshotAbi = [
   {
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'spender', internalType: 'address', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
+    type: 'error',
     inputs: [
       { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'approve',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
+    name: 'ERC20InsufficientAllowance',
   },
   {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
+    type: 'error',
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'snapshotId', internalType: 'uint256', type: 'uint256' },
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'balanceOfAt',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
+    name: 'ERC20InsufficientBalance',
   },
   {
-    type: 'function',
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
-    stateMutability: 'view',
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
   },
   {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'subtractedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'decreaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
   },
   {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'addedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'increaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
   },
   {
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'totalSupplyAt',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Approval',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'id', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'Snapshot',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Transfer',
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
   },
 ] as const
 
@@ -1439,10 +810,10 @@ export const erc20SnapshotAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const entryPointAbi = [
   {
@@ -1461,6 +832,16 @@ export const entryPointAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'delegateAndRevert',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'depositTo',
     outputs: [],
@@ -1476,7 +857,7 @@ export const entryPointAbi = [
         internalType: 'struct IStakeManager.DepositInfo',
         type: 'tuple',
         components: [
-          { name: 'deposit', internalType: 'uint112', type: 'uint112' },
+          { name: 'deposit', internalType: 'uint256', type: 'uint256' },
           { name: 'staked', internalType: 'bool', type: 'bool' },
           { name: 'stake', internalType: 'uint112', type: 'uint112' },
           { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
@@ -1508,18 +889,16 @@ export const entryPointAbi = [
     inputs: [
       {
         name: 'userOp',
-        internalType: 'struct UserOperation',
+        internalType: 'struct PackedUserOperation',
         type: 'tuple',
         components: [
           { name: 'sender', internalType: 'address', type: 'address' },
           { name: 'nonce', internalType: 'uint256', type: 'uint256' },
           { name: 'initCode', internalType: 'bytes', type: 'bytes' },
           { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
           { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
           { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
           { name: 'signature', internalType: 'bytes', type: 'bytes' },
         ],
@@ -1539,18 +918,16 @@ export const entryPointAbi = [
         components: [
           {
             name: 'userOps',
-            internalType: 'struct UserOperation[]',
+            internalType: 'struct PackedUserOperation[]',
             type: 'tuple[]',
             components: [
               { name: 'sender', internalType: 'address', type: 'address' },
               { name: 'nonce', internalType: 'uint256', type: 'uint256' },
               { name: 'initCode', internalType: 'bytes', type: 'bytes' },
               { name: 'callData', internalType: 'bytes', type: 'bytes' },
-              { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-              { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
               { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-              { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-              { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
               { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
               { name: 'signature', internalType: 'bytes', type: 'bytes' },
             ],
@@ -1570,18 +947,16 @@ export const entryPointAbi = [
     inputs: [
       {
         name: 'ops',
-        internalType: 'struct UserOperation[]',
+        internalType: 'struct PackedUserOperation[]',
         type: 'tuple[]',
         components: [
           { name: 'sender', internalType: 'address', type: 'address' },
           { name: 'nonce', internalType: 'uint256', type: 'uint256' },
           { name: 'initCode', internalType: 'bytes', type: 'bytes' },
           { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
           { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
           { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
           { name: 'signature', internalType: 'bytes', type: 'bytes' },
         ],
@@ -1596,60 +971,6 @@ export const entryPointAbi = [
     type: 'function',
     inputs: [{ name: 'key', internalType: 'uint192', type: 'uint192' }],
     name: 'incrementNonce',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'op',
-        internalType: 'struct UserOperation',
-        type: 'tuple',
-        components: [
-          { name: 'sender', internalType: 'address', type: 'address' },
-          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
-          { name: 'signature', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'targetCallData', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'simulateHandleOp',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'userOp',
-        internalType: 'struct UserOperation',
-        type: 'tuple',
-        components: [
-          { name: 'sender', internalType: 'address', type: 'address' },
-          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
-          { name: 'signature', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-    ],
-    name: 'simulateValidation',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -1691,6 +1012,17 @@ export const entryPointAbi = [
       { name: 'totalDeposit', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
     name: 'Deposited',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'PostOpRevertReason',
   },
   {
     type: 'event',
@@ -1748,6 +1080,16 @@ export const entryPointAbi = [
       { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
       { name: 'sender', internalType: 'address', type: 'address', indexed: true },
       { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationPrefundTooLow',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
       { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
     ],
     name: 'UserOperationRevertReason',
@@ -1765,14 +1107,10 @@ export const entryPointAbi = [
   {
     type: 'error',
     inputs: [
-      { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'paid', internalType: 'uint256', type: 'uint256' },
-      { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
-      { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
-      { name: 'targetSuccess', internalType: 'bool', type: 'bool' },
-      { name: 'targetResult', internalType: 'bytes', type: 'bytes' },
+      { name: 'success', internalType: 'bool', type: 'bool' },
+      { name: 'ret', internalType: 'bytes', type: 'bytes' },
     ],
-    name: 'ExecutionResult',
+    name: 'DelegateAndRevert',
   },
   {
     type: 'error',
@@ -1784,6 +1122,20 @@ export const entryPointAbi = [
   },
   {
     type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+      { name: 'inner', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'FailedOpWithRevert',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'returnData', internalType: 'bytes', type: 'bytes' }],
+    name: 'PostOpReverted',
+  },
+  {
+    type: 'error',
     inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
     name: 'SenderAddressResult',
   },
@@ -1792,103 +1144,349 @@ export const entryPointAbi = [
     inputs: [{ name: 'aggregator', internalType: 'address', type: 'address' }],
     name: 'SignatureValidationFailed',
   },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const entryPointAddress = {
+  1: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  1337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  8008: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  8453: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  84532: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  845337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const entryPointConfig = { address: entryPointAddress, abi: entryPointAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EntryPointSimulations
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const entryPointSimulationsAbi = [
+  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  { type: 'receive', stateMutability: 'payable' },
   {
-    type: 'error',
+    type: 'function',
     inputs: [
+      { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: '_validateSenderAndPaymaster',
+    outputs: [],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'delegateAndRevert',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'depositTo',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'deposits',
+    outputs: [
+      { name: 'deposit', internalType: 'uint256', type: 'uint256' },
+      { name: 'staked', internalType: 'bool', type: 'bool' },
+      { name: 'stake', internalType: 'uint112', type: 'uint112' },
+      { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
+      { name: 'withdrawTime', internalType: 'uint48', type: 'uint48' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'getDepositInfo',
+    outputs: [
       {
-        name: 'returnInfo',
-        internalType: 'struct IEntryPoint.ReturnInfo',
+        name: 'info',
+        internalType: 'struct IStakeManager.DepositInfo',
         type: 'tuple',
         components: [
-          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
-          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
-          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
-          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
-          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      {
-        name: 'senderInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'factoryInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'paymasterInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+          { name: 'deposit', internalType: 'uint256', type: 'uint256' },
+          { name: 'staked', internalType: 'bool', type: 'bool' },
+          { name: 'stake', internalType: 'uint112', type: 'uint112' },
+          { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
+          { name: 'withdrawTime', internalType: 'uint48', type: 'uint48' },
         ],
       },
     ],
-    name: 'ValidationResult',
+    stateMutability: 'view',
   },
   {
-    type: 'error',
+    type: 'function',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'key', internalType: 'uint192', type: 'uint192' },
+    ],
+    name: 'getNonce',
+    outputs: [{ name: 'nonce', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'initCode', internalType: 'bytes', type: 'bytes' }],
+    name: 'getSenderAddress',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [
       {
-        name: 'returnInfo',
-        internalType: 'struct IEntryPoint.ReturnInfo',
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'getUserOpHash',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'opsPerAggregator',
+        internalType: 'struct IEntryPoint.UserOpsPerAggregator[]',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'userOps',
+            internalType: 'struct PackedUserOperation[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'sender', internalType: 'address', type: 'address' },
+              { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+              { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+              { name: 'callData', internalType: 'bytes', type: 'bytes' },
+              { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+              { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+              { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+              { name: 'signature', internalType: 'bytes', type: 'bytes' },
+            ],
+          },
+          { name: 'aggregator', internalType: 'contract IAggregator', type: 'address' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleAggregatedOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'ops',
+        internalType: 'struct PackedUserOperation[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'uint192', type: 'uint192' }],
+    name: 'incrementNonce',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'callData', internalType: 'bytes', type: 'bytes' },
+      {
+        name: 'opInfo',
+        internalType: 'struct EntryPoint.UserOpInfo',
+        type: 'tuple',
+        components: [
+          {
+            name: 'mUserOp',
+            internalType: 'struct EntryPoint.MemoryUserOp',
+            type: 'tuple',
+            components: [
+              { name: 'sender', internalType: 'address', type: 'address' },
+              { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+              { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterVerificationGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterPostOpGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymaster', internalType: 'address', type: 'address' },
+              { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+          { name: 'contextOffset', internalType: 'uint256', type: 'uint256' },
+          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'innerHandleOp',
+    outputs: [{ name: 'actualGasCost', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'uint192', type: 'uint192' },
+    ],
+    name: 'nonceSequenceNumber',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'op',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'targetCallData', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'simulateHandleOp',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct IEntryPointSimulations.ExecutionResult',
         type: 'tuple',
         components: [
           { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
-          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
-          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
-          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
-          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+          { name: 'paid', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountValidationData', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterValidationData', internalType: 'uint256', type: 'uint256' },
+          { name: 'targetSuccess', internalType: 'bool', type: 'bool' },
+          { name: 'targetResult', internalType: 'bytes', type: 'bytes' },
         ],
       },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
       {
-        name: 'senderInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
         type: 'tuple',
         components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
         ],
       },
+    ],
+    name: 'simulateValidation',
+    outputs: [
       {
-        name: 'factoryInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
+        name: '',
+        internalType: 'struct IEntryPointSimulations.ValidationResult',
         type: 'tuple',
         components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'paymasterInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'aggregatorInfo',
-        internalType: 'struct IEntryPoint.AggregatorStakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'aggregator', internalType: 'address', type: 'address' },
           {
-            name: 'stakeInfo',
+            name: 'returnInfo',
+            internalType: 'struct IEntryPoint.ReturnInfo',
+            type: 'tuple',
+            components: [
+              { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+              { name: 'accountValidationData', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterValidationData', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+            ],
+          },
+          {
+            name: 'senderInfo',
             internalType: 'struct IStakeManager.StakeInfo',
             type: 'tuple',
             components: [
@@ -1896,35 +1494,225 @@ export const entryPointAbi = [
               { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
             ],
           },
+          {
+            name: 'factoryInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          {
+            name: 'paymasterInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          {
+            name: 'aggregatorInfo',
+            internalType: 'struct IEntryPoint.AggregatorStakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'aggregator', internalType: 'address', type: 'address' },
+              {
+                name: 'stakeInfo',
+                internalType: 'struct IStakeManager.StakeInfo',
+                type: 'tuple',
+                components: [
+                  { name: 'stake', internalType: 'uint256', type: 'uint256' },
+                  { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+                ],
+              },
+            ],
+          },
         ],
       },
     ],
-    name: 'ValidationResultWithAggregation',
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'interfaceId', internalType: 'bytes4', type: 'bytes4' }],
+    name: 'supportsInterface',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'withdrawAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'factory', internalType: 'address', type: 'address', indexed: false },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AccountDeployed',
+  },
+  { type: 'event', anonymous: false, inputs: [], name: 'BeforeExecution' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalDeposit', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Deposited',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'PostOpRevertReason',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address', indexed: true }],
+    name: 'SignatureAggregatorChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalStaked', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeLocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawTime', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeUnlocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeWithdrawn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'success', internalType: 'bool', type: 'bool', indexed: false },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'actualGasUsed', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationEvent',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationPrefundTooLow',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'UserOperationRevertReason',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Withdrawn',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'success', internalType: 'bool', type: 'bool' },
+      { name: 'ret', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'DelegateAndRevert',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+    ],
+    name: 'FailedOp',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+      { name: 'inner', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'FailedOpWithRevert',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'returnData', internalType: 'bytes', type: 'bytes' }],
+    name: 'PostOpReverted',
+  },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'SenderAddressResult',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address' }],
+    name: 'SignatureValidationFailed',
   },
 ] as const
-
-/**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const entryPointAddress = {
-  1: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-  1337: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-  8008: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-  8453: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-  84532: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-  845337: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
-} as const
-
-/**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const entryPointConfig = { address: entryPointAddress, abi: entryPointAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IEntryPoint
@@ -1947,6 +1735,16 @@ export const iEntryPointAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'delegateAndRevert',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'depositTo',
     outputs: [],
@@ -1962,7 +1760,7 @@ export const iEntryPointAbi = [
         internalType: 'struct IStakeManager.DepositInfo',
         type: 'tuple',
         components: [
-          { name: 'deposit', internalType: 'uint112', type: 'uint112' },
+          { name: 'deposit', internalType: 'uint256', type: 'uint256' },
           { name: 'staked', internalType: 'bool', type: 'bool' },
           { name: 'stake', internalType: 'uint112', type: 'uint112' },
           { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
@@ -1994,18 +1792,16 @@ export const iEntryPointAbi = [
     inputs: [
       {
         name: 'userOp',
-        internalType: 'struct UserOperation',
+        internalType: 'struct PackedUserOperation',
         type: 'tuple',
         components: [
           { name: 'sender', internalType: 'address', type: 'address' },
           { name: 'nonce', internalType: 'uint256', type: 'uint256' },
           { name: 'initCode', internalType: 'bytes', type: 'bytes' },
           { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
           { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
           { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
           { name: 'signature', internalType: 'bytes', type: 'bytes' },
         ],
@@ -2025,18 +1821,16 @@ export const iEntryPointAbi = [
         components: [
           {
             name: 'userOps',
-            internalType: 'struct UserOperation[]',
+            internalType: 'struct PackedUserOperation[]',
             type: 'tuple[]',
             components: [
               { name: 'sender', internalType: 'address', type: 'address' },
               { name: 'nonce', internalType: 'uint256', type: 'uint256' },
               { name: 'initCode', internalType: 'bytes', type: 'bytes' },
               { name: 'callData', internalType: 'bytes', type: 'bytes' },
-              { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-              { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+              { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
               { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-              { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-              { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
               { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
               { name: 'signature', internalType: 'bytes', type: 'bytes' },
             ],
@@ -2056,18 +1850,16 @@ export const iEntryPointAbi = [
     inputs: [
       {
         name: 'ops',
-        internalType: 'struct UserOperation[]',
+        internalType: 'struct PackedUserOperation[]',
         type: 'tuple[]',
         components: [
           { name: 'sender', internalType: 'address', type: 'address' },
           { name: 'nonce', internalType: 'uint256', type: 'uint256' },
           { name: 'initCode', internalType: 'bytes', type: 'bytes' },
           { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
           { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
           { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
           { name: 'signature', internalType: 'bytes', type: 'bytes' },
         ],
@@ -2082,60 +1874,6 @@ export const iEntryPointAbi = [
     type: 'function',
     inputs: [{ name: 'key', internalType: 'uint192', type: 'uint192' }],
     name: 'incrementNonce',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'op',
-        internalType: 'struct UserOperation',
-        type: 'tuple',
-        components: [
-          { name: 'sender', internalType: 'address', type: 'address' },
-          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
-          { name: 'signature', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'targetCallData', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'simulateHandleOp',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'userOp',
-        internalType: 'struct UserOperation',
-        type: 'tuple',
-        components: [
-          { name: 'sender', internalType: 'address', type: 'address' },
-          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
-          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
-          { name: 'signature', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-    ],
-    name: 'simulateValidation',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -2177,6 +1915,17 @@ export const iEntryPointAbi = [
       { name: 'totalDeposit', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
     name: 'Deposited',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'PostOpRevertReason',
   },
   {
     type: 'event',
@@ -2234,6 +1983,16 @@ export const iEntryPointAbi = [
       { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
       { name: 'sender', internalType: 'address', type: 'address', indexed: true },
       { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationPrefundTooLow',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
       { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
     ],
     name: 'UserOperationRevertReason',
@@ -2251,14 +2010,10 @@ export const iEntryPointAbi = [
   {
     type: 'error',
     inputs: [
-      { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
-      { name: 'paid', internalType: 'uint256', type: 'uint256' },
-      { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
-      { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
-      { name: 'targetSuccess', internalType: 'bool', type: 'bool' },
-      { name: 'targetResult', internalType: 'bytes', type: 'bytes' },
+      { name: 'success', internalType: 'bool', type: 'bool' },
+      { name: 'ret', internalType: 'bytes', type: 'bytes' },
     ],
-    name: 'ExecutionResult',
+    name: 'DelegateAndRevert',
   },
   {
     type: 'error',
@@ -2270,6 +2025,20 @@ export const iEntryPointAbi = [
   },
   {
     type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+      { name: 'inner', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'FailedOpWithRevert',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'returnData', internalType: 'bytes', type: 'bytes' }],
+    name: 'PostOpReverted',
+  },
+  {
+    type: 'error',
     inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
     name: 'SenderAddressResult',
   },
@@ -2278,241 +2047,19 @@ export const iEntryPointAbi = [
     inputs: [{ name: 'aggregator', internalType: 'address', type: 'address' }],
     name: 'SignatureValidationFailed',
   },
-  {
-    type: 'error',
-    inputs: [
-      {
-        name: 'returnInfo',
-        internalType: 'struct IEntryPoint.ReturnInfo',
-        type: 'tuple',
-        components: [
-          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
-          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
-          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
-          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
-          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      {
-        name: 'senderInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'factoryInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'paymasterInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-    ],
-    name: 'ValidationResult',
-  },
-  {
-    type: 'error',
-    inputs: [
-      {
-        name: 'returnInfo',
-        internalType: 'struct IEntryPoint.ReturnInfo',
-        type: 'tuple',
-        components: [
-          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'prefund', internalType: 'uint256', type: 'uint256' },
-          { name: 'sigFailed', internalType: 'bool', type: 'bool' },
-          { name: 'validAfter', internalType: 'uint48', type: 'uint48' },
-          { name: 'validUntil', internalType: 'uint48', type: 'uint48' },
-          { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      {
-        name: 'senderInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'factoryInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'paymasterInfo',
-        internalType: 'struct IStakeManager.StakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'stake', internalType: 'uint256', type: 'uint256' },
-          { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-      {
-        name: 'aggregatorInfo',
-        internalType: 'struct IEntryPoint.AggregatorStakeInfo',
-        type: 'tuple',
-        components: [
-          { name: 'aggregator', internalType: 'address', type: 'address' },
-          {
-            name: 'stakeInfo',
-            internalType: 'struct IStakeManager.StakeInfo',
-            type: 'tuple',
-            components: [
-              { name: 'stake', internalType: 'uint256', type: 'uint256' },
-              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
-            ],
-          },
-        ],
-      },
-    ],
-    name: 'ValidationResultWithAggregation',
-  },
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// IMetaPaymaster
+// IEntryPointSimulations
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const iMetaPaymasterAbi = [
+export const iEntryPointSimulationsAbi = [
   {
     type: 'function',
-    inputs: [
-      { name: 'target', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'fund',
+    inputs: [{ name: '_unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
     outputs: [],
-    stateMutability: 'nonpayable',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Send
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const sendAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: 'multisig', internalType: 'address', type: 'address' },
-      { name: 'manager', internalType: 'address', type: 'address' },
-      { name: 'knownBots', internalType: 'address[]', type: 'address[]' },
-      { name: 'initialMaxBuy', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: '_botDefence',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: '_botDefenceActivatedOnce',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: '_knownBots',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: '_manager',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: '_maxBuy',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: '_multisig',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: '_totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'activateBotDefenceOnce',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'spender', internalType: 'address', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_tokenContract', internalType: 'address', type: 'address' },
-      { name: '_spender', internalType: 'address', type: 'address' },
-      { name: '_value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'approveToken',
-    outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
   },
   {
     type: 'function',
@@ -2524,161 +2071,290 @@ export const sendAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'snapshotId', internalType: 'uint256', type: 'uint256' },
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
     ],
-    name: 'balanceOfAt',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_newManager', internalType: 'address', type: 'address' }],
-    name: 'changeOwner',
+    name: 'delegateAndRevert',
     outputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'createSnapshot',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'deactivateBotDefence',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'depositTo',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'getDepositInfo',
+    outputs: [
+      {
+        name: 'info',
+        internalType: 'struct IStakeManager.DepositInfo',
+        type: 'tuple',
+        components: [
+          { name: 'deposit', internalType: 'uint256', type: 'uint256' },
+          { name: 'staked', internalType: 'bool', type: 'bool' },
+          { name: 'stake', internalType: 'uint112', type: 'uint112' },
+          { name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' },
+          { name: 'withdrawTime', internalType: 'uint48', type: 'uint48' },
+        ],
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'subtractedValue', internalType: 'uint256', type: 'uint256' },
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'key', internalType: 'uint192', type: 'uint192' },
     ],
-    name: 'decreaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getLatestSnapshot',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'getNonce',
+    outputs: [{ name: 'nonce', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'addedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'increaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_newMaxBuy', internalType: 'uint256', type: 'uint256' }],
-    name: 'modifyMaxBuy',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_bots', internalType: 'address[]', type: 'address[]' }],
-    name: 'removeBots',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
-    name: 'totalSupplyAt',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_tokenContract', internalType: 'address', type: 'address' },
-      { name: '_transferTo', internalType: 'address', type: 'address' },
-      { name: '_value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferToken',
+    inputs: [{ name: 'initCode', internalType: 'bytes', type: 'bytes' }],
+    name: 'getSenderAddress',
     outputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
     inputs: [
-      { name: '_tokenContract', internalType: 'address', type: 'address' },
-      { name: '_transferFrom', internalType: 'address', type: 'address' },
-      { name: '_transferTo', internalType: 'address', type: 'address' },
-      { name: '_value', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
     ],
-    name: 'transferTokenFrom',
+    name: 'getUserOpHash',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'opsPerAggregator',
+        internalType: 'struct IEntryPoint.UserOpsPerAggregator[]',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'userOps',
+            internalType: 'struct PackedUserOperation[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'sender', internalType: 'address', type: 'address' },
+              { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+              { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+              { name: 'callData', internalType: 'bytes', type: 'bytes' },
+              { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+              { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+              { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+              { name: 'signature', internalType: 'bytes', type: 'bytes' },
+            ],
+          },
+          { name: 'aggregator', internalType: 'contract IAggregator', type: 'address' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'handleAggregatedOps',
     outputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
     inputs: [
-      { name: '_amount', internalType: 'uint256', type: 'uint256' },
-      { name: '_to', internalType: 'address payable', type: 'address' },
+      {
+        name: 'ops',
+        internalType: 'struct PackedUserOperation[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'beneficiary', internalType: 'address payable', type: 'address' },
     ],
-    name: 'withdraw',
+    name: 'handleOps',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'key', internalType: 'uint192', type: 'uint192' }],
+    name: 'incrementNonce',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'op',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'targetCallData', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'simulateHandleOp',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct IEntryPointSimulations.ExecutionResult',
+        type: 'tuple',
+        components: [
+          { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paid', internalType: 'uint256', type: 'uint256' },
+          { name: 'accountValidationData', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterValidationData', internalType: 'uint256', type: 'uint256' },
+          { name: 'targetSuccess', internalType: 'bool', type: 'bool' },
+          { name: 'targetResult', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'simulateValidation',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct IEntryPointSimulations.ValidationResult',
+        type: 'tuple',
+        components: [
+          {
+            name: 'returnInfo',
+            internalType: 'struct IEntryPoint.ReturnInfo',
+            type: 'tuple',
+            components: [
+              { name: 'preOpGas', internalType: 'uint256', type: 'uint256' },
+              { name: 'prefund', internalType: 'uint256', type: 'uint256' },
+              { name: 'accountValidationData', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterValidationData', internalType: 'uint256', type: 'uint256' },
+              { name: 'paymasterContext', internalType: 'bytes', type: 'bytes' },
+            ],
+          },
+          {
+            name: 'senderInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          {
+            name: 'factoryInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          {
+            name: 'paymasterInfo',
+            internalType: 'struct IStakeManager.StakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'stake', internalType: 'uint256', type: 'uint256' },
+              { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          {
+            name: 'aggregatorInfo',
+            internalType: 'struct IEntryPoint.AggregatorStakeInfo',
+            type: 'tuple',
+            components: [
+              { name: 'aggregator', internalType: 'address', type: 'address' },
+              {
+                name: 'stakeInfo',
+                internalType: 'struct IStakeManager.StakeInfo',
+                type: 'tuple',
+                components: [
+                  { name: 'stake', internalType: 'uint256', type: 'uint256' },
+                  { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256' },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'withdrawAmount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -2686,52 +2362,155 @@ export const sendAbi = [
     type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'factory', internalType: 'address', type: 'address', indexed: false },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: false },
     ],
-    name: 'Approval',
+    name: 'AccountDeployed',
   },
+  { type: 'event', anonymous: false, inputs: [], name: 'BeforeExecution' },
   {
     type: 'event',
     anonymous: false,
-    inputs: [{ name: 'id', internalType: 'uint256', type: 'uint256', indexed: false }],
-    name: 'Snapshot',
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalDeposit', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Deposited',
   },
   {
     type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
     ],
-    name: 'Transfer',
+    name: 'PostOpRevertReason',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address', indexed: true }],
+    name: 'SignatureAggregatorChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'totalStaked', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'unstakeDelaySec', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeLocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawTime', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeUnlocked',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'StakeWithdrawn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'paymaster', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'success', internalType: 'bool', type: 'bool', indexed: false },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'actualGasUsed', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationEvent',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationPrefundTooLow',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'nonce', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'revertReason', internalType: 'bytes', type: 'bytes', indexed: false },
+    ],
+    name: 'UserOperationRevertReason',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address', indexed: true },
+      { name: 'withdrawAddress', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Withdrawn',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'success', internalType: 'bool', type: 'bool' },
+      { name: 'ret', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'DelegateAndRevert',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+    ],
+    name: 'FailedOp',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'opIndex', internalType: 'uint256', type: 'uint256' },
+      { name: 'reason', internalType: 'string', type: 'string' },
+      { name: 'inner', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'FailedOpWithRevert',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'returnData', internalType: 'bytes', type: 'bytes' }],
+    name: 'PostOpReverted',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'SenderAddressResult',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'aggregator', internalType: 'address', type: 'address' }],
+    name: 'SignatureValidationFailed',
   },
 ] as const
-
-/**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const sendAddress = {
-  1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-  1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-  8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-  8453: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-  84532: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-  845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-} as const
-
-/**
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const sendConfig = { address: sendAddress, abi: sendAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendAirdropsSafe
@@ -3002,6 +2781,32 @@ export const sendMerkleDropAbi = [
     inputs: [{ name: 'tranche', internalType: 'uint256', type: 'uint256', indexed: false }],
     name: 'TrancheExpired',
   },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'AddressInsufficientBalance',
+  },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+  },
 ] as const
 
 /**
@@ -3049,6 +2854,177 @@ export const sendRevenueSafeConfig = {
   address: sendRevenueSafeAddress,
   abi: sendRevenueSafeAbi,
 } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendToken
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const sendTokenAbi = [
+  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
+  },
+] as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const sendTokenAddress = {
+  1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+  1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+  8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+  8453: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+  84532: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+  845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+} as const
+
+/**
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const sendTokenConfig = { address: sendTokenAddress, abi: sendTokenAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendTreasurySafe
@@ -3110,7 +3086,7 @@ export const testUsdcAbi = [
     type: 'function',
     inputs: [
       { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'approve',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -3129,26 +3105,6 @@ export const testUsdcAbi = [
     name: 'decimals',
     outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
     stateMutability: 'pure',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'subtractedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'decreaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'addedValue', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'increaseAllowance',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -3175,7 +3131,7 @@ export const testUsdcAbi = [
     type: 'function',
     inputs: [
       { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'transfer',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -3186,7 +3142,7 @@ export const testUsdcAbi = [
     inputs: [
       { name: 'from', internalType: 'address', type: 'address' },
       { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'transferFrom',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
@@ -3211,6 +3167,44 @@ export const testUsdcAbi = [
       { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
     name: 'Transfer',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
   },
 ] as const
 
@@ -3354,6 +3348,14 @@ export const usdcConfig = { address: usdcAddress, abi: usdcAbi } as const
 export const readDaimoAccount = /*#__PURE__*/ createReadContract({ abi: daimoAccountAbi })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ */
+export const readDaimoAccountUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
+  abi: daimoAccountAbi,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"entryPoint"`
  */
 export const readDaimoAccountEntryPoint = /*#__PURE__*/ createReadContract({
@@ -3463,14 +3465,6 @@ export const writeDaimoAccountSignatureStruct = /*#__PURE__*/ createWriteContrac
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const writeDaimoAccountUpgradeTo = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
  */
 export const writeDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
@@ -3534,14 +3528,6 @@ export const prepareWriteDaimoAccountSignatureStruct = /*#__PURE__*/ createSimul
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const prepareWriteDaimoAccountUpgradeTo = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
  */
 export const prepareWriteDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
@@ -3570,22 +3556,6 @@ export const watchDaimoAccountEvent = /*#__PURE__*/ createWatchContractEvent({
 export const watchDaimoAccountAccountInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoAccountAbi,
   eventName: 'AccountInitialized',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const watchDaimoAccountAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const watchDaimoAccountBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'BeaconUpgraded',
 })
 
 /**
@@ -3717,740 +3687,6 @@ export const prepareWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ create
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const readDaimoEphemeralNotes = /*#__PURE__*/ createReadContract({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"notes"`
- */
-export const readDaimoEphemeralNotesNotes = /*#__PURE__*/ createReadContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'notes',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"token"`
- */
-export const readDaimoEphemeralNotesToken = /*#__PURE__*/ createReadContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'token',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const writeDaimoEphemeralNotes = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
- */
-export const writeDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'claimNote',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
- */
-export const writeDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const prepareWriteDaimoEphemeralNotes = /*#__PURE__*/ createSimulateContract({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
- */
-export const prepareWriteDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createSimulateContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'claimNote',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
- */
-export const prepareWriteDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createSimulateContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const watchDaimoEphemeralNotesEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteCreated"`
- */
-export const watchDaimoEphemeralNotesNoteCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoEphemeralNotesAbi,
-  eventName: 'NoteCreated',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteRedeemed"`
- */
-export const watchDaimoEphemeralNotesNoteRedeemedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoEphemeralNotesAbi,
-  eventName: 'NoteRedeemed',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const readDaimoEphemeralNotesV2 = /*#__PURE__*/ createReadContract({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"notes"`
- */
-export const readDaimoEphemeralNotesV2Notes = /*#__PURE__*/ createReadContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'notes',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"token"`
- */
-export const readDaimoEphemeralNotesV2Token = /*#__PURE__*/ createReadContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'token',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const writeDaimoEphemeralNotesV2 = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
- */
-export const writeDaimoEphemeralNotesV2ClaimNoteRecipient = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'claimNoteRecipient',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
- */
-export const writeDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'claimNoteSelf',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
- */
-export const writeDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const prepareWriteDaimoEphemeralNotesV2 = /*#__PURE__*/ createSimulateContract({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
- */
-export const prepareWriteDaimoEphemeralNotesV2ClaimNoteRecipient =
-  /*#__PURE__*/ createSimulateContract({
-    abi: daimoEphemeralNotesV2Abi,
-    functionName: 'claimNoteRecipient',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
- */
-export const prepareWriteDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createSimulateContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'claimNoteSelf',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
- */
-export const prepareWriteDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createSimulateContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const watchDaimoEphemeralNotesV2Event = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteCreated"`
- */
-export const watchDaimoEphemeralNotesV2NoteCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoEphemeralNotesV2Abi,
-  eventName: 'NoteCreated',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteRedeemed"`
- */
-export const watchDaimoEphemeralNotesV2NoteRedeemedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoEphemeralNotesV2Abi,
-  eventName: 'NoteRedeemed',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const readDaimoNameRegistry = /*#__PURE__*/ createReadContract({ abi: daimoNameRegistryAbi })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"implementation"`
- */
-export const readDaimoNameRegistryImplementation = /*#__PURE__*/ createReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'implementation',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"owner"`
- */
-export const readDaimoNameRegistryOwner = /*#__PURE__*/ createReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"proxiableUUID"`
- */
-export const readDaimoNameRegistryProxiableUuid = /*#__PURE__*/ createReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'proxiableUUID',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveAddr"`
- */
-export const readDaimoNameRegistryResolveAddr = /*#__PURE__*/ createReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'resolveAddr',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveName"`
- */
-export const readDaimoNameRegistryResolveName = /*#__PURE__*/ createReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'resolveName',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const writeDaimoNameRegistry = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
- */
-export const writeDaimoNameRegistryForceRegister = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'forceRegister',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
- */
-export const writeDaimoNameRegistryInit = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
- */
-export const writeDaimoNameRegistryRegister = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'register',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
- */
-export const writeDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'registerSelf',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const writeDaimoNameRegistryRenounceOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const writeDaimoNameRegistryTransferOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const writeDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const writeDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const prepareWriteDaimoNameRegistry = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
- */
-export const prepareWriteDaimoNameRegistryForceRegister = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'forceRegister',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
- */
-export const prepareWriteDaimoNameRegistryInit = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
- */
-export const prepareWriteDaimoNameRegistryRegister = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'register',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
- */
-export const prepareWriteDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'registerSelf',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const prepareWriteDaimoNameRegistryRenounceOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const prepareWriteDaimoNameRegistryTransferOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const prepareWriteDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const prepareWriteDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const watchDaimoNameRegistryEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const watchDaimoNameRegistryAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const watchDaimoNameRegistryBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'BeaconUpgraded',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Initialized"`
- */
-export const watchDaimoNameRegistryInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'Initialized',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"OwnershipTransferred"`
- */
-export const watchDaimoNameRegistryOwnershipTransferredEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: daimoNameRegistryAbi,
-    eventName: 'OwnershipTransferred',
-  })
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Registered"`
- */
-export const watchDaimoNameRegistryRegisteredEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'Registered',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Upgraded"`
- */
-export const watchDaimoNameRegistryUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__
- */
-export const watchDaimoNameRegistryProxyEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryProxyAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const watchDaimoNameRegistryProxyAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryProxyAbi,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const watchDaimoNameRegistryProxyBeaconUpgradedEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: daimoNameRegistryProxyAbi,
-    eventName: 'BeaconUpgraded',
-  })
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"Upgraded"`
- */
-export const watchDaimoNameRegistryProxyUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoNameRegistryProxyAbi,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const readDaimoPaymasterV2 = /*#__PURE__*/ createReadContract({ abi: daimoPaymasterV2Abi })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"bundlerWhitelist"`
- */
-export const readDaimoPaymasterV2BundlerWhitelist = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'bundlerWhitelist',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"entryPoint"`
- */
-export const readDaimoPaymasterV2EntryPoint = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'entryPoint',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"getDeposit"`
- */
-export const readDaimoPaymasterV2GetDeposit = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'getDeposit',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"metaPaymaster"`
- */
-export const readDaimoPaymasterV2MetaPaymaster = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'metaPaymaster',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"owner"`
- */
-export const readDaimoPaymasterV2Owner = /*#__PURE__*/ createReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const writeDaimoPaymasterV2 = /*#__PURE__*/ createWriteContract({ abi: daimoPaymasterV2Abi })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
- */
-export const writeDaimoPaymasterV2AddStake = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'addStake',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
- */
-export const writeDaimoPaymasterV2Deposit = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
- */
-export const writeDaimoPaymasterV2PostOp = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'postOp',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const writeDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
- */
-export const writeDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'setBundlerWhitelist',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
- */
-export const writeDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'setMetaPaymaster',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
- */
-export const writeDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
- */
-export const writeDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'unlockStake',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
- */
-export const writeDaimoPaymasterV2ValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'validatePaymasterUserOp',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
- */
-export const writeDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawStake',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
- */
-export const writeDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawTo',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const prepareWriteDaimoPaymasterV2 = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
- */
-export const prepareWriteDaimoPaymasterV2AddStake = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'addStake',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
- */
-export const prepareWriteDaimoPaymasterV2Deposit = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
- */
-export const prepareWriteDaimoPaymasterV2PostOp = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'postOp',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const prepareWriteDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
- */
-export const prepareWriteDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createSimulateContract(
-  { abi: daimoPaymasterV2Abi, functionName: 'setBundlerWhitelist' }
-)
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
- */
-export const prepareWriteDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'setMetaPaymaster',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
- */
-export const prepareWriteDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
- */
-export const prepareWriteDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'unlockStake',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
- */
-export const prepareWriteDaimoPaymasterV2ValidatePaymasterUserOp =
-  /*#__PURE__*/ createSimulateContract({
-    abi: daimoPaymasterV2Abi,
-    functionName: 'validatePaymasterUserOp',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
- */
-export const prepareWriteDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawStake',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
- */
-export const prepareWriteDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawTo',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const watchDaimoPaymasterV2Event = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoPaymasterV2Abi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"OwnershipTransferred"`
- */
-export const watchDaimoPaymasterV2OwnershipTransferredEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: daimoPaymasterV2Abi,
-    eventName: 'OwnershipTransferred',
-  })
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"UserOperationSponsored"`
- */
-export const watchDaimoPaymasterV2UserOperationSponsoredEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: daimoPaymasterV2Abi,
-    eventName: 'UserOperationSponsored',
-  })
-
-/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
  *
@@ -4458,6 +3694,17 @@ export const watchDaimoPaymasterV2UserOperationSponsoredEvent =
 export const readDaimoVerifier = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
   address: daimoVerifierAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ *
+ *
+ */
+export const readDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
+  abi: daimoVerifierAbi,
+  address: daimoVerifierAddress,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
 })
 
 /**
@@ -4645,28 +3892,6 @@ export const watchDaimoVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"AdminChanged"`
- *
- *
- */
-export const watchDaimoVerifierAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"BeaconUpgraded"`
- *
- *
- */
-export const watchDaimoVerifierBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'BeaconUpgraded',
-})
-
-/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Initialized"`
  *
  *
@@ -4710,28 +3935,6 @@ export const watchDaimoVerifierProxyEvent = /*#__PURE__*/ createWatchContractEve
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"AdminChanged"`
- *
- *
- */
-export const watchDaimoVerifierProxyAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierProxyAbi,
-  address: daimoVerifierProxyAddress,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
- *
- *
- */
-export const watchDaimoVerifierProxyBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierProxyAbi,
-  address: daimoVerifierProxyAddress,
-  eventName: 'BeaconUpgraded',
-})
-
-/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
  *
  *
@@ -4743,26 +3946,23 @@ export const watchDaimoVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchCon
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc165Abi}__
+ */
+export const readErc165 = /*#__PURE__*/ createReadContract({ abi: erc165Abi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc165Abi}__ and `functionName` set to `"supportsInterface"`
+ */
+export const readErc165SupportsInterface = /*#__PURE__*/ createReadContract({
+  abi: erc165Abi,
+  functionName: 'supportsInterface',
+})
+
+/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__
  */
 export const watchErc1967ProxyEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: erc1967ProxyAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const watchErc1967ProxyAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc1967ProxyAbi,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const watchErc1967ProxyBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc1967ProxyAbi,
-  eventName: 'BeaconUpgraded',
 })
 
 /**
@@ -4774,33 +3974,33 @@ export const watchErc1967ProxyUpgradedEvent = /*#__PURE__*/ createWatchContractE
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__
  */
-export const watchErc1967UpgradeEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const watchErc1967UtilsEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UtilsAbi,
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"AdminChanged"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__ and `eventName` set to `"AdminChanged"`
  */
-export const watchErc1967UpgradeAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const watchErc1967UtilsAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UtilsAbi,
   eventName: 'AdminChanged',
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__ and `eventName` set to `"BeaconUpgraded"`
  */
-export const watchErc1967UpgradeBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const watchErc1967UtilsBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UtilsAbi,
   eventName: 'BeaconUpgraded',
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"Upgraded"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__ and `eventName` set to `"Upgraded"`
  */
-export const watchErc1967UpgradeUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const watchErc1967UtilsUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UtilsAbi,
   eventName: 'Upgraded',
 })
 
@@ -4871,22 +4071,6 @@ export const writeErc20Approve = /*#__PURE__*/ createWriteContract({
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const writeErc20DecreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: erc20Abi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const writeErc20IncreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: erc20Abi,
-  functionName: 'increaseAllowance',
-})
-
-/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"transfer"`
  */
 export const writeErc20Transfer = /*#__PURE__*/ createWriteContract({
@@ -4913,22 +4097,6 @@ export const prepareWriteErc20 = /*#__PURE__*/ createSimulateContract({ abi: erc
 export const prepareWriteErc20Approve = /*#__PURE__*/ createSimulateContract({
   abi: erc20Abi,
   functionName: 'approve',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const prepareWriteErc20DecreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: erc20Abi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const prepareWriteErc20IncreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: erc20Abi,
-  functionName: 'increaseAllowance',
 })
 
 /**
@@ -4969,204 +4137,12 @@ export const watchErc20TransferEvent = /*#__PURE__*/ createWatchContractEvent({
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const readErc20Snapshot = /*#__PURE__*/ createReadContract({ abi: erc20SnapshotAbi })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"allowance"`
- */
-export const readErc20SnapshotAllowance = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'allowance',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOf"`
- */
-export const readErc20SnapshotBalanceOf = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'balanceOf',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOfAt"`
- */
-export const readErc20SnapshotBalanceOfAt = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'balanceOfAt',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decimals"`
- */
-export const readErc20SnapshotDecimals = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'decimals',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"name"`
- */
-export const readErc20SnapshotName = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'name',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"symbol"`
- */
-export const readErc20SnapshotSymbol = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'symbol',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupply"`
- */
-export const readErc20SnapshotTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'totalSupply',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupplyAt"`
- */
-export const readErc20SnapshotTotalSupplyAt = /*#__PURE__*/ createReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'totalSupplyAt',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const writeErc20Snapshot = /*#__PURE__*/ createWriteContract({ abi: erc20SnapshotAbi })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
- */
-export const writeErc20SnapshotApprove = /*#__PURE__*/ createWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const writeErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const writeErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'increaseAllowance',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
- */
-export const writeErc20SnapshotTransfer = /*#__PURE__*/ createWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const writeErc20SnapshotTransferFrom = /*#__PURE__*/ createWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const prepareWriteErc20Snapshot = /*#__PURE__*/ createSimulateContract({
-  abi: erc20SnapshotAbi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
- */
-export const prepareWriteErc20SnapshotApprove = /*#__PURE__*/ createSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const prepareWriteErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const prepareWriteErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'increaseAllowance',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
- */
-export const prepareWriteErc20SnapshotTransfer = /*#__PURE__*/ createSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const prepareWriteErc20SnapshotTransferFrom = /*#__PURE__*/ createSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const watchErc20SnapshotEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc20SnapshotAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Approval"`
- */
-export const watchErc20SnapshotApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc20SnapshotAbi,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Snapshot"`
- */
-export const watchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc20SnapshotAbi,
-  eventName: 'Snapshot',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Transfer"`
- */
-export const watchErc20SnapshotTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: erc20SnapshotAbi,
-  eventName: 'Transfer',
-})
-
-/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const readEntryPoint = /*#__PURE__*/ createReadContract({
   abi: entryPointAbi,
@@ -5176,10 +4152,10 @@ export const readEntryPoint = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"balanceOf"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const readEntryPointBalanceOf = /*#__PURE__*/ createReadContract({
   abi: entryPointAbi,
@@ -5190,10 +4166,10 @@ export const readEntryPointBalanceOf = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getDepositInfo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const readEntryPointGetDepositInfo = /*#__PURE__*/ createReadContract({
   abi: entryPointAbi,
@@ -5204,10 +4180,10 @@ export const readEntryPointGetDepositInfo = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getNonce"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const readEntryPointGetNonce = /*#__PURE__*/ createReadContract({
   abi: entryPointAbi,
@@ -5218,10 +4194,10 @@ export const readEntryPointGetNonce = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getUserOpHash"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const readEntryPointGetUserOpHash = /*#__PURE__*/ createReadContract({
   abi: entryPointAbi,
@@ -5232,10 +4208,10 @@ export const readEntryPointGetUserOpHash = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPoint = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5245,10 +4221,10 @@ export const writeEntryPoint = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointAddStake = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5257,12 +4233,26 @@ export const writeEntryPointAddStake = /*#__PURE__*/ createWriteContract({
 })
 
 /**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const writeEntryPointDelegateAndRevert = /*#__PURE__*/ createWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointDepositTo = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5273,10 +4263,10 @@ export const writeEntryPointDepositTo = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointGetSenderAddress = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5287,10 +4277,10 @@ export const writeEntryPointGetSenderAddress = /*#__PURE__*/ createWriteContract
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointHandleAggregatedOps = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5301,10 +4291,10 @@ export const writeEntryPointHandleAggregatedOps = /*#__PURE__*/ createWriteContr
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointHandleOps = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5315,10 +4305,10 @@ export const writeEntryPointHandleOps = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointIncrementNonce = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5327,40 +4317,12 @@ export const writeEntryPointIncrementNonce = /*#__PURE__*/ createWriteContract({
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const writeEntryPointSimulateHandleOp = /*#__PURE__*/ createWriteContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const writeEntryPointSimulateValidation = /*#__PURE__*/ createWriteContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateValidation',
-})
-
-/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointUnlockStake = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5371,10 +4333,10 @@ export const writeEntryPointUnlockStake = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointWithdrawStake = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5385,10 +4347,10 @@ export const writeEntryPointWithdrawStake = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const writeEntryPointWithdrawTo = /*#__PURE__*/ createWriteContract({
   abi: entryPointAbi,
@@ -5399,10 +4361,10 @@ export const writeEntryPointWithdrawTo = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPoint = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5412,10 +4374,10 @@ export const prepareWriteEntryPoint = /*#__PURE__*/ createSimulateContract({
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointAddStake = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5424,12 +4386,26 @@ export const prepareWriteEntryPointAddStake = /*#__PURE__*/ createSimulateContra
 })
 
 /**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const prepareWriteEntryPointDelegateAndRevert = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointDepositTo = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5440,10 +4416,10 @@ export const prepareWriteEntryPointDepositTo = /*#__PURE__*/ createSimulateContr
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointGetSenderAddress = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5454,10 +4430,10 @@ export const prepareWriteEntryPointGetSenderAddress = /*#__PURE__*/ createSimula
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5468,10 +4444,10 @@ export const prepareWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createSim
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointHandleOps = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5482,10 +4458,10 @@ export const prepareWriteEntryPointHandleOps = /*#__PURE__*/ createSimulateContr
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointIncrementNonce = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5494,40 +4470,12 @@ export const prepareWriteEntryPointIncrementNonce = /*#__PURE__*/ createSimulate
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const prepareWriteEntryPointSimulateHandleOp = /*#__PURE__*/ createSimulateContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const prepareWriteEntryPointSimulateValidation = /*#__PURE__*/ createSimulateContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateValidation',
-})
-
-/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointUnlockStake = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5538,10 +4486,10 @@ export const prepareWriteEntryPointUnlockStake = /*#__PURE__*/ createSimulateCon
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointWithdrawStake = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5552,10 +4500,10 @@ export const prepareWriteEntryPointWithdrawStake = /*#__PURE__*/ createSimulateC
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const prepareWriteEntryPointWithdrawTo = /*#__PURE__*/ createSimulateContract({
   abi: entryPointAbi,
@@ -5566,10 +4514,10 @@ export const prepareWriteEntryPointWithdrawTo = /*#__PURE__*/ createSimulateCont
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5579,10 +4527,10 @@ export const watchEntryPointEvent = /*#__PURE__*/ createWatchContractEvent({
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"AccountDeployed"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointAccountDeployedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5593,10 +4541,10 @@ export const watchEntryPointAccountDeployedEvent = /*#__PURE__*/ createWatchCont
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"BeforeExecution"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5607,10 +4555,10 @@ export const watchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createWatchCont
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Deposited"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointDepositedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5619,12 +4567,26 @@ export const watchEntryPointDepositedEvent = /*#__PURE__*/ createWatchContractEv
 })
 
 /**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"PostOpRevertReason"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const watchEntryPointPostOpRevertReasonEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'PostOpRevertReason',
+})
+
+/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointSignatureAggregatorChangedEvent =
   /*#__PURE__*/ createWatchContractEvent({
@@ -5636,10 +4598,10 @@ export const watchEntryPointSignatureAggregatorChangedEvent =
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeLocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointStakeLockedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5650,10 +4612,10 @@ export const watchEntryPointStakeLockedEvent = /*#__PURE__*/ createWatchContract
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeUnlocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5664,10 +4626,10 @@ export const watchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createWatchContra
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeWithdrawn"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5678,10 +4640,10 @@ export const watchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createWatchContr
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationEvent"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointUserOperationEventEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
@@ -5690,12 +4652,27 @@ export const watchEntryPointUserOperationEventEvent = /*#__PURE__*/ createWatchC
 })
 
 /**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const watchEntryPointUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'UserOperationPrefundTooLow',
+  })
+
+/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointUserOperationRevertReasonEvent = /*#__PURE__*/ createWatchContractEvent(
   { abi: entryPointAbi, address: entryPointAddress, eventName: 'UserOperationRevertReason' }
@@ -5704,14 +4681,419 @@ export const watchEntryPointUserOperationRevertReasonEvent = /*#__PURE__*/ creat
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Withdrawn"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const watchEntryPointWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: entryPointAbi,
   address: entryPointAddress,
+  eventName: 'Withdrawn',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const readEntryPointSimulations = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"_validateSenderAndPaymaster"`
+ */
+export const readEntryPointSimulationsValidateSenderAndPaymaster = /*#__PURE__*/ createReadContract(
+  { abi: entryPointSimulationsAbi, functionName: '_validateSenderAndPaymaster' }
+)
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const readEntryPointSimulationsBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"deposits"`
+ */
+export const readEntryPointSimulationsDeposits = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'deposits',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getDepositInfo"`
+ */
+export const readEntryPointSimulationsGetDepositInfo = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getDepositInfo',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getNonce"`
+ */
+export const readEntryPointSimulationsGetNonce = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getUserOpHash"`
+ */
+export const readEntryPointSimulationsGetUserOpHash = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getUserOpHash',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"nonceSequenceNumber"`
+ */
+export const readEntryPointSimulationsNonceSequenceNumber = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'nonceSequenceNumber',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"supportsInterface"`
+ */
+export const readEntryPointSimulationsSupportsInterface = /*#__PURE__*/ createReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'supportsInterface',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const writeEntryPointSimulations = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
+ */
+export const writeEntryPointSimulationsAddStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const writeEntryPointSimulationsDelegateAndRevert = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'delegateAndRevert',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const writeEntryPointSimulationsDepositTo = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
+ */
+export const writeEntryPointSimulationsGetSenderAddress = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ */
+export const writeEntryPointSimulationsHandleAggregatedOps = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'handleAggregatedOps',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const writeEntryPointSimulationsHandleOps = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
+ */
+export const writeEntryPointSimulationsIncrementNonce = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"innerHandleOp"`
+ */
+export const writeEntryPointSimulationsInnerHandleOp = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'innerHandleOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
+ */
+export const writeEntryPointSimulationsSimulateHandleOp = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
+ */
+export const writeEntryPointSimulationsSimulateValidation = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'simulateValidation',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const writeEntryPointSimulationsUnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const writeEntryPointSimulationsWithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const writeEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const prepareWriteEntryPointSimulations = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
+ */
+export const prepareWriteEntryPointSimulationsAddStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const prepareWriteEntryPointSimulationsDelegateAndRevert =
+  /*#__PURE__*/ createSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'delegateAndRevert',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const prepareWriteEntryPointSimulationsDepositTo = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
+ */
+export const prepareWriteEntryPointSimulationsGetSenderAddress =
+  /*#__PURE__*/ createSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'getSenderAddress',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ */
+export const prepareWriteEntryPointSimulationsHandleAggregatedOps =
+  /*#__PURE__*/ createSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'handleAggregatedOps',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const prepareWriteEntryPointSimulationsHandleOps = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
+ */
+export const prepareWriteEntryPointSimulationsIncrementNonce = /*#__PURE__*/ createSimulateContract(
+  { abi: entryPointSimulationsAbi, functionName: 'incrementNonce' }
+)
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"innerHandleOp"`
+ */
+export const prepareWriteEntryPointSimulationsInnerHandleOp = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'innerHandleOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
+ */
+export const prepareWriteEntryPointSimulationsSimulateHandleOp =
+  /*#__PURE__*/ createSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'simulateHandleOp',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
+ */
+export const prepareWriteEntryPointSimulationsSimulateValidation =
+  /*#__PURE__*/ createSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'simulateValidation',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const prepareWriteEntryPointSimulationsUnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const prepareWriteEntryPointSimulationsWithdrawStake = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const prepareWriteEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const watchEntryPointSimulationsEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"AccountDeployed"`
+ */
+export const watchEntryPointSimulationsAccountDeployedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'AccountDeployed',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"BeforeExecution"`
+ */
+export const watchEntryPointSimulationsBeforeExecutionEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'BeforeExecution',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"Deposited"`
+ */
+export const watchEntryPointSimulationsDepositedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointSimulationsAbi,
+  eventName: 'Deposited',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"PostOpRevertReason"`
+ */
+export const watchEntryPointSimulationsPostOpRevertReasonEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'PostOpRevertReason',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ */
+export const watchEntryPointSimulationsSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"StakeLocked"`
+ */
+export const watchEntryPointSimulationsStakeLockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointSimulationsAbi,
+  eventName: 'StakeLocked',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"StakeUnlocked"`
+ */
+export const watchEntryPointSimulationsStakeUnlockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointSimulationsAbi,
+  eventName: 'StakeUnlocked',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"StakeWithdrawn"`
+ */
+export const watchEntryPointSimulationsStakeWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent(
+  { abi: entryPointSimulationsAbi, eventName: 'StakeWithdrawn' }
+)
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"UserOperationEvent"`
+ */
+export const watchEntryPointSimulationsUserOperationEventEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'UserOperationEvent',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
+ */
+export const watchEntryPointSimulationsUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'UserOperationPrefundTooLow',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"UserOperationRevertReason"`
+ */
+export const watchEntryPointSimulationsUserOperationRevertReasonEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'UserOperationRevertReason',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"Withdrawn"`
+ */
+export const watchEntryPointSimulationsWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: entryPointSimulationsAbi,
   eventName: 'Withdrawn',
 })
 
@@ -5766,6 +5148,14 @@ export const writeIEntryPointAddStake = /*#__PURE__*/ createWriteContract({
 })
 
 /**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const writeIEntryPointDelegateAndRevert = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointAbi,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"depositTo"`
  */
 export const writeIEntryPointDepositTo = /*#__PURE__*/ createWriteContract({
@@ -5806,22 +5196,6 @@ export const writeIEntryPointIncrementNonce = /*#__PURE__*/ createWriteContract(
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- */
-export const writeIEntryPointSimulateHandleOp = /*#__PURE__*/ createWriteContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateValidation"`
- */
-export const writeIEntryPointSimulateValidation = /*#__PURE__*/ createWriteContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateValidation',
-})
-
-/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"unlockStake"`
  */
 export const writeIEntryPointUnlockStake = /*#__PURE__*/ createWriteContract({
@@ -5856,6 +5230,14 @@ export const prepareWriteIEntryPoint = /*#__PURE__*/ createSimulateContract({ ab
 export const prepareWriteIEntryPointAddStake = /*#__PURE__*/ createSimulateContract({
   abi: iEntryPointAbi,
   functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const prepareWriteIEntryPointDelegateAndRevert = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointAbi,
+  functionName: 'delegateAndRevert',
 })
 
 /**
@@ -5896,22 +5278,6 @@ export const prepareWriteIEntryPointHandleOps = /*#__PURE__*/ createSimulateCont
 export const prepareWriteIEntryPointIncrementNonce = /*#__PURE__*/ createSimulateContract({
   abi: iEntryPointAbi,
   functionName: 'incrementNonce',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- */
-export const prepareWriteIEntryPointSimulateHandleOp = /*#__PURE__*/ createSimulateContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateValidation"`
- */
-export const prepareWriteIEntryPointSimulateValidation = /*#__PURE__*/ createSimulateContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateValidation',
 })
 
 /**
@@ -5968,6 +5334,14 @@ export const watchIEntryPointDepositedEvent = /*#__PURE__*/ createWatchContractE
 })
 
 /**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"PostOpRevertReason"`
+ */
+export const watchIEntryPointPostOpRevertReasonEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: iEntryPointAbi,
+  eventName: 'PostOpRevertReason',
+})
+
+/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
  */
 export const watchIEntryPointSignatureAggregatorChangedEvent =
@@ -6009,6 +5383,15 @@ export const watchIEntryPointUserOperationEventEvent = /*#__PURE__*/ createWatch
 })
 
 /**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
+ */
+export const watchIEntryPointUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointAbi,
+    eventName: 'UserOperationPrefundTooLow',
+  })
+
+/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
  */
 export const watchIEntryPointUserOperationRevertReasonEvent =
@@ -6026,763 +5409,363 @@ export const watchIEntryPointWithdrawnEvent = /*#__PURE__*/ createWatchContractE
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ * Wraps __{@link readContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const writeIMetaPaymaster = /*#__PURE__*/ createWriteContract({ abi: iMetaPaymasterAbi })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
- */
-export const writeIMetaPaymasterFund = /*#__PURE__*/ createWriteContract({
-  abi: iMetaPaymasterAbi,
-  functionName: 'fund',
+export const readIEntryPointSimulations = /*#__PURE__*/ createReadContract({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ * Wraps __{@link readContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"balanceOf"`
  */
-export const prepareWriteIMetaPaymaster = /*#__PURE__*/ createSimulateContract({
-  abi: iMetaPaymasterAbi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
- */
-export const prepareWriteIMetaPaymasterFund = /*#__PURE__*/ createSimulateContract({
-  abi: iMetaPaymasterAbi,
-  functionName: 'fund',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSend = /*#__PURE__*/ createReadContract({ abi: sendAbi, address: sendAddress })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefence"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendBotDefence = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_botDefence',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefenceActivatedOnce"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendBotDefenceActivatedOnce = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_botDefenceActivatedOnce',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_knownBots"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendKnownBots = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_knownBots',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_manager"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendManager = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_manager',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_maxBuy"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendMaxBuy = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_maxBuy',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_multisig"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendMultisig = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_multisig',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_totalSupply"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_totalSupply',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"allowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendAllowance = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'allowance',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOf"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const readSendBalanceOf = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
+export const readIEntryPointSimulationsBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: iEntryPointSimulationsAbi,
   functionName: 'balanceOf',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOfAt"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link readContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getDepositInfo"`
  */
-export const readSendBalanceOfAt = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'balanceOfAt',
+export const readIEntryPointSimulationsGetDepositInfo = /*#__PURE__*/ createReadContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getDepositInfo',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decimals"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link readContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getNonce"`
  */
-export const readSendDecimals = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'decimals',
+export const readIEntryPointSimulationsGetNonce = /*#__PURE__*/ createReadContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getNonce',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"getLatestSnapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link readContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getUserOpHash"`
  */
-export const readSendGetLatestSnapshot = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'getLatestSnapshot',
+export const readIEntryPointSimulationsGetUserOpHash = /*#__PURE__*/ createReadContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getUserOpHash',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"name"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const readSendName = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'name',
+export const writeIEntryPointSimulations = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"symbol"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
  */
-export const readSendSymbol = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'symbol',
+export const writeIEntryPointSimulationsAddStake = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupply"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
  */
-export const _readSendTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'totalSupply',
+export const writeIEntryPointSimulationsDelegateAndRevert = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'delegateAndRevert',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupplyAt"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
  */
-export const readSendTotalSupplyAt = /*#__PURE__*/ createReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'totalSupplyAt',
+export const writeIEntryPointSimulationsDepositTo = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'depositTo',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
  */
-export const writeSend = /*#__PURE__*/ createWriteContract({ abi: sendAbi, address: sendAddress })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const writeSendActivateBotDefenceOnce = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'activateBotDefenceOnce',
+export const writeIEntryPointSimulationsGetSenderAddress = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getSenderAddress',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
  */
-export const writeSendApprove = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approve',
+export const writeIEntryPointSimulationsHandleAggregatedOps = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'handleAggregatedOps',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
  */
-export const writeSendApproveToken = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approveToken',
+export const writeIEntryPointSimulationsHandleOps = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'handleOps',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
  */
-export const writeSendChangeOwner = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'changeOwner',
+export const writeIEntryPointSimulationsIncrementNonce = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'incrementNonce',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
  */
-export const writeSendCreateSnapshot = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'createSnapshot',
+export const writeIEntryPointSimulationsSimulateHandleOp = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'simulateHandleOp',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
  */
-export const writeSendDeactivateBotDefence = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'deactivateBotDefence',
+export const writeIEntryPointSimulationsSimulateValidation = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'simulateValidation',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
  */
-export const writeSendDecreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'decreaseAllowance',
+export const writeIEntryPointSimulationsUnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
  */
-export const writeSendIncreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'increaseAllowance',
+export const writeIEntryPointSimulationsWithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'withdrawStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
  */
-export const writeSendModifyMaxBuy = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'modifyMaxBuy',
+export const writeIEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const writeSendRemoveBots = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'removeBots',
+export const prepareWriteIEntryPointSimulations = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
  */
-export const writeSendTransfer = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transfer',
+export const prepareWriteIEntryPointSimulationsAddStake = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
  */
-export const writeSendTransferFrom = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferFrom',
+export const prepareWriteIEntryPointSimulationsDelegateAndRevert =
+  /*#__PURE__*/ createSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'delegateAndRevert',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const prepareWriteIEntryPointSimulationsDepositTo = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'depositTo',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
  */
-export const writeSendTransferToken = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferToken',
+export const prepareWriteIEntryPointSimulationsGetSenderAddress =
+  /*#__PURE__*/ createSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'getSenderAddress',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ */
+export const prepareWriteIEntryPointSimulationsHandleAggregatedOps =
+  /*#__PURE__*/ createSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'handleAggregatedOps',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const prepareWriteIEntryPointSimulationsHandleOps = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'handleOps',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
  */
-export const writeSendTransferTokenFrom = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferTokenFrom',
+export const prepareWriteIEntryPointSimulationsIncrementNonce =
+  /*#__PURE__*/ createSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'incrementNonce',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
+ */
+export const prepareWriteIEntryPointSimulationsSimulateHandleOp =
+  /*#__PURE__*/ createSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'simulateHandleOp',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
+ */
+export const prepareWriteIEntryPointSimulationsSimulateValidation =
+  /*#__PURE__*/ createSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'simulateValidation',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const prepareWriteIEntryPointSimulationsUnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
  */
-export const writeSendWithdraw = /*#__PURE__*/ createWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'withdraw',
+export const prepareWriteIEntryPointSimulationsWithdrawStake = /*#__PURE__*/ createSimulateContract(
+  { abi: iEntryPointSimulationsAbi, functionName: 'withdrawStake' }
+)
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const prepareWriteIEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const prepareWriteSend = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
+export const watchIEntryPointSimulationsEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"AccountDeployed"`
  */
-export const prepareWriteSendActivateBotDefenceOnce = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'activateBotDefenceOnce',
+export const watchIEntryPointSimulationsAccountDeployedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'AccountDeployed',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"BeforeExecution"`
+ */
+export const watchIEntryPointSimulationsBeforeExecutionEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'BeforeExecution',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"Deposited"`
+ */
+export const watchIEntryPointSimulationsDepositedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: iEntryPointSimulationsAbi,
+  eventName: 'Deposited',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"PostOpRevertReason"`
  */
-export const prepareWriteSendApprove = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approve',
+export const watchIEntryPointSimulationsPostOpRevertReasonEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'PostOpRevertReason',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ */
+export const watchIEntryPointSimulationsSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"StakeLocked"`
+ */
+export const watchIEntryPointSimulationsStakeLockedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: iEntryPointSimulationsAbi,
+  eventName: 'StakeLocked',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"StakeUnlocked"`
  */
-export const prepareWriteSendApproveToken = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approveToken',
-})
+export const watchIEntryPointSimulationsStakeUnlockedEvent = /*#__PURE__*/ createWatchContractEvent(
+  { abi: iEntryPointSimulationsAbi, eventName: 'StakeUnlocked' }
+)
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"StakeWithdrawn"`
  */
-export const prepareWriteSendChangeOwner = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'changeOwner',
-})
+export const watchIEntryPointSimulationsStakeWithdrawnEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'StakeWithdrawn',
+  })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"UserOperationEvent"`
  */
-export const prepareWriteSendCreateSnapshot = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'createSnapshot',
-})
+export const watchIEntryPointSimulationsUserOperationEventEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'UserOperationEvent',
+  })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
  */
-export const prepareWriteSendDeactivateBotDefence = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'deactivateBotDefence',
-})
+export const watchIEntryPointSimulationsUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'UserOperationPrefundTooLow',
+  })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"UserOperationRevertReason"`
  */
-export const prepareWriteSendDecreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'decreaseAllowance',
-})
+export const watchIEntryPointSimulationsUserOperationRevertReasonEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'UserOperationRevertReason',
+  })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"Withdrawn"`
  */
-export const prepareWriteSendIncreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'increaseAllowance',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendModifyMaxBuy = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'modifyMaxBuy',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendRemoveBots = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'removeBots',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendTransfer = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendTransferFrom = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendTransferToken = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferToken',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendTransferTokenFrom = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferTokenFrom',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const prepareWriteSendWithdraw = /*#__PURE__*/ createSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'withdraw',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const watchSendEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Approval"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const watchSendApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Snapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const watchSendSnapshotEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-  eventName: 'Snapshot',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Transfer"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const watchSendTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-  eventName: 'Transfer',
+export const watchIEntryPointSimulationsWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: iEntryPointSimulationsAbi,
+  eventName: 'Withdrawn',
 })
 
 /**
@@ -7202,6 +6185,254 @@ export const watchSendMerkleDropTrancheExpiredEvent = /*#__PURE__*/ createWatchC
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendToken = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenAllowance = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenDecimals = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenName = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenSymbol = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const readSendTokenTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendToken = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenApprove = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenTransfer = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const writeSendTokenTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendToken = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenApprove = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenTransfer = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const prepareWriteSendTokenTransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const watchSendTokenEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const watchSendTokenApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const watchSendTokenTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  eventName: 'Transfer',
+})
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link senderCreatorAbi}__
  */
 export const writeSenderCreator = /*#__PURE__*/ createWriteContract({ abi: senderCreatorAbi })
@@ -7296,22 +6527,6 @@ export const writeTestUsdcApprove = /*#__PURE__*/ createWriteContract({
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const writeTestUsdcDecreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const writeTestUsdcIncreaseAllowance = /*#__PURE__*/ createWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'increaseAllowance',
-})
-
-/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transfer"`
  */
 export const writeTestUsdcTransfer = /*#__PURE__*/ createWriteContract({
@@ -7338,22 +6553,6 @@ export const prepareWriteTestUsdc = /*#__PURE__*/ createSimulateContract({ abi: 
 export const prepareWriteTestUsdcApprove = /*#__PURE__*/ createSimulateContract({
   abi: testUsdcAbi,
   functionName: 'approve',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const prepareWriteTestUsdcDecreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const prepareWriteTestUsdcIncreaseAllowance = /*#__PURE__*/ createSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'increaseAllowance',
 })
 
 /**
@@ -7645,6 +6844,14 @@ export const watchUsdcTransferEvent = /*#__PURE__*/ createWatchContractEvent({
 export const useReadDaimoAccount = /*#__PURE__*/ createUseReadContract({ abi: daimoAccountAbi })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ */
+export const useReadDaimoAccountUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
+  abi: daimoAccountAbi,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"entryPoint"`
  */
 export const useReadDaimoAccountEntryPoint = /*#__PURE__*/ createUseReadContract({
@@ -7754,14 +6961,6 @@ export const useWriteDaimoAccountSignatureStruct = /*#__PURE__*/ createUseWriteC
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const useWriteDaimoAccountUpgradeTo = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
  */
 export const useWriteDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
@@ -7825,14 +7024,6 @@ export const useSimulateDaimoAccountSignatureStruct = /*#__PURE__*/ createUseSim
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const useSimulateDaimoAccountUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
  */
 export const useSimulateDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
@@ -7863,22 +7054,6 @@ export const useWatchDaimoAccountAccountInitializedEvent =
     abi: daimoAccountAbi,
     eventName: 'AccountInitialized',
   })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const useWatchDaimoAccountAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const useWatchDaimoAccountBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'BeaconUpgraded',
-})
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Initialized"`
@@ -8008,752 +7183,6 @@ export const useSimulateDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createU
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const useReadDaimoEphemeralNotes = /*#__PURE__*/ createUseReadContract({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"notes"`
- */
-export const useReadDaimoEphemeralNotesNotes = /*#__PURE__*/ createUseReadContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'notes',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"token"`
- */
-export const useReadDaimoEphemeralNotesToken = /*#__PURE__*/ createUseReadContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'token',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const useWriteDaimoEphemeralNotes = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
- */
-export const useWriteDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'claimNote',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
- */
-export const useWriteDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const useSimulateDaimoEphemeralNotes = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
- */
-export const useSimulateDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'claimNote',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
- */
-export const useSimulateDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoEphemeralNotesAbi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
- */
-export const useWatchDaimoEphemeralNotesEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoEphemeralNotesAbi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteCreated"`
- */
-export const useWatchDaimoEphemeralNotesNoteCreatedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoEphemeralNotesAbi,
-    eventName: 'NoteCreated',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteRedeemed"`
- */
-export const useWatchDaimoEphemeralNotesNoteRedeemedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoEphemeralNotesAbi,
-    eventName: 'NoteRedeemed',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const useReadDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseReadContract({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"notes"`
- */
-export const useReadDaimoEphemeralNotesV2Notes = /*#__PURE__*/ createUseReadContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'notes',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"token"`
- */
-export const useReadDaimoEphemeralNotesV2Token = /*#__PURE__*/ createUseReadContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'token',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const useWriteDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
- */
-export const useWriteDaimoEphemeralNotesV2ClaimNoteRecipient = /*#__PURE__*/ createUseWriteContract(
-  { abi: daimoEphemeralNotesV2Abi, functionName: 'claimNoteRecipient' }
-)
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
- */
-export const useWriteDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'claimNoteSelf',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
- */
-export const useWriteDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const useSimulateDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
- */
-export const useSimulateDaimoEphemeralNotesV2ClaimNoteRecipient =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoEphemeralNotesV2Abi,
-    functionName: 'claimNoteRecipient',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
- */
-export const useSimulateDaimoEphemeralNotesV2ClaimNoteSelf =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoEphemeralNotesV2Abi,
-    functionName: 'claimNoteSelf',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
- */
-export const useSimulateDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoEphemeralNotesV2Abi,
-  functionName: 'createNote',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
- */
-export const useWatchDaimoEphemeralNotesV2Event = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoEphemeralNotesV2Abi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteCreated"`
- */
-export const useWatchDaimoEphemeralNotesV2NoteCreatedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoEphemeralNotesV2Abi,
-    eventName: 'NoteCreated',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteRedeemed"`
- */
-export const useWatchDaimoEphemeralNotesV2NoteRedeemedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoEphemeralNotesV2Abi,
-    eventName: 'NoteRedeemed',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const useReadDaimoNameRegistry = /*#__PURE__*/ createUseReadContract({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"implementation"`
- */
-export const useReadDaimoNameRegistryImplementation = /*#__PURE__*/ createUseReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'implementation',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"owner"`
- */
-export const useReadDaimoNameRegistryOwner = /*#__PURE__*/ createUseReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"proxiableUUID"`
- */
-export const useReadDaimoNameRegistryProxiableUuid = /*#__PURE__*/ createUseReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'proxiableUUID',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveAddr"`
- */
-export const useReadDaimoNameRegistryResolveAddr = /*#__PURE__*/ createUseReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'resolveAddr',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveName"`
- */
-export const useReadDaimoNameRegistryResolveName = /*#__PURE__*/ createUseReadContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'resolveName',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const useWriteDaimoNameRegistry = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
- */
-export const useWriteDaimoNameRegistryForceRegister = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'forceRegister',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
- */
-export const useWriteDaimoNameRegistryInit = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
- */
-export const useWriteDaimoNameRegistryRegister = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'register',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
- */
-export const useWriteDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'registerSelf',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const useWriteDaimoNameRegistryRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const useWriteDaimoNameRegistryTransferOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const useWriteDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const useWriteDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const useSimulateDaimoNameRegistry = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
- */
-export const useSimulateDaimoNameRegistryForceRegister = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'forceRegister',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
- */
-export const useSimulateDaimoNameRegistryInit = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
- */
-export const useSimulateDaimoNameRegistryRegister = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'register',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
- */
-export const useSimulateDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'registerSelf',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const useSimulateDaimoNameRegistryRenounceOwnership =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoNameRegistryAbi,
-    functionName: 'renounceOwnership',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const useSimulateDaimoNameRegistryTransferOwnership =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoNameRegistryAbi,
-    functionName: 'transferOwnership',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
- */
-export const useSimulateDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoNameRegistryAbi,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const useSimulateDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract(
-  { abi: daimoNameRegistryAbi, functionName: 'upgradeToAndCall' }
-)
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__
- */
-export const useWatchDaimoNameRegistryEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const useWatchDaimoNameRegistryAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent(
-  { abi: daimoNameRegistryAbi, eventName: 'AdminChanged' }
-)
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const useWatchDaimoNameRegistryBeaconUpgradedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoNameRegistryAbi,
-    eventName: 'BeaconUpgraded',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Initialized"`
- */
-export const useWatchDaimoNameRegistryInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'Initialized',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"OwnershipTransferred"`
- */
-export const useWatchDaimoNameRegistryOwnershipTransferredEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoNameRegistryAbi,
-    eventName: 'OwnershipTransferred',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Registered"`
- */
-export const useWatchDaimoNameRegistryRegisteredEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'Registered',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Upgraded"`
- */
-export const useWatchDaimoNameRegistryUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoNameRegistryAbi,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__
- */
-export const useWatchDaimoNameRegistryProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoNameRegistryProxyAbi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const useWatchDaimoNameRegistryProxyAdminChangedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoNameRegistryProxyAbi,
-    eventName: 'AdminChanged',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const useWatchDaimoNameRegistryProxyBeaconUpgradedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoNameRegistryProxyAbi,
-    eventName: 'BeaconUpgraded',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"Upgraded"`
- */
-export const useWatchDaimoNameRegistryProxyUpgradedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoNameRegistryProxyAbi,
-    eventName: 'Upgraded',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const useReadDaimoPaymasterV2 = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterV2Abi,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"bundlerWhitelist"`
- */
-export const useReadDaimoPaymasterV2BundlerWhitelist = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'bundlerWhitelist',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"entryPoint"`
- */
-export const useReadDaimoPaymasterV2EntryPoint = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'entryPoint',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"getDeposit"`
- */
-export const useReadDaimoPaymasterV2GetDeposit = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'getDeposit',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"metaPaymaster"`
- */
-export const useReadDaimoPaymasterV2MetaPaymaster = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'metaPaymaster',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"owner"`
- */
-export const useReadDaimoPaymasterV2Owner = /*#__PURE__*/ createUseReadContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const useWriteDaimoPaymasterV2 = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
- */
-export const useWriteDaimoPaymasterV2AddStake = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'addStake',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
- */
-export const useWriteDaimoPaymasterV2Deposit = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
- */
-export const useWriteDaimoPaymasterV2PostOp = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'postOp',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const useWriteDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
- */
-export const useWriteDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'setBundlerWhitelist',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
- */
-export const useWriteDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'setMetaPaymaster',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
- */
-export const useWriteDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
- */
-export const useWriteDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'unlockStake',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
- */
-export const useWriteDaimoPaymasterV2ValidatePaymasterUserOp = /*#__PURE__*/ createUseWriteContract(
-  { abi: daimoPaymasterV2Abi, functionName: 'validatePaymasterUserOp' }
-)
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
- */
-export const useWriteDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawStake',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
- */
-export const useWriteDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawTo',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const useSimulateDaimoPaymasterV2 = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
- */
-export const useSimulateDaimoPaymasterV2AddStake = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'addStake',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
- */
-export const useSimulateDaimoPaymasterV2Deposit = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
- */
-export const useSimulateDaimoPaymasterV2PostOp = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'postOp',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const useSimulateDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createUseSimulateContract(
-  { abi: daimoPaymasterV2Abi, functionName: 'renounceOwnership' }
-)
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
- */
-export const useSimulateDaimoPaymasterV2SetBundlerWhitelist =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoPaymasterV2Abi,
-    functionName: 'setBundlerWhitelist',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
- */
-export const useSimulateDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'setMetaPaymaster',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
- */
-export const useSimulateDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createUseSimulateContract(
-  { abi: daimoPaymasterV2Abi, functionName: 'transferOwnership' }
-)
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
- */
-export const useSimulateDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'unlockStake',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
- */
-export const useSimulateDaimoPaymasterV2ValidatePaymasterUserOp =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: daimoPaymasterV2Abi,
-    functionName: 'validatePaymasterUserOp',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
- */
-export const useSimulateDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawStake',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
- */
-export const useSimulateDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoPaymasterV2Abi,
-  functionName: 'withdrawTo',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
- */
-export const useWatchDaimoPaymasterV2Event = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoPaymasterV2Abi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"OwnershipTransferred"`
- */
-export const useWatchDaimoPaymasterV2OwnershipTransferredEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoPaymasterV2Abi,
-    eventName: 'OwnershipTransferred',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"UserOperationSponsored"`
- */
-export const useWatchDaimoPaymasterV2UserOperationSponsoredEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoPaymasterV2Abi,
-    eventName: 'UserOperationSponsored',
-  })
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
  *
@@ -8761,6 +7190,17 @@ export const useWatchDaimoPaymasterV2UserOperationSponsoredEvent =
 export const useReadDaimoVerifier = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
   address: daimoVerifierAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ *
+ *
+ */
+export const useReadDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
+  abi: daimoVerifierAbi,
+  address: daimoVerifierAddress,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
 })
 
 /**
@@ -8948,28 +7388,6 @@ export const useWatchDaimoVerifierEvent = /*#__PURE__*/ createUseWatchContractEv
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"AdminChanged"`
- *
- *
- */
-export const useWatchDaimoVerifierAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"BeaconUpgraded"`
- *
- *
- */
-export const useWatchDaimoVerifierBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'BeaconUpgraded',
-})
-
-/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Initialized"`
  *
  *
@@ -9014,30 +7432,6 @@ export const useWatchDaimoVerifierProxyEvent = /*#__PURE__*/ createUseWatchContr
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"AdminChanged"`
- *
- *
- */
-export const useWatchDaimoVerifierProxyAdminChangedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoVerifierProxyAbi,
-    address: daimoVerifierProxyAddress,
-    eventName: 'AdminChanged',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
- *
- *
- */
-export const useWatchDaimoVerifierProxyBeaconUpgradedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoVerifierProxyAbi,
-    address: daimoVerifierProxyAddress,
-    eventName: 'BeaconUpgraded',
-  })
-
-/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
  *
  *
@@ -9049,26 +7443,23 @@ export const useWatchDaimoVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWa
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc165Abi}__
+ */
+export const useReadErc165 = /*#__PURE__*/ createUseReadContract({ abi: erc165Abi })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc165Abi}__ and `functionName` set to `"supportsInterface"`
+ */
+export const useReadErc165SupportsInterface = /*#__PURE__*/ createUseReadContract({
+  abi: erc165Abi,
+  functionName: 'supportsInterface',
+})
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__
  */
 export const useWatchErc1967ProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: erc1967ProxyAbi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__ and `eventName` set to `"AdminChanged"`
- */
-export const useWatchErc1967ProxyAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc1967ProxyAbi,
-  eventName: 'AdminChanged',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
- */
-export const useWatchErc1967ProxyBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc1967ProxyAbi,
-  eventName: 'BeaconUpgraded',
 })
 
 /**
@@ -9080,33 +7471,33 @@ export const useWatchErc1967ProxyUpgradedEvent = /*#__PURE__*/ createUseWatchCon
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__
  */
-export const useWatchErc1967UpgradeEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const useWatchErc1967UtilsEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UtilsAbi,
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"AdminChanged"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__ and `eventName` set to `"AdminChanged"`
  */
-export const useWatchErc1967UpgradeAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const useWatchErc1967UtilsAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UtilsAbi,
   eventName: 'AdminChanged',
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__ and `eventName` set to `"BeaconUpgraded"`
  */
-export const useWatchErc1967UpgradeBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const useWatchErc1967UtilsBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UtilsAbi,
   eventName: 'BeaconUpgraded',
 })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"Upgraded"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__ and `eventName` set to `"Upgraded"`
  */
-export const useWatchErc1967UpgradeUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc1967UpgradeAbi,
+export const useWatchErc1967UtilsUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UtilsAbi,
   eventName: 'Upgraded',
 })
 
@@ -9177,22 +7568,6 @@ export const useWriteErc20Approve = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const useWriteErc20DecreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20Abi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const useWriteErc20IncreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20Abi,
-  functionName: 'increaseAllowance',
-})
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"transfer"`
  */
 export const useWriteErc20Transfer = /*#__PURE__*/ createUseWriteContract({
@@ -9219,22 +7594,6 @@ export const useSimulateErc20 = /*#__PURE__*/ createUseSimulateContract({ abi: e
 export const useSimulateErc20Approve = /*#__PURE__*/ createUseSimulateContract({
   abi: erc20Abi,
   functionName: 'approve',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const useSimulateErc20DecreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20Abi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const useSimulateErc20IncreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20Abi,
-  functionName: 'increaseAllowance',
 })
 
 /**
@@ -9275,204 +7634,12 @@ export const useWatchErc20TransferEvent = /*#__PURE__*/ createUseWatchContractEv
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const useReadErc20Snapshot = /*#__PURE__*/ createUseReadContract({ abi: erc20SnapshotAbi })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"allowance"`
- */
-export const useReadErc20SnapshotAllowance = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'allowance',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOf"`
- */
-export const useReadErc20SnapshotBalanceOf = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'balanceOf',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOfAt"`
- */
-export const useReadErc20SnapshotBalanceOfAt = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'balanceOfAt',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decimals"`
- */
-export const useReadErc20SnapshotDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'decimals',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"name"`
- */
-export const useReadErc20SnapshotName = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'name',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"symbol"`
- */
-export const useReadErc20SnapshotSymbol = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'symbol',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupply"`
- */
-export const useReadErc20SnapshotTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'totalSupply',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupplyAt"`
- */
-export const useReadErc20SnapshotTotalSupplyAt = /*#__PURE__*/ createUseReadContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'totalSupplyAt',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const useWriteErc20Snapshot = /*#__PURE__*/ createUseWriteContract({ abi: erc20SnapshotAbi })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
- */
-export const useWriteErc20SnapshotApprove = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const useWriteErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const useWriteErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'increaseAllowance',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
- */
-export const useWriteErc20SnapshotTransfer = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useWriteErc20SnapshotTransferFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const useSimulateErc20Snapshot = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20SnapshotAbi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
- */
-export const useSimulateErc20SnapshotApprove = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const useSimulateErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const useSimulateErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'increaseAllowance',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
- */
-export const useSimulateErc20SnapshotTransfer = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useSimulateErc20SnapshotTransferFrom = /*#__PURE__*/ createUseSimulateContract({
-  abi: erc20SnapshotAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__
- */
-export const useWatchErc20SnapshotEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc20SnapshotAbi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Approval"`
- */
-export const useWatchErc20SnapshotApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc20SnapshotAbi,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Snapshot"`
- */
-export const useWatchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc20SnapshotAbi,
-  eventName: 'Snapshot',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Transfer"`
- */
-export const useWatchErc20SnapshotTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: erc20SnapshotAbi,
-  eventName: 'Transfer',
-})
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useReadEntryPoint = /*#__PURE__*/ createUseReadContract({
   abi: entryPointAbi,
@@ -9482,10 +7649,10 @@ export const useReadEntryPoint = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"balanceOf"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useReadEntryPointBalanceOf = /*#__PURE__*/ createUseReadContract({
   abi: entryPointAbi,
@@ -9496,10 +7663,10 @@ export const useReadEntryPointBalanceOf = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getDepositInfo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useReadEntryPointGetDepositInfo = /*#__PURE__*/ createUseReadContract({
   abi: entryPointAbi,
@@ -9510,10 +7677,10 @@ export const useReadEntryPointGetDepositInfo = /*#__PURE__*/ createUseReadContra
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getNonce"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useReadEntryPointGetNonce = /*#__PURE__*/ createUseReadContract({
   abi: entryPointAbi,
@@ -9524,10 +7691,10 @@ export const useReadEntryPointGetNonce = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getUserOpHash"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useReadEntryPointGetUserOpHash = /*#__PURE__*/ createUseReadContract({
   abi: entryPointAbi,
@@ -9538,10 +7705,10 @@ export const useReadEntryPointGetUserOpHash = /*#__PURE__*/ createUseReadContrac
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPoint = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9551,10 +7718,10 @@ export const useWriteEntryPoint = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointAddStake = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9563,12 +7730,26 @@ export const useWriteEntryPointAddStake = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const useWriteEntryPointDelegateAndRevert = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointDepositTo = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9579,10 +7760,10 @@ export const useWriteEntryPointDepositTo = /*#__PURE__*/ createUseWriteContract(
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointGetSenderAddress = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9593,10 +7774,10 @@ export const useWriteEntryPointGetSenderAddress = /*#__PURE__*/ createUseWriteCo
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9607,10 +7788,10 @@ export const useWriteEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseWrit
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointHandleOps = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9621,10 +7802,10 @@ export const useWriteEntryPointHandleOps = /*#__PURE__*/ createUseWriteContract(
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointIncrementNonce = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9633,40 +7814,12 @@ export const useWriteEntryPointIncrementNonce = /*#__PURE__*/ createUseWriteCont
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const useWriteEntryPointSimulateHandleOp = /*#__PURE__*/ createUseWriteContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const useWriteEntryPointSimulateValidation = /*#__PURE__*/ createUseWriteContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateValidation',
-})
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointUnlockStake = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9677,10 +7830,10 @@ export const useWriteEntryPointUnlockStake = /*#__PURE__*/ createUseWriteContrac
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointWithdrawStake = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9691,10 +7844,10 @@ export const useWriteEntryPointWithdrawStake = /*#__PURE__*/ createUseWriteContr
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWriteEntryPointWithdrawTo = /*#__PURE__*/ createUseWriteContract({
   abi: entryPointAbi,
@@ -9705,10 +7858,10 @@ export const useWriteEntryPointWithdrawTo = /*#__PURE__*/ createUseWriteContract
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPoint = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9718,10 +7871,10 @@ export const useSimulateEntryPoint = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"addStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointAddStake = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9730,12 +7883,26 @@ export const useSimulateEntryPointAddStake = /*#__PURE__*/ createUseSimulateCont
 })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const useSimulateEntryPointDelegateAndRevert = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"depositTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointDepositTo = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9746,10 +7913,10 @@ export const useSimulateEntryPointDepositTo = /*#__PURE__*/ createUseSimulateCon
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"getSenderAddress"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointGetSenderAddress = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9760,10 +7927,10 @@ export const useSimulateEntryPointGetSenderAddress = /*#__PURE__*/ createUseSimu
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleAggregatedOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9774,10 +7941,10 @@ export const useSimulateEntryPointHandleAggregatedOps = /*#__PURE__*/ createUseS
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"handleOps"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointHandleOps = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9788,10 +7955,10 @@ export const useSimulateEntryPointHandleOps = /*#__PURE__*/ createUseSimulateCon
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"incrementNonce"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointIncrementNonce = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9800,40 +7967,12 @@ export const useSimulateEntryPointIncrementNonce = /*#__PURE__*/ createUseSimula
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const useSimulateEntryPointSimulateHandleOp = /*#__PURE__*/ createUseSimulateContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"simulateValidation"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- */
-export const useSimulateEntryPointSimulateValidation = /*#__PURE__*/ createUseSimulateContract({
-  abi: entryPointAbi,
-  address: entryPointAddress,
-  functionName: 'simulateValidation',
-})
-
-/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"unlockStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointUnlockStake = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9844,10 +7983,10 @@ export const useSimulateEntryPointUnlockStake = /*#__PURE__*/ createUseSimulateC
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawStake"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointWithdrawStake = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9858,10 +7997,10 @@ export const useSimulateEntryPointWithdrawStake = /*#__PURE__*/ createUseSimulat
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointAbi}__ and `functionName` set to `"withdrawTo"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useSimulateEntryPointWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
   abi: entryPointAbi,
@@ -9872,10 +8011,10 @@ export const useSimulateEntryPointWithdrawTo = /*#__PURE__*/ createUseSimulateCo
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9885,10 +8024,10 @@ export const useWatchEntryPointEvent = /*#__PURE__*/ createUseWatchContractEvent
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"AccountDeployed"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointAccountDeployedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9899,10 +8038,10 @@ export const useWatchEntryPointAccountDeployedEvent = /*#__PURE__*/ createUseWat
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"BeforeExecution"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9913,10 +8052,10 @@ export const useWatchEntryPointBeforeExecutionEvent = /*#__PURE__*/ createUseWat
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Deposited"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointDepositedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9925,12 +8064,26 @@ export const useWatchEntryPointDepositedEvent = /*#__PURE__*/ createUseWatchCont
 })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"PostOpRevertReason"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const useWatchEntryPointPostOpRevertReasonEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointAbi,
+  address: entryPointAddress,
+  eventName: 'PostOpRevertReason',
+})
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointSignatureAggregatorChangedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -9942,10 +8095,10 @@ export const useWatchEntryPointSignatureAggregatorChangedEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeLocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointStakeLockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9956,10 +8109,10 @@ export const useWatchEntryPointStakeLockedEvent = /*#__PURE__*/ createUseWatchCo
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeUnlocked"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9970,10 +8123,10 @@ export const useWatchEntryPointStakeUnlockedEvent = /*#__PURE__*/ createUseWatch
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"StakeWithdrawn"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9984,10 +8137,10 @@ export const useWatchEntryPointStakeWithdrawnEvent = /*#__PURE__*/ createUseWatc
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationEvent"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointUserOperationEventEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
@@ -9996,12 +8149,27 @@ export const useWatchEntryPointUserOperationEventEvent = /*#__PURE__*/ createUse
 })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ */
+export const useWatchEntryPointUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointAbi,
+    address: entryPointAddress,
+    eventName: 'UserOperationPrefundTooLow',
+  })
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointUserOperationRevertReasonEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -10013,16 +8181,433 @@ export const useWatchEntryPointUserOperationRevertReasonEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointAbi}__ and `eventName` set to `"Withdrawn"`
  *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032)
  */
 export const useWatchEntryPointWithdrawnEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: entryPointAbi,
   address: entryPointAddress,
   eventName: 'Withdrawn',
 })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const useReadEntryPointSimulations = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"_validateSenderAndPaymaster"`
+ */
+export const useReadEntryPointSimulationsValidateSenderAndPaymaster =
+  /*#__PURE__*/ createUseReadContract({
+    abi: entryPointSimulationsAbi,
+    functionName: '_validateSenderAndPaymaster',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadEntryPointSimulationsBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"deposits"`
+ */
+export const useReadEntryPointSimulationsDeposits = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'deposits',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getDepositInfo"`
+ */
+export const useReadEntryPointSimulationsGetDepositInfo = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getDepositInfo',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getNonce"`
+ */
+export const useReadEntryPointSimulationsGetNonce = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getNonce',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getUserOpHash"`
+ */
+export const useReadEntryPointSimulationsGetUserOpHash = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getUserOpHash',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"nonceSequenceNumber"`
+ */
+export const useReadEntryPointSimulationsNonceSequenceNumber = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'nonceSequenceNumber',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"supportsInterface"`
+ */
+export const useReadEntryPointSimulationsSupportsInterface = /*#__PURE__*/ createUseReadContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'supportsInterface',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const useWriteEntryPointSimulations = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
+ */
+export const useWriteEntryPointSimulationsAddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const useWriteEntryPointSimulationsDelegateAndRevert = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'delegateAndRevert',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const useWriteEntryPointSimulationsDepositTo = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
+ */
+export const useWriteEntryPointSimulationsGetSenderAddress = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'getSenderAddress',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ */
+export const useWriteEntryPointSimulationsHandleAggregatedOps =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'handleAggregatedOps',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const useWriteEntryPointSimulationsHandleOps = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
+ */
+export const useWriteEntryPointSimulationsIncrementNonce = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'incrementNonce',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"innerHandleOp"`
+ */
+export const useWriteEntryPointSimulationsInnerHandleOp = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'innerHandleOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
+ */
+export const useWriteEntryPointSimulationsSimulateHandleOp = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'simulateHandleOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
+ */
+export const useWriteEntryPointSimulationsSimulateValidation = /*#__PURE__*/ createUseWriteContract(
+  { abi: entryPointSimulationsAbi, functionName: 'simulateValidation' }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const useWriteEntryPointSimulationsUnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const useWriteEntryPointSimulationsWithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const useWriteEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const useSimulateEntryPointSimulations = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
+ */
+export const useSimulateEntryPointSimulationsAddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const useSimulateEntryPointSimulationsDelegateAndRevert =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'delegateAndRevert',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const useSimulateEntryPointSimulationsDepositTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'depositTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
+ */
+export const useSimulateEntryPointSimulationsGetSenderAddress =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'getSenderAddress',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ */
+export const useSimulateEntryPointSimulationsHandleAggregatedOps =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'handleAggregatedOps',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const useSimulateEntryPointSimulationsHandleOps = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'handleOps',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
+ */
+export const useSimulateEntryPointSimulationsIncrementNonce =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'incrementNonce',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"innerHandleOp"`
+ */
+export const useSimulateEntryPointSimulationsInnerHandleOp =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'innerHandleOp',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
+ */
+export const useSimulateEntryPointSimulationsSimulateHandleOp =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'simulateHandleOp',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
+ */
+export const useSimulateEntryPointSimulationsSimulateValidation =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'simulateValidation',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const useSimulateEntryPointSimulationsUnlockStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const useSimulateEntryPointSimulationsWithdrawStake =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entryPointSimulationsAbi,
+    functionName: 'withdrawStake',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const useSimulateEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: entryPointSimulationsAbi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__
+ */
+export const useWatchEntryPointSimulationsEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: entryPointSimulationsAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"AccountDeployed"`
+ */
+export const useWatchEntryPointSimulationsAccountDeployedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'AccountDeployed',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"BeforeExecution"`
+ */
+export const useWatchEntryPointSimulationsBeforeExecutionEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'BeforeExecution',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"Deposited"`
+ */
+export const useWatchEntryPointSimulationsDepositedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'Deposited',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"PostOpRevertReason"`
+ */
+export const useWatchEntryPointSimulationsPostOpRevertReasonEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'PostOpRevertReason',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
+ */
+export const useWatchEntryPointSimulationsSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'SignatureAggregatorChanged',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"StakeLocked"`
+ */
+export const useWatchEntryPointSimulationsStakeLockedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'StakeLocked',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"StakeUnlocked"`
+ */
+export const useWatchEntryPointSimulationsStakeUnlockedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'StakeUnlocked',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"StakeWithdrawn"`
+ */
+export const useWatchEntryPointSimulationsStakeWithdrawnEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'StakeWithdrawn',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"UserOperationEvent"`
+ */
+export const useWatchEntryPointSimulationsUserOperationEventEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'UserOperationEvent',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
+ */
+export const useWatchEntryPointSimulationsUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'UserOperationPrefundTooLow',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"UserOperationRevertReason"`
+ */
+export const useWatchEntryPointSimulationsUserOperationRevertReasonEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'UserOperationRevertReason',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entryPointSimulationsAbi}__ and `eventName` set to `"Withdrawn"`
+ */
+export const useWatchEntryPointSimulationsWithdrawnEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entryPointSimulationsAbi,
+    eventName: 'Withdrawn',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link iEntryPointAbi}__
@@ -10075,6 +8660,14 @@ export const useWriteIEntryPointAddStake = /*#__PURE__*/ createUseWriteContract(
 })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const useWriteIEntryPointDelegateAndRevert = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointAbi,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"depositTo"`
  */
 export const useWriteIEntryPointDepositTo = /*#__PURE__*/ createUseWriteContract({
@@ -10112,22 +8705,6 @@ export const useWriteIEntryPointHandleOps = /*#__PURE__*/ createUseWriteContract
 export const useWriteIEntryPointIncrementNonce = /*#__PURE__*/ createUseWriteContract({
   abi: iEntryPointAbi,
   functionName: 'incrementNonce',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- */
-export const useWriteIEntryPointSimulateHandleOp = /*#__PURE__*/ createUseWriteContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateValidation"`
- */
-export const useWriteIEntryPointSimulateValidation = /*#__PURE__*/ createUseWriteContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateValidation',
 })
 
 /**
@@ -10170,6 +8747,14 @@ export const useSimulateIEntryPointAddStake = /*#__PURE__*/ createUseSimulateCon
 })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"delegateAndRevert"`
+ */
+export const useSimulateIEntryPointDelegateAndRevert = /*#__PURE__*/ createUseSimulateContract({
+  abi: iEntryPointAbi,
+  functionName: 'delegateAndRevert',
+})
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"depositTo"`
  */
 export const useSimulateIEntryPointDepositTo = /*#__PURE__*/ createUseSimulateContract({
@@ -10207,22 +8792,6 @@ export const useSimulateIEntryPointHandleOps = /*#__PURE__*/ createUseSimulateCo
 export const useSimulateIEntryPointIncrementNonce = /*#__PURE__*/ createUseSimulateContract({
   abi: iEntryPointAbi,
   functionName: 'incrementNonce',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateHandleOp"`
- */
-export const useSimulateIEntryPointSimulateHandleOp = /*#__PURE__*/ createUseSimulateContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateHandleOp',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointAbi}__ and `functionName` set to `"simulateValidation"`
- */
-export const useSimulateIEntryPointSimulateValidation = /*#__PURE__*/ createUseSimulateContract({
-  abi: iEntryPointAbi,
-  functionName: 'simulateValidation',
 })
 
 /**
@@ -10281,6 +8850,13 @@ export const useWatchIEntryPointDepositedEvent = /*#__PURE__*/ createUseWatchCon
 })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"PostOpRevertReason"`
+ */
+export const useWatchIEntryPointPostOpRevertReasonEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: iEntryPointAbi, eventName: 'PostOpRevertReason' }
+)
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
  */
 export const useWatchIEntryPointSignatureAggregatorChangedEvent =
@@ -10321,6 +8897,15 @@ export const useWatchIEntryPointUserOperationEventEvent = /*#__PURE__*/ createUs
 )
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
+ */
+export const useWatchIEntryPointUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointAbi,
+    eventName: 'UserOperationPrefundTooLow',
+  })
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointAbi}__ and `eventName` set to `"UserOperationRevertReason"`
  */
 export const useWatchIEntryPointUserOperationRevertReasonEvent =
@@ -10338,772 +8923,371 @@ export const useWatchIEntryPointWithdrawnEvent = /*#__PURE__*/ createUseWatchCon
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const useWriteIMetaPaymaster = /*#__PURE__*/ createUseWriteContract({
-  abi: iMetaPaymasterAbi,
+export const useReadIEntryPointSimulations = /*#__PURE__*/ createUseReadContract({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"balanceOf"`
  */
-export const useWriteIMetaPaymasterFund = /*#__PURE__*/ createUseWriteContract({
-  abi: iMetaPaymasterAbi,
-  functionName: 'fund',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
- */
-export const useSimulateIMetaPaymaster = /*#__PURE__*/ createUseSimulateContract({
-  abi: iMetaPaymasterAbi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
- */
-export const useSimulateIMetaPaymasterFund = /*#__PURE__*/ createUseSimulateContract({
-  abi: iMetaPaymasterAbi,
-  functionName: 'fund',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSend = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefence"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendBotDefence = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_botDefence',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefenceActivatedOnce"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendBotDefenceActivatedOnce = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_botDefenceActivatedOnce',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_knownBots"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendKnownBots = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_knownBots',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_manager"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendManager = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_manager',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_maxBuy"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendMaxBuy = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_maxBuy',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_multisig"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendMultisig = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_multisig',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_totalSupply"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: '_totalSupply',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"allowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendAllowance = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'allowance',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOf"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useReadSendBalanceOf = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
+export const useReadIEntryPointSimulationsBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: iEntryPointSimulationsAbi,
   functionName: 'balanceOf',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOfAt"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getDepositInfo"`
  */
-export const useReadSendBalanceOfAt = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'balanceOfAt',
+export const useReadIEntryPointSimulationsGetDepositInfo = /*#__PURE__*/ createUseReadContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getDepositInfo',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decimals"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getNonce"`
  */
-export const useReadSendDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'decimals',
+export const useReadIEntryPointSimulationsGetNonce = /*#__PURE__*/ createUseReadContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getNonce',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"getLatestSnapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getUserOpHash"`
  */
-export const useReadSendGetLatestSnapshot = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'getLatestSnapshot',
+export const useReadIEntryPointSimulationsGetUserOpHash = /*#__PURE__*/ createUseReadContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getUserOpHash',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"name"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const useReadSendName = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'name',
+export const useWriteIEntryPointSimulations = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"symbol"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
  */
-export const useReadSendSymbol = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'symbol',
+export const useWriteIEntryPointSimulationsAddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupply"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
  */
-export const _useReadSendTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'totalSupply',
+export const useWriteIEntryPointSimulationsDelegateAndRevert = /*#__PURE__*/ createUseWriteContract(
+  { abi: iEntryPointSimulationsAbi, functionName: 'delegateAndRevert' }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const useWriteIEntryPointSimulationsDepositTo = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'depositTo',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupplyAt"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
  */
-export const useReadSendTotalSupplyAt = /*#__PURE__*/ createUseReadContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'totalSupplyAt',
+export const useWriteIEntryPointSimulationsGetSenderAddress = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'getSenderAddress',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
  */
-export const useWriteSend = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
+export const useWriteIEntryPointSimulationsHandleAggregatedOps =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'handleAggregatedOps',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const useWriteIEntryPointSimulationsHandleOps = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'handleOps',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
  */
-export const useWriteSendActivateBotDefenceOnce = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'activateBotDefenceOnce',
+export const useWriteIEntryPointSimulationsIncrementNonce = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'incrementNonce',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
  */
-export const useWriteSendApprove = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approve',
+export const useWriteIEntryPointSimulationsSimulateHandleOp = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'simulateHandleOp',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
  */
-export const useWriteSendApproveToken = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approveToken',
+export const useWriteIEntryPointSimulationsSimulateValidation =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'simulateValidation',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const useWriteIEntryPointSimulationsUnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'unlockStake',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
  */
-export const useWriteSendChangeOwner = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'changeOwner',
+export const useWriteIEntryPointSimulationsWithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'withdrawStake',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
  */
-export const useWriteSendCreateSnapshot = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'createSnapshot',
+export const useWriteIEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const useWriteSendDeactivateBotDefence = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'deactivateBotDefence',
+export const useSimulateIEntryPointSimulations = /*#__PURE__*/ createUseSimulateContract({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"addStake"`
  */
-export const useWriteSendDecreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'decreaseAllowance',
+export const useSimulateIEntryPointSimulationsAddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'addStake',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"delegateAndRevert"`
  */
-export const useWriteSendIncreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'increaseAllowance',
+export const useSimulateIEntryPointSimulationsDelegateAndRevert =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'delegateAndRevert',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"depositTo"`
+ */
+export const useSimulateIEntryPointSimulationsDepositTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'depositTo',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"getSenderAddress"`
  */
-export const useWriteSendModifyMaxBuy = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'modifyMaxBuy',
+export const useSimulateIEntryPointSimulationsGetSenderAddress =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'getSenderAddress',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleAggregatedOps"`
+ */
+export const useSimulateIEntryPointSimulationsHandleAggregatedOps =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'handleAggregatedOps',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"handleOps"`
+ */
+export const useSimulateIEntryPointSimulationsHandleOps = /*#__PURE__*/ createUseSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'handleOps',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"incrementNonce"`
  */
-export const useWriteSendRemoveBots = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'removeBots',
+export const useSimulateIEntryPointSimulationsIncrementNonce =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'incrementNonce',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateHandleOp"`
+ */
+export const useSimulateIEntryPointSimulationsSimulateHandleOp =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'simulateHandleOp',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"simulateValidation"`
+ */
+export const useSimulateIEntryPointSimulationsSimulateValidation =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'simulateValidation',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"unlockStake"`
+ */
+export const useSimulateIEntryPointSimulationsUnlockStake = /*#__PURE__*/ createUseSimulateContract(
+  { abi: iEntryPointSimulationsAbi, functionName: 'unlockStake' }
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const useSimulateIEntryPointSimulationsWithdrawStake =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: iEntryPointSimulationsAbi,
+    functionName: 'withdrawStake',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const useSimulateIEntryPointSimulationsWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: iEntryPointSimulationsAbi,
+  functionName: 'withdrawTo',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__
  */
-export const useWriteSendTransfer = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transfer',
+export const useWatchIEntryPointSimulationsEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: iEntryPointSimulationsAbi,
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"AccountDeployed"`
  */
-export const useWriteSendTransferFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferFrom',
-})
+export const useWatchIEntryPointSimulationsAccountDeployedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'AccountDeployed',
+  })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"BeforeExecution"`
  */
-export const useWriteSendTransferToken = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferToken',
-})
+export const useWatchIEntryPointSimulationsBeforeExecutionEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'BeforeExecution',
+  })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"Deposited"`
  */
-export const useWriteSendTransferTokenFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferTokenFrom',
-})
+export const useWatchIEntryPointSimulationsDepositedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'Deposited',
+  })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"PostOpRevertReason"`
  */
-export const useWriteSendWithdraw = /*#__PURE__*/ createUseWriteContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'withdraw',
-})
+export const useWatchIEntryPointSimulationsPostOpRevertReasonEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'PostOpRevertReason',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"SignatureAggregatorChanged"`
  */
-export const useSimulateSend = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-})
+export const useWatchIEntryPointSimulationsSignatureAggregatorChangedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'SignatureAggregatorChanged',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"StakeLocked"`
  */
-export const useSimulateSendActivateBotDefenceOnce = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'activateBotDefenceOnce',
-})
+export const useWatchIEntryPointSimulationsStakeLockedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'StakeLocked',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"StakeUnlocked"`
  */
-export const useSimulateSendApprove = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approve',
-})
+export const useWatchIEntryPointSimulationsStakeUnlockedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'StakeUnlocked',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"StakeWithdrawn"`
  */
-export const useSimulateSendApproveToken = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'approveToken',
-})
+export const useWatchIEntryPointSimulationsStakeWithdrawnEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'StakeWithdrawn',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"UserOperationEvent"`
  */
-export const useSimulateSendChangeOwner = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'changeOwner',
-})
+export const useWatchIEntryPointSimulationsUserOperationEventEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'UserOperationEvent',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"UserOperationPrefundTooLow"`
  */
-export const useSimulateSendCreateSnapshot = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'createSnapshot',
-})
+export const useWatchIEntryPointSimulationsUserOperationPrefundTooLowEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'UserOperationPrefundTooLow',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"UserOperationRevertReason"`
  */
-export const useSimulateSendDeactivateBotDefence = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'deactivateBotDefence',
-})
+export const useWatchIEntryPointSimulationsUserOperationRevertReasonEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'UserOperationRevertReason',
+  })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iEntryPointSimulationsAbi}__ and `eventName` set to `"Withdrawn"`
  */
-export const useSimulateSendDecreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendIncreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'increaseAllowance',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendModifyMaxBuy = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'modifyMaxBuy',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendRemoveBots = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'removeBots',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendTransfer = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendTransferFrom = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendTransferToken = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferToken',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendTransferTokenFrom = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'transferTokenFrom',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useSimulateSendWithdraw = /*#__PURE__*/ createUseSimulateContract({
-  abi: sendAbi,
-  address: sendAddress,
-  functionName: 'withdraw',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useWatchSendEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Approval"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useWatchSendApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Snapshot"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useWatchSendSnapshotEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-  eventName: 'Snapshot',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Transfer"`
- *
- * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * -
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
- */
-export const useWatchSendTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendAbi,
-  address: sendAddress,
-  eventName: 'Transfer',
-})
+export const useWatchIEntryPointSimulationsWithdrawnEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iEntryPointSimulationsAbi,
+    eventName: 'Withdrawn',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendMerkleDropAbi}__
@@ -11523,6 +9707,254 @@ export const useWatchSendMerkleDropTrancheExpiredEvent = /*#__PURE__*/ createUse
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendToken = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenName = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useReadSendTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendToken = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWriteSendTokenTransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenApprove = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenTransfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendTokenAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useSimulateSendTokenTransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWatchSendTokenEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWatchSendTokenApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendTokenAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * -
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A)
+ */
+export const useWatchSendTokenTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendTokenAbi,
+  address: sendTokenAddress,
+  eventName: 'Transfer',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link senderCreatorAbi}__
  */
 export const useWriteSenderCreator = /*#__PURE__*/ createUseWriteContract({ abi: senderCreatorAbi })
@@ -11617,22 +10049,6 @@ export const useWriteTestUsdcApprove = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const useWriteTestUsdcDecreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const useWriteTestUsdcIncreaseAllowance = /*#__PURE__*/ createUseWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'increaseAllowance',
-})
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transfer"`
  */
 export const useWriteTestUsdcTransfer = /*#__PURE__*/ createUseWriteContract({
@@ -11659,22 +10075,6 @@ export const useSimulateTestUsdc = /*#__PURE__*/ createUseSimulateContract({ abi
 export const useSimulateTestUsdcApprove = /*#__PURE__*/ createUseSimulateContract({
   abi: testUsdcAbi,
   functionName: 'approve',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"decreaseAllowance"`
- */
-export const useSimulateTestUsdcDecreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'decreaseAllowance',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"increaseAllowance"`
- */
-export const useSimulateTestUsdcIncreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'increaseAllowance',
 })
 
 /**

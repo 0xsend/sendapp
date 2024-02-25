@@ -34,7 +34,7 @@
     "editor.defaultFormatter": "JuanBlanco.solidity"
   },
   "solidity.linter": "solhint",
-  "solidity.compileUsingRemoteVersion": "v0.8.20+commit.a1b79de6",
+  "solidity.compileUsingRemoteVersion": "v0.8.23+commit.f704f362",
   "solidity.formatter": "forge",
   "solidity.monoRepoSupport": false,
   "solidity.remappings": [

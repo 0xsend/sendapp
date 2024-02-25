@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "files": [
+    "src/",
+    "out/",
+    "broadcast/"
+  ],
   "scripts": {
     "gen-dist-merkle-tree": "bun run ./script/gen-dist-merkle-tree.ts",
     "build": "forge build",

@@ -173,9 +173,12 @@ function CreateSendAccount() {
     // store the init code in the database to avoid having to recompute it in case user drops off
     // and does not finish onboarding flow
     const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
-    const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(_publicKey)])
+    const factory = daimoAccountFactory.address
+    const factoryData = encodeCreateAccountData(_publicKey)
+    const initCode = concat([factory, factoryData])
     const senderAddress = await getSenderAddress(baseMainnetClient, {
-      initCode,
+      factory,
+      factoryData,
       entryPoint: entrypoint.address,
     })
     const { error } = await supabase.rpc('create_send_account', {

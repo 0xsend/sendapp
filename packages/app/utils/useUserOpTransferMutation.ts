@@ -1,19 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { assert } from './assert'
-import {
-  ContractFunctionExecutionError,
-  ContractFunctionRevertedError,
-  Hex,
-  encodeFunctionData,
-  erc20Abi,
-  isAddress,
-  isHex,
-} from 'viem'
+import { Hex, encodeFunctionData, erc20Abi, isAddress, isHex, size, slice } from 'viem'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   daimoAccountAbi,
-  entryPointAbi,
   entryPointAddress,
 } from '@my/wagmi'
 import { UserOperation, getUserOperationHash } from 'permissionless'
@@ -107,17 +98,21 @@ export function useUserOpTransferMutation() {
 
       // @todo implement gas estimation
       // @todo implement paymaster and data
-      const userOp: UserOperation = {
+      const userOp: UserOperation<'v0.7'> = {
         sender,
         nonce,
-        initCode,
+        factory: size(initCode) ? slice(initCode, 0, 20) : undefined,
+        factoryData: size(initCode) ? slice(initCode, 20) : undefined,
         callData,
         callGasLimit: 300000n,
         verificationGasLimit: 700000n,
         preVerificationGas: 300000n,
         maxFeePerGas: 1000000n,
         maxPriorityFeePerGas: 1000000n,
-        paymasterAndData: '0x',
+        paymaster: undefined,
+        paymasterData: undefined,
+        paymasterPostOpGasLimit: undefined,
+        paymasterVerificationGasLimit: undefined,
         signature: '0x',
       }
 
@@ -136,55 +131,54 @@ export function useUserOpTransferMutation() {
       })
 
       // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
-      await baseMainnetClient
-        .simulateContract({
-          address: entryPoint,
-          functionName: 'simulateValidation',
-          abi: entryPointAbi,
-          args: [userOp],
-        })
-        .catch((e: ContractFunctionExecutionError) => {
-          const cause: ContractFunctionRevertedError = e.cause
-          if (cause.data?.errorName === 'ValidationResult') {
-            const data = cause.data
-            if ((data.args?.[0] as { sigFailed: boolean }).sigFailed) {
-              throw new Error('Signature failed')
-            }
-            // console.log('ValidationResult', data)
-            return data
-          }
-          throw e
-        })
+      // await baseMainnetClient
+      //   .simulateContract({
+      //     address: entryPoint,
+      //     functionName: 'simulateValidation',
+      //     abi: entryPointAbi,
+      //     args: [userOp],
+      //   })
+      //   .catch((e: ContractFunctionExecutionError) => {
+      //     const cause: ContractFunctionRevertedError = e.cause
+      //     if (cause.data?.errorName === 'ValidationResult') {
+      //       const data = cause.data
+      //       if ((data.args?.[0] as { sigFailed: boolean }).sigFailed) {
+      //         throw new Error('Signature failed')
+      //       }
+      //       // console.log('ValidationResult', data)
+      //       return data
+      //     }
+      //     throw e
+      //   })
 
       // [simulateHandleOp](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L203)
-      await baseMainnetClient
-        .simulateContract({
-          address: entryPoint,
-          functionName: 'simulateHandleOp',
-          abi: entryPointAbi,
-          args: [
-            userOp,
-            '0x0000000000000000000000000000000000000000',
-            '0x', // target calldata
-          ],
-        })
-        .catch((e: ContractFunctionExecutionError) => {
-          const cause: ContractFunctionRevertedError = e.cause
-          if (cause.data?.errorName === 'ExecutionResult') {
-            const data = cause.data
-            if ((data.args?.[0] as { success: boolean }).success) {
-              throw new Error('Handle op failed')
-            }
-            // console.log('ExecutionResult', data)
-            // @todo use to estimate gas
-            return data
-          }
-          throw e
-        })
+      // await baseMainnetClient
+      //   .simulateContract({
+      //     address: entryPoint,
+      //     functionName: 'simulateHandleOp',
+      //     abi: entryPointAbi,
+      //     args: [
+      //       userOp,
+      //       '0x0000000000000000000000000000000000000000',
+      //       '0x', // target calldata
+      //     ],
+      //   })
+      //   .catch((e: ContractFunctionExecutionError) => {
+      //     const cause: ContractFunctionRevertedError = e.cause
+      //     if (cause.data?.errorName === 'ExecutionResult') {
+      //       const data = cause.data
+      //       if ((data.args?.[0] as { success: boolean }).success) {
+      //         throw new Error('Handle op failed')
+      //       }
+      //       // console.log('ExecutionResult', data)
+      //       // @todo use to estimate gas
+      //       return data
+      //     }
+      //     throw e
+      //   })
 
       const hash = await baseMainnetBundlerClient.sendUserOperation({
         userOperation: userOp,
-        entryPoint,
       })
       const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
       assert(receipt.success === true, 'Failed to send userOp')

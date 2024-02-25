@@ -2,7 +2,7 @@
 pragma solidity ^0.8.10;
 
 import "forge-std/Test.sol";
-import {Send} from "../src/Send.sol";
+import {SendToken} from "../src/SendToken.sol";
 import {SendMerkleDrop} from "../src/SendMerkleDrop.sol";
 import {Helper} from "../src/Helper.sol";
 
@@ -16,19 +16,18 @@ contract SendMerkleDropTest is Test, Helper {
     uint256 constant TRANCHE_AMOUNT = 653359200;
     bytes32 constant TRANCHE_MERKLE_ROOT = 0x8f9787b27bc7ebe82a8ba2ebe0bd7a85a941c1ff90f1969e0d9ce7125b0cfbf8;
 
-    Send private send;
+    SendToken private sendToken;
     SendMerkleDrop private sendMerkleDrop;
 
     function setUp() public {
         address[] memory knownBots = new address[](1);
         knownBots[0] = KNOWN_BOT;
-        // Mock deploy your Send and SendMerkleDrop contracts.
-        send = new Send(address(this), address(this), knownBots, INITIAL_MAX_BUY);
-        sendMerkleDrop = new SendMerkleDrop(send, address(this));
+        sendToken = new SendToken();
+        sendMerkleDrop = new SendMerkleDrop(sendToken, address(this));
 
-        assertEq(send.balanceOf(address(this)), 100e9);
+        assertEq(sendToken.balanceOf(address(this)), 100e9);
 
-        send.approve(address(sendMerkleDrop), TRANCHE_AMOUNT);
+        sendToken.approve(address(sendMerkleDrop), TRANCHE_AMOUNT);
         sendMerkleDrop.addTranche(TRANCHE_MERKLE_ROOT, TRANCHE_AMOUNT);
 
         // Assertions
@@ -39,7 +38,7 @@ contract SendMerkleDropTest is Test, Helper {
 
     function test_AllowSingleTrancheClaim() public {
         address bigboss = address(0x0030788CA58a0a5daC70941e76bA4ee604931bF1);
-        uint256 bigbossBalance = send.balanceOf(bigboss);
+        uint256 bigbossBalance = sendToken.balanceOf(bigboss);
         uint256 index = 0;
         uint256 amount = 10102861;
         // generate the proofs using the gen-dist-merkle-tree script
@@ -55,7 +54,7 @@ contract SendMerkleDropTest is Test, Helper {
         sendMerkleDrop.claimTranche(bigboss, TRANCHE_ID, index, amount, proof);
 
         // Assertions
-        assertEq(send.balanceOf(bigboss), bigbossBalance + amount);
+        assertEq(sendToken.balanceOf(bigboss), bigbossBalance + amount);
         assertEq(sendMerkleDrop.trancheAmountsClaimed(TRANCHE_ID), amount);
         assertTrue(sendMerkleDrop.isClaimed(TRANCHE_ID, index));
     }
@@ -63,7 +62,7 @@ contract SendMerkleDropTest is Test, Helper {
     // test that another address cannot claim the same index
     function test_DenyDoubleClaim() public {
         address bob = address(0xb0b);
-        uint256 bobBalance = send.balanceOf(bob);
+        uint256 bobBalance = sendToken.balanceOf(bob);
         uint256 index = 0;
         uint256 amount = 10102861;
         // generate the proofs using the gen-dist-merkle-tree script
@@ -81,7 +80,7 @@ contract SendMerkleDropTest is Test, Helper {
         sendMerkleDrop.claimTranche(bob, TRANCHE_ID, index, amount, proof);
 
         // Assertions
-        assertEq(send.balanceOf(bob), bobBalance);
+        assertEq(sendToken.balanceOf(bob), bobBalance);
         assertEq(sendMerkleDrop.trancheAmountsClaimed(TRANCHE_ID), 0);
         assertFalse(sendMerkleDrop.isClaimed(TRANCHE_ID, index));
     }

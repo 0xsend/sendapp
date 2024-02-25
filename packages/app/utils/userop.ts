@@ -5,9 +5,11 @@ import {
   daimoAccountFactoryAddress as daimoAccountFactoryAddresses,
   daimoVerifierAbi,
   daimoVerifierProxyAddress,
+  entryPointAddress,
   iEntryPointAbi,
+  iEntryPointSimulationsAbi,
 } from '@my/wagmi'
-import { UserOperation, getSenderAddress } from 'permissionless'
+
 import {
   http,
   Hex,
@@ -21,7 +23,6 @@ import {
   getContract,
   hexToBytes,
   numberToBytes,
-  parseEther,
   isHex,
   publicActions,
 } from 'viem'
@@ -53,9 +54,15 @@ export const daimoAccountFactory = getContract({
 })
 
 export const entrypoint = getContract({
-  abi: [getAbiItem({ abi: iEntryPointAbi, name: 'getUserOpHash' })],
+  abi: iEntryPointAbi,
+  address: entryPointAddress[baseMainnetClient.chain.id],
   client: baseMainnetClient,
-  address: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+})
+
+export const entrypointSimulations = getContract({
+  abi: iEntryPointSimulationsAbi,
+  address: entryPointAddress[baseMainnetClient.chain.id],
+  client: baseMainnetClient,
 })
 
 export const daimoVerifierAddress = daimoVerifierProxyAddress[845337] // TODO: use chain id
@@ -102,72 +109,6 @@ export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
       USEROP_SALT, // salt
     ],
   })
-}
-
-// @todo needs to accept a send account and signature
-// @todo add logic for handling init code
-// @todo add logic for handling call data
-// @todo add logic for estimating gas
-// @todo add logic for paymaster and data
-export async function generateUserOp(publicKey: [Hex, Hex]) {
-  const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(publicKey)])
-
-  const senderAddress = await getSenderAddress(baseMainnetClient, {
-    initCode,
-    entryPoint: entrypoint.address,
-  })
-
-  const address = await daimoAccountFactory.read.getAddress([
-    USEROP_KEY_SLOT,
-    publicKey,
-    [],
-    USEROP_SALT,
-  ])
-
-  if (address !== senderAddress) {
-    throw new Error('Address mismatch')
-  }
-
-  // GENERATE THE CALLDATA
-  // Finally, we should be able to do a userop from our new Daimo account.
-  const to = receiverAccount.address
-  const value = parseEther('0.01')
-  const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
-
-  const callData = encodeFunctionData({
-    abi: daimoAccountAbi,
-    functionName: 'executeBatch',
-    args: [
-      [
-        {
-          dest: to,
-          value: value,
-          data: data,
-        },
-      ],
-    ],
-  })
-  const userOp: UserOperation = {
-    sender: senderAddress,
-    nonce: 0n,
-    initCode,
-    callData,
-    callGasLimit: 300000n,
-    verificationGasLimit: 700000n,
-    preVerificationGas: 300000n,
-    maxFeePerGas: 1000000n,
-    maxPriorityFeePerGas: 1000000n,
-    paymasterAndData: '0x',
-    signature: '0x',
-  }
-
-  // get userop hash
-  const userOpHash = await entrypoint.read.getUserOpHash([userOp])
-
-  return {
-    userOp,
-    userOpHash,
-  }
 }
 
 /**

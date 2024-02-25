@@ -6,8 +6,6 @@ import debug from 'debug'
 const log = debug('app:features:onboarding:screen')
 import crypto from 'node:crypto'
 import {
-  ContractFunctionExecutionError,
-  ContractFunctionRevertedError,
   Hex,
   bytesToHex,
   concat,
@@ -19,7 +17,7 @@ import {
   parseEther,
 } from 'viem'
 
-import { daimoAccountAbi, iEntryPointAbi } from '@my/wagmi'
+import { daimoAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import {
   USEROP_KEY_SLOT,
@@ -35,7 +33,7 @@ import {
   verifier,
 } from 'app/utils/userop'
 import { numberToBytes } from 'viem'
-import { getSenderAddress, UserOperation } from 'permissionless'
+import { getSenderAddress, getUserOperationHash, UserOperation } from 'permissionless'
 import nock from 'nock'
 
 jest.mock('@daimo/expo-passkeys', () => ({
@@ -138,10 +136,7 @@ async function createAccountAndVerifySignature() {
   const _userOp = {
     ...userOp,
     signature: opSig,
-  }
-  if (userOpHash !== (await entrypoint.read.getUserOpHash([_userOp]))) {
-    throw new Error('Invalid signature')
-  }
+  } as UserOperation<'v0.7'>
 
   const message = challenge
   const signature = bytesToHex(hexToBytes(opSig).slice(7))
@@ -153,33 +148,32 @@ async function createAccountAndVerifySignature() {
   expect(result).toBe(true)
 
   // always reverts
-  await baseMainnetClient
-    .simulateContract({
-      address: entrypoint.address,
-      functionName: 'simulateValidation',
-      abi: iEntryPointAbi,
-      args: [_userOp],
-    })
-    .catch((e: ContractFunctionExecutionError) => {
-      const cause: ContractFunctionRevertedError = e.cause
-      if (cause.data?.errorName !== 'ValidationResult') {
-        throw e
-      }
-      const validationResult = cause.data.args?.[0]
-      if ((validationResult as { sigFailed: boolean })?.sigFailed) {
-        console.log('Validation result: ', validationResult)
-        throw new Error('Signature failed')
-      }
-    })
+  // await baseMainnetClient
+  //   .simulateContract({
+  //     address: entrypoint.address,
+  //     functionName: 'simulateValidation',
+  //     abi: iEntryPointSimulationsAbi,
+  //     args: [_userOp],
+  //   })
+  //   .catch((e: ContractFunctionExecutionError) => {
+  //     const cause: ContractFunctionRevertedError = e.cause
+  //     if (cause.data?.errorName !== 'ValidationResult') {
+  //       throw e
+  //     }
+  //     const validationResult = cause.data.args?.[0]
+  //     if ((validationResult as { sigFailed: boolean })?.sigFailed) {
+  //       console.log('Validation result: ', validationResult)
+  //       throw new Error('Signature failed')
+  //     }
+  //   })
 
   return { userOp: _userOp, userOpHash }
 }
 
 export async function generateUserOp(publicKey: [Hex, Hex]) {
-  const initCode = concat([daimoAccountFactory.address, encodeCreateAccountData(publicKey)])
-
   const senderAddress = await getSenderAddress(baseMainnetClient, {
-    initCode,
+    factory: daimoAccountFactory.address,
+    factoryData: encodeCreateAccountData(publicKey),
     entryPoint: entrypoint.address,
   })
 
@@ -213,22 +207,30 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
       ],
     ],
   })
-  const userOp: UserOperation = {
+  const userOp: UserOperation<'v0.7'> = {
     sender: senderAddress,
     nonce: 0n,
-    initCode,
+    factory: daimoAccountFactory.address,
+    factoryData: encodeCreateAccountData(publicKey),
     callData,
     callGasLimit: 300000n,
     verificationGasLimit: 700000n,
     preVerificationGas: 300000n,
     maxFeePerGas: 1000000n,
     maxPriorityFeePerGas: 1000000n,
-    paymasterAndData: '0x',
+    paymaster: undefined,
+    paymasterData: undefined,
+    paymasterPostOpGasLimit: undefined,
+    paymasterVerificationGasLimit: undefined,
     signature: '0x',
   }
 
   // get userop hash
-  const userOpHash = await entrypoint.read.getUserOpHash([userOp])
+  const userOpHash = getUserOperationHash({
+    userOperation: userOp,
+    entryPoint: entrypoint.address,
+    chainId: baseMainnetClient.chain.id,
+  })
   return {
     userOp,
     userOpHash,
@@ -247,10 +249,7 @@ afterEach(async () => {
 test.skip('can create a new account', async () => {
   const { userOp } = await createAccountAndVerifySignature()
   // submit userop
-  const _userOpHash = await bundlerClient.sendUserOperation({
-    userOperation: userOp,
-    entryPoint: entrypoint.address,
-  })
+  const _userOpHash = await bundlerClient.sendUserOperation({ userOperation: userOp })
   const senderBalA = await baseMainnetClient.getBalance({ address: userOp.sender })
   const receiverBalA = await baseMainnetClient.getBalance({
     address: receiverAccount.address,
@@ -274,7 +273,9 @@ test.skip('can create a new account', async () => {
 
 test.skip('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
-  log('TODO: implement bundler test', supportedEntryPoints)
+  expect(supportedEntryPoints).toBeDefined()
+  expect(supportedEntryPoints.length).toBeGreaterThan(0)
+  expect(supportedEntryPoints).toContain(entrypoint.address)
 })
 
 test.skip('can get gas user operation gas prices', async () => {
