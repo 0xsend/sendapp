@@ -108,32 +108,10 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - name: Switch to Vercel Send team
-        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }}  team switch 0xsend
-      - name: Pull Vercel Environment Information
-        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }} pull --yes --environment=preview
-      - name: Build Project Artifacts
-        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }} build
-      - name: Extract branch name
-        shell: bash
-        run: |
-          branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          branch="${branch//\//-}"        # Replace / with -
-          branch="${branch//_/-}"         # Replace _ with -
-          branch="${branch,,}"            # Convert to lowercase
-          branch="${branch//[^a-z0-9-]/}" # Remove any character that is not a-z, 0-9, or -
-          branch="${branch%-}"            # Remove trailing hyphen, if any
-          branch="${branch#-}"            # Remove leading hyphen, if any
-          echo "branch=${branch}" >> $GITHUB_OUTPUT
-          echo "public_url=https://sendapp-${BRANCH}-0xsend.vercel.app" >> $GITHUB_OUTPUT
-        id: extract_branch
-      - name: Deploy Project Artifacts to Vercel
-        id: deploy
-        run: |
-          vercel --token=${{ secrets.VERCEL_TOKEN }} deploy --prebuilt \
-            --env=NEXT_PUBLIC_URL=${{ steps.extract_branch.outputs.public_url }} \
-            > deployment-url.txt && \
-            echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
-          echo ::notice::Deployment URL: $(cat deployment-url.txt)
-      - name: Set Vercel alias
-        run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ steps.extract_branch.outputs.public_url }}
+      - name: Vercel Deploy
+        uses: ./.github/actions/vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

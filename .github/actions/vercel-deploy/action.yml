@@ -1,0 +1,53 @@
+name: "Deploy Vercel"
+description: "Deploy the project to Vercel. Pulls environment information, builds the project, and deploys it to Vercel. Sets the Vercel alias."
+inputs:
+  vercel-token:
+    description: "The Vercel token to use for deployment."
+    required: true
+outputs:
+  deployment-url:
+    description: "The URL of the deployment."
+    value: ${{ steps.deploy.outputs.deployment_url }}
+runs:
+  using: "composite"
+  steps:
+    - name: Mask Vercel Token
+      shell: bash
+      run: echo "::add-mask::${{ inputs.vercel-token }}"
+    - name: Switch to Vercel Send team
+      shell: bash
+      run: bunx vercel --token=${{ inputs.vercel-token }}  team switch 0xsend
+    - name: Pull Vercel Environment Information
+      shell: bash
+      run: bunx vercel --token=${{ inputs.vercel-token }} pull --yes --environment=preview
+    - name: Build Project Artifacts
+      shell: bash
+      run: yarn build && bunx vercel --token=${{ inputs.vercel-token }} build
+    - name: Extract branch name
+      shell: bash
+      run: |
+        branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+        branch="${branch//\//-}"        # Replace / with -
+        branch="${branch//_/-}"         # Replace _ with -
+        branch="${branch,,}"            # Convert to lowercase
+        branch="${branch//[^a-z0-9-]/}" # Remove any character that is not a-z, 0-9, or -
+        branch="${branch%-}"            # Remove trailing hyphen, if any
+        branch="${branch#-}"            # Remove leading hyphen, if any
+        echo "branch=${branch}" >> $GITHUB_OUTPUT
+        echo "public_url=https://sendapp-${BRANCH}-0xsend.vercel.app" >> $GITHUB_OUTPUT
+      id: extract_branch
+    - name: Deploy Project Artifacts to Vercel
+      id: deploy
+      shell: bash
+      run: |
+        vercel --token=${{ inputs.vercel-token }} deploy --prebuilt \
+          --env=NEXT_PUBLIC_URL=${{ steps.extract_branch.outputs.public_url }} \
+          > deployment-url.txt && \
+        echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+        echo ::notice::Deployment URL: $(cat deployment-url.txt)
+    - name: Set Vercel Branch Alias
+      shell: bash
+      run: |
+        bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ steps.extract_branch.outputs.public_url }}
+        echo "public_url=${{ steps.extract_branch.outputs.public_url }}" >> $GITHUB_OUTPUT
+        echo ::notice::Vercel Alias URL: ${{ steps.extract_branch.outputs.public_url }}
