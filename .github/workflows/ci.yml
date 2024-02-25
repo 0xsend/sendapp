@@ -11,15 +11,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # set yarn cache
   cache-deps:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - name: Setup Environment
         uses: ./.github/actions/setup-env
+        with:
+          install-foundry: false
+          install-bun: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
 
@@ -29,7 +31,6 @@ jobs:
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
-      YARN_ENABLE_HARDENED_MODE: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -103,6 +104,8 @@ jobs:
           submodules: recursive
       - name: Setup Environment
         uses: ./.github/actions/setup-env
+        env:
+          YARN_ENABLE_HARDENED_MODE: 0
       - name: Switch to Vercel Send team
         run: bunx vercel --token=${{ secrets.VERCEL_TOKEN }}  team switch 0xsend
       - name: Pull Vercel Environment Information
