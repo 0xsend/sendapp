@@ -95,7 +95,7 @@ jobs:
   # @todo create supabase branch https://supabase.com/docs/reference/cli/supabase-branches-update
   vercel-deploy-preview:
     # skip if on dev since it will be deployed with another workflow
-    if: github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [cache-deps]
 
