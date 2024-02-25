@@ -3,8 +3,8 @@ import { react, actions, foundry } from '@wagmi/cli/plugins'
 import { pascalCase } from 'change-case'
 import { globby } from 'globby'
 import { erc20Abi } from 'viem'
-import { base, baseSepolia, mainnet } from 'viem/chains'
-import { localhost, baseLocal, stagingMainnet } from './src/chains'
+import { base, baseSepolia, mainnet, sepolia } from 'viem/chains'
+import { localhost, baseLocal } from './src/chains'
 import { iEntryPointAbi } from './src'
 
 const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
@@ -109,7 +109,7 @@ export default defineConfig({
       address: {
         [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet
         [localhost.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet localhost fork
-        [stagingMainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet staging fork
+        [sepolia.id]: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // mainnet staging fork
         [baseLocal.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', //  base mainnet fork
         [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // base mainnet
         [baseSepolia.id]: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // base sepolia
@@ -121,7 +121,7 @@ export default defineConfig({
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
         [localhost.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
-        [stagingMainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+        [sepolia.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
         [baseLocal.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
         [base.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
         [baseSepolia.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',

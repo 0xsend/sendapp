@@ -81,43 +81,58 @@ jobs:
           path: packages/playwright/playwright-report/
           retention-days: 30
 
-  # TODO: add back when we decide where to deploy
-  # vercel-deploy-preview:
-  #   # skip if on develop since it will be deployed with another workflow
-  #   if: github.ref != 'refs/heads/develop' && github.ref != 'refs/heads/main'
-  #   runs-on: ubuntu-latest
-  #   needs: ci
+  vercel-deploy-preview:
+    # skip if on dev since it will be deployed with another workflow
+    if: github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: ci
 
-  #   env:
-  #     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  #     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         submodules: recursive
-  #     - name: Install Vercel CLI
-  #       run: npm install --global vercel@latest
-  #     - name: Install Foundry
-  #       uses: foundry-rs/foundry-toolchain@v1
-  #       with:
-  #         version: nightly
-  #     - name: Switch to Vercel Send team
-  #       run: vercel team switch 0xsend --token=${{ secrets.VERCEL_TOKEN }}
-  #     - name: Pull Vercel Environment Information
-  #       run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-  #     - name: Build Project Artifacts
-  #       run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-  #     - name: Deploy Project Artifacts to Vercel
-  #       id: deploy
-  #       run: |
-  #         vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt && echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
-  #         echo ::notice::Deployment URL: $(cat deployment-url.txt)
-
-  # does not work unless you do it with a full access token
-  # - name: Extract branch name
-  #   shell: bash
-  #   run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-  #   id: extract_branch
-  # - name: Set Vercel alias
-  #   run: vercel alias --token=${{ secrets.VERCEL_TOKEN }} set ${{ steps.deploy.outputs.deployment_url }} sendstack-${{ steps.extract_branch.outputs.branch }}-0xsend.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: 'yarn'
+      - uses: oven-sh/setup-bun@v1
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: Install Vercel CLI
+        run: yarn global add vercel
+      - name: Switch to Vercel Send team
+        run: vercel --token=${{ secrets.VERCEL_TOKEN }}  team switch 0xsend
+      - name: Pull Vercel Environment Information
+        run: vercel --token=${{ secrets.VERCEL_TOKEN }} pull --yes --environment=preview
+      - name: Build Project Artifacts
+        run: vercel --token=${{ secrets.VERCEL_TOKEN }} build
+      - name: Extract branch name
+        shell: bash
+        run: |
+          branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          branch="${branch//\//-}"        # Replace / with -
+          branch="${branch//_/-}"         # Replace _ with -
+          branch="${branch,,}"            # Convert to lowercase
+          branch="${branch//[^a-z0-9-]/}" # Remove any character that is not a-z, 0-9, or -
+          branch="${branch%-}"            # Remove trailing hyphen, if any
+          branch="${branch#-}"            # Remove leading hyphen, if any
+          echo "branch=${branch}" >> $GITHUB_OUTPUT
+          echo "public_url=https://sendapp-${BRANCH}-0xsend.vercel.app" >> $GITHUB_OUTPUT
+        id: extract_branch
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          vercel --token=${{ secrets.VERCEL_TOKEN }} deploy --prebuilt \
+            --env=NEXT_PUBLIC_URL=${{ steps.extract_branch.outputs.public_url }} \
+            > deployment-url.txt && \
+            echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+          echo ::notice::Deployment URL: $(cat deployment-url.txt)
+      - name: Set Vercel alias
+        run: vercel --token=${{ secrets.VERCEL_TOKEN }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ steps.extract_branch.outputs.public_url }}
