@@ -1,5 +1,5 @@
 import { defineChain } from 'viem'
-import { base as baseMainnetViem, mainnet as mainnetViem } from 'viem/chains'
+import { base as baseMainnetViem, mainnet as mainnetViem, baseSepolia, sepolia } from 'viem/chains'
 
 // @ts-expect-error __DEV__ so we can share some react native code
 globalThis.__DEV__ = globalThis.__DEV__ ?? false
@@ -21,21 +21,6 @@ export const localhost = defineChain({
       url: 'http://localhost:5100/',
     },
   },
-})
-
-export const stagingMainnet = defineChain({
-  id: 8008,
-  name: 'Sendstack Anvil Staging',
-  rpcUrls: {
-    default: {
-      http: ['https://sendstack-anvil.metalrodeo.xyz'],
-    },
-    public: {
-      http: ['https://sendstack-anvil.metalrodeo.xyz'],
-    },
-  },
-  nativeCurrency: mainnetViem.nativeCurrency,
-  network: 'sendnet',
 })
 
 /**
@@ -64,16 +49,17 @@ export const baseLocal = defineChain({
 
 const mainnetChains = {
   [String(mainnetViem.id)]: mainnetViem,
-  [String(stagingMainnet.id)]: stagingMainnet,
+  [String(sepolia.id)]: sepolia,
   [String(localhost.id)]: localhost,
 } as const
 
 const baseChains = {
   [String(baseMainnetViem.id)]: baseMainnetViem,
+  [String(baseSepolia.id)]: baseSepolia,
   [String(baseLocal.id)]: baseLocal,
 } as const
 
-export const mainnet: typeof mainnetViem | typeof localhost | typeof stagingMainnet =
+export const mainnet: typeof mainnetViem | typeof localhost | typeof sepolia =
   (function mainnetFromEnv() {
     if (process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID) {
       const chain = mainnetChains[process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID]
@@ -88,7 +74,7 @@ export const mainnet: typeof mainnetViem | typeof localhost | typeof stagingMain
     return mainnetViem
   })()
 
-export const baseMainnet: typeof baseMainnetViem | typeof baseLocal =
+export const baseMainnet: typeof baseMainnetViem | typeof baseLocal | typeof baseSepolia =
   (function baseMainnetFromEnv() {
     if (process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID) {
       const chain = baseChains[process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID]
