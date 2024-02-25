@@ -15,4 +15,5 @@ runs:
       with:
         version: nightly
     - name: Yarn Install
+      shell: bash
       run: yarn install --immutable
