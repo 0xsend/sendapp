@@ -104,6 +104,8 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
+      - name: Yarn Install
+        run: yarn install --immutable
       - name: Install Vercel CLI
         run: yarn global add vercel
       - name: Switch to Vercel Send team
