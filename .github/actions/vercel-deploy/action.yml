@@ -38,5 +38,5 @@ runs:
       if: ${{ inputs.public-url != '' }}
       shell: bash
       run: |
-        bunx vercel --token=${{ secrets.VERCEL_TOKEN }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-url }}
+        bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-url }}
         echo ::notice:: Vercel Alias URL ${{ inputs.public-url }}
