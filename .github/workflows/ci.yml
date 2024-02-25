@@ -109,9 +109,29 @@ jobs:
         env:
           YARN_ENABLE_HARDENED_MODE: 0
       - name: Vercel Deploy
+        id: deploy
         uses: ./.github/actions/vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Extract branch name
+        id: extract_branch
+        shell: bash
+        run: |
+          branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          branch="${branch//\//-}"        # Replace / with -
+          branch="${branch//_/-}"         # Replace _ with -
+          branch="${branch,,}"            # Convert to lowercase
+          branch="${branch//[^a-z0-9-]/}" # Remove any character that is not a-z, 0-9, or -
+          branch="${branch%-}"            # Remove trailing hyphen, if any
+          branch="${branch#-}"            # Remove leading hyphen, if any
+          echo "branch=${branch}" >> $GITHUB_OUTPUT
+          echo "public_url=https://sendapp-${BRANCH}-0xsend.vercel.app" >> $GITHUB_OUTPUT
+      - name: Set Vercel Branch Alias
+        shell: bash
+        run: |
+          bunx vercel --token=${{ secrets.VERCEL_TOKEN }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ steps.extract_branch.outputs.public_url }}
+          echo "public_url=${{ steps.extract_branch.outputs.public_url }}" >> $GITHUB_OUTPUT
+          echo ::notice::Vercel Alias URL: ${{ steps.extract_branch.outputs.public_url }}
