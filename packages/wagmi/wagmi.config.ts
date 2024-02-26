@@ -8,6 +8,9 @@ import { localhost, baseLocal } from './src/chains'
 import { iEntryPointAbi } from './src'
 
 const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
+
+if (!broadcasts.length) throw new Error('No broadcasts found.')
+
 const deployments = await broadcasts.reduce(async (accP, file) => {
   const acc = await accP
   const data = await import(file, {
