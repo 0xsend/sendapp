@@ -27,6 +27,8 @@ jobs:
           SKIP_YARN_POST_INSTALL: 1
 
   ci:
+    # skip if on dev and main (but not PRS to dev or main)
+    if: ${{ !(contains(github.ref, 'dev') || contains(github.ref, 'main')) }}
     runs-on: ubuntu-latest
     needs: [cache-deps]
     env:
@@ -93,7 +95,7 @@ jobs:
           retention-days: 30
 
   vercel-deploy-preview:
-    # skip if on dev and main since it will be deployed with another workflow
+    # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ !(contains(github.ref, 'dev') || contains(github.ref, 'main') || contains(github.head_ref, 'dev') || contains(github.head_ref, 'main')) }}
     runs-on: ubuntu-latest
     needs: [cache-deps]
@@ -139,10 +141,5 @@ jobs:
 
   deploy-staging:
     if: github.ref == 'refs/heads/dev'
-    runs-on: ubuntu-latest
     needs: [cache-deps]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: ./.github/workflows/deploy-staging.yml
+    uses: ./.github/workflows/deploy-staging.yml
