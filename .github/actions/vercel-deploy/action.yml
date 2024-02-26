@@ -4,6 +4,12 @@ inputs:
   vercel-token:
     description: "The Vercel token to use for deployment."
     required: true
+  vercel-org-id:
+    description: "The Vercel organization ID to use for deployment."
+    required: true
+  vercel-project-id:
+    description: "The Vercel project ID to use for deployment."
+    required: true
   public-hostname:
     description: "The public hostname alias to use for the deployment."
     required: false
@@ -25,12 +31,21 @@ runs:
     - name: Switch to Vercel Send team
       shell: bash
       run: bunx vercel --token=${{ inputs.vercel-token }} team switch 0xsend
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Pull Vercel Environment Information
       shell: bash
       run: bunx vercel --token=${{ inputs.vercel-token }} pull --yes --environment=preview
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Build Project Artifacts
       shell: bash
       run: bunx vercel --token=${{ inputs.vercel-token }} build
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Deploy Project Artifacts to Vercel
       id: deploy
       shell: bash
@@ -42,9 +57,15 @@ runs:
         fi
         echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
         echo ::notice::Deployment URL: $(cat deployment-url.txt)
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Set Vercel Branch Alias
       if: ${{ inputs.public-hostname != '' }}
       shell: bash
       run: |
         bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-hostname }}
         echo ::notice::Vercel Alias URL https://${{ inputs.public-hostname }}/
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}

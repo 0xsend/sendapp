@@ -1,4 +1,4 @@
-name: Supabase Deploy Migratinos
+name: Supabase Deploy Migrations
 description: "Deploy the project to Supabase. Run migrations against the database."
 inputs:
   supabase-project-id:

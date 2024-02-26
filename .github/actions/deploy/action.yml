@@ -37,9 +37,8 @@ runs:
       uses: ./.github/actions/supabase-deploy
       with:
         supabase-project-id: ${{ inputs.supabase-project-id }}
-      env:
-        SUPABASE_ACCESS_TOKEN: ${{ inputs.supabase-access-token }}
-        SUPABASE_DB_PASSWORD: ${{ inputs.supabase-db-password }}
+        supabase-access-token: ${{ inputs.supabase-access-token }}
+        supabase-db-password: ${{ inputs.supabase-db-password }}
     - name: Extract Branch
       id: extract-branch
       uses: ./.github/actions/extract-branch
@@ -51,9 +50,9 @@ runs:
       uses: ./.github/actions/vercel-deploy
       with:
         vercel-token: ${{ inputs.vercel-token }}
+        vercel-org-id: ${{ inputs.vercel-org-id }}
+        vercel-project-id: ${{ inputs.vercel-project-id }}
         public-hostname: ${{ steps.extract-branch.outputs.public-hostname }}
         production: ${{ inputs.production }}
       env:
-        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
-        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
         YARN_ENABLE_HARDENED_MODE: "0"
