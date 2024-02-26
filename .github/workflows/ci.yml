@@ -31,8 +31,6 @@ jobs:
           echo github.head_ref=${{ github.head_ref }}
 
   ci:
-    # skip if on dev and main (but not PRS to dev or main)
-    if: ${{ github.ref != 'refs/head/dev' && github.ref != 'refs/head/main' }}
     runs-on: ubuntu-latest
     needs: [cache-deps]
     env:
@@ -100,7 +98,7 @@ jobs:
 
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
-    if: ${{ github.ref != 'refs/head/dev' && github.ref != 'refs/head/main' && github.head_ref != 'refs/head/dev' && github.head_ref != 'refs/head/main'  }}
+    if: ${{ github.ref != 'refs/head/dev' && github.ref != 'refs/head/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
     runs-on: ubuntu-latest
     needs: [cache-deps]
 
