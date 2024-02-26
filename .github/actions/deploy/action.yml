@@ -45,14 +45,14 @@ runs:
     - name: Public Hostname
       shell: bash
       id: public-hostname
-      run: echo "::set-output name=public-hostname::${{ steps.extract-branch.outputs.branch }}"
+      run: echo "public-hostname=sendapp-${{steps.extract-branch.outputs.branch}}-0xsend.vercel.app" >> $GITHUB_OUTPUT
     - name: Vercel Deploy
       uses: ./.github/actions/vercel-deploy
       with:
         vercel-token: ${{ inputs.vercel-token }}
         vercel-org-id: ${{ inputs.vercel-org-id }}
         vercel-project-id: ${{ inputs.vercel-project-id }}
-        public-hostname: ${{ steps.extract-branch.outputs.public-hostname }}
+        public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
         production: ${{ inputs.production }}
       env:
         YARN_ENABLE_HARDENED_MODE: "0"
