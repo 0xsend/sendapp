@@ -10,7 +10,18 @@ import { baseMainnetClient } from '@my/wagmi'
 import * as Device from 'expo-device'
 import { concat } from 'viem'
 import { getSenderAddress } from 'permissionless'
-import { Anchor, YStack, Theme, XStack, SubmitButton, ButtonText, H1, Paragraph } from '@my/ui'
+import {
+  Anchor,
+  YStack,
+  Theme,
+  XStack,
+  SubmitButton,
+  ButtonText,
+  H1,
+  Paragraph,
+  BigHeading,
+  H3,
+} from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -103,6 +114,8 @@ export const OnboardingForm = () => {
             borderBottomWidth: 2,
             borderRadius: '$0',
             placeholder: deviceName,
+            fontFamily: '$mono',
+            fontSize: '$7',
             width: '100%',
             backgroundColor: 'transparent',
             outlineColor: 'transparent',
@@ -141,7 +154,7 @@ export const OnboardingForm = () => {
                   als: 'flex-end',
                   mx: 0,
                   ml: 'auto',
-                  maw: '$14',
+                  maw: '$12',
                 }}
               >
                 <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
@@ -155,13 +168,17 @@ export const OnboardingForm = () => {
         {(fields) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <Theme inverse={true}>
-              <H1 col="$background" size="$11">
-                SETUP PASSKEY
-              </H1>
+              <BigHeading col="$background">SETUP PASSKEY</BigHeading>
             </Theme>
-            <Paragraph fontWeight="normal" theme="active" $sm={{ size: '$5' }}>
+            <H3
+              fontFamily={'$mono'}
+              lineHeight={28}
+              col={'gray'}
+              fontWeight={'normal'}
+              $sm={{ size: '$5' }}
+            >
               Start by creating a Passkey below. Send uses passkeys to secure your account
-            </Paragraph>
+            </H3>
             <YStack gap="$2">
               <Theme inverse={true}>
                 <Paragraph col="$background" size={'$1'} fontWeight={'500'}>

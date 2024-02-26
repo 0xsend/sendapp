@@ -1,4 +1,5 @@
 import {
+  BigHeading,
   ButtonText,
   FormWrapper,
   H1,
@@ -69,7 +70,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             color: '$background',
             themeInverse: true,
             fontSize: '$6',
-            w: '60%',
+            $sm: {
+              w: '60%',
+            },
             outlineColor: 'transparent',
           },
         }}
@@ -92,12 +95,16 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         {(fields) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <Theme inverse={true}>
-              <H1 col="$background" size="$11">
-                VERIFY ACCOUNT
-              </H1>
+              <BigHeading col="$background">VERIFY ACCOUNT</BigHeading>
             </Theme>
-            <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
-              Enter the verification code we sent you
+            <H3
+              fontFamily={'$mono'}
+              lineHeight={28}
+              col={'gray'}
+              fontWeight={'300'}
+              $sm={{ size: '$5' }}
+            >
+              Enter the code we sent you on your phone
             </H3>
             <YStack gap="$2">
               <Theme inverse={true}>

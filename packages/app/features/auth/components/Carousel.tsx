@@ -43,7 +43,7 @@ const CarouselProgress = () => {
   }, [setCarouselProgress, progressWidth])
 
   return (
-    <XStack w="100%" jc="center" py="$5" gap="$2">
+    <XStack w="100%" maw="100%" jc="center" py="$5" gap="$2">
       {carouselItems?.map(({ title }, i) => {
         return (
           <Progress
@@ -52,6 +52,7 @@ const CarouselProgress = () => {
             h={1}
             backgroundColor={'$background'}
             direction="ltr"
+            miw={0}
             value={carouselProgress < i ? 0 : carouselProgress === i ? progressWidth : 100}
           >
             <Progress.Indicator animation="100ms" backgroundColor={'$white'} />
@@ -69,14 +70,14 @@ export const Carousel = () => {
 
   return (
     <>
-      <Stack fd="column" $gtMd={{ fd: 'row', jc: 'space-between', ai: 'center' }} gap="$3">
+      <Stack fd="column" $gtMd={{ fd: 'row', jc: 'space-between', ai: 'flex-end' }} gap="$3">
         <H1 color="$white">{item?.title}</H1>
         <Paragraph
-          $gtMd={{ ta: 'right' }}
+          $gtMd={{ ta: 'right', pb: '$2' }}
           pr="$5"
           fontSize="$2"
           $gtXs={{ fontSize: '$4' }}
-          fontWeight={'normal'}
+          fontWeight={'300'}
           color="$white"
         >
           {item?.description}

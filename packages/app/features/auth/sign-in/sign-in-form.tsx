@@ -1,4 +1,4 @@
-import { ButtonText, H1, H3, Paragraph, SubmitButton, Theme, XStack, YStack } from '@my/ui'
+import { ButtonText, BigHeading, Paragraph, SubmitButton, Theme, XStack, YStack, H3 } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { api } from 'app/utils/api'
@@ -97,13 +97,18 @@ export const SignInForm = () => {
           {(fields) => (
             <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
               <Theme inverse={true}>
-                <H1 col="$background" size="$11">
-                  WELCOME TO SEND
-                </H1>
+                <BigHeading col="$background">WELCOME TO SEND</BigHeading>
               </Theme>
-              <Paragraph fontWeight="normal" theme="active" $sm={{ size: '$5' }}>
+              <H3
+                fontFamily={'$mono'}
+                lineHeight={28}
+                col={'gray'}
+                fontWeight={'300'}
+                $sm={{ size: '$5' }}
+              >
                 Sign in with your phone number
-              </Paragraph>
+              </H3>
+
               <YStack gap="$2">
                 <Theme inverse={true}>
                   <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
