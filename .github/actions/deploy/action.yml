@@ -26,9 +26,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
     - name: Setup Environment
       uses: ./.github/actions/setup-env
       with:

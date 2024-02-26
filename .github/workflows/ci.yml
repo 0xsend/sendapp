@@ -92,7 +92,6 @@ jobs:
           path: packages/playwright/playwright-report/
           retention-days: 30
 
-  # @todo create supabase branch https://supabase.com/docs/reference/cli/supabase-branches-update
   vercel-deploy-preview:
     # skip if on dev and main since it will be deployed with another workflow
     if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev'
@@ -137,3 +136,10 @@ jobs:
           message: |
             Vercel Unique URL: [${{ steps.vercel-deploy.outputs.deployment-url }}](${{ steps.vercel-deploy.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    needs: [cache-deps]
+    steps:
+      - uses: ./.github/workflows/deploy-staging.yml

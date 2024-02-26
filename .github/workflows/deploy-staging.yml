@@ -2,9 +2,7 @@ name: Deploy Staging
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - dev
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}
@@ -13,6 +11,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Deploy
         uses: ./.github/actions/deploy
         with:
