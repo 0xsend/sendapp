@@ -1,0 +1,303 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`shovel config 1`] = `
+{
+  "dashboard": {
+    "root_password": "$DASHBOARD_ROOT_PASSWORD",
+  },
+  "integrations": [
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "user_op_hash",
+            "indexed": true,
+            "name": "userOpHash",
+            "type": "bytes32",
+          },
+          {
+            "column": "sender",
+            "indexed": true,
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "factory",
+            "filter_arg": [
+              "0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0",
+              "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC",
+            ],
+            "filter_op": "contains",
+            "indexed": false,
+            "name": "factory",
+            "type": "address",
+          },
+          {
+            "column": "paymaster",
+            "indexed": false,
+            "name": "paymaster",
+            "type": "address",
+          },
+        ],
+        "name": "AccountDeployed",
+        "type": "event",
+      },
+      "name": "send_account_deployed",
+      "sources": [
+        {
+          "name": "$BASE_NAME",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "user_op_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "factory",
+            "type": "bytea",
+          },
+          {
+            "name": "paymaster",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_account_deployed",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "f",
+            "filter_op": "contains",
+            "filter_ref": {
+              "column": "sender",
+              "integration": "send_account_deployed",
+            },
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+          },
+          {
+            "column": "t",
+            "filter_op": "contains",
+            "filter_ref": {
+              "column": "sender",
+              "integration": "send_account_deployed",
+            },
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+          },
+          {
+            "column": "v",
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Transfer",
+        "type": "event",
+      },
+      "name": "send_account_transfers",
+      "sources": [
+        {
+          "name": "$BASE_NAME",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "f",
+            "type": "bytea",
+          },
+          {
+            "name": "t",
+            "type": "bytea",
+          },
+          {
+            "name": "v",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_account_transfers",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "f",
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+          },
+          {
+            "column": "t",
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+          },
+          {
+            "column": "v",
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Transfer",
+        "type": "event",
+      },
+      "name": "send_token_transfers",
+      "sources": [
+        {
+          "name": "$BASE_NAME",
+          "start": 9475780n,
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "f",
+            "type": "bytea",
+          },
+          {
+            "name": "t",
+            "type": "bytea",
+          },
+          {
+            "name": "v",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_token_transfers",
+      },
+    },
+  ],
+  "pg_url": "$DATABASE_URL",
+  "sources": [
+    {
+      "batch_size": 100,
+      "chain_id": "$BASE_CHAIN_ID",
+      "concurrency": 1,
+      "name": "$BASE_NAME",
+      "url": "$BASE_RPC_URL",
+    },
+    {
+      "batch_size": 2000,
+      "chain_id": "$BASE_CHAIN_ID",
+      "concurrency": 2,
+      "name": "$BASE_NAME",
+      "url": "$BASE_RPC_URL",
+    },
+  ],
+}
+`;

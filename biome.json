@@ -19,7 +19,8 @@
       "**/theme-generated.ts",
       "./apps/expo/ios/**",
       "./apps/expo/android/**",
-      "./packages/app/components/img/**"
+      "./packages/app/components/img/**",
+      "packages/shovel/etc/config.json"
     ]
   },
   "organizeImports": {

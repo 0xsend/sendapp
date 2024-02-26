@@ -188,6 +188,31 @@ local_resource(
         ),
 )
 
+local_resource(
+    "shovel:generate-config",
+    allow_parallel = True,
+    cmd = "yarn workspace shovel generate",
+    labels = labels,
+    resource_deps = ["yarn:install"],
+    deps = files_matching(
+        os.path.join("packages", "shovel"),
+        lambda f: f.endswith(".ts"),
+    ),
+)
+
+cmd_button(
+    "shovel:generate-config",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn workspace shovel test --update-snapshots && yarn workspace shovel generate",
+    ],
+    icon_name = "restart_alt",
+    location = location.RESOURCE,
+    resource = "shovel:generate-config",
+    text = "shovel update-snapshot",
+)
+
 # INFRA
 labels = ["infra"]
 
@@ -371,7 +396,6 @@ local_resource(
     trigger_mode = TRIGGER_MODE_MANUAL,
 )
 
-# TODO: decide if we will use silius bundler or not
 local_resource(
     "aa_bundler:base",
     allow_parallel = True,
@@ -407,6 +431,48 @@ local_resource(
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
     """,
+)
+
+shovel_serve_rm_cmd = "docker ps -a | grep shovel | awk '{print $1}' | xargs docker rm -f"
+
+local_resource(
+    "shovel",
+    allow_parallel = True,
+    labels = labels,
+    links = ["http://localhost:8383/"],
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/diag",
+            port = 8383,
+        ),
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:base",
+        "supabase:test",
+        "shovel:generate-config",
+    ],
+    serve_cmd = """
+    {}
+    docker pull docker.io/indexsupply/shovel:latest || true
+    docker run --rm \
+        --name shovel \
+        --add-host=host.docker.internal:host-gateway \
+        -p 8383:80 \
+        --env DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres \
+        --env BASE_NAME=baselocalnet \
+        --env BASE_RPC_URL=http://host.docker.internal:8546 \
+        --env BASE_CHAIN_ID=845337 \
+        --env BASE_BLOCK_START={} \
+        --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
+        -v ./packages/shovel/etc:/etc/shovel \
+        --entrypoint /usr/local/bin/shovel \
+        -w /usr/local/bin \
+        docker.io/indexsupply/shovel -l :80 -config /etc/shovel/config.json
+    """.format(shovel_serve_rm_cmd, base_fork_block_number),
+    deps = [
+        "packages/shovel/etc/config.json",
+    ],
 )
 
 # TODO: decide if we will use silius bundler or not
