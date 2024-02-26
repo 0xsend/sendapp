@@ -4524,6 +4524,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/dm-mono@npm:^5.0.18":
+  version: 5.0.18
+  resolution: "@fontsource/dm-mono@npm:5.0.18"
+  checksum: 2f6887c2773d697a617d9cd987c9ef33a31b27c89eee9249157211885b50992454d56653b243f0ada67b3a32baeea82585814fb838f9f41e3d2b92b69e5db230
+  languageName: node
+  linkType: hard
+
+"@fontsource/dm-sans@npm:^5.0.18":
+  version: 5.0.18
+  resolution: "@fontsource/dm-sans@npm:5.0.18"
+  checksum: eb8a6396f9cb0b46395e19d4026c9e7b7fa322990eecf69e9bc832ff2aa3032b6a6ded7274ae149d157c1b7233880b2b48dd455692c46b0331b5cc26145fe995
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.0.1, @gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -11734,8 +11748,9 @@ __metadata:
   resolution: "app@workspace:packages/app"
   dependencies:
     "@daimo/expo-passkeys": "workspace:*"
+    "@fontsource/dm-mono": "npm:^5.0.18"
+    "@fontsource/dm-sans": "npm:^5.0.18"
     "@jest/globals": "npm:^29.7.0"
-    "@my/contracts": "workspace:*"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
     "@my/wagmi": "workspace:*"
