@@ -1,0 +1,62 @@
+name: Deploy
+description: "Deploy the project to Vercel and Supabase."
+inputs:
+  vercel-token:
+    description: "The Vercel token to use for deployment."
+    required: true
+  vercel-org-id:
+    description: "The Vercel organization ID to use for deployment."
+    required: true
+  vercel-project-id:
+    description: "The Vercel project ID to use for deployment."
+    required: true
+  production:
+    description: "Whether to deploy to the production environment."
+    required: false
+    default: "false"
+  supabase-project-id:
+    description: "The Supabase project ID to use for deployment."
+    required: true
+  supabase-access-token:
+    description: "The Supabase access token to use for deployment."
+    required: true
+  supabase-db-password:
+    description: "The Supabase database password to use for deployment."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Setup Environment
+      uses: ./.github/actions/setup-env
+      with:
+        yarn-install: false
+      env:
+        YARN_ENABLE_HARDENED_MODE: "0"
+    - name: Supabase Deploy
+      id: deploy
+      uses: ./.github/actions/supabase-deploy
+      with:
+        supabase-project-id: ${{ inputs.supabase-project-id }}
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ inputs.supabase-access-token }}
+        SUPABASE_DB_PASSWORD: ${{ inputs.supabase-db-password }}
+    - name: Extract Branch
+      id: extract-branch
+      uses: ./.github/actions/extract-branch
+    - name: Public Hostname
+      shell: bash
+      id: public-hostname
+      run: echo "::set-output name=public-hostname::${{ steps.extract-branch.outputs.branch }}"
+    - name: Vercel Deploy
+      uses: ./.github/actions/vercel-deploy
+      with:
+        vercel-token: ${{ inputs.vercel-token }}
+        public-hostname: ${{ steps.extract-branch.outputs.public-hostname }}
+        production: ${{ inputs.production }}
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
+        YARN_ENABLE_HARDENED_MODE: "0"

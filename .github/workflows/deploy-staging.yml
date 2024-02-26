@@ -1,0 +1,25 @@
+name: Deploy Staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: ./.github/actions/deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          production: false
+          supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
+          supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          supabase-db-password: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}

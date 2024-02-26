@@ -1,0 +1,21 @@
+name: "Extract Branch Name"
+description: "Extract the branch name from the GitHub event payload and set it as an output cleaned for use in Vercel."
+outputs:
+  branch:
+    description: "The cleaned branch name."
+    value: ${{ steps.extract.outputs.branch }}
+runs:
+  using: "composite"
+  steps:
+    - name: Extract Branch Name
+      id: extract
+      shell: bash
+      run: |
+        branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+        branch="${branch//\//-}"        # Replace / with -
+        branch="${branch//_/-}"         # Replace _ with -
+        branch="${branch,,}"            # Convert to lowercase
+        branch="${branch//[^a-z0-9-]/}" # Remove any character that is not a-z, 0-9, or -
+        branch="${branch%-}"            # Remove trailing hyphen, if any
+        branch="${branch#-}"            # Remove leading hyphen, if any
+        echo "branch=${branch}" >> $GITHUB_OUTPUT

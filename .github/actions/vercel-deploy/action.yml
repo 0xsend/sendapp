@@ -8,6 +8,10 @@ inputs:
     description: "The public hostname alias to use for the deployment."
     required: false
     default: ""
+  production:
+    description: "Whether to deploy to the production environment."
+    required: false
+    default: "false"
 outputs:
   deployment-url:
     description: "The URL of the deployment."
@@ -31,7 +35,11 @@ runs:
       id: deploy
       shell: bash
       run: |
-        bunx vercel --token=${{ inputs.vercel-token }} deploy --prebuilt > deployment-url.txt
+        if [[ ${{ inputs.production }} == "true" ]]; then
+          bunx vercel --token=${{ inputs.vercel-token }} deploy --prebuilt --prod > deployment-url.txt
+        else
+          bunx vercel --token=${{ inputs.vercel-token }} deploy --prebuilt > deployment-url.txt
+        fi
         echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
         echo ::notice::Deployment URL: $(cat deployment-url.txt)
     - name: Set Vercel Branch Alias

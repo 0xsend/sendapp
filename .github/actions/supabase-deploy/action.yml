@@ -1,0 +1,37 @@
+name: Supabase Deploy Migratinos
+description: "Deploy the project to Supabase. Run migrations against the database."
+inputs:
+  supabase-project-id:
+    description: "The Supabase project ID to use for deployment."
+    required: true
+  supabase-access-token:
+    description: "The Supabase access token to use for deployment."
+    required: true
+  supabase-db-password:
+    description: "The Supabase database password to use for deployment."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Mask Supabase Access Token
+      shell: bash
+      run: echo "::add-mask::${{ inputs.supabase-access-token }}"
+    - name: Mask Supabase Database Password
+      shell: bash
+      run: echo "::add-mask::${{ inputs.supabase-db-password }}"
+    - name: Mask Supabase Project ID
+      shell: bash
+      run: echo "::add-mask::${{ inputs.supabase-project-id }}"
+    - uses: supabase/setup-cli@v1
+      with:
+        version: latest
+    - shell: bash
+      run: supabase link --project-ref ${{ inputs.supabase-project-id }}
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ inputs.supabase-access-token }}
+        SUPABASE_DB_PASSWORD: ${{ inputs.supabase-db-password }}
+    - shell: bash
+      run: supabase db push
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ inputs.supabase-access-token }}
+        SUPABASE_DB_PASSWORD: ${{ inputs.supabase-db-password }}
