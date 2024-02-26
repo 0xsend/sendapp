@@ -70,7 +70,7 @@ local_resource(
 
 local_resource(
     "wagmi:generate",
-    "yarn wagmi build",
+    "yarn wagmi generate",
     allow_parallel = True,
     labels = labels,
     resource_deps = [
