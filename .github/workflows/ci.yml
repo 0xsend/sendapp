@@ -120,7 +120,7 @@ jobs:
         uses: ./.github/actions/extract-branch
       - name: Set Public Hostname
         id: public-hostname
-        run: echo "public-hostname=sendapp-${steps.extract-branch.outputs.branch}-0xsend.vercel.app" >> $GITHUB_OUTPUT
+        run: echo "public-hostname=sendapp-${{steps.extract-branch.outputs.branch}}-0xsend.vercel.app" >> $GITHUB_OUTPUT
       - name: Vercel Deploy
         id: vercel-deploy
         uses: ./.github/actions/vercel-deploy
