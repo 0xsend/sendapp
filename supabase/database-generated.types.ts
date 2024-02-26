@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       chain_addresses: {
@@ -29,9 +29,10 @@ export interface Database {
           {
             foreignKeyName: "chain_addresses_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       distribution_shares: {
@@ -78,15 +79,17 @@ export interface Database {
           {
             foreignKeyName: "distribution_shares_distribution_id_fkey"
             columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "distribution_shares_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       distribution_verification_values: {
@@ -118,9 +121,10 @@ export interface Database {
           {
             foreignKeyName: "distribution_verification_values_distribution_id_fkey"
             columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       distribution_verifications: {
@@ -152,15 +156,17 @@ export interface Database {
           {
             foreignKeyName: "distribution_verifications_distribution_id_fkey"
             columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "distribution_verifications_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       distributions: {
@@ -246,9 +252,10 @@ export interface Database {
           {
             foreignKeyName: "profiles_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       receipts: {
@@ -271,9 +278,10 @@ export interface Database {
           {
             foreignKeyName: "receipts_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       referrals: {
@@ -299,21 +307,24 @@ export interface Database {
           {
             foreignKeyName: "referrals_referred_id_fkey"
             columns: ["referred_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "referrals_referrer_id_fkey"
             columns: ["referrer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "referrals_tag_fkey"
             columns: ["tag"]
+            isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["name"]
-          }
+          },
         ]
       }
       send_account_credentials: {
@@ -339,15 +350,17 @@ export interface Database {
           {
             foreignKeyName: "account_credentials_account_id_fkey"
             columns: ["account_id"]
+            isOneToOne: false
             referencedRelation: "send_accounts"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "account_credentials_credential_id_fkey"
             columns: ["credential_id"]
+            isOneToOne: false
             referencedRelation: "webauthn_credentials"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       send_accounts: {
@@ -385,9 +398,10 @@ export interface Database {
           {
             foreignKeyName: "send_accounts_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       send_transfer_logs: {
@@ -443,15 +457,17 @@ export interface Database {
           {
             foreignKeyName: "tag_receipts_hash_fkey"
             columns: ["hash"]
+            isOneToOne: false
             referencedRelation: "receipts"
             referencedColumns: ["hash"]
           },
           {
             foreignKeyName: "tag_receipts_tag_name_fkey"
             columns: ["tag_name"]
+            isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["name"]
-          }
+          },
         ]
       }
       tag_reservations: {
@@ -495,9 +511,10 @@ export interface Database {
           {
             foreignKeyName: "tags_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       webauthn_credentials: {
@@ -547,9 +564,10 @@ export interface Database {
           {
             foreignKeyName: "webauthn_credentials_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -565,15 +583,17 @@ export interface Database {
           {
             foreignKeyName: "distribution_verifications_distribution_id_fkey"
             columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "distribution_verifications_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -581,13 +601,13 @@ export interface Database {
       citext:
         | {
             Args: {
-              "": string
+              "": boolean
             }
             Returns: string
           }
         | {
             Args: {
-              "": boolean
+              "": string
             }
             Returns: string
           }
@@ -716,4 +736,84 @@ export interface Database {
     }
   }
 }
+
+export type Tables<
+  PublicTableNameOrOptions extends
+    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
+        Database["public"]["Views"])
+    ? (Database["public"]["Tables"] &
+        Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  PublicEnumNameOrOptions extends
+    | keyof Database["public"]["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
+    ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+    : never
 
