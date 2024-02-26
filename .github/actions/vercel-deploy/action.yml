@@ -10,6 +10,10 @@ inputs:
   vercel-project-id:
     description: "The Vercel project ID to use for deployment."
     required: true
+  vercel-scope:
+    description: "The Vercel scope to use for deployment."
+    required: false
+    default: "0xsend"
   public-hostname:
     description: "The public hostname alias to use for the deployment."
     required: false
@@ -30,19 +34,19 @@ runs:
       run: echo "::add-mask::${{ inputs.vercel-token }}"
     - name: Switch to Vercel Send team
       shell: bash
-      run: bunx vercel --token=${{ inputs.vercel-token }} team switch 0xsend
+      run: bunx vercel --token=${{ inputs.vercel-token }} team switch ${{ inputs.vercel-scope }}
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Pull Vercel Environment Information
       shell: bash
-      run: bunx vercel --token=${{ inputs.vercel-token }} pull --yes --environment=preview
+      run: bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=preview
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Build Project Artifacts
       shell: bash
-      run: bunx vercel --token=${{ inputs.vercel-token }} build
+      run: bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} build
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
@@ -51,9 +55,9 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.production }} == "true" ]]; then
-          bunx vercel --token=${{ inputs.vercel-token }} deploy --prebuilt --prod > deployment-url.txt
+          bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt --prod > deployment-url.txt
         else
-          bunx vercel --token=${{ inputs.vercel-token }} deploy --prebuilt > deployment-url.txt
+          bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt > deployment-url.txt
         fi
         echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
         echo ::notice::Deployment URL: $(cat deployment-url.txt)
@@ -64,7 +68,7 @@ runs:
       if: ${{ inputs.public-hostname != '' }}
       shell: bash
       run: |
-        bunx vercel --token=${{ inputs.vercel-token }} -S 0xsend alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-hostname }}
+        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-hostname }}
         echo ::notice::Vercel Alias URL https://${{ inputs.public-hostname }}/
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
