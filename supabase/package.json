@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "dotenv-cli": "^6.0.0",
-    "supabase": "^1.99.0",
+    "supabase": "1.145.4",
     "type-fest": "^4.3.1"
   }
 }

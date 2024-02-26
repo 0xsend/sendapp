@@ -5631,7 +5631,7 @@ __metadata:
   resolution: "@my/supabase@workspace:supabase"
   dependencies:
     dotenv-cli: "npm:^6.0.0"
-    supabase: "npm:^1.99.0"
+    supabase: "npm:1.145.4"
     type-fest: "npm:^4.3.1"
   languageName: unknown
   linkType: soft
@@ -12564,7 +12564,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bin-links@npm:^4.0.1":
+"bin-links@npm:^4.0.3":
   version: 4.0.3
   resolution: "bin-links@npm:4.0.3"
   dependencies:
@@ -23556,7 +23556,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^3.2.10, node-fetch@npm:^3.3.2":
+"node-fetch@npm:^3.3.2":
   version: 3.3.2
   resolution: "node-fetch@npm:3.3.2"
   dependencies:
@@ -28751,17 +28751,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supabase@npm:^1.99.0":
-  version: 1.111.2
-  resolution: "supabase@npm:1.111.2"
+"supabase@npm:1.145.4":
+  version: 1.145.4
+  resolution: "supabase@npm:1.145.4"
   dependencies:
-    bin-links: "npm:^4.0.1"
+    bin-links: "npm:^4.0.3"
     https-proxy-agent: "npm:^7.0.2"
-    node-fetch: "npm:^3.2.10"
+    node-fetch: "npm:^3.3.2"
     tar: "npm:6.2.0"
   bin:
     supabase: bin/supabase
-  checksum: 850766f5fd1fbe3dea9131a55d577ac998fb1cccdee28eeb0d478d786a96a5faad4d2e124afe4e82986a99b29d8bf214cf6eea7c2dee4d3fa87c02e13d2ed048
+  checksum: 8b7d65ec1b84ebdd1053c925a444ed2d694aa1696ba8121c1779b8a964133990688e5aa27a481f192377db0f847e635581206dfa071b2f8e3f5e6bdbe5ee1d59
   languageName: node
   linkType: hard
 

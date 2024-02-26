@@ -1,0 +1,45 @@
+name: Deploy Staging
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      VERCEL_TOKEN:
+        description: 'Vercel token'
+        required: true
+      VERCEL_PROJECT_ID:
+        description: 'Vercel project id'
+        required: true
+      VERCEL_ORG_ID:
+        description: 'Vercel org id'
+        required: true
+      SUPABASE_ACCESS_TOKEN:
+        description: 'Supabase access token'
+        required: true
+      STAGING_SUPABASE_PROJECT_ID:
+        description: 'Staging Supabase project id'
+        required: true
+      STAGING_SUPABASE_DB_PASSWORD:
+        description: 'Staging Supabase db password'
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Deploy
+        uses: ./.github/actions/deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          production: false
+          supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
+          supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          supabase-db-password: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
