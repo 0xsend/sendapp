@@ -18,7 +18,7 @@ fork_block_number = 19299339
 
 [profile.base]
 # should be updated after releases
-fork_block_number = 11005692
+fork_block_number = 11272253
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 

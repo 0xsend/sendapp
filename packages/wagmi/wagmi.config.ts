@@ -112,7 +112,7 @@ export default defineConfig({
       address: {
         [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet
         [localhost.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet localhost fork
-        [sepolia.id]: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // mainnet staging fork
+        [sepolia.id]: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // sepolia
         [baseLocal.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', //  base mainnet fork
         [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // base mainnet
         [baseSepolia.id]: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // base sepolia
@@ -138,6 +138,7 @@ export default defineConfig({
       deployments: {
         SendToken: {
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+          [sepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [base.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base mainnet
@@ -146,6 +147,7 @@ export default defineConfig({
         },
         SendMerkleDrop: {
           1: '0xB9310daE45E71c7a160A13D64204623071a8E347',
+          [sepolia.id]: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           8008: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
         },

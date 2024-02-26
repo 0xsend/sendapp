@@ -93,6 +93,7 @@ interface Table_public_distributions {
   hodler_min_balance: number;
   created_at: string;
   updated_at: string;
+  snapshot_block_num: number | null;
 }
 interface Table_pgtle_feature_info {
   feature: Enum_pgtle_pg_tle_features;
@@ -138,12 +139,25 @@ interface Table_auth_identities {
   updated_at: string | null;
   id: string;
 }
+interface Table_shovel_ig_updates {
+  name: string;
+  src_name: string;
+  backfill: boolean | null;
+  num: number;
+  latency: string | null;
+  nrows: number | null;
+  stop: number | null;
+}
 interface Table_auth_instances {
   id: string;
   uuid: string | null;
   raw_base_config: string | null;
   created_at: string | null;
   updated_at: string | null;
+}
+interface Table_shovel_integrations {
+  name: string | null;
+  conf: Json | null;
 }
 interface Table_pgsodium_key {
   id: string;
@@ -282,6 +296,35 @@ interface Table_public_send_account_credentials {
   key_slot: number;
   created_at: string | null;
 }
+interface Table_public_send_account_deployed {
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  user_op_hash: string | null;
+  sender: string | null;
+  factory: string | null;
+  paymaster: string | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
+interface Table_public_send_account_transfers {
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  f: string | null;
+  t: string | null;
+  v: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
 interface Table_public_send_accounts {
   id: string;
   user_id: string;
@@ -291,6 +334,20 @@ interface Table_public_send_accounts {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+}
+interface Table_public_send_token_transfers {
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  f: string | null;
+  t: string | null;
+  v: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
 }
 interface Table_public_send_transfer_logs {
   from: string;
@@ -315,6 +372,11 @@ interface Table_auth_sessions {
   user_agent: string | null;
   ip: string | null;
   tag: string | null;
+}
+interface Table_shovel_sources {
+  name: string | null;
+  chain_id: number | null;
+  url: string | null;
 }
 interface Table_auth_sso_domains {
   id: string;
@@ -343,6 +405,20 @@ interface Table_public_tags {
   status: Enum_public_tag_status;
   user_id: string;
   created_at: string;
+}
+interface Table_shovel_task_updates {
+  num: number | null;
+  hash: string | null;
+  insert_at: string | null;
+  src_hash: string | null;
+  src_num: number | null;
+  nblocks: number | null;
+  nrows: number | null;
+  latency: string | null;
+  src_name: string | null;
+  stop: number | null;
+  chain_id: number | null;
+  ig_name: string | null;
 }
 interface Table_auth_users {
   instance_id: string | null;
@@ -451,7 +527,10 @@ interface Schema_public {
   receipts: Table_public_receipts;
   referrals: Table_public_referrals;
   send_account_credentials: Table_public_send_account_credentials;
+  send_account_deployed: Table_public_send_account_deployed;
+  send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
+  send_token_transfers: Table_public_send_token_transfers;
   send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
@@ -460,6 +539,12 @@ interface Schema_public {
 }
 interface Schema_realtime {
 
+}
+interface Schema_shovel {
+  ig_updates: Table_shovel_ig_updates;
+  integrations: Table_shovel_integrations;
+  sources: Table_shovel_sources;
+  task_updates: Table_shovel_task_updates;
 }
 interface Schema_storage {
   buckets: Table_storage_buckets;
@@ -490,6 +575,7 @@ interface Database {
   pgtle: Schema_pgtle;
   public: Schema_public;
   realtime: Schema_realtime;
+  shovel: Schema_shovel;
   storage: Schema_storage;
   supabase_functions: Schema_supabase_functions;
   supabase_migrations: Schema_supabase_migrations;
