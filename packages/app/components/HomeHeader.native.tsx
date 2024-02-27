@@ -2,7 +2,6 @@ import {
   Anchor,
   Button,
   H1,
-  H2,
   Header,
   Link,
   Text,
@@ -16,14 +15,7 @@ import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import {
-  IconClose,
-  IconCopy,
-  IconGear,
-  IconHamburger,
-  IconQr,
-  IconStar,
-} from 'app/components/icons'
+import { IconClose, IconCopy, IconGear, IconHamburger, IconStar } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 
 // TODO: this should probably named HomeTopNav
@@ -36,17 +28,20 @@ export function HomeHeader({ children }: { children: string }) {
   return (
     <Header w="100%">
       <XStack jc="space-between" fd="row" ai="center">
+        <H1 fontWeight={'100'}>{children}</H1>
+        <XStack $lg={{ display: 'none' }} ai="center" space="$2" height="$4" $gtSm={{ fd: 'row' }}>
+          <ReferralCodeCard />
+          <PointsCount />
+          <SettingsButton />
+          <WagmiAccountInfo />
+        </XStack>
         <XStack $gtLg={{ display: 'none' }} ai="center" space="$2" height="$4">
           <Button
             onPress={handleHomeBottomSheet}
             bg="transparent"
-            icon={<IconHamburger size={'$2.5'} />}
+            icon={<IconHamburger size={'$3'} />}
           />
         </XStack>
-        <H1 fontSize={'$9.5'} fontWeight={'300'} color={'$color075'}>
-          {children}
-        </H1>
-        <Button $gtLg={{ display: 'none' }} bg="transparent" icon={<IconQr size={'$2.5'} />} />
       </XStack>
     </Header>
   )

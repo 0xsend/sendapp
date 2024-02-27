@@ -1,5 +1,6 @@
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { HomeScreen } from 'app/features/home/screen'
+import { HomeLayout } from 'app/features/home/layout.web'
 import { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
@@ -11,9 +12,9 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Home</title>
       </Head>
-      <HomeSideBarWrapper>
-        <HomeScreen />
-      </HomeSideBarWrapper>
+      {/* <HomeSideBarWrapper> */}
+      <HomeScreen />
+      {/* </HomeSideBarWrapper> */}
     </>
   )
 }
@@ -34,5 +35,7 @@ function setReferralCodeCookie(context: GetServerSidePropsContext) {
     )
   }
 }
+
+Page.getLayout = (children) => <HomeLayout header="Home">{children}</HomeLayout>
 
 export default Page

@@ -7,6 +7,7 @@ import {
   ListItem,
   Paragraph,
   ScrollView,
+  Spinner,
   XStack,
   YStack,
   useToastController,
@@ -50,94 +51,96 @@ export function HomeScreen() {
 
   return (
     <>
-      <MainLayout scrollable={true}>
-        <YStack
-          $gtLg={{ width: 600 }}
-          $sm={{ width: '100vw' }}
-          $gtSm={{ width: '100vw' }}
-          ai={'center'}
-        >
-          {/* Balance Card */}
-          <XStack w={'100%'} jc={'center'} borderColor={separatorColor} borderBottomWidth={1}>
-            <XStack w={'90%'} zIndex={4}>
-              <YStack mx={'$3'} py={'$11'}>
-                <YStack jc={'center'} gap={'$6'}>
-                  <Paragraph
-                    fontSize={'$4'}
-                    zIndex={1}
-                    color={'$color12'}
-                    textTransform={'uppercase'}
-                  >
-                    [ Total Balance ]
-                  </Paragraph>
-                  <XStack style={{ color: 'white' }} gap={'$2.5'}>
-                    <Paragraph
-                      color={'$color12'}
-                      fontSize={96}
-                      fontWeight={'500'}
-                      lineHeight={'$12'}
-                      zIndex={1}
-                    >
-                      {USDollar.format(totalBalance()).replace('$', '').split('.')[0]}
-                    </Paragraph>
-                    <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
-                      {'USD'}
-                    </Paragraph>
-                  </XStack>
-                </YStack>
-              </YStack>
-            </XStack>
-          </XStack>
-          <XStack w={'90%'} ai={'center'} pt={'$7'}>
-            <Button
-              px={'$3.5'}
-              h={'$8'}
-              width={'100%'}
-              backgroundColor={'$primary'}
-              borderRadius={'$4'}
-              onPress={() => {
-                toast.show('TODO: Add Funds')
-              }}
-            >
-              <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
-                  Add Funds
+      <YStack
+        $gtLg={{ width: 600 }}
+        $sm={{ width: '100vw' }}
+        $gtSm={{ width: '100vw' }}
+        ai={'center'}
+      >
+        {/* Balance Card */}
+        <XStack w={'100%'} jc={'center'} borderColor={separatorColor} borderBottomWidth={1}>
+          <XStack w={'90%'} zIndex={4}>
+            <YStack mx={'$3'} py={'$11'}>
+              <YStack jc={'center'} gap={'$6'}>
+                <Paragraph
+                  fontSize={'$4'}
+                  zIndex={1}
+                  color={'$color12'}
+                  textTransform={'uppercase'}
+                >
+                  [ Total Balance ]
                 </Paragraph>
-                <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                  <IconDeposit size={'$2.5'} color={'$black'} />
-                </XStack>
-              </XStack>
-            </Button>
-          </XStack>
-          <YStack width={'90%'} gap={'$3.5'} pt={'$6'} pb={'$12'}>
-            {coins.map((coin, index) => (
-              <XStack
-                jc={'space-between'}
-                ai={'center'}
-                p={'$3.5'}
-                borderColor={separatorColor}
-                borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
-                key={coin.label}
-              >
-                <XStack gap={'$2'}>
-                  {coin.icon}
+                <XStack style={{ color: 'white' }} gap={'$2.5'}>
                   <Paragraph
-                    fontSize={'$5'}
-                    fontWeight={'500'}
-                    textTransform={'uppercase'}
                     color={'$color12'}
+                    fontSize={96}
+                    fontWeight={'500'}
+                    lineHeight={'$12'}
+                    zIndex={1}
                   >
-                    {coin.label}
+                    {USDollar.format(totalBalance()).replace('$', '').split('.')[0]}
+                  </Paragraph>
+                  <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
+                    {'USD'}
                   </Paragraph>
                 </XStack>
+              </YStack>
+            </YStack>
+          </XStack>
+        </XStack>
+        <XStack w={'90%'} ai={'center'} pt={'$7'}>
+          <Button
+            px={'$3.5'}
+            h={'$8'}
+            width={'100%'}
+            backgroundColor={'$primary'}
+            borderRadius={'$4'}
+            onPress={() => {
+              toast.show('TODO: Add Funds')
+            }}
+          >
+            <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+              <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
+                Add Funds
+              </Paragraph>
+              <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                <IconDeposit size={'$2.5'} color={'$black'} />
+              </XStack>
+            </XStack>
+          </Button>
+        </XStack>
+        <YStack width={'90%'} gap={'$3.5'} pt={'$6'} pb={'$12'}>
+          {coins.map((coin, index) => (
+            <XStack
+              jc={'space-between'}
+              ai={'center'}
+              p={'$3.5'}
+              borderColor={separatorColor}
+              borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
+              key={coin.label}
+            >
+              <XStack gap={'$2'}>
+                {coin.icon}
+                <Paragraph
+                  fontSize={'$5'}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  color={'$color12'}
+                >
+                  {coin.label}
+                </Paragraph>
+              </XStack>
+              {balances[coin.token] ? (
                 <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
                   {formatAmount(balances[coin.token]?.data?.formatted, undefined, 3)}
                 </Paragraph>
-              </XStack>
-            ))}
-          </YStack>
+              ) : balances[coin.token]?.isPending ? (
+                <Spinner size={'small'} />
+              ) : null}
+            </XStack>
+          ))}
         </YStack>
-      </MainLayout>
+      </YStack>
     </>
   )
 }
