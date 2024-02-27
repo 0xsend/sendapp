@@ -20,7 +20,7 @@
     "src"
   ],
   "scripts": {
-    "build": "wagmi generate"
+    "generate": "wagmi generate"
   },
   "devDependencies": {
     "@safe-global/safe-deployments": "^1.26.0",
