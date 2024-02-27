@@ -1,4 +1,3 @@
-import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { HomeScreen } from 'app/features/home/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { GetServerSidePropsContext } from 'next'
@@ -12,9 +11,7 @@ export const Page: NextPageWithLayout = () => {
       <Head>
         <title>Home</title>
       </Head>
-      {/* <HomeSideBarWrapper> */}
       <HomeScreen />
-      {/* </HomeSideBarWrapper> */}
     </>
   )
 }
