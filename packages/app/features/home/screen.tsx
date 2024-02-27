@@ -105,7 +105,7 @@ export function HomeScreen() {
                 borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
                 key={coin.label}
               >
-                <XStack gap={'$2'}>
+                <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }}>
                   {coin.icon}
                   <Paragraph
                     fontSize={'$5'}
@@ -116,11 +116,16 @@ export function HomeScreen() {
                     {coin.label}
                   </Paragraph>
                 </XStack>
-                <XStack gap={'$2'} ai={'center'}>
+                <XStack
+                  gap={'$3.5'}
+                  ai={'center'}
+                  cursor={'pointer'}
+                  onPress={() => toast.show(`@TODO: ${coin.label} details`)}
+                >
                   <TokenDetails tokenAddress={coin.token} />
-                  <Button bg="transparent" p={0} circular>
+                  <XStack $lg={{ display: 'none' }}>
                     <IconArrowRight color={iconColor} />
-                  </Button>
+                  </XStack>
                 </XStack>
               </XStack>
             ))}
