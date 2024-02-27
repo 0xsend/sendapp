@@ -30,38 +30,33 @@ import { useNav } from 'app/routers/params'
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
-    <SideBar {...props}>
+    <SideBar {...props} alignItems={'flex-start'} pl={'$7'} width={208}>
       <Link href={'/'} marginTop={'$10'}>
-        <Button borderRadius={9999} w={'$11'} h={'$11'} bg={'transparent'}>
-          {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
-          <ButtonIcon>
-            <IconSLogo size={'$10'} />
-          </ButtonIcon>
-        </Button>
+        <IconSendLogo size={'$2.5'} color={'$color12'} />
       </Link>
-      <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="stretch" justifyContent="center" w={'100%'} f={1}>
-          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
+      <Nav display="flex" flex={1} pt={'$12'}>
+        <YStack gap={'$4'} alignItems="stretch" w={'100%'} f={1}>
+          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'home'} href={'/'} />
           <SideBarNavLink
             icon={<IconActivity size={'$2'} />}
-            text={'Activity'}
+            text={'activity'}
             href={'/activity'}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
-            text={'Distributions'}
+            text={'distributions'}
             href={'/distributions'}
           />
-          <SideBarNavLink icon={<IconGear size={'$2'} />} text={'Settings'} href={'/settings'} />
+          <SideBarNavLink icon={<IconGear size={'$2'} />} text={'settings'} href={'/settings'} />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
-            text={'Leaderboard'}
+            text={'leaderboard'}
             href={'/leaderboard'}
             hoverStyle={{ cursor: 'not-allowed' }}
           />
         </YStack>
       </Nav>
-      <YStack gap="$4" alignItems="center">
+      {/* <YStack gap="$4" alignItems="center">
         <IconSendLogo size={'$4'} />
         <XStack gap="$2">
           <SideBarFooterLink
@@ -77,7 +72,7 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
             borderRadius={9999}
           />
         </XStack>
-      </YStack>
+      </YStack> */}
     </SideBar>
   )
 }
@@ -93,41 +88,36 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
   return (
     <BottomSheet open={nav === 'home'} onOpenChange={onOpenChange}>
       <Link href={'/'} marginTop={'$4'}>
-        <Button borderRadius={9999} w={'$11'} h={'$11'} bg={'transparent'}>
-          {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
-          <ButtonIcon>
-            <IconSLogo size={'$10'} />
-          </ButtonIcon>
-        </Button>
+        <IconSendLogo size={'$2.5'} color={'$color12'} />
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
         <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
-          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
+          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'home'} href={'/'} />
           <SideBarNavLink
             icon={<IconActivity size={'$2'} />}
-            text={'Activity'}
+            text={'activity'}
             href={'/activity'}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
-            text={'Distributions'}
+            text={'distributions'}
             href={'/distributions'}
           />
           <SideBarNavLink
             icon={<IconDistributions size={'$2'} />}
-            text={'Settings'}
+            text={'settings'}
             href={'/settings'}
           />
           <SideBarNavLink
             icon={<IconSLogo size={'$2'} />}
-            text={'Leaderboard'}
+            text={'leaderboard'}
             href={'/leaderboard'}
             disabled={true}
             hoverStyle={{ cursor: 'not-allowed' }}
           />
         </YStack>
       </Nav>
-      <YStack gap="$4" py="$4" alignItems="center">
+      {/* <YStack gap="$4" py="$4" alignItems="center">
         <IconSendLogo size={'$4'} />
         <XStack gap="$2">
           <SideBarFooterLink
@@ -143,7 +133,7 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
             borderRadius={9999}
           />
         </XStack>
-      </YStack>
+      </YStack> */}
     </BottomSheet>
   )
 }
@@ -151,7 +141,20 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
 
-  if (media.gtLg) return <SideBarWrapper sidebar={<HomeSideBar />}>{children}</SideBarWrapper>
+  if (media.gtLg)
+    return (
+      <SideBarWrapper
+        sidebar={
+          <HomeSideBar
+            $theme-dark={{ backgroundColor: '#081619' }}
+            borderTopRightRadius={'$7'}
+            borderBottomRightRadius={'$7'}
+          />
+        }
+      >
+        {children}
+      </SideBarWrapper>
+    )
   return (
     <>
       <HomeBottomSheet />

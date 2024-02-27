@@ -2,7 +2,6 @@ import { Paragraph, Spinner } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { useEffect } from 'react'
 import { useBalance } from 'wagmi'
 
 const TokenDetails = ({ tokenAddress }: { tokenAddress: `0x${string}` }) => {

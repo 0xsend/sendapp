@@ -20,13 +20,12 @@ export const useSendAccountBalances = () => {
     })
   }
 
-  const totalBalance = () => {
-    let total = 0
-    for (const token of tokens) {
-      const tokenBalance = parseFloat(balances[token]?.data?.formatted ?? '0')
-      total += tokenBalance
+  let totalBalance = 0n
+  for (const token of tokens) {
+    if (balances[token]?.isPending) {
+      return { balances, undefined }
     }
-    return total
+    totalBalance += balances[token]?.data?.value ?? 0n
   }
 
   return { balances, totalBalance }

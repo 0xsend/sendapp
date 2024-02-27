@@ -35,6 +35,7 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import TokenDetails from './TokenDetails'
 
 export function HomeScreen() {
+  const { totalBalance } = useSendAccountBalances()
   const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -73,15 +74,23 @@ export function HomeScreen() {
                     Total Balance
                   </Paragraph>
                   <XStack style={{ color: 'white' }} gap={'$2.5'}>
-                    <Paragraph
-                      color={'$color12'}
-                      fontSize={96}
-                      fontWeight={'500'}
-                      lineHeight={'$12'}
-                      zIndex={1}
-                    >
-                      {USDollar.format(0).replace('$', '').split('.')[0]}
-                    </Paragraph>
+                    {totalBalance === undefined ? (
+                      <Spinner size={'large'} />
+                    ) : (
+                      <Paragraph
+                        color={'$color12'}
+                        fontSize={96}
+                        fontWeight={'500'}
+                        lineHeight={'$12'}
+                        zIndex={1}
+                      >
+                        {
+                          USDollar.format(parseFloat(totalBalance?.toString()))
+                            .replace('$', '')
+                            .split('.')[0]
+                        }
+                      </Paragraph>
+                    )}
                     <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
                       {'USD'}
                     </Paragraph>
