@@ -27,16 +27,18 @@ import { testClient } from 'app/utils/userop'
 import { parseEther } from 'viem'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
+import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 
 export function OnboardingScreen() {
+  const { carouselProgress } = useAuthCarouselContext()
   const media = useMedia()
   const { data: sendAccts } = useSendAccounts()
 
   if (media.gtMd)
     return (
       <YStack f={3} jc="center" miw={0} maw={'100%'} space="$4" gap="$4">
-        <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} mx="auto" maw={738}>
-          <Carousel />
+        <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} ml="auto" w="100%" maw={738}>
+          <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
         </YStack>
       </YStack>
     )
@@ -50,15 +52,7 @@ export function OnboardingScreen() {
       </Stack>
 
       <YStack f={3} jc="center" maw={'100%'} space="$4" gap="$4">
-        {media.gtMd ? (
-          <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} mx="auto" maw={'100%'}>
-            <Carousel />
-          </YStack>
-        ) : sendAccts?.length === 0 ? (
-          <OnboardingForm />
-        ) : (
-          <SendAccountCongratulations />
-        )}
+        {sendAccts?.length === 0 ? <OnboardingForm /> : <SendAccountCongratulations />}
       </YStack>
     </YStack>
   )
