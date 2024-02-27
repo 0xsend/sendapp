@@ -30,26 +30,34 @@ import { useNav } from 'app/routers/params'
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
-    <SideBar {...props} alignItems={'flex-start'} pl={'$7'} width={208}>
+    <SideBar
+      {...props}
+      alignItems={'flex-start'}
+      h={'100%'}
+      m={0}
+      pl={'$7'}
+      width={208}
+      minWidth={208}
+    >
       <Link href={'/'} marginTop={'$10'}>
         <IconSendLogo size={'$2.5'} color={'$color12'} />
       </Link>
       <Nav display="flex" flex={1} pt={'$12'}>
         <YStack gap={'$4'} alignItems="stretch" w={'100%'} f={1}>
-          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'home'} href={'/'} />
+          <SideBarNavLink icon={<IconDashboard size={'$1'} />} text={'home'} href={'/'} />
           <SideBarNavLink
-            icon={<IconActivity size={'$2'} />}
+            icon={<IconActivity size={'$1'} />}
             text={'activity'}
             href={'/activity'}
           />
           <SideBarNavLink
-            icon={<IconDistributions size={'$2'} />}
+            icon={<IconDistributions size={'$1'} />}
             text={'distributions'}
             href={'/distributions'}
           />
-          <SideBarNavLink icon={<IconGear size={'$2'} />} text={'settings'} href={'/settings'} />
+          <SideBarNavLink icon={<IconGear size={'$1'} />} text={'settings'} href={'/settings'} />
           <SideBarNavLink
-            icon={<IconSLogo size={'$2'} />}
+            icon={<IconSLogo size={'$1'} />}
             text={'leaderboard'}
             href={'/leaderboard'}
             hoverStyle={{ cursor: 'not-allowed' }}
@@ -92,24 +100,24 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
         <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
-          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'home'} href={'/'} />
+          <SideBarNavLink icon={<IconDashboard size={'$1'} />} text={'home'} href={'/'} />
           <SideBarNavLink
-            icon={<IconActivity size={'$2'} />}
+            icon={<IconActivity size={'$1'} />}
             text={'activity'}
             href={'/activity'}
           />
           <SideBarNavLink
-            icon={<IconDistributions size={'$2'} />}
+            icon={<IconDistributions size={'$1'} />}
             text={'distributions'}
             href={'/distributions'}
           />
           <SideBarNavLink
-            icon={<IconDistributions size={'$2'} />}
+            icon={<IconDistributions size={'$1'} />}
             text={'settings'}
             href={'/settings'}
           />
           <SideBarNavLink
-            icon={<IconSLogo size={'$2'} />}
+            icon={<IconSLogo size={'$1'} />}
             text={'leaderboard'}
             href={'/leaderboard'}
             disabled={true}
@@ -147,6 +155,8 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
         sidebar={
           <HomeSideBar
             $theme-dark={{ backgroundColor: '#081619' }}
+            borderTopLeftRadius={0}
+            borderBottomLeftRadius={0}
             borderTopRightRadius={'$7'}
             borderBottomRightRadius={'$7'}
           />

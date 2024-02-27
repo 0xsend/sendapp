@@ -35,6 +35,7 @@ export function SideBarNavLink({
         fontFamily={'$heading'}
         color={isActiveRoute ? iconActiveColor : iconInActiveColor}
         opacity={isActiveRoute ? 1 : 0.63}
+        gap={'$1.5'}
       >
         <ButtonIcon>{icon}</ButtonIcon>
         <ButtonText f={1} fontWeight={isActiveRoute ? 'bold' : 'normal'}>
