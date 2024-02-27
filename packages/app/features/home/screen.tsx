@@ -1,7 +1,11 @@
 import { Button, Container, Paragraph, Spinner, XStack, YStack, useToastController } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowRight, IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
-import { baseMainnet, usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
+import {
+  baseMainnet,
+  usdcAddress as usdcAddresses,
+  sendTokenAddress as sendAddresses,
+} from '@my/wagmi'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import TokenDetails from './TokenDetails'
 
