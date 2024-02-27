@@ -12,7 +12,7 @@ export const Container: React.FC<XStackProps> = (props: XStackProps) => {
       }}
       $gtLg={{
         maxWidth: 1200,
-        px: '$8',
+        px: '$11',
       }}
       $gtXl={{
         maxWidth: 1440,

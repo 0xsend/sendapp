@@ -1,35 +1,6 @@
-import {
-  Anchor,
-  Avatar,
-  Button,
-  Card,
-  Container,
-  ListItem,
-  Paragraph,
-  ScrollView,
-  Spinner,
-  XStack,
-  YStack,
-  useToastController,
-} from '@my/ui'
+import { Button, Container, Paragraph, Spinner, XStack, YStack, useToastController } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
-import {
-  IconArrowDown,
-  IconArrowRight,
-  IconClose,
-  IconDeposit,
-  IconEthereum,
-  IconReceive,
-  IconSend,
-  IconSendTile,
-  IconUSDC,
-} from 'app/components/icons'
-import { MainLayout } from 'app/components/layout/index.native'
-import { CommentsTime } from 'app/utils/dateHelper'
-import formatAmount from 'app/utils/formatAmount'
-import { useSendAccounts } from 'app/utils/send-accounts'
-import { useState } from 'react'
-import { Square } from 'tamagui'
+import { IconArrowRight, IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
 import { baseMainnet, usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import TokenDetails from './TokenDetails'
@@ -61,7 +32,11 @@ export function HomeScreen() {
           ai={'center'}
         >
           {/* Balance Card */}
-          <XStack w={'100%'} jc={'center'} borderColor={separatorColor} borderBottomWidth={1}>
+          <XStack
+            w={'100%'}
+            jc={'center'}
+            $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
+          >
             <XStack w={'100%'} zIndex={4}>
               <YStack py={'$11'}>
                 <YStack jc={'center'} gap={'$6'}>

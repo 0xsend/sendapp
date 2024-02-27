@@ -141,7 +141,7 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
 
-  if (media.gtLg)
+  if (media.gtMd)
     return (
       <SideBarWrapper
         sidebar={
