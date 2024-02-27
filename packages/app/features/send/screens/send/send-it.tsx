@@ -1,6 +1,5 @@
 import { Button, Image, Input, Link, SizableText, XStack, YStack, styled } from '@my/ui'
 import { IconBack, IconClose } from 'app/components/icons'
-import { SendButton } from 'app/components/layout/footer/components/SendButton'
 import { SendConfirmModal } from 'app/features/send/components/modal'
 import { useSubScreenContext, useTransferContext } from 'app/features/send/providers'
 import { ANIMATE_DIRECTION_LEFT, SendScreen } from 'app/features/send/types'
@@ -75,7 +74,7 @@ export const SendItScreen = () => {
         </YStack>
 
         <YStack fg={1} jc={'flex-end'}>
-          <SendButton height={'$6'} borderRadius={'$9'} onPress={() => setShowModal(true)} />
+          <Button height={'$6'} borderRadius={'$9'} onPress={() => setShowModal(true)} />
         </YStack>
         <Button
           pos={'absolute'}

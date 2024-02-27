@@ -83,7 +83,6 @@ exports[`OnboardingScreen 1`] = `
           vbHeight={116}
           vbWidth={100}
           width={44}
-          xmlns="http://www.w3.org/2000/svg"
         >
           <RNSVGGroup
             fill={
@@ -251,7 +250,6 @@ exports[`OnboardingScreen 1`] = `
       vbHeight={48}
       vbWidth={132}
       width={121}
-      xmlns="http://www.w3.org/2000/svg"
     >
       <RNSVGGroup
         fill={

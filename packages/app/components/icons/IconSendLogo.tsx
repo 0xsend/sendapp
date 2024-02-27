@@ -17,7 +17,6 @@ const SendLogo = (props: IconProps) => {
       height={size}
       viewBox="0 0 132 48"
       color={color as ColorTokens | undefined}
-      xmlns="http://www.w3.org/2000/svg"
       {...rest}
     >
       <G clipPath="url(#clip0_12_4001)">

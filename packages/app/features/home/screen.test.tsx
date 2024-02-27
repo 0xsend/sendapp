@@ -17,6 +17,18 @@ jest.mock('app/routers/params', () => ({
 }))
 
 jest.mock('wagmi', () => ({
+  createConfig: jest.fn(),
+  useChainId: jest.fn().mockReturnValue(1337),
+  useBalance: jest.fn().mockReturnValue({
+    data: {
+      decimals: 6,
+      formatted: '0',
+      symbol: 'send',
+      value: 0n,
+    },
+    isPending: true,
+    refetch: jest.fn(),
+  }),
   useAccount: jest.fn().mockReturnValue({
     address: '0x123',
     isConnected: false,
@@ -40,6 +52,21 @@ jest.mock('solito/link', () => ({
 jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue(123),
 }))
+
+jest.mock('app/utils/useSendAccountBalances', () => ({
+  useSendAccountBalances: jest.fn().mockReturnValue({
+    balances: {
+      '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A': {},
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': {},
+    },
+    totalBalance: () => 0,
+  }),
+}))
+
+// jest.mock('@vonovak/react-native-theme-control', () => ({
+//   useThemePreference: jest.fn().mockReturnValue('light'),
+//   setThemePreference: jest.fn(),
+// }))
 
 test('HomeScreen', () => {
   const tree = render(

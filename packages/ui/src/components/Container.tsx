@@ -11,11 +11,11 @@ export const Container: React.FC<XStackProps> = (props: XStackProps) => {
         maxWidth: 960,
       }}
       $gtLg={{
-        maxWidth: 1200,
-        px: '$8',
+        maxWidth: 1440,
+        px: '$11',
       }}
       $gtXl={{
-        maxWidth: 1440,
+        maxWidth: 1920,
       }}
       als="center"
       f={1}
