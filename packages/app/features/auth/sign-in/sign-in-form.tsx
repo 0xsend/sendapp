@@ -54,7 +54,7 @@ export const SignInForm = () => {
             countrycode: {
               // @ts-expect-error unsure how to get web props to work with tamagui
               'aria-label': 'Country Code',
-              height: '$3',
+              size: '$3',
             },
             phone: {
               'aria-label': 'Phone number',
@@ -67,7 +67,6 @@ export const SignInForm = () => {
               borderWidth: 0,
               borderBottomWidth: 2,
               borderRadius: '$0',
-              placeholder: 'Phone number',
               width: '100%',
               backgroundColor: 'transparent',
               outlineColor: 'transparent',
@@ -86,8 +85,16 @@ export const SignInForm = () => {
                 br="$3"
                 bc={'$accent9Light'}
                 $sm={{ w: '100%' }}
+                $gtMd={{
+                  mt: '0',
+                  als: 'flex-end',
+                  mx: 0,
+                  ml: 'auto',
+                  w: '$10',
+                  h: '$3.5',
+                }}
               >
-                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
+                <ButtonText size={'$2'} padding={'unset'} ta="center" margin={'unset'} col="black">
                   {'/SEND IT'}
                 </ButtonText>
               </SubmitButton>
@@ -102,20 +109,20 @@ export const SignInForm = () => {
               <H3
                 fontFamily={'$mono'}
                 lineHeight={28}
-                col={'gray'}
+                col="accent"
                 fontWeight={'300'}
                 $sm={{ size: '$5' }}
               >
                 Sign in with your phone number
               </H3>
 
-              <YStack gap="$2">
+              <YStack gap="$4">
                 <Theme inverse={true}>
                   <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
                     Your Phone
                   </Paragraph>
                 </Theme>
-                <XStack gap="$2">{Object.values(fields)}</XStack>
+                <XStack gap="$5">{Object.values(fields)}</XStack>
               </YStack>
             </YStack>
           )}

@@ -2,30 +2,26 @@ import { Stack, YStack, Button, ButtonText, XStack, useMedia, Theme } from '@my/
 import { IconSendLogo } from 'app/components/icons'
 import { useContext, useEffect, useState } from 'react'
 import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
-import { AnimationLayout } from 'app/components/layout/animation-layout'
+
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel } from 'app/features/auth/components/Carousel'
 
 export const SignInScreen = () => {
+  const { carouselProgress } = useContext(AuthCarouselContext)
   const media = useMedia()
+
+  if (media.gtMd)
+    return (
+      <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
+        <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} ml="auto" w="100%" maw={738}>
+          <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
+        </YStack>
+      </YStack>
+    )
 
   return (
     <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
-      {media.gtMd ? (
-        <YStack
-          jc="flex-end"
-          f={1}
-          gap="$2"
-          h="100%"
-          $gtMd={{ pb: '$8', w: '80%', miw: 550 }}
-          mx="auto"
-          maw={738}
-        >
-          <Carousel />
-        </YStack>
-      ) : (
-        <SignInScreensMobile />
-      )}
+      <SignInScreensMobile />
     </YStack>
   )
 }
@@ -76,13 +72,8 @@ const SignInScreensMobile = () => {
           <SignInForm />
         ) : (
           <>
-            <AnimationLayout
-              currentKey={screens[signInProgress] || 'none'}
-              direction={1}
-              fullscreen={false}
-            >
-              <Carousel />
-            </AnimationLayout>
+            <Carousel fullscreen={false} currentKey={screens[signInProgress]} />
+
             {getSignInButtons(screens[signInProgress])}
           </>
         )}

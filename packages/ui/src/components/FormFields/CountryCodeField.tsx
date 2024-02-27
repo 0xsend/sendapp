@@ -11,7 +11,6 @@ import {
   Select,
   SelectProps,
   Sheet,
-  Spinner,
   Text,
   Theme,
   XStack,
@@ -67,11 +66,27 @@ export const CountryCodeField = ({
           value={country ? country.name : undefined}
           {...props}
         >
-          <Select.Trigger f={1} iconAfter={ChevronDown} space="$3s">
+          <Select.Trigger
+            f={1}
+            $theme-light={{
+              bc: '$white',
+              hoverStyle: { bc: '$gray8Light' },
+            }}
+            $theme-dark={{
+              bc: '$gray8Light',
+              hoverStyle: { bc: '$gray8Dark' },
+            }}
+            br={12}
+            borderWidth="$0"
+            iconAfter={() => <ChevronDown color="$black" />}
+            space="$2"
+          >
             {country ? (
               <Text
-                fontSize="$4"
-                fontWeight="normal"
+                fontSize="$7"
+                fontWeight="bold"
+                fontFamily={'$mono'}
+                col={'$black'}
                 style={{
                   textTransform: 'uppercase',
                 }}
@@ -79,7 +94,7 @@ export const CountryCodeField = ({
                 {country?.flag} +{country?.dialCode}
               </Text>
             ) : (
-              <Text fontSize="$2" fontWeight="normal">
+              <Text fontSize="$2" fontWeight="normal" col={'$black'}>
                 Country
               </Text>
             )}

@@ -7,7 +7,7 @@ export const SideBar = ({
 }: { children?: React.ReactNode } & YStackProps) => {
   return (
     <YStack
-      height={'95%'}
+      height={'92%'}
       width={width || '20%'}
       py="$6"
       ml="$7"

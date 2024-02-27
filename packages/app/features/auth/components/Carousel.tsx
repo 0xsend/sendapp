@@ -1,19 +1,23 @@
 import { useContext, useEffect, useState } from 'react'
 import { AuthCarouselContext } from '../AuthCarouselContext'
 import { H1, Paragraph, Progress, Stack, XStack, useMedia } from '@my/ui'
+import { AnimationLayout } from 'app/components/layout/animation-layout'
 
 const carouselItems = [
   {
-    title: 'LIKE CASH',
+    title: 'Like Cash',
     description: 'Send and receive money globally in seconds',
+    descriptionFontSize: 16,
   },
   {
-    title: 'ALL YOURS',
+    title: 'All Yours',
     description: 'Only you have access to your funds',
+    descriptionFontSize: 18,
   },
   {
-    title: 'SECURE',
+    title: 'Secure',
     description: 'Privacy first with verified sign-in and transfers',
+    descriptionFontSize: 16,
   },
 ] as const
 
@@ -30,27 +34,28 @@ const CarouselProgress = () => {
   useEffect(() => {
     const progressWidthInterval = setInterval(() => {
       setProgressWidth((progressWidth) => {
+        if (progressWidth >= 100) {
+          setCarouselProgress((progress) => {
+            return (progress + 1) % carouselItems?.length
+          })
+        }
         return progressWidth >= 100 ? 0 : progressWidth + 1
       })
-      if (progressWidth >= 100) {
-        setCarouselProgress((progress) => (progress + 1) % carouselItems?.length)
-      }
     }, 50)
-
     return () => {
       clearInterval(progressWidthInterval)
     }
-  }, [setCarouselProgress, progressWidth])
+  }, [setCarouselProgress])
 
   return (
-    <XStack w="100%" maw="100%" jc="center" py="$5" gap="$2">
+    <XStack w="100%" jc="center" py="$5" gap="$2">
       {carouselItems?.map(({ title }, i) => {
         return (
           <Progress
             key={title}
             f={1}
             h={1}
-            backgroundColor={'$background'}
+            backgroundColor={'$gray500'}
             direction="ltr"
             miw={0}
             value={carouselProgress < i ? 0 : carouselProgress === i ? progressWidth : 100}
@@ -62,28 +67,35 @@ const CarouselProgress = () => {
     </XStack>
   )
 }
-export const Carousel = () => {
+export const Carousel = (props: { currentKey: string | undefined; fullscreen: boolean }) => {
   const { carouselProgress } = useContext(AuthCarouselContext)
   const { gtMd } = useMedia()
 
   const item = carouselItems?.at(carouselProgress)
 
   return (
-    <>
+    <AnimationLayout
+      currentKey={props.currentKey || 'none'}
+      direction={1}
+      fullscreen={props.fullscreen}
+    >
       <Stack fd="column" $gtMd={{ fd: 'row', jc: 'space-between', ai: 'flex-end' }} gap="$3">
-        <H1 color="$white">{item?.title}</H1>
+        <H1 color="$white" fontWeight={'500'}>
+          {item?.title}
+        </H1>
         <Paragraph
-          $gtMd={{ ta: 'right', pb: '$2' }}
+          $gtMd={{ ta: 'right', pb: '$2', fontSize: item?.descriptionFontSize }}
           pr="$5"
-          fontSize="$2"
-          $gtXs={{ fontSize: '$4' }}
-          fontWeight={'300'}
+          fontSize={20}
+          fontWeight={'200'}
+          fontFamily={'$mono'}
+          lh={28}
           color="$white"
         >
           {item?.description}
         </Paragraph>
       </Stack>
       {gtMd && <CarouselProgress />}
-    </>
+    </AnimationLayout>
   )
 }

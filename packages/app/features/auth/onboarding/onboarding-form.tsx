@@ -17,7 +17,6 @@ import {
   XStack,
   SubmitButton,
   ButtonText,
-  H1,
   Paragraph,
   BigHeading,
   H3,
@@ -155,6 +154,7 @@ export const OnboardingForm = () => {
                   mx: 0,
                   ml: 'auto',
                   maw: '$12',
+                  h: '$3.5',
                 }}
               >
                 <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
@@ -173,13 +173,13 @@ export const OnboardingForm = () => {
             <H3
               fontFamily={'$mono'}
               lineHeight={28}
-              col={'gray'}
+              col="accent"
               fontWeight={'normal'}
               $sm={{ size: '$5' }}
             >
               Start by creating a Passkey below. Send uses passkeys to secure your account
             </H3>
-            <YStack gap="$2">
+            <YStack gap="$4">
               <Theme inverse={true}>
                 <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
                   Passkey Name

@@ -17,7 +17,7 @@ const AuthSideBar = ({ ...props }: YStackProps) => {
 
   return (
     <SideBar px="$7" {...props}>
-      <Stack als={'flex-start'} pl="$3">
+      <Stack als={'flex-start'}>
         <Theme inverse={true}>
           <IconSendLogo size={'$3'} color="$background" />
         </Theme>
@@ -38,7 +38,11 @@ const AuthSideBar = ({ ...props }: YStackProps) => {
 export const AuthSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
   if (media.gtMd) {
-    return <SideBarWrapper sidebar={<AuthSideBar bc={'$background'} />}>{children}</SideBarWrapper>
+    return (
+      <SideBarWrapper overflow="hidden" sidebar={<AuthSideBar bc={'$background'} />}>
+        {children}
+      </SideBarWrapper>
+    )
   }
   return children
 }
