@@ -1,4 +1,8 @@
-import { baseMainnet, usdcAddress as usdcAddresses, sendAddress as sendAddresses } from '@my/wagmi'
+import {
+  baseMainnet,
+  usdcAddress as usdcAddresses,
+  sendTokenAddress as sendAddresses,
+} from '@my/wagmi'
 import { UseBalanceReturnType, useBalance } from 'wagmi'
 import { useSendAccounts } from './send-accounts'
 
