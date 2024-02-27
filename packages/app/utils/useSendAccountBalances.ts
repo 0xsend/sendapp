@@ -13,12 +13,12 @@ export const useSendAccountBalances = () => {
   const balances: {
     [key: string]: UseBalanceReturnType
   } = {}
-  const tokens = [usdcAddresses[baseMainnet.id], sendAddresses[baseMainnet.id]]
+  const tokens = [usdcAddresses[baseMainnet.id], 'eth', sendAddresses[baseMainnet.id]]
 
   for (const token of tokens) {
     balances[token] = useBalance({
       address: sendAccount?.address,
-      token,
+      token: token === 'eth' ? undefined : (token as `0x${string}`),
       query: { enabled: !!sendAccount },
       chainId: baseMainnet.id,
     })
