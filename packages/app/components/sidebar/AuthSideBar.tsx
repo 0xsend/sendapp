@@ -8,11 +8,13 @@ import { SendAccountCongratulations } from 'app/features/auth/onboarding/screen'
 
 const AuthSideBar = ({ ...props }: YStackProps) => {
   const pathName = usePathname()
+  // @todo handle loading and error states
   const {
     data: sendAccts,
     // error: sendAcctsError,
     // isLoading: sendAcctsIsLoading,
   } = useSendAccounts()
+
   return (
     <SideBar px="$7" {...props}>
       <Stack als={'flex-start'} pl="$3">

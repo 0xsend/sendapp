@@ -9,10 +9,16 @@ import { daimoAccountFactory, encodeCreateAccountData, entrypoint } from 'app/ut
 import { baseMainnetClient } from '@my/wagmi'
 import * as Device from 'expo-device'
 import { concat } from 'viem'
-import { useState } from 'react'
 import { getSenderAddress } from 'permissionless'
-import { Input, Label, Anchor, YStack, Theme, XStack, Button } from '@my/ui'
+import { Anchor, YStack, Theme, XStack, SubmitButton, ButtonText, H1, Paragraph } from '@my/ui'
+import { SchemaForm, formFields } from 'app/utils/SchemaForm'
+import { z } from 'zod'
+import { useForm, FormProvider } from 'react-hook-form'
 import { useSendAccounts } from 'app/utils/send-accounts'
+
+const OnboardingSchema = z.object({
+  accountName: formFields.text,
+})
 
 /**
  * Create a send account but not onchain, yet.
@@ -21,16 +27,16 @@ export const OnboardingForm = () => {
   // REMOTE / SUPABASE STATE
   const supabase = useSupabase()
   const { user } = useUser()
+  const form = useForm<z.infer<typeof OnboardingSchema>>()
   const { refetch: refetchSendAccounts } = useSendAccounts()
 
   // PASSKEY / ACCOUNT CREATION STATE
   const deviceName = Device.deviceName
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
-  const [accountName, setAccountName] = useState<string>(deviceName) // TODO: use expo-device to get device name
 
   // TODO: split creating the on-device and remote creation to introduce retries in-case of failures
-  async function createAccount() {
+  async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     assert(!!user?.id, 'No user id')
 
     const keySlot = 0
@@ -78,62 +84,110 @@ export const OnboardingForm = () => {
   }
 
   return (
-    // TODO: turn into a form
-    <YStack space="$4" f={1}>
-      <Theme inverse={true}>
-        <Label htmlFor="accountName" color={'$background'}>
-          Passkey name
-        </Label>
-      </Theme>
-      <YStack space="$4" f={1}>
-        <Input
-          id="accountName"
-          borderBottomColor="$accent9Light"
-          borderWidth={0}
-          borderBottomWidth={2}
-          borderRadius="$0"
-          width="100%"
-          backgroundColor="transparent"
-          outlineColor="transparent"
-          onChangeText={setAccountName}
-          value={accountName}
-        />
-        <Anchor
-          col={'$accentBackground'}
-          href="https://info.send.it/send/mission-vision-and-values"
-          target="_blank"
-          dsp="flex"
-          jc="flex-end"
-          $gtMd={{ dsp: 'none' }}
-        >
-          Why Passkey?
-        </Anchor>
-      </YStack>
-
-      <XStack jc="space-between" ai="center" w="100%" px="$2">
-        <Anchor
-          col={'$accentBackground'}
-          href="https://info.send.it/send/mission-vision-and-values"
-          target="_blank"
-          dsp="none"
-          $gtMd={{ dsp: 'block' }}
-        >
-          Why Passkey?
-        </Anchor>
-        <Theme name={'accent_Button'}>
-          <Button
-            onPress={createAccount}
-            mb="auto"
-            als="auto"
-            br="$4"
-            mx="auto"
+    <FormProvider {...form}>
+      <SchemaForm
+        form={form}
+        schema={OnboardingSchema}
+        onSubmit={createAccount}
+        defaultValues={{ accountName: deviceName }}
+        props={{
+          accountName: {
+            'aria-label': 'Account name',
+            '$theme-dark': {
+              borderBottomColor: '$accent9Light',
+            },
+            '$theme-light': {
+              borderBottomColor: '$black',
+            },
+            borderWidth: 0,
+            borderBottomWidth: 2,
+            borderRadius: '$0',
+            placeholder: deviceName,
+            width: '100%',
+            backgroundColor: 'transparent',
+            outlineColor: 'transparent',
+          },
+        }}
+        renderAfter={({ submit }) => (
+          <XStack
+            jc="space-between"
+            ai="center"
             w="100%"
-            $gtMd={{ mt: '0', als: 'flex-end', miw: '$12' }}
+            px="$2"
+            $sm={{ jc: 'center', height: '100%' }}
           >
-            Create Passkey
-          </Button>
-        </Theme>
-      </XStack>
-    </YStack>
+            <Anchor
+              $theme-dark={{
+                col: '$accentBackground',
+              }}
+              $theme-light={{ col: '$black' }}
+              href="https://info.send.it/send/mission-vision-and-values"
+              target="_blank"
+              dsp="none"
+              $gtMd={{ dsp: 'block' }}
+            >
+              Why Passkey?
+            </Anchor>
+            <Theme name={'accent_Button'}>
+              <SubmitButton
+                onPress={submit}
+                mb="auto"
+                als="auto"
+                br="$4"
+                mx="auto"
+                w="100%"
+                $gtMd={{
+                  mt: '0',
+                  als: 'flex-end',
+                  mx: 0,
+                  ml: 'auto',
+                  maw: '$14',
+                }}
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
+                  CREATE PASSKEY
+                </ButtonText>
+              </SubmitButton>
+            </Theme>
+          </XStack>
+        )}
+      >
+        {(fields) => (
+          <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
+            <Theme inverse={true}>
+              <H1 col="$background" size="$11">
+                SETUP PASSKEY
+              </H1>
+            </Theme>
+            <Paragraph fontWeight="normal" theme="active" $sm={{ size: '$5' }}>
+              Start by creating a Passkey below. Send uses passkeys to secure your account
+            </Paragraph>
+            <YStack gap="$2">
+              <Theme inverse={true}>
+                <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
+                  Passkey Name
+                </Paragraph>
+              </Theme>
+              <YStack space="$4" f={1}>
+                {Object.values(fields)}
+                <Anchor
+                  $theme-dark={{
+                    col: '$accentBackground',
+                  }}
+                  $theme-light={{ col: '$black' }}
+                  href="https://info.send.it/send/mission-vision-and-values"
+                  target="_blank"
+                  dsp="flex"
+                  jc="flex-end"
+                  $gtMd={{ dsp: 'none' }}
+                >
+                  Why Passkey?
+                </Anchor>
+              </YStack>
+            </YStack>
+          </YStack>
+        )}
+      </SchemaForm>
+    </FormProvider>
   )
 }

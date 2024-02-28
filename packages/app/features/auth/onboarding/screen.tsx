@@ -7,7 +7,6 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { createPasskey } from '@daimo/expo-passkeys'
 import {
   Paragraph,
   Stack,
@@ -16,7 +15,6 @@ import {
   Theme,
   useMedia,
   H3,
-  H1,
   useToastController,
   Button,
 } from '@my/ui'
@@ -32,11 +30,7 @@ import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 
 export function OnboardingScreen() {
   const media = useMedia()
-  const {
-    data: sendAccts,
-    // error: sendAcctsError,
-    // isLoading: sendAcctsIsLoading,
-  } = useSendAccounts()
+  const { data: sendAccts } = useSendAccounts()
 
   if (media.gtMd)
     return (
@@ -48,34 +42,19 @@ export function OnboardingScreen() {
     )
 
   return (
-    <YStack w="100%" h={'100%'} jc="flex-start" py="$7">
-      <Stack f={1} $gtMd={{ dsp: 'none' }}>
+    <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
+      <Stack $gtMd={{ dsp: 'none' }}>
         <Theme inverse={true}>
           <IconSendLogo size={'$2'} color="$background" />
         </Theme>
       </Stack>
 
       <YStack f={3} jc="center" maw="100%" space="$4" gap="$4">
-        {sendAccts?.length === 0 ? (
-          <>
-            <Theme inverse={true}>
-              <H1 col="$background" size="$11">
-                SETUP PASSKEY
-              </H1>
-            </Theme>
-            <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
-              Start by creating a Passkey below. Send uses passkeys to secure your account.
-            </H3>
-            <OnboardingForm />
-          </>
-        ) : (
-          <SendAccountCongratulations />
-        )}
+        {sendAccts?.length === 0 ? <OnboardingForm /> : <SendAccountCongratulations />}
       </YStack>
     </YStack>
   )
 }
-
 export function SendAccountCongratulations() {
   const toast = useToastController()
   const { data: sendAccts } = useSendAccounts()
