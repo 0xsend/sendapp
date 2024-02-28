@@ -8,6 +8,7 @@ import {
 } from '@my/wagmi'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import TokenDetails from './TokenDetails'
+import formatAmount from 'app/utils/formatAmount'
 
 export function HomeScreen() {
   const { totalBalance } = useSendAccountBalances()
@@ -63,11 +64,7 @@ export function HomeScreen() {
                         lineHeight={'$12'}
                         zIndex={1}
                       >
-                        {
-                          USDollar.format(parseFloat(totalBalance?.toString()))
-                            .replace('$', '')
-                            .split('.')[0]
-                        }
+                        {formatAmount(USDollar.format(totalBalance).replace('$', '').split('.')[0])}
                       </Paragraph>
                     )}
                     <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
