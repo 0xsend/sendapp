@@ -23,8 +23,9 @@ fork_block_number = 11005692
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 
 [rpc_endpoints]
-mainnet = "${MAINNET_RPC_URL}"
-base = "${BASE_RPC_URL}"
+mainnet = "${FOUNDRY_MAINNET_RPC_URL}"
+base = "${FOUNDRY_BASE_RPC_URL}"
+base-sepolia = "${FOUNDRY_BASE_SEPOLIA_RPC_URL}"
 
 [etherscan]
 # mainnet = { key = "${ETHERSCAN_API_KEY}" }
