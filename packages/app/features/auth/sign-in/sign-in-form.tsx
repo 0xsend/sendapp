@@ -3,7 +3,7 @@ import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { api } from 'app/utils/api'
 import { useRouter } from 'solito/router'
-import { VerifyCode } from './components/VerifyCode'
+import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { z } from 'zod'
 
 const SignInSchema = z.object({
@@ -85,7 +85,7 @@ export const SignInForm = () => {
           )}
         >
           {(fields) => (
-            <YStack gap="$5" jc="center" p="$7" f={1}>
+            <YStack gap="$5" jc="center" f={1}>
               <Theme inverse={true}>
                 <H1 col="$background" size="$11">
                   WELCOME TO SEND

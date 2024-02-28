@@ -1,6 +1,5 @@
-import { ScrollView, YStack } from '@my/ui'
-
-import { SignInSideBarWrapper } from 'app/components/sidebar/SignInSideBar'
+import { Container, ScrollView, YStack } from '@my/ui'
+import { AuthSideBarWrapper } from 'app/components/sidebar/AuthSideBar'
 import { useMemo, useState } from 'react'
 import { AuthCarouselContext } from './AuthCarouselContext'
 import { SolitoImage } from 'solito/image'
@@ -17,7 +16,7 @@ export function AuthLayout({ children }: { children: React.ReactNode; header?: s
       <AuthCarouselContext.Provider
         value={{ carouselImages, setCarouselImages, carouselProgress, setCarouselProgress }}
       >
-        <SignInSideBarWrapper>
+        <AuthSideBarWrapper>
           {carouselImage && (
             <SolitoImage
               placeholder="blur"
@@ -28,12 +27,14 @@ export function AuthLayout({ children }: { children: React.ReactNode; header?: s
               alt="sign-in-carousel"
             />
           )}
-          <YStack h={'100%'} f={1}>
-            <ScrollView f={3} fb={0} jc="center" backgroundColor={'$transparent'}>
-              {children}
-            </ScrollView>
-          </YStack>
-        </SignInSideBarWrapper>
+          <Container>
+            <YStack h={'100%'} f={1}>
+              <ScrollView f={3} fb={0} jc="center" backgroundColor={'$transparent'}>
+                {children}
+              </ScrollView>
+            </YStack>
+          </Container>
+        </AuthSideBarWrapper>
       </AuthCarouselContext.Provider>
     ),
     [carouselImage, carouselImages, carouselProgress, children]

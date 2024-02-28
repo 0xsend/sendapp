@@ -23,6 +23,7 @@ import {
   Anchor,
   H3,
   H1,
+  useToastController,
 } from '@my/ui'
 import { base16, base64 } from '@scure/base'
 import { assert } from 'app/utils/assert'
@@ -51,13 +52,15 @@ export function OnboardingScreen() {
     // isLoading: sendAcctsIsLoading,
   } = useSendAccounts()
 
+  if (media.gtMd) return null
+
   return (
     <YStack w="100%" h={'100%'} jc="flex-start" p="$7">
       <Stack f={1} $gtMd={{ dsp: 'none' }}>
         <IconSendLogo size={'$2'} color="$white" />
       </Stack>
 
-      <YStack f={3} jc="center" maw="100%" space="$4" gap="$4">
+      <YStack f={3} jc="center" maw="100%" space="$4" gap="$4" $gtMd={{ display: 'none' }}>
         {sendAccts?.length === 0 ? (
           <>
             <Theme inverse={true}>
@@ -94,7 +97,7 @@ export function OnboardingScreen() {
 /**
  * Create a send account but not onchain, yet.
  */
-function CreateSendAccount() {
+export function CreateSendAccount() {
   // REMOTE / SUPABASE STATE
   const supabase = useSupabase()
   const { user } = useUser()
@@ -150,20 +153,6 @@ function CreateSendAccount() {
 
     if (error) {
       throw error
-    }
-
-    if (__DEV__) {
-      console.log('Funding sending address', senderAddress)
-      await testClient.setBalance({
-        address: senderAddress,
-        value: parseEther('1'),
-      })
-      await setERC20Balance({
-        client: testClient,
-        address: senderAddress,
-        tokenAddress: usdcAddress[baseMainnetClient.chain.id],
-        value: BigInt(100e6),
-      })
     }
 
     await sendAcctsRefetch()
@@ -232,9 +221,11 @@ function CreateSendAccount() {
   )
 }
 
-function SendAccountCongratulations() {
+export function SendAccountCongratulations() {
+  const toast = useToastController()
   const { data: sendAccts } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
+
   return (
     <YStack w="100%" space="$4" f={1}>
       <H3>Congratulations on opening your first Send Account! </H3>
@@ -247,6 +238,41 @@ function SendAccountCongratulations() {
           </Paragraph>
           <IconCopy />
         </XStack>
+
+        {__DEV__ && !!sendAcct && (
+          <Theme name="dim">
+            <YStack pt="$4" gap="$4">
+              <YStack gap="$2">
+                <Paragraph mx="auto">⭐️ Secret Shop ⭐️</Paragraph>
+                <Paragraph mx="auto">Available on Localnet/Testnet only.</Paragraph>
+              </YStack>
+              <Button
+                onPress={async () => {
+                  await testClient.setBalance({
+                    address: sendAcct.address,
+                    value: parseEther('10'),
+                  })
+                  toast.show('Funded with 10 ETH')
+                }}
+              >
+                Fund with 10 ETH
+              </Button>
+              <Button
+                onPress={async () => {
+                  await setERC20Balance({
+                    client: testClient,
+                    address: sendAcct.address,
+                    tokenAddress: usdcAddress[baseMainnetClient.chain.id],
+                    value: BigInt(100e6),
+                  })
+                  toast.show('Funded with 100 USDC')
+                }}
+              >
+                Fund with 100 USDC
+              </Button>
+            </YStack>
+          </Theme>
+        )}
       </Stack>
     </YStack>
   )
