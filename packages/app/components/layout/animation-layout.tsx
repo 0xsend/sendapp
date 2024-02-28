@@ -14,13 +14,18 @@ const YStackEnterable = styled(YStack, {
   } as const,
 })
 
-export const AnimationLayout = ({ children, currentKey, direction }: AnimationLayoutProps) => {
+export const AnimationLayout = ({
+  children,
+  currentKey,
+  direction,
+  fullscreen = true,
+}: AnimationLayoutProps & { fullscreen?: boolean }) => {
   const enterVariant = direction === 1 || direction === 0 ? 'isRight' : 'isLeft'
   const exitVariant = direction === 1 ? 'isLeft' : 'isRight'
 
   return (
     <AnimatePresence enterVariant={enterVariant} exitVariant={exitVariant}>
-      <YStackEnterable key={currentKey} animation="200ms" fullscreen x={0} opacity={1}>
+      <YStackEnterable key={currentKey} animation="200ms" fullscreen={fullscreen} x={0} opacity={1}>
         {children}
       </YStackEnterable>
     </AnimatePresence>

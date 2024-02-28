@@ -69,23 +69,28 @@ export const SignInForm = () => {
             },
           }}
           renderAfter={({ submit }) => (
-            <XStack f={1} mt={'0'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'flex-start'}>
+            <XStack
+              f={1}
+              mt={'0'}
+              jc={'flex-end'}
+              $sm={{ jc: 'center', height: '100%' }}
+              ai={'flex-start'}
+            >
               <SubmitButton
                 onPress={() => submit()}
                 br="$3"
                 bc={'$accent9Light'}
-                w={'$12'}
-                $sm={{ dsp: form.getValues().phone?.length > 0 ? 'flex' : 'none' }}
+                $sm={{ w: '100%' }}
               >
                 <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                  {'/SEND IT!'}
+                  {'/SEND IT'}
                 </ButtonText>
               </SubmitButton>
             </XStack>
           )}
         >
           {(fields) => (
-            <YStack gap="$5" jc="center" f={1}>
+            <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
               <Theme inverse={true}>
                 <H1 col="$background" size="$11">
                   WELCOME TO SEND

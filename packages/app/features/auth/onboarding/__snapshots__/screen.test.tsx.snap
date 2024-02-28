@@ -8,8 +8,6 @@ exports[`OnboardingScreen 1`] = `
       "height": "100%",
       "justifyContent": "flex-start",
       "paddingBottom": 39,
-      "paddingLeft": 39,
-      "paddingRight": 39,
       "paddingTop": 39,
       "width": "100%",
     }
