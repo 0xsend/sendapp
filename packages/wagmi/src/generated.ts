@@ -277,7 +277,7 @@ export const daimoAccountAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const daimoAccountFactoryAbi = [
   {
@@ -354,14 +354,15 @@ export const daimoAccountFactoryAbi = [
 ] as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const daimoAccountFactoryAddress = {
+  84532: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
   845337: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
 } as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const daimoAccountFactoryConfig = {
   address: daimoAccountFactoryAddress,
@@ -3601,7 +3602,7 @@ export const watchDaimoAccountUpgradedEvent = /*#__PURE__*/ createWatchContractE
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactory = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3611,7 +3612,7 @@ export const readDaimoAccountFactory = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3622,7 +3623,7 @@ export const readDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ create
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3633,7 +3634,7 @@ export const readDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createReadContrac
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryGetAddress = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3644,7 +3645,7 @@ export const readDaimoAccountFactoryGetAddress = /*#__PURE__*/ createReadContrac
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"verifier"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryVerifier = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3655,7 +3656,7 @@ export const readDaimoAccountFactoryVerifier = /*#__PURE__*/ createReadContract(
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const writeDaimoAccountFactory = /*#__PURE__*/ createWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -3665,7 +3666,7 @@ export const writeDaimoAccountFactory = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const writeDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -3676,7 +3677,7 @@ export const writeDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createWriteCo
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const prepareWriteDaimoAccountFactory = /*#__PURE__*/ createSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -3686,7 +3687,7 @@ export const prepareWriteDaimoAccountFactory = /*#__PURE__*/ createSimulateContr
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const prepareWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -7155,7 +7156,7 @@ export const useWatchDaimoAccountUpgradedEvent = /*#__PURE__*/ createUseWatchCon
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactory = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7165,7 +7166,7 @@ export const useReadDaimoAccountFactory = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7176,7 +7177,7 @@ export const useReadDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ cre
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7187,7 +7188,7 @@ export const useReadDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadC
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryGetAddress = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7198,7 +7199,7 @@ export const useReadDaimoAccountFactoryGetAddress = /*#__PURE__*/ createUseReadC
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"verifier"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryVerifier = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7209,7 +7210,7 @@ export const useReadDaimoAccountFactoryVerifier = /*#__PURE__*/ createUseReadCon
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useWriteDaimoAccountFactory = /*#__PURE__*/ createUseWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -7219,7 +7220,7 @@ export const useWriteDaimoAccountFactory = /*#__PURE__*/ createUseWriteContract(
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -7230,7 +7231,7 @@ export const useWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseW
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useSimulateDaimoAccountFactory = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -7240,7 +7241,7 @@ export const useSimulateDaimoAccountFactory = /*#__PURE__*/ createUseSimulateCon
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useSimulateDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoAccountFactoryAbi,
