@@ -11,7 +11,6 @@ import { createPasskey } from '@daimo/expo-passkeys'
 import {
   Button,
   Footer,
-  H2,
   Input,
   Label,
   Paragraph,
@@ -19,13 +18,11 @@ import {
   YStack,
   Link,
   XStack,
-  CornerTriangle,
-  Image,
   Theme,
   useMedia,
   Anchor,
   H3,
-  useToastController,
+  H1,
 } from '@my/ui'
 import { base16, base64 } from '@scure/base'
 import { assert } from 'app/utils/assert'
@@ -38,13 +35,7 @@ import { daimoAccountFactory, encodeCreateAccountData, entrypoint } from 'app/ut
 import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 import * as Device from 'expo-device'
 import { concat, parseEther } from 'viem'
-import {
-  IconSLogo,
-  IconSendLogo,
-  IconTelegramLogo,
-  IconXLogo,
-  IconCopy,
-} from 'app/components/icons'
+import { IconSendLogo, IconTelegramLogo, IconXLogo, IconCopy } from 'app/components/icons'
 import { telegram as telegramSocial, twitter as twitterSocial } from 'app/data/socialLinks'
 import { useState } from 'react'
 import { getSenderAddress } from 'permissionless'
@@ -61,63 +52,22 @@ export function OnboardingScreen() {
   } = useSendAccounts()
 
   return (
-    <YStack ai="center" jc="space-between" h={'95%'} w={'95%'} px="$6" m="auto">
-      <Stack pos="absolute" top={0} left={0} mt="auto" mb="auto" zIndex={-1} w="100%" h="100%">
-        <Stack mt="auto" mb="auto" w="100%" h="100%" zIndex={1}>
-          <Stack
-            position="absolute"
-            bottom={'$0'}
-            right={'$0'}
-            dsp="none"
-            $gtMd={{ dsp: 'inherit' }}
-            zIndex={1}
-          >
-            <IconSLogo size={'$4'} />
-          </Stack>
-          <CornerTriangle
-            btc={'$background'}
-            corner="topLeft"
-            pos="absolute"
-            top={0}
-            left={0}
-            btw={273}
-            brw={90}
-          />
-          <Image
-            width="100%"
-            height="100%"
-            source={{
-              uri: 'https://raw.githubusercontent.com/0xsend/assets/main/app_images/setup-passkey.jpg',
-            }}
-            style={{ borderRadius: 33, zIndex: -1, opacity: 0.1 }}
-          />
-          <CornerTriangle
-            btc={'$background'}
-            corner="bottomRight"
-            pos="absolute"
-            bottom={0}
-            right={0}
-            btw={273}
-            brw={90}
-          />
-        </Stack>
+    <YStack w="100%" h={'100%'} jc="flex-start" p="$7">
+      <Stack f={1} $gtMd={{ dsp: 'none' }}>
+        <IconSendLogo size={'$2'} color="$white" />
       </Stack>
-      <Stack f={1} jc="center">
-        <Theme inverse={true}>
-          <IconSendLogo size={media.gtMd ? '$6' : '$4'} color="$background" />
-        </Theme>
-      </Stack>
-      <YStack f={3} jc="center" maw="100%" $gtMd={{ maw: 400 }} space="$4">
+
+      <YStack f={3} jc="center" maw="100%" space="$4" gap="$4">
         {sendAccts?.length === 0 ? (
           <>
-            <YStack pb="$4" space="$2" f={1} jc={'flex-end'}>
-              <Theme inverse={true}>
-                <H2 color={'$green100'}>Setup Passkey</H2>
-              </Theme>
-              <Paragraph>
-                Start by creating a Passkey below. Send uses passkeys to secure your account.
-              </Paragraph>
-            </YStack>
+            <Theme inverse={true}>
+              <H1 col="$background" size="$11">
+                SETUP PASSKEY
+              </H1>
+            </Theme>
+            <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
+              Start by creating a Passkey below. Send uses passkeys to secure your account.
+            </H3>
             <CreateSendAccount />
           </>
         ) : (
@@ -149,7 +99,6 @@ function CreateSendAccount() {
   const supabase = useSupabase()
   const { user } = useUser()
   const { refetch: sendAcctsRefetch } = useSendAccounts()
-  const media = useMedia()
 
   // PASSKEY / ACCOUNT CREATION STATE
   const deviceName = Device.deviceName
@@ -225,41 +174,67 @@ function CreateSendAccount() {
   return (
     // TODO: turn into a form
     <YStack space="$4" f={1}>
-      <Label htmlFor="accountName">Passkey name</Label>
-      <Input id="accountName" onChangeText={setAccountName} value={accountName} />
-      {media.gtMd ? (
-        <XStack jc="space-between" ai="center" w="100%" px="$2">
-          <Anchor
-            col={'$accentBackground'}
-            href="https://info.send.it/send/mission-vision-and-values"
-            target="_blank"
-            dsp={'none'}
-            $gtMd={{ dsp: 'block' }}
-          >
-            Why Passkey?
-          </Anchor>
-          <Theme name={'accent_Button'}>
-            <Button onPress={createAccount} mt="0" als="flex-end" miw="$12">
-              Create
-            </Button>
-          </Theme>
-        </XStack>
-      ) : (
+      <Theme inverse={true}>
+        <Label htmlFor="accountName" color={'$background'}>
+          Passkey name
+        </Label>
+      </Theme>
+      <YStack space="$4" f={1}>
+        <Input
+          id="accountName"
+          borderBottomColor="$accent9Light"
+          borderWidth={0}
+          borderBottomWidth={2}
+          borderRadius="$0"
+          width="100%"
+          backgroundColor="transparent"
+          outlineColor="transparent"
+          onChangeText={setAccountName}
+          value={accountName}
+        />
+        <Anchor
+          col={'$accentBackground'}
+          href="https://info.send.it/send/mission-vision-and-values"
+          target="_blank"
+          dsp="flex"
+          jc="flex-end"
+          $gtMd={{ dsp: 'none' }}
+        >
+          Why Passkey?
+        </Anchor>
+      </YStack>
+
+      <XStack jc="space-between" ai="center" w="100%" px="$2">
+        <Anchor
+          col={'$accentBackground'}
+          href="https://info.send.it/send/mission-vision-and-values"
+          target="_blank"
+          dsp="none"
+          $gtMd={{ dsp: 'block' }}
+        >
+          Why Passkey?
+        </Anchor>
         <Theme name={'accent_Button'}>
-          <Button onPress={createAccount} mt="auto" als="auto">
-            Create
+          <Button
+            onPress={createAccount}
+            mb="auto"
+            als="auto"
+            br="$4"
+            mx="auto"
+            w="100%"
+            $gtMd={{ mt: '0', als: 'flex-end', miw: '$12' }}
+          >
+            Create Passkey
           </Button>
         </Theme>
-      )}
+      </XStack>
     </YStack>
   )
 }
 
 function SendAccountCongratulations() {
-  const toast = useToastController()
   const { data: sendAccts } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
-
   return (
     <YStack w="100%" space="$4" f={1}>
       <H3>Congratulations on opening your first Send Account! </H3>
@@ -272,41 +247,6 @@ function SendAccountCongratulations() {
           </Paragraph>
           <IconCopy />
         </XStack>
-
-        {__DEV__ && !!sendAcct && (
-          <Theme name="dim">
-            <YStack pt="$4" gap="$4">
-              <YStack gap="$2">
-                <Paragraph mx="auto">⭐️ Secret Shop ⭐️</Paragraph>
-                <Paragraph mx="auto">Available on Localnet/Testnet only.</Paragraph>
-              </YStack>
-              <Button
-                onPress={async () => {
-                  await testClient.setBalance({
-                    address: sendAcct.address,
-                    value: parseEther('10'),
-                  })
-                  toast.show('Funded with 10 ETH')
-                }}
-              >
-                Fund with 10 ETH
-              </Button>
-              <Button
-                onPress={async () => {
-                  await setERC20Balance({
-                    client: testClient,
-                    address: sendAcct.address,
-                    tokenAddress: usdcAddress[baseMainnetClient.chain.id],
-                    value: BigInt(100e6),
-                  })
-                  toast.show('Funded with 100 USDC')
-                }}
-              >
-                Fund with 100 USDC
-              </Button>
-            </YStack>
-          </Theme>
-        )}
       </Stack>
     </YStack>
   )
