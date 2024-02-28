@@ -1,7 +1,11 @@
 import '../public/reset.css'
 
-import '@tamagui/font-inter/css/400.css'
-import '@tamagui/font-inter/css/700.css'
+import '@fontsource/dm-sans/400.css'
+import '@fontsource/dm-sans/900.css'
+import '@fontsource/dm-mono/300.css'
+import '@fontsource/dm-mono/400.css'
+import '@fontsource/dm-mono/500.css'
+
 import 'raf/polyfill'
 
 import { ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'

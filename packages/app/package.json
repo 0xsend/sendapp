@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@daimo/expo-passkeys": "workspace:*",
-    "@my/contracts": "workspace:*",
+    "@fontsource/dm-mono": "^5.0.18",
+    "@fontsource/dm-sans": "^5.0.18",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
     "@my/wagmi": "workspace:*",
