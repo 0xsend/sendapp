@@ -60,7 +60,7 @@ export function AuthLayout({
             </AnimationLayout>
           )}
 
-          <Container height={'100%'}>
+          <Container height={'100%'} $sm={{ px: '$4' }}>
             <YStack h={'100%'} f={1}>
               {children}
             </YStack>

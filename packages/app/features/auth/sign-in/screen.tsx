@@ -12,7 +12,15 @@ export const SignInScreen = () => {
   return (
     <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
       {media.gtMd ? (
-        <YStack jc="flex-end" f={1} gap="$2" h="100%" $gtMd={{ pb: '$8' }} mx="auto" maw={738}>
+        <YStack
+          jc="flex-end"
+          f={1}
+          gap="$2"
+          h="100%"
+          $gtMd={{ pb: '$8', w: '80%', miw: 550 }}
+          mx="auto"
+          maw={738}
+        >
           <Carousel />
         </YStack>
       ) : (

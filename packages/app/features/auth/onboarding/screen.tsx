@@ -34,7 +34,7 @@ export function OnboardingScreen() {
 
   if (media.gtMd)
     return (
-      <YStack f={3} jc="center" maw="100%" space="$4" gap="$4">
+      <YStack f={3} jc="center" miw={0} maw={'100%'} space="$4" gap="$4">
         <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} mx="auto" maw={738}>
           <Carousel />
         </YStack>
@@ -49,8 +49,16 @@ export function OnboardingScreen() {
         </Theme>
       </Stack>
 
-      <YStack f={3} jc="center" maw="100%" space="$4" gap="$4">
-        {sendAccts?.length === 0 ? <OnboardingForm /> : <SendAccountCongratulations />}
+      <YStack f={3} jc="center" maw={'100%'} space="$4" gap="$4">
+        {media.gtMd ? (
+          <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} mx="auto" maw={'100%'}>
+            <Carousel />
+          </YStack>
+        ) : sendAccts?.length === 0 ? (
+          <OnboardingForm />
+        ) : (
+          <SendAccountCongratulations />
+        )}
       </YStack>
     </YStack>
   )
