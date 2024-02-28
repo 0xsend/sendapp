@@ -13,7 +13,7 @@ const carouselItems = [
   },
   {
     title: 'SECURE',
-    description: 'PRIVACY FIRST WITH VERFIED SIGN-IN AND TRANSFERS',
+    description: 'PRIVACY FIRST WITH VERIFIED SIGN-IN AND TRANSFERS',
   },
 ] as const
 
