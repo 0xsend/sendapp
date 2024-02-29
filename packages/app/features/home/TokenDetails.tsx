@@ -20,9 +20,14 @@ const TokenDetails = ({ tokenAddress }: { tokenAddress: `0x${string}` | undefine
     if (balance.isPending) {
       return <Spinner size={'small'} />
     }
+    if (balance?.data?.value === undefined) {
+      return <></>
+    }
     return (
       <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
-        {formatAmount(balance.data?.value.toString(), undefined, 3)}
+        {formatAmount(
+          (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString()
+        )}
       </Paragraph>
     )
   }
