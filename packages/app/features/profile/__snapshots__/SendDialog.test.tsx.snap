@@ -1339,6 +1339,78 @@ exports[`SendDialog it can send: SendForm 1`] = `
                             USDC
                           </Text>
                         </View>
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "height": 0,
+                              "minHeight": 0,
+                              "minWidth": 0,
+                              "width": 0,
+                            }
+                          }
+                        />
+                        <View
+                          accessibilityLabelledBy=":rp:"
+                          accessibilityState={
+                            {
+                              "disabled": undefined,
+                              "selected": false,
+                            }
+                          }
+                          cancelable={true}
+                          cursor="pointer"
+                          focusable={true}
+                          minPressDuration={0}
+                          onBlur={[Function]}
+                          onFocus={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          onPress={[Function]}
+                          onPressIn={[Function]}
+                          onPressOut={[Function]}
+                          style={
+                            {
+                              "alignItems": "center",
+                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                              "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                              "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                              "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                              "flexDirection": "row",
+                              "flexWrap": "nowrap",
+                              "justifyContent": "space-between",
+                              "maxWidth": "100%",
+                              "minHeight": 44,
+                              "overflow": "hidden",
+                              "paddingBottom": 10,
+                              "paddingLeft": 18,
+                              "paddingRight": 18,
+                              "paddingTop": 10,
+                              "width": "100%",
+                            }
+                          }
+                          tabIndex={-1}
+                        >
+                          <Text
+                            id=":rp:"
+                            lineBreakMode="clip"
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "hsla(112, 22%, 59%, 1)",
+                                "fontFamily": "System",
+                                "fontSize": 16.8,
+                                "fontWeight": "400",
+                                "lineHeight": 19,
+                              }
+                            }
+                            suppressHighlighting={true}
+                            userSelect="none"
+                          >
+                            SEND
+                          </Text>
+                        </View>
                       </View>
                     </View>
                   </View>
@@ -2828,6 +2900,78 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                             userSelect="none"
                           >
                             USDC
+                          </Text>
+                        </View>
+                        <View
+                          pointerEvents="none"
+                          style={
+                            {
+                              "height": 0,
+                              "minHeight": 0,
+                              "minWidth": 0,
+                              "width": 0,
+                            }
+                          }
+                        />
+                        <View
+                          accessibilityLabelledBy=":rp:"
+                          accessibilityState={
+                            {
+                              "disabled": undefined,
+                              "selected": false,
+                            }
+                          }
+                          cancelable={true}
+                          cursor="pointer"
+                          focusable={true}
+                          minPressDuration={0}
+                          onBlur={[Function]}
+                          onFocus={[Function]}
+                          onMouseEnter={[Function]}
+                          onMouseLeave={[Function]}
+                          onPress={[Function]}
+                          onPressIn={[Function]}
+                          onPressOut={[Function]}
+                          style={
+                            {
+                              "alignItems": "center",
+                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                              "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                              "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                              "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                              "flexDirection": "row",
+                              "flexWrap": "nowrap",
+                              "justifyContent": "space-between",
+                              "maxWidth": "100%",
+                              "minHeight": 44,
+                              "overflow": "hidden",
+                              "paddingBottom": 10,
+                              "paddingLeft": 18,
+                              "paddingRight": 18,
+                              "paddingTop": 10,
+                              "width": "100%",
+                            }
+                          }
+                          tabIndex={-1}
+                        >
+                          <Text
+                            id=":rp:"
+                            lineBreakMode="clip"
+                            numberOfLines={1}
+                            style={
+                              {
+                                "color": "hsla(112, 22%, 59%, 1)",
+                                "fontFamily": "System",
+                                "fontSize": 16.8,
+                                "fontWeight": "400",
+                                "lineHeight": 19,
+                              }
+                            }
+                            suppressHighlighting={true}
+                            userSelect="none"
+                          >
+                            SEND
                           </Text>
                         </View>
                       </View>
