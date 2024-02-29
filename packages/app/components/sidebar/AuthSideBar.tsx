@@ -3,17 +3,9 @@ import { IconSendLogo } from 'app/components/icons'
 import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
 import { OnboardingForm } from 'app/features/auth/onboarding/onboarding-form'
 import { usePathname } from 'app/utils/usePathname'
-import { useSendAccounts } from 'app/utils/send-accounts'
-import { SendAccountCongratulations } from 'app/features/auth/onboarding/screen'
 
 const AuthSideBar = ({ ...props }: YStackProps) => {
   const pathName = usePathname()
-  // @todo handle loading and error states
-  const {
-    data: sendAccts,
-    // error: sendAcctsError,
-    // isLoading: sendAcctsIsLoading,
-  } = useSendAccounts()
 
   return (
     <SideBar px="$7" {...props}>
@@ -25,11 +17,9 @@ const AuthSideBar = ({ ...props }: YStackProps) => {
       <YStack f={1} gap="$4" ai="center" jc="center">
         {pathName.includes('/auth/sign-in') ? (
           <SignInForm />
-        ) : pathName.includes('auth/onboarding') && sendAccts?.length === 0 ? (
+        ) : pathName.includes('auth/onboarding') ? (
           <OnboardingForm />
-        ) : (
-          <SendAccountCongratulations />
-        )}
+        ) : null}
       </YStack>
     </SideBar>
   )

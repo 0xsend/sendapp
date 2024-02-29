@@ -7,20 +7,9 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import {
-  Paragraph,
-  Stack,
-  YStack,
-  XStack,
-  Theme,
-  useMedia,
-  H3,
-  useToastController,
-  Button,
-} from '@my/ui'
+import { Paragraph, Stack, YStack, Theme, useMedia, useToastController, Button } from '@my/ui'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { IconSendLogo, IconCopy } from 'app/components/icons'
-import { shorten } from 'app/utils/strings'
+import { IconSendLogo } from 'app/components/icons'
 import { OnboardingForm } from './onboarding-form'
 import { Carousel } from '../components/Carousel'
 import { testClient } from 'app/utils/userop'
@@ -32,7 +21,6 @@ import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 export function OnboardingScreen() {
   const { carouselProgress } = useAuthCarouselContext()
   const media = useMedia()
-  const { data: sendAccts } = useSendAccounts()
 
   if (media.gtMd)
     return (
@@ -52,12 +40,12 @@ export function OnboardingScreen() {
       </Stack>
 
       <YStack f={3} jc="center" maw={'100%'} space="$4" gap="$4">
-        {sendAccts?.length === 0 ? <OnboardingForm /> : <SendAccountCongratulations />}
+        <OnboardingForm />
       </YStack>
     </YStack>
   )
 }
-export function SendAccountCongratulations() {
+export function SendSecretStore() {
   const toast = useToastController()
   const { data: sendAccts } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
