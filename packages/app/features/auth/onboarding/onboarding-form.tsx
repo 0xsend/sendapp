@@ -25,6 +25,7 @@ import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useSendAccounts } from 'app/utils/send-accounts'
+import { useRouter } from 'solito/router'
 
 const OnboardingSchema = z.object({
   accountName: formFields.text,
@@ -39,6 +40,7 @@ export const OnboardingForm = () => {
   const { user } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
   const { refetch: refetchSendAccounts } = useSendAccounts()
+  const { replace } = useRouter()
 
   // PASSKEY / ACCOUNT CREATION STATE
   const deviceName = Device.deviceName
@@ -90,7 +92,10 @@ export const OnboardingForm = () => {
     if (error) {
       throw error
     }
-    await refetchSendAccounts()
+    //@todo We need to show something to the user when this fails
+    //For example, if the user tries to create multiple passkeys on the same device
+    const { data: sendAccts } = await refetchSendAccounts()
+    if (sendAccts?.length && sendAccts.length > 0) replace('/')
   }
 
   return (
