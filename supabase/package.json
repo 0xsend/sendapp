@@ -23,7 +23,7 @@
     "test": "npx supabase test db"
   },
   "devDependencies": {
-    "dotenv-cli": "^6.0.0",
+    "dotenv-cli": "^7.3.0",
     "supabase": "1.145.4",
     "type-fest": "^4.3.1"
   }

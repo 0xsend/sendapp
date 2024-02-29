@@ -12,7 +12,7 @@
     "@types/pg": "^8",
     "app": "workspace:*",
     "debug": "^4.3.4",
-    "dotenv-cli": "^6.0.0",
+    "dotenv-cli": "^7.3.0",
     "extract-zip": "^2.0.1",
     "headless-web3-provider": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
