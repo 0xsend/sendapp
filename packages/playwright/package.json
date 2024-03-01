@@ -19,9 +19,9 @@
     "viem": "^2.7.6"
   },
   "scripts": {
-    "_with-env": "dotenv -e ../../.env",
+    "_with-env": "dotenv -e ../../.env -c",
     "codegen": "npx ts-node ./bin/codegen.ts",
-    "test": "yarn _with-env -c development -- yarn playwright test"
+    "test": "yarn _with-env -- yarn playwright test"
   },
   "dependencies": {
     "cbor": "^9.0.1",
