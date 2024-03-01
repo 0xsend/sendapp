@@ -479,14 +479,15 @@ local_resource(
     ),
     resource_deps = [
         "yarn:install",
-        "anvil:mainnet",
-        "anvil:base",
-        "aa_bundler:base",
         "supabase",
         "supabase:generate",
         "wagmi:generate",
         "ui:build",
-    ],
+    ] + ([
+        "anvil:mainnet",
+        "anvil:base",
+        "aa_bundler:base",
+    ] if not CI else []),
     serve_cmd =
         "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
 )
@@ -534,8 +535,6 @@ local_resource(
     labels = labels,
     resource_deps = [
         "yarn:install",
-        "aa_bundler:base",  # TODO: remove once bundler tests are moved to playwright
-        "anvil:send-account-fixtures",  # TODO: remove once bundler tests are moved to playwright
     ],
     deps =
         files_matching(
@@ -681,7 +680,6 @@ local_resource(
     resource_deps = [
         # messy but create a single resource that runs all the tests
         "app:test",
-        "lint",
         "webauthn-authenticator:test",
         "supabase:test",
         "contracts:test",
