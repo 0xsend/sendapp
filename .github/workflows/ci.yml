@@ -46,6 +46,7 @@ jobs:
         run: yarn lint
 
   unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     needs: [cache-deps]
     env:
@@ -84,7 +85,8 @@ jobs:
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
 
-  e2e:
+  playwright-tests:
+    name: Playwright Tests
     runs-on: ubuntu-latest
     needs: [cache-deps]
     env:
