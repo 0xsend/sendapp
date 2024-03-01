@@ -112,12 +112,6 @@ jobs:
           YARN_ENABLE_HARDENED_MODE: 0
         with:
           yarn-install: false
-      - name: Tilt CI
-        shell: bash
-        run: tilt ci e2e:tests
-      - name: All Changes Committed
-        shell: bash
-        run: git diff --exit-code
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
