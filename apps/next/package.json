@@ -45,7 +45,7 @@
     "@tamagui/next-plugin": "^1.88.8",
     "@types/node": "^20.11.0",
     "@welldone-software/why-did-you-render": "^7.0.1",
-    "dotenv-cli": "^6.0.0",
+    "dotenv-cli": "^7.3.0",
     "eslint-config-next": "^14.0.4"
   }
 }

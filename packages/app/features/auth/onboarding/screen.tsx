@@ -26,7 +26,7 @@ import { Carousel } from '../components/Carousel'
 import { testClient } from 'app/utils/userop'
 import { parseEther } from 'viem'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { baseMainnetClient, usdcAddress } from '@my/wagmi'
+import { baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
 
 export function OnboardingScreen() {
   const media = useMedia()
@@ -111,6 +111,19 @@ export function SendAccountCongratulations() {
                 }}
               >
                 Fund with 100 USDC
+              </Button>
+              <Button
+                onPress={async () => {
+                  await setERC20Balance({
+                    client: testClient,
+                    address: sendAcct.address,
+                    tokenAddress: sendTokenAddress[baseMainnetClient.chain.id],
+                    value: BigInt(1e6),
+                  })
+                  toast.show('Funded with 1M Send')
+                }}
+              >
+                Fund with 1M Send
               </Button>
             </YStack>
           </Theme>

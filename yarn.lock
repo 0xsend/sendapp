@@ -5616,11 +5616,11 @@ __metadata:
     app: "workspace:*"
     cbor: "npm:^9.0.1"
     debug: "npm:^4.3.4"
-    dotenv-cli: "npm:^6.0.0"
+    dotenv-cli: "npm:^7.3.0"
     extract-zip: "npm:^2.0.1"
     headless-web3-provider: "npm:^0.2.3"
     jsonwebtoken: "npm:^9.0.2"
-    permissionless: "npm:^0.1.0"
+    permissionless: "npm:^0.1.4"
     pg: "npm:^8.11.3"
     typescript: "npm:^5.1.3"
     viem: "npm:^2.7.6"
@@ -5644,7 +5644,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/supabase@workspace:supabase"
   dependencies:
-    dotenv-cli: "npm:^6.0.0"
+    dotenv-cli: "npm:^7.3.0"
     supabase: "npm:1.145.4"
     type-fest: "npm:^4.3.1"
   languageName: unknown
@@ -5686,7 +5686,7 @@ __metadata:
     change-case: "npm:^5.4.2"
     debug: "npm:^4.3.4"
     globby: "npm:^14.0.0"
-    permissionless: "npm:^0.1.0"
+    permissionless: "npm:^0.1.4"
     typescript: "npm:^5.1.3"
     viem: "npm:^2.7.6"
     wagmi: "npm:^2.5.5"
@@ -11792,7 +11792,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jest-expo: "npm:^49.0.0"
     nock: "npm:^14.0.0-beta.2"
-    permissionless: "npm:^0.1.0"
+    permissionless: "npm:^0.1.4"
     react-hook-form: "npm:^7.48.2"
     react-native-safe-area-context: "npm:4.6.3"
     react-native-svg: "npm:13.9.0"
@@ -14841,7 +14841,7 @@ __metadata:
     app: "workspace:*"
     bun-types: "npm:latest"
     debug: "npm:^4.3.4"
-    dotenv-cli: "npm:^6.0.0"
+    dotenv-cli: "npm:^7.3.0"
     express: "npm:^4.18.2"
     lru-cache: "npm:^10.0.1"
     pino: "npm:^8.16.1"
@@ -14977,17 +14977,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-cli@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "dotenv-cli@npm:6.0.0"
+"dotenv-cli@npm:^7.3.0":
+  version: 7.3.0
+  resolution: "dotenv-cli@npm:7.3.0"
   dependencies:
     cross-spawn: "npm:^7.0.3"
-    dotenv: "npm:^16.0.0"
-    dotenv-expand: "npm:^8.0.1"
-    minimist: "npm:^1.2.5"
+    dotenv: "npm:^16.3.0"
+    dotenv-expand: "npm:^10.0.0"
+    minimist: "npm:^1.2.6"
   bin:
     dotenv: cli.js
-  checksum: 3db5a363eedd24d428001a956d9b8c72094983bfe0e0e722cda7803b614daf85dde9c9beb5d9fa28a139a5c594533ecd8f9d8430a90c244175e81c9a40abc5b1
+  checksum: bc48e9872ed451aa7633cfde0079f5e4b40837d49dca4eab947682c80f524bd1e63ec31ff69b7cf955ff969185a05a343dd5d754dd5569e4ae31f8e9a790ab1b
   languageName: node
   linkType: hard
 
@@ -15007,17 +15007,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-expand@npm:^8.0.1":
-  version: 8.0.3
-  resolution: "dotenv-expand@npm:8.0.3"
-  checksum: 375c681ee44511ac30491494b106761c76a132b800ffe5060bfd2037fffa942941bf15b7fcc93113836c33ca05a8880d0bd82ba82d3c5cccc2d32419fe11b182
-  languageName: node
-  linkType: hard
-
-"dotenv@npm:^16.0.0, dotenv@npm:~16.0.3":
-  version: 16.0.3
-  resolution: "dotenv@npm:16.0.3"
-  checksum: d6788c8e40b35ad9a9ca29249dccf37fa6b3ad26700fcbc87f2f41101bf914f5193a04e36a3d23de70b1dcb8e5d5a3b21e151debace2c4cd08d868be500a1b29
+"dotenv@npm:^16.3.0":
+  version: 16.4.5
+  resolution: "dotenv@npm:16.4.5"
+  checksum: 55a3134601115194ae0f924e54473459ed0d9fc340ae610b676e248cca45aa7c680d86365318ea964e6da4e2ea80c4514c1adab5adb43d6867fb57ff068f95c8
   languageName: node
   linkType: hard
 
@@ -15032,6 +15025,13 @@ __metadata:
   version: 8.6.0
   resolution: "dotenv@npm:8.6.0"
   checksum: 31d7b5c010cebb80046ba6853d703f9573369b00b15129536494f04b0af4ea0060ce8646e3af58b455af2f6f1237879dd261a5831656410ec92561ae1ea44508
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:~16.0.3":
+  version: 16.0.3
+  resolution: "dotenv@npm:16.0.3"
+  checksum: d6788c8e40b35ad9a9ca29249dccf37fa6b3ad26700fcbc87f2f41101bf914f5193a04e36a3d23de70b1dcb8e5d5a3b21e151debace2c4cd08d868be500a1b29
   languageName: node
   linkType: hard
 
@@ -22909,7 +22909,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimist@npm:^1.2.0, minimist@npm:^1.2.3, minimist@npm:^1.2.5, minimist@npm:^1.2.6, minimist@npm:^1.2.8":
+"minimist@npm:^1.2.0, minimist@npm:^1.2.3, minimist@npm:^1.2.6, minimist@npm:^1.2.8":
   version: 1.2.8
   resolution: "minimist@npm:1.2.8"
   checksum: 908491b6cc15a6c440ba5b22780a0ba89b9810e1aea684e253e43c4e3b8d56ec1dcdd7ea96dde119c29df59c936cde16062159eae4225c691e19c70b432b6e6f
@@ -23319,7 +23319,7 @@ __metadata:
     "@types/node": "npm:^20.11.0"
     "@welldone-software/why-did-you-render": "npm:^7.0.1"
     app: "workspace:*"
-    dotenv-cli: "npm:^6.0.0"
+    dotenv-cli: "npm:^7.3.0"
     eslint-config-next: "npm:^14.0.4"
     next: "npm:13.4.19"
     plaiceholder: "npm:^3.0.0"
@@ -24653,12 +24653,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"permissionless@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "permissionless@npm:0.1.0"
+"permissionless@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "permissionless@npm:0.1.4"
   peerDependencies:
     viem: ^2.0.0
-  checksum: a0c4f8f0d6d9360a6da76b36ba23fd62274bd962ba265441345f6dd36bd7723d4927ebf1688eeb7276249a157b2f9e570821802f3fdc64bbeb5359bf7929a506
+  checksum: 29d82440c1ca0001d4f35e869cf0550e6a7505bdef4439ece25606740f212edcacdb0ff15d32870c253b01e2307854d7cbfcccc2a27b2ce37c8567d1e5ad9d23
   languageName: node
   linkType: hard
 

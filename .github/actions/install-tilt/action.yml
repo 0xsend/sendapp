@@ -1,0 +1,8 @@
+name: "Install Tilt"
+runs:
+  using: "composite"
+  steps:
+    - name: Install Tilt
+      id: tilt
+      shell: bash
+      run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
