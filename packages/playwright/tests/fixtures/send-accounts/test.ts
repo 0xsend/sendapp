@@ -3,7 +3,7 @@ import { test as base } from '../auth'
 import { OnboardingPage } from './page'
 import { testBaseClient } from '../viem/base'
 import { assert } from 'app/utils/assert'
-import { parseEther } from 'viem'
+import { parseEther, zeroAddress } from 'viem'
 import { debug } from 'debug'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 
@@ -35,13 +35,14 @@ const sendAccountTest = base.extend<{
       throw error
     }
     assert(!!sendAccount, 'no send account found')
+    assert(sendAccount.address !== zeroAddress, 'send account address is zero')
 
     log('fund send account', sendAccount.address)
     await testBaseClient.setBalance({
       address: sendAccount.address,
       value: parseEther('1'),
     })
-    setERC20Balance({
+    await setERC20Balance({
       client: testBaseClient,
       address: sendAccount.address,
       tokenAddress: usdcAddress[testBaseClient.chain.id],

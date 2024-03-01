@@ -8,7 +8,7 @@ import { useUser } from 'app/utils/useUser'
 import { daimoAccountFactory, encodeCreateAccountData, entrypoint } from 'app/utils/userop'
 import { baseMainnetClient } from '@my/wagmi'
 import * as Device from 'expo-device'
-import { concat } from 'viem'
+import { concat, zeroAddress } from 'viem'
 import { getSenderAddress } from 'permissionless'
 import {
   Anchor,
@@ -70,6 +70,8 @@ export const OnboardingForm = () => {
       factoryData,
       entryPoint: entrypoint.address,
     })
+    assert(!!senderAddress, 'No sender address')
+    assert(senderAddress !== zeroAddress, 'Zero sender address')
     const { error } = await supabase.rpc('create_send_account', {
       send_account: {
         address: senderAddress,

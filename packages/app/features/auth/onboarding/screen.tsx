@@ -27,7 +27,6 @@ import { testClient } from 'app/utils/userop'
 import { parseEther } from 'viem'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
-import { Link } from 'solito/link'
 
 export function OnboardingScreen() {
   const media = useMedia()
