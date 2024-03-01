@@ -581,6 +581,7 @@ local_resource(
         "anvil:send-account-fixtures",
         "aa_bundler:base",
         "snaplet:generate",
+        "next:web",
         "supabase",
     ],
 )
