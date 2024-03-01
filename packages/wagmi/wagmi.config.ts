@@ -46,65 +46,36 @@ console.log({ deployments })
 export default defineConfig({
   out: 'src/generated.ts',
   contracts: [
+    /**
+     * [Send: Treasury](https://basescan.org/address/0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE)
+     **/
     {
       name: 'SendRevenueSafe',
-      address: '0xBB253919a15C5E0C9986d83f205A9279b4247E3d',
+      address: '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE',
       abi: [],
     },
     {
       /**
-       * [Send: DEX & CEX Listings](https://etherscan.io/address/0xF530e6E60e7a65Ea717f843a8b2e6fcdC727aC9E)
-       **/
-      name: 'SendEXListingsSafe',
-      address: '0xF530e6E60e7a65Ea717f843a8b2e6fcdC727aC9E',
-      abi: [],
-    },
-    {
-      /**
-       * [Send: Treasury](https://etherscan.io/address/0x4bB2f4c771ccB60723a78a974a2537AD339071c7)
+       * [Send: Treasury](https://basescan.org/address/0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE)
        **/
       name: 'SendTreasurySafe',
-      address: '0x4bB2f4c771ccB60723a78a974a2537AD339071c7',
+      address: '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE',
       abi: [],
     },
     {
       /**
-       * [Send: Airdrops](https://etherscan.io/address/0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7)
+       * [Send: Airdrops](https://basescan.org/address/0x077c4E5983e5c495599C1Eb5c1511A52C538eB50)
        **/
       name: 'SendAirdropsSafe',
-      address: '0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7',
+      address: '0x077c4E5983e5c495599C1Eb5c1511A52C538eB50',
       abi: [],
     },
     {
       /**
-       * [Send: Core Team](https://etherscan.io/address/0xE52D0967A2eE242098d11c209f53C8158E329eCC)
-       **/
-      name: 'SendCoreTeamSafe',
-      address: '0xE52D0967A2eE242098d11c209f53C8158E329eCC',
-      abi: [],
-    },
-    {
-      /**
-       * [Send: Contributor Incentives](https://etherscan.io/address/0x4F30818f5c1a20803AB2075B813DBDE810e51b98)
-       **/
-      name: 'SendContributorIncentivesSafe',
-      address: '0x4F30818f5c1a20803AB2075B813DBDE810e51b98',
-      abi: [],
-    },
-    {
-      /**
-       * [Send: Multisig Signer Payouts](https://etherscan.io/address/0x5355c409fa3D0901292231Ddb953C949C2211D96)
-       **/
-      name: 'SendMultisigSignerPayoutsSafe',
-      address: '0x5355c409fa3D0901292231Ddb953C949C2211D96',
-      abi: [],
-    },
-    {
-      /**
-       * [UniswapV3Pool: send](https://etherscan.io/address/0x14F59C715C205002c6e3F36766D302c1a19bacC8)
+       * [UniswapV3Pool: send](https://basescan.org/address/0xa1b2457c0b627f97f6cc892946a382451e979014)
        **/
       name: 'SendUniswapV3Pool',
-      address: '0x14F59C715C205002c6e3F36766D302c1a19bacC8',
+      address: '0xa1b2457c0b627f97f6cc892946a382451e979014',
       abi: [],
     },
     {

@@ -367,7 +367,7 @@ export const daimoAccountFactoryAbi = [
  */
 export const daimoAccountFactoryAddress = {
   84532: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
-  845337: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
+  845337: '0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC',
 } as const
 
 /**
@@ -2533,51 +2533,11 @@ export const iEntryPointSimulationsAbi = [
 
 export const sendAirdropsSafeAbi = [] as const
 
-export const sendAirdropsSafeAddress = '0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7' as const
+export const sendAirdropsSafeAddress = '0x077c4E5983e5c495599C1Eb5c1511A52C538eB50' as const
 
 export const sendAirdropsSafeConfig = {
   address: sendAirdropsSafeAddress,
   abi: sendAirdropsSafeAbi,
-} as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SendContributorIncentivesSafe
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const sendContributorIncentivesSafeAbi = [] as const
-
-export const sendContributorIncentivesSafeAddress =
-  '0x4F30818f5c1a20803AB2075B813DBDE810e51b98' as const
-
-export const sendContributorIncentivesSafeConfig = {
-  address: sendContributorIncentivesSafeAddress,
-  abi: sendContributorIncentivesSafeAbi,
-} as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SendCoreTeamSafe
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const sendCoreTeamSafeAbi = [] as const
-
-export const sendCoreTeamSafeAddress = '0xE52D0967A2eE242098d11c209f53C8158E329eCC' as const
-
-export const sendCoreTeamSafeConfig = {
-  address: sendCoreTeamSafeAddress,
-  abi: sendCoreTeamSafeAbi,
-} as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SendEXListingsSafe
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const sendExListingsSafeAbi = [] as const
-
-export const sendExListingsSafeAddress = '0xF530e6E60e7a65Ea717f843a8b2e6fcdC727aC9E' as const
-
-export const sendExListingsSafeConfig = {
-  address: sendExListingsSafeAddress,
-  abi: sendExListingsSafeAbi,
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2848,26 +2808,12 @@ export const sendMerkleDropConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SendMultisigSignerPayoutsSafe
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const sendMultisigSignerPayoutsSafeAbi = [] as const
-
-export const sendMultisigSignerPayoutsSafeAddress =
-  '0x5355c409fa3D0901292231Ddb953C949C2211D96' as const
-
-export const sendMultisigSignerPayoutsSafeConfig = {
-  address: sendMultisigSignerPayoutsSafeAddress,
-  abi: sendMultisigSignerPayoutsSafeAbi,
-} as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendRevenueSafe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const sendRevenueSafeAbi = [] as const
 
-export const sendRevenueSafeAddress = '0xBB253919a15C5E0C9986d83f205A9279b4247E3d' as const
+export const sendRevenueSafeAddress = '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE' as const
 
 export const sendRevenueSafeConfig = {
   address: sendRevenueSafeAddress,
@@ -3055,7 +3001,7 @@ export const sendTokenConfig = { address: sendTokenAddress, abi: sendTokenAbi } 
 
 export const sendTreasurySafeAbi = [] as const
 
-export const sendTreasurySafeAddress = '0x4bB2f4c771ccB60723a78a974a2537AD339071c7' as const
+export const sendTreasurySafeAddress = '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE' as const
 
 export const sendTreasurySafeConfig = {
   address: sendTreasurySafeAddress,
@@ -3068,7 +3014,7 @@ export const sendTreasurySafeConfig = {
 
 export const sendUniswapV3PoolAbi = [] as const
 
-export const sendUniswapV3PoolAddress = '0x14F59C715C205002c6e3F36766D302c1a19bacC8' as const
+export const sendUniswapV3PoolAddress = '0xA1B2457C0B627F97f6cc892946A382451e979014' as const
 
 export const sendUniswapV3PoolConfig = {
   address: sendUniswapV3PoolAddress,

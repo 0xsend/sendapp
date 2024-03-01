@@ -16,7 +16,9 @@
       "default": "./src/chains.ts"
     }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "generate": "wagmi generate"
   },

@@ -29,7 +29,7 @@ export const supabaseAdmin = createClient<Database>(
 
 const client = createPublicClient({
   chain: mainnet,
-  transport: http(process.env.NEXT_PUBLIC_MAINNET_RPC_URL),
+  transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL),
 })
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -51,7 +51,7 @@ function calculatePercentageWithBips(value: bigint, bips: bigint) {
 export class DistributorWorker {
   private log: Logger
   private running: boolean
-  private lastBlockNumber = 17579999n // send token deployment block
+  private lastBlockNumber = 9063447n // send token deployment block
   private lastBlockNumberAt: Date
   private id: string
   private workerPromise: Promise<void>
