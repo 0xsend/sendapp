@@ -72,6 +72,8 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+        with:
+          yarn-install: false
       - name: Tilt CI
         shell: bash
         run: tilt ci unit-tests:tests
@@ -108,6 +110,8 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+        with:
+          yarn-install: false
       - name: Tilt CI
         shell: bash
         run: tilt ci e2e:tests
