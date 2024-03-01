@@ -134,7 +134,7 @@ jobs:
             sleep 1
           done
           echo tilt is ready
-          tilt wait --timeout 60s --for=condition=Ready "uiresource/playwright:deps"
+          tilt wait --timeout 120s --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
       - name: Playwright Report
         uses: actions/upload-artifact@v4
