@@ -133,6 +133,7 @@ jobs:
             curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i failed, trying again..."
             sleep 1
           done
+          sleep 1
           echo tilt is ready
           tilt wait --timeout 120s --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
