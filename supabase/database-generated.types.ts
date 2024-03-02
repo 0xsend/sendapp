@@ -373,6 +373,7 @@ export type Database = {
           block_time: number | null
           chain_id: number | null
           factory: string | null
+          id: number
           ig_name: string | null
           log_addr: string | null
           log_idx: number | null
@@ -388,6 +389,7 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           factory?: string | null
+          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -403,6 +405,7 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           factory?: string | null
+          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -421,6 +424,7 @@ export type Database = {
           block_time: number | null
           chain_id: number | null
           f: string | null
+          id: number
           ig_name: string | null
           log_addr: string | null
           log_idx: number | null
@@ -435,6 +439,7 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           f?: string | null
+          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -449,6 +454,7 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           f?: string | null
+          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -525,6 +531,7 @@ export type Database = {
           block_time: number | null
           chain_id: number | null
           f: string | null
+          id: number
           ig_name: string | null
           log_addr: string | null
           log_idx: number | null
@@ -539,6 +546,7 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           f?: string | null
+          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
@@ -553,6 +561,7 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           f?: string | null
+          id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null

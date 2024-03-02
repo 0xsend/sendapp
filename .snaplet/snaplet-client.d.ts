@@ -213,6 +213,7 @@ type Override = {
   send_account_deployed?: {
     name?: string;
     fields?: {
+      id?: string;
       chain_id?: string;
       log_addr?: string;
       block_time?: string;
@@ -231,6 +232,7 @@ type Override = {
   send_account_transfers?: {
     name?: string;
     fields?: {
+      id?: string;
       chain_id?: string;
       log_addr?: string;
       block_time?: string;
@@ -271,6 +273,7 @@ type Override = {
   send_token_transfers?: {
     name?: string;
     fields?: {
+      id?: string;
       chain_id?: string;
       log_addr?: string;
       block_time?: string;
@@ -524,6 +527,7 @@ export interface Fingerprint {
     credential?: FingerprintRelationField;
   }
   sendAccountDeployeds?: {
+    id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     blockNum?: FingerprintNumberField;
@@ -532,6 +536,7 @@ export interface Fingerprint {
     abiIdx?: FingerprintNumberField;
   }
   sendAccountTransfers?: {
+    id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     v?: FingerprintNumberField;
@@ -553,6 +558,7 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
   }
   sendTokenTransfers?: {
+    id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     v?: FingerprintNumberField;

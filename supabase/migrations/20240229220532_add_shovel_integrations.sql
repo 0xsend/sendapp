@@ -1,5 +1,5 @@
 create table "public"."send_account_deployed"(
-    "id" serial,
+    "id" serial primary key,
     "chain_id" numeric,
     "log_addr" bytea,
     "block_time" numeric,
@@ -27,7 +27,7 @@ create unique index u_send_account_deployed on public.send_account_deployed usin
     src_name, block_num, tx_idx, log_idx, abi_idx);
 
 create table "public"."send_account_transfers"(
-    "id" serial,
+    "id" serial primary key,
     "chain_id" numeric,
     "log_addr" bytea,
     "block_time" numeric,
@@ -52,7 +52,7 @@ create index send_account_transfers_f on public.send_account_transfers using btr
 create index send_account_transfers_t on public.send_account_transfers using btree(t);
 
 create table "public"."send_token_transfers"(
-    "id" serial,
+    "id" serial primary key,
     "chain_id" numeric,
     "log_addr" bytea,
     "block_time" numeric,
