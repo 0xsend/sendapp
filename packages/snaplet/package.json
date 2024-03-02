@@ -5,10 +5,10 @@
   "type": "module",
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
-    "@snaplet/copycat": "^4.1.0",
-    "@snaplet/seed": "^0.88.0",
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "^0.89.4",
     "@types/pg": "^8",
-    "snaplet": "^0.88.0"
+    "snaplet": "^0.89.4"
   },
   "dependencies": {
     "pg": "^8.11.3",
