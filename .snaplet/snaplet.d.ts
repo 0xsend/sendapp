@@ -297,6 +297,7 @@ interface Table_public_send_account_credentials {
   created_at: string | null;
 }
 interface Table_public_send_account_deployed {
+  id: number;
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
@@ -312,6 +313,7 @@ interface Table_public_send_account_deployed {
   abi_idx: number | null;
 }
 interface Table_public_send_account_transfers {
+  id: number;
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
@@ -341,6 +343,7 @@ interface Table_public_send_liquidity_pools {
   chain_id: number;
 }
 interface Table_public_send_token_transfers {
+  id: number;
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
