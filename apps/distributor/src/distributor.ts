@@ -1,10 +1,45 @@
 import { cpus } from 'os'
 import { Database, Functions, Tables } from '@my/supabase/database.types'
-import { sendTokenAbi, sendTokenAddress } from '@my/wagmi'
+import {
+  sendTokenAddress,
+  readSendTokenBalanceOf,
+  baseMainnet,
+  mainnet,
+  baseMainnetClient,
+  mainnetClient,
+} from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
 import type { Logger } from 'pino'
-import { http, createPublicClient, getContract } from 'viem'
-import { mainnet } from 'viem/chains'
+import { createConfig } from '@wagmi/core'
+import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
+import debug from 'debug'
+
+const log = debug('distributor')
+
+export const config = createConfig({
+  chains: [baseMainnet, mainnet, baseMainnetOg, mainnetOg],
+  client({ chain: { id: chainId } }) {
+    if (chainId === mainnet.id) return mainnetClient
+    if (chainId === baseMainnet.id) return baseMainnetClient
+    // handle __DEV__ mode
+    if (__DEV__) {
+      if (chainId === baseMainnetOg.id) {
+        log(
+          `⚠️ Overriding Base chain ID ${baseMainnetOg.id} with ${baseMainnetClient.chain.id} in __DEV__ mode`
+        )
+        return baseMainnetClient
+      }
+      if (chainId === mainnetOg.id) {
+        log(
+          `⚠️ Overriding Mainnet chain ID ${mainnetOg.id} with ${mainnetClient.chain.id} in __DEV__ mode`
+        )
+        return mainnetClient
+      }
+    }
+    throw new Error(`Unknown chain id: ${chainId}`)
+  },
+  multiInjectedProviderDiscovery: false,
+})
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -26,11 +61,6 @@ export const supabaseAdmin = createClient<Database>(
   { auth: { persistSession: false } }
 )
 
-const client = createPublicClient({
-  chain: mainnet,
-  transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL),
-})
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const cpuCount = cpus().length
@@ -50,16 +80,14 @@ function calculatePercentageWithBips(value: bigint, bips: bigint) {
 export class DistributorWorker {
   private log: Logger
   private running: boolean
-  private lastBlockNumber = 9063447n // send token deployment block
-  private lastBlockNumberAt: Date
   private id: string
+  private lastDistributionId: number | null = null
   private workerPromise: Promise<void>
 
   constructor(log: Logger) {
     this.id = Math.random().toString(36).substring(7)
     this.log = log.child({ module: 'distributor', id: this.id })
     this.running = true
-    this.lastBlockNumberAt = new Date()
     this.workerPromise = this.worker()
   }
 
@@ -101,6 +129,17 @@ export class DistributorWorker {
       await this._calculateDistributionShares(distribution).catch((error) => errors.push(error))
     }
 
+    if (distributions.length > 0) {
+      const lastDistribution = distributions[distributions.length - 1]
+      this.lastDistributionId = lastDistribution?.id ?? null
+    } else {
+      this.lastDistributionId = null
+    }
+    this.log.info(
+      { lastDistributionId: this.lastDistributionId },
+      'Finished calculating distributions.'
+    )
+
     if (errors.length > 0) {
       this.log.error(`Error calculating distribution shares. Encountered ${errors.length} errors.`)
       throw errors[0]
@@ -117,6 +156,7 @@ export class DistributorWorker {
   ) {
     const log = this.log.child({ distribution_id: distribution.id })
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
+
     // fetch all verifications
     const verifications: Tables<'distribution_verifications'>[] = await (async () => {
       const _verifications: Tables<'distribution_verifications'>[] = []
@@ -228,19 +268,19 @@ export class DistributorWorker {
     log.debug({ hodlerAddresses })
 
     // lookup balances of all hodler addresses in qualification period
-    const sendTokenContract = getContract({
-      abi: sendTokenAbi,
-      address: sendTokenAddress[client.chain.id],
-      client,
-    })
-
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
       return await Promise.all(
         addresses.map(async ({ user_id, address }) => {
-          const balance = await sendTokenContract.read.balanceOf([address as `0x${string}`])
+          const balance = await readSendTokenBalanceOf(config, {
+            args: [address],
+            chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+            blockNumber: distribution.snapshot_block_num
+              ? BigInt(distribution.snapshot_block_num)
+              : undefined,
+          })
           return {
             user_id,
-            address: address as `0x${string}`,
+            address,
             balance: balance.toString(),
           }
         })
@@ -260,7 +300,9 @@ export class DistributorWorker {
       ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
     )
 
-    log.info(`Found ${balances.length} balances after filtering.`)
+    log.info(
+      `Found ${balances.length} balances after filtering hodler_min_balance of ${distribution.hodler_min_balance}`
+    )
     log.debug({ balances })
 
     // Calculate hodler pool share weights
@@ -423,33 +465,6 @@ export class DistributorWorker {
   private async worker() {
     this.log.info('Starting distributor...', { id: this.id })
 
-    // lookup last block number
-    const { data: latestTransfer, error } = await supabaseAdmin
-      .from('send_transfer_logs')
-      .select('*')
-      .order('block_number', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    if (error) {
-      this.log.error(
-        { error: error.message, code: error.code, details: error.details },
-        'Error fetching last block number.'
-      )
-      if (error.code !== 'PGRST116') {
-        throw error
-      }
-    }
-
-    if (latestTransfer) {
-      this.log.debug({ latestTransfer }, 'Found latest transfer.')
-      this.lastBlockNumber = BigInt(latestTransfer.block_number)
-    } else {
-      this.log.debug('No transfers found. Using default block number.')
-    }
-
-    this.log.info(`Using last block number ${this.lastBlockNumber}.`)
-
     while (this.running) {
       try {
         await this.calculateDistributions()
@@ -459,28 +474,13 @@ export class DistributorWorker {
       await sleep(60_000) // sleep for 1 minute
     }
 
-    this.log.info('Distributor stopped.', {
-      lastBlockNumber: this.lastBlockNumber,
-      lastBlockNumberAt: this.lastBlockNumberAt,
-    })
+    this.log.info('Distributor stopped.')
   }
 
   public async stop() {
     this.log.info('Stopping distributor...')
     this.running = false
     return await this.workerPromise
-  }
-
-  public isRunning() {
-    return this.running
-  }
-
-  public getLastBlockNumber() {
-    return this.lastBlockNumber
-  }
-
-  public getLastBlockNumberAt() {
-    return this.lastBlockNumberAt
   }
 
   public async calculateDistribution(id: string) {
@@ -507,10 +507,8 @@ export class DistributorWorker {
   public toJSON() {
     return {
       id: this.id,
-      lastBlockNumber: this.lastBlockNumber.toString(),
-      lastBlockNumberAt: this.lastBlockNumberAt.toISOString(),
       running: this.running,
-      calculateDistribution: this.calculateDistribution.bind(this),
+      lastDistributionId: this.lastDistributionId,
     }
   }
 }

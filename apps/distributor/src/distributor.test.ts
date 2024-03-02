@@ -1,5 +1,8 @@
+// @ts-expect-error set __DEV__ for code shared between server and client
+globalThis.__DEV__ = true
+
 import request from 'supertest'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import app from './app'
 
 describe('Root Route', () => {
@@ -30,11 +33,18 @@ describe('Distributor Route', () => {
   })
 
   it('should perform distributor logic correctly', async () => {
-    const res = await request(app)
-      .post('/distributor')
-      .send({ id: 1 })
-      .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)
+    // get latest distribution id from API
+    let lastDistributionId: number
+    while (true) {
+      const res = await request(app).get('/distributor')
+      expect(res.statusCode).toBe(200)
+      if (res.body.lastDistributionId) {
+        lastDistributionId = res.body.lastDistributionId
+        break
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
 
-    expect(res.statusCode).toBe(200)
+    expect(lastDistributionId).toBeDefined()
   }, 10_000)
 })
