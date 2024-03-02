@@ -94,6 +94,7 @@ interface Table_public_distributions {
   created_at: string;
   updated_at: string;
   snapshot_block_num: number | null;
+  chain_id: number;
 }
 interface Table_pgtle_feature_info {
   feature: Enum_pgtle_pg_tle_features;

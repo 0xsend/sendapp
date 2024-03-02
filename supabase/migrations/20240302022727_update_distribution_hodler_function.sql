@@ -28,15 +28,16 @@ create or replace function "public"."distribution_hodler_addresses"(distribution
     return query
         select distinct chain_addresses.*
         from distributions
-                 join distribution_verifications on distribution_verifications.distribution_id = distributions.id
-                 join chain_addresses on chain_addresses.user_id = distribution_verifications.user_id
-                 left join send_token_transfers on
-                     lower(concat('0x', encode(send_token_transfers.f, 'hex')))::citext = chain_addresses.address
-            and send_token_transfers.t in (select send_liquidity_pools.address from send_liquidity_pools)
-            and to_timestamp(send_token_transfers.block_time) >= distributions.qualification_start
-            and to_timestamp(send_token_transfers.block_time) <= distributions.qualification_end
+            join distribution_verifications on distribution_verifications.distribution_id = distributions.id
+            join chain_addresses on chain_addresses.user_id = distribution_verifications.user_id
+            left join send_token_transfers on
+                lower(concat('0x', encode(send_token_transfers.f, 'hex')))::citext = chain_addresses.address
+                    and to_timestamp(send_token_transfers.block_time) >= distributions.qualification_start
+                    and to_timestamp(send_token_transfers.block_time) <= distributions.qualification_end
+            left join send_liquidity_pools on send_token_transfers.t = send_liquidity_pools.address
+                    and send_liquidity_pools.chain_id = distributions.chain_id
         where send_token_transfers.f is null
-          and distributions.id = $1;
+            and distributions.id = $1;
 
 end;
 
