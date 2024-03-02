@@ -39,6 +39,8 @@ export default defineConfig({
     vault: false,
     net: false,
     shovel: false,
+    // @ts-expect-error pgtap is only defined in the test environment but we want to ensure to always ignore it
+    pgtap: false,
   },
   transform: {
     auth: {
