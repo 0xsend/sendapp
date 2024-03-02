@@ -37,6 +37,8 @@ export default defineConfig({
     pgtle: false,
     realtime: false,
     vault: false,
+    net: false,
+    shovel: false,
   },
   transform: {
     auth: {
@@ -44,8 +46,10 @@ export default defineConfig({
         let phone: string
         if (row.phone !== null) {
           phone = `1${copycat.phoneNumber(row.phone?.slice(1), {
-            min: 10000000000,
-            max: 99999999999,
+            length: {
+              min: 10000000000,
+              max: 99999999999,
+            },
           })}`
           // supabase does not store the + in the phone number
           phone = phone.replace('+', '')
@@ -70,6 +74,7 @@ export default defineConfig({
         return {}
       },
     },
+
     public: {
       profiles({ row }) {
         return {
@@ -77,6 +82,15 @@ export default defineConfig({
           about: copycat.sentence(row.about),
           referral_code: copycat.scramble(row.referral_code),
         }
+      },
+      send_account_transfers({ row }) {
+        return {}
+      },
+      send_account_deployed({ row }) {
+        return {}
+      },
+      send_token_transfers({ row }) {
+        return {}
       },
       tags({ row }) {
         return {

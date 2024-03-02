@@ -14,19 +14,6 @@ type Inflection = {
   oppositeBaseNameMap?: Record<string, string>;
 };
 type Override = {
-  _http_response?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      status_code?: string;
-      content_type?: string;
-      headers?: string;
-      content?: string;
-      timed_out?: string;
-      error_msg?: string;
-      created?: string;
-    };
-  }
   buckets?: {
     name?: string;
     fields?: {
@@ -127,36 +114,6 @@ type Override = {
       hook_name?: string;
       created_at?: string;
       request_id?: string;
-    };
-  }
-  http_request_queue?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      method?: string;
-      url?: string;
-      headers?: string;
-      body?: string;
-      timeout_milliseconds?: string;
-    };
-  }
-  ig_updates?: {
-    name?: string;
-    fields?: {
-      name?: string;
-      src_name?: string;
-      backfill?: string;
-      num?: string;
-      latency?: string;
-      nrows?: string;
-      stop?: string;
-    };
-  }
-  integrations?: {
-    name?: string;
-    fields?: {
-      name?: string;
-      conf?: string;
     };
   }
   storage_migrations?: {
@@ -334,14 +291,6 @@ type Override = {
       created_at?: string;
     };
   }
-  sources?: {
-    name?: string;
-    fields?: {
-      name?: string;
-      chain_id?: string;
-      url?: string;
-    };
-  }
   tag_receipts?: {
     name?: string;
     fields?: {
@@ -369,23 +318,6 @@ type Override = {
       users?: string;
       referrals?: string;
       tag_receipts?: string;
-    };
-  }
-  task_updates?: {
-    name?: string;
-    fields?: {
-      num?: string;
-      hash?: string;
-      insert_at?: string;
-      src_hash?: string;
-      src_num?: string;
-      nblocks?: string;
-      nrows?: string;
-      latency?: string;
-      src_name?: string;
-      stop?: string;
-      chain_id?: string;
-      ig_name?: string;
     };
   }
   users?: {
@@ -477,12 +409,6 @@ interface FingerprintNumberField {
   }
 }
 export interface Fingerprint {
-  HttpResponses?: {
-    id?: FingerprintNumberField;
-    statusCode?: FingerprintNumberField;
-    headers?: FingerprintJsonField;
-    created?: FingerprintDateField;
-  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
@@ -546,19 +472,6 @@ export interface Fingerprint {
     hookTableId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     requestId?: FingerprintNumberField;
-  }
-  httpRequestQueues?: {
-    id?: FingerprintNumberField;
-    headers?: FingerprintJsonField;
-    timeoutMilliseconds?: FingerprintNumberField;
-  }
-  igUpdates?: {
-    num?: FingerprintNumberField;
-    nrows?: FingerprintNumberField;
-    stop?: FingerprintNumberField;
-  }
-  integrations?: {
-    conf?: FingerprintJsonField;
   }
   storageMigrations?: {
     id?: FingerprintNumberField;
@@ -643,9 +556,6 @@ export interface Fingerprint {
     logIndex?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
   }
-  sources?: {
-    chainId?: FingerprintNumberField;
-  }
   tagReceipts?: {
     ha?: FingerprintRelationField;
     tag?: FingerprintRelationField;
@@ -658,15 +568,6 @@ export interface Fingerprint {
     user?: FingerprintRelationField;
     referralsByTag?: FingerprintRelationField;
     tagReceipts?: FingerprintRelationField;
-  }
-  taskUpdates?: {
-    num?: FingerprintNumberField;
-    insertAt?: FingerprintDateField;
-    srcNum?: FingerprintNumberField;
-    nblocks?: FingerprintNumberField;
-    nrows?: FingerprintNumberField;
-    stop?: FingerprintNumberField;
-    chainId?: FingerprintNumberField;
   }
   users?: {
     emailConfirmedAt?: FingerprintDateField;
