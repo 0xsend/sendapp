@@ -18,7 +18,8 @@ select throws_ok($$SELECT *
 select tests.create_supabase_user('hodler');
 
 -- create a liquidity pool
-insert into send_liquidity_pools (address, chain_id) values (decode('a1b2457c0b627f97f6cc892946a382451e979014', 'hex'), 8543);
+insert into send_liquidity_pools (address, chain_id) 
+values (decode('a1b2457c0b627f97f6cc892946a382451e979014', 'hex'), 8453);
 
 INSERT INTO distributions (
         number,
@@ -31,7 +32,8 @@ INSERT INTO distributions (
         qualification_start,
         qualification_end,
         hodler_min_balance,
-        claim_end
+        claim_end,
+        chain_id
     )
 VALUES(
         123,
@@ -44,7 +46,8 @@ VALUES(
         '2023-01-01T00:00:00.000Z',
         '2023-01-31T00:00:00.000Z',
         1e6::bigint,
-        '2023-02-28T00:00:00.000Z'
+        '2023-02-28T00:00:00.000Z',
+        8453
     );
 
 -- 2. Test when there are eligible hodler addresses

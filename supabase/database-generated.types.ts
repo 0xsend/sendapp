@@ -173,6 +173,7 @@ export type Database = {
         Row: {
           amount: number
           bonus_pool_bips: number
+          chain_id: number
           claim_end: string
           created_at: string
           description: string | null
@@ -191,6 +192,7 @@ export type Database = {
         Insert: {
           amount: number
           bonus_pool_bips: number
+          chain_id: number
           claim_end: string
           created_at?: string
           description?: string | null
@@ -209,6 +211,7 @@ export type Database = {
         Update: {
           amount?: number
           bonus_pool_bips?: number
+          chain_id?: number
           claim_end?: string
           created_at?: string
           description?: string | null

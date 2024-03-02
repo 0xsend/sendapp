@@ -101,6 +101,7 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       snapshot_block_num?: string;
+      chain_id?: string;
       distribution_shares?: string;
       distribution_verification_values?: string;
       distribution_verifications?: string;
@@ -474,6 +475,7 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     snapshotBlockNum?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
     distributionShares?: FingerprintRelationField;
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;

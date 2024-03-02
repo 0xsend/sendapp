@@ -1,7 +1,16 @@
 
--- Add snapshot block number to distributions table
+-- Distribution four is the first distribution on a new chain, Base (8453)
+
+-- Add snapshot block number and chain ID to distributions table
 alter table public.distributions
-  add column snapshot_block_num bigint null;
+  add column snapshot_block_num bigint null,
+  add column chain_id integer null;
+
+-- update previous distributions to have the correct chain ID
+update public.distributions set chain_id = 1 where chain_id is null;
+
+-- ensure chain_id is not null
+alter table public.distributions alter column chain_id set not null;
 
 -- Create the fourth distribution
 INSERT INTO public.distributions (
@@ -15,7 +24,8 @@ INSERT INTO public.distributions (
     qualification_start,
     qualification_end,
     hodler_min_balance,
-    claim_end
+    claim_end,
+    chain_id
   )
 VALUES (
     4,
@@ -34,7 +44,8 @@ VALUES (
     -- 1,000,000 SEND
     (
       select '2024-06-01T00:00:00Z'::timestamp with time zone - interval '1 second'
-    )
+    ),
+    8453 -- Base chain
   );
 
 INSERT INTO public.distribution_verification_values (
