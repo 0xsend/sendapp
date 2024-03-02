@@ -14878,7 +14878,6 @@ __metadata:
     debug: "npm:^4.3.4"
     dotenv-cli: "npm:^7.3.0"
     express: "npm:^4.18.2"
-    lru-cache: "npm:^10.0.1"
     pino: "npm:^8.16.1"
     supertest: "npm:^6.3.3"
     ts-node: "npm:^10.9.1"
@@ -22179,7 +22178,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^10.0.0, lru-cache@npm:^10.0.1":
+"lru-cache@npm:^10.0.0":
   version: 10.0.1
   resolution: "lru-cache@npm:10.0.1"
   checksum: 5bb91a97a342a41fd049c3494b44d9e21a7d4843f9284d0a0b26f00bb0e436f1f627d0641c78f88be16b86b4231546c5ee4f284733fb530c7960f0bcd7579026
