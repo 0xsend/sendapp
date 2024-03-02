@@ -17,8 +17,6 @@ create table "public"."send_account_deployed"(
 
 alter table "public"."send_account_deployed" enable row level security;
 
-create index send_account_deployed_sender on public.send_account_deployed using btree(sender);
-
 create index shovel_log_addr on public.send_account_deployed using btree(log_addr);
 
 create index shovel_sender on public.send_account_deployed using btree(sender);
