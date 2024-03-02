@@ -20,7 +20,8 @@
       "./apps/expo/ios/**",
       "./apps/expo/android/**",
       "./packages/app/components/img/**",
-      "packages/shovel/etc/config.json"
+      "packages/shovel/etc/config.json",
+      "./supabase/.temp/**"
     ]
   },
   "organizeImports": {
