@@ -24,7 +24,6 @@
     "@wagmi/core": "^2.6.3",
     "app": "workspace:*",
     "express": "^4.18.2",
-    "lru-cache": "^10.0.1",
     "pino": "^8.16.1",
     "viem": "^2.7.15"
   },

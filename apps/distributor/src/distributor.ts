@@ -2,7 +2,6 @@ import { cpus } from 'os'
 import { Database, Functions, Tables } from '@my/supabase/database.types'
 import { sendTokenAbi, sendTokenAddress } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
-import { LRUCache } from 'lru-cache'
 import type { Logger } from 'pino'
 import { http, createPublicClient, getContract } from 'viem'
 import { mainnet } from 'viem/chains'
@@ -55,9 +54,6 @@ export class DistributorWorker {
   private lastBlockNumberAt: Date
   private id: string
   private workerPromise: Promise<void>
-  private blockTimestamps = new LRUCache<`0x${string}`, bigint>({
-    max: 100,
-  })
 
   constructor(log: Logger) {
     this.id = Math.random().toString(36).substring(7)
@@ -65,107 +61,6 @@ export class DistributorWorker {
     this.running = true
     this.lastBlockNumberAt = new Date()
     this.workerPromise = this.worker()
-  }
-
-  private async saveTransfers(from: bigint, to: bigint) {
-    this.log.debug(`Getting transfers for block ${from}-${to}...`)
-
-    const transfers = await client.getLogs({
-      event: {
-        type: 'event',
-        inputs: [
-          {
-            name: 'from',
-            type: 'address',
-            indexed: true,
-          },
-          {
-            name: 'to',
-            type: 'address',
-            indexed: true,
-          },
-          {
-            name: 'value',
-            type: 'uint256',
-            indexed: false,
-          },
-        ],
-        name: 'Transfer',
-      },
-      address: sendTokenAddress[client.chain.id],
-      strict: true,
-      fromBlock: from,
-      toBlock: to,
-    })
-
-    if (transfers.length === 0) {
-      this.log.debug('No transfers found.')
-      return
-    }
-
-    this.log.debug(`Got ${transfers.length} transfers.`)
-
-    // fetch the block timestamps in batches
-    const batches = inBatches(transfers).flatMap(async (transfers) => {
-      return await Promise.all(
-        transfers.map(async (transfer) => {
-          const { blockHash, blockNumber, transactionHash, logIndex, args } = transfer
-          const { from, to, value }: { from: string; to: string; value: bigint } = args
-          const blockTimestamp = await this.getBlockTimestamp(blockHash)
-          return {
-            block_hash: blockHash,
-            block_number: blockNumber.toString(),
-            block_timestamp: new Date(Number(blockTimestamp) * 1000),
-            tx_hash: transactionHash,
-            log_index: logIndex.toString(),
-            from,
-            to,
-            value: value.toString(),
-          }
-        })
-      )
-    })
-    let rows: {
-      block_hash: `0x${string}`
-      block_number: string
-      block_timestamp: Date
-      tx_hash: `0x${string}`
-      log_index: string
-      from: string
-      to: string
-      value: string
-    }[] = []
-    for await (const batch of batches) {
-      rows = rows.concat(...batch)
-    }
-
-    if (rows.length === 0) {
-      this.log.debug('No transfers found.')
-      return []
-    }
-
-    this.log.debug({ rows: rows[0] }, `Saving ${rows.length} transfers...`)
-
-    const { error } = await supabaseAdmin
-      .from('send_transfer_logs')
-      // @ts-expect-error supabase-js does not support bigint
-      .upsert(rows, { onConflict: 'block_hash,tx_hash,log_index' })
-
-    if (error) {
-      this.log.error({ error: error.message, code: error.code }, 'Error saving transfers.')
-      throw error
-    }
-  }
-
-  private async getBlockTimestamp(blockHash: `0x${string}`) {
-    const cachedTimestamp = this.blockTimestamps.get(blockHash)
-    if (cachedTimestamp) {
-      return cachedTimestamp
-    }
-    const { timestamp } = await client.getBlock({ blockHash })
-    this.blockTimestamps.set(blockHash, timestamp)
-    // biome-ignore lint/style/noNonNullAssertion: we know timestamp is defined
-    return this.blockTimestamps.get(blockHash)!
   }
 
   /**
@@ -556,51 +451,14 @@ export class DistributorWorker {
 
     this.log.info(`Using last block number ${this.lastBlockNumber}.`)
 
-    let latestBlockNumber = await client.getBlockNumber().catch((error) => {
-      this.log.error(error, 'Error fetching latest block number.')
-      process.exit(1)
-    })
-    const cancel = client.watchBlocks({
-      onBlock: async (block) => {
-        if (block.number <= this.lastBlockNumber) {
-          return
-        }
-        this.log.info(`New block ${block.number}`)
-        latestBlockNumber = block.number
-      },
-    })
-
     while (this.running) {
       try {
-        if (latestBlockNumber <= this.lastBlockNumber) {
-          if (new Date().getTime() - this.lastBlockNumberAt.getTime() > 30000) {
-            this.log.warn('No new blocks found')
-          }
-          await sleep(client.pollingInterval)
-          continue
-        }
-
-        this.log.info(`Processing block ${latestBlockNumber}`)
-
-        // Always analyze back to finalized block handle reorgs/forked blocks
-        const { number: finalizedBlockNumber } = await client.getBlock({ blockTag: 'finalized' })
-        const from =
-          this.lastBlockNumber < finalizedBlockNumber ? this.lastBlockNumber : finalizedBlockNumber
-        const to = latestBlockNumber
-        await this.saveTransfers(from, to)
         await this.calculateDistributions()
-
-        // update last block number
-        this.lastBlockNumberAt = new Date()
-        this.lastBlockNumber = latestBlockNumber
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
-        await sleep(client.pollingInterval)
-        // skip to next block
+        await sleep(60_000) // sleep for 1 minute
       }
     }
-
-    cancel()
 
     this.log.info('Distributor stopped.', {
       lastBlockNumber: this.lastBlockNumber,
