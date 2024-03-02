@@ -305,7 +305,8 @@ local_resource(
                 "--rpc-url=127.0.0.1:8545",
             ],
         ),
-        period_secs = 15,
+        initial_delay_secs = 1,
+        period_secs = 2,
         timeout_secs = 5,
     ),
     serve_cmd = [
@@ -316,6 +317,7 @@ local_resource(
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
         "--fork-block-number=" + mainnet_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
+        os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
     ],
 )
 
@@ -369,7 +371,8 @@ local_resource(
                 "--rpc-url=127.0.0.1:8546",
             ],
         ),
-        period_secs = 15,
+        initial_delay_secs = 1,
+        period_secs = 2,
         timeout_secs = 5,
     ),
     serve_cmd = [
@@ -380,6 +383,7 @@ local_resource(
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
         "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
+        os.getenv("ANVIL_BASE_EXTRA_ARGS", "--silent"),
     ],
 )
 
@@ -405,8 +409,6 @@ local_resource(
             path = "/",
             port = 3030,
         ),
-        period_secs = 15,
-        timeout_secs = 5,
     ),
     resource_deps = [
         "yarn:install",
@@ -438,6 +440,7 @@ shovel_serve_rm_cmd = "docker ps -a | grep shovel | awk '{print $1}' | xargs doc
 local_resource(
     "shovel",
     allow_parallel = True,
+    auto_init = False,  # shovel eats a lot of RPCs, so we don't want it to start automatically
     labels = labels,
     links = ["http://localhost:8383/"],
     readiness_probe = probe(
@@ -474,29 +477,6 @@ local_resource(
         "packages/shovel/etc/config.json",
     ],
 )
-
-# TODO: decide if we will use silius bundler or not
-# local_resource(
-#     "silius:base",
-#     allow_parallel = True,
-#     labels = labels,
-#     readiness_probe = probe(
-#         exec = exec_action(
-#             command = [
-#                 "cast",
-#                 "bn",
-#                 "--rpc-url=127.0.0.1:3030",
-#             ],
-#         ),
-#         period_secs = 15,
-#         timeout_secs = 5,
-#     ),
-#     resource_deps = [
-#         "yarn:install",
-#         "anvil:base",
-#     ],
-#     serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --uopool-mode unsafe --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
-# )
 
 local_resource(
     "otterscan:base",
@@ -561,7 +541,6 @@ local_resource(
 local_resource(
     "distributor:web",
     allow_parallel = True,
-    auto_init = False,
     labels = labels,
     links = ["http://localhost:3050"],
     readiness_probe = probe(
@@ -699,7 +678,6 @@ local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
-    auto_init = False,
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -751,6 +729,7 @@ local_resource(
         "supabase:test",
         "contracts:test",
         "next:web",
-    ] + (["distributor:test"] if not CI else []),
+        "distributor:test",
+    ],
 )
 
