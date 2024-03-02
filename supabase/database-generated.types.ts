@@ -184,6 +184,7 @@ export type Database = {
           number: number
           qualification_end: string
           qualification_start: string
+          snapshot_block_num: number | null
           snapshot_id: number | null
           updated_at: string
         }
@@ -201,6 +202,7 @@ export type Database = {
           number: number
           qualification_end: string
           qualification_start: string
+          snapshot_block_num?: number | null
           snapshot_id?: number | null
           updated_at?: string
         }
@@ -218,6 +220,7 @@ export type Database = {
           number?: number
           qualification_end?: string
           qualification_start?: string
+          snapshot_block_num?: number | null
           snapshot_id?: number | null
           updated_at?: string
         }

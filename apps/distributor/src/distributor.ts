@@ -115,6 +115,8 @@ export class DistributorWorker {
       distribution_verification_values: Tables<'distribution_verification_values'>[]
     }
   ) {
+    const log = this.log.child({ distribution_id: distribution.id })
+    log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
     // fetch all verifications
     const verifications: Tables<'distribution_verifications'>[] = await (async () => {
       const _verifications: Tables<'distribution_verifications'>[] = []
@@ -130,10 +132,7 @@ export class DistributorWorker {
           .range(page, page + pageSize)
 
         if (error) {
-          this.log.error(
-            { error: error.message, code: error.code },
-            'Error fetching verifications.'
-          )
+          log.error({ error: error.message, code: error.code }, 'Error fetching verifications.')
           throw error
         }
 
@@ -148,8 +147,8 @@ export class DistributorWorker {
       return _verifications
     })()
 
-    this.log.info(`Found ${verifications.length} verifications.`)
-    this.log.debug({ verifications })
+    log.info(`Found ${verifications.length} verifications.`)
+    log.debug({ verifications })
 
     const verificationValues = distribution.distribution_verification_values.reduce(
       (acc, verification) => {
@@ -173,8 +172,8 @@ export class DistributorWorker {
       {} as Record<string, Database['public']['Tables']['distribution_verifications']['Row'][]>
     )
 
-    this.log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
-    this.log.debug({ verificationsByUserId })
+    log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
+    log.debug({ verificationsByUserId })
 
     const hodlerAddresses: Functions<'distribution_hodler_addresses'> = await (async () => {
       const _hodlerAddresses: Functions<'distribution_hodler_addresses'> = []
@@ -195,7 +194,7 @@ export class DistributorWorker {
           .range(page, page + pageSize)
 
         if (error) {
-          this.log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
+          log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
           throw error
         }
 
@@ -225,8 +224,8 @@ export class DistributorWorker {
       {} as Record<string, string>
     )
 
-    this.log.info(`Found ${hodlerAddresses.length} addresses.`)
-    this.log.debug({ hodlerAddresses })
+    log.info(`Found ${hodlerAddresses.length} addresses.`)
+    log.debug({ hodlerAddresses })
 
     // lookup balances of all hodler addresses in qualification period
     const sendTokenContract = getContract({
@@ -253,16 +252,16 @@ export class DistributorWorker {
       balances = balances.concat(...batch)
     }
 
-    this.log.info(`Found ${balances.length} balances.`)
-    this.log.debug({ balances })
+    log.info(`Found ${balances.length} balances.`)
+    log.debug({ balances })
 
     // Filter out hodler with not enough send token balance
     balances = balances.filter(
       ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
     )
 
-    this.log.info(`Found ${balances.length} balances after filtering.`)
-    this.log.debug({ balances })
+    log.info(`Found ${balances.length} balances after filtering.`)
+    log.debug({ balances })
 
     // Calculate hodler pool share weights
     const amount = BigInt(distribution.amount)
@@ -285,14 +284,14 @@ export class DistributorWorker {
     const hodlerPoolAvailableAmount = calculatePercentageWithBips(amount, hodlerPoolBips)
     const weightPerSend = (totalWeight * 10000n) / hodlerPoolAvailableAmount
 
-    this.log.info(
+    log.info(
       { totalWeight, hodlerPoolAvailableAmount, weightPerSend },
       `Calculated ${Object.keys(poolWeights).length} weights.`
     )
-    this.log.debug({ poolWeights })
+    log.debug({ poolWeights })
 
     if (totalWeight === 0n) {
-      this.log.warn('Total weight is 0. Skipping distribution.')
+      log.warn('Total weight is 0. Skipping distribution.')
       return
     }
 
@@ -316,7 +315,7 @@ export class DistributorWorker {
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]
       if (!hodler || !hodler.address) {
-        this.log.debug({ userId }, 'Hodler not found for user Skipping verification.')
+        log.debug({ userId }, 'Hodler not found for user Skipping verification.')
         continue
       }
       const { address } = hodler
@@ -346,13 +345,13 @@ export class DistributorWorker {
     let totalBonusPoolAmount = 0n
     let totalFixedPoolAmount = 0n
 
-    this.log.info(
+    log.info(
       {
         maxBonusPoolBips,
       },
       'Calculated fixed & bonus pool amounts.'
     )
-    this.log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
+    log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
 
     const shares = hodlerShares
       .map((share) => {
@@ -367,11 +366,11 @@ export class DistributorWorker {
         totalFixedPoolAmount += fixedPoolAmount
 
         if (!userId) {
-          this.log.debug({ share }, 'Hodler not found for address. Skipping share.')
+          log.debug({ share }, 'Hodler not found for address. Skipping share.')
           return null
         }
 
-        this.log.debug(
+        log.debug(
           {
             address: share.address,
             balance: balancesByAddress[share.address],
@@ -396,7 +395,7 @@ export class DistributorWorker {
       })
       .filter(Boolean)
 
-    this.log.info(
+    log.info(
       {
         totalAmount,
         totalHodlerPoolAmount,
@@ -408,14 +407,14 @@ export class DistributorWorker {
       },
       'Distribution totals'
     )
-    this.log.info(`Calculated ${shares.length} shares.`)
-    this.log.debug({ shares })
+    log.info(`Calculated ${shares.length} shares.`)
+    log.debug({ shares })
     const { error } = await supabaseAdmin.rpc('update_distribution_shares', {
       distribution_id: distribution.id,
       shares,
     })
     if (error) {
-      this.log.error({ error: error.message, code: error.code }, 'Error saving shares.')
+      log.error({ error: error.message, code: error.code }, 'Error saving shares.')
       throw error
     }
     return shares
@@ -456,8 +455,8 @@ export class DistributorWorker {
         await this.calculateDistributions()
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
-        await sleep(60_000) // sleep for 1 minute
       }
+      await sleep(60_000) // sleep for 1 minute
     }
 
     this.log.info('Distributor stopped.', {
