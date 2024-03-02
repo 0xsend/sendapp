@@ -335,6 +335,11 @@ interface Table_public_send_accounts {
   updated_at: string;
   deleted_at: string | null;
 }
+interface Table_public_send_liquidity_pools {
+  id: number;
+  address: string;
+  chain_id: number;
+}
 interface Table_public_send_token_transfers {
   chain_id: number | null;
   log_addr: string | null;
@@ -530,6 +535,7 @@ interface Schema_public {
   send_account_deployed: Table_public_send_account_deployed;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
+  send_liquidity_pools: Table_public_send_liquidity_pools;
   send_token_transfers: Table_public_send_token_transfers;
   send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;
