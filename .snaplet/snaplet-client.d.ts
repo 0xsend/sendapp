@@ -260,6 +260,14 @@ type Override = {
       send_account_credentials?: string;
     };
   }
+  send_liquidity_pools?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      address?: string;
+      chain_id?: string;
+    };
+  }
   send_token_transfers?: {
     name?: string;
     fields?: {
@@ -539,6 +547,10 @@ export interface Fingerprint {
     deletedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
     sendAccountCredentialsByAccountId?: FingerprintRelationField;
+  }
+  sendLiquidityPools?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
   }
   sendTokenTransfers?: {
     chainId?: FingerprintNumberField;

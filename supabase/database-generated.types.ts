@@ -500,6 +500,24 @@ export type Database = {
           },
         ]
       }
+      send_liquidity_pools: {
+        Row: {
+          address: string
+          chain_id: number
+          id: number
+        }
+        Insert: {
+          address: string
+          chain_id: number
+          id?: number
+        }
+        Update: {
+          address?: string
+          chain_id?: number
+          id?: number
+        }
+        Relationships: []
+      }
       send_token_transfers: {
         Row: {
           abi_idx: number | null
