@@ -43,7 +43,7 @@ void (async function main() {
   console.log(chalk.blue('Disable auto-mining...'))
   await $`cast rpc --rpc-url http://localhost:8546 evm_setAutomine false`
 
-  console.log(chalk.blue(`Re-enable interval mining... ${$.env.ANVIL_BLOCK_TIME ?? '5'}`))
+  console.log(chalk.blue(`Re-enable interval mining... ${$.env.ANVIL_BLOCK_TIME ?? '2'}`))
   await $`cast rpc --rpc-url http://localhost:8546 evm_setIntervalMining ${
     $.env.ANVIL_BLOCK_TIME ?? '2'
   }` // mimics Tiltfile default
