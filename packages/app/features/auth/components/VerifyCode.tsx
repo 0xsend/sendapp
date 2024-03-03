@@ -73,6 +73,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             $sm: {
               w: '60%',
             },
+            // @todo move these to OTP form when that becomes stable
+            textContentType: 'oneTimeCode',
+            autoComplete: 'sms-otp',
             outlineColor: 'transparent',
           },
         }}
@@ -84,7 +87,20 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             $sm={{ jc: 'center', height: '100%' }}
             ai={'flex-start'}
           >
-            <SubmitButton onPress={() => submit()} br="$3" bc={'$accent9Light'} $sm={{ w: '100%' }}>
+            <SubmitButton
+              onPress={() => submit()}
+              br="$3"
+              bc={'$accent9Light'}
+              $sm={{ w: '100%' }}
+              $gtMd={{
+                mt: '0',
+                als: 'flex-end',
+                mx: 0,
+                ml: 'auto',
+                w: '$10.5',
+                h: '$3.5',
+              }}
+            >
               <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
                 {'VERIFY ACCOUNT'}
               </ButtonText>
@@ -100,13 +116,13 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             <H3
               fontFamily={'$mono'}
               lineHeight={28}
-              col={'gray'}
+              col="accent"
               fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
               Enter the code we sent you on your phone
             </H3>
-            <YStack gap="$2">
+            <YStack gap="$4">
               <Theme inverse={true}>
                 <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
                   Your Code

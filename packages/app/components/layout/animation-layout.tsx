@@ -9,8 +9,8 @@ type AnimationLayoutProps = {
 
 const YStackEnterable = styled(YStack, {
   variants: {
-    isLeft: { true: { x: -300, opacity: 0 } },
-    isRight: { true: { x: 300, opacity: 0 } },
+    isLeft: { true: { x: -300, opacity: 0, display: 'none' } },
+    isRight: { true: { x: 300, opacity: 0, display: 'none' } },
   } as const,
 })
 
@@ -25,7 +25,14 @@ export const AnimationLayout = ({
 
   return (
     <AnimatePresence enterVariant={enterVariant} exitVariant={exitVariant}>
-      <YStackEnterable key={currentKey} animation="200ms" fullscreen={fullscreen} x={0} opacity={1}>
+      <YStackEnterable
+        key={currentKey}
+        animation="200ms"
+        fullscreen={fullscreen}
+        x={0}
+        opacity={1}
+        overflow="hidden"
+      >
         {children}
       </YStackEnterable>
     </AnimatePresence>
