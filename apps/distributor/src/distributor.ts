@@ -1,45 +1,8 @@
 import { cpus } from 'os'
 import { Database, Functions, Tables } from '@my/supabase/database.types'
-import {
-  sendTokenAddress,
-  readSendTokenBalanceOf,
-  baseMainnet,
-  mainnet,
-  baseMainnetClient,
-  mainnetClient,
-} from '@my/wagmi'
+import { sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
 import type { Logger } from 'pino'
-import { createConfig } from '@wagmi/core'
-import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
-import debug from 'debug'
-
-const log = debug('distributor')
-
-export const config = createConfig({
-  chains: [baseMainnet, mainnet, baseMainnetOg, mainnetOg],
-  client({ chain: { id: chainId } }) {
-    if (chainId === mainnet.id) return mainnetClient
-    if (chainId === baseMainnet.id) return baseMainnetClient
-    // handle __DEV__ mode
-    if (__DEV__) {
-      if (chainId === baseMainnetOg.id) {
-        log(
-          `⚠️ Overriding Base chain ID ${baseMainnetOg.id} with ${baseMainnetClient.chain.id} in __DEV__ mode`
-        )
-        return baseMainnetClient
-      }
-      if (chainId === mainnetOg.id) {
-        log(
-          `⚠️ Overriding Mainnet chain ID ${mainnetOg.id} with ${mainnetClient.chain.id} in __DEV__ mode`
-        )
-        return mainnetClient
-      }
-    }
-    throw new Error(`Unknown chain id: ${chainId}`)
-  },
-  multiInjectedProviderDiscovery: false,
-})
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(

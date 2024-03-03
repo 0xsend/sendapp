@@ -43,6 +43,11 @@ const deployments = await broadcasts.reduce(async (accP, file) => {
 
 console.log({ deployments })
 
+// @ts-expect-error it's parsed JSON
+const deployedSendMerkleDrop = deployments.SendMerkleDrop
+
+if (!deployedSendMerkleDrop) throw new Error('No SendMerkleDrop found.')
+
 export default defineConfig({
   out: 'src/generated.ts',
   contracts: [
@@ -110,19 +115,20 @@ export default defineConfig({
         SendToken: {
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [sepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-          8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [base.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base mainnet
           [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
           845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base localnet
         },
+        ...deployments,
         SendMerkleDrop: {
           1: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           [sepolia.id]: '0xB9310daE45E71c7a160A13D64204623071a8E347',
-          8008: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
+          [base.id]: '0xA57A1aAcbd242400Cf8AE68d820f830AeD2aced8', // base mainnet
+          [baseSepolia.id]: '0xA57A1aAcbd242400Cf8AE68d820f830AeD2aced8', // base sepolia
+          ...deployedSendMerkleDrop,
         },
-        ...deployments,
       },
       include: [
         'Send*.sol/*',
