@@ -357,6 +357,7 @@ interface Table_public_send_token_transfers {
   tx_idx: number | null;
   log_idx: number | null;
   abi_idx: number | null;
+  tx_hash: string | null;
 }
 interface Table_public_send_transfer_logs {
   from: string;

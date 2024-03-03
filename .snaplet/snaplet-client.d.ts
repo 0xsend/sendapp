@@ -287,6 +287,7 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      tx_hash?: string;
     };
   }
   send_transfer_logs?: {

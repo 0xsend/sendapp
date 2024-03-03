@@ -29,6 +29,7 @@ create table "public"."send_account_transfers"(
     "chain_id" numeric,
     "log_addr" bytea,
     "block_time" numeric,
+    "tx_hash" bytea,
     "f" bytea,
     "t" bytea,
     "v" numeric,
@@ -66,6 +67,13 @@ create table "public"."send_token_transfers"(
 );
 
 alter table "public"."send_token_transfers" enable row level security;
+
+create policy "Users can see their own token transfers"
+    on public.send_token_transfers for select using (auth.uid() in (
+        select user_id
+        from chain_addresses
+        where "address" = lower(concat('0x', encode(send_token_transfers.f, 'hex')))::citext
+            or "address" = lower(concat('0x', encode(send_token_transfers.t, 'hex')))::citext));
 
 create index send_token_transfers_f on public.send_token_transfers using btree(f);
 
