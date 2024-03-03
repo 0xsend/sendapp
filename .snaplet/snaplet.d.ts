@@ -318,6 +318,7 @@ interface Table_public_send_account_transfers {
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
+  tx_hash: string | null;
   f: string | null;
   t: string | null;
   v: number | null;
@@ -357,7 +358,6 @@ interface Table_public_send_token_transfers {
   tx_idx: number | null;
   log_idx: number | null;
   abi_idx: number | null;
-  tx_hash: string | null;
 }
 interface Table_public_send_transfer_logs {
   from: string;
