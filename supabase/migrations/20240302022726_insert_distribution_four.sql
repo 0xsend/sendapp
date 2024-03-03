@@ -9,6 +9,11 @@ alter table public.distributions
 -- update previous distributions to have the correct chain ID
 update public.distributions set chain_id = 1 where chain_id is null;
 
+-- set past snapshot block numbers
+update public.distributions set snapshot_block_num = 18251966 where number = 1;
+update public.distributions set snapshot_block_num = 18687852 where number = 2;
+update public.distributions set snapshot_block_num = 19136913 where number = 3;
+
 -- ensure chain_id is not null
 alter table public.distributions alter column chain_id set not null;
 
