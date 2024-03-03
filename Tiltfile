@@ -313,7 +313,7 @@ local_resource(
         "anvil",
         "--host=0.0.0.0",
         "--port=8545",
-        "--chain-id=1337",
+        "--chain-id=" + os.getenv("NEXT_PUBLIC_MAINNET_CHAIN_ID", "1337"),
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
         "--fork-block-number=" + mainnet_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
@@ -379,7 +379,7 @@ local_resource(
         "anvil",
         "--host=0.0.0.0",
         "--port=8546",
-        "--chain-id=845337",
+        "--chain-id=" + os.getenv("NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID", "845337"),
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
         "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
@@ -469,23 +469,27 @@ local_resource(
         "shovel:generate-config",
     ],
     serve_cmd = """
-    {}
+    {rm}
     docker pull docker.io/indexsupply/shovel:latest || true
     docker run --rm \
         --name shovel \
         --add-host=host.docker.internal:host-gateway \
         -p 8383:80 \
         --env DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres \
-        --env BASE_NAME=baselocalnet \
+        --env BASE_NAME=base \
         --env BASE_RPC_URL=http://host.docker.internal:8546 \
-        --env BASE_CHAIN_ID=845337 \
-        --env BASE_BLOCK_START={} \
+        --env BASE_CHAIN_ID={chain_id} \
+        --env BASE_BLOCK_START={bn} \
         --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
         -v ./packages/shovel/etc:/etc/shovel \
         --entrypoint /usr/local/bin/shovel \
         -w /usr/local/bin \
         docker.io/indexsupply/shovel -l :80 -config /etc/shovel/config.json
-    """.format(shovel_serve_rm_cmd, base_fork_block_number),
+    """.format(
+        bn = base_fork_block_number,
+        chain_id = os.getenv("NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID", "845337"),
+        rm = shovel_serve_rm_cmd,
+    ),
     deps = [
         "packages/shovel/etc/config.json",
     ],
