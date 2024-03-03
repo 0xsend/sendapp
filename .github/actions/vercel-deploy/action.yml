@@ -14,6 +14,10 @@ inputs:
     description: "The Vercel scope to use for deployment."
     required: false
     default: "0xsend"
+  deploy-preview-extra-args:
+    description: "The Vercel extra args to add to the deploy preview command. e.g. '-e NODE_ENV=production -e API_URL=https://api.example.com'"
+    required: false
+    default: ""
   public-hostname:
     description: "The public hostname alias to use for the deployment."
     required: false
@@ -31,7 +35,9 @@ runs:
   steps:
     - name: Mask Vercel Token
       shell: bash
-      run: echo "::add-mask::${{ inputs.vercel-token }}"
+      run: |
+        echo "::add-mask::${{ inputs.vercel-token }}"
+        echo "::add-mask::${{ inputs.deploy-preview-extra-args }}"
     - name: Switch to Vercel Send team
       shell: bash
       run: bunx vercel --token=${{ inputs.vercel-token }} team switch ${{ inputs.vercel-scope }}
@@ -57,7 +63,7 @@ runs:
         if [[ ${{ inputs.production }} == "true" ]]; then
           bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt --prod > deployment-url.txt
         else
-          bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt > deployment-url.txt
+          bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt ${{inputs.deploy-preview-extra-args}} > deployment-url.txt
         fi
         echo "deployment_url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
         echo ::notice::Deployment URL: $(cat deployment-url.txt)

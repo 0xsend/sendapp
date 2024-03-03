@@ -198,6 +198,7 @@ jobs:
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
+          deploy-preview-extra-args: '-e NEXT_PUBLIC_SUPABASE_PROJECT_ID=${{steps.supabase-branch.outputs.ref}} -e SUPABASE_DB_URL=postgres://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.ref}}:${{steps.supabase-branch.outputs.db_password}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres -e NEXT_PUBLIC_SUPABASE_URL=${{steps.supabase-branch.outputs.api_url}} -e SUPABASE_JWT_SECRET=${{steps.supabase-branch.outputs.jwt_secret}} -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL=${{steps.supabase-branch.outputs.graphql_url}}'
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
