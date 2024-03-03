@@ -29,7 +29,7 @@ abstract contract Helper is Script {
     /**
      * Send Merkle Drop for Send token distributions on base.
      */
-    address constant SEND_MERKLE_DROP = 0xA57A1aAcbd242400Cf8AE68d820f830AeD2aced8;
+    address constant SEND_MERKLE_DROP = 0x240761104aF5DAeDFd9025810FfEB741fEB316B3;
     /**
      * Send Account Verifier
      * @notice Not deployed yet. TODO: update this address when deployed.
