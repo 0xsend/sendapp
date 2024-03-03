@@ -168,7 +168,7 @@ jobs:
           yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - uses: 0xbigboss/supabase-branch-gh-action@0.0.0
+      - uses: 0xbigboss/supabase-branch-gh-action@0.0.1
         id: supabase-branch
         with:
           supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
