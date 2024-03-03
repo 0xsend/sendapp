@@ -237,6 +237,7 @@ type Override = {
       chain_id?: string;
       log_addr?: string;
       block_time?: string;
+      tx_hash?: string;
       f?: string;
       t?: string;
       v?: string;
@@ -287,7 +288,6 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
-      tx_hash?: string;
     };
   }
   send_transfer_logs?: {
