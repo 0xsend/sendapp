@@ -1,4 +1,5 @@
 import { Anchor, Button, Paragraph, TooltipSimple, YStack } from '@my/ui'
+import { sendMerkleDropAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import {
   UseDistributionsResultData,
@@ -26,22 +27,27 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const isEligible = !!share && share.amount > 0
   const isClaimActive = distribution.qualification_end < new Date()
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   // find out if the tranche is active using SendMerkleDrop.trancheActive(uint256 _tranche)
   const {
     data: isTrancheActive,
     isLoading: isTrancheActiveLoading,
     error: isTrancheActiveError,
-  } = useSendMerkleDropTrancheActive(trancheId)
+  } = useSendMerkleDropTrancheActive({
+    tranche: trancheId,
+    chainId: chainId,
+  })
   // find out if user is eligible onchain using SendMerkleDrop.isClaimed(uint256 _tranche, uint256 _index)
   const {
     data: isClaimed,
     isLoading: isClaimedLoading,
     error: isClaimedError,
     refetch: refetchIsClaimed,
-  } = useSendMerkleDropIsClaimed(
-    trancheId,
-    share?.index !== undefined ? BigInt(share.index) : undefined
-  )
+  } = useSendMerkleDropIsClaimed({
+    chainId,
+    tranche: trancheId,
+    index: share?.index !== undefined ? BigInt(share.index) : undefined,
+  })
   const { isConnected, address: account, chain } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
   const publicClient = usePublicClient()
