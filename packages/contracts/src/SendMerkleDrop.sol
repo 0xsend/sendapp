@@ -26,7 +26,8 @@ contract SendMerkleDrop is Ownable {
     IERC20 public token;
     mapping(uint256 => bytes32) public merkleRoots;
     mapping(uint256 => mapping(uint256 => uint256)) private claimedBitmaps;
-    uint256 public trancheCursor;
+    // 0 based index for tranch IDs
+    uint256 public trancheCursor = 3; // on base, we will start at 3 (0-2 are already used for mainnet distributions)
     mapping(uint256 => uint256) public trancheAmounts;
     mapping(uint256 => uint256) public trancheAmountsClaimed;
 

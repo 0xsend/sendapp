@@ -14,14 +14,11 @@ contract DeploySendMerkleDropScript is Script, Helper {
 
     function run() public {
         bytes32 salt = bytes32(uint256(31415));
-        bytes memory args = abi.encode(IERC20(SEND_TOKEN), SEND_AIRDROPS_SAFE);
-        address contractAddress = vm.computeCreate2Address(salt, hashInitCode(type(SendMerkleDrop).creationCode, args));
-
-        // solhint-disable-next-line
-        console2.log("Deploying SendMerkleDrop contract to address: %s", contractAddress);
-
         vm.startBroadcast();
-        new SendMerkleDrop{salt: salt}(IERC20(SEND_TOKEN), SEND_AIRDROPS_SAFE);
+        SendMerkleDrop smd = new SendMerkleDrop{salt: salt}(IERC20(SEND_TOKEN), SEND_AIRDROPS_SAFE);
+        // solhint-disable-next-line no-console
+        console2.log("Deployed SendMerkleDrop at address: ", address(smd));
         vm.stopBroadcast();
+        require(SEND_MERKLE_DROP == address(smd), "Deployed contract address does not match expected address");
     }
 }
