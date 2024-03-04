@@ -7,9 +7,19 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { Paragraph, Stack, YStack, Theme, useMedia, useToastController, Button } from '@my/ui'
+import {
+  Paragraph,
+  Stack,
+  YStack,
+  Theme,
+  useMedia,
+  useToastController,
+  Button,
+  H3,
+  XStack,
+} from '@my/ui'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { IconSendLogo } from 'app/components/icons'
+import { IconCopy, IconSendLogo } from 'app/components/icons'
 import { OnboardingForm } from './onboarding-form'
 import { Carousel } from '../components/Carousel'
 import { testClient } from 'app/utils/userop'
@@ -17,6 +27,7 @@ import { parseEther } from 'viem'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
+import { shorten } from 'app/utils/strings'
 
 export function OnboardingScreen() {
   const { carouselProgress } = useAuthCarouselContext()

@@ -11,7 +11,7 @@ import {
 import { PostgrestError } from '@supabase/supabase-js'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useBalance, useChainId, useReadContract, useSimulateContract } from 'wagmi'
+import { useBalance, useReadContract, useSimulateContract } from 'wagmi'
 import { api } from './api'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)

@@ -9,15 +9,7 @@ import {
   useMedia,
 } from '@my/ui'
 import { Link } from '@my/ui'
-import {
-  IconAccount,
-  IconActivity,
-  IconDashboard,
-  IconDistributions,
-  IconHome,
-  IconSLogo,
-  IconSendLogo,
-} from 'app/components/icons'
+import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import { useNav } from 'app/routers/params'
