@@ -122,6 +122,10 @@ exports[`shovel config 1`] = `
           "name": "block_time",
         },
         {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
           "column": "log_addr",
           "filter_arg": [
             "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
@@ -190,6 +194,10 @@ exports[`shovel config 1`] = `
           {
             "name": "block_time",
             "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
           },
           {
             "name": "f",
