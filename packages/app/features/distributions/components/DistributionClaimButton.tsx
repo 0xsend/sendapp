@@ -78,8 +78,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     }
   )
 
-  assert(!!publicClient, 'No public client found')
-
   if (!isClaimActive) {
     return null
   }
@@ -216,7 +214,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     )
   }
 
-  if (!isLoadingRpcChainId && rpcChainId !== publicClient.chain?.id) {
+  if (!isLoadingRpcChainId && rpcChainId !== publicClient?.chain?.id) {
     return (
       <YStack ai="center" w="100%" mx="auto">
         <Paragraph size="$1" theme="alt2">
@@ -227,7 +225,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     )
   }
 
-  if (publicClient.chain.id !== chain?.id) {
+  if (publicClient?.chain.id !== chain?.id) {
     return (
       <YStack ai="center" w="100%" mx="auto">
         <Paragraph size="$1" theme="alt2">
@@ -237,7 +235,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           w="100%"
           onPress={() => {
             assert(!!switchChain, 'No switchChain found')
-            switchChain({ chainId: publicClient.chain.id })
+            switchChain({ chainId: publicClient?.chain.id })
           }}
         >
           Switch Network
