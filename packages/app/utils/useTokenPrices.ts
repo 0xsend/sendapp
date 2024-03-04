@@ -11,7 +11,7 @@ export const TokenPricesSchema = z.object({
   'usd-coin': TokenPriceSchema,
 })
 
-export const useTokenPrices = (): UseQueryResult<typeof TokenPricesSchema._type, Error> => {
+export const useTokenPrices = (): UseQueryResult<z.infer<typeof TokenPricesSchema>, Error> => {
   return useQuery({
     queryKey: ['tokenPrices'],
     queryFn: async () => {

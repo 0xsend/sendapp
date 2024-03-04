@@ -17,7 +17,11 @@ const TokenDetails = ({ tokenAddress }: { tokenAddress: `0x${string}` | undefine
 
   if (balance) {
     if (balance.isError) {
-      throw new Error(`Error occurred while fetching balance. ${balance.error.message}`)
+      return (
+        <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$error'}>
+          Error occurred while fetching balance. {balance.error.message}
+        </Paragraph>
+      )
     }
     if (balance.isPending) {
       return <Spinner size={'small'} />

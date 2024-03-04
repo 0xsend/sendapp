@@ -21,12 +21,6 @@ const sendBaseContract = {
   chainId: baseMainnet.id,
 } as const
 
-const coinNameMapping = {
-  eth: 'ethereum',
-  Send: 'send-token',
-  USDC: 'usd-coin',
-}
-
 export const useSendAccountBalances = () => {
   const { data: tokenPrices } = useTokenPrices()
   const { data: sendAccounts } = useSendAccounts()
