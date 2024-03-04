@@ -219,7 +219,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           SUPABASE_DB_URL: 'postgres://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres'
           SUPABASE_JWT_SECRET: '${{steps.supabase-branch.outputs.jwt_secret}}'
-          SUPABASE_SERVICE_ROLE: ${{ steps.supabase-branch.outputs.service_role_key }}
+          SUPABASE_SERVICE_ROLE: '${{ steps.supabase-branch.outputs.service_role_key }}'
           NEXT_PUBLIC_SUPABASE_URL: '${{steps.supabase-branch.outputs.api_url}}'
           NEXT_PUBLIC_SUPABASE_PROJECT_ID: '${{steps.supabase-branch.outputs.project_ref}}'
           NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: '${{steps.supabase-branch.outputs.graphql_url}}'
@@ -227,7 +227,7 @@ jobs:
           NEXT_PUBLIC_MAINNET_CHAIN_ID: '11155111'
           NEXT_PUBLIC_BASE_RPC_URL: 'https://sepolia.base.org'
           NEXT_PUBLIC_MAINNET_RPC_URL: 'https://ethereum-sepolia-rpc.publicnode.com'
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase-branch.outputs.anon_key }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: '${{ steps.supabase-branch.outputs.anon_key }}'
 
       - uses: mshick/add-pr-comment@v2
         with:
