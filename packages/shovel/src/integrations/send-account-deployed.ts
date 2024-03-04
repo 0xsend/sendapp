@@ -16,6 +16,7 @@ export const sendAcctFactoryTable: Table = {
     { name: 'log_addr', type: 'bytea' },
     { name: 'block_time', type: 'numeric' },
     { name: 'user_op_hash', type: 'bytea' },
+    { name: 'tx_hash', type: 'bytea' },
     { name: 'sender', type: 'bytea' },
     { name: 'factory', type: 'bytea' },
     { name: 'paymaster', type: 'bytea' },
@@ -38,6 +39,10 @@ export const integration: Omit<Integration, 'sources'> = {
     {
       name: 'block_time',
       column: 'block_time',
+    },
+    {
+      name: 'tx_hash',
+      column: 'tx_hash',
     },
     {
       name: 'log_addr',

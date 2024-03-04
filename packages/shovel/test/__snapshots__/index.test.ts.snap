@@ -17,6 +17,10 @@ exports[`shovel config 1`] = `
           "name": "block_time",
         },
         {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
           "column": "log_addr",
           "filter_arg": [
             "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
@@ -44,8 +48,8 @@ exports[`shovel config 1`] = `
           {
             "column": "factory",
             "filter_arg": [
-              "0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0",
               "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC",
+              "0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0",
             ],
             "filter_op": "contains",
             "indexed": false,
@@ -85,6 +89,10 @@ exports[`shovel config 1`] = `
           },
           {
             "name": "user_op_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_hash",
             "type": "bytea",
           },
           {

@@ -383,6 +383,7 @@ export type Database = {
           paymaster: string | null
           sender: string | null
           src_name: string | null
+          tx_hash: string | null
           tx_idx: number | null
           user_op_hash: string | null
         }
@@ -399,6 +400,7 @@ export type Database = {
           paymaster?: string | null
           sender?: string | null
           src_name?: string | null
+          tx_hash?: string | null
           tx_idx?: number | null
           user_op_hash?: string | null
         }
@@ -415,6 +417,7 @@ export type Database = {
           paymaster?: string | null
           sender?: string | null
           src_name?: string | null
+          tx_hash?: string | null
           tx_idx?: number | null
           user_op_hash?: string | null
         }
@@ -543,6 +546,7 @@ export type Database = {
           log_idx: number | null
           src_name: string | null
           t: string | null
+          tx_hash: string | null
           tx_idx: number | null
           v: number | null
         }
@@ -558,6 +562,7 @@ export type Database = {
           log_idx?: number | null
           src_name?: string | null
           t?: string | null
+          tx_hash?: string | null
           tx_idx?: number | null
           v?: number | null
         }
@@ -573,6 +578,7 @@ export type Database = {
           log_idx?: number | null
           src_name?: string | null
           t?: string | null
+          tx_hash?: string | null
           tx_idx?: number | null
           v?: number | null
         }

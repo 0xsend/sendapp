@@ -9,6 +9,7 @@ export const transfersTable: Table = {
     { name: 'chain_id', type: 'numeric' },
     { name: 'log_addr', type: 'bytea' },
     { name: 'block_time', type: 'numeric' },
+    { name: 'tx_hash', type: 'bytea' },
     { name: 'f', type: 'bytea' },
     { name: 't', type: 'bytea' },
     { name: 'v', type: 'numeric' },
@@ -27,6 +28,10 @@ export const integration: Omit<Integration, 'sources'> = {
     {
       name: 'block_time',
       column: 'block_time',
+    },
+    {
+      name: 'tx_hash',
+      column: 'tx_hash',
     },
     {
       name: 'log_addr',
