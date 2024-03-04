@@ -5,10 +5,11 @@ import {
 } from '@my/wagmi'
 import { UseBalanceReturnType, useBalance } from 'wagmi'
 import { useSendAccounts } from './send-accounts'
-import { useEffect, useState } from 'react'
+import { useTokenPrices } from './useTokenPrices'
+import { assert } from './assert'
 
 export const useSendAccountBalances = () => {
-  const [tokenPrices, setTokenPrices] = useState<{ [key: string]: { usd: number } }>({})
+  const { tokenPrices, error } = useTokenPrices()
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
@@ -26,20 +27,7 @@ export const useSendAccountBalances = () => {
     })
   }
 
-  useEffect(() => {
-    const func = async () => {
-      const res = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,send-token&vs_currencies=usd'
-      )
-      const data = await res.json()
-      setTokenPrices({
-        USDC: data['usd-coin'],
-        ETH: data.ethereum,
-        send: data['send-token'],
-      })
-    }
-    func()
-  }, [])
+  assert(!error, error?.message)
 
   let totalBalance = 0
   for (const token of tokens) {

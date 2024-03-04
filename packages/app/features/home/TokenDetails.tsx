@@ -1,5 +1,6 @@
 import { Paragraph, Spinner } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
+import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useBalance } from 'wagmi'
@@ -15,8 +16,8 @@ const TokenDetails = ({ tokenAddress }: { tokenAddress: `0x${string}` | undefine
     chainId: baseMainnet.id,
   })
 
-  // @TODO: add balance error check
   if (balance) {
+    assert(!balance?.error, balance?.error?.message)
     if (balance.isPending) {
       return <Spinner size={'small'} />
     }
