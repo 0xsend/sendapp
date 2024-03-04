@@ -1,4 +1,4 @@
-import { ChangePhoneScreen } from 'app/features/settings/changePhone'
+import { ChangePhoneScreen } from 'app/features/account/changePhone'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
