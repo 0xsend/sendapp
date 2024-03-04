@@ -70,7 +70,7 @@ runs:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
         VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
-        VERCEL_GIT_COMMIT_REF: ${{ github.ref }}
+        VERCEL_GIT_COMMIT_REF: ${{ github.head_ref }}
         VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
     - name: Set Deploy Preview Vercel Branch Alias
       if: ${{ inputs.public-hostname != '' && inputs.production != 'true'}}
@@ -107,7 +107,7 @@ runs:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
         VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
-        VERCEL_GIT_COMMIT_REF: ${{ github.ref }}
+        VERCEL_GIT_COMMIT_REF: ${{ github.head_ref }}
         VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
     - name: Set Deploy Production Vercel Branch Alias
       if: ${{ inputs.public-hostname != '' && inputs.production == 'true'}}
