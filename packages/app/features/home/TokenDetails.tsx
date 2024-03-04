@@ -1,6 +1,5 @@
 import { Paragraph, Spinner, useToastController } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
-import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useBalance } from 'wagmi'
@@ -19,8 +18,7 @@ const TokenDetails = ({ tokenAddress }: { tokenAddress: `0x${string}` | undefine
 
   if (balance) {
     if (balance.isError) {
-      toast.show(balance.error.message)
-      return <></>
+      throw new Error(`Error occurred while fetching balance. ${balance.error.message}`)
     }
     if (balance.isPending) {
       return <Spinner size={'small'} />

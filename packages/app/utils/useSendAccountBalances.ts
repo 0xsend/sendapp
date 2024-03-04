@@ -2,13 +2,12 @@ import {
   baseMainnet,
   usdcAddress as usdcAddresses,
   sendTokenAddress as sendAddresses,
-  sendAbi,
+  sendTokenAbi,
   usdcAbi,
 } from '@my/wagmi'
 import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccounts } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
-import { assert } from './assert'
 
 const usdcBaseContract = {
   address: usdcAddresses[baseMainnet.id],
@@ -18,12 +17,18 @@ const usdcBaseContract = {
 
 const sendBaseContract = {
   address: sendAddresses[baseMainnet.id],
-  abi: sendAbi,
+  abi: sendTokenAbi,
   chainId: baseMainnet.id,
 } as const
 
+const coinNameMapping = {
+  eth: 'ethereum',
+  Send: 'send-token',
+  USDC: 'usd-coin',
+}
+
 export const useSendAccountBalances = () => {
-  const { tokenPrices, error } = useTokenPrices()
+  const { data: tokenPrices } = useTokenPrices()
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
@@ -57,5 +62,15 @@ export const useSendAccountBalances = () => {
         ...tokenBalances,
       }
 
-  return { balances }
+  if (!tokenPrices) {
+    return { balances, undefined }
+  }
+  const usdcBalanceInUsd =
+    (Number(tokenBalances?.[0].result ?? 0n) / 10 ** 6) * tokenPrices['usd-coin'].usd
+  const sendBalanceInUsd = Number(tokenBalances?.[1].result ?? 0n) * tokenPrices['send-token'].usd
+  const ethBalanceInUsd =
+    (Number(ethBalanceOnBase?.value ?? 0n) / 10 ** 18) * tokenPrices.ethereum.usd
+  const totalBalance = usdcBalanceInUsd + sendBalanceInUsd + ethBalanceInUsd
+
+  return { balances, totalBalance }
 }

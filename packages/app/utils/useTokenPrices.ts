@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { UseQueryResult, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 const TokenPriceSchema = z.object({
@@ -11,12 +11,8 @@ export const TokenPricesSchema = z.object({
   'usd-coin': TokenPriceSchema,
 })
 
-export const useTokenPrices = () => {
-  const {
-    data: tokenPrices,
-    error,
-    isLoading,
-  } = useQuery({
+export const useTokenPrices = (): UseQueryResult<typeof TokenPricesSchema._type, Error> => {
+  return useQuery({
     queryKey: ['tokenPrices'],
     queryFn: async () => {
       const res = await fetch(
@@ -27,11 +23,7 @@ export const useTokenPrices = () => {
       }
 
       const json = await res.json()
-      TokenPricesSchema.parse(json)
-
-      return json
+      return TokenPricesSchema.parse(json)
     },
   })
-
-  return { tokenPrices, error, isLoading }
 }
