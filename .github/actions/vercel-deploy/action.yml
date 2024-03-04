@@ -48,7 +48,7 @@ runs:
       shell: bash
       run: |
         bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=preview
-        # do not re-use the preview env vars, require them to be passed via input in --env flag
+        # do not re-use the preview env vars, require them to be passed via input in env
         rm .vercel/.env.preview.local
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
