@@ -33,6 +33,9 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Testing
+      shell: bash
+      run: echo "Testing $TESTING"
     - name: Mask Vercel Token
       shell: bash
       run: |

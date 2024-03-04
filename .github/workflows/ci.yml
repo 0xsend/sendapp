@@ -215,6 +215,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
         env:
+          TESTING: 'yes please'
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           SUPABASE_DB_URL: postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres
