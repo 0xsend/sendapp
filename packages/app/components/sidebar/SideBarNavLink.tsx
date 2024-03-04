@@ -38,7 +38,7 @@ export function SideBarNavLink({
         gap={'$1.5'}
       >
         <ButtonIcon>{icon}</ButtonIcon>
-        <ButtonText f={1} fontWeight={isActiveRoute ? 'bold' : 'normal'}>
+        <ButtonText f={1} fontFamily="$mono" fontWeight={isActiveRoute ? 'bold' : '300'}>
           {text}
         </ButtonText>
       </Button>
