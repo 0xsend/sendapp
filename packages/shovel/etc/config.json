@@ -68,8 +68,8 @@
             "column": "factory",
             "filter_op": "contains",
             "filter_arg": [
-              "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC",
-              "0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0"
+              "0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0",
+              "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC"
             ]
           },
           {
@@ -179,11 +179,11 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
             "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
+            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
           ]
         }
       ],

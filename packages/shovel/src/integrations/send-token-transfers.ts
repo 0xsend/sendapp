@@ -35,7 +35,7 @@ export const integration: Omit<Integration, 'sources'> = {
       name: 'log_addr',
       column: 'log_addr',
       filter_op: 'contains',
-      filter_arg: [...new Set(Object.values(sendTokenAddress))],
+      filter_arg: [...new Set(Object.values(sendTokenAddress))].sort(),
     },
   ] as BlockData[],
   event: {

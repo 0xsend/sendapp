@@ -40,7 +40,7 @@ export const integration: Omit<Integration, 'sources'> = {
       filter_arg: [
         ...new Set(Object.values(sendTokenAddress)),
         ...new Set(Object.values(usdcAddress)),
-      ],
+      ].sort(),
     },
   ] as BlockData[],
   event: {

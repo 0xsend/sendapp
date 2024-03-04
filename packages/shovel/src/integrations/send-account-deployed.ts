@@ -1,12 +1,11 @@
 import type {
   BlockData,
   Column,
-  Event,
   FilterReference,
   Integration,
   Table,
 } from '@indexsupply/shovel-config'
-import { daimoAccountFactoryAddress, entryPointAbi } from '@my/wagmi'
+import { daimoAccountFactoryAddress } from '@my/wagmi'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 
 export const sendAcctFactoryTable: Table = {
@@ -63,7 +62,9 @@ export const integration: Omit<Integration, 'sources'> = {
         indexed: false,
         column: 'factory',
         filter_op: 'contains',
-        filter_arg: [...new Set(Object.values(daimoAccountFactoryAddress))] as `0x${string}`[],
+        filter_arg: [
+          ...new Set(Object.values(daimoAccountFactoryAddress)),
+        ].sort() as `0x${string}`[],
       },
       { name: 'paymaster', type: 'address', indexed: false, column: 'paymaster' },
     ],
