@@ -29,7 +29,7 @@ inputs:
 outputs:
   deployment-url:
     description: "The URL of the deployment."
-    value: ${{ steps.deploy.outputs.deployment_url }}
+    value: ${{ steps.deploy-preview.outputs.deployment_url }}
 runs:
   using: "composite"
   steps:
@@ -60,7 +60,7 @@ runs:
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Deploy Preview
       if: ${{ inputs.production != 'true' }}
-      id: deploy
+      id: deploy-preview
       shell: bash
       run: |
         bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt ${{inputs.deploy-preview-extra-args}} > deployment-url.txt
@@ -74,6 +74,15 @@ runs:
         VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
         VERCEL_GIT_COMMIT_REF: ${{ github.ref }}
         VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
+    - name: Set Deploy Preview Vercel Branch Alias
+      if: ${{ inputs.public-hostname != '' && inputs.production != 'true'}}
+      shell: bash
+      run: |
+        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} alias set ${{ steps.deploy-preview.outputs.deployment_url }} ${{ inputs.public-hostname }}
+        echo ::notice::Vercel Alias URL https://${{ inputs.public-hostname }}/
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Setup Production Environment
       if: ${{ inputs.production == 'true' }}
       shell: bash
@@ -90,7 +99,7 @@ runs:
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Deploy Production
       if: ${{ inputs.production == 'true' }}
-      id: deploy
+      id: deploy-prod
       shell: bash
       run: |
         bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} deploy --prebuilt --prod > deployment-url.txt
@@ -102,11 +111,11 @@ runs:
         VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
         VERCEL_GIT_COMMIT_REF: ${{ github.ref }}
         VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
-    - name: Set Vercel Branch Alias
-      if: ${{ inputs.public-hostname != '' }}
+    - name: Set Deploy Production Vercel Branch Alias
+      if: ${{ inputs.public-hostname != '' && inputs.production == 'true'}}
       shell: bash
       run: |
-        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} alias set ${{ steps.deploy.outputs.deployment_url }} ${{ inputs.public-hostname }}
+        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} alias set ${{ steps.deploy-prod.outputs.deployment_url }} ${{ inputs.public-hostname }}
         echo ::notice::Vercel Alias URL https://${{ inputs.public-hostname }}/
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
