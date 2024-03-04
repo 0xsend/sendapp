@@ -1,4 +1,4 @@
-import { Avatar, Button, Container, Paragraph, XStack, YStack, Label, SubmitButton } from '@my/ui'
+import { Avatar, Container, Paragraph, XStack, YStack, Label, SubmitButton } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
 import { useUser } from 'app/utils/useUser'

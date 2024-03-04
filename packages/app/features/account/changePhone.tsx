@@ -1,15 +1,12 @@
 import {
   Fieldset,
-  H2,
   Input,
   Label,
   SubmitButton,
-  Theme,
   YStack,
   isWeb,
   useToastController,
   XStack,
-  Button,
   Paragraph,
   Container,
 } from '@my/ui'

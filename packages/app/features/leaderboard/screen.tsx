@@ -1,4 +1,4 @@
-import { Button, Container, KVTable, Paragraph, XStack, YStack } from '@my/ui'
+import { Container, Paragraph, XStack, YStack } from '@my/ui'
 
 const users = [
   {

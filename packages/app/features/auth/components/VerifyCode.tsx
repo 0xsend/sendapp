@@ -2,7 +2,6 @@ import {
   BigHeading,
   ButtonText,
   FormWrapper,
-  H1,
   H3,
   Paragraph,
   SubmitButton,

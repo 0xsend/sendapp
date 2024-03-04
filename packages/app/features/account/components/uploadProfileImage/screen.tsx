@@ -1,4 +1,4 @@
-import { Paragraph, SizableText, Theme, YStack } from '@my/ui'
+import { SizableText, YStack } from '@my/ui'
 import { Upload } from '@tamagui/lucide-icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
