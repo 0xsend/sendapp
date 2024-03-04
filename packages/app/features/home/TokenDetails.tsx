@@ -1,11 +1,10 @@
-import { Paragraph, Spinner, useToastController } from '@my/ui'
+import { Paragraph, Spinner } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useBalance } from 'wagmi'
 
 const TokenDetails = ({ tokenAddress }: { tokenAddress: `0x${string}` | undefined }) => {
-  const toast = useToastController()
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
