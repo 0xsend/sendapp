@@ -490,6 +490,7 @@ local_resource(
         chain_id = os.getenv("NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID", "845337"),
         rm = shovel_serve_rm_cmd,
     ),
+    trigger_mode = TRIGGER_MODE_MANUAL,
     deps = [
         "packages/shovel/etc/config.json",
     ],
