@@ -2,35 +2,57 @@ import {
   baseMainnet,
   usdcAddress as usdcAddresses,
   sendTokenAddress as sendAddresses,
+  sendAbi,
+  usdcAbi,
 } from '@my/wagmi'
-import { UseBalanceReturnType, useBalance } from 'wagmi'
+import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccounts } from './send-accounts'
+
+const usdcBaseContract = {
+  address: usdcAddresses[baseMainnet.id],
+  abi: usdcAbi,
+  chainId: baseMainnet.id,
+} as const
+
+const sendBaseContract = {
+  address: sendAddresses[baseMainnet.id],
+  abi: sendAbi,
+  chainId: baseMainnet.id,
+} as const
 
 export const useSendAccountBalances = () => {
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
-  const balances: {
-    [key: string]: UseBalanceReturnType
-  } = {}
-  const tokens = [usdcAddresses[baseMainnet.id], 'eth', sendAddresses[baseMainnet.id]]
+  //@todo this is improper use of a hook. Hooks should always be used at top level of component
+  const { data: tokenBalances, isPending: isPendingTokenBalances } = useReadContracts({
+    query: { enabled: !!sendAccount },
+    contracts: [
+      {
+        ...usdcBaseContract,
+        functionName: 'balanceOf',
+        args: sendAccount?.address && [sendAccount?.address],
+      },
+      {
+        ...sendBaseContract,
+        functionName: 'balanceOf',
+        args: sendAccount?.address && [sendAccount?.address],
+      },
+    ],
+  })
+  const { data: ethBalanceOnBase, isPending: isPendingEthBalanceOnBase } = useBalance({
+    address: sendAccount?.address,
+    query: { enabled: !!sendAccount },
+    chainId: baseMainnet.id,
+  })
 
-  for (const token of tokens) {
-    balances[token] = useBalance({
-      address: sendAccount?.address,
-      token: token === 'eth' ? undefined : (token as `0x${string}`),
-      query: { enabled: !!sendAccount },
-      chainId: baseMainnet.id,
-    })
-  }
+  const isPending = isPendingTokenBalances || isPendingEthBalanceOnBase
+  const balances = isPending
+    ? undefined
+    : {
+        eth: ethBalanceOnBase,
+        ...tokenBalances,
+      }
 
-  let totalBalance = 0n
-  for (const token of tokens) {
-    if (balances[token]?.isPending) {
-      return { balances, undefined }
-    }
-    totalBalance += balances[token]?.data?.value ?? 0n
-  }
-
-  return { balances, totalBalance }
+  return { balances }
 }
