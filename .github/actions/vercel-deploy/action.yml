@@ -44,6 +44,15 @@ runs:
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
+    - name: Setup Environment
+      shell: bash
+      run: |
+        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=preview
+        # do not re-use the preview env vars, require them to be passed via input in --env flag
+        rm .vercel/.env.preview.local
+      env:
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
     - name: Build Preview Project Artifacts
       if: ${{ inputs.production != 'true' }}
       shell: bash
