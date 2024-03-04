@@ -19,14 +19,14 @@ test('can login', async ({ page, pg }) => {
   const phone = `${Math.floor(Math.random() * 1e9)}`
   // naive but go to home page to see if user is logged in
   await page.goto('/')
-  await expect(page).toHaveURL('/sign-in')
+  await expect(page).toHaveURL('/auth/sign-in')
   await page.getByLabel('Phone number').fill(phone)
   try {
-    await page.getByRole('button', { name: 'SEND IT!' }).click()
+    await page.getByRole('button', { name: '/SEND IT' }).click()
     await page.getByLabel('One-time Password').fill('123456')
-    await page.getByRole('button', { name: 'Verify' }).click()
+    await page.getByRole('button', { name: 'VERIFY ACCOUNT' }).click()
     await page.waitForLoadState()
-    await expect(page).toHaveURL('/onboarding')
+    await expect(page).toHaveURL('/auth/onboarding')
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone])
   }
@@ -44,7 +44,7 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
 
   const ipPromise = page.waitForRequest('https://ipapi.co/json/')
   await page.goto('/')
-  await expect(page).toHaveURL('/sign-in')
+  await expect(page).toHaveURL('/auth/sign-in')
   await ipPromise
 
   await expect(page.getByText(`${country.flag} +${country.dialCode}`)).toBeVisible()
@@ -60,11 +60,11 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
     })
   })
   try {
-    await page.getByRole('button', { name: 'SEND IT!' }).click()
+    await page.getByRole('button', { name: '/SEND IT' }).click()
     await page.getByLabel('One-time Password').fill('123456')
-    await page.getByRole('button', { name: 'Verify' }).click()
+    await page.getByRole('button', { name: 'VERIFY ACCOUNT' }).click()
     await page.waitForLoadState()
-    await expect(page).toHaveURL('/onboarding')
+    await expect(page).toHaveURL('/auth/onboarding')
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone])
   }

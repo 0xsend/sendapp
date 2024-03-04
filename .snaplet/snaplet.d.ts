@@ -129,13 +129,14 @@ interface Table_net_http_request_queue {
   timeout_milliseconds: number;
 }
 interface Table_auth_identities {
-  id: string;
+  provider_id: string;
   user_id: string;
   identity_data: Json;
   provider: string;
   last_sign_in_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  id: string;
 }
 interface Table_auth_instances {
   id: string;
@@ -310,6 +311,10 @@ interface Table_auth_sessions {
   factor_id: string | null;
   aal: Enum_auth_aal_level | null;
   not_after: string | null;
+  refreshed_at: string | null;
+  user_agent: string | null;
+  ip: string | null;
+  tag: string | null;
 }
 interface Table_auth_sso_domains {
   id: string;

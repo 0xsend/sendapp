@@ -214,7 +214,11 @@ local_resource(
 )
 
 if config.tilt_subcommand == "down":
-    local("yarn supabase stop --no-backup")
+    local("""
+    yarn supabase stop --no-backup
+    # can be removed once supabase stop --no-backup is fixed
+    docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
+    """)
 
 cmd_button(
     "supabase:db reset",
@@ -475,14 +479,15 @@ local_resource(
     ),
     resource_deps = [
         "yarn:install",
-        "anvil:mainnet",
-        "anvil:base",
-        "aa_bundler:base",
         "supabase",
         "supabase:generate",
         "wagmi:generate",
         "ui:build",
-    ],
+    ] + ([
+        "anvil:mainnet",
+        "anvil:base",
+        "aa_bundler:base",
+    ] if not CI else []),
     serve_cmd =
         "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
 )
@@ -490,6 +495,7 @@ local_resource(
 local_resource(
     "distributor:web",
     allow_parallel = True,
+    auto_init = False,
     labels = labels,
     links = ["http://localhost:3050"],
     readiness_probe = probe(
@@ -529,8 +535,6 @@ local_resource(
     labels = labels,
     resource_deps = [
         "yarn:install",
-        "aa_bundler:base",  # TODO: remove once bundler tests are moved to playwright
-        "anvil:send-account-fixtures",  # TODO: remove once bundler tests are moved to playwright
     ],
     deps =
         files_matching(
@@ -577,6 +581,7 @@ local_resource(
         "anvil:send-account-fixtures",
         "aa_bundler:base",
         "snaplet:generate",
+        "next:web",
         "supabase",
     ],
 )
@@ -628,6 +633,7 @@ local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
+    auto_init = False,
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -675,7 +681,6 @@ local_resource(
     resource_deps = [
         # messy but create a single resource that runs all the tests
         "app:test",
-        "lint",
         "webauthn-authenticator:test",
         "supabase:test",
         "contracts:test",

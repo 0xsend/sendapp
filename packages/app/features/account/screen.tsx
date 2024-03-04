@@ -2,12 +2,9 @@ import {
   Avatar,
   Button,
   Card,
-  Container,
-  Image,
   Link,
   Paragraph,
   Separator,
-  Theme,
   XStack,
   YStack,
   useToastController,
@@ -19,7 +16,6 @@ import {
   IconNext,
   IconNotification,
   IconOur,
-  IconPersonal,
   IconPhone,
   IconQr,
   IconReferral,
@@ -34,7 +30,7 @@ import { useUser } from 'app/utils/useUser'
 import { useEffect, useState } from 'react'
 import { Square } from 'tamagui'
 
-export function SettingsScreen() {
+export function AccountScreen() {
   const { profile, user } = useUser()
   const name = profile?.name
   const code = profile?.referral_code
@@ -50,21 +46,21 @@ export function SettingsScreen() {
     setMode(current ? current : '')
   }, [current])
 
-  const accountSettings = [
+  const accountAccount = [
     {
       icon: <IconPhone />,
       label: 'Change Phone',
-      href: '/settings/change-phone',
+      href: '/account/change-phone',
     },
     {
       icon: <IconSecurity />,
       label: 'Security & Privacy',
-      href: '/settings',
+      href: '/account',
     },
     {
       icon: <IconNotification />,
       label: 'Notifications',
-      href: '/settings',
+      href: '/account',
     },
   ]
 
@@ -154,7 +150,7 @@ export function SettingsScreen() {
                   {about}
                 </Paragraph>
 
-                <Link href={'/settings/profile'} w={'100%'}>
+                <Link href={'/account/profile'} w={'100%'}>
                   <Button f={1} bw={'$0.5'} marginTop={'$5'} width={'$18'}>
                     Edit Profile
                   </Button>
@@ -223,7 +219,7 @@ export function SettingsScreen() {
             shadowOpacity={0.1}
           >
             <YStack h={'inherit'} padding={'$5'}>
-              {accountSettings.map((account) => (
+              {accountAccount.map((account) => (
                 <Link href={account.href} key={account.label}>
                   <XStack jc={'space-between'} marginBottom={20}>
                     <XStack>

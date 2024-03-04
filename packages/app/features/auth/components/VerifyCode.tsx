@@ -1,10 +1,8 @@
 import {
+  BigHeading,
   ButtonText,
   FormWrapper,
-  H1,
-  H2,
   H3,
-  H4,
   Paragraph,
   SubmitButton,
   Theme,
@@ -56,7 +54,12 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         props={{
           token: {
             'aria-label': 'One-time Password',
-            borderBottomColor: '$accent9Light',
+            '$theme-dark': {
+              borderBottomColor: '$accent9Light',
+            },
+            '$theme-light': {
+              borderBottomColor: '$black',
+            },
             borderWidth: 0,
             borderBottomWidth: 2,
             borderRadius: '$0',
@@ -66,31 +69,59 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             color: '$background',
             themeInverse: true,
             fontSize: '$6',
-            w: '60%',
+            $sm: {
+              w: '60%',
+            },
+            // @todo move these to OTP form when that becomes stable
+            textContentType: 'oneTimeCode',
+            autoComplete: 'sms-otp',
             outlineColor: 'transparent',
           },
         }}
         renderAfter={({ submit }) => (
-          <XStack f={1} mt={'0'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'flex-start'}>
-            <SubmitButton onPress={() => submit()} br="$3" bc={'$accent9Light'} w={'$12'}>
+          <XStack
+            f={1}
+            mt={'0'}
+            jc={'flex-end'}
+            $sm={{ jc: 'center', height: '100%' }}
+            ai={'flex-start'}
+          >
+            <SubmitButton
+              onPress={() => submit()}
+              br="$3"
+              bc={'$accent9Light'}
+              $sm={{ w: '100%' }}
+              $gtMd={{
+                mt: '0',
+                als: 'flex-end',
+                mx: 0,
+                ml: 'auto',
+                w: '$10.5',
+                h: '$3.5',
+              }}
+            >
               <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                {'Verify Account'}
+                {'VERIFY ACCOUNT'}
               </ButtonText>
             </SubmitButton>
           </XStack>
         )}
       >
         {(fields) => (
-          <YStack gap="$5" jc="center" p="$7">
+          <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <Theme inverse={true}>
-              <H1 col="$background" size="$11">
-                VERIFY ACCOUNT
-              </H1>
+              <BigHeading col="$background">VERIFY ACCOUNT</BigHeading>
             </Theme>
-            <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
-              Enter the verification code we sent you
+            <H3
+              fontFamily={'$mono'}
+              lineHeight={28}
+              col="accent"
+              fontWeight={'300'}
+              $sm={{ size: '$5' }}
+            >
+              Enter the code we sent you on your phone
             </H3>
-            <YStack gap="$2">
+            <YStack gap="$4">
               <Theme inverse={true}>
                 <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
                   Your Code

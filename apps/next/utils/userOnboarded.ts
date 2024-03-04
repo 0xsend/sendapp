@@ -34,7 +34,7 @@ export async function userOnboarded<
     log('no send accounts')
     return {
       redirect: {
-        destination: '/onboarding', // @todo add query param to redirect back to page after onboarding
+        destination: '/auth/onboarding', // @todo add query param to redirect back to page after onboarding
         permanent: false,
       },
     }

@@ -6,7 +6,7 @@ import "forge-std/Test.sol";
 import {P256} from "p256-verifier/P256.sol";
 
 abstract contract BaseSepoliaForkTest is Test {
-    string defaultUrl = "https://base-sepolia.publicnode.com";
+    string defaultUrl = "https://base-sepolia-rpc.publicnode.com";
     string BASE_SEPOLIA_RPC_URL = vm.envOr("BASE_SEPOLIA_RPC_URL", defaultUrl);
 
     function createAndSelectFork() public {

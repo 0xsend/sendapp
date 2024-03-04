@@ -7,14 +7,15 @@ const Home = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
-      viewBox="0 0 23 24"
+      fill="none"
+      viewBox="0 0 20 20"
       color={color as ColorTokens | undefined}
-      width={size ?? 23}
-      height={size ?? 24}
+      width={size ?? 20}
+      height={size ?? 20}
       {...rest}
     >
       <Path
-        d="M2.83334 22H7.83334V13.6667H15.1667V22H20.1667V9L11.5 2.5L2.83334 9V22ZM0.833336 24V8L11.5 0L22.1667 8V24H13.1667V15.6667H9.83334V24H0.833336Z"
+        d="M4.58301 16.25H7.70801V11.0417H12.2913V16.25H15.4163V8.125L9.99967 4.0625L4.58301 8.125V16.25ZM3.33301 17.5V7.5L9.99967 2.5L16.6663 7.5V17.5H11.0413V12.2917H8.95801V17.5H3.33301Z"
         fill="currentColor"
       />
     </Svg>

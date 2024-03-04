@@ -277,7 +277,7 @@ export const daimoAccountAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const daimoAccountFactoryAbi = [
   {
@@ -354,14 +354,15 @@ export const daimoAccountFactoryAbi = [
 ] as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const daimoAccountFactoryAddress = {
+  84532: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
   845337: '0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0',
 } as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const daimoAccountFactoryConfig = {
   address: daimoAccountFactoryAddress,
@@ -373,7 +374,7 @@ export const daimoAccountFactoryConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const daimoVerifierAbi = [
   { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
@@ -509,14 +510,15 @@ export const daimoVerifierAbi = [
 ] as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const daimoVerifierAddress = {
+  84532: '0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F',
   845337: '0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F',
 } as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const daimoVerifierConfig = { address: daimoVerifierAddress, abi: daimoVerifierAbi } as const
 
@@ -525,7 +527,7 @@ export const daimoVerifierConfig = { address: daimoVerifierAddress, abi: daimoVe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const daimoVerifierProxyAbi = [
   {
@@ -558,14 +560,15 @@ export const daimoVerifierProxyAbi = [
 ] as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const daimoVerifierProxyAddress = {
+  84532: '0xdAAb03239f5CC5b3452837E557295F790D9ab319',
   845337: '0xdAAb03239f5CC5b3452837E557295F790D9ab319',
 } as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const daimoVerifierProxyConfig = {
   address: daimoVerifierProxyAddress,
@@ -3599,7 +3602,7 @@ export const watchDaimoAccountUpgradedEvent = /*#__PURE__*/ createWatchContractE
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactory = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3609,7 +3612,7 @@ export const readDaimoAccountFactory = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3620,7 +3623,7 @@ export const readDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ create
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3631,7 +3634,7 @@ export const readDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createReadContrac
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryGetAddress = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3642,7 +3645,7 @@ export const readDaimoAccountFactoryGetAddress = /*#__PURE__*/ createReadContrac
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"verifier"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const readDaimoAccountFactoryVerifier = /*#__PURE__*/ createReadContract({
   abi: daimoAccountFactoryAbi,
@@ -3653,7 +3656,7 @@ export const readDaimoAccountFactoryVerifier = /*#__PURE__*/ createReadContract(
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const writeDaimoAccountFactory = /*#__PURE__*/ createWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -3663,7 +3666,7 @@ export const writeDaimoAccountFactory = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const writeDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -3674,7 +3677,7 @@ export const writeDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createWriteCo
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const prepareWriteDaimoAccountFactory = /*#__PURE__*/ createSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -3684,7 +3687,7 @@ export const prepareWriteDaimoAccountFactory = /*#__PURE__*/ createSimulateContr
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const prepareWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -3695,7 +3698,7 @@ export const prepareWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ create
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const readDaimoVerifier = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
@@ -3705,7 +3708,7 @@ export const readDaimoVerifier = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const readDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
@@ -3716,7 +3719,7 @@ export const readDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createRead
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"implementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const readDaimoVerifierImplementation = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
@@ -3727,7 +3730,7 @@ export const readDaimoVerifierImplementation = /*#__PURE__*/ createReadContract(
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const readDaimoVerifierOwner = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
@@ -3738,7 +3741,7 @@ export const readDaimoVerifierOwner = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const readDaimoVerifierProxiableUuid = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
@@ -3749,7 +3752,7 @@ export const readDaimoVerifierProxiableUuid = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"verifySignature"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const readDaimoVerifierVerifySignature = /*#__PURE__*/ createReadContract({
   abi: daimoVerifierAbi,
@@ -3760,7 +3763,7 @@ export const readDaimoVerifierVerifySignature = /*#__PURE__*/ createReadContract
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const writeDaimoVerifier = /*#__PURE__*/ createWriteContract({
   abi: daimoVerifierAbi,
@@ -3770,7 +3773,7 @@ export const writeDaimoVerifier = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const writeDaimoVerifierInit = /*#__PURE__*/ createWriteContract({
   abi: daimoVerifierAbi,
@@ -3781,7 +3784,7 @@ export const writeDaimoVerifierInit = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const writeDaimoVerifierRenounceOwnership = /*#__PURE__*/ createWriteContract({
   abi: daimoVerifierAbi,
@@ -3792,7 +3795,7 @@ export const writeDaimoVerifierRenounceOwnership = /*#__PURE__*/ createWriteCont
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const writeDaimoVerifierTransferOwnership = /*#__PURE__*/ createWriteContract({
   abi: daimoVerifierAbi,
@@ -3803,7 +3806,7 @@ export const writeDaimoVerifierTransferOwnership = /*#__PURE__*/ createWriteCont
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const writeDaimoVerifierUpgradeTo = /*#__PURE__*/ createWriteContract({
   abi: daimoVerifierAbi,
@@ -3814,7 +3817,7 @@ export const writeDaimoVerifierUpgradeTo = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const writeDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
   abi: daimoVerifierAbi,
@@ -3825,7 +3828,7 @@ export const writeDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createWriteContr
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const prepareWriteDaimoVerifier = /*#__PURE__*/ createSimulateContract({
   abi: daimoVerifierAbi,
@@ -3835,7 +3838,7 @@ export const prepareWriteDaimoVerifier = /*#__PURE__*/ createSimulateContract({
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const prepareWriteDaimoVerifierInit = /*#__PURE__*/ createSimulateContract({
   abi: daimoVerifierAbi,
@@ -3846,7 +3849,7 @@ export const prepareWriteDaimoVerifierInit = /*#__PURE__*/ createSimulateContrac
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const prepareWriteDaimoVerifierRenounceOwnership = /*#__PURE__*/ createSimulateContract({
   abi: daimoVerifierAbi,
@@ -3857,7 +3860,7 @@ export const prepareWriteDaimoVerifierRenounceOwnership = /*#__PURE__*/ createSi
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const prepareWriteDaimoVerifierTransferOwnership = /*#__PURE__*/ createSimulateContract({
   abi: daimoVerifierAbi,
@@ -3868,7 +3871,7 @@ export const prepareWriteDaimoVerifierTransferOwnership = /*#__PURE__*/ createSi
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const prepareWriteDaimoVerifierUpgradeTo = /*#__PURE__*/ createSimulateContract({
   abi: daimoVerifierAbi,
@@ -3879,7 +3882,7 @@ export const prepareWriteDaimoVerifierUpgradeTo = /*#__PURE__*/ createSimulateCo
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const prepareWriteDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
   abi: daimoVerifierAbi,
@@ -3890,7 +3893,7 @@ export const prepareWriteDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createSim
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const watchDaimoVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -3900,7 +3903,7 @@ export const watchDaimoVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Initialized"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const watchDaimoVerifierInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -3911,7 +3914,7 @@ export const watchDaimoVerifierInitializedEvent = /*#__PURE__*/ createWatchContr
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const watchDaimoVerifierOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -3922,7 +3925,7 @@ export const watchDaimoVerifierOwnershipTransferredEvent = /*#__PURE__*/ createW
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const watchDaimoVerifierUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -3933,7 +3936,7 @@ export const watchDaimoVerifierUpgradedEvent = /*#__PURE__*/ createWatchContract
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const watchDaimoVerifierProxyEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoVerifierProxyAbi,
@@ -3943,7 +3946,7 @@ export const watchDaimoVerifierProxyEvent = /*#__PURE__*/ createWatchContractEve
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const watchDaimoVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: daimoVerifierProxyAbi,
@@ -7153,7 +7156,7 @@ export const useWatchDaimoAccountUpgradedEvent = /*#__PURE__*/ createUseWatchCon
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactory = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7163,7 +7166,7 @@ export const useReadDaimoAccountFactory = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7174,7 +7177,7 @@ export const useReadDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ cre
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7185,7 +7188,7 @@ export const useReadDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadC
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryGetAddress = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7196,7 +7199,7 @@ export const useReadDaimoAccountFactoryGetAddress = /*#__PURE__*/ createUseReadC
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"verifier"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useReadDaimoAccountFactoryVerifier = /*#__PURE__*/ createUseReadContract({
   abi: daimoAccountFactoryAbi,
@@ -7207,7 +7210,7 @@ export const useReadDaimoAccountFactoryVerifier = /*#__PURE__*/ createUseReadCon
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useWriteDaimoAccountFactory = /*#__PURE__*/ createUseWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -7217,7 +7220,7 @@ export const useWriteDaimoAccountFactory = /*#__PURE__*/ createUseWriteContract(
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseWriteContract({
   abi: daimoAccountFactoryAbi,
@@ -7228,7 +7231,7 @@ export const useWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseW
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useSimulateDaimoAccountFactory = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -7238,7 +7241,7 @@ export const useSimulateDaimoAccountFactory = /*#__PURE__*/ createUseSimulateCon
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x22125D5129b1562CE447dE9FFb5612CdE4Bd63b0)
  */
 export const useSimulateDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoAccountFactoryAbi,
@@ -7249,7 +7252,7 @@ export const useSimulateDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createU
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useReadDaimoVerifier = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
@@ -7259,7 +7262,7 @@ export const useReadDaimoVerifier = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useReadDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
@@ -7270,7 +7273,7 @@ export const useReadDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createU
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"implementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useReadDaimoVerifierImplementation = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
@@ -7281,7 +7284,7 @@ export const useReadDaimoVerifierImplementation = /*#__PURE__*/ createUseReadCon
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useReadDaimoVerifierOwner = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
@@ -7292,7 +7295,7 @@ export const useReadDaimoVerifierOwner = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useReadDaimoVerifierProxiableUuid = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
@@ -7303,7 +7306,7 @@ export const useReadDaimoVerifierProxiableUuid = /*#__PURE__*/ createUseReadCont
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"verifySignature"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useReadDaimoVerifierVerifySignature = /*#__PURE__*/ createUseReadContract({
   abi: daimoVerifierAbi,
@@ -7314,7 +7317,7 @@ export const useReadDaimoVerifierVerifySignature = /*#__PURE__*/ createUseReadCo
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWriteDaimoVerifier = /*#__PURE__*/ createUseWriteContract({
   abi: daimoVerifierAbi,
@@ -7324,7 +7327,7 @@ export const useWriteDaimoVerifier = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWriteDaimoVerifierInit = /*#__PURE__*/ createUseWriteContract({
   abi: daimoVerifierAbi,
@@ -7335,7 +7338,7 @@ export const useWriteDaimoVerifierInit = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWriteDaimoVerifierRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: daimoVerifierAbi,
@@ -7346,7 +7349,7 @@ export const useWriteDaimoVerifierRenounceOwnership = /*#__PURE__*/ createUseWri
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWriteDaimoVerifierTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: daimoVerifierAbi,
@@ -7357,7 +7360,7 @@ export const useWriteDaimoVerifierTransferOwnership = /*#__PURE__*/ createUseWri
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWriteDaimoVerifierUpgradeTo = /*#__PURE__*/ createUseWriteContract({
   abi: daimoVerifierAbi,
@@ -7368,7 +7371,7 @@ export const useWriteDaimoVerifierUpgradeTo = /*#__PURE__*/ createUseWriteContra
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWriteDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
   abi: daimoVerifierAbi,
@@ -7379,7 +7382,7 @@ export const useWriteDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createUseWrit
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useSimulateDaimoVerifier = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoVerifierAbi,
@@ -7389,7 +7392,7 @@ export const useSimulateDaimoVerifier = /*#__PURE__*/ createUseSimulateContract(
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useSimulateDaimoVerifierInit = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoVerifierAbi,
@@ -7400,7 +7403,7 @@ export const useSimulateDaimoVerifierInit = /*#__PURE__*/ createUseSimulateContr
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useSimulateDaimoVerifierRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoVerifierAbi,
@@ -7411,7 +7414,7 @@ export const useSimulateDaimoVerifierRenounceOwnership = /*#__PURE__*/ createUse
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useSimulateDaimoVerifierTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoVerifierAbi,
@@ -7422,7 +7425,7 @@ export const useSimulateDaimoVerifierTransferOwnership = /*#__PURE__*/ createUse
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useSimulateDaimoVerifierUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoVerifierAbi,
@@ -7433,7 +7436,7 @@ export const useSimulateDaimoVerifierUpgradeTo = /*#__PURE__*/ createUseSimulate
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useSimulateDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
   abi: daimoVerifierAbi,
@@ -7444,7 +7447,7 @@ export const useSimulateDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createUseS
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWatchDaimoVerifierEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -7454,7 +7457,7 @@ export const useWatchDaimoVerifierEvent = /*#__PURE__*/ createUseWatchContractEv
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Initialized"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWatchDaimoVerifierInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -7465,7 +7468,7 @@ export const useWatchDaimoVerifierInitializedEvent = /*#__PURE__*/ createUseWatc
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWatchDaimoVerifierOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -7477,7 +7480,7 @@ export const useWatchDaimoVerifierOwnershipTransferredEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
  */
 export const useWatchDaimoVerifierUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: daimoVerifierAbi,
@@ -7488,7 +7491,7 @@ export const useWatchDaimoVerifierUpgradedEvent = /*#__PURE__*/ createUseWatchCo
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const useWatchDaimoVerifierProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: daimoVerifierProxyAbi,
@@ -7498,7 +7501,7 @@ export const useWatchDaimoVerifierProxyEvent = /*#__PURE__*/ createUseWatchContr
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
  */
 export const useWatchDaimoVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: daimoVerifierProxyAbi,
