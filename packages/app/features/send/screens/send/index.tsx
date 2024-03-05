@@ -23,9 +23,9 @@ const Screen = () => {
 
   return (
     <TransferProvider>
-      <AnimationLayout currentKey={currentComponent} direction={direction}>
-        <ScreenComponent />
-      </AnimationLayout>
+      {/* <AnimationLayout currentKey={currentComponent} direction={direction}> */}
+      <ScreenComponent />
+      {/* </AnimationLayout> */}
     </TransferProvider>
   )
 }
