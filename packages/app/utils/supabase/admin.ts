@@ -1,6 +1,5 @@
 import { Database } from '@my/supabase/database.types'
 import { createClient } from '@supabase/supabase-js'
-import crypto from 'crypto'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -16,11 +15,6 @@ if (!process.env.SUPABASE_SERVICE_ROLE) {
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE
-;(async () => {
-  // debug hash of service role so it's not leaked
-  const hash = crypto.createHash('sha256').update(SUPABASE_SERVICE_ROLE).digest('hex')
-  console.log('SUPABASE_SERVICE_ROLE_HASH', hash)
-})()
 
 /**
  * only meant to be used on the server side.
