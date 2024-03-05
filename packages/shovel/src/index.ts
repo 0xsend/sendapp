@@ -9,7 +9,7 @@ import {
 
 // baseSrcBlockHeaders is to be used for integrations that require block headers
 const baseSrcBlockHeaders: Source = {
-  name: '$BASE_NAME',
+  name: 'base_block_headers',
   url: '$BASE_RPC_URL',
   chain_id: '$BASE_CHAIN_ID',
   batch_size: 100,
@@ -18,7 +18,7 @@ const baseSrcBlockHeaders: Source = {
 
 // baseSrcLogs is to be used for integrations that require logs
 const baseSrcLogs: Source = {
-  name: '$BASE_NAME',
+  name: 'base_logs',
   url: '$BASE_RPC_URL',
   chain_id: '$BASE_CHAIN_ID',
   batch_size: 2000,

@@ -5,14 +5,14 @@
   "pg_url": "$DATABASE_URL",
   "eth_sources": [
     {
-      "name": "$BASE_NAME",
+      "name": "base_block_headers",
       "url": "$BASE_RPC_URL",
       "chain_id": "$BASE_CHAIN_ID",
       "batch_size": 100,
       "concurrency": 1
     },
     {
-      "name": "$BASE_NAME",
+      "name": "base_logs",
       "url": "$BASE_RPC_URL",
       "chain_id": "$BASE_CHAIN_ID",
       "batch_size": 2000,
@@ -120,7 +120,7 @@
       },
       "sources": [
         {
-          "name": "$BASE_NAME",
+          "name": "base_logs",
           "start": "$BASE_BLOCK_START"
         }
       ]
@@ -224,7 +224,7 @@
       },
       "sources": [
         {
-          "name": "$BASE_NAME",
+          "name": "base_logs",
           "start": "$BASE_BLOCK_START"
         }
       ]
@@ -314,7 +314,7 @@
       },
       "sources": [
         {
-          "name": "$BASE_NAME",
+          "name": "base_logs",
           "start": "9475780"
         }
       ]

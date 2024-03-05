@@ -69,7 +69,7 @@ exports[`shovel config 1`] = `
       "name": "send_account_deployed",
       "sources": [
         {
-          "name": "$BASE_NAME",
+          "name": "base_logs",
           "start": "$BASE_BLOCK_START",
         },
       ],
@@ -177,7 +177,7 @@ exports[`shovel config 1`] = `
       "name": "send_account_transfers",
       "sources": [
         {
-          "name": "$BASE_NAME",
+          "name": "base_logs",
           "start": "$BASE_BLOCK_START",
         },
       ],
@@ -267,7 +267,7 @@ exports[`shovel config 1`] = `
       "name": "send_token_transfers",
       "sources": [
         {
-          "name": "$BASE_NAME",
+          "name": "base_logs",
           "start": 9475780n,
         },
       ],
@@ -312,14 +312,14 @@ exports[`shovel config 1`] = `
       "batch_size": 100,
       "chain_id": "$BASE_CHAIN_ID",
       "concurrency": 1,
-      "name": "$BASE_NAME",
+      "name": "base_block_headers",
       "url": "$BASE_RPC_URL",
     },
     {
       "batch_size": 2000,
       "chain_id": "$BASE_CHAIN_ID",
       "concurrency": 2,
-      "name": "$BASE_NAME",
+      "name": "base_logs",
       "url": "$BASE_RPC_URL",
     },
   ],
