@@ -172,7 +172,7 @@ jobs:
         uses: 0xbigboss/supabase-branch-gh-action@v1
         id: supabase-branch
         with:
-          supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
           supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
           wait-for-migrations: false # Optional. Default is false.
           timeout: 60 # Optional. Default is 60.
@@ -180,7 +180,7 @@ jobs:
         uses: 0xbigboss/supabase-manager-script-gh-action@v1
         id: add-sms-provider
         with:
-          supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
           script: |
             const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
               ref: process.env.SUPABASE_PARENT_PROJECT_ID,
