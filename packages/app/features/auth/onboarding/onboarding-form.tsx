@@ -20,6 +20,7 @@ import {
   Paragraph,
   BigHeading,
   H3,
+  FontLanguage,
 } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
@@ -124,7 +125,8 @@ export const OnboardingForm = () => {
             borderRadius: '$0',
             placeholder: deviceName,
             fontFamily: '$mono',
-            fontSize: '$7',
+            fontVariant: ['tabular-nums'],
+            fontSize: 20,
             width: '100%',
             backgroundColor: 'transparent',
             outlineColor: 'transparent',
@@ -181,10 +183,11 @@ export const OnboardingForm = () => {
               <BigHeading col="$background">SETUP PASSKEY</BigHeading>
             </Theme>
             <H3
-              fontFamily={'$mono'}
               lineHeight={28}
-              col="accent"
-              fontWeight={'normal'}
+              $platform-web={{ fontFamily: '$mono' }}
+              $theme-light={{ col: '$gray10Light' }}
+              $theme-dark={{ col: '$olive' }}
+              fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
               Start by creating a Passkey below. Send uses passkeys to secure your account

@@ -23,7 +23,6 @@
     "@tamagui/animations-react-native": "^1.88.8",
     "@tamagui/cli": "^1.88.8",
     "@tamagui/create-theme": "^1.88.8",
-    "@tamagui/font-inter": "^1.88.8",
     "@tamagui/helpers-icon": "^1.88.8",
     "@tamagui/react-native-media-driver": "^1.88.8",
     "@tamagui/shorthands": "^1.88.8",
