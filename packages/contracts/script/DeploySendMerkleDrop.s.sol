@@ -18,7 +18,7 @@ contract DeploySendMerkleDropScript is Script, Helper {
         SendMerkleDrop smd = new SendMerkleDrop{salt: salt}(IERC20(SEND_TOKEN), SEND_AIRDROPS_SAFE);
         // solhint-disable-next-line no-console
         console2.log("Deployed SendMerkleDrop at address: ", address(smd));
-        vm.stopBroadcast();
         require(SEND_MERKLE_DROP == address(smd), "Deployed contract address does not match expected address");
+        vm.stopBroadcast();
     }
 }
