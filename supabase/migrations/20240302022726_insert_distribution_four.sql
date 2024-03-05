@@ -45,8 +45,8 @@ VALUES (
     (
       select '2024-04-01T00:00:00Z'::timestamp with time zone - interval '1 second'
     ),
-    1e6::bigint,
-    -- 1,000,000 SEND
+    --  100,000 SEND
+    100000,
     (
       select '2024-06-01T00:00:00Z'::timestamp with time zone - interval '1 second'
     ),
