@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { getPriceInWei, getSenderSafeReceivedEvents } from 'app/features/checkout/screen'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { mainnetClient } from '@my/wagmi'
+import { baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
 import { isAddressEqual } from 'viem'
 import { z } from 'zod'
@@ -73,10 +73,10 @@ export const tagRouter = createTRPCRouter({
 
         // get transaction receipt
         const [receipt, confirmations] = await Promise.all([
-          mainnetClient.getTransactionReceipt({
+          baseMainnetClient.getTransactionReceipt({
             hash: txHash as `0x${string}`,
           }),
-          mainnetClient.getTransactionConfirmations({
+          baseMainnetClient.getTransactionConfirmations({
             hash: txHash as `0x${string}`,
           }),
         ]).catch((error) => {
@@ -104,7 +104,7 @@ export const tagRouter = createTRPCRouter({
 
         // validate transaction is payment for tags
         const eventLogs = await getSenderSafeReceivedEvents({
-          publicClient: mainnetClient,
+          publicClient: baseMainnetClient,
           sender: receipt.from,
         }).catch((error) => {
           log('get events error', error)

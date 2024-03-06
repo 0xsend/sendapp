@@ -1,4 +1,3 @@
-import * as path from 'path'
 import express, { Request, Response, Router } from 'express'
 import pino from 'pino'
 import { DistributorWorker } from './distributor'

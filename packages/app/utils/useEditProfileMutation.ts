@@ -32,8 +32,8 @@ export const useEditProfileMutation = (userID: string | undefined) => {
       }
     },
     async onSuccess() {
-      await queryClient.invalidateQueries(['profile'])
-      router.push('/settings')
+      await queryClient.invalidateQueries({ queryKey: ['profile'] })
+      router.push('/account')
       toast.show('Successfully updated')
     },
   })

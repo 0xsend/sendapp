@@ -76,10 +76,10 @@ export const mainnet: typeof mainnetViem | typeof localhost | typeof sepolia =
 
 export const baseMainnet: typeof baseMainnetViem | typeof baseLocal | typeof baseSepolia =
   (function baseMainnetFromEnv() {
-    if (process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID) {
-      const chain = baseChains[process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID]
+    if (process.env.NEXT_PUBLIC_BASE_CHAIN_ID) {
+      const chain = baseChains[process.env.NEXT_PUBLIC_BASE_CHAIN_ID]
       if (!chain) {
-        throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID}`)
+        throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_BASE_CHAIN_ID}`)
       }
       return chain
     }

@@ -188,6 +188,31 @@ local_resource(
         ),
 )
 
+local_resource(
+    "shovel:generate-config",
+    allow_parallel = True,
+    cmd = "yarn workspace shovel generate",
+    labels = labels,
+    resource_deps = ["yarn:install"],
+    deps = files_matching(
+        os.path.join("packages", "shovel"),
+        lambda f: f.endswith(".ts"),
+    ),
+)
+
+cmd_button(
+    "shovel:generate-config",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn workspace shovel test --update-snapshots && yarn workspace shovel generate",
+    ],
+    icon_name = "restart_alt",
+    location = location.RESOURCE,
+    resource = "shovel:generate-config",
+    text = "shovel update-snapshot",
+)
+
 # INFRA
 labels = ["infra"]
 
@@ -280,17 +305,19 @@ local_resource(
                 "--rpc-url=127.0.0.1:8545",
             ],
         ),
-        period_secs = 15,
+        initial_delay_secs = 1,
+        period_secs = 2,
         timeout_secs = 5,
     ),
     serve_cmd = [
         "anvil",
         "--host=0.0.0.0",
         "--port=8545",
-        "--chain-id=1337",
+        "--chain-id=" + os.getenv("NEXT_PUBLIC_MAINNET_CHAIN_ID", "1337"),
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
         "--fork-block-number=" + mainnet_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
+        os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
     ],
 )
 
@@ -344,17 +371,19 @@ local_resource(
                 "--rpc-url=127.0.0.1:8546",
             ],
         ),
-        period_secs = 15,
+        initial_delay_secs = 1,
+        period_secs = 2,
         timeout_secs = 5,
     ),
     serve_cmd = [
         "anvil",
         "--host=0.0.0.0",
         "--port=8546",
-        "--chain-id=845337",
+        "--chain-id=" + os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
         "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
+        os.getenv("ANVIL_BASE_EXTRA_ARGS", "--silent"),
     ],
 )
 
@@ -371,7 +400,19 @@ local_resource(
     trigger_mode = TRIGGER_MODE_MANUAL,
 )
 
-# TODO: decide if we will use silius bundler or not
+local_resource(
+    "anvil:anvil-add-send-merkle-drop-fixtures",
+    "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
 local_resource(
     "aa_bundler:base",
     allow_parallel = True,
@@ -381,22 +422,20 @@ local_resource(
             path = "/",
             port = 3030,
         ),
-        period_secs = 15,
-        timeout_secs = 5,
     ),
     resource_deps = [
         "yarn:install",
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep aa-bundler | awk '{print $1}' | xargs docker rm -f
+    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs docker rm -f
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
         -p 3030:3030 \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./etc/aa-bundler:/app/etc/aa-bundler \
-        -e "DEBUG=aa*" \
+        -e "DEBUG={bundler_debug}" \
         -e "DEBUG_COLORS=true" \
         docker.io/0xbigboss/bundler:0.7.0 \
         --port 3030 \
@@ -406,31 +445,55 @@ local_resource(
         --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
-    """,
+""".format(
+        bundler_debug = os.getenv("BUNDLER_DEBUG", "aa.rpc"),
+    ),
 )
 
-# TODO: decide if we will use silius bundler or not
-# local_resource(
-#     "silius:base",
-#     allow_parallel = True,
-#     labels = labels,
-#     readiness_probe = probe(
-#         exec = exec_action(
-#             command = [
-#                 "cast",
-#                 "bn",
-#                 "--rpc-url=127.0.0.1:3030",
-#             ],
-#         ),
-#         period_secs = 15,
-#         timeout_secs = 5,
-#     ),
-#     resource_deps = [
-#         "yarn:install",
-#         "anvil:base",
-#     ],
-#     serve_cmd = "docker run --add-host=host.docker.internal:host-gateway -p 3030:3030 -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 -v ./var/silius/db:/data/silius/db ghcr.io/silius-rs/silius:latest node --uopool-mode unsafe --eth-client-address http://host.docker.internal:8546 --datadir data/silius --mnemonic-file data/silius/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --entry-points 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 --http --http.addr 0.0.0.0 --http.port 3030 --http.api eth,debug,web3 --ws --ws.addr 0.0.0.0 --ws.port 3001 --ws.api eth,debug,web3 --eth-client-proxy-address http://host.docker.internal:8546",
-# )
+local_resource(
+    "shovel",
+    allow_parallel = True,
+    auto_init = False,  # shovel eats a lot of RPCs, so we don't want it to start automatically
+    labels = labels,
+    links = ["http://localhost:8383/"],
+    readiness_probe = probe(
+        http_get = http_get_action(
+            path = "/diag",
+            port = 8383,
+        ),
+    ),
+    resource_deps = [
+        "yarn:install",
+        "anvil:base",
+        "supabase:test",
+        "shovel:generate-config",
+    ],
+    serve_cmd = """
+    docker ps -a | grep shovel | awk '{{print $1}}' | xargs docker rm -f
+    docker pull docker.io/indexsupply/shovel:latest || true
+    docker run --rm \
+        --name shovel \
+        --add-host=host.docker.internal:host-gateway \
+        -p 8383:80 \
+        --env DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres \
+        --env BASE_NAME=base \
+        --env BASE_RPC_URL=http://host.docker.internal:8546 \
+        --env BASE_CHAIN_ID={chain_id} \
+        --env BASE_BLOCK_START={bn} \
+        --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
+        -v ./packages/shovel/etc:/etc/shovel \
+        --entrypoint /usr/local/bin/shovel \
+        -w /usr/local/bin \
+        docker.io/indexsupply/shovel -l :80 -config /etc/shovel/config.json
+    """.format(
+        bn = base_fork_block_number,
+        chain_id = os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
+    ),
+    trigger_mode = TRIGGER_MODE_MANUAL,
+    deps = [
+        "packages/shovel/etc/config.json",
+    ],
+)
 
 local_resource(
     "otterscan:base",
@@ -495,7 +558,6 @@ local_resource(
 local_resource(
     "distributor:web",
     allow_parallel = True,
-    auto_init = False,
     labels = labels,
     links = ["http://localhost:3050"],
     readiness_probe = probe(
@@ -596,6 +658,7 @@ local_resource(
         "next:web",
         "playwright:deps",
     ],
+    trigger_mode = CI and TRIGGER_MODE_AUTO or TRIGGER_MODE_MANUAL,
     deps = files_matching(
         os.path.join("packages", "playwright"),
         lambda f: f.endswith(".ts"),
@@ -633,7 +696,6 @@ local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
-    auto_init = False,
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -685,6 +747,7 @@ local_resource(
         "supabase:test",
         "contracts:test",
         "next:web",
-    ] + (["distributor:test"] if not CI else []),
+        "distributor:test",
+    ],
 )
 

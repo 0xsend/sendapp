@@ -1,4 +1,5 @@
 import { Anchor, Button, Paragraph, TooltipSimple, YStack } from '@my/ui'
+import { sendMerkleDropAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import {
   UseDistributionsResultData,
@@ -26,27 +27,30 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const isEligible = !!share && share.amount > 0
   const isClaimActive = distribution.qualification_end < new Date()
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   // find out if the tranche is active using SendMerkleDrop.trancheActive(uint256 _tranche)
   const {
     data: isTrancheActive,
     isLoading: isTrancheActiveLoading,
     error: isTrancheActiveError,
-  } = useSendMerkleDropTrancheActive(trancheId)
+  } = useSendMerkleDropTrancheActive({
+    tranche: trancheId,
+    chainId: chainId,
+  })
   // find out if user is eligible onchain using SendMerkleDrop.isClaimed(uint256 _tranche, uint256 _index)
   const {
     data: isClaimed,
     isLoading: isClaimedLoading,
     error: isClaimedError,
     refetch: refetchIsClaimed,
-  } = useSendMerkleDropIsClaimed(
-    trancheId,
-    share?.index !== undefined ? BigInt(share.index) : undefined
-  )
-  const { isConnected, address: account, chain } = useAccount()
+  } = useSendMerkleDropIsClaimed({
+    chainId,
+    tranche: trancheId,
+    index: share?.index !== undefined ? BigInt(share.index) : undefined,
+  })
+  const { isConnected, address: account, chain: accountChain } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
-  const publicClient = usePublicClient()
-  const { data: rpcChainId, isLoading: isLoadingRpcChainId } = useRpcChainId()
-  const { switchChain } = useSwitchChain()
+  const { chains, switchChain } = useSwitchChain()
   const {
     data: claimWriteConfig,
     error: claimWriteConfigError,
@@ -72,8 +76,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     }
   )
 
-  assert(!!publicClient, 'No public client found')
-
   if (!isClaimActive) {
     return null
   }
@@ -81,6 +83,30 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (!isEligible) {
     // If the user is not eligible, show the claim button disabled
     return <Button disabled>Not Eligible</Button>
+  }
+
+  if (distribution.chain_id !== accountChain?.id) {
+    const distributionChain = chains.find((c) => c.id === distribution.chain_id)
+    assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
+    return (
+      <YStack ai="center" w="100%" mx="auto">
+        <Paragraph size="$1" theme="alt2">
+          Please switch to {distributionChain.name} to view claimability
+        </Paragraph>
+        <Button
+          w="100%"
+          onPress={() => {
+            assert(!!switchChain, 'No switchChain found')
+            switchChain(
+              { chainId: distributionChain.id },
+              { onError: (error) => console.error(error) }
+            )
+          }}
+        >
+          Switch Network
+        </Button>
+      </YStack>
+    )
   }
 
   if (isTrancheActiveLoading || isClaimedLoading) {
@@ -206,36 +232,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             {shorten(account)}
           </Anchor>
         </Paragraph>
-      </YStack>
-    )
-  }
-
-  if (!isLoadingRpcChainId && rpcChainId !== publicClient.chain?.id) {
-    return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          😵 Tell a dev! This should not happen. RPC chain id {rpcChainId} does not match public
-          client chain id: {publicClient.chain.id}.
-        </Paragraph>
-      </YStack>
-    )
-  }
-
-  if (publicClient.chain.id !== chain?.id) {
-    return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          Please switch to {chain?.name} to claim
-        </Paragraph>
-        <Button
-          w="100%"
-          onPress={() => {
-            assert(!!switchChain, 'No switchChain found')
-            switchChain({ chainId: publicClient.chain.id })
-          }}
-        >
-          Switch Network
-        </Button>
       </YStack>
     )
   }

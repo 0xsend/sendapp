@@ -37,15 +37,21 @@ export default defineConfig({
     pgtle: false,
     realtime: false,
     vault: false,
+    net: false,
+    shovel: false,
+    // @ts-expect-error pgtap is only defined in the test environment but we want to ensure to always ignore it
+    pgtap: false,
   },
   transform: {
     auth: {
       users({ row }) {
         let phone: string
         if (row.phone !== null) {
-          phone = `1${copycat.phoneNumber(row.phone?.slice(1), {
-            min: 10000000000,
-            max: 99999999999,
+          phone = `1${copycat.phoneNumber(row.phone.slice(1), {
+            length: {
+              min: 11,
+              max: 14, // max 15 including prefix
+            },
           })}`
           // supabase does not store the + in the phone number
           phone = phone.replace('+', '')
@@ -70,6 +76,7 @@ export default defineConfig({
         return {}
       },
     },
+
     public: {
       profiles({ row }) {
         return {
@@ -77,6 +84,15 @@ export default defineConfig({
           about: copycat.sentence(row.about),
           referral_code: copycat.scramble(row.referral_code),
         }
+      },
+      send_account_transfers({ row }) {
+        return {}
+      },
+      send_account_deployed({ row }) {
+        return {}
+      },
+      send_token_transfers({ row }) {
+        return {}
       },
       tags({ row }) {
         return {

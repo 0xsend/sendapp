@@ -48,6 +48,8 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     /// Emitted after removing a signing key (remove device).
     event SigningKeyRemoved(IAccount indexed account, uint8 keySlot, bytes32[2] key);
 
+    event Received(address indexed sender, uint256 value);
+
     modifier onlySelf() {
         require(msg.sender == address(this), "only self");
         _;
@@ -59,7 +61,9 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     }
 
     // solhint-disable-next-line no-empty-blocks
-    receive() external payable {}
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
+    }
 
     /// Runs at deploy time. Implementation contract = no init, no state.
     /// All other methods are called via proxy = initialized once, has state.

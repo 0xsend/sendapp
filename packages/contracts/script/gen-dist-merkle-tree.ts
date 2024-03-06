@@ -7,7 +7,7 @@ import { config } from 'dotenv'
 
 const log = debug('contracts:script:gen-merkle-tree')
 
-const dotenvPath = join(__dirname, '..', '..', '..', '.env.production.local')
+const dotenvPath = join(__dirname, '..', '..', '..', '.env.local')
 config({ path: dotenvPath, override: true })
 
 log(`Loaded environment variables from ${dotenvPath}`)

@@ -1,0 +1,19 @@
+{
+  "name": "shovel",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "generate": "bun test && bun run src/generate.ts --path='./etc/config.json'",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@indexsupply/shovel-config": "^0.0.5",
+    "@my/wagmi": "workspace:*",
+    "@types/bun": "latest",
+    "permissionless": "^0.1.4",
+    "viem": "^2.7.15"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,18 +1,18 @@
 import { expect, test } from './fixtures/send-accounts'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/settings')
+  await page.goto('/account')
 })
 
-test('can visit settings page', async ({ page }) => {
-  await expect(page).toHaveURL('/settings')
+test('can visit account page', async ({ page }) => {
+  await expect(page).toHaveURL('/account')
 })
 
 test('can update profile', async ({ page, supabase }) => {
   const editProfileButton = page.getByRole('button', { name: 'Edit Profile' })
   await editProfileButton.click()
 
-  await page.waitForNavigation()
+  await page.waitForURL('/account/profile')
   await expect(page).toHaveTitle('Account')
 
   await page.getByLabel('Name').fill('LeO')
@@ -21,7 +21,7 @@ test('can update profile', async ({ page, supabase }) => {
 
   await page.getByRole('button', { name: 'Update Profile' }).click()
 
-  await expect(page.getByText('Notification Successfully updated')).toBeVisible()
+  await expect(page.getByText('Successfully updated')).toBeVisible()
 
   const { data, error } = await supabase.auth.getSession()
   expect(error).toBeFalsy()

@@ -26,7 +26,8 @@ INSERT INTO distributions (
         qualification_start,
         qualification_end,
         hodler_min_balance,
-        claim_end
+        claim_end,
+        chain_id
     )
 VALUES(
         123,
@@ -45,7 +46,8 @@ VALUES(
         1e6::bigint,
         (
             select now() + interval '2 day'
-        )
+        ),
+        8453
     );
 
 INSERT INTO public.distribution_verification_values (
@@ -107,7 +109,8 @@ SELECT throws_ok(
                 fixed_pool_bips,
                 qualification_start,
                 qualification_end,
-                claim_end
+                claim_end,
+                chain_id
             )
         VALUES(
                 1234,
@@ -119,7 +122,8 @@ SELECT throws_ok(
                 1000000,
                 '2023-01-01T00:00:00.000Z',
                 '2023-01-31T00:00:00.000Z',
-                '2023-02-28T00:00:00.000Z'
+                '2023-02-28T00:00:00.000Z',
+                8453
             );
 
 $$,
@@ -141,7 +145,8 @@ SELECT throws_ok(
                 fixed_pool_bips,
                 qualification_start,
                 qualification_end,
-                claim_end
+                claim_end,
+                chain_id
             )
         VALUES(
                 1234,
@@ -153,7 +158,8 @@ SELECT throws_ok(
                 1000000,
                 '2023-01-01T00:00:00.000Z',
                 '2023-01-31T00:00:00.000Z',
-                '2023-02-28T00:00:00.000Z'
+                '2023-02-28T00:00:00.000Z',
+                8453
             );
 
 $$,

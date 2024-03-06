@@ -17,7 +17,7 @@ import {
   YStack,
   YStackProps,
 } from '@my/ui'
-import { sendRevenueSafeAddress } from '@my/wagmi'
+import { baseMainnet, sendRevenueSafeAddress } from '@my/wagmi'
 import { CheckCircle, X } from '@tamagui/lucide-icons'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'
@@ -28,7 +28,6 @@ import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useMounted } from 'app/utils/useMounted'
 import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
-import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useLink } from 'solito/link'
 import { type PublicClient, formatEther } from 'viem'
@@ -128,7 +127,7 @@ export function ConfirmDialog({
 
   return (
     <Dialog modal open={open} onOpenChange={handleOpenChange}>
-      <YStack mx="auto" width="100%">
+      <YStack width="100%">
         {(hasPendingTags || needsVerification) && (
           <YStack
             animateOnly={['transform', 'opacity']}
@@ -143,18 +142,10 @@ export function ConfirmDialog({
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             space="$2"
-            py="$3"
-            px="$6"
-            bc="$color1"
             w="100%"
             flex={1}
-            // @ts-expect-error tamagui doesn't support this yet
-            position="fixed"
-            left={0}
-            right={0}
-            bottom={0}
           >
-            <YStack maxWidth={600} width="100%" als="center">
+            <YStack maxWidth={600} width="100%">
               {BigInt(weiAmount) > 0 && (
                 <Paragraph maw="100%" ta="right">
                   Total: {ethAmount} ETH
@@ -163,7 +154,6 @@ export function ConfirmDialog({
               <Dialog.Trigger asChild>
                 <Button
                   disabled={!needsVerification && (pendingTags ?? []).length === 0}
-                  mt="$2"
                   space="$1.5"
                   icon={CheckCircle}
                   f={1}
@@ -252,11 +242,6 @@ export function ConfirmDialog({
 export function ConfirmFlow() {
   const { isConnected, chainId } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
-  const publicClient = usePublicClient()
-  const { data: rpcChainId, isLoading: isLoadingRpcChainId } = useRpcChainId()
-
-  assert(!!publicClient?.chain.id, 'publicClient.chain.id is required')
-
   const { switchChain } = useSwitchChain()
   const { isLoadingTags } = useUser()
 
@@ -265,17 +250,6 @@ export function ConfirmFlow() {
       <ConfirmDialogContent>
         <Dialog.Description>Checking your Send Tags...</Dialog.Description>
         <Spinner color="$color11" />
-      </ConfirmDialogContent>
-    )
-  }
-
-  if (!isLoadingRpcChainId && rpcChainId !== publicClient.chain.id) {
-    return (
-      <ConfirmDialogContent>
-        <Dialog.Description theme="error">
-          😵 Tell a dev! This should not happen. RPC chain id {rpcChainId} does not match public
-          client chain id: {publicClient.chain.id}.
-        </Dialog.Description>
       </ConfirmDialogContent>
     )
   }
@@ -324,17 +298,15 @@ export function ConfirmFlow() {
     )
   }
 
-  if (publicClient.chain.id !== chainId) {
+  if (baseMainnet.id !== chainId) {
     return (
       <ConfirmDialogContent>
-        <Dialog.Description>
-          Please switch to {publicClient.chain.name} in your wallet.
-        </Dialog.Description>
+        <Dialog.Description>Please switch to {baseMainnet.name} in your wallet.</Dialog.Description>
         <Theme name="error">
           <Button
             onPress={() => {
               assert(!!switchChain, 'switchChain is required')
-              switchChain({ chainId: publicClient.chain.id })
+              switchChain({ chainId: baseMainnet.id }, { onError: console.error })
             }}
           >
             Switch Network
@@ -754,9 +726,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
             // @ts-expect-error tamagui doesn't support this yet
             title={address}
             target="_blank"
-            href={`${
-              publicClient.chain.blockExplorers?.default ?? 'https://etherscan.io'
-            }/address/${address}`}
+            href={`${baseMainnet.blockExplorers?.default.url}/address/${address}`}
           >
             {shorten(address)}
           </Anchor>
@@ -771,9 +741,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
             // @ts-expect-error tamagui doesn't support this yet
             title={address}
             target="_blank"
-            href={`${
-              publicClient.chain.blockExplorers?.default ?? 'https://etherscan.io'
-            }/address/${sendRevenueSafeAddress}`}
+            href={`${baseMainnet.blockExplorers?.default.url}/address/${sendRevenueSafeAddress}`}
           >
             Send Tag Safe
           </Anchor>

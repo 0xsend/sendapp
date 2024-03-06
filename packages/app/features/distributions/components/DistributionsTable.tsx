@@ -22,13 +22,12 @@ import {
   useSendSellCountDuringDistribution,
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
-import { shorten } from 'app/utils/strings'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
-import { useSendBalance, useSendBalanceOfAt } from 'app/utils/useSendBalance'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
-import { formatUnits } from 'viem'
 import { DistributionClaimButton } from './DistributionClaimButton'
 import { DistributionsStatCard } from './distribution-stat-cards'
+import { baseMainnet, sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { assert } from 'app/utils/assert'
 
 export const DistributionsTable = () => {
   const { data: distributions, isLoading, error } = useDistributions()
@@ -58,21 +57,26 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
     isLoading: isLoadingChainAddresses,
     error: chainAddressesError,
   } = useChainAddresses()
+  const address = addresses?.[0]?.address
   const shareAmount = distribution.distribution_shares?.[0]?.amount
   const verificationSummary = distribution.distribution_verifications_summary?.[0]
+  const chainId = distribution.chain_id as keyof typeof sendTokenAddress
+  assert(chainId in sendTokenAddress, 'Chain ID not found in sendTokenAddress')
+  // snapshot balance
   const {
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
-  } = useSendBalanceOfAt({
-    address: addresses?.[0]?.address,
-    snapshot: distribution.snapshot_id ? BigInt(distribution.snapshot_id) : undefined,
+  } = useReadSendTokenBalanceOf({
+    chainId,
+    args: address ? [address] : undefined,
+    blockNumber: distribution.snapshot_block_num
+      ? BigInt(distribution.snapshot_block_num)
+      : undefined,
+    query: {
+      enabled: !!address,
+    },
   })
-  const {
-    data: sendBalanceData,
-    isLoading: isLoadingSendBalance,
-    error: sendBalanceError,
-  } = useSendBalance(addresses?.[0]?.address)
   const {
     data: sells,
     error: sendSellsError,
@@ -166,197 +170,194 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
         <YStack als="center" w="100%" maxWidth={320}>
           <DistributionClaimButton distribution={distribution} />
         </YStack>
-        <Accordion overflow="hidden" type="multiple" w="100%">
-          <Accordion.Item value="a1">
-            <Accordion.Trigger flexDirection="row" justifyContent="center">
-              {({ open }: { open: boolean }) => (
-                <>
-                  <Square als="center" animation="quick" rotate={open ? '180deg' : '0deg'}>
-                    <ChevronDown size="$1" />
-                  </Square>
-                </>
-              )}
-            </Accordion.Trigger>
-            <Accordion.Content w="100%" f={1}>
-              <YStack space="$4" $gtMd={{ fd: 'row' }} w="100%">
-                <KVTable f={1}>
-                  {distribution.snapshot_id === null ? (
+        {qualificationEndDiffInMs > 0 ? (
+          <Accordion overflow="hidden" type="multiple" w="100%">
+            <Accordion.Item value="a1">
+              <Accordion.Trigger flexDirection="row" justifyContent="center">
+                {({ open }: { open: boolean }) => (
+                  <>
+                    <Square als="center" animation="quick" rotate={open ? '180deg' : '0deg'}>
+                      <ChevronDown size="$1" />
+                    </Square>
+                  </>
+                )}
+              </Accordion.Trigger>
+              <Accordion.Content w="100%" f={1}>
+                <YStack space="$4" $gtMd={{ fd: 'row' }} w="100%">
+                  <KVTable f={1}>
+                    {distribution.snapshot_id === null ? (
+                      <KVTable.Row>
+                        <KVTable.Key>
+                          <SizableText>Current Balance</SizableText>
+                        </KVTable.Key>
+                        <KVTable.Value>
+                          <YStack w="100%">
+                            {isLoadingChainAddresses || isLoadingSnapshotBalance ? (
+                              <Spinner color="$color" />
+                            ) : chainAddressesError !== null || snapshotBalanceError !== null ? (
+                              <SizableText>
+                                Error:{' '}
+                                {chainAddressesError
+                                  ? chainAddressesError.message
+                                  : snapshotBalanceError?.message}
+                              </SizableText>
+                            ) : (
+                              // no need to use decimals, we know send is 0 decimals
+                              <SizableText>
+                                {formatAmount(Number(snapshotBalance), 9)} send
+                              </SizableText>
+                            )}
+                            {Number(snapshotBalance ?? BigInt(0)) <
+                            distribution.hodler_min_balance ? (
+                              <SizableText>
+                                Your balance is below the minimum required to qualify for rewards.{' '}
+                                {formatAmount(distribution.hodler_min_balance, 9, 0)} send required.
+                                😿
+                              </SizableText>
+                            ) : null}
+                          </YStack>
+                        </KVTable.Value>
+                      </KVTable.Row>
+                    ) : null}
+                    {distribution.snapshot_id !== null ? (
+                      <KVTable.Row>
+                        <KVTable.Key>
+                          <SizableText>Snapshot Balance</SizableText>
+                        </KVTable.Key>
+                        <KVTable.Value>
+                          <YStack w="100%">
+                            {isLoadingChainAddresses || isLoadingSnapshotBalance ? (
+                              <Spinner color="$color" />
+                            ) : chainAddressesError !== null || snapshotBalanceError !== null ? (
+                              <SizableText>
+                                Error:{' '}
+                                {chainAddressesError
+                                  ? chainAddressesError.message
+                                  : snapshotBalanceError?.message}
+                              </SizableText>
+                            ) : (
+                              <SizableText>
+                                {formatAmount(Number(snapshotBalance || 0), 9)} send
+                              </SizableText>
+                            )}
+                            {Number(snapshotBalance || 0) < distribution.hodler_min_balance ? (
+                              <SizableText>
+                                Your balance is below the minimum required to qualify for rewards.{' '}
+                                {formatAmount(distribution.hodler_min_balance, 9, 0)} send required.
+                                😿
+                              </SizableText>
+                            ) : null}
+                          </YStack>
+                        </KVTable.Value>
+                      </KVTable.Row>
+                    ) : null}
                     <KVTable.Row>
                       <KVTable.Key>
-                        <SizableText>Current Balance</SizableText>
+                        <SizableText>Sells</SizableText>
                       </KVTable.Key>
                       <KVTable.Value>
-                        <YStack w="100%">
-                          {isLoadingChainAddresses || isLoadingSendBalance ? (
-                            <Spinner color="$color" />
-                          ) : chainAddressesError !== null || sendBalanceError !== null ? (
-                            <SizableText>
-                              Error:{' '}
-                              {chainAddressesError
-                                ? chainAddressesError.message
-                                : sendBalanceError?.message}
-                            </SizableText>
-                          ) : (
-                            <SizableText>
-                              {formatAmount(
-                                formatUnits(
-                                  sendBalanceData?.value ?? BigInt(0),
-                                  sendBalanceData?.decimals ?? 0
-                                )
-                              )}{' '}
-                              send
-                            </SizableText>
-                          )}
-                          {Number(sendBalanceData?.value ?? BigInt(0)) <
-                          distribution.hodler_min_balance ? (
-                            <SizableText>
-                              Your balance is below the minimum required to qualify for rewards.{' '}
-                              {formatAmount(distribution.hodler_min_balance, 9, 0)} send required.
-                              😿
-                            </SizableText>
-                          ) : null}
-                        </YStack>
-                      </KVTable.Value>
-                    </KVTable.Row>
-                  ) : null}
-                  {distribution.snapshot_id !== null ? (
-                    <KVTable.Row>
-                      <KVTable.Key>
-                        <SizableText>Snapshot Balance</SizableText>
-                      </KVTable.Key>
-                      <KVTable.Value>
-                        <YStack w="100%">
-                          {isLoadingChainAddresses || isLoadingSnapshotBalance ? (
-                            <Spinner color="$color" />
-                          ) : chainAddressesError !== null || snapshotBalanceError !== null ? (
-                            <SizableText>
-                              Error:{' '}
-                              {chainAddressesError
-                                ? chainAddressesError.message
-                                : snapshotBalanceError?.message}
-                            </SizableText>
-                          ) : (
-                            <SizableText>
-                              {formatAmount(Number(snapshotBalance || 0), 9)} send
-                            </SizableText>
-                          )}
-                          {Number(snapshotBalance || 0) < distribution.hodler_min_balance ? (
-                            <SizableText>
-                              Your balance is below the minimum required to qualify for rewards.{' '}
-                              {formatAmount(distribution.hodler_min_balance, 9, 0)} send required.
-                              😿
-                            </SizableText>
-                          ) : null}
-                        </YStack>
-                      </KVTable.Value>
-                    </KVTable.Row>
-                  ) : null}
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Sells</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        {isSendSellsLoading ? (
-                          <Spinner color="$color" />
-                        ) : sendSellsError ? (
-                          <SizableText>Error: {(sendSellsError as Error).message}</SizableText>
-                        ) : sells && sells.length > 0 ? (
-                          `${sells.length} made during distribution. Ineligible for rewards. 😿 Use a different wallet next time.`
-                        ) : (
-                          '0 made during distribution. 😺'
-                        )}
-                      </SizableText>
-                      <YStack>
-                        {sells?.map(({ tx_hash }) => (
-                          <Anchor
-                            key={tx_hash}
-                            href={`https://etherscan.io/tx/${tx_hash}`}
-                            target="_blank"
-                          >
-                            {shorten(tx_hash, 8, 3)}
-                          </Anchor>
-                        ))}
-                      </YStack>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Referrals</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        {formatAmount(verificationSummary?.tag_referrals || 0, 5, 0)}
-                      </SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Tags Registered</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        {formatAmount(verificationSummary?.tag_registrations || 0, 5, 0)}
-                      </SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Qualification Start</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        {new Date(distribution.qualification_start).toLocaleDateString()}
-                      </SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Qualification End</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        {new Date(distribution.qualification_end).toLocaleDateString()}
-                      </SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Claim End</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <SizableText>
-                        {new Date(distribution.claim_end).toLocaleDateString()}
-                      </SizableText>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Total Pool</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <TooltipSimple label={`${distribution.amount} send`}>
-                        <SizableText>{formatAmount(distribution.amount, 10, 0)}</SizableText>
-                      </TooltipSimple>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                  <KVTable.Row>
-                    <KVTable.Key>
-                      <SizableText>Minimum Balance Required</SizableText>
-                    </KVTable.Key>
-                    <KVTable.Value>
-                      <TooltipSimple label={`${distribution.hodler_min_balance} send`}>
                         <SizableText>
-                          {formatAmount(distribution.hodler_min_balance, 10, 0)} send
+                          {isSendSellsLoading ? (
+                            <Spinner color="$color" />
+                          ) : sendSellsError ? (
+                            <SizableText>Error: {(sendSellsError as Error).message}</SizableText>
+                          ) : sells && sells.length > 0 ? (
+                            `${sells.length} made during distribution. Ineligible for rewards. 😿 Use a different wallet next time.`
+                          ) : (
+                            '0 made during distribution. 😺'
+                          )}
                         </SizableText>
-                      </TooltipSimple>
-                    </KVTable.Value>
-                  </KVTable.Row>
-                </KVTable>
-              </YStack>
-            </Accordion.Content>
-          </Accordion.Item>
-        </Accordion>
+                        <YStack>
+                          {sells?.map(({ tx_hash }) => (
+                            <Anchor
+                              key={tx_hash}
+                              href={`${baseMainnet.blockExplorers.default.url}/tx/${tx_hash}`}
+                              target="_blank"
+                            >
+                              {tx_hash} tx
+                            </Anchor>
+                          ))}
+                        </YStack>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Referrals</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <SizableText>
+                          {formatAmount(verificationSummary?.tag_referrals || 0, 5, 0)}
+                        </SizableText>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Tags Registered</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <SizableText>
+                          {formatAmount(verificationSummary?.tag_registrations || 0, 5, 0)}
+                        </SizableText>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Qualification Start</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <SizableText>
+                          {new Date(distribution.qualification_start).toLocaleDateString()}
+                        </SizableText>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Qualification End</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <SizableText>
+                          {new Date(distribution.qualification_end).toLocaleDateString()}
+                        </SizableText>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Claim End</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <SizableText>
+                          {new Date(distribution.claim_end).toLocaleDateString()}
+                        </SizableText>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Total Pool</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <TooltipSimple label={`${distribution.amount} send`}>
+                          <SizableText>{formatAmount(distribution.amount, 10, 0)}</SizableText>
+                        </TooltipSimple>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                    <KVTable.Row>
+                      <KVTable.Key>
+                        <SizableText>Minimum Balance Required</SizableText>
+                      </KVTable.Key>
+                      <KVTable.Value>
+                        <TooltipSimple label={`${distribution.hodler_min_balance} send`}>
+                          <SizableText>
+                            {formatAmount(distribution.hodler_min_balance, 10, 0)} send
+                          </SizableText>
+                        </TooltipSimple>
+                      </KVTable.Value>
+                    </KVTable.Row>
+                  </KVTable>
+                </YStack>
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion>
+        ) : null}
       </KVTable>
     </DistributionsStatCard>
   )
