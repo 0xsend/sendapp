@@ -10,7 +10,7 @@ export class ProfilePage {
     public readonly page: Page,
     public readonly profile: { name: string; about: string }
   ) {
-    this.sendButton = page.getByRole('button', { name: 'Send' })
+    this.sendButton = page.getByTestId('openSendDialogButton')
     this.requestButton = page.getByRole('button', { name: 'Request' })
   }
 
