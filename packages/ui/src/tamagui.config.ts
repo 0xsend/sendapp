@@ -15,8 +15,10 @@ import { color } from './themes/token-colors'
 /**
  * This avoids shipping themes as JS. Instead, Tamagui will hydrate them from CSS.
  */
-const shipThemes = process.env.NODE_ENV === 'test' || process.env.TAMAGUI_IS_SERVER
-const themes = shipThemes ? themesIn : ({} as typeof themesIn)
+const themes =
+  process.env.TAMAGUI_IS_SERVER || process.env.NODE_ENV !== 'production'
+    ? themesIn
+    : ({} as typeof themesIn)
 
 const conf = {
   themes,
