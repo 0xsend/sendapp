@@ -302,6 +302,7 @@ interface Table_public_send_account_deployed {
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
+  tx_hash: string | null;
   user_op_hash: string | null;
   sender: string | null;
   factory: string | null;
@@ -349,6 +350,7 @@ interface Table_public_send_token_transfers {
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
+  tx_hash: string | null;
   f: string | null;
   t: string | null;
   v: number | null;

@@ -218,6 +218,7 @@ type Override = {
       chain_id?: string;
       log_addr?: string;
       block_time?: string;
+      tx_hash?: string;
       user_op_hash?: string;
       sender?: string;
       factory?: string;
@@ -279,6 +280,7 @@ type Override = {
       chain_id?: string;
       log_addr?: string;
       block_time?: string;
+      tx_hash?: string;
       f?: string;
       t?: string;
       v?: string;
