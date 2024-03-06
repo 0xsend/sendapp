@@ -48,11 +48,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
   })
-  const { isConnected, address: account, chain } = useAccount()
+  const { isConnected, address: account, chain: accountChain } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
-  const publicClient = usePublicClient()
-  const { data: rpcChainId, isLoading: isLoadingRpcChainId } = useRpcChainId()
-  const { switchChain } = useSwitchChain()
+  const { chains, switchChain } = useSwitchChain()
   const {
     data: claimWriteConfig,
     error: claimWriteConfigError,
@@ -85,6 +83,30 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (!isEligible) {
     // If the user is not eligible, show the claim button disabled
     return <Button disabled>Not Eligible</Button>
+  }
+
+  if (distribution.chain_id !== accountChain?.id) {
+    const distributionChain = chains.find((c) => c.id === distribution.chain_id)
+    assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
+    return (
+      <YStack ai="center" w="100%" mx="auto">
+        <Paragraph size="$1" theme="alt2">
+          Please switch to {distributionChain.name} to view claimability
+        </Paragraph>
+        <Button
+          w="100%"
+          onPress={() => {
+            assert(!!switchChain, 'No switchChain found')
+            switchChain(
+              { chainId: distributionChain.id },
+              { onError: (error) => console.error(error) }
+            )
+          }}
+        >
+          Switch Network
+        </Button>
+      </YStack>
+    )
   }
 
   if (isTrancheActiveLoading || isClaimedLoading) {
@@ -210,36 +232,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             {shorten(account)}
           </Anchor>
         </Paragraph>
-      </YStack>
-    )
-  }
-
-  if (!isLoadingRpcChainId && rpcChainId !== publicClient?.chain?.id) {
-    return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          😵 Tell a dev! This should not happen. RPC chain id {rpcChainId} does not match public
-          client chain id: {publicClient.chain.id}.
-        </Paragraph>
-      </YStack>
-    )
-  }
-
-  if (publicClient?.chain.id !== chain?.id) {
-    return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          Please switch to {chain?.name} to claim
-        </Paragraph>
-        <Button
-          w="100%"
-          onPress={() => {
-            assert(!!switchChain, 'No switchChain found')
-            switchChain({ chainId: publicClient?.chain.id })
-          }}
-        >
-          Switch Network
-        </Button>
       </YStack>
     )
   }

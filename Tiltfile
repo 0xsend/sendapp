@@ -379,7 +379,7 @@ local_resource(
         "anvil",
         "--host=0.0.0.0",
         "--port=8546",
-        "--chain-id=" + os.getenv("NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID", "845337"),
+        "--chain-id=" + os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
         "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
@@ -487,7 +487,7 @@ local_resource(
         docker.io/indexsupply/shovel -l :80 -config /etc/shovel/config.json
     """.format(
         bn = base_fork_block_number,
-        chain_id = os.getenv("NEXT_PUBLIC_BASE_MAINNET_CHAIN_ID", "845337"),
+        chain_id = os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
         rm = shovel_serve_rm_cmd,
     ),
     trigger_mode = TRIGGER_MODE_MANUAL,

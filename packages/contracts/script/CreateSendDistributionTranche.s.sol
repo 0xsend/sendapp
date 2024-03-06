@@ -15,9 +15,9 @@ contract CreateSendDistributionTrancheScript is Script, Helper {
         vm.startBroadcast();
         SendMerkleDrop sendMerkleDrop = SendMerkleDrop(SEND_MERKLE_DROP);
         SendToken send = SendToken(SEND_TOKEN);
-        send.approve(SEND_MERKLE_DROP, 717100769);
+        send.approve(SEND_MERKLE_DROP, 585002498);
         // TODO: figure out an easier way to test this
-        sendMerkleDrop.addTranche(0x83c580aeb9546d9144688a39f479473fd7917b708b113bfbd4d62947d62cddff, 717100769);
+        sendMerkleDrop.addTranche(0x74e8d928d7453878f3d2b0628db0ed202cf0b177154d655e0dd0b509e7dc60ca, 585002498);
         vm.stopBroadcast();
     }
 }

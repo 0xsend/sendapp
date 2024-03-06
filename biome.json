@@ -21,7 +21,8 @@
       "./apps/expo/android/**",
       "./packages/app/components/img/**",
       "packages/shovel/etc/config.json",
-      "./supabase/.temp/**"
+      "./supabase/.temp/**",
+      "./packages/contracts/var/*.json"
     ]
   },
   "organizeImports": {
