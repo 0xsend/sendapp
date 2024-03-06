@@ -428,14 +428,14 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep aa-bundler | awk '{print $1}' | xargs docker rm -f
+    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs docker rm -f
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
         -p 3030:3030 \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./etc/aa-bundler:/app/etc/aa-bundler \
-        -e "DEBUG=aa*" \
+        -e "DEBUG={bundler_debug}" \
         -e "DEBUG_COLORS=true" \
         docker.io/0xbigboss/bundler:0.7.0 \
         --port 3030 \
@@ -445,10 +445,10 @@ local_resource(
         --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
-    """,
+""".format(
+        bundler_debug = os.getenv("BUNDLER_DEBUG", "aa.rpc"),
+    ),
 )
-
-shovel_serve_rm_cmd = "docker ps -a | grep shovel | awk '{print $1}' | xargs docker rm -f"
 
 local_resource(
     "shovel",
@@ -469,7 +469,7 @@ local_resource(
         "shovel:generate-config",
     ],
     serve_cmd = """
-    {rm}
+    docker ps -a | grep shovel | awk '{{print $1}}' | xargs docker rm -f
     docker pull docker.io/indexsupply/shovel:latest || true
     docker run --rm \
         --name shovel \
@@ -488,7 +488,6 @@ local_resource(
     """.format(
         bn = base_fork_block_number,
         chain_id = os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
-        rm = shovel_serve_rm_cmd,
     ),
     trigger_mode = TRIGGER_MODE_MANUAL,
     deps = [
