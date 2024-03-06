@@ -32,7 +32,7 @@ const TokenDetails = ({
 
   return (
     <XStack {...props}>
-      <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }}>
+      <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
         {coin.icon}
         <Paragraph
           fontSize={'$5'}
