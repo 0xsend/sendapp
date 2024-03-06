@@ -26,7 +26,7 @@ import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { DistributionClaimButton } from './DistributionClaimButton'
 import { DistributionsStatCard } from './distribution-stat-cards'
-import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { baseMainnet, sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 
 export const DistributionsTable = () => {
@@ -268,13 +268,13 @@ const DistributionInfo = ({ distribution }: DistributionInfoProps) => {
                           )}
                         </SizableText>
                         <YStack>
-                          {sells?.map(({ tx_idx }) => (
+                          {sells?.map(({ tx_hash }) => (
                             <Anchor
-                              key={tx_idx}
-                              href={`https://etherscan.io/tx/${tx_idx}`}
+                              key={tx_hash}
+                              href={`${baseMainnet.blockExplorers.default.url}/tx/${tx_hash}`}
                               target="_blank"
                             >
-                              {tx_idx} tx
+                              {tx_hash} tx
                             </Anchor>
                           ))}
                         </YStack>
