@@ -20,13 +20,13 @@ import {
   Paragraph,
   BigHeading,
   H3,
-  FontLanguage,
 } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { useRouter } from 'solito/router'
+import { useIsClient } from 'app/utils/useIsClient'
 
 const OnboardingSchema = z.object({
   accountName: formFields.text,
@@ -103,6 +103,8 @@ export const OnboardingForm = () => {
       throw Error(`Sorry something went wrong \n\n ${e}`)
     }
   }
+  const isClient = useIsClient()
+  if (!isClient) return null
 
   return (
     <FormProvider {...form}>
@@ -123,7 +125,7 @@ export const OnboardingForm = () => {
             borderWidth: 0,
             borderBottomWidth: 2,
             borderRadius: '$0',
-            placeholder: deviceName,
+            placeholder: 'My Send Account',
             fontFamily: '$mono',
             fontVariant: ['tabular-nums'],
             fontSize: 20,
