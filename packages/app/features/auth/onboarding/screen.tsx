@@ -28,10 +28,20 @@ import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { shorten } from 'app/utils/strings'
+import { useEffect, useState } from 'react'
 
 export function OnboardingScreen() {
   const { carouselProgress } = useAuthCarouselContext()
   const media = useMedia()
+
+  // workaround for now due to SSR issues with tamagui and this component
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) return null
 
   if (media.gtMd)
     return (
