@@ -22,14 +22,14 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
       </Link>
       <Nav display="flex" flex={1} pt={'$10'}>
         <YStack gap={'$4'} alignItems="stretch" w={'100%'} f={1}>
-          <SideBarNavLink icon={<IconHome size={'$1.75'} />} text={'Home'} href={'/'} />
-          <SideBarNavLink icon={<IconSLogo size={'$1'} />} text={'Send'} href={'/send'} />
+          <SideBarNavLink icon={<IconHome size={'$1.75'} />} text={'home'} href={'/'} />
+          <SideBarNavLink icon={<IconSLogo size={'$1'} />} text={'send'} href={'/send'} />
           <SideBarNavLink
             icon={<IconActivity size={'$1'} />}
-            text={'Activity'}
+            text={'activity'}
             href={'/activity'}
           />
-          <SideBarNavLink icon={<IconAccount size={'$1'} />} text={'Account'} href={'/account'} />
+          <SideBarNavLink icon={<IconAccount size={'$1'} />} text={'account'} href={'/account'} />
         </YStack>
       </Nav>
     </SideBar>
@@ -51,14 +51,14 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
         <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
-          <SideBarNavLink icon={<IconHome size={'$1.75'} />} text={'Home'} href={'/'} />
-          <SideBarNavLink icon={<IconSLogo size={'$1'} />} text={'Send'} href={'/send'} />
+          <SideBarNavLink icon={<IconHome size={'$1.75'} />} text={'home'} href={'/'} />
+          <SideBarNavLink icon={<IconSLogo size={'$1'} />} text={'send'} href={'/send'} />
           <SideBarNavLink
             icon={<IconActivity size={'$1'} />}
-            text={'Activity'}
+            text={'activity'}
             href={'/activity'}
           />
-          <SideBarNavLink icon={<IconAccount size={'$1'} />} text={'Account'} href={'/account'} />
+          <SideBarNavLink icon={<IconAccount size={'$1'} />} text={'account'} href={'/account'} />
         </YStack>
       </Nav>
     </BottomSheet>

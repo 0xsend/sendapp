@@ -1,14 +1,14 @@
 import { Button, Container, Paragraph, Spinner, XStack, YStack, useToastController } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconArrowRight, IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
+import { IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
 import {
   baseMainnet,
   usdcAddress as usdcAddresses,
   sendTokenAddress as sendAddresses,
 } from '@my/wagmi'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import TokenDetails from './TokenDetails'
 import formatAmount from 'app/utils/formatAmount'
+import TokenDetails from './TokenDetails'
 
 export function HomeScreen() {
   const { balances } = useSendAccountBalances()
@@ -106,37 +106,15 @@ export function HomeScreen() {
           </XStack>
           <YStack width={'100%'} gap={'$3.5'} pt={'$6'} pb={'$12'}>
             {coins.map((coin, index) => (
-              <XStack
+              <TokenDetails
+                coin={coin}
+                key={coin.label}
                 jc={'space-between'}
                 ai={'center'}
                 py={'$3.5'}
                 borderColor={separatorColor}
                 borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
-                key={coin.label}
-              >
-                <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }}>
-                  {coin.icon}
-                  <Paragraph
-                    fontSize={'$5'}
-                    fontWeight={'500'}
-                    textTransform={'uppercase'}
-                    color={'$color12'}
-                  >
-                    {coin.label}
-                  </Paragraph>
-                </XStack>
-                <XStack
-                  gap={'$3.5'}
-                  ai={'center'}
-                  cursor={'pointer'}
-                  onPress={() => toast.show(`@TODO: ${coin.label} details`)}
-                >
-                  <TokenDetails tokenAddress={coin.token} />
-                  <XStack $lg={{ display: 'none' }}>
-                    <IconArrowRight color={iconColor} />
-                  </XStack>
-                </XStack>
-              </XStack>
+              />
             ))}
           </YStack>
         </YStack>
