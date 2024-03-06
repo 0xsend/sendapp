@@ -52,11 +52,11 @@ export default defineConfig({
   out: 'src/generated.ts',
   contracts: [
     /**
-     * [Send: Treasury](https://basescan.org/address/0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE)
+     * [Send: Revenue](https://basescan.org/address/0x71fa02bb11e4b119bEDbeeD2f119F62048245301)
      **/
     {
       name: 'SendRevenueSafe',
-      address: '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE',
+      address: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
       abi: [],
     },
     {

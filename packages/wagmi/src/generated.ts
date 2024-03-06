@@ -2821,7 +2821,7 @@ export const sendMerkleDropConfig = {
 
 export const sendRevenueSafeAbi = [] as const
 
-export const sendRevenueSafeAddress = '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE' as const
+export const sendRevenueSafeAddress = '0x71fa02bb11e4b119bEDbeeD2f119F62048245301' as const
 
 export const sendRevenueSafeConfig = {
   address: sendRevenueSafeAddress,
