@@ -12,15 +12,12 @@ const debugAuthSession = async (page: Page) => {
 }
 
 const pricingText = [
-  '6+ characters',
-  '0.005 ETH',
-  '0.01 ETH after',
-  '5 characters',
+  '5+ characters',
   '0.01 ETH',
   '4 characters',
-  '0.03 ETH',
+  '0.02 ETH',
   '1-3 characters',
-  '0.05 ETH',
+  '0.03 ETH',
 ]
 
 test.beforeEach(async ({ checkoutPage }) => {

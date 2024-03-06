@@ -1,28 +1,20 @@
 import {
-  Adapt,
   AnimatePresence,
   Button,
-  Dialog,
+  Container,
   FormWrapper,
-  H2,
-  KVTable,
   Paragraph,
-  ScrollView,
-  Section,
   Separator,
-  Sheet,
-  SizableText,
   SubmitButton,
   Theme,
   Tooltip,
-  Unspaced,
   XStack,
   YStack,
   useIsTouchDevice,
   useToastController,
 } from '@my/ui'
 import { baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
-import { AlertTriangle, Clock, Info, X, XCircle } from '@tamagui/lucide-icons'
+import { AlertTriangle, Clock, XCircle } from '@tamagui/lucide-icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
@@ -31,36 +23,34 @@ import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
 import React, { useEffect, useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { PublicClient, formatEther, parseEther } from 'viem'
+import { formatEther, parseEther } from 'viem'
 import { z } from 'zod'
 import { ConfirmDialog } from './components/confirm-dialog'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
+import { SendTagPricingDialog } from './SendTagPricingDialog'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
-  `I am the owner of the address: ${a}.`
+  `I am the owner of the address: ${a}.
+  
+Send.app`
 
 /**
 | Send Tag Length | Cost to Confirm |
-|-----------------|-----------------|
-| 6+              | first 0.005 ETH, 0.01 ETH after |
-| 5               | 0.01 ETH         |
-| 4               | 0.03 ETH         |
-| 1-3             | 0.05 ETH         |
+| --------------- | --------------- |
+| 5+              | 0.01 ETH        |
+| 4               | 0.02 ETH        |
+| 1-3             | 0.03 ETH        |
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function tagLengthToWei(length: number, isFirstTag = false) {
   switch (length) {
-    case 5:
-      return parseEther('0.01')
     case 4:
-      return parseEther('0.03')
+      return parseEther('0.02')
     case 3:
     case 2:
     case 1:
-      return parseEther('0.05')
+      return parseEther('0.03')
     default:
-      if (isFirstTag) {
-        return parseEther('0.005')
-      }
       return parseEther('0.01')
   }
 }
@@ -171,7 +161,6 @@ export const CheckoutScreen = () => {
         <YStack f={1} als={'stretch'} h="100%" width="100%">
           <YStack gap="$2" py="$4" pb="$4" mx="auto" width="100%" maw={600}>
             <FormWrapper.Body>
-              <H2 ta="center">Send Tags Confirmed</H2>
               <Paragraph>You have already reserved 5 Send Tags.</Paragraph>
               {user.tags?.map((tag) => (
                 <YStack key={tag.name} space="$2">
@@ -186,158 +175,165 @@ export const CheckoutScreen = () => {
   }
 
   return (
-    <YStack h="100%" width="100%">
-      <YStack f={1} als={'stretch'} h="100%" width="100%">
-        <FormProvider {...form}>
-          <SchemaForm
-            form={form}
-            onSubmit={createSendTag}
-            schema={CheckoutTagSchema}
-            defaultValues={{
-              name: '',
-            }}
-            props={{
-              name: {
-                autoFocus: true,
-                'aria-label': 'Send Tag name',
-                placeholder: 'Send Tag name',
-              },
-            }}
-            renderAfter={({ submit }) => (
-              <YStack width="100%" mb="$16" mt="-$20" position="relative" top="-$20">
-                {!has5Tags && (
-                  <Theme inverse>
-                    <SubmitButton mb="$6" onPress={() => submit()}>
-                      Add Tag
-                    </SubmitButton>
-                  </Theme>
-                )}
-                <YStack aria-labelledby="checkout-pending-tags-label">
-                  {has5Tags && (
-                    <Paragraph id="checkout-pending-tags-label" ta="center" mb="$6">
-                      Please review your Send Tags below.
-                    </Paragraph>
+    <Container>
+      <YStack h="100%" width="100%">
+        <YStack f={1} als={'stretch'} h="100%">
+          <FormProvider {...form}>
+            <SchemaForm
+              form={form}
+              onSubmit={createSendTag}
+              schema={CheckoutTagSchema}
+              defaultValues={{
+                name: '',
+              }}
+              props={{
+                name: {
+                  autoFocus: true,
+                  'aria-label': 'Send Tag name',
+                  placeholder: 'Send Tag name',
+                },
+              }}
+              formProps={{
+                width: '100%',
+                maxWidth: '100%',
+                $gtMd: {
+                  als: 'flex-start',
+                },
+              }}
+              renderAfter={({ submit }) => (
+                <YStack width="100%">
+                  {!has5Tags && (
+                    <Theme inverse>
+                      <SubmitButton mb="$6" onPress={() => submit()}>
+                        Add Tag
+                      </SubmitButton>
+                    </Theme>
                   )}
-                  {pendingTags
-                    ?.sort(
-                      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-                    )
-                    .map((tag) => (
-                      <YStack
-                        aria-label={`Pending Send Tag ${tag.name}`}
-                        position="relative"
-                        top="-$8"
-                        mt="-$6"
-                        space="$2"
-                        key={tag.name}
-                      >
-                        <XStack jc="space-between" ai="center" f={1}>
-                          <Paragraph fontWeight={'bold'}>{tag.name}</Paragraph>
-                          <Paragraph>
-                            <Button
-                              // @ts-expect-error tamagui doesn't support this yet
-                              type="button"
-                              bg="transparent"
-                              maw="100%"
-                              p="$0"
-                              hoverStyle={{ bg: 'transparent' }}
-                              onPress={() => {
-                                supabase
-                                  .from('tags')
-                                  .delete()
-                                  .eq('name', tag.name)
-                                  .then(({ data, error }) => {
-                                    if (error) {
-                                      throw error
-                                    }
-                                    return data
-                                  })
-                                  .then(() => toast.show('Released'))
-                                  .then(() => user?.updateProfile())
-                              }}
-                            >
-                              <XCircle color="$color11" />
-                            </Button>
-                          </Paragraph>
-                        </XStack>
-
-                        <XStack jc="space-between" ai="center" f={1}>
-                          <ConfirmTagPrice tag={tag} />
-                          <HoldingTime created={new Date(tag.created_at)} />
-                        </XStack>
-                      </YStack>
-                    ))}
-                </YStack>
-              </YStack>
-            )}
-          >
-            {(fields) => {
-              return (
-                <YStack mb="-$8" width="100%">
-                  <YStack gap="$2" py="$4" pb="$4" mx="auto" width="100%" $gtMd={{ maxWidth: 600 }}>
-                    <XStack jc="space-between">
-                      <H2 ta="center">Send Tags</H2>
-                      <SendTagPricingDialog />
-                    </XStack>
-                    <YStack aria-labelledby="send-tags-registered" gap="$2">
-                      <XStack justifyContent="space-between" ai="center">
-                        <YStack>
-                          {hasConfirmedTags && (
-                            <Paragraph id="send-tags-registered">Send Tags Registered</Paragraph>
-                          )}
-                        </YStack>
-                      </XStack>
-                      {confirmedTags?.map((tag) => (
+                  <YStack aria-labelledby="checkout-pending-tags-label">
+                    {has5Tags && (
+                      <Paragraph id="checkout-pending-tags-label" ta="center" mb="$6">
+                        Please review your Send Tags below.
+                      </Paragraph>
+                    )}
+                    {pendingTags
+                      ?.sort(
+                        (a, b) =>
+                          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                      )
+                      .map((tag) => (
                         <YStack
-                          aria-label={`Confirmed Send Tag ${tag.name}`}
-                          key={tag.name}
+                          aria-label={`Pending Send Tag ${tag.name}`}
+                          position="relative"
+                          top="-$8"
+                          mt="-$6"
                           space="$2"
+                          key={tag.name}
                         >
-                          <Paragraph fontWeight={'bold'}>{tag.name}</Paragraph>
+                          <XStack jc="space-between" ai="center" f={1}>
+                            <Paragraph fontWeight={'bold'}>{tag.name}</Paragraph>
+                            <Paragraph>
+                              <Button
+                                // @ts-expect-error tamagui doesn't support this yet
+                                type="button"
+                                bg="transparent"
+                                maw="100%"
+                                p="$0"
+                                hoverStyle={{ bg: 'transparent' }}
+                                onPress={() => {
+                                  supabase
+                                    .from('tags')
+                                    .delete()
+                                    .eq('name', tag.name)
+                                    .then(({ data, error }) => {
+                                      if (error) {
+                                        throw error
+                                      }
+                                      return data
+                                    })
+                                    .then(() => toast.show('Released'))
+                                    .then(() => user?.updateProfile())
+                                }}
+                              >
+                                <XCircle color="$color11" />
+                              </Button>
+                            </Paragraph>
+                          </XStack>
+
+                          <XStack jc="space-between" ai="center" f={1}>
+                            <ConfirmTagPrice tag={tag} />
+                            <HoldingTime created={new Date(tag.created_at)} />
+                          </XStack>
                         </YStack>
                       ))}
-                      {hasConfirmedTags && <Separator my="$2" />}
-                    </YStack>
-                    <Paragraph>
-                      Pick a unique a Send Tag that is not yet reserved. Reserve up to 5 tags.
-                    </Paragraph>
-
-                    <YStack space="$2" mb="$4">
-                      {!hasPendingTags && !hasConfirmedTags && (
-                        <Paragraph>You have no Send Tags yet</Paragraph>
-                      )}
-                      {hasPendingTags && (
-                        <Paragraph>
-                          Your Send Tags are not confirmed until payment is received and your wallet
-                          is verified.
-                        </Paragraph>
-                      )}
-                      {isTouch && (
-                        <Paragraph>
-                          Each Send Tag is reserved for 30 minutes. If you do not claim it within
-                          that time, it is claimable by someone else.
-                        </Paragraph>
-                      )}
-                    </YStack>
-                  </YStack>
-                  <YStack>
-                    <Paragraph position="absolute" als="flex-end" mb="$0" p="$0">
-                      Registered {user?.tags?.length ?? 0} / 5
-                    </Paragraph>
-                    {!has5Tags && Object.values(fields)}
                   </YStack>
                 </YStack>
-              )
-            }}
-          </SchemaForm>
-          <Theme name="accent">
-            <AnimatePresence>
-              <ConfirmDialog onConfirmed={onConfirmed} needsVerification={needsVerification} />
-            </AnimatePresence>
-          </Theme>
-        </FormProvider>
+              )}
+            >
+              {(fields) => {
+                return (
+                  <YStack mb="-$8" width="100%">
+                    <YStack gap="$2" py="$4" pb="$4" mx="auto" width="100%">
+                      <YStack aria-labelledby="send-tags-registered" gap="$2">
+                        <XStack justifyContent="space-between" ai="center">
+                          <YStack>
+                            {hasConfirmedTags && (
+                              <Paragraph id="send-tags-registered">Send Tags Registered</Paragraph>
+                            )}
+                          </YStack>
+                          <SendTagPricingDialog />
+                        </XStack>
+                        {confirmedTags?.map((tag) => (
+                          <YStack
+                            aria-label={`Confirmed Send Tag ${tag.name}`}
+                            key={tag.name}
+                            space="$2"
+                          >
+                            <Paragraph fontWeight={'bold'}>{tag.name}</Paragraph>
+                          </YStack>
+                        ))}
+                        {hasConfirmedTags && <Separator my="$2" />}
+                      </YStack>
+                      <Paragraph>
+                        Pick a unique a Send Tag that is not yet reserved. Reserve up to 5 tags.
+                      </Paragraph>
+
+                      <YStack space="$2" mb="$4">
+                        {!hasPendingTags && !hasConfirmedTags && (
+                          <Paragraph>You have no Send Tags yet</Paragraph>
+                        )}
+                        {hasPendingTags && (
+                          <Paragraph>
+                            Your Send Tags are not confirmed until payment is received and your
+                            wallet is verified.
+                          </Paragraph>
+                        )}
+                        {isTouch && (
+                          <Paragraph>
+                            Each Send Tag is reserved for 30 minutes. If you do not claim it within
+                            that time, it is claimable by someone else.
+                          </Paragraph>
+                        )}
+                      </YStack>
+                    </YStack>
+                    <YStack>
+                      <Paragraph position="absolute" als="flex-end" mb="$0" p="$0">
+                        Registered {user?.tags?.length ?? 0} / 5
+                      </Paragraph>
+                      {!has5Tags && Object.values(fields)}
+                    </YStack>
+                  </YStack>
+                )
+              }}
+            </SchemaForm>
+            <Theme name="accent">
+              <AnimatePresence>
+                <ConfirmDialog onConfirmed={onConfirmed} needsVerification={needsVerification} />
+              </AnimatePresence>
+            </Theme>
+          </FormProvider>
+        </YStack>
       </YStack>
-    </YStack>
+    </Container>
   )
 }
 
@@ -387,7 +383,7 @@ function HoldingTime({ created }: { created: Date }) {
           ]}
         >
           <Tooltip.Arrow />
-          <Paragraph size="$2" lineHeight="$1" maw="$20">
+          <Paragraph size="$2" maw="$20">
             Each Send Tag is reserved for 30 minutes. If you do not claim it within that time, it is
             claimable by someone else.
           </Paragraph>
@@ -418,125 +414,5 @@ function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
     <Paragraph>Free</Paragraph>
   ) : (
     <Paragraph>Price: {formatEther(price).toLocaleString()} ETH</Paragraph>
-  )
-}
-
-function SendTagPricingDialog() {
-  return (
-    <Dialog modal>
-      <Dialog.Trigger asChild>
-        <Button
-          position="absolute"
-          top="$1"
-          right={0}
-          maw="$20"
-          mx="auto"
-          chromeless
-          icon={<Info />}
-          // @ts-expect-error tamagui doesn't support this yet
-          type="button"
-        >
-          Pricing
-        </Button>
-      </Dialog.Trigger>
-
-      <Adapt when="sm" platform="touch">
-        <Sheet zIndex={200000} modal dismissOnSnapToBottom disableDrag>
-          <Sheet.Frame padding="$4" gap="$4">
-            <Adapt.Contents />
-          </Sheet.Frame>
-          <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-        </Sheet>
-      </Adapt>
-
-      <Dialog.Portal>
-        <Dialog.Overlay
-          key="overlay"
-          animation="quick"
-          opacity={0.5}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-
-        <Dialog.Content
-          bordered
-          elevate
-          key="content"
-          animateOnly={['transform', 'opacity']}
-          animation={[
-            'quick',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-          gap="$4"
-          width="100%"
-          maw={600}
-        >
-          <Dialog.Title>Send Tag Pricing</Dialog.Title>
-          <Dialog.Description>
-            Send Tags are priced based on their length. The shorter the Send Tag, the more it costs.
-          </Dialog.Description>
-          <ScrollView>
-            <Section>
-              <KVTable>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">6+ characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>
-                      First one {(0.005).toLocaleString()} ETH, {(0.01).toLocaleString()} ETH after
-                    </SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">5 characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>{(0.01).toLocaleString()} ETH</SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">4 characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>{(0.03).toLocaleString()} ETH</SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">1-3 characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>{(0.05).toLocaleString()} ETH</SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-              </KVTable>
-            </Section>
-          </ScrollView>
-
-          <XStack alignSelf="flex-end" gap="$4">
-            <Dialog.Close displayWhenAdapted asChild>
-              <Button theme="alt1" aria-label="Close">
-                Ok
-              </Button>
-            </Dialog.Close>
-          </XStack>
-
-          <Unspaced>
-            <Dialog.Close asChild>
-              <Button position="absolute" top="$3" right="$3" size="$2" circular icon={X} />
-            </Dialog.Close>
-          </Unspaced>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
   )
 }

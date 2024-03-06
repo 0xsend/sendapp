@@ -659,6 +659,7 @@ local_resource(
         "next:web",
         "playwright:deps",
     ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
     deps = files_matching(
         os.path.join("packages", "playwright"),
         lambda f: f.endswith(".ts"),

@@ -28,7 +28,6 @@ import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useMounted } from 'app/utils/useMounted'
 import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
-import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useLink } from 'solito/link'
 import { type PublicClient, formatEther } from 'viem'
@@ -128,7 +127,7 @@ export function ConfirmDialog({
 
   return (
     <Dialog modal open={open} onOpenChange={handleOpenChange}>
-      <YStack mx="auto" width="100%">
+      <YStack width="100%">
         {(hasPendingTags || needsVerification) && (
           <YStack
             animateOnly={['transform', 'opacity']}
@@ -143,18 +142,10 @@ export function ConfirmDialog({
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             space="$2"
-            py="$3"
-            px="$6"
-            bc="$color1"
             w="100%"
             flex={1}
-            // @ts-expect-error tamagui doesn't support this yet
-            position="fixed"
-            left={0}
-            right={0}
-            bottom={0}
           >
-            <YStack maxWidth={600} width="100%" als="center">
+            <YStack maxWidth={600} width="100%">
               {BigInt(weiAmount) > 0 && (
                 <Paragraph maw="100%" ta="right">
                   Total: {ethAmount} ETH
@@ -163,7 +154,6 @@ export function ConfirmDialog({
               <Dialog.Trigger asChild>
                 <Button
                   disabled={!needsVerification && (pendingTags ?? []).length === 0}
-                  mt="$2"
                   space="$1.5"
                   icon={CheckCircle}
                   f={1}
