@@ -21,7 +21,7 @@ import {
   useIsTouchDevice,
   useToastController,
 } from '@my/ui'
-import { sendRevenueSafeAddress } from '@my/wagmi'
+import { baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
 import { AlertTriangle, Clock, Info, X, XCircle } from '@tamagui/lucide-icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -81,7 +81,7 @@ export async function getSenderSafeReceivedEvents({
   publicClient,
   sender,
 }: {
-  publicClient: PublicClient
+  publicClient: typeof baseMainnetClient
   sender: `0x${string}`
 }) {
   return await publicClient.getLogs({
@@ -98,7 +98,7 @@ export async function getSenderSafeReceivedEvents({
       sender,
     },
     strict: true,
-    fromBlock: BigInt(17993814), // send revenue contract creation block,
+    fromBlock: BigInt(11269822), // send revenue contract creation block,
   })
 }
 
