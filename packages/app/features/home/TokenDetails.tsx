@@ -59,9 +59,14 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
   if (balance) {
     if (balance.isError) {
       return (
-        <ErrorTooltip groupId="1" placement="right" Icon={<IconError />}>
-          Error occurred while fetching balance. {balance.error.message}
-        </ErrorTooltip>
+        <>
+          <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
+            --
+          </Paragraph>
+          <ErrorTooltip groupId="1" placement="right" Icon={<IconError color={'$redVibrant'} />}>
+            Error occurred while fetching balance. {balance.error.message}
+          </ErrorTooltip>
+        </>
       )
     }
     if (balance.isPending) {
@@ -111,7 +116,7 @@ const ErrorTooltip = ({ Icon, children, ...props }: TooltipProps & { Icon?: JSX.
         ]}
         bc={'transparent'}
         borderWidth={1}
-        borderColor={'#DE4747'}
+        borderColor={'$redVibrant'}
       >
         <Paragraph color={'$color12'} fontWeight={'500'}>
           {children}

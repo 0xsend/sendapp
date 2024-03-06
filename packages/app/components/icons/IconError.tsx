@@ -15,7 +15,7 @@ const Err = (props: IconProps) => {
     >
       <Path
         d="M12 3.25L2.375 19.875H21.625M12 6.75L18.5888 18.125H5.41125M11.125 10.25V13.75H12.875V10.25M11.125 15.5V17.25H12.875V15.5"
-        fill="#DE4747"
+        fill="currentColor"
       />
     </Svg>
   )
