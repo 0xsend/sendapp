@@ -26,18 +26,26 @@ Then, ssh into the droplet and run the following commands.
 
 ## Install dependencies
 
-### Install node 18
+### Install fnm and node
 
 ```shell
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg git
-# Install node
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-NODE_MAJOR=18
-echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-sudo apt-get update
-apt-get install nodejs=18.16.1-1nodesource1 -y
+sudo apt-get install -y ca-certificates curl gnupg git unzip
+curl -fsSL https://fnm.vercel.app/install | bash
+source /root/.bashrc
+fnm install
+corepack enable
+```
+
+### Install Shovel
+
+```shell
+# linux/amd64, darwin/arm64, darwin/amd64, windows/amd64
+curl -LO https://indexsupply.net/bin/main/linux/amd64/shovel
+chmod +x shovel
+mv shovel /usr/local/bin/shovel
+shovel -version
+# vmain 0ec8
 ```
 
 ### Install Caddy

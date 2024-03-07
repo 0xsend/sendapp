@@ -100,6 +100,27 @@ cast --help
 
 A demonstrative example of how to fork mainnet and deploy a contract and impersonate accounts. Note: `anvil_setBalance` on a forked mainnet anvil node will not work. A regular `eth_sendTransaction` will work.
 
+#### Deploying SendAccountFactory
+
+```shell
+forge script ./script/DeploySendMerkleDropScript.s.sol:DeploySendMerkleDropScript \
+  -vvv \
+  --rpc-url base-sepolia \
+  --sender 0x647eb43401e13e995D89Cf26cD87e68890EE3f89 \
+  --keystores ~/.foundry/keystores/send_deployer 
+  # --broadcast --verify
+```
+
+#### Deploying SendMerkleDrop
+
+```shell
+forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \ 
+  -vvv \
+  --rpc-url base-sepolia \
+  --sender 0x647eb43401e13e995D89Cf26cD87e68890EE3f89 \
+  --keystores ~/.foundry/keystores/send_deployer
+```
+
 #### Creating a Distribution Tranche
 
 ```shell
