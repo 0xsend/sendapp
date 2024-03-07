@@ -1,22 +1,22 @@
-import { DistributionsScreen } from 'app/features/distributions/screen'
+import { EarnTokensScreen } from 'app/features/account/earn-tokens/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from './_app'
+import { NextPageWithLayout } from 'next-app/pages/_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Distributions</title>
+        <title>Send | Hold & Earn</title>
       </Head>
-      <DistributionsScreen />
+      <EarnTokensScreen />
     </>
   )
 }
 
 export const getServerSideProps = userProtectedGetSSP()
 
-Page.getLayout = (children) => <HomeLayout header="Distributions">{children}</HomeLayout>
+Page.getLayout = (children) => <HomeLayout header="Hold & Earn">{children}</HomeLayout>
 
 export default Page
