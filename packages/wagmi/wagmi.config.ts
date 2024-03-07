@@ -127,6 +127,7 @@ export default defineConfig({
           1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           [base.id]: '0x240761104aF5DAeDFd9025810FfEB741fEB316B3', // base mainnet
           [baseSepolia.id]: '0x240761104aF5DAeDFd9025810FfEB741fEB316B3', // base sepolia
+          [baseLocal.id]: '0x240761104aF5DAeDFd9025810FfEB741fEB316B3', // base localnet
           ...deployedSendMerkleDrop,
         },
       },
