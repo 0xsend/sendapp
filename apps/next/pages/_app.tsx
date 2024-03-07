@@ -10,7 +10,7 @@ import { api } from 'app/utils/api'
 import { NextPage } from 'next'
 import Head from 'next/head'
 
-import { ReactElement, ReactNode } from 'react'
+import { ReactElement, ReactNode, useEffect, useState } from 'react'
 import type { SolitoAppProps } from 'solito'
 import Favicons from './favicons'
 
@@ -28,8 +28,8 @@ function MyApp({
 }: SolitoAppProps<{ initialSession: AuthProviderProps['initialSession'] }>) {
   // reference: https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts
   const getLayout = Component.getLayout || ((page) => page)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [theme, setTheme] = useRootTheme()
+
+  const [, setTheme] = useRootTheme()
 
   return (
     <>
