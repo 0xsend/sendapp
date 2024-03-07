@@ -64,6 +64,9 @@ export const SignInForm = () => {
               '$theme-light': {
                 borderBottomColor: '$black',
               },
+              fontFamily: '$mono',
+              fontVariant: ['tabular-nums'],
+              fontSize: '$7',
               borderWidth: 0,
               borderBottomWidth: 2,
               borderRadius: '$0',
@@ -107,13 +110,14 @@ export const SignInForm = () => {
                 <BigHeading col="$background">WELCOME TO SEND</BigHeading>
               </Theme>
               <H3
-                fontFamily={'$mono'}
                 lineHeight={28}
-                col="accent"
+                $platform-web={{ fontFamily: '$mono' }}
+                $theme-light={{ col: '$gray10Light' }}
+                $theme-dark={{ col: '$olive' }}
                 fontWeight={'300'}
                 $sm={{ size: '$5' }}
               >
-                Sign in with your phone number
+                Start by creating a Passkey below. Send uses passkeys to secure your account
               </H3>
 
               <YStack gap="$4">

@@ -13,8 +13,6 @@
   },
   "dependencies": {
     "@daimo/expo-passkeys": "workspace:*",
-    "@fontsource/dm-mono": "^5.0.18",
-    "@fontsource/dm-sans": "^5.0.18",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
     "@my/wagmi": "workspace:*",
@@ -28,7 +26,6 @@
     "@supabase/supabase-js": "^2.38.5",
     "@tamagui/animations-react-native": "^1.88.8",
     "@tamagui/colors": "^1.88.8",
-    "@tamagui/font-inter": "^1.88.8",
     "@tamagui/helpers-icon": "^1.88.8",
     "@tamagui/lucide-icons": "^1.88.8",
     "@tamagui/shorthands": "^1.88.8",

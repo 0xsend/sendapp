@@ -68,7 +68,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             backgroundColor: 'transparent',
             color: '$background',
             themeInverse: true,
-            fontSize: '$6',
+            fontFamily: '$mono',
+            fontVariant: ['tabular-nums'],
+            fontSize: '$7',
             $sm: {
               w: '60%',
             },
@@ -113,13 +115,14 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
               <BigHeading col="$background">VERIFY ACCOUNT</BigHeading>
             </Theme>
             <H3
-              fontFamily={'$mono'}
               lineHeight={28}
-              col="accent"
+              $platform-web={{ fontFamily: '$mono' }}
+              $theme-light={{ col: '$gray10Light' }}
+              $theme-dark={{ col: '$olive' }}
               fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
-              Enter the code we sent you on your phone
+              Start by creating a Passkey below. Send uses passkeys to secure your account
             </H3>
             <YStack gap="$4">
               <Theme inverse={true}>

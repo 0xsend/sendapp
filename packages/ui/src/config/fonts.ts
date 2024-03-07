@@ -2,9 +2,16 @@ import { createFont, isWeb } from 'tamagui'
 
 export const headingFont = createFont({
   family: isWeb
-    ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-    : 'DM Sans',
+    ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif '
+    : 'DM Sans, sans-serif',
   size: {
+    1: 11,
+    2: 12,
+    3: 13,
+    4: 14,
+    true: 14,
+    5: 16,
+    6: 18,
     7: 20,
     8: 23,
     9: 30,
@@ -18,7 +25,7 @@ export const headingFont = createFont({
 export const bodyFont = createFont({
   family: isWeb
     ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-    : 'DM Sans',
+    : 'DM Sans, sans-serif',
   size: {
     1: 11,
     2: 12,
@@ -45,8 +52,8 @@ export const bodyFont = createFont({
 })
 export const monoFont = createFont({
   family: isWeb
-    ? 'DM Mono, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-    : 'DM Mono',
+    ? 'DM Mono, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, monospace'
+    : 'DM Mono, monospace',
   size: {
     1: 11,
     2: 12,
@@ -86,8 +93,9 @@ export const monoFont = createFont({
     16: 134,
   },
   weight: {
-    6: '400',
-    7: '500',
+    3: '300',
+    4: '400',
+    5: '500',
   },
   face: {
     500: { normal: 'DM Mono' },
