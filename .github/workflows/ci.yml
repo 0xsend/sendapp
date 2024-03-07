@@ -170,6 +170,7 @@ jobs:
         env:
           YARN_ENABLE_HARDENED_MODE: 0
       - name: Get Supabase Database Branch
+        if: github.base_ref == 'dev'
         uses: 0xbigboss/supabase-branch-gh-action@v1
         id: supabase-branch
         with:
@@ -178,6 +179,7 @@ jobs:
           wait-for-migrations: false # Optional. Default is false.
           timeout: 60 # Optional. Default is 60.
       - name: Add SMS provider to Supabase branch
+        if: github.base_ref == 'dev'
         uses: 0xbigboss/supabase-manager-script-gh-action@v1
         id: add-sms-provider
         with:
@@ -209,8 +211,9 @@ jobs:
       - name: Set Public Hostname
         id: public-hostname
         run: echo "public-hostname=sendapp-${{steps.extract-branch.outputs.branch}}-0xsend.vercel.app" >> $GITHUB_OUTPUT
-      - name: Vercel Deploy
-        id: vercel-deploy
+      - name: Vercel Deploy Preview with Supabase Branch
+        if: github.base_ref == 'dev'
+        id: vercel-deploy-with-branch
         uses: ./.github/actions/vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -229,16 +232,38 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PROJECT_ID: ${{steps.supabase-branch.outputs.project_ref}}
           NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: ${{steps.supabase-branch.outputs.graphql_url}}
           NEXT_PUBLIC_BASE_CHAIN_ID: 84532
-          NEXT_PUBLIC_MAINNET_CHAIN_ID: '11155111'
-          NEXT_PUBLIC_BASE_RPC_URL: 'https://sepolia.base.org'
-          NEXT_PUBLIC_MAINNET_RPC_URL: 'https://ethereum-sepolia-rpc.publicnode.com'
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: '${{ steps.supabase-branch.outputs.anon_key }}'
+          NEXT_PUBLIC_MAINNET_CHAIN_ID: 11155111
+          NEXT_PUBLIC_BASE_RPC_URL: https://sepolia.base.org
+          NEXT_PUBLIC_MAINNET_RPC_URL: https://ethereum-sepolia-rpc.publicnode.com
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase-branch.outputs.anon_key }}
+      - name: Vercel Deploy Preview
+        if: github.base_ref != 'dev'
+        id: vercel-deploy-preview
+        uses: ./.github/actions/vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
+          VERCEL_GIT_COMMIT_REF: ${{ github.head_ref }}
+          VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
 
       - uses: mshick/add-pr-comment@v2
+        if: github.base_ref == 'dev'
         with:
           message-id: vercel-preview-url
           message: |
-            Vercel Unique URL: [${{ steps.vercel-deploy.outputs.deployment-url }}](${{ steps.vercel-deploy.outputs.deployment-url }})
+            Vercel Unique URL: [${{ steps.vercel-deploy-with-branch.outputs.deployment-url }}](${{ steps.vercel-deploy-with-branch.outputs.deployment-url }})
+            Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
+
+      - uses: mshick/add-pr-comment@v2
+        if: github.base_ref != 'dev'
+        with:
+          message-id: vercel-preview-url
+          message: |
+            Vercel Unique URL: [${{ steps.vercel-deploy-preview.outputs.deployment-url }}](${{ steps.vercel-deploy-preview.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
 
   deploy-staging:
