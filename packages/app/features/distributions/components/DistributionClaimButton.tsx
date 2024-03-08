@@ -8,12 +8,10 @@ import {
   useSendMerkleDropTrancheActive,
 } from 'app/utils/distributions'
 import { shorten } from 'app/utils/strings'
-import { useRpcChainId } from 'app/utils/viem/useRpcChainId'
 import {
   useAccount,
   useConnect,
   useWriteContract,
-  usePublicClient,
   useSwitchChain,
   useWaitForTransactionReceipt,
 } from 'wagmi'
@@ -50,7 +48,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   })
   const { isConnected, address: account, chain: accountChain } = useAccount()
   const { connect, connectors, error: connectError } = useConnect()
-  const { chains, switchChain } = useSwitchChain()
+  const { chains, switchChain, error: switchError } = useSwitchChain()
   const {
     data: claimWriteConfig,
     error: claimWriteConfigError,
@@ -85,6 +83,36 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return <Button disabled>Not Eligible</Button>
   }
 
+  if (!isConnected) {
+    return (
+      <YStack ai="center" w="100%" mx="auto">
+        <Paragraph size="$1" theme="alt2">
+          Please connect a wallet to claim
+        </Paragraph>
+        <Button
+          w="100%"
+          onPress={() => {
+            assert(!!connectors[0], 'No connectors found')
+            connect({ connector: connectors[0] })
+          }}
+        >
+          Connect Wallet
+        </Button>
+        {connectError ? (
+          connectError.message?.includes('Connector not found') ? (
+            <Paragraph size="$1" theme="alt2">
+              Error finding wallet. Please install a web3 wallet like MetaMask.
+            </Paragraph>
+          ) : (
+            <Paragraph size="$1" theme="alt2">
+              Error connecting wallet. Please try again later. {connectError.message}
+            </Paragraph>
+          )
+        ) : null}
+      </YStack>
+    )
+  }
+
   if (distribution.chain_id !== accountChain?.id) {
     const distributionChain = chains.find((c) => c.id === distribution.chain_id)
     assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
@@ -105,6 +133,11 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         >
           Switch Network
         </Button>
+        {switchError ? (
+          <Paragraph size="$1" theme="alt2" maw="100%">
+            Error switching network. Please try again later. {switchError.message}
+          </Paragraph>
+        ) : null}
       </YStack>
     )
   }
@@ -166,43 +199,13 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           <Paragraph size="$1" theme="alt2">
             <Anchor
               accessibilityLabel="View Claim on Etherscan"
-              href={`https://etherscan.io/tx/${claimWriteHash}`}
+              href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
             >
               {shorten(claimWriteHash)}
             </Anchor>
           </Paragraph>
         )}
       </Paragraph>
-    )
-  }
-
-  if (!isConnected) {
-    return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          Please connect a wallet to claim
-        </Paragraph>
-        <Button
-          w="100%"
-          onPress={() => {
-            assert(!!connectors[0], 'No connectors found')
-            connect({ connector: connectors[0] })
-          }}
-        >
-          Connect Wallet
-        </Button>
-        {connectError ? (
-          connectError.message?.includes('Connector not found') ? (
-            <Paragraph size="$1" theme="alt2">
-              Error finding wallet. Please install a web3 wallet like MetaMask.
-            </Paragraph>
-          ) : (
-            <Paragraph size="$1" theme="alt2">
-              Error connecting wallet. Please try again later. {connectError.message}
-            </Paragraph>
-          )
-        ) : null}
-      </YStack>
     )
   }
 
@@ -215,7 +218,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             size="$1"
             target="_blank"
             accessibilityLabel="View on Etherscan"
-            href={`https://etherscan.io/address/${share?.address}`}
+            href={`${accountChain.blockExplorers.default.url}/address/${share?.address}`}
           >
             {shorten(share?.address)}
           </Anchor>
@@ -227,7 +230,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             size="$1"
             target="_blank"
             accessibilityLabel="View on Etherscan"
-            href={`https://etherscan.io/address/${account}`}
+            href={`${accountChain.blockExplorers.default.url}/address/${account}`}
           >
             {shorten(account)}
           </Anchor>
@@ -286,7 +289,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           Claimed!{' '}
           <Anchor
             accessibilityLabel="View Claim on Etherscan"
-            href={`https://etherscan.io/tx/${claimWriteHash}`}
+            href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
           >
             {shorten(claimWriteHash)}
           </Anchor>

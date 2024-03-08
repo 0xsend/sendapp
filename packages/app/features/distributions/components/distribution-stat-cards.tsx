@@ -1,6 +1,5 @@
 import { Card, CardProps, H6, Paragraph, Progress, Spinner, Text, XStack, YStack } from '@my/ui'
 import { ServerCrash } from '@tamagui/lucide-icons'
-import { IconSendToken } from 'app/components/icons/IconSendToken'
 import { useActiveDistribution } from 'app/utils/distributions'
 import {
   DISTRIBUTION_INITIAL_POOL_AMOUNT,
@@ -9,6 +8,7 @@ import {
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import React, { useEffect, useState } from 'react'
 import { DistributionClaimButton } from './DistributionClaimButton'
+import { IconSend } from 'app/components/icons'
 
 export function DistributionsStatCard(cardProps: CardProps) {
   return (
@@ -56,7 +56,7 @@ export function DistributionProgressCard(props: CardProps) {
               Distributed
             </Paragraph>
             <XStack ai="center" space="$2">
-              <IconSendToken size={20} />
+              <IconSend size={20} />
               <H6 size="$7" fontWeight={'700'}>
                 {distributed}
               </H6>
@@ -77,7 +77,7 @@ export function DistributionProgressCard(props: CardProps) {
             </Paragraph>
             <XStack ai="center" space="$2">
               <XStack w={20}>
-                <IconSendToken size={20} />
+                <IconSend size={20} />
               </XStack>
               <H6 size="$7" fontWeight={'700'}>
                 {DISTRIBUTION_INITIAL_POOL_AMOUNT.toLocaleString()}
