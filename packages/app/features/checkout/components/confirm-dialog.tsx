@@ -145,7 +145,7 @@ export function ConfirmDialog({
             w="100%"
             flex={1}
           >
-            <YStack maxWidth={600} width="100%" $sm={{ mx: 'auto' }}>
+            <YStack maxWidth={600} width="100%">
               {BigInt(weiAmount) > 0 && (
                 <Paragraph maw="100%" ta="right">
                   Total: {ethAmount} ETH
