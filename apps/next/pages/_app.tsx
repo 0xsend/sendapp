@@ -10,9 +10,8 @@ import { api } from 'app/utils/api'
 import { NextPage } from 'next'
 import Head from 'next/head'
 
-import { ReactElement, ReactNode, useEffect, useState } from 'react'
+import { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
-import Favicons from './favicons'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -43,7 +42,13 @@ function MyApp({
           name="viewport"
           content="width=320, initial-scale=1, minimum-scale=1, maximum-scale=1"
         />
-        <Favicons />
+        <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+        <link rel="manifest" href="/favicon/site.webmanifest" />
+        <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#122023" />
+        <meta name="msapplication-TileColor" content="#2b5797" />
+        <meta name="theme-color" content="#40fb50" />
         <meta property="og:image" content="https://0xsend.github.io/assets/sendtags.png" />
       </Head>
       <NextThemeProvider
