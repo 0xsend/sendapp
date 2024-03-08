@@ -11,7 +11,7 @@ import formatAmount from 'app/utils/formatAmount'
 import TokenDetails from './TokenDetails'
 
 export function HomeScreen() {
-  const { balances } = useSendAccountBalances()
+  const { totalBalance } = useSendAccountBalances()
 
   const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
@@ -55,24 +55,11 @@ export function HomeScreen() {
                     Total Balance
                   </Paragraph>
                   <XStack style={{ color: 'white' }} gap={'$2.5'}>
-                    {balances === undefined ? (
+                    {totalBalance === undefined ? (
                       <Spinner size={'large'} />
                     ) : (
-                      <Paragraph
-                        color={'$color12'}
-                        fontSize={96}
-                        fontWeight={'500'}
-                        lineHeight={'$12'}
-                        zIndex={1}
-                      >
-                        {
-                          //@todo We aren't doing any USD conversion yet. We will want to make a seperate hook that will fetch from coingecko API
-                          formatAmount(
-                            balances?.eth?.value
-                              ? USDollar.format(balances.eth?.value).replace('$', '').split('.')[0]
-                              : '?'
-                          )
-                        }
+                      <Paragraph color={'$color12'} fontSize={96} fontWeight={'500'} zIndex={1}>
+                        {formatAmount(USDollar.format(totalBalance).split('.')[0])}
                       </Paragraph>
                     )}
                     <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
