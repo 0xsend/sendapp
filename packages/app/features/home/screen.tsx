@@ -126,12 +126,13 @@ export function HomeScreen() {
               backgroundColor={'$primary'}
               borderRadius={'$4'}
               onPress={() => {
-                toast.show('TODO: Add Funds')
+                // @todo onramp / deposit
+                toast.show('Coming Soon: Deposit')
               }}
             >
               <XStack w={'100%'} jc={'space-between'} ai={'center'}>
                 <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
-                  Add Funds
+                  Deposit
                 </Paragraph>
                 <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
                   <IconDeposit size={'$2.5'} color={'$black'} />
