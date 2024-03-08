@@ -14,6 +14,29 @@ import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import { useNav } from 'app/routers/params'
 
+const links = [
+  {
+    icon: <IconHome size={'$1.75'} />,
+    text: 'home',
+    href: '/',
+  },
+  {
+    icon: <IconSLogo size={'$1'} />,
+    text: 'send',
+    href: '/send',
+  },
+  {
+    icon: <IconActivity size={'$1'} />,
+    text: 'activity',
+    href: '/activity',
+  },
+  {
+    icon: <IconAccount size={'$1'} />,
+    text: 'account',
+    href: '/account',
+  },
+]
+
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props}>
@@ -22,14 +45,9 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
       </Link>
       <Nav display="flex" flex={1} pt={'$10'}>
         <YStack gap={'$4'} alignItems="stretch" w={'100%'} f={1}>
-          <SideBarNavLink icon={<IconHome size={'$1.75'} />} text={'home'} href={'/'} />
-          <SideBarNavLink icon={<IconSLogo size={'$1'} />} text={'send'} href={'/send'} />
-          <SideBarNavLink
-            icon={<IconActivity size={'$1'} />}
-            text={'activity'}
-            href={'/activity'}
-          />
-          <SideBarNavLink icon={<IconAccount size={'$1'} />} text={'account'} href={'/account'} />
+          {links.map((link) => (
+            <SideBarNavLink key={link.href} {...link} />
+          ))}
         </YStack>
       </Nav>
     </SideBar>
@@ -51,14 +69,9 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
       </Link>
       <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
         <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
-          <SideBarNavLink icon={<IconHome size={'$1.75'} />} text={'home'} href={'/'} />
-          <SideBarNavLink icon={<IconSLogo size={'$1'} />} text={'send'} href={'/send'} />
-          <SideBarNavLink
-            icon={<IconActivity size={'$1'} />}
-            text={'activity'}
-            href={'/activity'}
-          />
-          <SideBarNavLink icon={<IconAccount size={'$1'} />} text={'account'} href={'/account'} />
+          {links.map((link) => (
+            <SideBarNavLink key={link.href} {...link} />
+          ))}
         </YStack>
       </Nav>
     </BottomSheet>
