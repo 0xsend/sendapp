@@ -63,6 +63,11 @@ jest.mock('app/utils/useSendAccountBalances', () => ({
   }),
 }))
 
+jest.mock('@tamagui/tooltip', () => ({
+  ...jest.requireActual('@tamagui/tooltip'),
+  TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 // jest.mock('@vonovak/react-native-theme-control', () => ({
 //   useThemePreference: jest.fn().mockReturnValue('light'),
 //   setThemePreference: jest.fn(),

@@ -1,4 +1,14 @@
-import { Button, Container, Paragraph, Spinner, XStack, YStack, useToastController } from '@my/ui'
+import {
+  Button,
+  Container,
+  Paragraph,
+  Spinner,
+  Tooltip,
+  TooltipGroup,
+  XStack,
+  YStack,
+  useToastController,
+} from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
 import {
@@ -26,7 +36,6 @@ export function HomeScreen() {
 
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
 
   return (
     <>
@@ -46,26 +55,65 @@ export function HomeScreen() {
             <XStack w={'100%'} zIndex={4}>
               <YStack py={'$11'}>
                 <YStack jc={'center'} gap={'$6'}>
-                  <Paragraph
-                    fontSize={'$4'}
-                    zIndex={1}
-                    color={'$color05'}
-                    textTransform={'uppercase'}
-                  >
-                    Total Balance
-                  </Paragraph>
-                  <XStack style={{ color: 'white' }} gap={'$2.5'}>
-                    {totalBalance === undefined ? (
-                      <Spinner size={'large'} />
-                    ) : (
-                      <Paragraph color={'$color12'} fontSize={96} fontWeight={'500'} zIndex={1}>
-                        {formatAmount(USDollar.format(totalBalance).split('.')[0])}
-                      </Paragraph>
-                    )}
-                    <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
-                      {'USD'}
-                    </Paragraph>
-                  </XStack>
+                  <TooltipGroup delay={{ open: 0, close: 1500 }}>
+                    <Tooltip placement="bottom">
+                      <Tooltip.Trigger>
+                        <Paragraph
+                          fontSize={'$4'}
+                          zIndex={1}
+                          color={'$color05'}
+                          textTransform={'uppercase'}
+                        >
+                          Total Balance
+                        </Paragraph>
+                        <XStack style={{ color: 'white' }} gap={'$2.5'}>
+                          {totalBalance === undefined ? (
+                            <Spinner size={'large'} />
+                          ) : (
+                            <Paragraph
+                              color={'$color12'}
+                              fontSize={96}
+                              fontWeight={'500'}
+                              zIndex={1}
+                            >
+                              {formatAmount(totalBalance, 4, 0)}
+                            </Paragraph>
+                          )}
+                          <Paragraph
+                            color={'$color12'}
+                            fontSize={'$6'}
+                            fontWeight={'500'}
+                            zIndex={1}
+                          >
+                            {'USD'}
+                          </Paragraph>
+                        </XStack>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                        exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                        scale={1}
+                        x={0}
+                        y={0}
+                        opacity={1}
+                        animation={[
+                          'quick',
+                          {
+                            opacity: {
+                              overshootClamping: true,
+                            },
+                          },
+                        ]}
+                      >
+                        <Tooltip.Arrow />
+                        <Paragraph fontSize={'$6'} fontWeight={'500'}>
+                          {totalBalance === undefined
+                            ? null
+                            : USDollar.format(Number(totalBalance))}
+                        </Paragraph>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </TooltipGroup>
                 </YStack>
               </YStack>
             </XStack>
