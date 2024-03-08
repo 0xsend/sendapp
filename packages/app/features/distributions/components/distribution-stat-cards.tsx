@@ -87,8 +87,8 @@ export function DistributionProgressCard(props: CardProps) {
         </XStack>
       </Card.Header>
       <YStack px="$4" jc="flex-start" f={1} zIndex={1}>
-        <Progress backgroundColor={'$gold4'} my="$4" direction="ltr" value={distributionProgress}>
-          <Progress.Indicator animation="quick" backgroundColor={'$gold9'} />
+        <Progress my="$4" direction="ltr" value={distributionProgress} theme="alt1">
+          <Progress.Indicator animation="quick" />
         </Progress>
         {isError ? (
           <H6 size="$4" f={6} color="$orange11">
