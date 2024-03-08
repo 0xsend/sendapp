@@ -17,6 +17,13 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
-Page.getLayout = (children) => <HomeLayout header="Hold & Earn">{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout
+    header="Hold & Earn"
+    subheader="Maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. "
+  >
+    {children}
+  </HomeLayout>
+)
 
 export default Page
