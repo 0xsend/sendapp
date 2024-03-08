@@ -201,7 +201,7 @@ exports[`HomeScreen 1`] = `
             }
             suppressHighlighting={true}
           >
-            Add Funds
+            Deposit
           </Text>
           <View
             style={

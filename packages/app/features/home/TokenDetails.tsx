@@ -86,7 +86,10 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
         <XStack
           $lg={{ display: 'none' }}
           cursor={'pointer'}
-          onPress={() => toast.show('@TODO: Go to Balance details')}
+          onPress={() => {
+            // @todo go to balance details
+            toast.show('Coming Soon: Balance details')
+          }}
         >
           <IconArrowRight color={iconColor} />
         </XStack>
