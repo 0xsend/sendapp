@@ -44,19 +44,12 @@ runs:
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
+    # BEGIN Preview Environment
     - name: Setup Preview Environment
       if: ${{ inputs.production != 'true' }}
       shell: bash
       run: |
         bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=preview
-      env:
-        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
-        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
-    - name: Setup Production Environment
-      if: ${{ inputs.production == 'true' }}
-      shell: bash
-      run: |
-        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=production
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
@@ -90,6 +83,9 @@ runs:
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
+    # END Preview Environment
+
+    # BEGIN Production Environment
     - name: Setup Production Environment
       if: ${{ inputs.production == 'true' }}
       shell: bash
@@ -127,3 +123,4 @@ runs:
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
+    # END Production Environment

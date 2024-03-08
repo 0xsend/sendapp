@@ -24,7 +24,7 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit",
@@ -45,11 +45,5 @@
     "@openzeppelin/contracts/=packages/contracts/lib/openzeppelin-contracts/contracts/",
     "openzeppelin-contracts-upgradeable/=packages/contracts/lib/openzeppelin-contracts-upgradeable/",
     "p256-verifier/=packages/contracts/lib/p256-verifier/src/"
-  ],
-  "[sql]": {
-    "editor.defaultFormatter": "bradymholt.pgformatter"
-  },
-  "pgFormatter.keywordCase": "lowercase",
-  "pgFormatter.wrapLimit": 100,
-  "pgFormatter.keepNewline": true
+  ]
 }
