@@ -15,14 +15,12 @@ abstract contract Helper is Script {
     /**
      * Send: Treasury
      * https://etherscan.io/address/0x4bB2f4c771ccB60723a78a974a2537AD339071c7
-     * @notice Only on Mainnet
      *
      */
     address constant SEND_TREASURY_SAFE = 0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE;
     /**
      * Send: Airdrops
      * https://etherscan.io/address/0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7
-     * @notice Only on Mainnet
      *
      */
     address constant SEND_AIRDROPS_SAFE = 0x077c4E5983e5c495599C1Eb5c1511A52C538eB50;

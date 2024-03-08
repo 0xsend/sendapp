@@ -177,7 +177,7 @@ export const CheckoutScreen = () => {
   return (
     <Container>
       <YStack h="100%" width="100%">
-        <YStack f={1} als={'stretch'} h="100%">
+        <YStack f={1} als={'stretch'} h="100%" $lg={{ mx: 'auto' }}>
           <FormProvider {...form}>
             <SchemaForm
               form={form}

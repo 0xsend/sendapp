@@ -18,7 +18,7 @@ export function HomeHeader({ children }: { children: string }) {
   return (
     <Header w="100%">
       <XStack jc="space-between" fd="row" ai="center">
-        <XStack $gtMd={{ display: 'none' }} ai="center" space="$2" height="$4">
+        <XStack $gtLg={{ display: 'none' }} ai="center" space="$2" height="$4">
           <Button
             onPress={handleHomeBottomSheet}
             bg="transparent"
@@ -35,7 +35,7 @@ export function HomeHeader({ children }: { children: string }) {
           </H2>
         )}
         <Button
-          $gtMd={{ display: 'none' }}
+          $gtLg={{ display: 'none' }}
           bg="transparent"
           icon={<IconQr size={'$2.5'} color={iconColor} />}
         />

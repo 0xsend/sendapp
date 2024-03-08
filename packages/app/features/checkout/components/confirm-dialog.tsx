@@ -17,7 +17,7 @@ import {
   YStack,
   YStackProps,
 } from '@my/ui'
-import { baseMainnet, sendRevenueSafeAddress } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
 import { CheckCircle, X } from '@tamagui/lucide-icons'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'
@@ -448,7 +448,7 @@ export function ConfirmWithSignTransaction() {
   const { refetch: refetchReceipts } = useReceipts()
   const ethAmount = getPriceInWei(pendingTags ?? [], confirmedTags ?? [])
   const confirm = api.tag.confirm.useMutation()
-  const publicClient = usePublicClient()
+  const { chain } = useAccount()
   const [sentTx, setSentTx] = useState<`0x${string}`>()
   const { data: txReceipt, error: txWaitError } = useWaitForTransactionReceipt({
     hash: sentTx,
@@ -552,8 +552,6 @@ export function ConfirmWithSignTransaction() {
     }
   }, [open, reset])
 
-  assert(!!publicClient, 'publicClient is required')
-
   if (confirmed) {
     return (
       <ConfirmDialogContent>
@@ -562,9 +560,9 @@ export function ConfirmWithSignTransaction() {
           <YStack space="$2">
             <Paragraph maw="100%">
               Confirmed transaction using{' '}
-              {publicClient.chain.blockExplorers ? (
+              {chain ? (
                 <Anchor
-                  href={`${publicClient.chain.blockExplorers.default}/tx/${txReceipt.transactionHash}`}
+                  href={`${chain.blockExplorers.default.url}/tx/${txReceipt.transactionHash}`}
                 >
                   {shorten(txReceipt.transactionHash, 7, 3)}
                 </Anchor>
@@ -618,8 +616,8 @@ export function ConfirmWithSignTransaction() {
         {!isFree && (
           <Paragraph mx="auto" maw="100%">
             Sent transaction...{' '}
-            {publicClient.chain.blockExplorers ? (
-              <Anchor href={`${publicClient.chain.blockExplorers.default}/tx/${sentTx}`}>
+            {chain ? (
+              <Anchor href={`${chain.blockExplorers.default.url}/tx/${sentTx}`}>
                 {shorten(sentTx, 7, 3)}
               </Anchor>
             ) : (
@@ -686,14 +684,13 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
   const receiptHashes = useMemo(() => receipts?.map((r) => r.hash) ?? [], [receipts])
   const { data: block } = useBlockNumber()
 
-  assert(!!publicClient, 'publicClient is required')
-
   const lookupSafeReceivedEvent = useCallback(async () => {
     if (!address) return
     if (isLoadingReceipts) return
     if (receipts === undefined) return
+    if (!publicClient) return
     const events = await getSenderSafeReceivedEvents({
-      publicClient: publicClient as PublicClient,
+      publicClient: publicClient as typeof baseMainnetClient,
       sender: address,
     })
     const event = events.filter(
