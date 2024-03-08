@@ -19,7 +19,7 @@ const MainLayout = ({
       <YStack height={'100vh'} pb={'$size.10'} $shorter={{ pb: '$size.8' }}>
         <XStack borderColor={separatorColor} borderBottomWidth={1} pt={'$6'}>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'} py={'$6'}>
-            <Link href={'/settings'}>
+            <Link href={'/account'}>
               <Avatar br={'$6'} size={'$4.5'}>
                 {avatar_url ? (
                   <Avatar.Image src={avatar_url} width={48} height={48} />
