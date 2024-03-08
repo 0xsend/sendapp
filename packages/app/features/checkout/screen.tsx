@@ -88,7 +88,6 @@ export async function getSenderSafeReceivedEvents({
       sender,
     },
     strict: true,
-    fromBlock: BigInt(11269822), // send revenue contract creation block,
   })
 }
 
