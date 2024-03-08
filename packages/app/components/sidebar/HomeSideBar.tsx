@@ -1,6 +1,7 @@
 import {
   BottomSheet,
   Nav,
+  Paragraph,
   SheetProps,
   SideBar,
   SideBarWrapper,
@@ -13,6 +14,7 @@ import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'ap
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import { useNav } from 'app/routers/params'
+import { ReactElement } from 'react'
 
 const links = [
   {
@@ -35,7 +37,13 @@ const links = [
     text: 'account',
     href: '/account',
   },
-]
+  // @todo enable on testnet
+  __DEV__ && {
+    icon: <Paragraph px="$1">🔒</Paragraph>,
+    text: 'secret shop',
+    href: '/secret-shop',
+  },
+].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (

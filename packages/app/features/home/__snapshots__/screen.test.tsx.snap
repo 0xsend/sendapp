@@ -98,7 +98,7 @@ exports[`HomeScreen 1`] = `
                     "fontFamily": "System",
                     "fontSize": 96,
                     "fontWeight": "500",
-                    "lineHeight": 67,
+                    "lineHeight": 19,
                     "zIndex": 1,
                   }
                 }
