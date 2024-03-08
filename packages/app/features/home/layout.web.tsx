@@ -1,5 +1,5 @@
 import { Container, ScrollView, YStack } from '@my/ui'
-import { HomeHeader } from 'app/components/HomeHeader'
+import { HomeTopNav } from 'app/components/HomeTopNav'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { useThemeSetting } from '@tamagui/next-theme'
 
@@ -14,14 +14,9 @@ export function HomeLayout({
     <HomeSideBarWrapper>
       <YStack h={'100%'} f={1}>
         <ScrollView f={3} fb={0} backgroundColor={'$background05'}>
-          <Container
-            mb={'$6'}
-            $gtLg={{ mb: '$7', maxWidth: 1440, px: '$11' }}
-            $lg={{ borderBottomWidth: 1, borderColor: separatorColor }}
-            $sm={{ pt: '$6' }}
-          >
-            <YStack gap="$6" py={'$3'} $gtLg={{ pt: '$11', pb: '$7' }} w={'100%'}>
-              <HomeHeader backLink={backLink}>{header}</HomeHeader>
+          <Container $lg={{ borderBottomWidth: 1, borderColor: separatorColor }} $sm={{ pt: '$6' }}>
+            <YStack gap="$3" py={'$3'} $gtMd={{ pt: '$11' }} w={'100%'}>
+              <HomeTopNav>{header}</HomeTopNav>
             </YStack>
           </Container>
           {children}
