@@ -152,7 +152,7 @@ function SettingsButton() {
       px={'$3'}
       br="$4"
     >
-      <Link href="/settings" alignSelf="stretch">
+      <Link href="/account" alignSelf="stretch">
         <YStack ai={'center'}>
           <IconGear size={'$2'} />
         </YStack>
