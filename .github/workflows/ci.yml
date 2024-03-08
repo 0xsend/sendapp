@@ -258,7 +258,7 @@ jobs:
           message: |
             Vercel Unique URL: [${{ steps.vercel-deploy-with-branch.outputs.deployment-url }}](${{ steps.vercel-deploy-with-branch.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
-            Last Commit: ${{ github.workflow_sha }}
+            Last Commit: ${{ github.event.pull_request.head.sha }}
 
       - uses: mshick/add-pr-comment@v2
         if: github.base_ref != 'dev'
@@ -268,7 +268,7 @@ jobs:
           message: |
             Vercel Unique URL: [${{ steps.vercel-deploy-preview.outputs.deployment-url }}](${{ steps.vercel-deploy-preview.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
-            Last Commit: ${{ github.sha }}
+            Last Commit: ${{ github.event.pull_request.head.sha }}
 
   deploy-staging:
     if: github.ref == 'refs/heads/dev'
