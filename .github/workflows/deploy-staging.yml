@@ -25,6 +25,9 @@ on:
       SECRET_SHOP_PRIVATE_KEY:
         description: 'Secret shop private key'
         required: false
+      CI_QA_NOTIFICATION_URL:
+        description: 'QA notification url'
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}

@@ -295,6 +295,7 @@ jobs:
       STAGING_SUPABASE_PROJECT_ID: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
       STAGING_SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
       SECRET_SHOP_PRIVATE_KEY: ${{ secrets.SECRET_SHOP_PRIVATE_KEY }}
+      CI_QA_NOTIFICATION_URL: ${{ secrets.CI_QA_NOTIFICATION_URL }}
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
