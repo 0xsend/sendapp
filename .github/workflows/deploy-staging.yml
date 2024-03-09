@@ -46,3 +46,4 @@ jobs:
           supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
           supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           supabase-db-password: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
+          qa-notification-url: ${{ secrets.CI_QA_NOTIFICATION_URL }}
