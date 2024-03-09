@@ -218,7 +218,19 @@ jobs:
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
-          deploy-preview-extra-args: -e SUPABASE_DB_URL="postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres" -e SUPABASE_JWT_SECRET="${{steps.supabase-branch.outputs.jwt_secret}}" -e SUPABASE_SERVICE_ROLE="${{ steps.supabase-branch.outputs.service_role_key }}" -e NEXT_PUBLIC_SUPABASE_URL="https://${{ steps.supabase-branch.outputs.project_ref }}.supabase.co" -e NEXT_PUBLIC_SUPABASE_PROJECT_ID="${{steps.supabase-branch.outputs.project_ref}}" -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="${{steps.supabase-branch.outputs.graphql_url}}" -e NEXT_PUBLIC_BASE_CHAIN_ID="84532" -e NEXT_PUBLIC_MAINNET_CHAIN_ID="11155111" -e NEXT_PUBLIC_BASE_RPC_URL="https://sepolia.base.org" -e NEXT_PUBLIC_MAINNET_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com" -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ steps.supabase-branch.outputs.anon_key }}"
+          deploy-preview-extra-args: >-
+            -e SUPABASE_DB_URL="postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres" 
+            -e SUPABASE_JWT_SECRET="${{steps.supabase-branch.outputs.jwt_secret}}" 
+            -e SUPABASE_SERVICE_ROLE="${{ steps.supabase-branch.outputs.service_role_key }}" 
+            -e NEXT_PUBLIC_SUPABASE_URL="https://${{ steps.supabase-branch.outputs.project_ref }}.supabase.co" 
+            -e NEXT_PUBLIC_SUPABASE_PROJECT_ID="${{steps.supabase-branch.outputs.project_ref}}" 
+            -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="${{steps.supabase-branch.outputs.graphql_url}}" 
+            -e NEXT_PUBLIC_BASE_CHAIN_ID="84532" 
+            -e NEXT_PUBLIC_MAINNET_CHAIN_ID="11155111" 
+            -e NEXT_PUBLIC_BASE_RPC_URL="https://sepolia.base.org" 
+            -e NEXT_PUBLIC_MAINNET_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com" 
+            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ steps.supabase-branch.outputs.anon_key }}"
+            -e SECRET_SHOP_PRIVATE_KEY="${{ secrets.SECRET_SHOP_PRIVATE_KEY }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -236,6 +248,7 @@ jobs:
           NEXT_PUBLIC_BASE_RPC_URL: https://sepolia.base.org
           NEXT_PUBLIC_MAINNET_RPC_URL: https://ethereum-sepolia-rpc.publicnode.com
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase-branch.outputs.anon_key }}
+          SECRET_SHOP_PRIVATE_KEY: ${{ secrets.SECRET_SHOP_PRIVATE_KEY }}
       - name: Vercel Deploy Preview
         if: github.base_ref != 'dev'
         id: vercel-deploy-preview
@@ -281,6 +294,7 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       STAGING_SUPABASE_PROJECT_ID: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
       STAGING_SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
+      SECRET_SHOP_PRIVATE_KEY: ${{ secrets.SECRET_SHOP_PRIVATE_KEY }}
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
