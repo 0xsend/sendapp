@@ -4,12 +4,14 @@ import { authRouter } from './auth'
 import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
 import { tagRouter } from './tag'
+import { secretShopRouter } from './secretShop'
 
 export const appRouter = createTRPCRouter({
   chainAddress: chainAddressRouter,
   tag: tagRouter,
   auth: authRouter,
   distribution: distributionRouter,
+  secretShop: secretShopRouter,
 })
 
 export type AppRouter = typeof appRouter

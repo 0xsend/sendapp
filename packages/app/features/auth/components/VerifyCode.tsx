@@ -53,7 +53,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         defaultValues={{ token: '' }}
         props={{
           token: {
-            'aria-label': 'One-time Password',
+            accessibilityLabel: 'One-time Password',
             '$theme-dark': {
               borderBottomColor: '$accent9Light',
             },
@@ -76,7 +76,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             },
             // @todo move these to OTP form when that becomes stable
             textContentType: 'oneTimeCode',
-            autoComplete: 'sms-otp',
+            autoComplete: 'one-time-code',
             outlineColor: 'transparent',
           },
         }}
@@ -122,7 +122,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
               fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
-              Start by creating a Passkey below. Send uses passkeys to secure your account
+              Enter the code we sent you on your phone.
             </H3>
             <YStack gap="$4">
               <Theme inverse={true}>

@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { verifyAddressMsg } from 'app/features/checkout/screen'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { verifyMessage } from 'viem'
+import { verifyMessage, isAddress, getAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 
@@ -13,9 +13,13 @@ export const chainAddressRouter = createTRPCRouter({
         address: z.string().regex(/^0x[0-9a-f]{40}$/i),
       })
     )
-    .mutation(async ({ ctx: { session }, input: { address, signature } }) => {
+    .mutation(async ({ ctx: { session }, input: { address: addressInput, signature } }) => {
+      if (!isAddress(addressInput, { strict: false })) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid address.' })
+      }
+      const address = getAddress(addressInput)
       const verified = await verifyMessage({
-        address: address as `0x${string}`,
+        address: address,
         message: verifyAddressMsg(address),
         signature: signature as `0x${string}`,
       }).catch((e) => {

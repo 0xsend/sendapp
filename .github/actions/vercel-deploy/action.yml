@@ -37,7 +37,6 @@ runs:
       shell: bash
       run: |
         echo "::add-mask::${{ inputs.vercel-token }}"
-        echo "::add-mask::${{ inputs.deploy-preview-extra-args }}"
     - name: Switch to Vercel team
       shell: bash
       run: bunx vercel --token=${{ inputs.vercel-token }} team switch ${{ inputs.vercel-scope }}

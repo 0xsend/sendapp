@@ -23,6 +23,10 @@ inputs:
   supabase-db-password:
     description: "The Supabase database password to use for deployment."
     required: true
+  qa-notification-url:
+    description: "The URL to use for notifying QA of a new deployment."
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -47,6 +51,7 @@ runs:
       id: public-hostname
       run: echo "public-hostname=sendapp-${{steps.extract-branch.outputs.branch}}-0xsend.vercel.app" >> $GITHUB_OUTPUT
     - name: Vercel Deploy
+      id: vercel-deploy
       uses: ./.github/actions/vercel-deploy
       with:
         vercel-token: ${{ inputs.vercel-token }}
@@ -56,3 +61,13 @@ runs:
         production: ${{ inputs.production }}
       env:
         YARN_ENABLE_HARDENED_MODE: "0"
+    - name: Notify QA
+      if: ${{ inputs.qa-notification-url != "" }}
+      shell: bash
+      run: |
+        # if production
+        if [ "${{ inputs.production }}" = "true" ]; then
+          curl -X POST -d 'A new production deployment is available at ${{ steps.vercel-deploy.outputs.deployment-url }}' ${{ inputs.qa-notification-url }}
+        else
+          curl -X POST -d 'A new staging deployment is available at ${{ steps.vercel-deploy.outputs.deployment-url }}' ${{ inputs.qa-notification-url }}
+        fi

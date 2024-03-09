@@ -86,6 +86,7 @@ This uses development settings. For production, use the production settings.
 ```shell
 cat <<EOF > .env.local
 # 🧑‍💻 DEVELOPMENT SETTING
+NODE_ENV=development
 NEXT_PUBLIC_SUPABASE_PROJECT_ID=default
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
@@ -99,11 +100,13 @@ NEXT_PUBLIC_MAINNET_CHAIN_ID=1337
 
 ### Running the app
 
-Then, run the app:
+#### Distributor
+
+This is the main application that recalculates the distribution shares for each Send token holder. Then, run the app:
 
 ```shell
-pm2 start "yarn distributor start"
-pm2 logs 0
+pm2 start --name distributor "yarn distributor start"
+pm2 logs distributor
 ```
 
 Check that the app is running:
@@ -111,6 +114,33 @@ Check that the app is running:
 ```shell
 curl http://localhost:3050/distributor
 # {"distributor":true,"id":"keworl","lastBlockNumber":"18252625","lastBlockNumberAt":"2023-10-14T16:54:05.346Z","running":true}
+```
+
+#### Shovel
+
+This is a background worker that listens for new Send token transfers and saves them to the database. It requires
+some environment variables to be set. You can set them in a script and run the script.
+
+Ensure the `shovel` binary is installed and the `shovel` command is available in the terminal. Then, pass the path config file to the `shovel` command.
+
+```shell
+cat <<EOF > shovel.sh
+#!/bin/bash
+set -e
+
+export DASHBOARD_ROOT_PASSWORD=$(tr -dc 'A-Za-z0-9!?%=' < /dev/urandom | head -c 32)
+export DATABASE_URL=postgres://postgres:postgres@localhost:54322/postgres
+export BASE_NAME=basesepolia
+export BASE_RPC_URL=https://base-sepolia-rpc.publicnode.com/
+export BASE_CHAIN_ID=84532
+export BASE_BLOCK_START=4570291
+
+shovel -config /root/sendapp/packages/shovel/etc/config.json
+EOF
+
+chmod +x shovel.sh
+pm2 start --name shovel $(pwd)/shovel.sh
+pm2 logs shovel
 ```
 
 #### ⚠️ If this is the first deployment, you should also run the following commands
@@ -140,7 +170,8 @@ caddy reload -c /etc/caddy/Caddyfile
 ```shell
 git pull
 yarn install
-pm2 restart "yarn distributor start"
+pm2 restart distributor
+pm2 restart shovel
 ```
 
 ## Monitoring
