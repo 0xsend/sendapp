@@ -62,7 +62,7 @@ runs:
       env:
         YARN_ENABLE_HARDENED_MODE: "0"
     - name: Notify QA
-      if: ${{ inputs.qa-notification-url != "" }}
+      if: ${{ inputs.qa-notification-url != '' }}
       shell: bash
       run: |
         # if production
