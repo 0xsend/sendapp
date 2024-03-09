@@ -66,7 +66,8 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.production }}" = "true" ]; then
-          curl -X POST -d 'A new production deployment is available at ${{ steps.vercel-deploy.outputs.deployment-url }}' ${{ inputs.qa-notification-url }}
+          data=$(printf "A new production deployment is available\n\nUnique URL: %s\n\nPublic Hostname: %s" "${{ steps.vercel-deploy.outputs.deployment-url }}" "https://${{ steps.public-hostname.outputs.public-hostname }}")
         else
-          curl -X POST -d 'A new staging deployment is available at ${{ steps.vercel-deploy.outputs.deployment-url }}' ${{ inputs.qa-notification-url }}
+          data=$(printf "A new staging deployment is available\n\nUnique URL: %s\n\nPublic Hostname: %s" "${{ steps.vercel-deploy.outputs.deployment-url }}" "https://${{ steps.public-hostname.outputs.public-hostname }}")
         fi
+        curl -X POST -d "$data" "${{ inputs.qa-notification-url }}"
