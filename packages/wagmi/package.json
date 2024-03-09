@@ -34,7 +34,7 @@
     "@wagmi/core": "^2.6.3",
     "change-case": "^5.4.2",
     "permissionless": "^0.1.4",
-    "viem": "^2.7.15",
+    "viem": "^2.7.22",
     "wagmi": "^2.5.5"
   }
 }

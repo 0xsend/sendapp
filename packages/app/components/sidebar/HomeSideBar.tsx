@@ -10,6 +10,7 @@ import {
   useMedia,
 } from '@my/ui'
 import { Link } from '@my/ui'
+import { baseMainnet } from '@my/wagmi/chains'
 import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -38,11 +39,13 @@ const links = [
     href: '/account',
   },
   // @todo enable on testnet
-  __DEV__ && {
-    icon: <Paragraph px="$1">🔒</Paragraph>,
-    text: 'secret shop',
-    href: '/secret-shop',
-  },
+  __DEV__ || baseMainnet.id === 84532
+    ? {
+        icon: <Paragraph px="$1">🔒</Paragraph>,
+        text: 'secret shop',
+        href: '/secret-shop',
+      }
+    : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {

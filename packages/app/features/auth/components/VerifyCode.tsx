@@ -76,7 +76,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             },
             // @todo move these to OTP form when that becomes stable
             textContentType: 'oneTimeCode',
-            autoComplete: 'sms-otp',
+            autoComplete: 'one-time-code',
             outlineColor: 'transparent',
           },
         }}
