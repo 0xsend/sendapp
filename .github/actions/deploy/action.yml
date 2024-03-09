@@ -65,7 +65,6 @@ runs:
       if: ${{ inputs.qa-notification-url != '' }}
       shell: bash
       run: |
-        # if production
         if [ "${{ inputs.production }}" = "true" ]; then
           curl -X POST -d 'A new production deployment is available at ${{ steps.vercel-deploy.outputs.deployment-url }}' ${{ inputs.qa-notification-url }}
         else
