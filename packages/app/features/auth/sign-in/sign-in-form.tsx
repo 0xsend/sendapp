@@ -117,7 +117,7 @@ export const SignInForm = () => {
                 fontWeight={'300'}
                 $sm={{ size: '$5' }}
               >
-                Start by creating a Passkey below. Send uses passkeys to secure your account
+                Sign up or Sign in with your phone number.
               </H3>
 
               <YStack gap="$4">
