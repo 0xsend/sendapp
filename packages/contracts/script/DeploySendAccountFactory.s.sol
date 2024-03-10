@@ -21,7 +21,10 @@ contract DeploySendAccountFactoryScript is Script, Helper {
         vm.startBroadcast();
         address factory =
             address(new DaimoAccountFactory{salt: 0}(IEntryPoint(AA_ENTRY_POINT_V0_7), DaimoVerifier(verifierProxy)));
-        // solhint-disable-next-line no-console
+
+        /* solhint-disable no-console */
+        console2.log("DaimoVerifier address:", verifier);
+        console2.log("DaimoVerifierProxy address:", verifierProxy);
         console2.log("DaimoAccountFactory address:", factory);
         vm.stopBroadcast();
     }

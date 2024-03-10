@@ -367,7 +367,7 @@ export const daimoAccountFactoryAbi = [
  */
 export const daimoAccountFactoryAddress = {
   84532: '0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC',
-  845337: '0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC',
+  845337: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
 } as const
 
 /**
@@ -523,7 +523,7 @@ export const daimoVerifierAbi = [
  */
 export const daimoVerifierAddress = {
   84532: '0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F',
-  845337: '0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F',
+  845337: '0xccfe0A37B2f7AFE57159D550E59B0D3da93092a4',
 } as const
 
 /**
@@ -573,7 +573,7 @@ export const daimoVerifierProxyAbi = [
  */
 export const daimoVerifierProxyAddress = {
   84532: '0xdAAb03239f5CC5b3452837E557295F790D9ab319',
-  845337: '0xdAAb03239f5CC5b3452837E557295F790D9ab319',
+  845337: '0x93a7df202E82862e61ba5239bC10996FD9a1CBBD',
 } as const
 
 /**
@@ -2799,7 +2799,7 @@ export const sendMerkleDropAddress = {
   1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
   8453: '0x240761104aF5DAeDFd9025810FfEB741fEB316B3',
   84532: '0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE',
-  845337: '0x240761104aF5DAeDFd9025810FfEB741fEB316B3',
+  845337: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6',
   11155111: '0xB9310daE45E71c7a160A13D64204623071a8E347',
 } as const
 

@@ -8,6 +8,10 @@ solc_version = "0.8.23"
 optimizer = true
 optimizer_runs = 999_999
 
+[profile.ci]
+verbosity = 4
+fuzz.runs = 512
+
 [profile.deploy]
 via_ir = true
 
