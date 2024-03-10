@@ -13,8 +13,13 @@ export function HomeLayout({
     <HomeSideBarWrapper>
       <YStack h={'100%'} f={1}>
         <ScrollView f={3} fb={0} backgroundColor={'$background05'}>
-          <Container $md={{ borderBottomWidth: 1, borderColor: separatorColor }} $sm={{ pt: '$6' }}>
-            <YStack gap="$6" py={'$3'} $gtMd={{ pt: '$11' }} w={'100%'}>
+          <Container
+            mb={'$6'}
+            $gtMd={{ mb: '$7' }}
+            $md={{ borderBottomWidth: 1, borderColor: separatorColor }}
+            $sm={{ pt: '$6' }}
+          >
+            <YStack gap="$6" py={'$3'} $gtMd={{ pt: '$11', pb: '$7' }} w={'100%'}>
               <HomeHeader>{header}</HomeHeader>
             </YStack>
           </Container>

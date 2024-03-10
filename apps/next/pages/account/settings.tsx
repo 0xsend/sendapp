@@ -1,26 +1,31 @@
 import { HomeLayout } from 'app/features/home/layout.web'
+import { AccountLayout } from 'app/features/account/layout.web'
+import { GeneralSettingsScreen } from 'app/features/account/general-screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../_app'
-import { AccountScreen } from 'app/features/account/screen'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Account</title>
+        <title>Settings</title>
         <meta
           name="description"
           content="Send Tags simplify transactions by replacing long wallet addresses with memorable identifiers."
           key="desc"
         />
       </Head>
-      <AccountScreen />
+      <GeneralSettingsScreen />
     </>
   )
 }
 
 export const getServerSideProps = userProtectedGetSSP()
-Page.getLayout = (children) => <HomeLayout header="Account">{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout>
+    <AccountLayout isAccountHome>{children}</AccountLayout>
+  </HomeLayout>
+)
 
 export default Page
