@@ -1,40 +1,13 @@
-import {
-  Avatar,
-  Button,
-  Card,
-  Container,
-  Link,
-  LinkProps,
-  Paragraph,
-  Separator,
-  XStack,
-  YStack,
-  useToastController,
-} from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
-import { IconDollar, IconGear, IconPlus, IconReferral } from 'app/components/icons'
-import { getReferralHref } from 'app/utils/getReferralLink'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { Avatar, Container, Link, LinkProps, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { IconDollar, IconGear, IconPlus } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
-import { useEffect, useState } from 'react'
 import { Square } from 'tamagui'
 
 export function AccountScreen() {
   const { profile, user, tags } = useUser()
   const name = profile?.name
-  const code = profile?.referral_code
-  const about = profile?.about
   const avatar_url = profile?.avatar_url
   const sendTags = tags?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
-  const referralHref = getReferralHref(code ?? '')
-  const supabase = useSupabase()
-  const { toggle, current } = useThemeSetting()
-  const [mode, setMode] = useState('')
-  const toast = useToastController()
-
-  useEffect(() => {
-    setMode(current ? current : '')
-  }, [current])
 
   return (
     <>
