@@ -1,6 +1,13 @@
 import { describe, expect, it } from '@jest/globals'
 import { CommentsTime } from './dateHelper'
 describe('CommentsTime', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2021-08-01').getTime())
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   it('time should be 0 sec ago', () => {
     expect(CommentsTime(new Date().toString())).toBe('0 sec ago')
   })
