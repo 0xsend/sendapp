@@ -39,7 +39,10 @@ export function AccountScreen() {
               <BorderedLink href={'/'} icon={<IconDollar color={'$primary'} />}>
                 Earn Tokens
               </BorderedLink>
-              <BorderedLink href={'/'} icon={<IconGear color={'$primary'} size={'$1'} />}>
+              <BorderedLink
+                href={'/account/settings'}
+                icon={<IconGear color={'$primary'} size={'$1'} />}
+              >
                 Settings
               </BorderedLink>
             </XStack>

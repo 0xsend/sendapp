@@ -1,10 +1,11 @@
-import { Button, H2, Header, XStack, useMedia } from '@my/ui'
+import { Button, H2, Header, Link, XStack, useMedia } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
+import { IconArrowLeft, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
+import { useRouter } from 'solito/router'
 
 // TODO: this should probably named HomeTopNav
-export function HomeHeader({ children }: { children: string }) {
+export function HomeHeader({ backButton, children }: { backButton?: boolean; children: string }) {
   const [nav, setNavParam] = useNav()
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
@@ -12,7 +13,7 @@ export function HomeHeader({ children }: { children: string }) {
 
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
-
+  const router = useRouter()
   const media = useMedia()
 
   return (
@@ -31,9 +32,19 @@ export function HomeHeader({ children }: { children: string }) {
             <IconSendLogo size={'$2.5'} color={'$color12'} />
           </XStack>
         ) : (
-          <H2 fontWeight={'300'} color={'$color05'} ai={'center'}>
-            {children}
-          </H2>
+          <XStack gap={'$3.5'} ai={'center'}>
+            <XStack
+              onPress={() => router.back()}
+              cursor="pointer"
+              $lg={{ display: 'none' }}
+              $gtLg={{ display: backButton ? 'flex' : 'none' }}
+            >
+              <IconArrowLeft color={iconColor} />
+            </XStack>
+            <H2 fontWeight={'300'} color={'$color05'} ai={'center'}>
+              {children}
+            </H2>
+          </XStack>
         )}
         <Button
           p={0}
