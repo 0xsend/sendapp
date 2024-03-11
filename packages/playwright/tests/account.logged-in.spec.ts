@@ -21,7 +21,7 @@ test('can update profile', async ({ page, supabase }) => {
 
   await page.getByRole('button', { name: 'Update Profile' }).click()
 
-  await expect(page.getByText('Successfully updated')).toBeVisible()
+  await expect(page.getByText('Notification Successfully updated')).toBeVisible()
 
   const { data, error } = await supabase.auth.getSession()
   expect(error).toBeFalsy()
