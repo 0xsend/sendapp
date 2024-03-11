@@ -1,9 +1,9 @@
 import {
   Anchor,
   Button,
-  Container,
+  ButtonText,
   Paragraph,
-  ScrollView,
+  Stack,
   Text,
   Theme,
   Tooltip,
@@ -15,25 +15,33 @@ import { sendAirdropsSafeAddress } from '@my/wagmi'
 import { ArrowRight } from '@tamagui/lucide-icons'
 import React from 'react'
 import { useLink } from 'solito/link'
-import { DistributionsTable } from './components/DistributionsTable'
+
 import {
   DistributionProgressCard,
   DistributionTimeCard,
 } from './components/distribution-stat-cards'
 import { useAccount } from 'wagmi'
 import { shorten } from 'app/utils/strings'
+import { UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
+import { useDistributionNumber } from 'app/routers/params'
 
 export function EarnTokensScreen() {
+  const { data: distributions } = useDistributions()
+
   return (
-    <Container>
-      <ScrollView f={3} fb={0} backgroundColor={'$background05'}>
-        <YStack gap="$6" pt="$5" pb="$8">
-          <YStack gap="$8">
-            <DistributionSection />
-          </YStack>
-        </YStack>
-      </ScrollView>
-    </Container>
+    <YStack f={1} gap="$6" pb="$8" backgroundColor={'$background05'} px="$6">
+      <YStack
+        gap="$8"
+        f={1}
+        overflow={'hidden'}
+        borderTopColor="$gray7Dark"
+        borderTopWidth="$1"
+        py="$4"
+      >
+        <DistributionSection />
+      </YStack>
+      <EarnList distributions={distributions} />
+    </YStack>
   )
 }
 
@@ -93,10 +101,65 @@ const DistributionSection = () => {
         <DistributionProgressCard />
         <DistributionTimeCard />
       </XStack>
-
-      <XStack px="$4" gap="$8" mb="$4" jc="center">
-        <DistributionsTable />
-      </XStack>
     </YStack>
   )
+}
+
+const EarnList = ({ distributions }: { distributions?: UseDistributionsResultData }) => {
+  const { isLoading, error, refetch } = useDistributions()
+  const [distributionNumberParam, setDistributionNumberParam] = useDistributionNumber()
+
+  if (error)
+    return (
+      <Stack w={'100%'} jc="center" ai="center">
+        <Button onPress={() => refetch()}>Reload</Button>
+      </Stack>
+    )
+
+  if (isLoading) return <EarnListSkeleton />
+
+  return (
+    <XStack w="full" px="$4" gap="$8" mb="$4" jc="flex-start">
+      {distributions?.toReversed().map(({ number, id }) => {
+        return (distributionNumberParam === undefined && number === distributions.length) ||
+          distributionNumberParam === number ? (
+          <Button
+            key={id}
+            bc={'$accent12Dark'}
+            w={'$7'}
+            h="$2"
+            br={6}
+            onPress={() => setDistributionNumberParam(number)}
+          >
+            <ButtonText
+              size={'$1'}
+              padding={'unset'}
+              ta="center"
+              margin={'unset'}
+              col="$background"
+            >
+              {`# ${number}  `}
+            </ButtonText>
+          </Button>
+        ) : (
+          <Button
+            key={id}
+            bc={'$decay'}
+            w={'$7'}
+            h="$2"
+            br={6}
+            onPress={() => setDistributionNumberParam(number)}
+          >
+            <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
+              {`# ${number}  `}
+            </ButtonText>
+          </Button>
+        )
+      })}
+    </XStack>
+  )
+}
+
+const EarnListSkeleton = () => {
+  return null
 }
