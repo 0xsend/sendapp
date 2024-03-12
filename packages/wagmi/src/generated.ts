@@ -379,6 +379,546 @@ export const daimoAccountFactoryConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoEphemeralNotes
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoEphemeralNotesAbi = [
+  {
+    type: 'constructor',
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: '_signature', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'claimNote',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'createNote',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'notes',
+    outputs: [
+      { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'token',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'note',
+        internalType: 'struct Note',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'NoteCreated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'note',
+        internalType: 'struct Note',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+      { name: 'redeemer', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'NoteRedeemed',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoEphemeralNotesV2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoEphemeralNotesV2Abi = [
+  {
+    type: 'constructor',
+    inputs: [{ name: '_token', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: '_signature', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'claimNoteRecipient',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_ephemeralOwner', internalType: 'address', type: 'address' }],
+    name: 'claimNoteSelf',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: '_amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'createNote',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'notes',
+    outputs: [
+      { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'token',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'note',
+        internalType: 'struct Note',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'NoteCreated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'note',
+        internalType: 'struct Note',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralOwner', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+      { name: 'redeemer', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'NoteRedeemed',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoNameRegistry
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoNameRegistryAbi = [
+  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'name', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'addr', internalType: 'address', type: 'address' },
+    ],
+    name: 'forceRegister',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'implementation',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'initialOwner', internalType: 'address', type: 'address' }],
+    name: 'init',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'proxiableUUID',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'name', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'addr', internalType: 'address', type: 'address' },
+    ],
+    name: 'register',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'name', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'registerSelf',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'name', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'resolveAddr',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'addr', internalType: 'address', type: 'address' }],
+    name: 'resolveName',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newImplementation', internalType: 'address', type: 'address' }],
+    name: 'upgradeTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'newImplementation', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'upgradeToAndCall',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
+      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AdminChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
+    name: 'BeaconUpgraded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'version', internalType: 'uint8', type: 'uint8', indexed: false }],
+    name: 'Initialized',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'name', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'addr', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'Registered',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoNameRegistryProxy
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoNameRegistryProxyAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_logic', internalType: 'address', type: 'address' },
+      { name: '_data', internalType: 'bytes', type: 'bytes' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'fallback', stateMutability: 'payable' },
+  { type: 'receive', stateMutability: 'payable' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
+      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AdminChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
+    name: 'BeaconUpgraded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DaimoPaymasterV2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const daimoPaymasterV2Abi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
+      { name: '_owner', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'bundlerWhitelist',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  { type: 'function', inputs: [], name: 'deposit', outputs: [], stateMutability: 'payable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'entryPoint',
+    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDeposit',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'metaPaymaster',
+    outputs: [{ name: '', internalType: 'contract IMetaPaymaster', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'mode', internalType: 'enum IPaymaster.PostOpMode', type: 'uint8' },
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'postOp',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'addresses', internalType: 'address[]', type: 'address[]' },
+      { name: 'isWhitelisted', internalType: 'bool', type: 'bool' },
+    ],
+    name: 'setBundlerWhitelist',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_metaPaymaster', internalType: 'contract IMetaPaymaster', type: 'address' }],
+    name: 'setMetaPaymaster',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct UserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'callGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'verificationGasLimit', internalType: 'uint256', type: 'uint256' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'maxCost', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'validatePaymasterUserOp',
+    outputs: [
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+      { name: 'validationData', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      { name: 'requiredPreFund', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationSponsored',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DaimoVerifier
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -633,6 +1173,34 @@ export const erc1967ProxyAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC1967Upgrade
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc1967UpgradeAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousAdmin', internalType: 'address', type: 'address', indexed: false },
+      { name: 'newAdmin', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'AdminChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'beacon', internalType: 'address', type: 'address', indexed: true }],
+    name: 'BeaconUpgraded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Utils
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -814,6 +1382,152 @@ export const erc20Abi = [
     type: 'error',
     inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
     name: 'ERC20InvalidSpender',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC20Snapshot
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc20SnapshotAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address' },
+      { name: 'snapshotId', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'balanceOfAt',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'subtractedValue', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'decreaseAllowance',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'addedValue', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'increaseAllowance',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
+    name: 'totalSupplyAt',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'id', internalType: 'uint256', type: 'uint256', indexed: false }],
+    name: 'Snapshot',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
   },
 ] as const
 
@@ -2528,6 +3242,321 @@ export const iEntryPointSimulationsAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IMetaPaymaster
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iMetaPaymasterAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'target', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'fund',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Send
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const sendAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'multisig', internalType: 'address', type: 'address' },
+      { name: 'manager', internalType: 'address', type: 'address' },
+      { name: 'knownBots', internalType: 'address[]', type: 'address[]' },
+      { name: 'initialMaxBuy', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: '_botDefence',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: '_botDefenceActivatedOnce',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: '_knownBots',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: '_manager',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: '_maxBuy',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: '_multisig',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: '_totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'activateBotDefenceOnce',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_tokenContract', internalType: 'address', type: 'address' },
+      { name: '_spender', internalType: 'address', type: 'address' },
+      { name: '_value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approveToken',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address' },
+      { name: 'snapshotId', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'balanceOfAt',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_newManager', internalType: 'address', type: 'address' }],
+    name: 'changeOwner',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'createSnapshot',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'deactivateBotDefence',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'subtractedValue', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'decreaseAllowance',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getLatestSnapshot',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'addedValue', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'increaseAllowance',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_newMaxBuy', internalType: 'uint256', type: 'uint256' }],
+    name: 'modifyMaxBuy',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_bots', internalType: 'address[]', type: 'address[]' }],
+    name: 'removeBots',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'snapshotId', internalType: 'uint256', type: 'uint256' }],
+    name: 'totalSupplyAt',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_tokenContract', internalType: 'address', type: 'address' },
+      { name: '_transferTo', internalType: 'address', type: 'address' },
+      { name: '_value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferToken',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_tokenContract', internalType: 'address', type: 'address' },
+      { name: '_transferFrom', internalType: 'address', type: 'address' },
+      { name: '_transferTo', internalType: 'address', type: 'address' },
+      { name: '_value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferTokenFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_amount', internalType: 'uint256', type: 'uint256' },
+      { name: '_to', internalType: 'address payable', type: 'address' },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'id', internalType: 'uint256', type: 'uint256', indexed: false }],
+    name: 'Snapshot',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendAirdropsSafe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3674,6 +4703,740 @@ export const prepareWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ create
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const readDaimoEphemeralNotes = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"notes"`
+ */
+export const readDaimoEphemeralNotesNotes = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'notes',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"token"`
+ */
+export const readDaimoEphemeralNotesToken = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const writeDaimoEphemeralNotes = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
+ */
+export const writeDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'claimNote',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
+ */
+export const writeDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const prepareWriteDaimoEphemeralNotes = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
+ */
+export const prepareWriteDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'claimNote',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
+ */
+export const prepareWriteDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const watchDaimoEphemeralNotesEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteCreated"`
+ */
+export const watchDaimoEphemeralNotesNoteCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesAbi,
+  eventName: 'NoteCreated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteRedeemed"`
+ */
+export const watchDaimoEphemeralNotesNoteRedeemedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesAbi,
+  eventName: 'NoteRedeemed',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const readDaimoEphemeralNotesV2 = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"notes"`
+ */
+export const readDaimoEphemeralNotesV2Notes = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'notes',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"token"`
+ */
+export const readDaimoEphemeralNotesV2Token = /*#__PURE__*/ createReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const writeDaimoEphemeralNotesV2 = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const writeDaimoEphemeralNotesV2ClaimNoteRecipient = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteRecipient',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const writeDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteSelf',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const writeDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const prepareWriteDaimoEphemeralNotesV2 = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const prepareWriteDaimoEphemeralNotesV2ClaimNoteRecipient =
+  /*#__PURE__*/ createSimulateContract({
+    abi: daimoEphemeralNotesV2Abi,
+    functionName: 'claimNoteRecipient',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const prepareWriteDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteSelf',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const prepareWriteDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const watchDaimoEphemeralNotesV2Event = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteCreated"`
+ */
+export const watchDaimoEphemeralNotesV2NoteCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+  eventName: 'NoteCreated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteRedeemed"`
+ */
+export const watchDaimoEphemeralNotesV2NoteRedeemedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+  eventName: 'NoteRedeemed',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const readDaimoNameRegistry = /*#__PURE__*/ createReadContract({ abi: daimoNameRegistryAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"implementation"`
+ */
+export const readDaimoNameRegistryImplementation = /*#__PURE__*/ createReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'implementation',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"owner"`
+ */
+export const readDaimoNameRegistryOwner = /*#__PURE__*/ createReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"proxiableUUID"`
+ */
+export const readDaimoNameRegistryProxiableUuid = /*#__PURE__*/ createReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'proxiableUUID',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveAddr"`
+ */
+export const readDaimoNameRegistryResolveAddr = /*#__PURE__*/ createReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'resolveAddr',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveName"`
+ */
+export const readDaimoNameRegistryResolveName = /*#__PURE__*/ createReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'resolveName',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const writeDaimoNameRegistry = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
+ */
+export const writeDaimoNameRegistryForceRegister = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'forceRegister',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
+ */
+export const writeDaimoNameRegistryInit = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
+ */
+export const writeDaimoNameRegistryRegister = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'register',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
+ */
+export const writeDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'registerSelf',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const writeDaimoNameRegistryRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const writeDaimoNameRegistryTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
+ */
+export const writeDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const writeDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const prepareWriteDaimoNameRegistry = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
+ */
+export const prepareWriteDaimoNameRegistryForceRegister = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'forceRegister',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
+ */
+export const prepareWriteDaimoNameRegistryInit = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
+ */
+export const prepareWriteDaimoNameRegistryRegister = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'register',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
+ */
+export const prepareWriteDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'registerSelf',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const prepareWriteDaimoNameRegistryRenounceOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const prepareWriteDaimoNameRegistryTransferOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
+ */
+export const prepareWriteDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const prepareWriteDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const watchDaimoNameRegistryEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"AdminChanged"`
+ */
+export const watchDaimoNameRegistryAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'AdminChanged',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ */
+export const watchDaimoNameRegistryBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'BeaconUpgraded',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Initialized"`
+ */
+export const watchDaimoNameRegistryInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'Initialized',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const watchDaimoNameRegistryOwnershipTransferredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: daimoNameRegistryAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Registered"`
+ */
+export const watchDaimoNameRegistryRegisteredEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'Registered',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const watchDaimoNameRegistryUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__
+ */
+export const watchDaimoNameRegistryProxyEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryProxyAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"AdminChanged"`
+ */
+export const watchDaimoNameRegistryProxyAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryProxyAbi,
+  eventName: 'AdminChanged',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ */
+export const watchDaimoNameRegistryProxyBeaconUpgradedEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: daimoNameRegistryProxyAbi,
+    eventName: 'BeaconUpgraded',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const watchDaimoNameRegistryProxyUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoNameRegistryProxyAbi,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const readDaimoPaymasterV2 = /*#__PURE__*/ createReadContract({ abi: daimoPaymasterV2Abi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"bundlerWhitelist"`
+ */
+export const readDaimoPaymasterV2BundlerWhitelist = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'bundlerWhitelist',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"entryPoint"`
+ */
+export const readDaimoPaymasterV2EntryPoint = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"getDeposit"`
+ */
+export const readDaimoPaymasterV2GetDeposit = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'getDeposit',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"metaPaymaster"`
+ */
+export const readDaimoPaymasterV2MetaPaymaster = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'metaPaymaster',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"owner"`
+ */
+export const readDaimoPaymasterV2Owner = /*#__PURE__*/ createReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const writeDaimoPaymasterV2 = /*#__PURE__*/ createWriteContract({ abi: daimoPaymasterV2Abi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
+ */
+export const writeDaimoPaymasterV2AddStake = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
+ */
+export const writeDaimoPaymasterV2Deposit = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
+ */
+export const writeDaimoPaymasterV2PostOp = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const writeDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
+ */
+export const writeDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setBundlerWhitelist',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
+ */
+export const writeDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const writeDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
+ */
+export const writeDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ */
+export const writeDaimoPaymasterV2ValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'validatePaymasterUserOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const writeDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const writeDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const prepareWriteDaimoPaymasterV2 = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
+ */
+export const prepareWriteDaimoPaymasterV2AddStake = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
+ */
+export const prepareWriteDaimoPaymasterV2Deposit = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
+ */
+export const prepareWriteDaimoPaymasterV2PostOp = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const prepareWriteDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
+ */
+export const prepareWriteDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createSimulateContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'setBundlerWhitelist' }
+)
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
+ */
+export const prepareWriteDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const prepareWriteDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
+ */
+export const prepareWriteDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ */
+export const prepareWriteDaimoPaymasterV2ValidatePaymasterUserOp =
+  /*#__PURE__*/ createSimulateContract({
+    abi: daimoPaymasterV2Abi,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const prepareWriteDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const prepareWriteDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const watchDaimoPaymasterV2Event = /*#__PURE__*/ createWatchContractEvent({
+  abi: daimoPaymasterV2Abi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const watchDaimoPaymasterV2OwnershipTransferredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: daimoPaymasterV2Abi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"UserOperationSponsored"`
+ */
+export const watchDaimoPaymasterV2UserOperationSponsoredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: daimoPaymasterV2Abi,
+    eventName: 'UserOperationSponsored',
+  })
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
  * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
@@ -3961,6 +5724,37 @@ export const watchErc1967ProxyUpgradedEvent = /*#__PURE__*/ createWatchContractE
 })
 
 /**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__
+ */
+export const watchErc1967UpgradeEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"AdminChanged"`
+ */
+export const watchErc1967UpgradeAdminChangedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+  eventName: 'AdminChanged',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ */
+export const watchErc1967UpgradeBeaconUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+  eventName: 'BeaconUpgraded',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const watchErc1967UpgradeUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+  eventName: 'Upgraded',
+})
+
+/**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__
  */
 export const watchErc1967UtilsEvent = /*#__PURE__*/ createWatchContractEvent({
@@ -4120,6 +5914,198 @@ export const watchErc20ApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
  */
 export const watchErc20TransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: erc20Abi,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const readErc20Snapshot = /*#__PURE__*/ createReadContract({ abi: erc20SnapshotAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"allowance"`
+ */
+export const readErc20SnapshotAllowance = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const readErc20SnapshotBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOfAt"`
+ */
+export const readErc20SnapshotBalanceOfAt = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'balanceOfAt',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decimals"`
+ */
+export const readErc20SnapshotDecimals = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"name"`
+ */
+export const readErc20SnapshotName = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"symbol"`
+ */
+export const readErc20SnapshotSymbol = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const readErc20SnapshotTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupplyAt"`
+ */
+export const readErc20SnapshotTotalSupplyAt = /*#__PURE__*/ createReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'totalSupplyAt',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const writeErc20Snapshot = /*#__PURE__*/ createWriteContract({ abi: erc20SnapshotAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
+ */
+export const writeErc20SnapshotApprove = /*#__PURE__*/ createWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const writeErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const writeErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
+ */
+export const writeErc20SnapshotTransfer = /*#__PURE__*/ createWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const writeErc20SnapshotTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const prepareWriteErc20Snapshot = /*#__PURE__*/ createSimulateContract({
+  abi: erc20SnapshotAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
+ */
+export const prepareWriteErc20SnapshotApprove = /*#__PURE__*/ createSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const prepareWriteErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const prepareWriteErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
+ */
+export const prepareWriteErc20SnapshotTransfer = /*#__PURE__*/ createSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const prepareWriteErc20SnapshotTransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const watchErc20SnapshotEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc20SnapshotAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Approval"`
+ */
+export const watchErc20SnapshotApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc20SnapshotAbi,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Snapshot"`
+ */
+export const watchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc20SnapshotAbi,
+  eventName: 'Snapshot',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const watchErc20SnapshotTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: erc20SnapshotAbi,
   eventName: 'Transfer',
 })
 
@@ -5796,6 +7782,443 @@ export const watchIEntryPointSimulationsWithdrawnEvent = /*#__PURE__*/ createWat
 })
 
 /**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ */
+export const writeIMetaPaymaster = /*#__PURE__*/ createWriteContract({ abi: iMetaPaymasterAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
+ */
+export const writeIMetaPaymasterFund = /*#__PURE__*/ createWriteContract({
+  abi: iMetaPaymasterAbi,
+  functionName: 'fund',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ */
+export const prepareWriteIMetaPaymaster = /*#__PURE__*/ createSimulateContract({
+  abi: iMetaPaymasterAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
+ */
+export const prepareWriteIMetaPaymasterFund = /*#__PURE__*/ createSimulateContract({
+  abi: iMetaPaymasterAbi,
+  functionName: 'fund',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__
+ */
+export const readSend = /*#__PURE__*/ createReadContract({ abi: sendAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefence"`
+ */
+export const readSendBotDefence = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_botDefence',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefenceActivatedOnce"`
+ */
+export const readSendBotDefenceActivatedOnce = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_botDefenceActivatedOnce',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_knownBots"`
+ */
+export const readSendKnownBots = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_knownBots',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_manager"`
+ */
+export const readSendManager = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_manager',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_maxBuy"`
+ */
+export const readSendMaxBuy = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_maxBuy',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_multisig"`
+ */
+export const readSendMultisig = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_multisig',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_totalSupply"`
+ */
+export const readSendTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: '_totalSupply',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"allowance"`
+ */
+export const readSendAllowance = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const readSendBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOfAt"`
+ */
+export const readSendBalanceOfAt = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'balanceOfAt',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decimals"`
+ */
+export const readSendDecimals = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"getLatestSnapshot"`
+ */
+export const readSendGetLatestSnapshot = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'getLatestSnapshot',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"name"`
+ */
+export const readSendName = /*#__PURE__*/ createReadContract({ abi: sendAbi, functionName: 'name' })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"symbol"`
+ */
+export const readSendSymbol = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const _readSendTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupplyAt"`
+ */
+export const readSendTotalSupplyAt = /*#__PURE__*/ createReadContract({
+  abi: sendAbi,
+  functionName: 'totalSupplyAt',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__
+ */
+export const writeSend = /*#__PURE__*/ createWriteContract({ abi: sendAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
+ */
+export const writeSendActivateBotDefenceOnce = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'activateBotDefenceOnce',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
+ */
+export const writeSendApprove = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
+ */
+export const writeSendApproveToken = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'approveToken',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
+ */
+export const writeSendChangeOwner = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'changeOwner',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
+ */
+export const writeSendCreateSnapshot = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'createSnapshot',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
+ */
+export const writeSendDeactivateBotDefence = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'deactivateBotDefence',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const writeSendDecreaseAllowance = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const writeSendIncreaseAllowance = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
+ */
+export const writeSendModifyMaxBuy = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'modifyMaxBuy',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
+ */
+export const writeSendRemoveBots = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'removeBots',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
+ */
+export const writeSendTransfer = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const writeSendTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
+ */
+export const writeSendTransferToken = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'transferToken',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
+ */
+export const writeSendTransferTokenFrom = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'transferTokenFrom',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const writeSendWithdraw = /*#__PURE__*/ createWriteContract({
+  abi: sendAbi,
+  functionName: 'withdraw',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__
+ */
+export const prepareWriteSend = /*#__PURE__*/ createSimulateContract({ abi: sendAbi })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
+ */
+export const prepareWriteSendActivateBotDefenceOnce = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'activateBotDefenceOnce',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
+ */
+export const prepareWriteSendApprove = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
+ */
+export const prepareWriteSendApproveToken = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'approveToken',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
+ */
+export const prepareWriteSendChangeOwner = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'changeOwner',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
+ */
+export const prepareWriteSendCreateSnapshot = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'createSnapshot',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
+ */
+export const prepareWriteSendDeactivateBotDefence = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'deactivateBotDefence',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const prepareWriteSendDecreaseAllowance = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const prepareWriteSendIncreaseAllowance = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
+ */
+export const prepareWriteSendModifyMaxBuy = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'modifyMaxBuy',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
+ */
+export const prepareWriteSendRemoveBots = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'removeBots',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
+ */
+export const prepareWriteSendTransfer = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const prepareWriteSendTransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
+ */
+export const prepareWriteSendTransferToken = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'transferToken',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
+ */
+export const prepareWriteSendTransferTokenFrom = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'transferTokenFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const prepareWriteSendWithdraw = /*#__PURE__*/ createSimulateContract({
+  abi: sendAbi,
+  functionName: 'withdraw',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__
+ */
+export const watchSendEvent = /*#__PURE__*/ createWatchContractEvent({ abi: sendAbi })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Approval"`
+ */
+export const watchSendApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAbi,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Snapshot"`
+ */
+export const watchSendSnapshotEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAbi,
+  eventName: 'Snapshot',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const watchSendTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAbi,
+  eventName: 'Transfer',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendMerkleDropAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
@@ -7359,6 +9782,752 @@ export const useSimulateDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createU
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const useReadDaimoEphemeralNotes = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"notes"`
+ */
+export const useReadDaimoEphemeralNotesNotes = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'notes',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"token"`
+ */
+export const useReadDaimoEphemeralNotesToken = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const useWriteDaimoEphemeralNotes = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
+ */
+export const useWriteDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'claimNote',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
+ */
+export const useWriteDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const useSimulateDaimoEphemeralNotes = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"claimNote"`
+ */
+export const useSimulateDaimoEphemeralNotesClaimNote = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'claimNote',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `functionName` set to `"createNote"`
+ */
+export const useSimulateDaimoEphemeralNotesCreateNote = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesAbi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__
+ */
+export const useWatchDaimoEphemeralNotesEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoEphemeralNotesAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteCreated"`
+ */
+export const useWatchDaimoEphemeralNotesNoteCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoEphemeralNotesAbi,
+    eventName: 'NoteCreated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesAbi}__ and `eventName` set to `"NoteRedeemed"`
+ */
+export const useWatchDaimoEphemeralNotesNoteRedeemedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoEphemeralNotesAbi,
+    eventName: 'NoteRedeemed',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useReadDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"notes"`
+ */
+export const useReadDaimoEphemeralNotesV2Notes = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'notes',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"token"`
+ */
+export const useReadDaimoEphemeralNotesV2Token = /*#__PURE__*/ createUseReadContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useWriteDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const useWriteDaimoEphemeralNotesV2ClaimNoteRecipient = /*#__PURE__*/ createUseWriteContract(
+  { abi: daimoEphemeralNotesV2Abi, functionName: 'claimNoteRecipient' }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const useWriteDaimoEphemeralNotesV2ClaimNoteSelf = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'claimNoteSelf',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const useWriteDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useSimulateDaimoEphemeralNotesV2 = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteRecipient"`
+ */
+export const useSimulateDaimoEphemeralNotesV2ClaimNoteRecipient =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoEphemeralNotesV2Abi,
+    functionName: 'claimNoteRecipient',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"claimNoteSelf"`
+ */
+export const useSimulateDaimoEphemeralNotesV2ClaimNoteSelf =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoEphemeralNotesV2Abi,
+    functionName: 'claimNoteSelf',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `functionName` set to `"createNote"`
+ */
+export const useSimulateDaimoEphemeralNotesV2CreateNote = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoEphemeralNotesV2Abi,
+  functionName: 'createNote',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__
+ */
+export const useWatchDaimoEphemeralNotesV2Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoEphemeralNotesV2Abi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteCreated"`
+ */
+export const useWatchDaimoEphemeralNotesV2NoteCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoEphemeralNotesV2Abi,
+    eventName: 'NoteCreated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoEphemeralNotesV2Abi}__ and `eventName` set to `"NoteRedeemed"`
+ */
+export const useWatchDaimoEphemeralNotesV2NoteRedeemedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoEphemeralNotesV2Abi,
+    eventName: 'NoteRedeemed',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const useReadDaimoNameRegistry = /*#__PURE__*/ createUseReadContract({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"implementation"`
+ */
+export const useReadDaimoNameRegistryImplementation = /*#__PURE__*/ createUseReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'implementation',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"owner"`
+ */
+export const useReadDaimoNameRegistryOwner = /*#__PURE__*/ createUseReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"proxiableUUID"`
+ */
+export const useReadDaimoNameRegistryProxiableUuid = /*#__PURE__*/ createUseReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'proxiableUUID',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveAddr"`
+ */
+export const useReadDaimoNameRegistryResolveAddr = /*#__PURE__*/ createUseReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'resolveAddr',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"resolveName"`
+ */
+export const useReadDaimoNameRegistryResolveName = /*#__PURE__*/ createUseReadContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'resolveName',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const useWriteDaimoNameRegistry = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
+ */
+export const useWriteDaimoNameRegistryForceRegister = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'forceRegister',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
+ */
+export const useWriteDaimoNameRegistryInit = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
+ */
+export const useWriteDaimoNameRegistryRegister = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'register',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
+ */
+export const useWriteDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'registerSelf',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useWriteDaimoNameRegistryRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useWriteDaimoNameRegistryTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
+ */
+export const useWriteDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const useWriteDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const useSimulateDaimoNameRegistry = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"forceRegister"`
+ */
+export const useSimulateDaimoNameRegistryForceRegister = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'forceRegister',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"init"`
+ */
+export const useSimulateDaimoNameRegistryInit = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"register"`
+ */
+export const useSimulateDaimoNameRegistryRegister = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'register',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"registerSelf"`
+ */
+export const useSimulateDaimoNameRegistryRegisterSelf = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'registerSelf',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useSimulateDaimoNameRegistryRenounceOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoNameRegistryAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useSimulateDaimoNameRegistryTransferOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoNameRegistryAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeTo"`
+ */
+export const useSimulateDaimoNameRegistryUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoNameRegistryAbi,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const useSimulateDaimoNameRegistryUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract(
+  { abi: daimoNameRegistryAbi, functionName: 'upgradeToAndCall' }
+)
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__
+ */
+export const useWatchDaimoNameRegistryEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"AdminChanged"`
+ */
+export const useWatchDaimoNameRegistryAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: daimoNameRegistryAbi, eventName: 'AdminChanged' }
+)
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ */
+export const useWatchDaimoNameRegistryBeaconUpgradedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoNameRegistryAbi,
+    eventName: 'BeaconUpgraded',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Initialized"`
+ */
+export const useWatchDaimoNameRegistryInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'Initialized',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const useWatchDaimoNameRegistryOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoNameRegistryAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Registered"`
+ */
+export const useWatchDaimoNameRegistryRegisteredEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'Registered',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const useWatchDaimoNameRegistryUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoNameRegistryAbi,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__
+ */
+export const useWatchDaimoNameRegistryProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoNameRegistryProxyAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"AdminChanged"`
+ */
+export const useWatchDaimoNameRegistryProxyAdminChangedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoNameRegistryProxyAbi,
+    eventName: 'AdminChanged',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ */
+export const useWatchDaimoNameRegistryProxyBeaconUpgradedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoNameRegistryProxyAbi,
+    eventName: 'BeaconUpgraded',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoNameRegistryProxyAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const useWatchDaimoNameRegistryProxyUpgradedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoNameRegistryProxyAbi,
+    eventName: 'Upgraded',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const useReadDaimoPaymasterV2 = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"bundlerWhitelist"`
+ */
+export const useReadDaimoPaymasterV2BundlerWhitelist = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'bundlerWhitelist',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"entryPoint"`
+ */
+export const useReadDaimoPaymasterV2EntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"getDeposit"`
+ */
+export const useReadDaimoPaymasterV2GetDeposit = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'getDeposit',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"metaPaymaster"`
+ */
+export const useReadDaimoPaymasterV2MetaPaymaster = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'metaPaymaster',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"owner"`
+ */
+export const useReadDaimoPaymasterV2Owner = /*#__PURE__*/ createUseReadContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const useWriteDaimoPaymasterV2 = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
+ */
+export const useWriteDaimoPaymasterV2AddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
+ */
+export const useWriteDaimoPaymasterV2Deposit = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
+ */
+export const useWriteDaimoPaymasterV2PostOp = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useWriteDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
+ */
+export const useWriteDaimoPaymasterV2SetBundlerWhitelist = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setBundlerWhitelist',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
+ */
+export const useWriteDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useWriteDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
+ */
+export const useWriteDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ */
+export const useWriteDaimoPaymasterV2ValidatePaymasterUserOp = /*#__PURE__*/ createUseWriteContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'validatePaymasterUserOp' }
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const useWriteDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const useWriteDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const useSimulateDaimoPaymasterV2 = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"addStake"`
+ */
+export const useSimulateDaimoPaymasterV2AddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"deposit"`
+ */
+export const useSimulateDaimoPaymasterV2Deposit = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"postOp"`
+ */
+export const useSimulateDaimoPaymasterV2PostOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useSimulateDaimoPaymasterV2RenounceOwnership = /*#__PURE__*/ createUseSimulateContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'renounceOwnership' }
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setBundlerWhitelist"`
+ */
+export const useSimulateDaimoPaymasterV2SetBundlerWhitelist =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoPaymasterV2Abi,
+    functionName: 'setBundlerWhitelist',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"setMetaPaymaster"`
+ */
+export const useSimulateDaimoPaymasterV2SetMetaPaymaster = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'setMetaPaymaster',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useSimulateDaimoPaymasterV2TransferOwnership = /*#__PURE__*/ createUseSimulateContract(
+  { abi: daimoPaymasterV2Abi, functionName: 'transferOwnership' }
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"unlockStake"`
+ */
+export const useSimulateDaimoPaymasterV2UnlockStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ */
+export const useSimulateDaimoPaymasterV2ValidatePaymasterUserOp =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: daimoPaymasterV2Abi,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawStake"`
+ */
+export const useSimulateDaimoPaymasterV2WithdrawStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `functionName` set to `"withdrawTo"`
+ */
+export const useSimulateDaimoPaymasterV2WithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: daimoPaymasterV2Abi,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__
+ */
+export const useWatchDaimoPaymasterV2Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: daimoPaymasterV2Abi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const useWatchDaimoPaymasterV2OwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoPaymasterV2Abi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoPaymasterV2Abi}__ and `eventName` set to `"UserOperationSponsored"`
+ */
+export const useWatchDaimoPaymasterV2UserOperationSponsoredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: daimoPaymasterV2Abi,
+    eventName: 'UserOperationSponsored',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__
  *
  * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
@@ -7647,6 +10816,37 @@ export const useWatchErc1967ProxyUpgradedEvent = /*#__PURE__*/ createUseWatchCon
 })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__
+ */
+export const useWatchErc1967UpgradeEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"AdminChanged"`
+ */
+export const useWatchErc1967UpgradeAdminChangedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+  eventName: 'AdminChanged',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"BeaconUpgraded"`
+ */
+export const useWatchErc1967UpgradeBeaconUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+  eventName: 'BeaconUpgraded',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UpgradeAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const useWatchErc1967UpgradeUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc1967UpgradeAbi,
+  eventName: 'Upgraded',
+})
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967UtilsAbi}__
  */
 export const useWatchErc1967UtilsEvent = /*#__PURE__*/ createUseWatchContractEvent({
@@ -7806,6 +11006,198 @@ export const useWatchErc20ApprovalEvent = /*#__PURE__*/ createUseWatchContractEv
  */
 export const useWatchErc20TransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: erc20Abi,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const useReadErc20Snapshot = /*#__PURE__*/ createUseReadContract({ abi: erc20SnapshotAbi })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadErc20SnapshotAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadErc20SnapshotBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"balanceOfAt"`
+ */
+export const useReadErc20SnapshotBalanceOfAt = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'balanceOfAt',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadErc20SnapshotDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadErc20SnapshotName = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadErc20SnapshotSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadErc20SnapshotTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"totalSupplyAt"`
+ */
+export const useReadErc20SnapshotTotalSupplyAt = /*#__PURE__*/ createUseReadContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'totalSupplyAt',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const useWriteErc20Snapshot = /*#__PURE__*/ createUseWriteContract({ abi: erc20SnapshotAbi })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteErc20SnapshotApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const useWriteErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const useWriteErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteErc20SnapshotTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteErc20SnapshotTransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const useSimulateErc20Snapshot = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20SnapshotAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateErc20SnapshotApprove = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const useSimulateErc20SnapshotDecreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const useSimulateErc20SnapshotIncreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateErc20SnapshotTransfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateErc20SnapshotTransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20SnapshotAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__
+ */
+export const useWatchErc20SnapshotEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc20SnapshotAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchErc20SnapshotApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc20SnapshotAbi,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Snapshot"`
+ */
+export const useWatchErc20SnapshotSnapshotEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc20SnapshotAbi,
+  eventName: 'Snapshot',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20SnapshotAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchErc20SnapshotTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc20SnapshotAbi,
   eventName: 'Transfer',
 })
 
@@ -9504,6 +12896,448 @@ export const useWatchIEntryPointSimulationsWithdrawnEvent =
     abi: iEntryPointSimulationsAbi,
     eventName: 'Withdrawn',
   })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ */
+export const useWriteIMetaPaymaster = /*#__PURE__*/ createUseWriteContract({
+  abi: iMetaPaymasterAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
+ */
+export const useWriteIMetaPaymasterFund = /*#__PURE__*/ createUseWriteContract({
+  abi: iMetaPaymasterAbi,
+  functionName: 'fund',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__
+ */
+export const useSimulateIMetaPaymaster = /*#__PURE__*/ createUseSimulateContract({
+  abi: iMetaPaymasterAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link iMetaPaymasterAbi}__ and `functionName` set to `"fund"`
+ */
+export const useSimulateIMetaPaymasterFund = /*#__PURE__*/ createUseSimulateContract({
+  abi: iMetaPaymasterAbi,
+  functionName: 'fund',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__
+ */
+export const useReadSend = /*#__PURE__*/ createUseReadContract({ abi: sendAbi })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefence"`
+ */
+export const useReadSendBotDefence = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_botDefence',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_botDefenceActivatedOnce"`
+ */
+export const useReadSendBotDefenceActivatedOnce = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_botDefenceActivatedOnce',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_knownBots"`
+ */
+export const useReadSendKnownBots = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_knownBots',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_manager"`
+ */
+export const useReadSendManager = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_manager',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_maxBuy"`
+ */
+export const useReadSendMaxBuy = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_maxBuy',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_multisig"`
+ */
+export const useReadSendMultisig = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_multisig',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"_totalSupply"`
+ */
+export const useReadSendTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: '_totalSupply',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadSendAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadSendBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"balanceOfAt"`
+ */
+export const useReadSendBalanceOfAt = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'balanceOfAt',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadSendDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"getLatestSnapshot"`
+ */
+export const useReadSendGetLatestSnapshot = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'getLatestSnapshot',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadSendName = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadSendSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const _useReadSendTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"totalSupplyAt"`
+ */
+export const useReadSendTotalSupplyAt = /*#__PURE__*/ createUseReadContract({
+  abi: sendAbi,
+  functionName: 'totalSupplyAt',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__
+ */
+export const useWriteSend = /*#__PURE__*/ createUseWriteContract({ abi: sendAbi })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
+ */
+export const useWriteSendActivateBotDefenceOnce = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'activateBotDefenceOnce',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteSendApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
+ */
+export const useWriteSendApproveToken = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'approveToken',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
+ */
+export const useWriteSendChangeOwner = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'changeOwner',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
+ */
+export const useWriteSendCreateSnapshot = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'createSnapshot',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
+ */
+export const useWriteSendDeactivateBotDefence = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'deactivateBotDefence',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const useWriteSendDecreaseAllowance = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const useWriteSendIncreaseAllowance = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
+ */
+export const useWriteSendModifyMaxBuy = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'modifyMaxBuy',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
+ */
+export const useWriteSendRemoveBots = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'removeBots',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteSendTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteSendTransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
+ */
+export const useWriteSendTransferToken = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'transferToken',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
+ */
+export const useWriteSendTransferTokenFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'transferTokenFrom',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const useWriteSendWithdraw = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAbi,
+  functionName: 'withdraw',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__
+ */
+export const useSimulateSend = /*#__PURE__*/ createUseSimulateContract({ abi: sendAbi })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"activateBotDefenceOnce"`
+ */
+export const useSimulateSendActivateBotDefenceOnce = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'activateBotDefenceOnce',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateSendApprove = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"approveToken"`
+ */
+export const useSimulateSendApproveToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'approveToken',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"changeOwner"`
+ */
+export const useSimulateSendChangeOwner = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'changeOwner',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"createSnapshot"`
+ */
+export const useSimulateSendCreateSnapshot = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'createSnapshot',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"deactivateBotDefence"`
+ */
+export const useSimulateSendDeactivateBotDefence = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'deactivateBotDefence',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"decreaseAllowance"`
+ */
+export const useSimulateSendDecreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'decreaseAllowance',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"increaseAllowance"`
+ */
+export const useSimulateSendIncreaseAllowance = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'increaseAllowance',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"modifyMaxBuy"`
+ */
+export const useSimulateSendModifyMaxBuy = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'modifyMaxBuy',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"removeBots"`
+ */
+export const useSimulateSendRemoveBots = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'removeBots',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateSendTransfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateSendTransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferToken"`
+ */
+export const useSimulateSendTransferToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'transferToken',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"transferTokenFrom"`
+ */
+export const useSimulateSendTransferTokenFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'transferTokenFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const useSimulateSendWithdraw = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAbi,
+  functionName: 'withdraw',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__
+ */
+export const useWatchSendEvent = /*#__PURE__*/ createUseWatchContractEvent({ abi: sendAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchSendApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAbi,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Snapshot"`
+ */
+export const useWatchSendSnapshotEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAbi,
+  eventName: 'Snapshot',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchSendTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAbi,
+  eventName: 'Transfer',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendMerkleDropAbi}__

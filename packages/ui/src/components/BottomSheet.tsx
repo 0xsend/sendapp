@@ -1,6 +1,10 @@
 import { Sheet, SheetProps } from 'tamagui'
 
-export const BottomSheet = ({ children, ...props }: SheetProps) => {
+export const BottomSheet = ({
+  closeButton,
+  children,
+  ...props
+}: SheetProps & { closeButton?: boolean }) => {
   return (
     <Sheet {...props} modal animation={'quick'} dismissOnSnapToBottom>
       <Sheet.Overlay />

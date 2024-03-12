@@ -1,7 +1,7 @@
 import { Button, H2, Header, Link, XStack, useMedia } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconArrowLeft, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
+import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { useRouter } from 'solito/router'
 
 // TODO: this should probably named HomeTopNav
@@ -9,6 +9,10 @@ export function HomeHeader({ backButton, children }: { backButton?: boolean; chi
   const [nav, setNavParam] = useNav()
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
+  }
+
+  const handleSettingsBottomSheet = () => {
+    setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
   }
 
   const { resolvedTheme } = useThemeSetting()
@@ -46,12 +50,23 @@ export function HomeHeader({ backButton, children }: { backButton?: boolean; chi
             </H2>
           </XStack>
         )}
-        <Button
-          p={0}
-          $gtLg={{ display: 'none' }}
-          bg="transparent"
-          icon={<IconQr size={'$2.5'} color={iconColor} />}
-        />
+
+        {children === 'Home' && media.md ? (
+          <Button p={0} bg="transparent" icon={<IconQr size={'$2.5'} color={iconColor} />} />
+        ) : (
+          <></>
+        )}
+
+        {(children === 'Account' || children === 'Settings') && media.md ? (
+          <Button
+            p={0}
+            onPress={handleSettingsBottomSheet}
+            bg="transparent"
+            icon={<IconGear size={'$2.5'} color={iconColor} />}
+          />
+        ) : (
+          <></>
+        )}
       </XStack>
     </Header>
   )
