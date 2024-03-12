@@ -31,7 +31,8 @@
     "playwright": "yarn workspace @my/playwright",
     "distributor": "yarn workspace distributor",
     "snaplet:seed": "DRY=0 bunx tsx ./packages/snaplet/seed.ts",
-    "snaplet:snapshot:restore": "bunx snaplet snapshot restore --no-reset --latest"
+    "snaplet:snapshot:restore": "bunx snaplet snapshot restore --no-reset --latest",
+    "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
     "react": "^18.2.0",

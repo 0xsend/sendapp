@@ -60,18 +60,18 @@ contract_files = files_matching(
 )
 
 local_resource(
-    "contracts:build",
-    "yarn contracts build --sizes",
+    name = "contracts:build",
     allow_parallel = True,
+    cmd = "yarn contracts build --sizes",
     labels = labels,
     resource_deps = ["yarn:install"],
     deps = contract_files,
 )
 
 local_resource(
-    "wagmi:generate",
-    "yarn wagmi generate",
+    name = "wagmi:generate",
     allow_parallel = True,
+    cmd = "yarn wagmi generate",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -90,9 +90,9 @@ local_resource(
 )
 
 local_resource(
-    "supabase:generate",
-    "yarn supabase g",
+    name = "supabase:generate",
     allow_parallel = True,
+    cmd = "yarn supabase g",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -105,13 +105,13 @@ local_resource(
 )
 
 local_resource(
-    "snaplet:generate",
-    "bunx snaplet generate",
+    name = "snaplet:generate",
     allow_parallel = True,
+    cmd = "bunx snaplet generate",
     labels = labels,
     resource_deps = [
         "yarn:install",
-        "supabase",
+        "supabase:test",
     ],
     deps = files_matching(
         os.path.join("supabase", "migrations"),
@@ -132,9 +132,9 @@ ui_files = files_matching(
 )
 
 local_resource(
-    "ui:build",
-    "yarn workspace @my/ui build",
+    name = "ui:build",
     allow_parallel = True,
+    cmd = "yarn workspace @my/ui build",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -143,9 +143,9 @@ local_resource(
 )
 
 local_resource(
-    "ui:generate-theme",
-    "yarn workspace @my/ui generate-theme",
+    name = "ui:generate-theme",
     allow_parallel = True,
+    cmd = "yarn workspace @my/ui generate-theme",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -154,9 +154,9 @@ local_resource(
 )
 
 local_resource(
-    "daimo-expo-passkeys:build",
-    "yarn workspace @daimo/expo-passkeys build",
+    name = "daimo-expo-passkeys:build",
     allow_parallel = True,
+    cmd = "yarn workspace @daimo/expo-passkeys build",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -176,9 +176,9 @@ local_resource(
 )
 
 local_resource(
-    "webauthn-authenticator:build",
-    "yarn workspace @0xsend/webauthn-authenticator build",
+    name = "webauthn-authenticator:build",
     allow_parallel = True,
+    cmd = "yarn workspace @0xsend/webauthn-authenticator build",
     labels = labels,
     resource_deps = ["yarn:install"],
     deps =
@@ -189,11 +189,14 @@ local_resource(
 )
 
 local_resource(
-    "shovel:generate-config",
+    name = "shovel:generate-config",
     allow_parallel = True,
     cmd = "yarn workspace shovel generate",
     labels = labels,
-    resource_deps = ["yarn:install"],
+    resource_deps = [
+        "yarn:install",
+        "wagmi:generate",
+    ],
     deps = files_matching(
         os.path.join("packages", "shovel"),
         lambda f: f.endswith(".ts"),
@@ -201,7 +204,7 @@ local_resource(
 )
 
 cmd_button(
-    "shovel:generate-config",
+    name = "shovel:generate-config",
     argv = [
         "/bin/sh",
         "-c",
@@ -244,6 +247,7 @@ if config.tilt_subcommand == "down":
     # can be removed once supabase stop --no-backup is fixed
     docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
     """)
+    local("yarn clean")
 
 cmd_button(
     "supabase:db reset",
@@ -580,8 +584,10 @@ local_resource(
 
 local_resource(
     "caddy:web",
+    auto_init = not CI,
     labels = labels,
     serve_cmd = "caddy run --watch --config Caddyfile.dev",
+    trigger_mode = TRIGGER_MODE_MANUAL,
     deps = [
         "Caddyfile.dev",
     ],
@@ -597,6 +603,16 @@ local_resource(
     labels = labels,
     resource_deps = [
         "yarn:install",
+        "contracts:build",
+        "wagmi:generate",
+        "supabase:generate",
+        "snaplet:generate",
+        "ui:build",
+        "ui:generate-theme",
+        "daimo-expo-passkeys:build",
+        "webauthn-authenticator:build",
+        "shovel:generate-config",
+        "shovel:generate-config",
     ],
     deps =
         files_matching(
@@ -736,7 +752,7 @@ local_resource(
 )
 
 local_resource(
-    "unit-tests:tests",
+    "unit-tests",
     "echo 🥳",
     allow_parallel = True,
     labels = labels,

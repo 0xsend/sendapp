@@ -9,8 +9,10 @@
     "broadcast/"
   ],
   "scripts": {
-    "gen-dist-merkle-tree": "bun run ./script/gen-dist-merkle-tree.ts",
     "build": "forge build",
+    "gen-dist-merkle-tree": "bun run ./script/gen-dist-merkle-tree.ts",
+    "forge": "forge",
+    "clean": "forge clean",
     "test": "forge test",
     "lint": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "lint:fix": "forge fmt && solhint --fix {script,src,test}/**/*.sol",

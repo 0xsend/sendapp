@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "tamagui-build",
+    "clean": "rm -rf dist && rm -rf types",
     "watch": "tamagui-build --watch",
     "generate-theme": "tamagui generate-themes ./src/themes/theme.ts ./src/themes/theme-generated.ts"
   },
