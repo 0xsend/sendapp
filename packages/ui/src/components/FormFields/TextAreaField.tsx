@@ -36,10 +36,8 @@ export const TextAreaField = (props: Pick<TextAreaProps, 'size' | 'autoFocus'>) 
             ref={field.ref}
             placeholder={placeholder}
             id={id}
-            rows={5}
             // temp fix
             height={150}
-            backgroundColor={resolvedTheme?.startsWith('dark') ? 'black' : 'white'}
             {...props}
           />
         </Shake>

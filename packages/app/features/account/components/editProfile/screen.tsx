@@ -3,22 +3,26 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { SolitoImage } from 'solito/image'
-import { UploadAvatar } from '../uploadProfileImage/screen'
+import { UploadAvatar, UploadAvatarRefObject } from '../uploadProfileImage/screen'
+import { useRef } from 'react'
 
 export const EditProfile = () => {
   const { profile, user } = useUser()
-  const name = profile?.name
-  const about = profile?.about
+  const userName = profile?.name
+  const displayName = profile?.name
+  const bio = profile?.about
   const isPublic = profile?.is_public
   const userID = user?.id
   const avatar_url = profile?.avatar_url
   const mutation = useEditProfileMutation(userID)
 
+  const avatarRef = useRef<UploadAvatarRefObject>(null)
+
   return (
     <Container>
       <YStack w={'100%'} ai={'center'}>
         <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'}>
-          <Paragraph size={'$9'} fontWeight={'700'}>
+          <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
             Edit Profile
           </Paragraph>
         </XStack>
@@ -26,23 +30,38 @@ export const EditProfile = () => {
           <SchemaForm
             schema={ProfileSchema}
             props={{
-              name: {
-                accessibilityLabel: 'Name',
-                borderWidth: 1,
+              userName: {
+                accessibilityLabel: 'User Name',
+                backgroundColor: '#081619',
+                borderWidth: 0,
+                fontSize: '$5',
+                color: '$color12',
               },
-              about: {
-                accessibilityLabel: 'About',
-                borderWidth: 1,
+              displayName: {
+                accessibilityLabel: 'Display Name',
+                backgroundColor: '#081619',
+                borderWidth: 0,
+                fontSize: '$5',
+                color: '$color12',
+              },
+              Bio: {
+                accessibilityLabel: 'Bio',
+                backgroundColor: '#081619',
+                borderWidth: 0,
+                fontSize: '$5',
+                rows: 1,
               },
               isPublic: {
-                accessibilityLabel: 'IsPublic',
-                borderWidth: 1,
+                accessibilityLabel: 'Is Public',
+                backgroundColor: '#081619',
+                borderWidth: 0,
                 defaultChecked: isPublic,
               },
             }}
             defaultValues={{
-              name: name ?? '',
-              about: about ?? '',
+              userName: userName ?? '',
+              displayName: displayName ?? '',
+              bio: bio ?? '',
               isPublic: isPublic ?? false,
             }}
             onSubmit={(values) => mutation.mutate(values)}
@@ -61,21 +80,40 @@ export const EditProfile = () => {
           >
             {(fields) => (
               <>
-                <YStack>
-                  <Label size="$3" htmlFor="current-Image">
-                    Image
-                  </Label>
-                  <UploadAvatar>
-                    <Avatar circular size={128}>
+                <XStack ai={'center'} gap={'$6'}>
+                  <UploadAvatar ref={avatarRef}>
+                    <Avatar size={'$7'} borderRadius={'$3'} id="current-Image">
                       <SolitoImage
                         src={avatar_url ? avatar_url : ''}
                         alt="your avatar"
-                        width={128}
-                        height={128}
+                        width={74}
+                        height={74}
                       />
                     </Avatar>
                   </UploadAvatar>
-                </YStack>
+                  <YStack gap={'$2'}>
+                    <Label
+                      size="$5"
+                      htmlFor="current-Image"
+                      fontFamily={'$mono'}
+                      textTransform="uppercase"
+                    >
+                      Profile Picture
+                    </Label>
+                    <Paragraph color={'$color075'} fontSize={'$5'} fontStyle={'italic'}>
+                      (Upload an image of your choice)
+                    </Paragraph>
+                    <Paragraph
+                      color={'$primary'}
+                      fontSize={'$5'}
+                      fontWeight={'700'}
+                      cursor={'pointer'}
+                      onPress={() => avatarRef.current?.pickImage()}
+                    >
+                      change
+                    </Paragraph>
+                  </YStack>
+                </XStack>
                 {Object.values(fields)}
               </>
             )}
