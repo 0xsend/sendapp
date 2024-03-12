@@ -1,4 +1,4 @@
-import { Button, ButtonIcon, ButtonText, Link, type LinkProps } from '@my/ui'
+import { Link, Paragraph, type LinkProps } from '@my/ui'
 import { usePathname } from 'app/utils/usePathname'
 import { type ReactElement } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -8,10 +8,8 @@ export function SettingsNavLink({
   ...props
 }: { text: string } & Omit<LinkProps, 'children'>): ReactElement {
   const location = usePathname()
-  const isActiveRoute =
-    props.href === '/account'
-      ? location === props.href.toString()
-      : location.includes(props.href.toString())
+  const href = props.href.toString().split('?')[0]
+  const isActiveRoute = href === '/account' ? location === href : location.includes(href as string)
 
   const { resolvedTheme } = useThemeSetting()
   const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
@@ -25,14 +23,14 @@ export function SettingsNavLink({
       opacity={isActiveRoute ? 1 : 0.63}
       disabled={props.disabled}
     >
-      <ButtonText
+      <Paragraph
         f={1}
         fontFamily="$mono"
         fontWeight={isActiveRoute ? 'bold' : '300'}
         color={isActiveRoute ? iconActiveColor : iconInActiveColor}
       >
         {text}
-      </ButtonText>
+      </Paragraph>
     </Link>
   )
 }

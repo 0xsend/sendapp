@@ -40,7 +40,7 @@ export function AccountScreen() {
                 Earn Tokens
               </BorderedLink>
               <BorderedLink
-                href={'/account/settings'}
+                href={'/account/settings/edit-profile'}
                 icon={<IconGear color={'$primary'} size={'$1'} />}
               >
                 Settings
