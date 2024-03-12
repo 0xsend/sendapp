@@ -111,7 +111,7 @@ local_resource(
     labels = labels,
     resource_deps = [
         "yarn:install",
-        "supabase:test",
+        "supabase",
     ],
     deps = files_matching(
         os.path.join("supabase", "migrations"),
@@ -732,7 +732,10 @@ local_resource(
     "yarn supabase test",
     allow_parallel = True,
     labels = labels,
-    resource_deps = ["supabase"],
+    resource_deps = [
+        "supabase",
+        "snaplet:generate",  # hack to ensure snaplet doesn't include test pg_tap schema
+    ],
     deps = files_matching(
         os.path.join("supabase", "tests"),
         lambda f: f.endswith(".sql"),
@@ -752,9 +755,9 @@ local_resource(
 )
 
 local_resource(
-    "unit-tests",
-    "echo 🥳",
+    name = "unit-tests",
     allow_parallel = True,
+    cmd = "echo 🥳",
     labels = labels,
     resource_deps = [
         # messy but create a single resource that runs all the tests

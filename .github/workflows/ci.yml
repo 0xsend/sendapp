@@ -119,6 +119,9 @@ jobs:
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
+      - name: All Changes Committed
+        shell: bash
+        run: git diff --exit-code
       # this is on purpose so we get github annotations
       - name: Playwright Tests
         id: playwright
