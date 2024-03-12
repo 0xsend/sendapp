@@ -265,4 +265,5 @@ export const brandColors = {
   cinereous: '#1D1D20',
   olive: '#86AE80',
   decay: '#3E4A3C',
+  darkest: '#081619',
 }

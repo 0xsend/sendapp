@@ -74,7 +74,7 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
           lineHeight={24}
           px="$6"
           $lg={{ py: '$6' }}
-          $gtLg={{ ml: '$7' }}
+          $gtLg={{ ml: '$7', pb: '$4' }}
           $theme-light={{ col: '$gray10Light' }}
           $theme-dark={{ col: '$gray10Dark' }}
         >
