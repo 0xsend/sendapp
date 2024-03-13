@@ -32,30 +32,18 @@ export const EditProfile = () => {
             props={{
               userName: {
                 accessibilityLabel: 'User Name',
-                backgroundColor: '#081619',
-                borderWidth: 0,
-                fontSize: '$5',
-                color: '$color12',
               },
               displayName: {
                 accessibilityLabel: 'Display Name',
-                backgroundColor: '#081619',
-                borderWidth: 0,
-                fontSize: '$5',
-                color: '$color12',
               },
-              Bio: {
+              bio: {
                 accessibilityLabel: 'Bio',
-                backgroundColor: '#081619',
-                borderWidth: 0,
-                fontSize: '$5',
-                rows: 1,
+                placeholder: 'Tell us about yourself',
+                fontStyle: 'italic',
               },
               isPublic: {
-                accessibilityLabel: 'Is Public',
-                backgroundColor: '#081619',
-                borderWidth: 0,
-                defaultChecked: isPublic,
+                // accessibilityLabel: 'Is Public',
+                defaultChecked: isPublic ?? false,
               },
             }}
             defaultValues={{
@@ -72,8 +60,8 @@ export const EditProfile = () => {
                 $lg={{ flexDirection: 'column' }}
                 $gtLg={{ flexDirection: 'row' }}
               >
-                <SubmitButton f={1} marginTop={'$5'} onPress={() => submit()}>
-                  Update Profile
+                <SubmitButton f={1} marginTop={'$5'} fontWeight={'500'} onPress={() => submit()}>
+                  SAVE
                 </SubmitButton>
               </XStack>
             )}

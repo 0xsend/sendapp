@@ -19,7 +19,7 @@ export const TextField = (props: InputProps) => {
       {/* flex 1 is needed to make the input fill the width of the parent in the case of a being in a container with flex direction row */}
       <Fieldset f={1}>
         {!!label && (
-          <Label size={props.size || '$3'} htmlFor={id}>
+          <Label size={props.size || '$5'} htmlFor={id} textTransform={'uppercase'}>
             {label} {isOptional && '(Optional)'}
           </Label>
         )}
@@ -28,6 +28,9 @@ export const TextField = (props: InputProps) => {
             accessibilityLabel={label}
             disabled={disabled}
             maxLength={maxLength}
+            borderWidth={0}
+            backgroundColor={'#081619'}
+            color={'$color12'}
             placeholderTextColor="$color10"
             spellCheck={isEmail ? false : undefined}
             autoCapitalize={isEmail ? 'none' : undefined}

@@ -43,6 +43,8 @@ export const SubmitButton = (props: ButtonProps) => {
         </AnimatePresence>
       }
       disabled={isSubmitting}
+      backgroundColor={'$primary'}
+      color={'$background'}
       {...props}
     />
   )
