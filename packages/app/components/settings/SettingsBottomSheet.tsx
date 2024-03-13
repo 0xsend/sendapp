@@ -13,19 +13,19 @@ export const settingsLinks = [
   },
   {
     text: 'Notification',
-    href: '/account/notification',
+    href: '/account/settings/notification',
   },
   {
     text: 'Security',
-    href: '/account/security',
+    href: '/account/settings/security',
   },
   {
     text: 'Privacy',
-    href: '/account/privacy',
+    href: '/account/settings/privacy',
   },
   {
     text: 'Support',
-    href: '/account/support',
+    href: '/account/settings/support',
   },
 ]
 
