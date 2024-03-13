@@ -25,7 +25,7 @@ export function SettingsNavLink({
     >
       <Paragraph
         f={1}
-        fontFamily="$mono"
+        $md={{ fontSize: '$5' }}
         fontWeight={isActiveRoute ? 'bold' : '300'}
         color={isActiveRoute ? iconActiveColor : iconInActiveColor}
       >

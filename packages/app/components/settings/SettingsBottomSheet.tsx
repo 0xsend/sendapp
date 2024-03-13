@@ -1,6 +1,7 @@
-import { BottomSheet, Link, Nav, Paragraph, SheetProps, YStack } from '@my/ui'
+import { BottomSheet, Link, Nav, Paragraph, SheetProps, XStack, YStack } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { SettingsNavLink } from './SettingsNavLink'
+import { IconX } from '../icons'
 
 export const settingsLinks = [
   {
@@ -38,17 +39,20 @@ export const SettingsBottomSheet = ({ open }: SheetProps) => {
   }
 
   return (
-    <BottomSheet open={nav === 'settings'} onOpenChange={onOpenChange}>
-      <Paragraph marginTop={'$6'} fontSize={'$6'} fontWeight={'700'} color={'$color12'}>
+    <BottomSheet open={nav === 'settings'} onOpenChange={onOpenChange} snapPointsMode="fit">
+      <Paragraph pb={'$6'} fontSize={'$6'} fontWeight={'700'} color={'$color12'}>
         Settings
       </Paragraph>
-      <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
+      <Nav display="flex" flex={2} justifyContent={'center'} pb={'$5'}>
+        <YStack gap={'$6'} alignItems="stretch" justifyContent="center">
           {settingsLinks.map((link) => (
             <SettingsNavLink key={link.href} {...link} />
           ))}
         </YStack>
       </Nav>
+      <XStack pos={'absolute'} top={'$5'} right={'$6'} onPress={onOpenChange}>
+        <IconX color={'$color05'} />
+      </XStack>
     </BottomSheet>
   )
 }
