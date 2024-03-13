@@ -9,7 +9,7 @@ export const settingsLinks = [
   },
   {
     text: 'Personal Information',
-    href: '/account/settings/info',
+    href: '/account/settings/personal-info',
   },
   {
     text: 'Notification',
