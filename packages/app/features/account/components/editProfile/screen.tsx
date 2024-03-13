@@ -54,16 +54,18 @@ export const EditProfile = () => {
             }}
             onSubmit={(values) => mutation.mutate(values)}
             renderAfter={({ submit }) => (
-              <XStack
-                jc={'space-between'}
-                ai={'center'}
-                $lg={{ flexDirection: 'column' }}
-                $gtLg={{ flexDirection: 'row' }}
-              >
-                <SubmitButton f={1} marginTop={'$5'} fontWeight={'500'} onPress={() => submit()}>
+              <YStack ai={'center'}>
+                <SubmitButton
+                  f={1}
+                  marginTop={'$5'}
+                  px={'$12'}
+                  py={'$5'}
+                  fontWeight={'500'}
+                  onPress={() => submit()}
+                >
                   SAVE
                 </SubmitButton>
-              </XStack>
+              </YStack>
             )}
           >
             {(fields) => (

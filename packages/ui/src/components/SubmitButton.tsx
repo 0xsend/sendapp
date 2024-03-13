@@ -1,5 +1,5 @@
 import { useFormState } from 'react-hook-form'
-import { AnimatePresence, Button, ButtonProps, Spinner } from 'tamagui'
+import { AnimatePresence, Button, ButtonProps, ButtonText, Spinner } from 'tamagui'
 
 // hack to prevent it from breaking on the server
 const useIsSubmitting = () => {
@@ -14,7 +14,7 @@ const useIsSubmitting = () => {
  * created to be used in forms
  * will show loading spinners and disable submission when already submitting
  */
-export const SubmitButton = (props: ButtonProps) => {
+export const SubmitButton = ({ children, ...props }: ButtonProps) => {
   const isSubmitting = useIsSubmitting()
 
   return (
@@ -46,6 +46,8 @@ export const SubmitButton = (props: ButtonProps) => {
       backgroundColor={'$primary'}
       color={'$background'}
       {...props}
-    />
+    >
+      {!isSubmitting ? <ButtonText>{children}</ButtonText> : <></>}
+    </Button>
   )
 }
