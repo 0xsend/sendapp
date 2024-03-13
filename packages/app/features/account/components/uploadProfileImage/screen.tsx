@@ -114,6 +114,7 @@ export const UploadAvatar = forwardRef(
               right={0}
               top={0}
               bottom={0}
+              $md={{ borderRadius: 12 }}
             />
             <YStack
               position="absolute"
