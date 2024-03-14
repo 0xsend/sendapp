@@ -8,6 +8,7 @@ import { usePathname } from 'app/utils/usePathname'
 // TODO: this should probably named HomeTopNav
 export function HomeHeader({ backLink, children }: { backLink?: string; children: string }) {
   const [nav, setNavParam] = useNav()
+
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
   }
