@@ -1,4 +1,4 @@
-import { SizableText, TamaguiElement, YStack, YStackProps } from '@my/ui'
+import { SizableText, YStack } from '@my/ui'
 import { IconRefresh } from 'app/components/icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'

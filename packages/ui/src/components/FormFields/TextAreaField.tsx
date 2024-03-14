@@ -1,11 +1,16 @@
 import { useThemeSetting } from '@tamagui/next-theme'
-import { useFieldInfo, useStringFieldInfo, useTsController } from '@ts-react/form'
+import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
 import { Fieldset, Label, TextArea, TextAreaProps, Theme, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
 
-export const TextAreaField = (props: Pick<TextAreaProps, 'size' | 'autoFocus'>) => {
+export const TextAreaField = (
+  props: Pick<
+    TextAreaProps,
+    'size' | 'autoFocus' | 'accessibilityLabel' | 'placeholder' | 'fontStyle'
+  >
+) => {
   const {
     field,
     error,
@@ -35,7 +40,7 @@ export const TextAreaField = (props: Pick<TextAreaProps, 'size' | 'autoFocus'>) 
           <TextArea
             disabled={disabled}
             borderWidth={0}
-            backgroundColor={'#081619'}
+            backgroundColor={'$charcoal'}
             color={'$color12'}
             placeholderTextColor="$color05"
             value={field.value}

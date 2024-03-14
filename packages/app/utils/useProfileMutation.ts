@@ -12,7 +12,7 @@ export const ProfileSchema = z.object({
   isPublic: formFields.boolean_checkbox.describe('Is Public'),
 })
 
-export const useEditProfileMutation = (userID: string | undefined) => {
+export const useProfileMutation = (userID: string | undefined) => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const router = useRouter()

@@ -1,16 +1,6 @@
-import {
-  Avatar,
-  Container,
-  Paragraph,
-  XStack,
-  YStack,
-  Label,
-  SubmitButton,
-  useMedia,
-  Separator,
-} from '@my/ui'
+import { Avatar, Paragraph, XStack, YStack, Label, SubmitButton, useMedia, Separator } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
-import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
+import { useProfileMutation, ProfileSchema } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { SolitoImage } from 'solito/image'
 import { UploadAvatar, UploadAvatarRefObject } from '../uploadProfileImage/screen'
@@ -25,7 +15,7 @@ export const EditProfile = () => {
   const isPublic = profile?.is_public
   const userID = user?.id
   const avatar_url = profile?.avatar_url
-  const mutation = useEditProfileMutation(userID)
+  const mutation = useProfileMutation(userID)
 
   const avatarRef = useRef<UploadAvatarRefObject>(null)
 

@@ -57,7 +57,7 @@ export const BooleanCheckboxField = (
             ref={field.ref}
             id={id}
             borderWidth={0}
-            backgroundColor={'#081619'}
+            backgroundColor={'$charcoal'}
             {...props}
           >
             <Checkbox.Indicator>
