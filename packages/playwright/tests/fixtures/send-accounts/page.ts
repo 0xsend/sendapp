@@ -17,5 +17,6 @@ export class OnboardingPage {
     await this.page.getByRole('button', { name: 'Create Passkey' }).click()
     // @todo add a check for the success message
     await this.page.getByRole('button', { name: 'Create Passkey' }).waitFor({ state: 'detached' })
+    await this.page.waitForURL('/')
   }
 }
