@@ -21,6 +21,10 @@ export function HomeHeader({ backLink, children }: { backLink?: string; children
   const pathname = usePathname()
   const media = useMedia()
 
+  const headers = children.split('/')
+  const desktopHeader = headers[0]
+  const mobileHeader = headers.length > 1 ? headers[1] : headers[0]
+
   return (
     <>
       {media.lg ? <SettingsBottomSheet /> : <></>}
@@ -49,7 +53,7 @@ export function HomeHeader({ backLink, children }: { backLink?: string; children
                 <IconArrowLeft color={iconColor} />
               </Link>
               <H2 fontWeight={'300'} $lg={{ fontSize: '$8' }} color={'$color05'} ai={'center'}>
-                {children}
+                {media.gtLg ? desktopHeader : mobileHeader}
               </H2>
             </XStack>
           )}
