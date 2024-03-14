@@ -50,8 +50,8 @@ exports[`HomeScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "paddingBottom": 74,
-              "paddingTop": 74,
+              "paddingBottom": 39,
+              "paddingTop": 39,
             }
           }
         >
