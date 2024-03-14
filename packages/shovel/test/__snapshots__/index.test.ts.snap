@@ -49,6 +49,7 @@ exports[`shovel config 1`] = `
             "column": "factory",
             "filter_arg": [
               "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC",
+              "0x92F9acDa58877431FF3d091D71A9e20Fe1BFf4dd",
             ],
             "filter_op": "contains",
             "indexed": false,
