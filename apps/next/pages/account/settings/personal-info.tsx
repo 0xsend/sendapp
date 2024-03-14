@@ -1,6 +1,6 @@
 import { HomeLayout } from 'app/features/home/layout.web'
 import { SettingsLayout } from 'app/features/account/layout.web'
-import { PersonalInfoScreen } from 'app/features/account/settings/personal-info'
+import { PersonalInfoScreen } from 'app/features/account/settings'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../../_app'
