@@ -32,13 +32,13 @@ export const PersonalInfoScreen = () => {
   }
 
   return (
-    <YStack w={'100%'} ai={'center'}>
-      <XStack w={'100%'} marginHorizontal={'5%'} $md={{ display: 'none' }}>
+    <YStack w={'100%'} als={'center'}>
+      <XStack w={'100%'} $lg={{ display: 'none' }}>
         <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
           Personal Information
         </Paragraph>
       </XStack>
-      <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
+      <XStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }}>
         <FormProvider {...form}>
           {form.formState.isSubmitSuccessful ? (
             <VerifyCode

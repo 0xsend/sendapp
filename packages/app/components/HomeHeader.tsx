@@ -34,7 +34,7 @@ export function HomeHeader({ backButton, children }: { backButton?: boolean; chi
               icon={<IconHamburger size={'$2.5'} color={iconColor} />}
             />
           </XStack>
-          {children === 'Home' && media.md ? (
+          {children === 'Home' && media.lg ? (
             <XStack>
               <IconSendLogo size={'$2.5'} color={'$color12'} />
             </XStack>
@@ -54,13 +54,13 @@ export function HomeHeader({ backButton, children }: { backButton?: boolean; chi
             </XStack>
           )}
 
-          {children === 'Home' && media.md ? (
+          {children === 'Home' && media.lg ? (
             <Button p={0} bg="transparent" icon={<IconQr size={'$2.5'} color={iconColor} />} />
           ) : (
             <></>
           )}
 
-          {(children === 'Account' || children === 'Settings') && media.md ? (
+          {(children === 'Account' || children === 'Settings') && media.lg ? (
             <Button
               p={0}
               onPress={handleSettingsBottomSheet}

@@ -16,11 +16,11 @@ export function HomeLayout({
         <ScrollView f={3} fb={0} backgroundColor={'$background05'}>
           <Container
             mb={'$6'}
-            $gtMd={{ mb: '$7' }}
-            $md={{ borderBottomWidth: 1, borderColor: separatorColor }}
+            $gtLg={{ mb: '$7', maxWidth: 1440, px: '$11' }}
+            $lg={{ borderBottomWidth: 1, borderColor: separatorColor }}
             $sm={{ pt: '$6' }}
           >
-            <YStack gap="$6" py={'$3'} $gtMd={{ pt: '$11', pb: '$7' }} w={'100%'}>
+            <YStack gap="$6" py={'$3'} $gtLg={{ pt: '$11', pb: '$7' }} w={'100%'}>
               <HomeHeader backButton={backButton}>{header}</HomeHeader>
             </YStack>
           </Container>

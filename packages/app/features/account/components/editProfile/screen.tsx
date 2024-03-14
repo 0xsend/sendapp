@@ -1,4 +1,14 @@
-import { Avatar, Container, Paragraph, XStack, YStack, Label, SubmitButton, useMedia } from '@my/ui'
+import {
+  Avatar,
+  Container,
+  Paragraph,
+  XStack,
+  YStack,
+  Label,
+  SubmitButton,
+  useMedia,
+  Separator,
+} from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
 import { useUser } from 'app/utils/useUser'
@@ -21,13 +31,13 @@ export const EditProfile = () => {
   const media = useMedia()
 
   return (
-    <YStack w={'100%'} ai={'center'} jc="center">
-      <XStack w={'100%'} marginHorizontal={'5%'} $md={{ display: 'none' }}>
+    <YStack w={'100%'} als={'center'}>
+      <XStack $lg={{ display: 'none' }}>
         <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
           Edit Profile
         </Paragraph>
       </XStack>
-      <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
+      <XStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }}>
         <SchemaForm
           schema={ProfileSchema}
           props={{
@@ -110,6 +120,7 @@ export const EditProfile = () => {
                   </Paragraph>
                 </YStack>
               </XStack>
+              <Separator my={'$7'} $gtLg={{ display: 'none' }} />
               {Object.values(fields)}
             </>
           )}
