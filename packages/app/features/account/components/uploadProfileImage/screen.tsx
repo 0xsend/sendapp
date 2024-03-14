@@ -1,15 +1,24 @@
 import { SizableText, YStack } from '@my/ui'
-import { Upload } from '@tamagui/lucide-icons'
+import { IconRefresh } from 'app/components/icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { decode } from 'base64-arraybuffer'
 import * as ImagePicker from 'expo-image-picker'
-import React, { useState } from 'react'
+import React, { Ref, forwardRef, useImperativeHandle, useState } from 'react'
 
-export const UploadAvatar = ({ children }: { children: React.ReactNode }) => {
+export interface UploadAvatarRefObject {
+  pickImage: () => void
+}
+
+export const UploadAvatar = forwardRef(function UploadAvatar(
+  { children }: { children: React.ReactNode },
+  ref: Ref<UploadAvatarRefObject>
+) {
   const { user, updateProfile } = useUser()
   const supabase = useSupabase()
   const [errMsg, setErrMsg] = useState('')
+
+  useImperativeHandle(ref, () => ({ pickImage }))
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -79,7 +88,7 @@ export const UploadAvatar = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <>
+    <YStack gap={'$4'}>
       <YStack
         position="relative"
         alignSelf="flex-start"
@@ -100,22 +109,21 @@ export const UploadAvatar = ({ children }: { children: React.ReactNode }) => {
         >
           <YStack
             backgroundColor="black"
-            opacity={0.3}
-            borderRadius="$10"
+            opacity={0.34}
+            borderRadius="$3"
             position="absolute"
             left={0}
             right={0}
             top={0}
             bottom={0}
+            $md={{ borderRadius: 12 }}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
-            <Upload color="white" />
+            <IconRefresh color="primary" />
           </YStack>
         </YStack>
       </YStack>
-      <SizableText theme="red" mt={'$4'}>
-        {errMsg}
-      </SizableText>
-    </>
+      {errMsg ? <SizableText theme="red">{errMsg}</SizableText> : <></>}
+    </YStack>
   )
-}
+})

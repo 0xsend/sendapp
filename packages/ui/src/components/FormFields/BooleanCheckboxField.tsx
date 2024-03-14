@@ -37,7 +37,13 @@ export const BooleanCheckboxField = (
       <Fieldset>
         <XStack gap="$4" ai={'center'}>
           {!!label && (
-            <Label size={props.size || '$3'} htmlFor={id}>
+            <Label
+              size={props.size || '$5'}
+              fontFamily={'$mono'}
+              lineHeight={52}
+              htmlFor={id}
+              textTransform={'uppercase'}
+            >
               {label} {isOptional && '(Optional)'}
             </Label>
           )}
@@ -50,10 +56,12 @@ export const BooleanCheckboxField = (
             }}
             ref={field.ref}
             id={id}
+            borderWidth={0}
+            backgroundColor={'$charcoal'}
             {...props}
           >
             <Checkbox.Indicator>
-              <Check />
+              <Check color={'$color12'} />
             </Checkbox.Indicator>
           </Checkbox>
         </XStack>

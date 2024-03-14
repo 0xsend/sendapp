@@ -6,12 +6,13 @@ import { z } from 'zod'
 import { useToastController } from '@my/ui'
 
 export const ProfileSchema = z.object({
-  name: formFields.text.describe('Name'),
-  about: formFields.textarea.describe('About'),
-  isPublic: formFields.boolean_checkbox.describe('IsPublic'),
+  userName: formFields.text.describe('User Name'),
+  displayName: formFields.text.describe('Display Name'),
+  bio: formFields.textarea.describe('Bio'),
+  isPublic: formFields.boolean_checkbox.describe('Is Public'),
 })
 
-export const useEditProfileMutation = (userID: string | undefined) => {
+export const useProfileMutation = (userID: string | undefined) => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const router = useRouter()
@@ -22,8 +23,9 @@ export const useEditProfileMutation = (userID: string | undefined) => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          name: data.name,
-          about: data.about,
+          name: data.userName,
+          // TODO: add display name
+          about: data.bio,
           is_public: data.isPublic,
         })
         .eq('id', userID ? userID : '')
@@ -33,7 +35,6 @@ export const useEditProfileMutation = (userID: string | undefined) => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries({ queryKey: ['profile'] })
-      router.push('/account')
       toast.show('Successfully updated')
     },
   })

@@ -1,87 +1,120 @@
-import { Avatar, Container, Paragraph, XStack, YStack, Label, SubmitButton } from '@my/ui'
+import { Avatar, Paragraph, XStack, YStack, Label, SubmitButton, useMedia, Separator } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
-import { useEditProfileMutation, ProfileSchema } from 'app/utils/useEditProfileMutation'
+import { useProfileMutation, ProfileSchema } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { SolitoImage } from 'solito/image'
-import { UploadAvatar } from '../uploadProfileImage/screen'
+import { UploadAvatar, UploadAvatarRefObject } from '../uploadProfileImage/screen'
+import { useRef } from 'react'
 
 export const EditProfile = () => {
+  const media = useMedia()
   const { profile, user } = useUser()
-  const name = profile?.name
-  const about = profile?.about
+  const userName = profile?.name
+  const displayName = profile?.name
+  const bio = profile?.about
   const isPublic = profile?.is_public
   const userID = user?.id
   const avatar_url = profile?.avatar_url
-  const mutation = useEditProfileMutation(userID)
+  const mutation = useProfileMutation(userID)
+
+  const avatarRef = useRef<UploadAvatarRefObject>(null)
 
   return (
-    <Container>
-      <YStack w={'100%'} ai={'center'}>
-        <XStack w={'100%'} jc={'space-between'} marginHorizontal={'5%'}>
-          <Paragraph size={'$9'} fontWeight={'700'}>
-            Edit Profile
-          </Paragraph>
-        </XStack>
-        <XStack w={'100%'} marginHorizontal={'5%'} paddingTop={'$6'}>
-          <SchemaForm
-            schema={ProfileSchema}
-            props={{
-              name: {
-                accessibilityLabel: 'Name',
-                borderWidth: 1,
-              },
-              about: {
-                accessibilityLabel: 'About',
-                borderWidth: 1,
-              },
-              isPublic: {
-                accessibilityLabel: 'IsPublic',
-                borderWidth: 1,
-                defaultChecked: isPublic,
-              },
-            }}
-            defaultValues={{
-              name: name ?? '',
-              about: about ?? '',
-              isPublic: isPublic ?? false,
-            }}
-            onSubmit={(values) => mutation.mutate(values)}
-            renderAfter={({ submit }) => (
-              <XStack
-                jc={'space-between'}
-                ai={'center'}
-                $lg={{ flexDirection: 'column' }}
-                $gtLg={{ flexDirection: 'row' }}
+    <YStack w={'100%'} als={'center'}>
+      <XStack $lg={{ display: 'none' }}>
+        <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
+          Edit Profile
+        </Paragraph>
+      </XStack>
+      <XStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }}>
+        <SchemaForm
+          schema={ProfileSchema}
+          props={{
+            userName: {
+              accessibilityLabel: 'User Name',
+            },
+            displayName: {
+              accessibilityLabel: 'Display Name',
+            },
+            bio: {
+              accessibilityLabel: 'Bio',
+              placeholder: 'Tell us about yourself',
+              fontStyle: 'italic',
+            },
+            isPublic: {
+              // accessibilityLabel: 'Is Public',
+              defaultChecked: isPublic ?? false,
+            },
+          }}
+          defaultValues={{
+            userName: userName ?? '',
+            displayName: displayName ?? '',
+            bio: bio ?? '',
+            isPublic: isPublic ?? false,
+          }}
+          onSubmit={(values) => mutation.mutate(values)}
+          renderAfter={({ submit }) => (
+            <YStack ai={'center'}>
+              <SubmitButton
+                f={1}
+                marginTop={'$5'}
+                px={'$12'}
+                py={'$5'}
+                fontWeight={'500'}
+                onPress={() => submit()}
               >
-                <SubmitButton f={1} marginTop={'$5'} onPress={() => submit()}>
-                  Update Profile
-                </SubmitButton>
-              </XStack>
-            )}
-          >
-            {(fields) => (
-              <>
-                <YStack>
-                  <Label size="$3" htmlFor="current-Image">
-                    Image
+                SAVE
+              </SubmitButton>
+            </YStack>
+          )}
+        >
+          {(fields) => (
+            <>
+              <XStack ai={'center'} gap={'$6'}>
+                <UploadAvatar ref={avatarRef}>
+                  <Avatar
+                    size={'$7'}
+                    borderRadius={'$3'}
+                    $md={{ size: '$10', borderRadius: 12 }}
+                    id="current-Image"
+                  >
+                    <SolitoImage
+                      src={avatar_url ? avatar_url : ''}
+                      alt="your avatar"
+                      width={media.md ? 104 : 74}
+                      height={media.md ? 104 : 74}
+                    />
+                  </Avatar>
+                </UploadAvatar>
+                <YStack gap={'$2'}>
+                  <Label
+                    size="$5"
+                    htmlFor="current-Image"
+                    fontFamily={'$mono'}
+                    textTransform="uppercase"
+                  >
+                    Profile Picture
                   </Label>
-                  <UploadAvatar>
-                    <Avatar circular size={128}>
-                      <SolitoImage
-                        src={avatar_url ? avatar_url : ''}
-                        alt="your avatar"
-                        width={128}
-                        height={128}
-                      />
-                    </Avatar>
-                  </UploadAvatar>
+                  <Paragraph color={'$color075'} fontSize={'$5'} fontStyle={'italic'}>
+                    (Upload an image of your choice)
+                  </Paragraph>
+                  <Paragraph
+                    color={'$primary'}
+                    fontSize={'$5'}
+                    fontWeight={'700'}
+                    cursor={'pointer'}
+                    onPress={() => avatarRef.current?.pickImage()}
+                  >
+                    change
+                  </Paragraph>
                 </YStack>
-                {Object.values(fields)}
-              </>
-            )}
-          </SchemaForm>
-        </XStack>
-      </YStack>
-    </Container>
+              </XStack>
+              <Separator my={'$7'} $gtLg={{ display: 'none' }} />
+              {Object.values(fields)}
+            </>
+          )}
+        </SchemaForm>
+      </XStack>
+    </YStack>
   )
 }

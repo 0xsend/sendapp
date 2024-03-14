@@ -1,7 +1,8 @@
-import { Container, Separator, XStack, YStack } from '@my/ui'
-import { AccountScreen } from './screen'
+import { Container, Separator, XStack, YStack, useMedia } from '@my/ui'
+import { settingsLinks } from 'app/components/settings/SettingsBottomSheet'
+import { SettingsNavLink } from 'app/components/settings/SettingsNavLink'
 
-export type AccountLayoutProps = {
+export type SettingsLayoutProps = {
   /**
    * web-only
    */
@@ -12,35 +13,41 @@ export type AccountLayoutProps = {
   children?: React.ReactNode
 }
 
-export const AccountLayout = ({ children, isAccountHome = false }: AccountLayoutProps) => {
+export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
   // const { isLoading, user } = useUser()
   // if (isLoading || !user) {
   //   return <FullscreenSpinner />
   // }
+  const media = useMedia()
 
   return (
     <Container>
-      <XStack separator={<Separator vertical />} f={1}>
-        <YStack
-          backgroundColor="$color1"
-          $sm={{ flex: 1, display: isAccountHome ? 'flex' : 'none' }}
-          // this file is web-only so we can safely use CSS
-          style={{
-            transition: '200ms ease width',
-          }}
-          $gtSm={{
-            width: 300,
-          }}
-          $gtLg={{
-            width: 400,
-          }}
-        >
-          <AccountScreen />
-        </YStack>
-        <YStack my="$10" f={1} ai="center" $sm={{ display: isAccountHome ? 'none' : 'block' }}>
-          <YStack width="100%">{children}</YStack>
-        </YStack>
-      </XStack>
+      {media.gtLg ? (
+        <XStack separator={<Separator vertical />} f={1} gap={'$size.8'}>
+          <YStack
+            backgroundColor="$color1"
+            // this file is web-only so we can safely use CSS
+            style={{
+              transition: '200ms ease width',
+            }}
+          >
+            <YStack width={'100%'} gap={'$space.6'}>
+              <YStack jc={'space-between'} zIndex={4}>
+                <YStack h={'inherit'} gap={'$6'}>
+                  {settingsLinks.map((link) => (
+                    <SettingsNavLink key={link.href} {...link} />
+                  ))}
+                </YStack>
+              </YStack>
+            </YStack>
+          </YStack>
+          <YStack f={1} ai="center">
+            <YStack width="100%">{children}</YStack>
+          </YStack>
+        </XStack>
+      ) : (
+        <YStack width="100%">{children}</YStack>
+      )}
     </Container>
   )
 }

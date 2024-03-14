@@ -99,6 +99,7 @@ export const accentDark = [
 
 export const brandColors = {
   primary: '#40FB50',
+  charcoal: '#081619',
   white: '#FFFFFF',
   black: '#122023',
   gray50: '#F5F6FC',

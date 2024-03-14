@@ -1,6 +1,6 @@
 import { createParam } from 'solito'
 
-type Nav = { nav?: 'home' }
+type Nav = { nav?: 'home' | 'settings' }
 
 const { useParam: useNavParam } = createParam<Nav>()
 

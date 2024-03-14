@@ -8,6 +8,7 @@ const Gear = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
+      fill="none"
       color={color as ColorTokens | undefined}
       width={size}
       height={size}
