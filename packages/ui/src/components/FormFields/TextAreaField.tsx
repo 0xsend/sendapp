@@ -21,7 +21,13 @@ export const TextAreaField = (props: Pick<TextAreaProps, 'size' | 'autoFocus'>) 
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
         {!!label && (
-          <Label size={props.size || '$5'} htmlFor={id} textTransform={'uppercase'}>
+          <Label
+            size={props.size || '$5'}
+            fontFamily={'$mono'}
+            lineHeight={52}
+            htmlFor={id}
+            textTransform={'uppercase'}
+          >
             {label} {isOptional && '(Optional)'}
           </Label>
         )}

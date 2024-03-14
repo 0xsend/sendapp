@@ -37,7 +37,13 @@ export const BooleanCheckboxField = (
       <Fieldset>
         <XStack gap="$4" ai={'center'}>
           {!!label && (
-            <Label size={props.size || '$5'} htmlFor={id} textTransform={'uppercase'}>
+            <Label
+              size={props.size || '$5'}
+              fontFamily={'$mono'}
+              lineHeight={52}
+              htmlFor={id}
+              textTransform={'uppercase'}
+            >
               {label} {isOptional && '(Optional)'}
             </Label>
           )}
