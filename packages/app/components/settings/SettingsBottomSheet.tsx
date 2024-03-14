@@ -15,18 +15,26 @@ export const settingsLinks = [
   {
     text: 'Notification',
     href: '/account/settings/notification',
+    disabled: true,
   },
   {
     text: 'Security',
     href: '/account/settings/security',
+    disabled: true,
   },
   {
     text: 'Privacy',
     href: '/account/settings/privacy',
+    disabled: true,
   },
   {
     text: 'Support',
     href: '/account/settings/support',
+  },
+  {
+    text: 'Backup',
+    href: '/account/settings/backup',
+    disabled: true,
   },
 ]
 

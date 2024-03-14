@@ -19,7 +19,12 @@ export function SettingsNavLink({
     <Link
       {...props}
       href={props.disabled ? '' : props.href}
-      hoverStyle={{ scale: '105%', opacity: 1, backgroundColor: 'transparent', borderWidth: 0 }}
+      hoverStyle={
+        props.disabled
+          ? {}
+          : { scale: '105%', opacity: 1, backgroundColor: 'transparent', borderWidth: 0 }
+      }
+      cursor={props.disabled ? 'not-allowed' : 'pointer'}
       opacity={isActiveRoute ? 1 : 0.63}
       disabled={props.disabled}
     >
