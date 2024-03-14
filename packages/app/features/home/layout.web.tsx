@@ -9,11 +9,10 @@ export function HomeLayout({
 }: { children: React.ReactNode; header?: string; subheader?: string }) {
   return (
     <HomeSideBarWrapper>
-      <YStack h={'100%'} f={1} backgroundColor={'$background05'}>
-        <YStack gap="$3" $gtLg={{ pt: '$11' }} w={'100%'}>
+      <YStack h={'100%'} f={1}>
+        <YStack gap="$3" $gtLg={{ pt: '$8' }} w={'100%'}>
           <HomeTopNav header={header} subheader={subheader} />
         </YStack>
-
         {children}
       </YStack>
     </HomeSideBarWrapper>

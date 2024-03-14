@@ -3,11 +3,9 @@ import { YStack, YStackProps } from 'tamagui'
 export const SideBar = ({ children, ...props }: YStackProps) => {
   return (
     <YStack
-      h={props.h ?? props.height ?? '92%'}
+      h={props.h ?? props.height ?? '100%'}
       width={props.w ?? props.width ?? '20%'}
       py={props.py ?? props.paddingVertical ?? '$6'}
-      ml={props.ml ?? props.marginLeft ?? '$7'}
-      my={props.my ?? props.marginVertical ?? 'auto'}
       zi={props.zi ?? props.zIndex ?? 1}
       jc={props.jc ?? props.justifyContent ?? 'space-between'}
       ai={props.ai ?? props.alignItems ?? 'center'}

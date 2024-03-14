@@ -29,7 +29,10 @@ export const AuthSideBarWrapper = ({ children }: { children?: React.ReactNode })
   const media = useMedia()
   if (media.gtMd) {
     return (
-      <SideBarWrapper overflow="hidden" sidebar={<AuthSideBar bc={'$background'} />}>
+      <SideBarWrapper
+        overflow="hidden"
+        sidebar={<AuthSideBar bc={'$background'} h={'92%'} ml={'$7'} my={'auto'} />}
+      >
         {children}
       </SideBarWrapper>
     )
