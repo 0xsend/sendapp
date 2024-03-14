@@ -27,22 +27,22 @@ abstract contract Helper is Script {
     /**
      * Send Merkle Drop for Send token distributions on base.
      */
-    address constant SEND_MERKLE_DROP = 0x240761104aF5DAeDFd9025810FfEB741fEB316B3;
+    address constant SEND_MERKLE_DROP = 0x471F9abb65aE7FC0cF0EF745dB234A3896142896;
     /**
      * Send Account Verifier
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_VERIFIER = 0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F;
+    address constant SEND_VERIFIER = 0xFC65337c9671a7dA063b62dBE6584bC29e6b65b5;
     /**
      * Send Account Verifier Proxy
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_VERIFIER_PROXY = 0xdAAb03239f5CC5b3452837E557295F790D9ab319;
+    address constant SEND_VERIFIER_PROXY = 0x5b0A5b6feEc59e93f541cD7fac1677db273bf070;
     /**
      * Send Account Factory
      * @notice Not deployed yet. TODO: update this address when deployed.
      */
-    address constant SEND_ACCOUNT_FACTORY = 0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC;
+    address constant SEND_ACCOUNT_FACTORY = 0x92F9acDa58877431FF3d091D71A9e20Fe1BFf4dd;
     /**
      *
      * Account-Abstraction (EIP-4337) v0.6.0 singleton EntryPoint implementation.
