@@ -73,7 +73,8 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
           fontFamily={'$mono'}
           lineHeight={24}
           px="$6"
-          $lg={{ py: '$6' }}
+          py="$3"
+          $gtMd={{ py: '$6' }}
           $gtLg={{ ml: '$7', pb: '$4' }}
           $theme-light={{ col: '$gray10Light' }}
           $theme-dark={{ col: '$gray10Dark' }}
