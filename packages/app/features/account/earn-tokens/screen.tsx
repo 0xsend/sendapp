@@ -23,7 +23,7 @@ import {
 import { useAccount } from 'wagmi'
 import { shorten } from 'app/utils/strings'
 
-export function DistributionsScreen() {
+export function EarnTokensScreen() {
   return (
     <Container>
       <ScrollView f={3} fb={0} backgroundColor={'$background05'}>
