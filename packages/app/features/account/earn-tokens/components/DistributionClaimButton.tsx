@@ -1,4 +1,4 @@
-import { Anchor, Button, Paragraph, TooltipSimple, YStack } from '@my/ui'
+import { Anchor, Button, ButtonText, Paragraph, TooltipSimple, YStack } from '@my/ui'
 import { sendMerkleDropAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import {
@@ -81,17 +81,15 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (!isConnected) {
     return (
       <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          Please connect a wallet to claim
-        </Paragraph>
         <Button
           w="100%"
+          bc="$accent12Dark"
           onPress={() => {
             assert(!!connectors[0], 'No connectors found')
             connect({ connector: connectors[0] })
           }}
         >
-          Connect Wallet
+          <ButtonText col="$black">Connect Wallet to Claim</ButtonText>
         </Button>
         {connectError ? (
           connectError.message?.includes('Connector not found') ? (
@@ -113,11 +111,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
     return (
       <YStack ai="center" w="100%" mx="auto">
-        <Paragraph size="$1" theme="alt2">
-          Please switch to {distributionChain.name} to view claimability
-        </Paragraph>
         <Button
           w="100%"
+          bc="$accent12Dark"
           onPress={() => {
             assert(!!switchChain, 'No switchChain found')
             switchChain(
@@ -126,7 +122,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             )
           }}
         >
-          Switch Network
+          <ButtonText col="$black">Switch Network</ButtonText>
         </Button>
         {switchError ? (
           <Paragraph size="$1" theme="alt2" maw="100%">

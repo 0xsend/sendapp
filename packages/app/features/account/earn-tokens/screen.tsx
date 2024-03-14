@@ -8,6 +8,7 @@ import {
   Label,
   Paragraph,
   ScrollView,
+  Spinner,
   Stack,
   Text,
   Theme,
@@ -18,17 +19,16 @@ import {
 
 import React from 'react'
 
-import {
-  UseDistributionsResultData,
-  useDistributions,
-  useSendTokenBalance,
-} from 'app/utils/distributions'
+import { UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
 import { TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { DistributionClaimButton } from './components/DistributionClaimButton'
+import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { assert } from 'app/utils/assert'
+import formatAmount from 'app/utils/formatAmount'
 
 export function EarnTokensScreen() {
   const { data: distributions, isLoading } = useDistributions()
@@ -66,10 +66,7 @@ export function EarnTokensScreen() {
         </Stack>
       )}
 
-      <DistributionRewardsList
-        selectedIndex={selectedDistributionIndex}
-        distributions={distributions}
-      />
+      <DistributionRewardsList distributions={distributions} />
     </YStack>
   )
 }
@@ -147,7 +144,7 @@ const DistributionRewardsSection = ({
       <Stack fd="column" $gtLg={{ fd: 'row' }} gap="$2" $gtSm={{ gap: '$4', f: 1 }} my="auto">
         <YStack f={1} $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
           <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-            <SendBalanceCard />
+            <SendBalanceCard distribution={distribution} />
           </Stack>
           <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
             <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
@@ -201,15 +198,38 @@ const ClaimTimeRemainingDigit = ({ children }: { children?: string | string[] })
   </Text>
 )
 
-const SendBalanceCard = () => {
-  const { data: addresses, error: chainAddressesError } = useChainAddresses()
-
-  const address = addresses?.[0]?.address
+const SendBalanceCard = ({
+  distribution,
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const {
+    data: addresses,
+    isLoading: isLoadingChainAddresses,
+    error: chainAddressesError,
+  } = useChainAddresses()
   if (chainAddressesError) throw chainAddressesError
 
-  const { data: sendBalance, error: sendBalanceError } = useSendTokenBalance(address)
+  const address = addresses?.[0]?.address
 
-  if (sendBalanceError) throw sendBalanceError
+  const chainId = distribution.chain_id as keyof typeof sendTokenAddress
+  assert(chainId in sendTokenAddress, 'Chain ID not found in sendTokenAddress')
+
+  const {
+    data: snapshotBalance,
+    isLoading: isLoadingSnapshotBalance,
+    error: snapshotBalanceError,
+  } = useReadSendTokenBalanceOf({
+    chainId,
+    args: address ? [address] : undefined,
+    blockNumber: distribution.snapshot_block_num
+      ? BigInt(distribution.snapshot_block_num)
+      : undefined,
+    query: {
+      enabled: !!address,
+    },
+  })
+  if (snapshotBalanceError) throw snapshotBalanceError
+
+  if (isLoadingSnapshotBalance || isLoadingChainAddresses) return <Spinner color="$color" />
 
   return (
     <Card
@@ -228,7 +248,9 @@ const SendBalanceCard = () => {
         </Label>
         <Theme inverse>
           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {sendBalance?.value ? sendBalance.value : '?'} SEND
+            {snapshotBalance
+              ? `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
+              : 'Error fetching SEND balance'}
           </Paragraph>
         </Theme>
       </YStack>
@@ -250,7 +272,7 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance?: number })
       <Label fontFamily={'$mono'}>Min Balance required</Label>
       <Theme inverse>
         <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-          {hodler_min_balance ? hodler_min_balance : '?'} SEND
+          {hodler_min_balance ? `${formatAmount(hodler_min_balance, 9, 0)} SEND` : '?'}
         </Paragraph>
       </Theme>
     </YStack>
@@ -288,6 +310,7 @@ const ReferralsCard = () => {
 const SendRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
+  const shareAmount = distribution.distribution_shares?.[0]?.amount
   return (
     <Card f={1} mih={198} $gtLg={{ f: 1 }} $gtMd={{ f: 2 }} bc="$darkest" br={12} jc="center">
       <YStack w={'100%'} gap="$8" mx="auto" jc="center" ai="center">
@@ -304,7 +327,7 @@ const SendRewardsCard = ({
               fontWeight={'500'}
               lh={40}
             >
-              0 SEND
+              {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
             </Paragraph>
           </Theme>
         </Stack>
@@ -328,8 +351,7 @@ const DistributionStatus = ({
 const numOfDistributions = 10
 const DistributionRewardsList = ({
   distributions,
-  selectedIndex,
-}: { distributions?: UseDistributionsResultData; selectedIndex: number }) => {
+}: { distributions?: UseDistributionsResultData }) => {
   const { isLoading, error } = useDistributions()
   const [distributionNumberParam, setDistributionNumberParam] = useDistributionNumber()
   const allDistributions = distributions?.concat(
