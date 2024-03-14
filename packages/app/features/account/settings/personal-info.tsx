@@ -16,7 +16,7 @@ import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
-import { AuthUserSchema, useAuthUserMutation } from 'app/utils/usePersonalInfoMutation'
+import { AuthUserSchema, useAuthUserMutation } from 'app/utils/useAuthUserMutation'
 
 export const PersonalInfoScreen = () => {
   const { user } = useUser()
@@ -24,7 +24,7 @@ export const PersonalInfoScreen = () => {
   const toast = useToastController()
   const router = useRouter()
   const form = useForm<z.infer<typeof AuthUserSchema>>() // Using react-hook-form
-  const mutation = useAuthUserMutation(user?.id)
+  const mutation = useAuthUserMutation()
 
   if (mutation.isError) {
     form.setError('phone', { type: 'custom', message: mutation.error.message })
