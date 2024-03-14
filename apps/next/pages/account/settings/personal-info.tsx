@@ -4,6 +4,7 @@ import { PersonalInfoScreen } from 'app/features/account/settings/personal-info'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../../_app'
+import { useMedia } from '@my/ui'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -18,10 +19,13 @@ export const Page: NextPageWithLayout = () => {
 }
 
 export const getServerSideProps = userProtectedGetSSP()
-Page.getLayout = (children) => (
-  <HomeLayout header="Settings" backButton>
-    <SettingsLayout>{children}</SettingsLayout>
-  </HomeLayout>
-)
+Page.getLayout = (children) => {
+  const media = useMedia()
+  return (
+    <HomeLayout header={media.lg ? 'Personal Information' : 'Settings'} backLink={'/account'}>
+      <SettingsLayout>{children}</SettingsLayout>
+    </HomeLayout>
+  )
+}
 
 export default Page

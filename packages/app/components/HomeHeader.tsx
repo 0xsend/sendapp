@@ -6,7 +6,7 @@ import { useRouter } from 'solito/router'
 import { SettingsBottomSheet } from './settings/SettingsBottomSheet'
 
 // TODO: this should probably named HomeTopNav
-export function HomeHeader({ backButton, children }: { backButton?: boolean; children: string }) {
+export function HomeHeader({ backLink, children }: { backLink?: string; children: string }) {
   const [nav, setNavParam] = useNav()
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
@@ -40,14 +40,13 @@ export function HomeHeader({ backButton, children }: { backButton?: boolean; chi
             </XStack>
           ) : (
             <XStack gap={'$3.5'} ai={'center'}>
-              <XStack
-                onPress={() => router.back()}
-                cursor="pointer"
+              <Link
+                href={backLink ?? ''}
                 $lg={{ display: 'none' }}
-                $gtLg={{ display: backButton ? 'flex' : 'none' }}
+                $gtLg={{ display: backLink ? 'flex' : 'none' }}
               >
                 <IconArrowLeft color={iconColor} />
-              </XStack>
+              </Link>
               <H2 fontWeight={'300'} color={'$color05'} ai={'center'}>
                 {children}
               </H2>

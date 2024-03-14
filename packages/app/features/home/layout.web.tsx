@@ -6,8 +6,8 @@ import { useThemeSetting } from '@tamagui/next-theme'
 export function HomeLayout({
   children,
   header = '',
-  backButton,
-}: { children: React.ReactNode; header?: string; backButton?: boolean }) {
+  backLink,
+}: { children: React.ReactNode; header?: string; backLink?: string }) {
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
   return (
@@ -21,7 +21,7 @@ export function HomeLayout({
             $sm={{ pt: '$6' }}
           >
             <YStack gap="$6" py={'$3'} $gtLg={{ pt: '$11', pb: '$7' }} w={'100%'}>
-              <HomeHeader backButton={backButton}>{header}</HomeHeader>
+              <HomeHeader backLink={backLink}>{header}</HomeHeader>
             </YStack>
           </Container>
           {children}

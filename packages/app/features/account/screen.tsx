@@ -11,7 +11,7 @@ export function AccountScreen() {
 
   return (
     <>
-      <Container fd={'column'} h={'calc(100vh - 135px)'}>
+      <Container>
         <YStack w={'100%'} ai={'center'} gap={'$7'}>
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
