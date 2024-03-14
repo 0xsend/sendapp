@@ -1,5 +1,6 @@
 import { Avatar, Container, Link, LinkProps, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { IconDollar, IconGear, IconPlus } from 'app/components/icons'
+import { formatPhoneNumber } from 'app/utils/formatPhoneNumber'
 import { useUser } from 'app/utils/useUser'
 import { Square } from 'tamagui'
 
@@ -68,7 +69,7 @@ export function AccountScreen() {
                 {sendTags !== '' ? sendTags : 'No tags'}
               </Paragraph>
               <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {user?.phone ?? ''}
+                {formatPhoneNumber(user?.phone) ?? ''}
               </Paragraph>
             </YStack>
           </XStack>
