@@ -74,14 +74,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     }
   )
 
-  if (!isClaimActive) {
-    return null
-  }
+  if (!isClaimActive) return null
 
-  if (!isEligible) {
-    // If the user is not eligible, show the claim button disabled
-    return null
-  }
+  if (!isEligible) return null
 
   if (!isConnected) {
     return (
@@ -146,7 +141,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <YStack ai="center" w="100%" mx="auto">
         <Button br={12} disabled f={1} w="100%">
-          Claim
+          Claim Reward
         </Button>
         <Paragraph size="$1" theme="alt2">
           Checking claimability...
@@ -159,7 +154,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <YStack ai="center" w="100%" mx="auto">
         <Button br={12} disabled f={1} w="100%">
-          Claim
+          Claim Reward
         </Button>
         <Paragraph size="$1" theme="alt2" width={'100%'}>
           Error checking eligibility. Please try again later. {isTrancheActiveError?.message}
@@ -170,31 +165,13 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   }
 
   // If the user is eligible but the tranche is inactive, show the claim button disabled
-  if (!isTrancheActive) {
-    return (
-      <TooltipSimple
-        contentProps={{ maw: 200 }}
-        label={
-          'You are eligible for this distribution, but the tranche is inactive. Please wait for it to be created.'
-        }
-      >
-        <YStack ai="center" w="100%" mx="auto">
-          <Button br={12} disabled f={1} w="100%">
-            Claim
-          </Button>
-          <Paragraph size="$1" theme="alt2">
-            Tranche is inactive.
-          </Paragraph>
-        </YStack>
-      </TooltipSimple>
-    )
-  }
+  if (!isTrancheActive) null
 
   // If the user is eligible but has already claimed, show the claim button disabled
   if (isClaimed) {
     return (
       <Paragraph size="$1" theme="alt2" mx="auto">
-        Already claimed{' '}
+        Already claimed
         {claimReceiptSuccess && (
           <Paragraph size="$1" theme="alt2">
             <Anchor
@@ -243,7 +220,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <YStack ai="center" w="100%" mx="auto">
         <Button br={12} disabled f={1} w="100%">
-          Claim
+          Claim Reward
         </Button>
         <Paragraph size="$1" theme="alt2" width={'100%'}>
           Error preparing claim. Please try again later. {claimWriteConfigError.message}

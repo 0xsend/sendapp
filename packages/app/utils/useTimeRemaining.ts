@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-type TimeRemaining = {
+export type TimeRemaining = {
   days: number
   hours: number
   minutes: number
