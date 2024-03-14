@@ -21,11 +21,9 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         with:
-          install-foundry: false
-          install-bun: false
+          build-nextjs: true
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-          SKIP_YARN_POST_INSTALL: 1
       - name: Show github refs
         run: |
           echo github.ref=${{ github.ref }}

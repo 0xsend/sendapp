@@ -17,6 +17,10 @@ inputs:
     description: "Whether to run Yarn install."
     required: false
     default: "true"
+  build-nextjs:
+    description: "Whether to build Next.js."
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -25,7 +29,17 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: .node-version
-        cache: "yarn"
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      shell: bash
+      run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+    - uses: actions/cache@v4
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
     - name: Setup Bun
       if: ${{ inputs.install-bun == 'true' }}
       uses: oven-sh/setup-bun@v1
@@ -38,3 +52,19 @@ runs:
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
       run: yarn install --immutable
+    - name: Cache Next.js Build
+      uses: actions/cache@v4
+      with:
+        # See here for caching with `yarn` https://github.com/actions/cache/blob/main/examples.md#node---yarn or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
+        path: ${{ github.workspace }}/apps/next/.next/cache
+        # Generate a new cache whenever packages or source files change.
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+        # If source files changed but packages didn't, rebuild from a prior cache.
+        restore-keys: |
+          ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-
+    - name: Build Next.js
+      if: ${{ inputs.yarn-install == 'true' && inputs.build-nextjs == 'true' }}
+      shell: bash
+      run: |
+        cp .env.local.template .env.local
+        yarn web:prod
