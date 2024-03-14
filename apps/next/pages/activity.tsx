@@ -8,7 +8,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Activity</title>
+        <title>/send | Activity</title>
       </Head>
       <ActivityScreen />
     </>

@@ -8,7 +8,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Leaderboard</title>
+        <title>/send | Leaderboard</title>
       </Head>
       <LeaderboardScreen />
     </>

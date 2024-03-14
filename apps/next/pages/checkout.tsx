@@ -8,7 +8,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send Tag Checkout</title>
+        <title>/send | Tag Checkout</title>
         <meta
           name="description"
           content="Send Tags simplify transactions by replacing long wallet addresses with memorable identifiers."
