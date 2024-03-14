@@ -80,7 +80,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 
   if (!isEligible) {
     // If the user is not eligible, show the claim button disabled
-    return <Button disabled>Not Eligible</Button>
+    return null
   }
 
   if (!isConnected) {
@@ -145,7 +145,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (isTrancheActiveLoading || isClaimedLoading) {
     return (
       <YStack ai="center" w="100%" mx="auto">
-        <Button disabled f={1} w="100%">
+        <Button br={12} disabled f={1} w="100%">
           Claim
         </Button>
         <Paragraph size="$1" theme="alt2">
@@ -158,7 +158,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (isTrancheActiveError || isClaimedError) {
     return (
       <YStack ai="center" w="100%" mx="auto">
-        <Button disabled f={1} w="100%">
+        <Button br={12} disabled f={1} w="100%">
           Claim
         </Button>
         <Paragraph size="$1" theme="alt2" width={'100%'}>
@@ -179,7 +179,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         }
       >
         <YStack ai="center" w="100%" mx="auto">
-          <Button disabled f={1} w="100%">
+          <Button br={12} disabled f={1} w="100%">
             Claim
           </Button>
           <Paragraph size="$1" theme="alt2">
@@ -242,7 +242,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (claimWriteConfigError) {
     return (
       <YStack ai="center" w="100%" mx="auto">
-        <Button disabled f={1} w="100%">
+        <Button br={12} disabled f={1} w="100%">
           Claim
         </Button>
         <Paragraph size="$1" theme="alt2" width={'100%'}>
@@ -271,8 +271,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           writeClaim(claimWriteConfig.request)
           refetchIsClaimed()
         }}
+        theme={'active_accent_Button'}
       >
-        {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim'}
+        {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim Reward'}
       </Button>
       {claimReceiptError && (
         <Paragraph size="$1" theme="alt2" width={'100%'}>
