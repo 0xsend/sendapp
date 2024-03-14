@@ -1,5 +1,1 @@
-import { EditProfile } from '../components/editProfile/screen'
-
-export function EditProfileScreen() {
-  return <EditProfile />
-}
+export { EditProfile as EditProfileScreen } from '../components/editProfile/screen'
