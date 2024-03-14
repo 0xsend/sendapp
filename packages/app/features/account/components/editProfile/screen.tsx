@@ -17,6 +17,7 @@ import { UploadAvatar, UploadAvatarRefObject } from '../uploadProfileImage/scree
 import { useRef } from 'react'
 
 export const EditProfile = () => {
+  const media = useMedia()
   const { profile, user } = useUser()
   const userName = profile?.name
   const displayName = profile?.name
@@ -27,8 +28,6 @@ export const EditProfile = () => {
   const mutation = useEditProfileMutation(userID)
 
   const avatarRef = useRef<UploadAvatarRefObject>(null)
-
-  const media = useMedia()
 
   return (
     <YStack w={'100%'} als={'center'}>
