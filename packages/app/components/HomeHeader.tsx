@@ -54,19 +54,17 @@ export function HomeHeader({ backButton, children }: { backButton?: boolean; chi
             </XStack>
           )}
 
-          {children === 'Home' && media.lg ? (
-            <Button p={0} bg="transparent" icon={<IconQr size={'$2.5'} color={iconColor} />} />
-          ) : (
-            <></>
-          )}
-
-          {(children === 'Account' || children === 'Settings') && media.lg ? (
-            <Button
-              p={0}
-              onPress={handleSettingsBottomSheet}
-              bg="transparent"
-              icon={<IconGear size={'$2.5'} color={iconColor} />}
-            />
+          {media.lg ? (
+            children === 'Account' || children === 'Settings' ? (
+              <Button
+                p={0}
+                onPress={handleSettingsBottomSheet}
+                bg="transparent"
+                icon={<IconGear size={'$2.5'} color={iconColor} />}
+              />
+            ) : (
+              <Button p={0} bg="transparent" icon={<IconQr size={'$2.5'} color={iconColor} />} />
+            )
           ) : (
             <></>
           )}
