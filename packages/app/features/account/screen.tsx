@@ -57,13 +57,7 @@ export function AccountScreen() {
                 Sendtags
               </Paragraph>
               <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Send ID
-              </Paragraph>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
                 Phone
-              </Paragraph>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Address
               </Paragraph>
             </YStack>
             <YStack gap={'$5'}>
@@ -74,13 +68,7 @@ export function AccountScreen() {
                 {sendTags !== '' ? sendTags : 'No tags'}
               </Paragraph>
               <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {profile?.id ?? ''}
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
                 {user?.phone ?? ''}
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                12, Main street, CA, USA
               </Paragraph>
             </YStack>
           </XStack>
