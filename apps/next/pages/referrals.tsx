@@ -8,7 +8,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Referral Rewards</title>
+        <title>/send | Referral Rewards</title>
         <meta name="description" content="Referral Rewards" key="desc" />
       </Head>
       <ReferralsScreen />
