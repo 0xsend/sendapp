@@ -116,10 +116,10 @@ export function AccountScreen() {
             </YStack>
           </YStack>
           <XStack gap={'$5'} display={'none'} $md={{ display: 'flex' }}>
-            <BorderedLink href={'/'} icon={<IconPlus color={'$primary'} />}>
+            <BorderedLink href={'/checkout'} icon={<IconPlus color={'$primary'} />}>
               Send Tags
             </BorderedLink>
-            <BorderedLink href={'/'} icon={<IconDollar color={'$primary'} />}>
+            <BorderedLink href={'/account/earn'} icon={<IconDollar color={'$primary'} />}>
               Earn Tokens
             </BorderedLink>
           </XStack>
