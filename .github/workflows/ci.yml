@@ -21,11 +21,9 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         with:
-          install-foundry: false
-          install-bun: false
+          build-nextjs: true
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-          SKIP_YARN_POST_INSTALL: 1
       - name: Show github refs
         run: |
           echo github.ref=${{ github.ref }}
@@ -77,6 +75,11 @@ jobs:
           YARN_ENABLE_HARDENED_MODE: 0
         with:
           yarn-install: false
+      - name: Load Next.js Build Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build-cache
+          path: ${{ github.workspace }}/apps/next/.next/cache
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
@@ -115,6 +118,11 @@ jobs:
         uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+      - name: Load Next.js Build Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build-cache
+          path: ${{ github.workspace }}/apps/next/.next/cache
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
@@ -173,6 +181,11 @@ jobs:
           yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+      - name: Load Next.js Build Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build-cache
+          path: ${{ github.workspace }}/apps/next/.next/cache
       - name: Get Supabase Database Branch
         if: github.base_ref == 'dev'
         uses: 0xbigboss/supabase-branch-gh-action@v1
