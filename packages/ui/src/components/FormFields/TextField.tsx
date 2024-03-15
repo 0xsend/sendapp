@@ -21,8 +21,8 @@ export const TextField = (props: InputProps) => {
         {!!label && (
           <Label
             size={props.size || '$5'}
-            fontFamily={'$mono'}
-            lineHeight={52}
+            // $mono font is broken in tests
+            fontFamily={process.env.NODE_ENV === 'test' ? undefined : '$mono'}
             htmlFor={id}
             textTransform={'uppercase'}
           >

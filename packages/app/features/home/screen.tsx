@@ -72,7 +72,7 @@ export function HomeScreen() {
                           ) : (
                             <Paragraph
                               color={'$color12'}
-                              size={'$16'}
+                              size={'$14'}
                               fontWeight={'500'}
                               zIndex={1}
                             >
