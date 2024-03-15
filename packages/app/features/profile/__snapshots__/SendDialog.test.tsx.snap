@@ -483,7 +483,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     "fontFamily": "System",
                     "fontSize": 19.2,
                     "fontWeight": "400",
-                    "lineHeight": 52,
+                    "lineHeight": 21,
                     "textTransform": "uppercase",
                   }
                 }
@@ -1990,7 +1990,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     "fontFamily": "System",
                     "fontSize": 19.2,
                     "fontWeight": "400",
-                    "lineHeight": 52,
+                    "lineHeight": 21,
                     "textTransform": "uppercase",
                   }
                 }

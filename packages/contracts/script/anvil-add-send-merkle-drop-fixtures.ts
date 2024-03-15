@@ -30,7 +30,7 @@ void (async function main() {
     ${AIRDROP_MULTISIG_SAFE}`
 
   console.log(chalk.blue('Adding a tranche to the airdrop...'))
-  await $`forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
+  await $`SEND_MERKLE_DROP_ADDRESS=0x240761104aF5DAeDFd9025810FfEB741fEB316B3 forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
               -vvvv \
               --fork-url http://localhost:8546 \
               --unlocked \
