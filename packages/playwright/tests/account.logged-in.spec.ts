@@ -9,31 +9,22 @@ test('can visit account page', async ({ page }) => {
 })
 
 test('can update profile', async ({ page, supabase }) => {
-  const editProfileButton = page.getByRole('button', { name: 'Edit Profile' })
+  const editProfileButton = page.getByRole('link', { name: 'Settings' })
   await editProfileButton.click()
 
-  await page.waitForURL('/account/profile')
-  await expect(page).toHaveTitle('Account')
+  await page.waitForURL('/account/settings/edit-profile')
+  await expect(page).toHaveTitle('Edit Profile')
 
-  await page.getByLabel('Name').fill('LeO')
-  await page.getByLabel('About').fill('Sender')
-  await page.getByLabel('IsPublic').setChecked(true)
+  await page.getByLabel('User Name').fill('LeO')
+  await page.getByLabel('Bio').fill('Sender')
+  await page.getByLabel('Is Public').setChecked(true)
 
-  await page.getByRole('button', { name: 'Update Profile' }).click()
+  await page.getByRole('button', { name: 'Save' }).click()
 
   await expect(page.getByText('Notification Successfully updated')).toBeVisible()
 
-  const { data, error } = await supabase.auth.getSession()
+  const { data: user, error } = await supabase.from('profiles').select('*').maybeSingle()
   expect(error).toBeFalsy()
-
-  if (data.session) {
-    const { data: user, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', data.session?.user.id)
-      .maybeSingle()
-    expect(error).toBeFalsy()
-    expect(user).toBeTruthy()
-    expect(user?.name === 'LeO' && user.about === 'Sender' && user.is_public === true).toBeTruthy()
-  }
+  expect(user).toBeTruthy()
+  expect(user?.name === 'LeO' && user.about === 'Sender' && user.is_public === true).toBeTruthy()
 })

@@ -30,7 +30,7 @@ import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useLink } from 'solito/link'
-import { type PublicClient, formatEther } from 'viem'
+import { formatEther } from 'viem'
 import {
   useAccount,
   useBlockNumber,
