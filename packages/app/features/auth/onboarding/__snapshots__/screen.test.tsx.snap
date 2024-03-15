@@ -454,7 +454,7 @@ exports[`OnboardingScreen 1`] = `
                       "borderTopLeftRadius": 0,
                       "borderTopRightRadius": 0,
                       "borderTopWidth": 0,
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "color": "hsla(112, 22%, 100%, 1)",
                       "fontFamily": "$mono",
                       "fontSize": 20,
                       "fontWeight": "400",
@@ -587,7 +587,7 @@ exports[`OnboardingScreen 1`] = `
                 {
                   "alignItems": "center",
                   "alignSelf": "auto",
-                  "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                  "backgroundColor": "#40FB50",
                   "borderBottomColor": "transparent",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
@@ -601,6 +601,7 @@ exports[`OnboardingScreen 1`] = `
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 1,
+                  "color": "hsla(125, 96%, 47%, 1)",
                   "flexDirection": "row",
                   "flexWrap": "nowrap",
                   "height": 44,
@@ -621,20 +622,39 @@ exports[`OnboardingScreen 1`] = `
                 numberOfLines={1}
                 style={
                   {
-                    "color": "black",
+                    "color": "hsla(125, 96%, 47%, 1)",
                     "flexGrow": 0,
                     "flexShrink": 1,
                     "fontFamily": "System",
-                    "fontSize": 13.2,
-                    "fontWeight": "300",
-                    "lineHeight": 16,
-                    "textAlign": "center",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
                   }
                 }
                 suppressHighlighting={true}
                 userSelect="none"
               >
-                CREATE PASSKEY
+                <Text
+                  cursor="pointer"
+                  lineBreakMode="clip"
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "black",
+                      "flexGrow": 0,
+                      "flexShrink": 1,
+                      "fontFamily": "System",
+                      "fontSize": 13.2,
+                      "fontWeight": "300",
+                      "lineHeight": 16,
+                      "textAlign": "center",
+                    }
+                  }
+                  suppressHighlighting={true}
+                  userSelect="none"
+                >
+                  CREATE PASSKEY
+                </Text>
               </Text>
               <View
                 pointerEvents="none"

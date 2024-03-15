@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "generate": "bun test && bun run src/generate.ts --path='./etc/config.json'",
+    "generate": "bun run src/generate.ts --path='./etc/config.json'",
     "test": "bun test"
   },
   "devDependencies": {

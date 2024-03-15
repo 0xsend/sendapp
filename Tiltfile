@@ -203,6 +203,23 @@ local_resource(
     ),
 )
 
+local_resource(
+    name = "shovel:test",
+    allow_parallel = True,
+    auto_init = not CI,
+    cmd = "yarn workspace shovel test",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "shovel:generate-config",
+    ],
+    trigger_mode = CI and TRIGGER_MODE_MANUAL or TRIGGER_MODE_AUTO,
+    deps = files_matching(
+        os.path.join("packages", "shovel", "etc"),
+        lambda f: f.endswith(".json"),
+    ),
+)
+
 cmd_button(
     name = "shovel:generate-config",
     argv = [
@@ -611,7 +628,6 @@ local_resource(
         "ui:generate-theme",
         "daimo-expo-passkeys:build",
         "webauthn-authenticator:build",
-        "shovel:generate-config",
         "shovel:generate-config",
     ],
     deps =

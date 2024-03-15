@@ -481,9 +481,10 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     "color": "hsla(112, 22%, 59%, 1)",
                     "display": "flex",
                     "fontFamily": "System",
-                    "fontSize": 15.6,
-                    "fontWeight": "300",
-                    "lineHeight": 36,
+                    "fontSize": 19.2,
+                    "fontWeight": "400",
+                    "lineHeight": 21,
+                    "textTransform": "uppercase",
                   }
                 }
                 suppressHighlighting={true}
@@ -670,21 +671,21 @@ exports[`SendDialog it can send: SendForm 1`] = `
                   readOnly={false}
                   style={
                     {
-                      "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                      "backgroundColor": "#081619",
                       "borderBottomColor": "hsla(191, 32%, 32%, 1)",
                       "borderBottomLeftRadius": 16,
                       "borderBottomRightRadius": 16,
-                      "borderBottomWidth": 1,
+                      "borderBottomWidth": 0,
                       "borderLeftColor": "hsla(191, 32%, 32%, 1)",
-                      "borderLeftWidth": 1,
+                      "borderLeftWidth": 0,
                       "borderRightColor": "hsla(191, 32%, 32%, 1)",
-                      "borderRightWidth": 1,
+                      "borderRightWidth": 0,
                       "borderStyle": "solid",
                       "borderTopColor": "hsla(191, 32%, 32%, 1)",
                       "borderTopLeftRadius": 16,
                       "borderTopRightRadius": 16,
-                      "borderTopWidth": 1,
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "borderTopWidth": 0,
+                      "color": "hsla(112, 22%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
@@ -966,7 +967,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                        "backgroundColor": "#40FB50",
                         "borderBottomColor": "transparent",
                         "borderBottomLeftRadius": 16,
                         "borderBottomRightRadius": 16,
@@ -980,6 +981,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         "borderTopLeftRadius": 16,
                         "borderTopRightRadius": 16,
                         "borderTopWidth": 1,
+                        "color": "hsla(125, 96%, 47%, 1)",
                         "flexDirection": "row",
                         "flexWrap": "nowrap",
                         "height": 44,
@@ -996,7 +998,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       numberOfLines={1}
                       style={
                         {
-                          "color": "hsla(191, 32%, 10%, 1)",
+                          "color": "hsla(125, 96%, 47%, 1)",
                           "flexGrow": 0,
                           "flexShrink": 1,
                           "fontFamily": "System",
@@ -1008,7 +1010,26 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       suppressHighlighting={true}
                       userSelect="none"
                     >
-                      Send
+                      <Text
+                        cursor="pointer"
+                        lineBreakMode="clip"
+                        numberOfLines={1}
+                        style={
+                          {
+                            "color": "hsla(125, 96%, 47%, 1)",
+                            "flexGrow": 0,
+                            "flexShrink": 1,
+                            "fontFamily": "System",
+                            "fontSize": 16.8,
+                            "fontWeight": "400",
+                            "lineHeight": 19,
+                          }
+                        }
+                        suppressHighlighting={true}
+                        userSelect="none"
+                      >
+                        Send
+                      </Text>
                     </Text>
                     <View
                       pointerEvents="none"
@@ -1967,9 +1988,10 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     "color": "hsla(0, 70%, 93%, 1)",
                     "display": "flex",
                     "fontFamily": "System",
-                    "fontSize": 15.6,
-                    "fontWeight": "300",
-                    "lineHeight": 36,
+                    "fontSize": 19.2,
+                    "fontWeight": "400",
+                    "lineHeight": 21,
+                    "textTransform": "uppercase",
                   }
                 }
                 suppressHighlighting={true}
@@ -2160,21 +2182,21 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                   readOnly={false}
                   style={
                     {
-                      "backgroundColor": "hsla(0, 70%, 10%, 1)",
+                      "backgroundColor": "#081619",
                       "borderBottomColor": "hsla(0, 70%, 32%, 1)",
                       "borderBottomLeftRadius": 16,
                       "borderBottomRightRadius": 16,
-                      "borderBottomWidth": 1,
+                      "borderBottomWidth": 0,
                       "borderLeftColor": "hsla(0, 70%, 32%, 1)",
-                      "borderLeftWidth": 1,
+                      "borderLeftWidth": 0,
                       "borderRightColor": "hsla(0, 70%, 32%, 1)",
-                      "borderRightWidth": 1,
+                      "borderRightWidth": 0,
                       "borderStyle": "solid",
                       "borderTopColor": "hsla(0, 70%, 32%, 1)",
                       "borderTopLeftRadius": 16,
                       "borderTopRightRadius": 16,
-                      "borderTopWidth": 1,
-                      "color": "hsla(0, 70%, 93%, 1)",
+                      "borderTopWidth": 0,
+                      "color": "hsla(0, 70%, 95%, 1)",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
@@ -2498,7 +2520,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                        "backgroundColor": "#40FB50",
                         "borderBottomColor": "transparent",
                         "borderBottomLeftRadius": 16,
                         "borderBottomRightRadius": 16,
@@ -2512,6 +2534,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                         "borderTopLeftRadius": 16,
                         "borderTopRightRadius": 16,
                         "borderTopWidth": 1,
+                        "color": "hsla(125, 96%, 47%, 1)",
                         "flexDirection": "row",
                         "flexWrap": "nowrap",
                         "height": 44,
@@ -2528,7 +2551,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       numberOfLines={1}
                       style={
                         {
-                          "color": "hsla(191, 32%, 10%, 1)",
+                          "color": "hsla(125, 96%, 47%, 1)",
                           "flexGrow": 0,
                           "flexShrink": 1,
                           "fontFamily": "System",
@@ -2540,7 +2563,26 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       suppressHighlighting={true}
                       userSelect="none"
                     >
-                      Send
+                      <Text
+                        cursor="pointer"
+                        lineBreakMode="clip"
+                        numberOfLines={1}
+                        style={
+                          {
+                            "color": "hsla(125, 96%, 47%, 1)",
+                            "flexGrow": 0,
+                            "flexShrink": 1,
+                            "fontFamily": "System",
+                            "fontSize": 16.8,
+                            "fontWeight": "400",
+                            "lineHeight": 19,
+                          }
+                        }
+                        suppressHighlighting={true}
+                        userSelect="none"
+                      >
+                        Send
+                      </Text>
                     </Text>
                     <View
                       pointerEvents="none"

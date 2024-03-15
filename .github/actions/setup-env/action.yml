@@ -17,6 +17,10 @@ inputs:
     description: "Whether to run Yarn install."
     required: false
     default: "true"
+  build-nextjs:
+    description: "Whether to build Next.js."
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -38,3 +42,15 @@ runs:
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
       run: yarn install --immutable
+    - name: Build Next.js
+      if: ${{ inputs.build-nextjs == 'true' }}
+      shell: bash
+      run: |
+        cp .env.local.template .env.local
+        yarn web:prod
+    - name: Save Next.js Cache
+      if: ${{ inputs.build-nextjs == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: nextjs-build-cache
+        path: ${{ github.workspace }}/apps/next/.next/cache

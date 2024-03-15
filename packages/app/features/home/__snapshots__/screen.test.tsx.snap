@@ -96,9 +96,9 @@ exports[`HomeScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 96,
+                    "fontSize": 110.39999999999999,
                     "fontWeight": "500",
-                    "lineHeight": 19,
+                    "lineHeight": 97,
                     "zIndex": 1,
                   }
                 }

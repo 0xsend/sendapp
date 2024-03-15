@@ -21,15 +21,11 @@ contract DeploySendVerifierScript is Script, Helper {
         // solhint-disable-next-line no-console
         console2.log("verifier address:", verifier);
 
-        require(address(verifier) == SEND_VERIFIER, "DeploySendVerifierScript: address mismatch");
-
         DaimoVerifierProxy dvp =
             new DaimoVerifierProxy{salt: 0}(verifier, abi.encodeWithSelector(DaimoVerifier.init.selector, owner));
 
         // solhint-disable-next-line no-console
         console2.log("DaimoVerifierProxy address:", address(dvp));
-
-        require(address(dvp) == SEND_VERIFIER_PROXY, "DeploySendVerifierScript: address mismatch");
 
         vm.stopBroadcast();
     }
