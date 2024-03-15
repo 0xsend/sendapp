@@ -2,6 +2,7 @@ import {
   Button,
   ButtonText,
   Card,
+  Container,
   H1,
   H2,
   H3,
@@ -40,34 +41,36 @@ export function EarnTokensScreen() {
       : 0
   const selectedDistribution = distributions?.at(selectedDistributionIndex)
 
-  return (
-    <YStack
-      f={1}
-      my="auto"
-      gap="$6"
-      px="$3"
-      $gtLg={{ px: '$11' }}
-      pb="$2"
-      $gtSm={{ pb: '$8', px: '$6' }}
-      jc="space-between"
-    >
-      {selectedDistribution ? (
-        <YStack
-          gap="$4"
-          f={2}
-          overflow={'hidden'}
-          $gtSm={{ borderTopColor: '$gray7Dark', borderTopWidth: '$1', gap: '$8' }}
-        >
-          <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
-        </YStack>
-      ) : (
-        <Stack f={1} gap="$6" jc="center" ai="center">
-          <H2>No distributions available</H2>
-        </Stack>
-      )}
+  if (isLoading)
+    return (
+      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
+        <Spinner color="$color" size="large" />
+      </Stack>
+    )
 
-      <DistributionRewardsList distributions={distributions} />
-    </YStack>
+  return (
+    <Container>
+      <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
+        {selectedDistribution ? (
+          <YStack
+            gap="$4"
+            f={2}
+            overflow={'hidden'}
+            $theme-dark={{ btc: '$gray7Dark' }}
+            $theme-light={{ btc: '$gray4Light' }}
+            $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
+          >
+            <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
+          </YStack>
+        ) : (
+          <Stack f={1} gap="$6" jc="center" ai="center">
+            <H2>No distributions available</H2>
+          </Stack>
+        )}
+
+        <DistributionRewardsList distributions={distributions} />
+      </YStack>
+    </Container>
   )
 }
 
@@ -104,7 +107,7 @@ const DistributionRewardsSection = ({
                   : now
   )
   return (
-    <YStack f={1} $gtXs={{ gap: '$6' }} gap="$4">
+    <YStack f={1} $lg={{ gap: '$2' }}>
       <Stack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
         <Label fontFamily={'$mono'} fontSize={'$5'}>
           ROUND
@@ -127,12 +130,12 @@ const DistributionRewardsSection = ({
           <Stack
             $gtSm={{ fd: 'row', gap: '$0' }}
             fd="column"
-            gap="$2"
+            gap="$4"
             f={1}
             justifyContent="space-between"
           >
             <ClaimTimeRemaining timeRemaining={timeRemaining} />
-            <YStack $gtSm={{ ai: 'flex-end' }} gap="$2">
+            <YStack $gtSm={{ ai: 'flex-end' }}>
               <Label fontFamily={'$mono'}>Status</Label>
               <Theme inverse>
                 <DistributionStatus distribution={distribution} />
@@ -141,8 +144,8 @@ const DistributionRewardsSection = ({
           </Stack>
         </XStack>
       </Stack>
-      <Stack fd="column" $gtLg={{ fd: 'row' }} gap="$2" $gtSm={{ gap: '$4', f: 1 }} my="auto">
-        <YStack f={1} $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
+      <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
+        <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
           <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
             <SendBalanceCard distribution={distribution} />
           </Stack>
@@ -161,7 +164,7 @@ const DistributionRewardsSection = ({
 
 const ClaimTimeRemaining = ({ timeRemaining }: { timeRemaining: TimeRemaining }) => {
   return (
-    <YStack gap="$2">
+    <YStack gap="$2" f={1}>
       <Label fontFamily={'$mono'}>Valid for</Label>
       <XStack ai={'flex-start'} jc="space-between" maw={312}>
         <Theme inverse>
@@ -233,17 +236,16 @@ const SendBalanceCard = ({
 
   return (
     <Card
-      f={1}
       bc="transparent"
       borderWidth={1}
       br={12}
       borderColor={'$decay'}
       p="$4"
-      $gtSm={{ p: '$6' }}
+      $gtLg={{ p: '$4' }}
       jc="center"
     >
-      <YStack gap="$4">
-        <Label fontFamily={'$mono'} col="$olive">
+      <YStack gap="$2" $gtLg={{ gap: '$4' }}>
+        <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
           Send Balance
         </Label>
         <Theme inverse>
@@ -265,11 +267,13 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance?: number })
     br={12}
     borderColor={'$decay'}
     p="$4"
-    $gtSm={{ p: '$6' }}
+    $gtLg={{ p: '$4' }}
     jc="center"
   >
-    <YStack gap="$4">
-      <Label fontFamily={'$mono'}>Min Balance required</Label>
+    <YStack gap="$2" $gtLg={{ gap: '$4' }}>
+      <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
+        Min Balance required
+      </Label>
       <Theme inverse>
         <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
           {hodler_min_balance ? `${formatAmount(hodler_min_balance, 9, 0)} SEND` : '?'}
@@ -290,11 +294,11 @@ const ReferralsCard = () => {
       br={12}
       borderColor={'$decay'}
       p="$4"
-      $gtSm={{ p: '$6' }}
+      $gtLg={{ p: '$4' }}
       jc="center"
     >
-      <YStack gap="$4">
-        <Label fontFamily={'$mono'} col="$olive">
+      <YStack gap="$2" $gtLg={{ gap: '$4' }}>
+        <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
           Referrals
         </Label>
         <Theme inverse>
@@ -312,10 +316,19 @@ const SendRewardsCard = ({
 }: { distribution: UseDistributionsResultData[number] }) => {
   const shareAmount = distribution.distribution_shares?.[0]?.amount
   return (
-    <Card f={1} mih={198} $gtLg={{ f: 1 }} $gtMd={{ f: 2 }} bc="$darkest" br={12} jc="center">
+    <Card
+      f={1}
+      mih={198}
+      $gtLg={{ f: 1 }}
+      $gtMd={{ f: 2 }}
+      $theme-dark={{ bc: '$darkest' }}
+      $theme-light={{ bc: '$gray3Light' }}
+      br={12}
+      jc="center"
+    >
       <YStack w={'100%'} gap="$8" mx="auto" jc="center" ai="center">
         <Stack gap="$6">
-          <Label fontFamily={'$mono'} col="$olive">
+          <Label fontFamily={'$mono'} col="$olive" ta="left" fontSize={'$5'}>
             Rewards
           </Label>
           <Theme inverse>
@@ -374,7 +387,7 @@ const DistributionRewardsList = ({
       <XStack w="100%" gap="$2" jc={'space-between'} py="$2" maw={1072} mx="auto">
         {allDistributions?.map((distribution, i) => {
           return distribution === undefined ? (
-            <Button bc={'$darkest'} maw={84} miw="$7" h="$2" br={6} disabled opacity={0.4}>
+            <Button bc={'$darkest'} f={1} maw={84} miw="$7" h="$2" br={6} disabled opacity={0.4}>
               <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
                 {`# ${i + 1}`}
               </ButtonText>
@@ -384,6 +397,7 @@ const DistributionRewardsList = ({
               distribution?.number === distributions?.length) ? (
             <Button
               key={distribution?.id}
+              f={1}
               bc={'$accent12Dark'}
               maw={84}
               miw="$7"
@@ -398,6 +412,7 @@ const DistributionRewardsList = ({
           ) : (
             <Button
               key={distribution?.id}
+              f={1}
               bc={'$decay'}
               maw={84}
               miw="$7"

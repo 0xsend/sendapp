@@ -14,7 +14,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Profile</title>
+        <title>/send | Profile</title>
       </Head>
       <ProfileScreen />
     </>
