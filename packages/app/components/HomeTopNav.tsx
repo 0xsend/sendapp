@@ -31,16 +31,18 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
         $gtLg={{ jc: 'flex-start', pb: '$2' }}
         jc="space-between"
         fd="row"
-        ai="center"
-        $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', pb: '$4' }}
+        $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', py: '$4' }}
       >
-        <Stack ai="center" space="$2" height="$4">
+        <Stack>
           {isSubRoute ? (
             <Button
               outlineColor={'transparent'}
               focusStyle={{ outlineColor: 'transparent' }}
               onPress={handleBack}
               bg="transparent"
+              ai="flex-start"
+              hoverStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+              pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
             />
           ) : (
@@ -57,7 +59,7 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
             <IconSendLogo size={'$2.5'} color={'$color12'} />
           </XStack>
         ) : (
-          <H2 fontWeight={'300'} color={'$color05'} ai={'center'}>
+          <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
             {header}
           </H2>
         )}
