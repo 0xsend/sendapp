@@ -330,7 +330,7 @@ local_resource(
         period_secs = 2,
         timeout_secs = 5,
     ),
-    serve_cmd = [
+    serve_cmd = [cmd for cmd in [
         "anvil",
         "--host=0.0.0.0",
         "--port=8545",
@@ -339,7 +339,7 @@ local_resource(
         "--fork-block-number=" + mainnet_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
         os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
-    ],
+    ] if cmd],
 )
 
 local_resource(
@@ -396,7 +396,7 @@ local_resource(
         period_secs = 2,
         timeout_secs = 5,
     ),
-    serve_cmd = [
+    serve_cmd = [cmd for cmd in [
         "anvil",
         "--host=0.0.0.0",
         "--port=8546",
@@ -405,7 +405,7 @@ local_resource(
         "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
         os.getenv("ANVIL_BASE_EXTRA_ARGS", "--silent"),
-    ],
+    ] if cmd],
 )
 
 local_resource(
@@ -702,7 +702,8 @@ cmd_button(
     argv = [
         "yarn",
         "playwright",
-        "playwright show-report",
+        "playwright",
+        "show-report",
     ],
     icon_name = "info",
     location = location.RESOURCE,
@@ -760,12 +761,25 @@ local_resource(
 
 local_resource(
     "contracts:test",
-    "yarn contracts test -vvv",
+    "yarn contracts test",
     allow_parallel = True,
     labels = labels,
     resource_deps = [
         "yarn:install",
         "contracts:build",
+    ],
+    deps = contract_files,
+)
+
+local_resource(
+    "contracts:cov",
+    "yarn contracts test:cov -vvv",
+    allow_parallel = True,
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "contracts:build",
+        "contracts:test",
     ],
     deps = contract_files,
 )
@@ -781,6 +795,7 @@ local_resource(
         "webauthn-authenticator:test",
         "supabase:test",
         "contracts:test",
+        "contracts:cov",
         "next:web",
         "distributor:test",
     ],

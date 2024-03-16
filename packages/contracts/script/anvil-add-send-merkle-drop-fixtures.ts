@@ -29,8 +29,21 @@ void (async function main() {
     anvil_impersonateAccount \
     ${AIRDROP_MULTISIG_SAFE}`
 
+  // parse merkle drop address from broadcast folder
+  const broadcast = JSON.parse(
+    await Bun.file(
+      `${import.meta.dir}/../broadcast/DeploySendMerkleDrop.s.sol/845337/run-latest.json`
+    ).text()
+  ) as {
+    transactions: {
+      contractAddress: string
+    }[]
+  }
+  const merkleDropAddress = broadcast.transactions[0].contractAddress // should be the first transaction
+  console.log(chalk.blue(`Merkle drop address: ${merkleDropAddress}`))
+
   console.log(chalk.blue('Adding a tranche to the airdrop...'))
-  await $`SEND_MERKLE_DROP_ADDRESS=0x240761104aF5DAeDFd9025810FfEB741fEB316B3 forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
+  await $`SEND_MERKLE_DROP_ADDRESS=${merkleDropAddress} forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
               -vvvv \
               --fork-url http://localhost:8546 \
               --unlocked \
