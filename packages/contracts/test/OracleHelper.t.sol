@@ -38,8 +38,11 @@ contract OracleHelperTest is Test {
         priceMaxAge: 86400,
         refundPostopCost: 40000,
         minEntryPointBalance: 0,
-        priceMarkup: PRICE_DENOM * 19 / 10 // 190%
+        priceMarkup: PRICE_DENOM * 19 / 10, // 190%
+        baseFee: 0
     });
+
+    RewardsConfig rc = RewardsConfig({rewardsShare: 0, rewardsPool: address(0)});
 
     UniswapHelperConfig uhc = UniswapHelperConfig({minSwapAmount: 1, slippage: 5, uniswapPoolFee: 3});
 
@@ -116,6 +119,7 @@ contract OracleHelperTest is Test {
             TestWrappedNativeToken(payable(0)),
             ISwapRouter(operator), // cannot approve to zero address
             tpc,
+            rc,
             ohc,
             uhc,
             operator
@@ -149,6 +153,7 @@ contract OracleHelperTest is Test {
             TestWrappedNativeToken(payable(0)),
             ISwapRouter(operator), // cannot approve to zero address
             tpc,
+            rc,
             ohc,
             uhc,
             operator
