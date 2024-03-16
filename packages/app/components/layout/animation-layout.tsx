@@ -9,8 +9,8 @@ type AnimationLayoutProps = {
 
 const YStackEnterable = styled(YStack, {
   variants: {
-    isLeft: { true: { x: -300, opacity: 0, display: 'none' } },
-    isRight: { true: { x: 300, opacity: 0, display: 'none' } },
+    isLeft: { true: { x: -300, opacity: 0, position: 'absolute' } },
+    isRight: { true: { x: 300, opacity: 0, position: 'absolute' } },
   } as const,
 })
 
