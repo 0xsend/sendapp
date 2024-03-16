@@ -21,7 +21,7 @@ const pricingText = [
 ]
 
 test.beforeEach(async ({ checkoutPage }) => {
-  log = debug(`test:checkout:logged-in:${test.info().parallelIndex}`)
+  log = debug(`test:account-sendtag-checkout:logged-in:${test.info().parallelIndex}`)
   log('beforeEach', `url=${checkoutPage.page.url()}`)
   await debugAuthSession(checkoutPage.page)
 })

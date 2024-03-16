@@ -6,7 +6,7 @@ import { NextPageWithLayout } from '../_app'
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
-import { CheckoutTagSchema } from 'app/features/checkout/CheckoutTagSchema'
+import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 

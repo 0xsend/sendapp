@@ -19,8 +19,8 @@ export class CheckoutPage {
   }
 
   async goto() {
-    log('goto /checkout')
-    await this.page.goto('/checkout')
+    log('goto /account/sendtag/checkout')
+    await this.page.goto('/account/sendtag/checkout')
   }
 
   async fillTagName(tag: string) {
@@ -131,7 +131,7 @@ export class CheckoutPage {
   async takeScreenshot() {
     const screenshot = path.join(
       'screenshots',
-      `./checkout-${Date.now()}-${Math.random() * 100}.png`
+      `./account/sendtag/checkout-${Date.now()}-${Math.random() * 100}.png`
     )
     log('takeScreenshot', screenshot)
     await this.page

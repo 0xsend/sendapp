@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { verifyAddressMsg } from 'app/features/checkout/screen'
+import { verifyAddressMsg } from 'app/features/account/sendtag/checkout/screen'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { verifyMessage, isAddress, getAddress } from 'viem'
 import { z } from 'zod'
