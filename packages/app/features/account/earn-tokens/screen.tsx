@@ -51,14 +51,7 @@ export function EarnTokensScreen() {
   return (
     <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
       {selectedDistribution ? (
-        <YStack
-          gap="$4"
-          f={2}
-          overflow={'hidden'}
-          $theme-dark={{ btc: '$gray7Dark' }}
-          $theme-light={{ btc: '$gray4Light' }}
-          $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
-        >
+        <YStack gap="$4" f={2} overflow={'hidden'}>
           <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
         </YStack>
       ) : (
@@ -106,8 +99,14 @@ const DistributionRewardsSection = ({
   )
   return (
     <Container>
-      <YStack f={1} $lg={{ gap: '$2' }}>
-        <Stack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
+      <YStack
+        f={1}
+        $lg={{ gap: '$2' }}
+        $theme-dark={{ btc: '$gray7Dark' }}
+        $theme-light={{ btc: '$gray4Light' }}
+        $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
+      >
+        <Stack gap="$2" $gtSm={{ pt: '$6', gap: '$6' }}>
           <Label fontFamily={'$mono'} fontSize={'$5'}>
             ROUND
           </Label>
@@ -377,7 +376,6 @@ const DistributionRewardsList = ({
 
   return (
     <ScrollView
-      jc="flex-start"
       $gtLg={{ f: 1 }}
       flex={0}
       overflow="scroll"
