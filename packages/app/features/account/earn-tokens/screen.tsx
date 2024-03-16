@@ -49,28 +49,26 @@ export function EarnTokensScreen() {
     )
 
   return (
-    <Container>
-      <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
-        {selectedDistribution ? (
-          <YStack
-            gap="$4"
-            f={2}
-            overflow={'hidden'}
-            $theme-dark={{ btc: '$gray7Dark' }}
-            $theme-light={{ btc: '$gray4Light' }}
-            $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
-          >
-            <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
-          </YStack>
-        ) : (
-          <Stack f={1} gap="$6" jc="center" ai="center">
-            <H2>No distributions available</H2>
-          </Stack>
-        )}
+    <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
+      {selectedDistribution ? (
+        <YStack
+          gap="$4"
+          f={2}
+          overflow={'hidden'}
+          $theme-dark={{ btc: '$gray7Dark' }}
+          $theme-light={{ btc: '$gray4Light' }}
+          $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
+        >
+          <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
+        </YStack>
+      ) : (
+        <Stack f={1} gap="$6" jc="center" ai="center">
+          <H2>No distributions available</H2>
+        </Stack>
+      )}
 
-        <DistributionRewardsList distributions={distributions} />
-      </YStack>
-    </Container>
+      <DistributionRewardsList distributions={distributions} />
+    </YStack>
   )
 }
 
@@ -107,58 +105,60 @@ const DistributionRewardsSection = ({
                   : now
   )
   return (
-    <YStack f={1} $lg={{ gap: '$2' }}>
-      <Stack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
-        <Label fontFamily={'$mono'} fontSize={'$5'}>
-          ROUND
-        </Label>
-        <XStack w="100%" ai="center" jc="space-around" mt="auto">
-          <Stack>
-            <Theme inverse>
-              <H1
-                fontFamily={'$mono'}
-                fontWeight={'300'}
-                fontSize={54}
-                $gtSm={{ fontSize: 79 }}
-                col="$background"
-              >
-                #{distribution.number}
-              </H1>
-            </Theme>
-          </Stack>
-          <View borderRightWidth={1} borderColor={'$decay'} w={0} h="100%" ai="stretch" mx="$4" />
-          <Stack
-            $gtSm={{ fd: 'row', gap: '$0' }}
-            fd="column"
-            gap="$4"
-            f={1}
-            justifyContent="space-between"
-          >
-            <ClaimTimeRemaining timeRemaining={timeRemaining} />
-            <YStack $gtSm={{ ai: 'flex-end' }}>
-              <Label fontFamily={'$mono'}>Status</Label>
+    <Container>
+      <YStack f={1} $lg={{ gap: '$2' }}>
+        <Stack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
+          <Label fontFamily={'$mono'} fontSize={'$5'}>
+            ROUND
+          </Label>
+          <XStack w="100%" ai="center" jc="space-around" mt="auto">
+            <Stack>
               <Theme inverse>
-                <DistributionStatus distribution={distribution} />
+                <H1
+                  fontFamily={'$mono'}
+                  fontWeight={'300'}
+                  fontSize={54}
+                  $gtSm={{ fontSize: 79 }}
+                  col="$background"
+                >
+                  #{distribution.number}
+                </H1>
               </Theme>
-            </YStack>
-          </Stack>
-        </XStack>
-      </Stack>
-      <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
-        <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
-          <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-            <SendBalanceCard distribution={distribution} />
-          </Stack>
-          <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-            <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
-            <ReferralsCard />
+            </Stack>
+            <View borderRightWidth={1} borderColor={'$decay'} w={0} h="100%" ai="stretch" mx="$4" />
+            <Stack
+              $gtSm={{ fd: 'row', gap: '$0' }}
+              fd="column"
+              gap="$4"
+              f={1}
+              justifyContent="space-between"
+            >
+              <ClaimTimeRemaining timeRemaining={timeRemaining} />
+              <YStack $gtSm={{ ai: 'flex-end' }}>
+                <Label fontFamily={'$mono'}>Status</Label>
+                <Theme inverse>
+                  <DistributionStatus distribution={distribution} />
+                </Theme>
+              </YStack>
+            </Stack>
           </XStack>
-        </YStack>
-        <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
-          <SendRewardsCard distribution={distribution} />
         </Stack>
-      </Stack>
-    </YStack>
+        <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
+          <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
+            <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
+              <SendBalanceCard distribution={distribution} />
+            </Stack>
+            <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
+              <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
+              <ReferralsCard />
+            </XStack>
+          </YStack>
+          <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
+            <SendRewardsCard distribution={distribution} />
+          </Stack>
+        </Stack>
+      </YStack>
+    </Container>
   )
 }
 
