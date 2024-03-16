@@ -98,9 +98,12 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
         sidebar={
           <HomeSideBar
             $theme-dark={{ backgroundColor: '$charcoal' }}
-            $theme-light={{ backgroundColor: '#gray50' }}
+            $theme-light={{ backgroundColor: '$gray3Light' }}
             width={208}
             minWidth={208}
+            btlr={0}
+            bblr={0}
+            pt="$10"
             jc="flex-start"
           />
         }

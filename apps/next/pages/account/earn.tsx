@@ -8,7 +8,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Hold & Earn</title>
+        <title>/send | Hold & Earn</title>
       </Head>
       <EarnTokensScreen />
     </>

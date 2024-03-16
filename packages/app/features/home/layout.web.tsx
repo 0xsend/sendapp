@@ -10,7 +10,7 @@ export function HomeLayout({
   return (
     <HomeSideBarWrapper>
       <ScrollView mih="100%" contentContainerStyle={{ minHeight: '100%' }}>
-        <YStack gap="$3" $gtLg={{ pt: '$8' }} w={'100%'}>
+        <YStack gap="$3" $gtLg={{ pt: '$10' }} w={'100%'}>
           <HomeTopNav header={header} subheader={subheader} />
         </YStack>
         {children}
