@@ -1,5 +1,8 @@
 import { TRPCError } from '@trpc/server'
-import { getPriceInWei, getSenderSafeReceivedEvents } from 'app/features/checkout/screen'
+import {
+  getPriceInWei,
+  getSenderSafeReceivedEvents,
+} from 'app/features/account/sendtag/checkout/screen'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
