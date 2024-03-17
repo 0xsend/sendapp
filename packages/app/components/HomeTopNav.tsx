@@ -5,7 +5,11 @@ import { IconArrowLeft, IconHamburger, IconQr, IconSendLogo } from 'app/componen
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
-export function HomeTopNav({ header, subheader }: { header: string; subheader?: string }) {
+export function HomeTopNav({
+  header,
+  subheader,
+  submenuHeader,
+}: { header: string; subheader?: string; submenuHeader?: string }) {
   const [nav, setNavParam] = useNav()
   const path = usePathname()
   const { push } = useRouter()
@@ -26,7 +30,7 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
   const isSubRoute = path.split('/').length - 1 > 1
 
   return (
-    <Header w="100%">
+    <Header w="100%" mb={'$6'}>
       <XStack
         $gtLg={{ jc: 'flex-start', pb: '$2' }}
         jc="space-between"
@@ -60,7 +64,7 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
           </XStack>
         ) : (
           <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
-            {header}
+            {media.gtLg ? header : submenuHeader}
           </H2>
         )}
         <Button
