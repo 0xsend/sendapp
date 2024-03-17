@@ -35,6 +35,7 @@ const TokenDetails = ({
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
         {coin.icon}
         <Paragraph
+          fontFamily={'$mono'}
           fontSize={'$5'}
           fontWeight={'500'}
           textTransform={'uppercase'}
@@ -77,7 +78,7 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
     }
     return (
       <>
-        <Paragraph fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
+        <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
           {formatAmount(
             (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString()
           )}

@@ -133,7 +133,12 @@ export function HomeScreen() {
               }}
             >
               <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
+                <Paragraph
+                  fontFamily={'$mono'}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  color={'$black'}
+                >
                   Deposit
                 </Paragraph>
                 <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
