@@ -18,7 +18,7 @@ export const localhost = defineChain({
   blockExplorers: {
     default: {
       name: 'Otterscan',
-      url: 'http://localhost:5100/',
+      url: 'http://localhost:5100',
     },
   },
 })
@@ -42,7 +42,7 @@ export const baseLocal = defineChain({
   blockExplorers: {
     default: {
       name: 'Otterscan',
-      url: 'http://localhost:5101/',
+      url: 'http://localhost:5101',
     },
   },
 })
