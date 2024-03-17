@@ -208,6 +208,7 @@ const SendBalanceCard = ({
     isLoading: isLoadingChainAddresses,
     error: chainAddressesError,
   } = useChainAddresses()
+
   if (chainAddressesError) throw chainAddressesError
 
   const address = addresses?.[0]?.address
@@ -231,7 +232,16 @@ const SendBalanceCard = ({
   })
   if (snapshotBalanceError) throw snapshotBalanceError
 
-  if (isLoadingSnapshotBalance || isLoadingChainAddresses) return <Spinner color="$color" />
+  const body = () => {
+    switch (true) {
+      case isLoadingSnapshotBalance || isLoadingChainAddresses:
+        return <Spinner color={'$color'} />
+      case snapshotBalance === undefined:
+        return 'Error fetching SEND balance'
+      default:
+        return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
+    }
+  }
 
   return (
     <Card
@@ -249,16 +259,14 @@ const SendBalanceCard = ({
         </Label>
         <Theme inverse>
           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {snapshotBalance
-              ? `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
-              : 'Error fetching SEND balance'}
+            {body()}
           </Paragraph>
         </Theme>
       </YStack>
     </Card>
   )
 }
-const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance?: number }) => (
+const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) => (
   <Card
     f={2}
     bc="transparent"
@@ -283,8 +291,20 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance?: number })
 )
 
 const ReferralsCard = () => {
-  const { referralsCount, error } = useUserReferralsCount()
+  const { referralsCount, isLoading, error } = useUserReferralsCount()
   if (error) throw error
+
+  const body = () => {
+    switch (true) {
+      case isLoading:
+        return <Spinner color={'$color'} />
+      case referralsCount === undefined:
+        return 'Fetch Error'
+      default:
+        return referralsCount
+    }
+  }
+
   return (
     <Card
       f={1}
@@ -302,7 +322,7 @@ const ReferralsCard = () => {
         </Label>
         <Theme inverse>
           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {referralsCount}
+            {body()}
           </Paragraph>
         </Theme>
       </YStack>
