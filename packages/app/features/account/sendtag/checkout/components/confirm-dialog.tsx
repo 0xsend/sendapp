@@ -668,17 +668,28 @@ export function ConfirmWithSignTransaction() {
 
 export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`) => void }) {
   const publicClient = usePublicClient()
-  const { address } = useAccount()
+  const { address, chainId } = useAccount()
   const { receipts, error: errorReceipts, isLoading: isLoadingReceipts } = useReceipts()
   const pendingTags = usePendingTags()
   const confirmedTags = useConfirmedTags()
   const ethAmount = getPriceInWei(pendingTags ?? [], confirmedTags ?? [])
 
+  assert(chainId === undefined || chainId in sendRevenueSafeAddress, 'chainId is required')
+
   const tx = {
-    to: sendRevenueSafeAddress,
+    to: sendRevenueSafeAddress[chainId as keyof typeof sendRevenueSafeAddress],
     value: ethAmount,
   } as const
-  const { data: txData, error: sendTxErr, isLoading } = useEstimateGas(tx)
+  const {
+    data: txData,
+    error: sendTxErr,
+    isLoading,
+  } = useEstimateGas({
+    ...tx,
+    query: {
+      enabled: chainId !== undefined,
+    },
+  })
   const { sendTransactionAsync } = useSendTransaction()
   const [error, setError] = useState<string>()
   const receiptHashes = useMemo(() => receipts?.map((r) => r.hash) ?? [], [receipts])
@@ -696,6 +707,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
     const event = events.filter(
       (e) => e.args.value === ethAmount && !receiptHashes.includes(e.transactionHash)
     )?.[0]
+
     // check it against the receipts
     if (event?.transactionHash) {
       onSent(event.transactionHash)
@@ -738,7 +750,9 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
             // @ts-expect-error tamagui doesn't support this yet
             title={address}
             target="_blank"
-            href={`${baseMainnet.blockExplorers?.default.url}/address/${sendRevenueSafeAddress}`}
+            href={`${baseMainnet.blockExplorers?.default.url}/address/${
+              sendRevenueSafeAddress[chainId as keyof typeof sendRevenueSafeAddress]
+            }`}
           >
             Send Tag Safe
           </Anchor>
