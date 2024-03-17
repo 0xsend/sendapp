@@ -56,7 +56,11 @@ export default defineConfig({
      **/
     {
       name: 'SendRevenueSafe',
-      address: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+      address: {
+        [baseLocal.id]: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+        [base.id]: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+        [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
+      },
       abi: [],
     },
     {
