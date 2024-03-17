@@ -66,13 +66,15 @@ export function HomeScreen() {
                         >
                           Total Balance
                         </Paragraph>
-                        <XStack style={{ color: 'white' }} gap={'$2.5'}>
+                        <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
                           {totalBalance === undefined ? (
                             <Spinner size={'large'} />
                           ) : (
                             <Paragraph
                               color={'$color12'}
-                              size={'$14'}
+                              fontFamily={'$mono'}
+                              fontSize={'$15'}
+                              lineHeight={'$14'}
                               fontWeight={'500'}
                               zIndex={1}
                             >
