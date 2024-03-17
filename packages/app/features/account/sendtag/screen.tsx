@@ -7,11 +7,12 @@ const maxNumSendTags = 5
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
+  const confirmedTags = tags?.filter((tag) => tag.status === 'confirmed')
 
   const allTags: (Tables<'tags'> | undefined)[] =
-    tags === undefined
+    confirmedTags === undefined
       ? new Array(maxNumSendTags).fill(undefined)
-      : [...tags, ...Array.from({ length: maxNumSendTags - tags.length })]
+      : [...confirmedTags, ...Array.from({ length: maxNumSendTags - confirmedTags.length })]
   const nextTagIndex = allTags?.findIndex((tag) => tag === undefined)
 
   if (isLoading)
@@ -34,7 +35,7 @@ export function SendTagScreen() {
           <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>
             REGISTERED SENDTAGS [
             <Paragraph fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$primary' }}>
-              {`${tags?.length || 0} / ${maxNumSendTags}`}
+              {`${confirmedTags?.length || 0} / ${maxNumSendTags}`}
             </Paragraph>
             ]
           </Label>
@@ -84,8 +85,14 @@ function TagItem({ tag, isNextTag }: { tag?: Tables<'tags'>; isNextTag: boolean 
     )
 
   return (
-    <ListItem h={54} br={12} $theme-dark={{ bc: '$darkest' }} $theme-light={{ bc: '$gray4Light' }}>
-      <H3 fontSize={'$5'} fontWeight={'500'} theme="accent">
+    <ListItem
+      h={54}
+      br={12}
+      w="fit-content"
+      $theme-dark={{ bc: '$darkest' }}
+      $theme-light={{ bc: '$gray4Light' }}
+    >
+      <H3 fontSize={32} fontWeight={'500'} fontFamily={'$mono'} $theme-dark={{ col: '$primary' }}>
         {tag.name}
       </H3>
     </ListItem>
