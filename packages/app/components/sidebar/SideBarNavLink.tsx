@@ -9,17 +9,18 @@ export function SideBarNavLink({
   ...props
 }: { icon?: ReactElement; text: string } & Omit<LinkProps, 'children'>): ReactElement {
   const location = usePathname()
+
   const isActiveRoute =
     props.href === '/'
       ? location === props.href.toString()
-      : location.includes(props.href.toString())
+      : location.split('/').includes(props.href.toString())
 
   const { resolvedTheme } = useThemeSetting()
   const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
   const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$color' : '$color12'
 
   return (
-    <Link {...props} href={props.disabled ? '' : props.href}>
+    <Link {...props} href={props.disabled ? '' : `/${props.href}`}>
       <Button
         width={'100%'}
         disabled={props.disabled}

@@ -26,17 +26,17 @@ const links = [
   {
     icon: <IconSLogo size={'$1'} />,
     text: 'send',
-    href: '/send',
+    href: 'send',
   },
   {
     icon: <IconActivity size={'$1'} />,
     text: 'activity',
-    href: '/activity',
+    href: 'activity',
   },
   {
     icon: <IconAccount size={'$1'} />,
     text: 'account',
-    href: '/account',
+    href: 'account',
   },
   // @todo enable on testnet
   __DEV__ || baseMainnet.id === 84532
@@ -51,7 +51,7 @@ const links = [
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props}>
-      <Link href={'/'}>
+      <Link href={'/'} display="flex" jc="center" ai="center">
         <IconSendLogo size={'$2.5'} color={'$color12'} />
       </Link>
       <Nav display="flex" flex={1} pt={'$10'}>
