@@ -2819,10 +2819,26 @@ export const sendMerkleDropConfig = {
 // SendRevenueSafe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x71fa02bb11e4b119bEDbeeD2f119F62048245301)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7)
+ */
 export const sendRevenueSafeAbi = [] as const
 
-export const sendRevenueSafeAddress = '0x71fa02bb11e4b119bEDbeeD2f119F62048245301' as const
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x71fa02bb11e4b119bEDbeeD2f119F62048245301)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7)
+ */
+export const sendRevenueSafeAddress = {
+  8453: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+  84532: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
+  845337: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+} as const
 
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x71fa02bb11e4b119bEDbeeD2f119F62048245301)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7)
+ */
 export const sendRevenueSafeConfig = {
   address: sendRevenueSafeAddress,
   abi: sendRevenueSafeAbi,
