@@ -155,6 +155,7 @@ export default defineConfig({
         'ERC*.sol/*',
         'IEntryPoint*.sol/*',
         'EntryPointSimulations.sol/*',
+        'TokenPaymaster.sol/*',
       ],
       exclude: [
         'Common.sol/**',

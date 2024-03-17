@@ -7,7 +7,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../src/TokenPaymaster.sol";
 
-contract DeploySendMerkleDropScript is Script {
+contract DeployTokenPaymasterScript is Script {
     uint256 private constant PRICE_DENOM = 1e26;
     uint40 private constant BASE_FEE_DEFAULT = 5e4; // ¢5
 
@@ -21,11 +21,11 @@ contract DeploySendMerkleDropScript is Script {
         address tokenOracle = vm.envAddress("TOKEN_ORACLE");
         address nativeOracle = vm.envAddress("NATIVE_ORACLE");
 
-        require(token == address(0), "TOKEN env variable not set");
-        require(weth == address(0), "WETH env variable not set");
-        require(uniswap == address(0), "UNISWAP_ROUTER env variable not set");
-        require(tokenOracle == address(0), "TOKEN_ORACLE env variable not set");
-        require(nativeOracle == address(0), "NATIVE_ORACLE env variable not set");
+        require(token != address(0), "TOKEN env variable not set");
+        require(weth != address(0), "WETH env variable not set");
+        require(uniswap != address(0), "UNISWAP_ROUTER env variable not set");
+        require(tokenOracle != address(0), "TOKEN_ORACLE env variable not set");
+        require(nativeOracle != address(0), "NATIVE_ORACLE env variable not set");
 
         TokenPaymasterConfig memory tpc = TokenPaymasterConfig({
             priceMaxAge: 86400,
@@ -34,21 +34,23 @@ contract DeploySendMerkleDropScript is Script {
             priceMarkup: PRICE_DENOM * 15 / 10, // 50%,
             baseFee: BASE_FEE_DEFAULT
         });
-
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: 0, rewardsPool: address(0)});
+        RewardsConfig memory rc = RewardsConfig({
+            rewardsShare: 3300, // 33% of base fee
+            rewardsPool: address(0x71fa02bb11e4b119bEDbeeD2f119F62048245301) // Send Revenues Safe
+        });
 
         OracleHelperConfig memory ohc = OracleHelperConfig({
-            cacheTimeToLive: 0,
-            maxOracleRoundAge: 0,
+            cacheTimeToLive: 3600, // 1 hour
+            maxOracleRoundAge: 43200, // 12 hours
             nativeOracle: IOracle(nativeOracle),
-            nativeOracleReverse: false,
             priceUpdateThreshold: PRICE_DENOM * 12 / 100, // 20%
             tokenOracle: IOracle(tokenOracle),
+            nativeOracleReverse: false,
             tokenOracleReverse: false,
             tokenToNativeOracle: false
         });
 
-        UniswapHelperConfig memory uhc = UniswapHelperConfig({minSwapAmount: 1, slippage: 5, uniswapPoolFee: 3});
+        UniswapHelperConfig memory uhc = UniswapHelperConfig({minSwapAmount: 1, slippage: 5, uniswapPoolFee: 500});
         vm.startBroadcast();
 
         TokenPaymaster paymaster = new TokenPaymaster{salt: salt}(
@@ -65,6 +67,9 @@ contract DeploySendMerkleDropScript is Script {
 
         // solhint-disable-next-line no-console
         console2.log("Deployed TokenPaymaster at address: ", address(paymaster));
+
+        IEntryPoint(entryPoint).depositTo{value: 1e18}(address(paymaster));
+        paymaster.addStake{value: 1e18}(1);
         vm.stopBroadcast();
     }
 }

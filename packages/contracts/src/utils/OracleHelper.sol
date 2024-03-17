@@ -8,7 +8,7 @@ import "./IOracle.sol";
 struct OracleHelperConfig {
     /// @notice The price cache will be returned without even fetching the oracles for this number of seconds
     uint48 cacheTimeToLive;
-    /// @notice The maximum acceptable age of the price oracle round
+    /// @notice The maximum acceptable age in seconds of the price oracle round
     uint48 maxOracleRoundAge;
     /// @notice The Oracle contract used to fetch the latest token prices
     IOracle tokenOracle;

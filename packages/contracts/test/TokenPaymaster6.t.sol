@@ -61,8 +61,8 @@ contract TokenPaymaster6Test is Test {
         (user, userKey) = makeAddrAndKey("user");
         account = factory.createAccount(user, 0);
         token = new TestERC20(6);
-        nativeAssetOracle = new TestOracle2(initialNativeAssetPrice, 8);
-        tokenOracle = new TestOracle2(initialTokenPrice, 8);
+        nativeAssetOracle = new TestOracle2(initialNativeAssetPrice, 8, "ETH/USD", operator);
+        tokenOracle = new TestOracle2(initialTokenPrice, 8, "TOK/USD", operator);
 
         TokenPaymasterConfig memory tpc = TokenPaymasterConfig({
             priceMaxAge: 86400,
@@ -454,7 +454,9 @@ contract TokenPaymaster6Test is Test {
 
     function testUpdatePrice() external {
         uint256 _tokenPrice = 400000000;
+        vm.startPrank(operator);
         tokenOracle.setPrice(int256(_tokenPrice));
+        vm.stopPrank();
         vm.expectEmit(address(paymaster));
         uint256 prevPrice = paymaster.cachedPrice();
         uint256 expected = paymaster.calculatePrice(_tokenPrice, uint256(initialNativeAssetPrice), false, false);
@@ -466,7 +468,9 @@ contract TokenPaymaster6Test is Test {
     function testFuzz_UpdatePrice(uint256 _tokenPrice) external {
         vm.assume(_tokenPrice < PRICE_DENOM);
         vm.assume(_tokenPrice > 0);
+        vm.startPrank(operator);
         tokenOracle.setPrice(int256(_tokenPrice));
+        vm.stopPrank();
         vm.expectEmit(address(paymaster));
         uint256 expected = paymaster.calculatePrice(_tokenPrice, uint256(initialNativeAssetPrice), false, false);
         uint256 prevPrice = paymaster.cachedPrice();
@@ -585,8 +589,10 @@ contract TokenPaymaster6Test is Test {
     function testShouldUpdateCachedTokenPriceIfTheChangeIsAboveConfiguredPercentage() external {
         token.sudoMint(address(account), 1e18);
         token.sudoApprove(address(account), address(paymaster), type(uint256).max);
+        vm.startPrank(operator);
         tokenOracle.setPrice(initialTokenPrice * 5);
         nativeAssetOracle.setPrice(initialNativeAssetPrice * 10);
+        vm.stopPrank();
         vm.warp(2);
 
         PackedUserOperation memory op =
@@ -713,9 +719,11 @@ contract TokenPaymaster6Test is Test {
         token.sudoMint(address(account), 1 ether);
         token.sudoApprove(address(account), address(paymaster), type(uint256).max);
 
+        vm.startPrank(operator);
         // Ether price increased 100 times!
         tokenOracle.setPrice(int256(initialTokenPrice));
         nativeAssetOracle.setPrice(int256(initialNativeAssetPrice * 100));
+        vm.stopPrank();
         vm.warp(200); // cannot happen too fast though
 
         PackedUserOperation memory op =
@@ -778,9 +786,11 @@ contract TokenPaymaster6Test is Test {
         token.sudoMint(address(account), 0.01 ether);
         token.sudoApprove(address(account), address(paymaster), type(uint256).max);
 
+        vm.startPrank(operator);
         // Ether price increased 100 times!
         tokenOracle.setPrice(int256(initialTokenPrice));
         nativeAssetOracle.setPrice(int256(initialNativeAssetPrice * 100));
+        vm.stopPrank();
         vm.warp(200); // cannot happen too fast though
 
         // Withdraw most of the tokens the account has inside the inner transaction

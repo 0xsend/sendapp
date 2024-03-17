@@ -435,6 +435,19 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-add-token-paymaster-fixtures",
+    "yarn contracts dev:anvil-add-token-paymaster-fixtures",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
+local_resource(
     "aa_bundler:base",
     allow_parallel = True,
     labels = labels,
