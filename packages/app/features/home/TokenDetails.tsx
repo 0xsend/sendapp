@@ -35,7 +35,6 @@ const TokenDetails = ({
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
         {coin.icon}
         <Paragraph
-          fontFamily={'$mono'}
           fontSize={'$5'}
           fontWeight={'500'}
           textTransform={'uppercase'}

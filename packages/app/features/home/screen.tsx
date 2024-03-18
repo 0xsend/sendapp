@@ -72,7 +72,7 @@ export function HomeScreen() {
                           ) : (
                             <Paragraph
                               color={'$color12'}
-                              fontFamily={'$mono'}
+                              // fontFamily={'$mono'}
                               fontSize={'$15'}
                               lineHeight={'$14'}
                               fontWeight={'500'}
@@ -134,7 +134,7 @@ export function HomeScreen() {
             >
               <XStack w={'100%'} jc={'space-between'} ai={'center'}>
                 <Paragraph
-                  fontFamily={'$mono'}
+                  // fontFamily={'$mono'}
                   fontWeight={'500'}
                   textTransform={'uppercase'}
                   color={'$black'}
