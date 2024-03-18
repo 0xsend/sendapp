@@ -23,6 +23,7 @@ export const TextField = (props: InputProps) => {
             size={props.size || '$5'}
             // $mono font is broken in tests
             fontFamily={process.env.NODE_ENV === 'test' ? undefined : '$mono'}
+            lineHeight={'$11'}
             htmlFor={id}
             textTransform={'uppercase'}
           >
