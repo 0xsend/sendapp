@@ -483,7 +483,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     "fontFamily": "System",
                     "fontSize": 19.2,
                     "fontWeight": "400",
-                    "lineHeight": 21,
+                    "lineHeight": 60,
                     "textTransform": "uppercase",
                   }
                 }
@@ -673,8 +673,8 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     {
                       "backgroundColor": "#081619",
                       "borderBottomColor": "hsla(191, 32%, 32%, 1)",
-                      "borderBottomLeftRadius": 16,
-                      "borderBottomRightRadius": 16,
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
                       "borderBottomWidth": 0,
                       "borderLeftColor": "hsla(191, 32%, 32%, 1)",
                       "borderLeftWidth": 0,
@@ -682,8 +682,8 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       "borderRightWidth": 0,
                       "borderStyle": "solid",
                       "borderTopColor": "hsla(191, 32%, 32%, 1)",
-                      "borderTopLeftRadius": 16,
-                      "borderTopRightRadius": 16,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
                       "borderTopWidth": 0,
                       "color": "hsla(112, 22%, 100%, 1)",
                       "fontFamily": "System",
@@ -1990,7 +1990,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     "fontFamily": "System",
                     "fontSize": 19.2,
                     "fontWeight": "400",
-                    "lineHeight": 21,
+                    "lineHeight": 60,
                     "textTransform": "uppercase",
                   }
                 }
@@ -2184,8 +2184,8 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     {
                       "backgroundColor": "#081619",
                       "borderBottomColor": "hsla(0, 70%, 32%, 1)",
-                      "borderBottomLeftRadius": 16,
-                      "borderBottomRightRadius": 16,
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
                       "borderBottomWidth": 0,
                       "borderLeftColor": "hsla(0, 70%, 32%, 1)",
                       "borderLeftWidth": 0,
@@ -2193,8 +2193,8 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       "borderRightWidth": 0,
                       "borderStyle": "solid",
                       "borderTopColor": "hsla(0, 70%, 32%, 1)",
-                      "borderTopLeftRadius": 16,
-                      "borderTopRightRadius": 16,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
                       "borderTopWidth": 0,
                       "color": "hsla(0, 70%, 95%, 1)",
                       "fontFamily": "System",
