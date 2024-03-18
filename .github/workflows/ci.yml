@@ -208,6 +208,8 @@ jobs:
               ref: process.env.SUPABASE_PARENT_PROJECT_ID,
             });
 
+            core.info('Disabling external phone');
+
             // workaround for supabase branching bug, disable and re-enable external phone
             await supabaseManager.projectsConfig.updateV1AuthConfig({
               ref: process.env.SUPABASE_PROJECT_ID,
@@ -216,6 +218,11 @@ jobs:
                 external_phone_enabled: false,
               },
             });
+
+            // sleep for 5 seconds
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+
+            core.info('Re-enabling external phone');
 
             await supabaseManager.projectsConfig.updateV1AuthConfig({
               ref: process.env.SUPABASE_PROJECT_ID,
@@ -229,6 +236,9 @@ jobs:
                   parentAuthConfig.sms_twilio_verify_message_service_sid,
               },
             });
+
+            core.info('Done');
+
             return "success";
         env:
           SUPABASE_PROJECT_ID: ${{ steps.supabase-branch.outputs.project_ref }}
