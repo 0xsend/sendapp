@@ -43,7 +43,7 @@ const links = [
     ? {
         icon: <Paragraph px="$1">🔒</Paragraph>,
         text: 'secret shop',
-        href: '/secret-shop',
+        href: 'secret-shop',
       }
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
