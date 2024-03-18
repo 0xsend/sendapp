@@ -53,7 +53,7 @@ export function HomeScreen() {
             $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
           >
             <XStack w={'100%'} zIndex={4}>
-              <YStack py={'$7'}>
+              <YStack py={'$7'} $md={{ py: '$13' }}>
                 <YStack jc={'center'} gap={'$6'}>
                   <TooltipGroup delay={{ open: 0, close: 1500 }}>
                     <Tooltip placement="bottom">
@@ -147,7 +147,7 @@ export function HomeScreen() {
               </XStack>
             </Button>
           </XStack>
-          <YStack width={'100%'} gap={'$3.5'} pt={'$6'} pb={'$12'}>
+          <YStack width={'100%'} $gtLg={{ gap: '$3.5' }} pt={'$6'} pb={'$12'}>
             {coins.map((coin, index) => (
               <TokenDetails
                 coin={coin}
