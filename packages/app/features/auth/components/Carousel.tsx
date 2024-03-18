@@ -34,18 +34,21 @@ const CarouselProgress = () => {
   useEffect(() => {
     const progressWidthInterval = setInterval(() => {
       setProgressWidth((progressWidth) => {
-        if (progressWidth >= 100) {
-          setCarouselProgress((progress) => {
-            return (progress + 1) % carouselItems?.length
-          })
-        }
         return progressWidth >= 100 ? 0 : progressWidth + 1
       })
     }, 50)
     return () => {
       clearInterval(progressWidthInterval)
     }
-  }, [setCarouselProgress])
+  }, [])
+
+  useEffect(() => {
+    if (progressWidth >= 100) {
+      setCarouselProgress((progress) => {
+        return (progress + 1) % carouselItems?.length
+      })
+    }
+  }, [progressWidth, setCarouselProgress])
 
   return (
     <XStack w="100%" jc="center" py="$5" gap="$2">
