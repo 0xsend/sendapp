@@ -40,8 +40,8 @@ export function HomeTopNav({
       {media.lg ? <SettingsBottomSheet /> : <></>}
       <Header
         w="100%"
-        mb={'$6'}
-        $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', py: '$4' }}
+        mb={'$8'}
+        $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', py: '$4', mb: '$6' }}
       >
         <Container>
           <XStack

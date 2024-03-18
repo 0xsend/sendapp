@@ -23,7 +23,7 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
   return (
     <Container>
       {media.gtLg ? (
-        <XStack separator={<Separator vertical />} f={1} gap={'$size.8'}>
+        <XStack separator={<Separator vertical />} f={1} gap={'$size.8'} pt={'$4'}>
           <YStack
             backgroundColor="$color1"
             // this file is web-only so we can safely use CSS
