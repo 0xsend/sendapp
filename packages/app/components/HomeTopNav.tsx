@@ -52,17 +52,13 @@ export function HomeTopNav({
             fd="row"
           >
             {isSubRoute ? (
-              <Link href={'#'} onPress={handleBack}>
-                <Stack ai={'center'}>
-                  <IconArrowLeft size={'$2.5'} color={iconColor} />
-                </Stack>
-              </Link>
+              <Stack ai={'center'} onPress={handleBack}>
+                <IconArrowLeft size={'$2.5'} color={iconColor} />
+              </Stack>
             ) : (
-              <Link href={'#'} $gtLg={{ display: 'none' }} onPress={handleHomeBottomSheet}>
-                <Stack ai={'center'}>
-                  <IconHamburger size={'$2.5'} color={iconColor} />
-                </Stack>
-              </Link>
+              <Stack ai={'center'} $gtLg={{ display: 'none' }} onPress={handleHomeBottomSheet}>
+                <IconHamburger size={'$2.5'} color={iconColor} />
+              </Stack>
             )}
             {header === 'Home' && media.md ? (
               <XStack>
@@ -78,11 +74,9 @@ export function HomeTopNav({
               </H2>
             )}
             {path.includes('/account') ? (
-              <Link href={'#'} $gtLg={{ display: 'none' }} onPress={handleSettingsBottomSheet}>
-                <Stack ai={'center'}>
-                  <IconGear size={'$2.5'} color={iconColor} />
-                </Stack>
-              </Link>
+              <Stack ai={'center'} $gtLg={{ display: 'none' }} onPress={handleSettingsBottomSheet}>
+                <IconGear size={'$2.5'} color={iconColor} />
+              </Stack>
             ) : (
               <Link href={'#'} $gtLg={{ display: 'none' }}>
                 <Stack ai={'center'}>
