@@ -38,7 +38,6 @@ const links = [
     text: 'account',
     href: 'account',
   },
-  // @todo enable on testnet
   __DEV__ || baseMainnet.id === 84532
     ? {
         icon: <Paragraph px="$1">🔒</Paragraph>,

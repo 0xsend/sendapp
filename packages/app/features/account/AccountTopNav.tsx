@@ -1,11 +1,13 @@
 import { H2, Header, Paragraph, XStack, Stack, useMedia, Button } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconArrowLeft, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
+import { IconArrowLeft, IconGear, IconHamburger, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
+import { SettingsBottomSheet } from './settings/SettingsBottomSheet'
 
-export function HomeTopNav({
+// there's not much difference between this and HomeTopNav, but it's too much to refactor in one go
+export function AccountTopNav({
   header,
   subheader,
 }: { header: string; subheader?: string; submenuHeader?: string }) {
@@ -15,6 +17,10 @@ export function HomeTopNav({
 
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
+  }
+
+  const handleSettingsBottomSheet = () => {
+    setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
   }
 
   const handleBack = () => {
@@ -70,7 +76,8 @@ export function HomeTopNav({
         <Button
           $gtLg={{ display: 'none' }}
           bg="transparent"
-          icon={<IconQr size={'$2.5'} color={iconColor} />}
+          icon={<IconGear size={'$2.5'} color={iconColor} />}
+          onPress={handleSettingsBottomSheet}
         />
       </XStack>
       {subheader && (
@@ -89,6 +96,7 @@ export function HomeTopNav({
           {subheader}
         </Paragraph>
       )}
+      <SettingsBottomSheet />
     </Header>
   )
 }
