@@ -1,0 +1,522 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
+<View
+  style={
+    {
+      "alignSelf": "center",
+      "flex": 1,
+      "flexDirection": "row",
+      "paddingLeft": 32,
+      "paddingRight": 32,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flexDirection": "column",
+        "gap": 39,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "width": "100%",
+          "zIndex": 4,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "column",
+            "gap": 24,
+            "justifyContent": "center",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomLeftRadius": 7,
+              "borderBottomRightRadius": 7,
+              "borderTopLeftRadius": 7,
+              "borderTopRightRadius": 7,
+              "flexDirection": "column",
+              "height": 84,
+              "justifyContent": "center",
+              "maxHeight": 84,
+              "maxWidth": 84,
+              "minHeight": 84,
+              "minWidth": 84,
+              "overflow": "hidden",
+              "position": "relative",
+              "width": 84,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "bottom": 0,
+                "flexDirection": "column",
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "zIndex": 1,
+              }
+            }
+          >
+            <Image
+              accessibilityLabel=""
+              fullscreen={true}
+              onError={[Function]}
+              onLoad={[Function]}
+              source={
+                {
+                  "uri": "https://example.com",
+                }
+              }
+              style={
+                {
+                  "height": 84,
+                  "width": 84,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              {
+                "backgroundColor": "$blue10",
+                "bottom": 0,
+                "flexDirection": "column",
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "zIndex": 0,
+              }
+            }
+          />
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "column",
+              "gap": 7,
+            }
+          }
+        >
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 36,
+                "fontWeight": "700",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            No Name
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+                "opacity": 0.6,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            @
+            tag1
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "display": "none",
+            "flexDirection": "row",
+            "gap": 24,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+          "borderLeftWidth": 0,
+          "borderRightColor": "hsla(191, 32%, 24%, 1)",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "hsla(191, 32%, 24%, 1)",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+          "width": "100%",
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "display": "none",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 24,
+            "width": 144,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Name
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Sendtags
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Phone
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 24,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "700",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          No Name
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "700",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+           @tag1
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "700",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        />
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "column",
+          "gap": 32,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 7,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Name
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          No Name
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 7,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Sendtags
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+           @tag1
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 7,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Send ID
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        />
+      </View>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 7,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Phone
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        />
+      </View>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 7,
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Address
+        </Text>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "500",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          12, Main street, CA, USA
+        </Text>
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "display": "flex",
+          "flexDirection": "row",
+          "gap": 24,
+        }
+      }
+    />
+  </View>
+</View>
+`;

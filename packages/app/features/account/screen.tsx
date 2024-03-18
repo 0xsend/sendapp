@@ -28,9 +28,11 @@ export function AccountScreen() {
                 <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
                   {name ? name : 'No Name'}
                 </Paragraph>
-                <Paragraph fontFamily={'$mono'} fontSize={'$5'} fontWeight={'400'} opacity={0.6}>
-                  @{tags?.[0]?.name}
-                </Paragraph>
+                {tags?.[0] ? (
+                  <Paragraph fontFamily={'$mono'} opacity={0.6}>
+                    @{tags[0].name}
+                  </Paragraph>
+                ) : null}
               </YStack>
             </XStack>
             <XStack gap={'$5'} $md={{ display: 'none' }}>
