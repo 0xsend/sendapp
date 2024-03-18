@@ -9,14 +9,8 @@ import { size } from './themes/token-size'
 import { space } from './themes/token-space'
 import { zIndex } from './themes/token-z-index'
 
-import * as themesIn from './themes/theme-generated'
+import * as themes from './themes/theme-generated'
 import { color } from './themes/token-colors'
-
-/**
- * This avoids shipping themes as JS. Instead, Tamagui will hydrate them from CSS.
- */
-const shipThemes = process.env.NODE_ENV === 'test' || process.env.TAMAGUI_IS_SERVER
-const themes = shipThemes ? themesIn : ({} as typeof themesIn)
 
 const conf = {
   themes,
