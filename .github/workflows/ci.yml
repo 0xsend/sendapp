@@ -208,6 +208,15 @@ jobs:
               ref: process.env.SUPABASE_PARENT_PROJECT_ID,
             });
 
+            // workaround for supabase branching bug, disable and re-enable external phone
+            await supabaseManager.projectsConfig.updateV1AuthConfig({
+              ref: process.env.SUPABASE_PROJECT_ID,
+              requestBody: {
+                external_email_enabled: false, // also disable email
+                external_phone_enabled: false,
+              },
+            });
+
             await supabaseManager.projectsConfig.updateV1AuthConfig({
               ref: process.env.SUPABASE_PROJECT_ID,
               requestBody: {
