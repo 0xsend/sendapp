@@ -53,7 +53,7 @@ export function HomeScreen() {
             $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
           >
             <XStack w={'100%'} zIndex={4}>
-              <YStack py={'$7'}>
+              <YStack py={'$7'} $md={{ py: '$13' }}>
                 <YStack jc={'center'} gap={'$6'}>
                   <TooltipGroup delay={{ open: 0, close: 1500 }}>
                     <Tooltip placement="bottom">
@@ -66,13 +66,15 @@ export function HomeScreen() {
                         >
                           Total Balance
                         </Paragraph>
-                        <XStack style={{ color: 'white' }} gap={'$2.5'}>
+                        <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
                           {totalBalance === undefined ? (
                             <Spinner size={'large'} />
                           ) : (
                             <Paragraph
                               color={'$color12'}
-                              size={'$14'}
+                              // fontFamily={'$mono'}
+                              fontSize={'$15'}
+                              lineHeight={'$14'}
                               fontWeight={'500'}
                               zIndex={1}
                             >
@@ -131,7 +133,12 @@ export function HomeScreen() {
               }}
             >
               <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
+                <Paragraph
+                  // fontFamily={'$mono'}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  color={'$black'}
+                >
                   Deposit
                 </Paragraph>
                 <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
@@ -140,7 +147,7 @@ export function HomeScreen() {
               </XStack>
             </Button>
           </XStack>
-          <YStack width={'100%'} gap={'$3.5'} pt={'$6'} pb={'$12'}>
+          <YStack width={'100%'} $gtLg={{ gap: '$3.5' }} pt={'$6'} pb={'$12'}>
             {coins.map((coin, index) => (
               <TokenDetails
                 coin={coin}

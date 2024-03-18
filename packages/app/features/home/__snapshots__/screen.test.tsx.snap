@@ -50,8 +50,8 @@ exports[`HomeScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "paddingBottom": 39,
-              "paddingTop": 39,
+              "paddingBottom": 102,
+              "paddingTop": 102,
             }
           }
         >
@@ -87,6 +87,7 @@ exports[`HomeScreen 1`] = `
                   "color": "white",
                   "flexDirection": "row",
                   "gap": 10,
+                  "marginTop": 13,
                 }
               }
             >
@@ -96,7 +97,7 @@ exports[`HomeScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 110.39999999999999,
+                    "fontSize": 136.79999999999998,
                     "fontWeight": "500",
                     "lineHeight": 97,
                     "zIndex": 1,
@@ -337,7 +338,6 @@ exports[`HomeScreen 1`] = `
       style={
         {
           "flexDirection": "column",
-          "gap": 16,
           "paddingBottom": 88,
           "paddingTop": 32,
           "width": "100%",

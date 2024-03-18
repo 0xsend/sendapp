@@ -17,7 +17,7 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout header="Settings" backLink={'/account'}>
+  <HomeLayout header="Settings">
     <SettingsLayout>{children}</SettingsLayout>
   </HomeLayout>
 )

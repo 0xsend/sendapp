@@ -59,18 +59,21 @@ export const PersonalInfoScreen = () => {
               props={{
                 phone: {
                   'aria-label': 'Phone number',
+                  autoComplete: 'tel',
+                  keyboardType: 'phone-pad',
+                  autoCapitalize: 'none',
                 },
-                email: {
-                  'aria-label': 'Email',
-                },
-                address: {
-                  'aria-label': 'Address',
-                },
+                // email: {
+                //   'aria-label': 'Email',
+                // },
+                // address: {
+                //   'aria-label': 'Address',
+                // },
               }}
               defaultValues={{
                 phone: user?.phone ?? '',
-                email: user?.email ?? '',
-                address: '',
+                // email: user?.email ?? '',
+                // address: '',
               }}
               renderAfter={({ submit }) => (
                 <YStack ai={'center'}>
@@ -87,27 +90,7 @@ export const PersonalInfoScreen = () => {
                 </YStack>
               )}
             >
-              {(fields) => (
-                <>
-                  {/* <Fieldset>
-                      <Label size="$3" htmlFor="current-phone">
-                        Current Phone
-                      </Label>
-                      <Input
-                        // disabled
-                        opacity={0.8}
-                        cursor="not-allowed"
-                        id="current-phone"
-                        autoComplete="tel"
-                        value={user?.phone}
-                        keyboardType="phone-pad"
-                        autoCapitalize="none"
-                        backgroundColor={resolvedTheme?.startsWith('dark') ? 'black' : 'white'}
-                      />
-                    </Fieldset> */}
-                  {Object.values(fields)}
-                </>
-              )}
+              {(fields) => <>{Object.values(fields)}</>}
             </SchemaForm>
           )}
         </FormProvider>

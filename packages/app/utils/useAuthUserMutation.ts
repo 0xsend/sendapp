@@ -6,8 +6,8 @@ import { useToastController } from '@my/ui'
 
 export const AuthUserSchema = z.object({
   phone: formFields.text.describe('Phone'),
-  email: formFields.text.describe('Email'),
-  address: formFields.text.describe('Address'),
+  // email: formFields.text.describe('Email'),
+  // address: formFields.text.describe('Address'),
 })
 
 export const useAuthUserMutation = () => {
@@ -19,7 +19,7 @@ export const useAuthUserMutation = () => {
     async mutationFn(data: z.infer<typeof AuthUserSchema>) {
       const { error } = await supabase.auth.updateUser({
         phone: data.phone,
-        email: data.email,
+        // email: data.email,
         // @TODO: add address
       })
 
