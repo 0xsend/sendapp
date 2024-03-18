@@ -206,7 +206,8 @@ jobs:
           script: |
             const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
               ref: process.env.SUPABASE_PARENT_PROJECT_ID,
-            });
+
+            core.info('Enabling Twilio verify external phone auth provider');
 
             await supabaseManager.projectsConfig.updateV1AuthConfig({
               ref: process.env.SUPABASE_PROJECT_ID,
@@ -220,6 +221,9 @@ jobs:
                   parentAuthConfig.sms_twilio_verify_message_service_sid,
               },
             });
+
+            core.info('Done');
+
             return "success";
         env:
           SUPABASE_PROJECT_ID: ${{ steps.supabase-branch.outputs.project_ref }}

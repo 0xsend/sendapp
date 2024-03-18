@@ -2,7 +2,6 @@ import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
   daimoAccountAbi,
   daimoAccountFactoryAbi,
-  daimoAccountFactoryAddress as daimoAccountFactoryAddresses,
   daimoVerifierAbi,
   daimoVerifierProxyAddress,
   entryPointAddress,
@@ -46,12 +45,6 @@ export const testClient = createTestClient({
   transport: http(baseMainnetClient.transport.url),
   mode: 'anvil',
 }).extend(publicActions)
-
-export const daimoAccountFactory = getContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddresses[845337], // TODO: use chain id
-  client: baseMainnetClient,
-})
 
 export const entrypoint = getContract({
   abi: iEntryPointAbi,

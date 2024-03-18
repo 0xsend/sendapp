@@ -48,6 +48,14 @@ const deployedSendMerkleDrop = deployments.SendMerkleDrop
 
 if (!deployedSendMerkleDrop) throw new Error('No SendMerkleDrop found.')
 
+// @ts-expect-error it's parsed JSON
+const accountFactory = deployments.DaimoAccountFactory
+if (!accountFactory) throw new Error('No DaimoAccountFactory found.')
+if (accountFactory[base.id])
+  throw new Error(
+    'DaimoAccountFactory already deployed on base mainnet. Failing to avoid duplicate.'
+  )
+
 export default defineConfig({
   out: 'src/generated.ts',
   contracts: [
@@ -133,6 +141,10 @@ export default defineConfig({
           [baseSepolia.id]: '0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE', // base sepolia
           [baseLocal.id]: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6', // base localnet
           ...deployedSendMerkleDrop,
+        },
+        DaimoAccountFactory: {
+          ...accountFactory,
+          [base.id]: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745', // not deployed yet
         },
       },
       include: [

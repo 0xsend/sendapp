@@ -1,6 +1,11 @@
 import { expect, test } from '@jest/globals'
 
-import { baseMainnetBundlerClient as bundlerClient, baseMainnetClient } from '@my/wagmi'
+import {
+  baseMainnetBundlerClient as bundlerClient,
+  baseMainnetClient,
+  daimoAccountFactoryAbi,
+  daimoAccountFactoryAddress,
+} from '@my/wagmi'
 import debug from 'debug'
 
 const log = debug('app:features:onboarding:screen')
@@ -13,6 +18,7 @@ import {
   encodeFunctionData,
   formatEther,
   getAbiItem,
+  getContract,
   hexToBytes,
   parseEther,
 } from 'viem'
@@ -24,7 +30,6 @@ import {
   USEROP_SALT,
   USEROP_VALID_UNTIL,
   USEROP_VERSION,
-  daimoAccountFactory,
   encodeCreateAccountData,
   entrypoint,
   generateChallenge,
@@ -35,6 +40,11 @@ import {
 import { numberToBytes } from 'viem'
 import { getSenderAddress, getUserOperationHash, UserOperation } from 'permissionless'
 import nock from 'nock'
+const daimoAccountFactory = getContract({
+  abi: daimoAccountFactoryAbi,
+  address: daimoAccountFactoryAddress[845337], // TODO: use chain id
+  client: baseMainnetClient,
+})
 
 jest.mock('@daimo/expo-passkeys', () => ({
   createPasskey: jest.fn(),
