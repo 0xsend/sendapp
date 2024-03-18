@@ -1,5 +1,5 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import { SettingsLayout } from 'app/features/account/layout.web'
+import { SettingsLayout } from 'app/features/account/settings/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../../_app'

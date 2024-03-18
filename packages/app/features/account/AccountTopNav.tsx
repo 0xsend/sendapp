@@ -1,19 +1,19 @@
-import { H2, Header, Paragraph, XStack, Stack, useMedia, Button } from '@my/ui'
+import { H2, Header, XStack, Stack, useMedia, Button } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 import { SettingsBottomSheet } from './settings/SettingsBottomSheet'
+import { assert } from 'app/utils/assert'
 
 // there's not much difference between this and HomeTopNav, but it's too much to refactor in one go
-export function AccountTopNav({
-  header,
-  subheader,
-}: { header: string; subheader?: string; submenuHeader?: string }) {
+// @dev handleBack pops to the base of the path instead of the previous path
+export function AccountTopNav({ header, subheader }: { header: string; subheader?: string }) {
   const [nav, setNavParam] = useNav()
   const path = usePathname()
   const { push } = useRouter()
+  const media = useMedia()
 
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
@@ -24,15 +24,14 @@ export function AccountTopNav({
   }
 
   const handleBack = () => {
-    const newPath = path.split('/').slice(0, -1).join('/')
+    // URLs should be like /account/settings/edit-profile, so we need to pop to /account
+    const newPath = path.split('/').slice(0, 2).join('/')
+    assert(!!newPath, 'newPath should not be empty')
     push(newPath)
   }
 
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
-
-  const media = useMedia()
-
   const isSubRoute = path.split('/').length - 1 > 1
 
   return (
@@ -64,13 +63,13 @@ export function AccountTopNav({
             />
           )}
         </Stack>
-        {header === 'Home' && media.md ? (
+        {header === '' ? (
           <XStack>
             <IconSendLogo size={'$2.5'} color={'$color12'} />
           </XStack>
         ) : (
           <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
-            {header}
+            {media.lg ? subheader : header}
           </H2>
         )}
         <Button
@@ -80,22 +79,6 @@ export function AccountTopNav({
           onPress={handleSettingsBottomSheet}
         />
       </XStack>
-      {subheader && (
-        <Paragraph
-          fontWeight={'400'}
-          fontSize={'$5'}
-          fontFamily={'$mono'}
-          lineHeight={24}
-          px="$6"
-          py="$3"
-          $gtSm={{ py: '$6' }}
-          $gtLg={{ ml: '$7', pb: '$4', pt: '$0' }}
-          $theme-light={{ col: '$gray10Light' }}
-          $theme-dark={{ col: '$gray10Dark' }}
-        >
-          {subheader}
-        </Paragraph>
-      )}
       <SettingsBottomSheet />
     </Header>
   )

@@ -1,6 +1,6 @@
 import { Container, Separator, XStack, YStack, useMedia } from '@my/ui'
-import { settingsLinks } from 'app/components/settings/SettingsBottomSheet'
-import { SettingsNavLink } from 'app/components/settings/SettingsNavLink'
+import { settingsLinks } from './SettingsBottomSheet'
+import { SettingsNavLink } from './SettingsNavLink'
 
 export type SettingsLayoutProps = {
   /**
@@ -14,10 +14,6 @@ export type SettingsLayoutProps = {
 }
 
 export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
-  // const { isLoading, user } = useUser()
-  // if (isLoading || !user) {
-  //   return <FullscreenSpinner />
-  // }
   const media = useMedia()
 
   return (

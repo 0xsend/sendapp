@@ -5,10 +5,7 @@ import { IconArrowLeft, IconHamburger, IconQr, IconSendLogo } from 'app/componen
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
-export function HomeTopNav({
-  header,
-  subheader,
-}: { header: string; subheader?: string; submenuHeader?: string }) {
+export function HomeTopNav({ header, subheader }: { header: string; subheader?: string }) {
   const [nav, setNavParam] = useNav()
   const path = usePathname()
   const { push } = useRouter()
