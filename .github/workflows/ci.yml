@@ -206,23 +206,8 @@ jobs:
           script: |
             const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
               ref: process.env.SUPABASE_PARENT_PROJECT_ID,
-            });
 
-            core.info('Disabling external phone');
-
-            // workaround for supabase branching bug, disable and re-enable external phone
-            await supabaseManager.projectsConfig.updateV1AuthConfig({
-              ref: process.env.SUPABASE_PROJECT_ID,
-              requestBody: {
-                external_email_enabled: false, // also disable email
-                external_phone_enabled: false,
-              },
-            });
-
-            // sleep for 5 seconds
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            core.info('Re-enabling external phone');
+            core.info('Enabling Twilio verify external phone auth provider');
 
             await supabaseManager.projectsConfig.updateV1AuthConfig({
               ref: process.env.SUPABASE_PROJECT_ID,
