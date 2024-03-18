@@ -51,11 +51,11 @@ const links = [
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props}>
-      <Link href={'/'} display="flex" jc="center" ai="center">
-        <IconSendLogo size={'$2.5'} color={'$color12'} />
-      </Link>
-      <Nav display="flex" flex={1} pt={'$10'}>
-        <YStack gap={'$4'} alignItems="stretch" w={'100%'} f={1}>
+      <Nav display="flex" flex={1}>
+        <Link href={'/'} display="flex" pl={'$4.5'}>
+          <IconSendLogo size={'$2.5'} color={'$color12'} />
+        </Link>
+        <YStack gap={'$4'} pt={'$10'} alignItems="stretch" w={'100%'} f={1}>
           {links.map((link) => (
             <SideBarNavLink key={link.href} {...link} />
           ))}
@@ -103,7 +103,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
             minWidth={208}
             btlr={0}
             bblr={0}
-            pt="$10"
+            pt={80}
             jc="flex-start"
           />
         }
