@@ -52,7 +52,7 @@ export function HomeTopNav({
             fd="row"
           >
             {isSubRoute ? (
-              <Stack ai={'center'} onPress={handleBack}>
+              <Stack ai={'center'} cursor="pointer" $gtLg={{ mr: '$3.5' }} onPress={handleBack}>
                 <IconArrowLeft size={'$2.5'} color={iconColor} />
               </Stack>
             ) : (
