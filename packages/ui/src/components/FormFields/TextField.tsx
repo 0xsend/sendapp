@@ -36,6 +36,7 @@ export const TextField = (props: InputProps) => {
             disabled={disabled}
             maxLength={maxLength}
             borderWidth={0}
+            borderRadius={'$4'}
             backgroundColor={'$charcoal'}
             color={'$color12'}
             placeholderTextColor="$color10"
