@@ -82,6 +82,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
       .update({ avatar_url: publicUrlRes.data.publicUrl })
       .eq('id', user.id)
     if (update_error) {
+      setErrMsg(update_error.message)
       return
     }
     await updateProfile()
@@ -108,15 +109,14 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
           zIndex={100}
         >
           <YStack
-            backgroundColor="black"
-            opacity={0.34}
+            backgroundColor="$black"
+            opacity={0.66}
             borderRadius="$3"
             position="absolute"
             left={0}
             right={0}
             top={0}
             bottom={0}
-            $md={{ borderRadius: 12 }}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
             <IconRefresh color="primary" />

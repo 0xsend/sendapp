@@ -40,6 +40,7 @@ export const TextAreaField = (
           <TextArea
             disabled={disabled}
             borderWidth={0}
+            borderRadius={'$4'}
             backgroundColor={'$charcoal'}
             color={'$color12'}
             placeholderTextColor="$color05"

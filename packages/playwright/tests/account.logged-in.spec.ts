@@ -15,7 +15,7 @@ test('can update profile', async ({ page, supabase }) => {
   await page.waitForURL('/account/settings/edit-profile')
   await expect(page).toHaveTitle('Edit Profile')
 
-  await page.getByLabel('User Name').fill('LeO')
+  await page.getByLabel('Name').fill('LeO')
   await page.getByLabel('Bio').fill('Sender')
   await page.getByLabel('Is Public').setChecked(true)
 

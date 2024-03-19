@@ -22,7 +22,8 @@ export const TextField = (props: InputProps) => {
           <Label
             size={props.size || '$5'}
             // $mono font is broken in tests
-            fontFamily={process.env.NODE_ENV === 'test' ? undefined : '$mono'}
+            fontFamily={'$mono'}
+            lineHeight={'$11'}
             htmlFor={id}
             textTransform={'uppercase'}
           >
@@ -35,6 +36,7 @@ export const TextField = (props: InputProps) => {
             disabled={disabled}
             maxLength={maxLength}
             borderWidth={0}
+            borderRadius={'$4'}
             backgroundColor={'$charcoal'}
             color={'$color12'}
             placeholderTextColor="$color10"
