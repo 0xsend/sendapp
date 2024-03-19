@@ -1,7 +1,7 @@
-import { BottomSheet, Link, Nav, Paragraph, SheetProps, XStack, YStack } from '@my/ui'
+import { BottomSheet, Button, Nav, Paragraph, SheetProps, XStack, YStack } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { SettingsNavLink } from './SettingsNavLink'
-import { IconX } from '../icons'
+import { IconX } from 'app/components/icons'
 
 export const settingsLinks = [
   {
@@ -58,8 +58,9 @@ export const SettingsBottomSheet = ({ open }: SheetProps) => {
           ))}
         </YStack>
       </Nav>
-      <XStack pos={'absolute'} top={'$5'} right={'$6'} onPress={onOpenChange}>
-        <IconX color={'$color05'} />
+
+      <XStack pos={'absolute'} top={'$5'} right={'$6'}>
+        <Button size="$4" transparent circular icon={IconX} onPress={onOpenChange} />
       </XStack>
     </BottomSheet>
   )

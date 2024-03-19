@@ -1,6 +1,6 @@
 import { Container, Separator, XStack, YStack, useMedia } from '@my/ui'
-import { settingsLinks } from 'app/components/settings/SettingsBottomSheet'
-import { SettingsNavLink } from 'app/components/settings/SettingsNavLink'
+import { settingsLinks } from './SettingsBottomSheet'
+import { SettingsNavLink } from './SettingsNavLink'
 
 export type SettingsLayoutProps = {
   /**
@@ -14,16 +14,12 @@ export type SettingsLayoutProps = {
 }
 
 export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
-  // const { isLoading, user } = useUser()
-  // if (isLoading || !user) {
-  //   return <FullscreenSpinner />
-  // }
   const media = useMedia()
 
   return (
     <Container>
       {media.gtLg ? (
-        <XStack separator={<Separator vertical />} f={1} gap={'$size.8'}>
+        <XStack separator={<Separator vertical />} f={1} gap={'$size.8'} pt={'$4'}>
           <YStack
             backgroundColor="$color1"
             // this file is web-only so we can safely use CSS

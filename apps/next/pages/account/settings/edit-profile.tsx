@@ -1,9 +1,10 @@
 import { HomeLayout } from 'app/features/home/layout.web'
-import { SettingsLayout } from 'app/features/account/layout.web'
+import { SettingsLayout } from 'app/features/account/settings/layout.web'
 import { EditProfileScreen } from 'app/features/account/settings/edit-profile'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../../_app'
+import { AccountTopNav } from 'app/features/account/AccountTopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -19,7 +20,7 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout header={'Settings/Edit Profile'} backLink={'/account'}>
+  <HomeLayout header={'Settings'} subheader={'Edit Profile'} TopNav={AccountTopNav}>
     <SettingsLayout>{children}</SettingsLayout>
   </HomeLayout>
 )

@@ -13,7 +13,14 @@ export function AccountScreen() {
   return (
     <>
       <Container>
-        <YStack w={'100%'} ai={'center'} gap={'$7'}>
+        <YStack
+          w={'100%'}
+          ai={'center'}
+          gap={'$6'}
+          py="$6"
+          $gtMd={{ pt: '$10' }}
+          $gtLg={{ pt: '$0' }}
+        >
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
               {avatar_url ? (
@@ -28,9 +35,11 @@ export function AccountScreen() {
                 <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
                   {name ? name : 'No Name'}
                 </Paragraph>
-                <Paragraph fontSize={'$5'} fontWeight={'400'} opacity={0.6}>
-                  @{tags?.[0]?.name}
-                </Paragraph>
+                {tags?.[0] ? (
+                  <Paragraph fontFamily={'$mono'} opacity={0.6}>
+                    @{tags[0].name}
+                  </Paragraph>
+                ) : null}
               </YStack>
             </XStack>
             <XStack gap={'$5'} $md={{ display: 'none' }}>
@@ -131,8 +140,8 @@ export function AccountScreen() {
 
 const BorderedLink = ({ icon, children, ...props }: { icon?: JSX.Element } & LinkProps) => {
   return (
-    <Link borderWidth={1} borderColor={'$primary'} borderRadius={'$4'} p={'$3.5'} {...props}>
-      <XStack gap={'$3'} ai={'center'}>
+    <Link borderWidth={1} borderColor={'$primary'} borderRadius={'$4'} p={'$3'} px="$4" {...props}>
+      <XStack gap={'$1.5'} ai={'center'}>
         {icon}
         <Paragraph color={'$primary'} textTransform="uppercase">
           {children}

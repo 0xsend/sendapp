@@ -38,12 +38,11 @@ const links = [
     text: 'account',
     href: 'account',
   },
-  // @todo enable on testnet
   __DEV__ || baseMainnet.id === 84532
     ? {
         icon: <Paragraph px="$1">🔒</Paragraph>,
         text: 'secret shop',
-        href: '/secret-shop',
+        href: 'secret-shop',
       }
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
@@ -51,11 +50,11 @@ const links = [
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props}>
-      <Link href={'/'} display="flex" jc="center" ai="center">
-        <IconSendLogo size={'$2.5'} color={'$color12'} />
-      </Link>
-      <Nav display="flex" flex={1} pt={'$10'}>
-        <YStack gap={'$4'} alignItems="stretch" w={'100%'} f={1}>
+      <Nav display="flex" flex={1}>
+        <Link href={'/'} display="flex" pl={'$4.5'}>
+          <IconSendLogo size={'$2.5'} color={'$color12'} />
+        </Link>
+        <YStack gap={'$4'} pt={'$10'} alignItems="stretch" w={'100%'} f={1}>
           {links.map((link) => (
             <SideBarNavLink key={link.href} {...link} />
           ))}
@@ -103,7 +102,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
             minWidth={208}
             btlr={0}
             bblr={0}
-            pt="$10"
+            pt={80}
             jc="flex-start"
           />
         }

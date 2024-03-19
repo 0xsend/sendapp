@@ -20,7 +20,7 @@ export function SideBarNavLink({
   const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$color' : '$color12'
 
   return (
-    <Link {...props} href={props.disabled ? '' : `/${props.href}`}>
+    <Link {...props} href={props.disabled ? '' : props.href}>
       <Button
         width={'100%'}
         disabled={props.disabled}

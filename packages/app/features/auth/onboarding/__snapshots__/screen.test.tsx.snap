@@ -455,7 +455,7 @@ exports[`OnboardingScreen 1`] = `
                       "borderTopRightRadius": 0,
                       "borderTopWidth": 0,
                       "color": "hsla(112, 22%, 100%, 1)",
-                      "fontFamily": "$mono",
+                      "fontFamily": "System",
                       "fontSize": 20,
                       "fontWeight": "400",
                       "height": 44,

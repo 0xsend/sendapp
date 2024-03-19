@@ -22,7 +22,7 @@ const conf = {
   fonts: {
     heading: headingFont,
     body: bodyFont,
-    mono: monoFont,
+    mono: process.env.NODE_ENV === 'test' && monoFont === undefined ? bodyFont : monoFont, // monoFont doesn't work in jest tests for some reason
   },
   tokens: createTokens({
     color,
