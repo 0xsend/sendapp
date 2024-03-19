@@ -33,13 +33,17 @@ import formatAmount from 'app/utils/formatAmount'
 
 export function EarnTokensScreen() {
   const { data: distributions, isLoading } = useDistributions()
+
+  const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
+
   const [distributionNumberParam] = useDistributionNumber()
   const selectedDistributionIndex = distributionNumberParam
     ? distributionNumberParam - 1
-    : distributions
-      ? distributions.length - 1
+    : sortedDistributions
+      ? sortedDistributions.length - 1
       : 0
-  const selectedDistribution = distributions?.at(selectedDistributionIndex)
+
+  const selectedDistribution = sortedDistributions?.at(selectedDistributionIndex)
 
   if (isLoading)
     return (
@@ -60,7 +64,7 @@ export function EarnTokensScreen() {
         </Stack>
       )}
 
-      <DistributionRewardsList distributions={distributions} />
+      <DistributionRewardsList distributions={sortedDistributions} />
     </YStack>
   )
 }
@@ -375,7 +379,7 @@ const DistributionStatus = ({
   const isClaimActive = distribution.qualification_end < new Date()
   return (
     <H3 fontSize="$5" $gtMd={{ fontSize: '$7' }} fontWeight={'500'} col="$background">
-      {isClaimActive ? 'Open' : 'Closed'}
+      {isClaimActive ? 'OPEN' : 'CLOSED'}
     </H3>
   )
 }
@@ -383,12 +387,14 @@ const DistributionStatus = ({
 const numOfDistributions = 10
 const DistributionRewardsList = ({
   distributions,
-}: { distributions?: UseDistributionsResultData }) => {
+}: { distributions?: (UseDistributionsResultData[number] | undefined)[] }) => {
   const { isLoading, error } = useDistributions()
   const [distributionNumberParam, setDistributionNumberParam] = useDistributionNumber()
-  const allDistributions = distributions?.concat(
-    Array(numOfDistributions - distributions.length).fill(undefined)
-  )
+
+  const allDistributions: (UseDistributionsResultData[number] | undefined)[] =
+    distributions === undefined
+      ? new Array(numOfDistributions).fill(undefined)
+      : [...distributions, ...Array.from({ length: numOfDistributions - distributions.length })]
 
   if (error) throw error
 
@@ -413,20 +419,35 @@ const DistributionRewardsList = ({
           ) : distributionNumberParam === distribution?.number ||
             (distributionNumberParam === undefined &&
               distribution?.number === distributions?.length) ? (
-            <Button
-              key={distribution?.id}
-              f={1}
-              bc={'$accent12Dark'}
-              maw={84}
-              miw="$7"
-              h="$2"
-              br={6}
-              onPress={() => setDistributionNumberParam(distribution.number)}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$black">
-                {`# ${distribution?.number}  `}
-              </ButtonText>
-            </Button>
+            <Stack key={distribution?.id} f={1} maw={84} miw="$7" h="$2" jc="center">
+              <View
+                position="absolute"
+                top={-5}
+                left={0}
+                right={0}
+                mx="auto"
+                w={0}
+                h={0}
+                borderLeftColor={'transparent'}
+                borderRightColor={'transparent'}
+                borderBottomColor={'$accent12Dark'}
+                borderBottomWidth={8}
+                borderLeftWidth={8}
+                borderRightWidth={8}
+              />
+
+              <Button
+                onPress={() => setDistributionNumberParam(distribution.number)}
+                bc={'$accent12Dark'}
+                br={6}
+                h="$2"
+                disabled
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$black">
+                  {`# ${distribution?.number}  `}
+                </ButtonText>
+              </Button>
+            </Stack>
           ) : (
             <Button
               key={distribution?.id}
