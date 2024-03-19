@@ -7,5 +7,6 @@ out/
 /broadcast/**/dry-run/
 /broadcast/CreateSendDistributionTranche.s.sol/
 /broadcast/CreateSendSnapshot.s.sol/
+/broadcast/DeployTestnetSendToken.s.sol/
 /broadcast/**/run-*.json
 !/broadcast/**/run-latest.json

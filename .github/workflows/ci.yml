@@ -52,6 +52,7 @@ jobs:
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
+      FOUNDRY_BASE_SEPOLIA_RPC_URL: ${{ secrets.CI_FOUNDRY_BASE_SEPOLIA_RPC_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
 
     steps:
@@ -251,7 +252,7 @@ jobs:
             -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="${{steps.supabase-branch.outputs.graphql_url}}" 
             -e NEXT_PUBLIC_BASE_CHAIN_ID="84532" 
             -e NEXT_PUBLIC_MAINNET_CHAIN_ID="11155111" 
-            -e NEXT_PUBLIC_BASE_RPC_URL="https://sepolia.base.org" 
+            -e NEXT_PUBLIC_BASE_RPC_URL="${{ secrets.BASE_SEPOLIA_RPC_URL }}" 
             -e NEXT_PUBLIC_MAINNET_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com" 
             -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ steps.supabase-branch.outputs.anon_key }}"
             -e SECRET_SHOP_PRIVATE_KEY="${{ secrets.SECRET_SHOP_PRIVATE_KEY }}"
@@ -269,7 +270,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: ${{steps.supabase-branch.outputs.graphql_url}}
           NEXT_PUBLIC_BASE_CHAIN_ID: 84532
           NEXT_PUBLIC_MAINNET_CHAIN_ID: 11155111
-          NEXT_PUBLIC_BASE_RPC_URL: https://sepolia.base.org
+          NEXT_PUBLIC_BASE_RPC_URL: ${{ secrets.BASE_SEPOLIA_RPC_URL }}
           NEXT_PUBLIC_MAINNET_RPC_URL: https://ethereum-sepolia-rpc.publicnode.com
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase-branch.outputs.anon_key }}
           SECRET_SHOP_PRIVATE_KEY: ${{ secrets.SECRET_SHOP_PRIVATE_KEY }}
