@@ -72,7 +72,7 @@ export function HomeScreen() {
                           ) : (
                             <Paragraph
                               color={'$color12'}
-                              // fontFamily={'$mono'}
+                              fontFamily={'$mono'}
                               fontSize={'$15'}
                               lineHeight={'$14'}
                               fontWeight={'500'}
