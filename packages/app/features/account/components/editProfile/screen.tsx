@@ -1,13 +1,4 @@
-import {
-  ProfileAvatar,
-  Paragraph,
-  XStack,
-  YStack,
-  Label,
-  SubmitButton,
-  Separator,
-  Spinner,
-} from '@my/ui'
+import { ProfileAvatar, Paragraph, XStack, YStack, SubmitButton, Separator, Spinner } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useProfileMutation, ProfileSchema } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
@@ -79,28 +70,6 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
             <UploadAvatar ref={avatarRef}>
               <ProfileAvatar avatarUrl={avatar_url ? avatar_url : undefined} />
             </UploadAvatar>
-            <YStack gap={'$2'} f={1}>
-              <Label
-                size="$5"
-                htmlFor="current-Image"
-                fontFamily={'$mono'}
-                textTransform="uppercase"
-              >
-                Profile Picture
-              </Label>
-              <Paragraph color={'$color075'} fontSize={'$5'} fontStyle={'italic'} width={'100%'}>
-                (Upload an image of your choice)
-              </Paragraph>
-              <Paragraph
-                color={'$primary'}
-                fontSize={'$5'}
-                fontWeight={'700'}
-                cursor={'pointer'}
-                onPress={() => avatarRef.current?.pickImage()}
-              >
-                change
-              </Paragraph>
-            </YStack>
           </XStack>
           <Separator my={'$7'} $gtLg={{ display: 'none' }} />
           {Object.values(fields)}
