@@ -7,7 +7,7 @@ import { useToastController } from '@my/ui'
 export const ProfileSchema = z.object({
   name: formFields.text.describe('Name'),
   about: formFields.textarea.describe('Bio'),
-  isPublic: formFields.boolean_checkbox.describe('Is Public'),
+  isPublic: formFields.boolean_checkbox.describe('Public?'),
 })
 
 export const useProfileMutation = (userID: string | undefined) => {
