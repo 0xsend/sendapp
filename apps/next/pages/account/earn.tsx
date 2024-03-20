@@ -18,12 +18,11 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
+const subheader =
+  'Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. '
+
 Page.getLayout = (children) => (
-  <HomeLayout
-    header="Hold & Earn"
-    subheader="Maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. "
-    TopNav={AccountTopNav}
-  >
+  <HomeLayout header="Hold & Earn" subheader={subheader} TopNav={AccountTopNav}>
     {children}
   </HomeLayout>
 )
