@@ -26,6 +26,7 @@ export const TextField = (props: InputProps) => {
             lineHeight={'$11'}
             htmlFor={id}
             textTransform={'uppercase'}
+            color="$olive"
           >
             {label} {isOptional && '(Optional)'}
           </Label>
@@ -37,9 +38,22 @@ export const TextField = (props: InputProps) => {
             maxLength={maxLength}
             borderWidth={0}
             borderRadius={'$4'}
-            backgroundColor={'$charcoal'}
-            color={'$color12'}
-            placeholderTextColor="$color10"
+            $theme-dark={{
+              bc: '$charcoal',
+              color: '$gray12Dark',
+              // placeholderTextColor fails in test env for some reason
+              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Dark' } : {}),
+            }}
+            $theme-light={{
+              bc: '$gray3Light',
+              color: '$gray12Light',
+              // placeholderTextColor fails in test env for some reason
+              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Light' } : {}),
+            }}
+            // @todo use the theme colors if we ever have the palette scales
+            // bc={'$color2'}
+            // color={'$color12'}
+            // placeholderTextColor={'$color10'}
             spellCheck={isEmail ? false : undefined}
             autoCapitalize={isEmail ? 'none' : undefined}
             keyboardType={isEmail ? 'email-address' : undefined}
@@ -49,6 +63,10 @@ export const TextField = (props: InputProps) => {
             ref={field.ref}
             placeholder={placeholder}
             id={id}
+            focusStyle={{
+              fontStyle: 'italic',
+              borderColor: '$color12',
+            }}
             {...props}
           />
         </Shake>

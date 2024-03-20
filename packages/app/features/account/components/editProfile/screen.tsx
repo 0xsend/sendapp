@@ -37,7 +37,6 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
         about: {
           accessibilityLabel: 'Bio',
           placeholder: 'Tell us about yourself',
-          fontStyle: 'italic',
         },
         isPublic: {
           defaultChecked: is_public !== null ? is_public : true,
@@ -58,6 +57,7 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
             py={'$5'}
             fontWeight={'500'}
             onPress={() => submit()}
+            theme="accent"
           >
             SAVE
           </SubmitButton>
