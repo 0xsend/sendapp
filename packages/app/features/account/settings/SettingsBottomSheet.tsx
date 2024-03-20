@@ -1,42 +1,7 @@
 import { BottomSheet, Button, Nav, Paragraph, SheetProps, XStack, YStack } from '@my/ui'
 import { useNav } from 'app/routers/params'
-import { SettingsNavLink } from './SettingsNavLink'
 import { IconX } from 'app/components/icons'
-
-export const settingsLinks = [
-  {
-    text: 'Edit Profile',
-    href: '/account/settings/edit-profile',
-  },
-  {
-    text: 'Personal Information',
-    href: '/account/settings/personal-info',
-  },
-  {
-    text: 'Notification',
-    href: '/account/settings/notification',
-    disabled: true,
-  },
-  {
-    text: 'Security',
-    href: '/account/settings/security',
-    disabled: true,
-  },
-  {
-    text: 'Privacy',
-    href: '/account/settings/privacy',
-    disabled: true,
-  },
-  {
-    text: 'Support',
-    href: '/account/settings/support',
-  },
-  {
-    text: 'Backup',
-    href: '/account/settings/backup',
-    disabled: true,
-  },
-]
+import { SettingsLinks } from './SettingsLinks'
 
 export const SettingsBottomSheet = ({ open }: SheetProps) => {
   const [nav, setNavParam] = useNav()
@@ -53,9 +18,7 @@ export const SettingsBottomSheet = ({ open }: SheetProps) => {
       </Paragraph>
       <Nav display="flex" flex={2} justifyContent={'center'} pb={'$5'}>
         <YStack gap={'$6'} alignItems="stretch" justifyContent="center">
-          {settingsLinks.map((link) => (
-            <SettingsNavLink key={link.href} {...link} />
-          ))}
+          <SettingsLinks />
         </YStack>
       </Nav>
 

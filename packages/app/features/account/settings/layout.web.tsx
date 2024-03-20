@@ -1,6 +1,5 @@
 import { Container, Separator, XStack, YStack, useMedia } from '@my/ui'
-import { settingsLinks } from './SettingsBottomSheet'
-import { SettingsNavLink } from './SettingsNavLink'
+import { SettingsLinks } from './SettingsLinks'
 
 export type SettingsLayoutProps = {
   /**
@@ -31,9 +30,7 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
             <YStack width={'100%'} gap={'$4'}>
               <YStack jc={'space-between'} zIndex={4} flex={1} width={'100%'}>
                 <YStack h={'inherit'} gap={'$6'} width={'100%'}>
-                  {settingsLinks.map((link) => (
-                    <SettingsNavLink key={link.href} {...link} />
-                  ))}
+                  <SettingsLinks />
                 </YStack>
               </YStack>
             </YStack>

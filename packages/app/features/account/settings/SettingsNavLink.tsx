@@ -10,7 +10,11 @@ export function SettingsNavLink({
   const location = usePathname()
   const sheet = useSheet()
   const href = props.href.toString().split('?')[0]
-  const isActiveRoute = href === '/account' ? location === href : location.includes(href as string)
+  const isActiveRoute = href
+    ? href === '/account'
+      ? location === href
+      : location.includes(href as string)
+    : false // no href is never active
 
   const { resolvedTheme } = useThemeSetting()
   const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
@@ -18,14 +22,14 @@ export function SettingsNavLink({
 
   return (
     <Link
-      {...props}
-      href={props.disabled ? '' : props.href}
       hoverStyle={
         props.disabled ? {} : { opacity: 1, backgroundColor: 'transparent', borderWidth: 0 }
       }
       cursor={props.disabled ? 'not-allowed' : 'pointer'}
       opacity={isActiveRoute ? 1 : 0.63}
       disabled={props.disabled}
+      {...props}
+      href={props.disabled ? '' : props.href}
     >
       <Paragraph
         f={1}
