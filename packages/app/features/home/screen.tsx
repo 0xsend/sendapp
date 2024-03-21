@@ -53,7 +53,7 @@ export function HomeScreen() {
             $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
           >
             <XStack w={'100%'} zIndex={4}>
-              <YStack py={'$7'} $md={{ py: '$13' }}>
+              <YStack>
                 <YStack jc={'center'} gap={'$6'}>
                   <TooltipGroup delay={{ open: 0, close: 1500 }}>
                     <Tooltip placement="bottom">

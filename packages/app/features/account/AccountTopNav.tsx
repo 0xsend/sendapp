@@ -1,4 +1,4 @@
-import { H2, Header, XStack, Stack, useMedia, Button } from '@my/ui'
+import { H2, Header, XStack, Stack, useMedia, Button, Container } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconSendLogo } from 'app/components/icons'
@@ -35,14 +35,14 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
   const isSubRoute = path.split('/').length - 1 > 1
 
   return (
-    <Header w="100%">
-      <XStack
+    <Header w="100%" pb={'$10'} $md={{ pb: '$12' }}>
+      <Container
         $gtLg={{ jc: 'flex-start', pb: '$2' }}
         jc="space-between"
         fd="row"
         $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', py: '$4' }}
       >
-        <Stack>
+        <Stack $gtLg={{ display: 'none' }}>
           {isSubRoute ? (
             <Button
               outlineColor={'transparent'}
@@ -78,7 +78,7 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
           icon={<IconGear size={'$2.5'} color={iconColor} />}
           onPress={handleSettingsBottomSheet}
         />
-      </XStack>
+      </Container>
       <SettingsBottomSheet />
     </Header>
   )
