@@ -41,10 +41,6 @@ jest.mock('wagmi', () => ({
   }),
 }))
 
-jest.mock('app/utils/getReferralLink', () => ({
-  getReferralHref: jest.fn().mockReturnValue('https://send.it/123'),
-}))
-
 jest.mock('solito/link', () => ({
   Link: jest.fn(),
 }))

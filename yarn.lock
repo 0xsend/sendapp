@@ -11826,6 +11826,7 @@ __metadata:
     dnum: "npm:^2.9.0"
     eslint: "npm:^8.46.0"
     eslint-config-custom: "workspace:*"
+    expo-clipboard: "npm:^5.0.1"
     expo-constants: "npm:~14.4.2"
     expo-device: "npm:5.6.0"
     expo-image-picker: "npm:~14.3.1"
@@ -17056,6 +17057,7 @@ __metadata:
     babel-plugin-transform-inline-environment-variables: "npm:^0.4.4"
     burnt: "npm:^0.11.7"
     expo: "npm:^49.0.0"
+    expo-clipboard: "npm:^5.0.1"
     expo-constants: "npm:~14.4.2"
     expo-dev-client: "npm:~2.4.11"
     expo-font: "npm:~11.4.0"
@@ -17101,6 +17103,15 @@ __metadata:
     path-browserify: "npm:^1.0.0"
     url-parse: "npm:^1.5.9"
   checksum: 2b6ac86e16b3a05c9afb3435e86cc27edb4ede81b1eb1e9e09b2575c90c2def87184617ef410f1cf5602d08dd1fa5ccc39bff837f8fe2278a004cdaa44575850
+  languageName: node
+  linkType: hard
+
+"expo-clipboard@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "expo-clipboard@npm:5.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: d3ac75dddcc4c453ae6268ccc63814b333fb81ea4b565c0a02baae1b422dc9c1da581412aa166cf6e1fe82e1660cd0d698f7a11209b5daf013df61a4d60652cc
   languageName: node
   linkType: hard
 
