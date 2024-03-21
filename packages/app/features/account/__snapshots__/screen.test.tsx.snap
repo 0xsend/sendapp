@@ -253,7 +253,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Phone
+          Referral Code
         </Text>
       </View>
       <View
@@ -306,7 +306,118 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             }
           }
           suppressHighlighting={true}
-        />
+        >
+          <View
+            accessibilityRole="button"
+            cancelable={true}
+            focusable={[Function]}
+            minPressDuration={0}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPress={[Function]}
+            onPressIn={[Function]}
+            onPressOut={[Function]}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "flex": 1,
+                "flexDirection": "row",
+              }
+            }
+          >
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            />
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "height": 0,
+                  "minHeight": 0,
+                  "minWidth": 11.088000000000001,
+                  "width": 11.088000000000001,
+                }
+              }
+            />
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight="20"
+              bbWidth="20"
+              color="hsla(112, 22%, 100%, 1)"
+              fill="none"
+              focusable={false}
+              height={20}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              strokeWidth="2"
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                  },
+                  {
+                    "flex": 0,
+                    "height": 20,
+                    "width": 20,
+                  },
+                ]
+              }
+              tintColor="hsla(112, 22%, 100%, 1)"
+              vbHeight={16}
+              vbWidth={16}
+              width={20}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "strokeWidth",
+                  ]
+                }
+                strokeWidth="2"
+              >
+                <RNSVGPath
+                  d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
+                  fill={
+                    {
+                      "type": 2,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                      "strokeLinecap",
+                    ]
+                  }
+                  strokeLinecap={1}
+                  strokeWidth="2"
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
+          </View>
+        </Text>
       </View>
     </View>
     <View
@@ -417,81 +528,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Send ID
-        </Text>
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "hsla(112, 22%, 100%, 1)",
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "500",
-              "lineHeight": 19,
-            }
-          }
-          suppressHighlighting={true}
-        />
-      </View>
-      <View
-        style={
-          {
-            "flexDirection": "column",
-            "gap": 7,
-          }
-        }
-      >
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "hsla(112, 22%, 59%, 1)",
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "500",
-              "lineHeight": 19,
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Phone
-        </Text>
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "hsla(112, 22%, 100%, 1)",
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "500",
-              "lineHeight": 19,
-            }
-          }
-          suppressHighlighting={true}
-        />
-      </View>
-      <View
-        style={
-          {
-            "flexDirection": "column",
-            "gap": 7,
-          }
-        }
-      >
-        <Text
-          selectable={true}
-          style={
-            {
-              "color": "hsla(112, 22%, 59%, 1)",
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "500",
-              "lineHeight": 19,
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Address
+          Referral Code
         </Text>
         <Text
           selectable={true}
@@ -506,7 +543,116 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          12, Main street, CA, USA
+          <View
+            accessibilityRole="button"
+            cancelable={true}
+            focusable={[Function]}
+            minPressDuration={0}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPress={[Function]}
+            onPressIn={[Function]}
+            onPressOut={[Function]}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "flex": 1,
+                "flexDirection": "row",
+              }
+            }
+          >
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            />
+            <View
+              pointerEvents="none"
+              style={
+                {
+                  "height": 0,
+                  "minHeight": 0,
+                  "minWidth": 11.088000000000001,
+                  "width": 11.088000000000001,
+                }
+              }
+            />
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight="20"
+              bbWidth="20"
+              color="hsla(112, 22%, 100%, 1)"
+              fill="none"
+              focusable={false}
+              height={20}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              strokeWidth="2"
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                  },
+                  {
+                    "flex": 0,
+                    "height": 20,
+                    "width": 20,
+                  },
+                ]
+              }
+              tintColor="hsla(112, 22%, 100%, 1)"
+              vbHeight={16}
+              vbWidth={16}
+              width={20}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "strokeWidth",
+                  ]
+                }
+                strokeWidth="2"
+              >
+                <RNSVGPath
+                  d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
+                  fill={
+                    {
+                      "type": 2,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                      "strokeLinecap",
+                    ]
+                  }
+                  strokeLinecap={1}
+                  strokeWidth="2"
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
+          </View>
         </Text>
       </View>
     </View>

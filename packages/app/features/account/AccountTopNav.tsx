@@ -69,7 +69,7 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
           </XStack>
         ) : (
           <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
-            {media.lg ? subheader : header}
+            {media.lg && subheader ? subheader : header}
           </H2>
         )}
         <Button

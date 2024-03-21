@@ -1,14 +1,69 @@
-import { Avatar, Container, Link, LinkProps, Paragraph, Separator, XStack, YStack } from '@my/ui'
-import { IconDollar, IconGear, IconPlus } from 'app/components/icons'
-import { formatPhoneNumber } from 'app/utils/formatPhoneNumber'
+import {
+  Avatar,
+  Container,
+  Link,
+  LinkProps,
+  Paragraph,
+  Separator,
+  XStack,
+  YStack,
+  Button,
+  useToastController,
+  TooltipSimple,
+  useMedia,
+} from '@my/ui'
+import { IconCopy, IconDollar, IconGear, IconPlus } from 'app/components/icons'
+import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import { Square } from 'tamagui'
+import * as Clipboard from 'expo-clipboard'
+import { useNav } from 'app/routers/params'
 
 export function AccountScreen() {
-  const { profile, user, tags } = useUser()
+  const media = useMedia()
+  const toast = useToastController()
+  const { profile, tags } = useUser()
   const name = profile?.name
   const avatar_url = profile?.avatar_url
   const sendTags = tags?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
+  const refCode = profile?.referral_code ?? ''
+  const referralHref = getReferralHref(refCode)
+  const [, setNavParam] = useNav()
+
+  const clickToCopy = async () => {
+    await Clipboard.setStringAsync(referralHref)
+      .then(() => toast.show('Copied your referral link to the clipboard'))
+      .catch(() =>
+        toast.show('Something went wrong', {
+          message: 'We were unable to copy your referral link to the clipboard',
+          customData: {
+            theme: 'error',
+          },
+        })
+      )
+  }
+
+  const facts = [
+    { label: 'Name', value: name },
+    { label: 'Sendtags', value: sendTags },
+    {
+      label: 'Referral Code',
+      value: (
+        <TooltipSimple label="Copy to clipboard">
+          <Button
+            f={1}
+            fd="row"
+            unstyled
+            onPress={clickToCopy}
+            color="$color12"
+            iconAfter={<IconCopy size="$1" $platform-web={{ cursor: 'pointer' }} />}
+          >
+            <Button.Text>{refCode}</Button.Text>
+          </Button>
+        </TooltipSimple>
+      ),
+    },
+  ]
 
   return (
     <>
@@ -50,80 +105,26 @@ export function AccountScreen() {
                 Earn Tokens
               </BorderedLink>
               <BorderedLink
-                href={'/account/settings/edit-profile'}
+                href="/account/settings/edit-profile"
                 icon={<IconGear color={'$primary'} size={'$1'} />}
+                // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
+                {...(media.lg
+                  ? {
+                      onPress: (e) => {
+                        if (media.lg) {
+                          e.preventDefault()
+                          setNavParam('settings', { webBehavior: 'replace' })
+                        }
+                      },
+                    }
+                  : {})}
               >
                 Settings
               </BorderedLink>
             </XStack>
           </XStack>
           <Separator w={'100%'} />
-          <XStack w={'100%'} $md={{ jc: 'center' }} $sm={{ display: 'none' }}>
-            <YStack gap={'$5'} w={'$12'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Name
-              </Paragraph>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Sendtags
-              </Paragraph>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Phone
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$5'}>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {name ? name : 'No Name'}
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {sendTags !== '' ? sendTags : 'No tags'}
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {formatPhoneNumber(user?.phone) ?? ''}
-              </Paragraph>
-            </YStack>
-          </XStack>
-          <YStack w={'100%'} gap={'$6'} $gtSm={{ display: 'none' }}>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Name
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {name ? name : 'No Name'}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Sendtags
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {sendTags !== '' ? sendTags : 'No tags'}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Send ID
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {profile?.id ?? ''}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Phone
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {user?.phone ?? ''}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Address
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                12, Main street, CA, USA
-              </Paragraph>
-            </YStack>
-          </YStack>
+          <ProfileFacts facts={facts} />
           <XStack gap={'$5'} display={'none'} $md={{ display: 'flex' }}>
             <BorderedLink href={'/account/sendtag'} icon={<IconPlus color={'$primary'} />}>
               Send Tags
@@ -148,5 +149,40 @@ const BorderedLink = ({ icon, children, ...props }: { icon?: JSX.Element } & Lin
         </Paragraph>
       </XStack>
     </Link>
+  )
+}
+
+const ProfileFacts = ({ facts }: { facts: { label: string; value?: React.ReactNode }[] }) => {
+  return (
+    <>
+      <XStack w={'100%'} $md={{ jc: 'center' }} $sm={{ display: 'none' }}>
+        <YStack gap={'$5'} w={'$12'}>
+          {facts.map((fact) => (
+            <Paragraph key={fact.label} fontSize={'$5'} fontWeight={'500'}>
+              {fact.label}
+            </Paragraph>
+          ))}
+        </YStack>
+        <YStack gap={'$5'}>
+          {facts.map((fact) => (
+            <Paragraph key={fact.label} color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
+              {fact.value ? fact.value : `No ${fact.label.toLowerCase()}`}
+            </Paragraph>
+          ))}
+        </YStack>
+      </XStack>
+      <YStack w={'100%'} gap={'$6'} $gtSm={{ display: 'none' }}>
+        {facts.map((fact) => (
+          <YStack key={fact.label} gap={'$2'}>
+            <Paragraph fontSize={'$5'} fontWeight={'500'}>
+              {fact.label}
+            </Paragraph>
+            <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
+              {fact.value ? fact.value : `No ${fact.label.toLowerCase()}`}
+            </Paragraph>
+          </YStack>
+        ))}
+      </YStack>
+    </>
   )
 }
