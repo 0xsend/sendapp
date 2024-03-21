@@ -9,10 +9,11 @@
       "app/*": ["./packages/app/*"],
       "@my/ui/*": ["./packages/ui/src/*"],
       "@my/wagmi/*": ["./packages/wagmi/src/*"],
+      "@my/contracts/*": ["./packages/contracts/out/*", "./packages/contracts/broadcast/*"],
       "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"],
       "@0xsend/webauthn-authenticator/*": ["./packages/webauthn-authenticator/src/*"],
       "@my/playwright/*": ["./packages/playwright/tests/*"],
-      "@my/snaplet/*": ["./packages/snaplet/*"],
+      "@my/snaplet/*": ["./packages/snaplet/*"]
     },
     "plugins": [
       {

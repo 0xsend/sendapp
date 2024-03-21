@@ -29,7 +29,8 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
   return (
     <Header w="100%">
       <XStack
-        $gtLg={{ jc: 'flex-start', pb: '$2' }}
+        $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
+        ai="center"
         jc="space-between"
         fd="row"
         $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', py: '$4' }}
@@ -41,7 +42,7 @@ export function HomeTopNav({ header, subheader }: { header: string; subheader?: 
               focusStyle={{ outlineColor: 'transparent' }}
               onPress={handleBack}
               bg="transparent"
-              ai="flex-start"
+              $gtLg={{ ai: 'flex-start' }}
               hoverStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
               icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}

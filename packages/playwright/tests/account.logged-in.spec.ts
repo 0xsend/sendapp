@@ -17,7 +17,7 @@ test('can update profile', async ({ page, supabase }) => {
 
   await page.getByLabel('Name').fill('LeO')
   await page.getByLabel('Bio').fill('Sender')
-  await page.getByLabel('Is Public').setChecked(true)
+  await page.getByLabel('Public?').setChecked(true)
 
   await page.getByRole('button', { name: 'Save' }).click()
 

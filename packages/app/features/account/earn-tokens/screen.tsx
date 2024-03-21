@@ -33,13 +33,17 @@ import formatAmount from 'app/utils/formatAmount'
 
 export function EarnTokensScreen() {
   const { data: distributions, isLoading } = useDistributions()
+
+  const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
+
   const [distributionNumberParam] = useDistributionNumber()
   const selectedDistributionIndex = distributionNumberParam
     ? distributionNumberParam - 1
-    : distributions
-      ? distributions.length - 1
+    : sortedDistributions
+      ? sortedDistributions.length - 1
       : 0
-  const selectedDistribution = distributions?.at(selectedDistributionIndex)
+
+  const selectedDistribution = sortedDistributions?.at(selectedDistributionIndex)
 
   if (isLoading)
     return (
@@ -60,7 +64,7 @@ export function EarnTokensScreen() {
         </Stack>
       )}
 
-      <DistributionRewardsList distributions={distributions} />
+      <DistributionRewardsList distributions={sortedDistributions} />
     </YStack>
   )
 }
@@ -234,11 +238,10 @@ const SendBalanceCard = ({
 
   const body = () => {
     switch (true) {
-      case isLoadingSnapshotBalance || isLoadingChainAddresses:
-        return <Spinner color={'$color'} />
       case snapshotBalance === undefined:
         return 'Error fetching SEND balance'
       default:
+        // @ts-expect-error ts isn't smart enough to know that snapshotBalance is defined
         return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
     }
   }
@@ -258,9 +261,13 @@ const SendBalanceCard = ({
           Send Balance
         </Label>
         <Theme inverse>
-          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {body()}
-          </Paragraph>
+          {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
+            <Spinner color={'$color'} />
+          ) : (
+            <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
+              {body()}
+            </Paragraph>
+          )}
         </Theme>
       </YStack>
     </Card>
@@ -372,10 +379,10 @@ const SendRewardsCard = ({
 const DistributionStatus = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
-  const isClaimActive = distribution.qualification_end < new Date()
+  const isClaimActive = distribution.qualification_end > new Date()
   return (
     <H3 fontSize="$5" $gtMd={{ fontSize: '$7' }} fontWeight={'500'} col="$background">
-      {isClaimActive ? 'Open' : 'Closed'}
+      {isClaimActive ? 'OPEN' : 'CLOSED'}
     </H3>
   )
 }
@@ -383,12 +390,18 @@ const DistributionStatus = ({
 const numOfDistributions = 10
 const DistributionRewardsList = ({
   distributions,
-}: { distributions?: UseDistributionsResultData }) => {
+}: { distributions?: (UseDistributionsResultData[number] | undefined)[] }) => {
   const { isLoading, error } = useDistributions()
   const [distributionNumberParam, setDistributionNumberParam] = useDistributionNumber()
-  const allDistributions = distributions?.concat(
-    Array(numOfDistributions - distributions.length).fill(undefined)
-  )
+
+  const mock = (len: number, start = 0) =>
+    new Array(len).fill(undefined).map((_, i) => ({ number: start + i + 1 }))
+
+  // @ts-expect-error we're mocking the data here
+  const allDistributions: UseDistributionsResultData[number][] =
+    distributions === undefined
+      ? mock(numOfDistributions)
+      : [...distributions, ...mock(numOfDistributions - distributions.length, distributions.length)]
 
   if (error) throw error
 
@@ -404,8 +417,18 @@ const DistributionRewardsList = ({
     >
       <XStack w="100%" gap="$2" jc={'space-between'} py="$2" maw={1072} mx="auto">
         {allDistributions?.map((distribution, i) => {
-          return distribution === undefined ? (
-            <Button bc={'$darkest'} f={1} maw={84} miw="$7" h="$2" br={6} disabled opacity={0.4}>
+          return distribution?.id === undefined ? (
+            <Button
+              key={distribution.number}
+              bc={'$darkest'}
+              f={1}
+              maw={84}
+              miw="$7"
+              h="$2"
+              br={6}
+              disabled
+              opacity={0.4}
+            >
               <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
                 {`# ${i + 1}`}
               </ButtonText>
@@ -413,23 +436,38 @@ const DistributionRewardsList = ({
           ) : distributionNumberParam === distribution?.number ||
             (distributionNumberParam === undefined &&
               distribution?.number === distributions?.length) ? (
-            <Button
-              key={distribution?.id}
-              f={1}
-              bc={'$accent12Dark'}
-              maw={84}
-              miw="$7"
-              h="$2"
-              br={6}
-              onPress={() => setDistributionNumberParam(distribution.number)}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$black">
-                {`# ${distribution?.number}  `}
-              </ButtonText>
-            </Button>
+            <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
+              <View
+                position="absolute"
+                top={-5}
+                left={0}
+                right={0}
+                mx="auto"
+                w={0}
+                h={0}
+                borderLeftColor={'transparent'}
+                borderRightColor={'transparent'}
+                borderBottomColor={'$accent12Dark'}
+                borderBottomWidth={8}
+                borderLeftWidth={8}
+                borderRightWidth={8}
+              />
+
+              <Button
+                onPress={() => setDistributionNumberParam(distribution.number)}
+                bc={'$accent12Dark'}
+                br={6}
+                h="$2"
+                disabled
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$black">
+                  {`# ${distribution?.number}  `}
+                </ButtonText>
+              </Button>
+            </Stack>
           ) : (
             <Button
-              key={distribution?.id}
+              key={distribution.number}
               f={1}
               bc={'$decay'}
               maw={84}

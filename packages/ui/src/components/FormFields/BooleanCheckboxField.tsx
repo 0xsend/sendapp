@@ -8,10 +8,12 @@ import {
   Fieldset,
   Label,
   Theme,
+  ThemeName,
   XStack,
   useThemeName,
 } from 'tamagui'
 import { FieldError } from '../FieldError'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export const BooleanCheckboxField = (
   props: Pick<CheckboxProps, 'size' | 'native' | 'defaultChecked'>
@@ -23,8 +25,10 @@ export const BooleanCheckboxField = (
   } = useTsController<CheckedState>()
   const { label, isOptional } = useFieldInfo()
   const id = useId()
-  const themeName = useThemeName()
   const disabled = isSubmitting
+  const defaultTheme = useThemeName() as string
+  const { resolvedTheme } = useThemeSetting()
+  const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
 
   const [isChecked, setIsChecked] = useState(props.defaultChecked)
 
@@ -43,6 +47,7 @@ export const BooleanCheckboxField = (
               lineHeight={52}
               htmlFor={id}
               textTransform={'uppercase'}
+              color="$olive"
             >
               {label} {isOptional && '(Optional)'}
             </Label>
@@ -57,11 +62,25 @@ export const BooleanCheckboxField = (
             ref={field.ref}
             id={id}
             borderWidth={0}
-            backgroundColor={'$charcoal'}
+            $theme-dark={{
+              bc: '$accent1Dark',
+            }}
+            $theme-light={{
+              bc: '$accent1Light',
+            }}
             {...props}
           >
             <Checkbox.Indicator>
-              <Check color={'$color12'} />
+              <Check
+                $theme-dark={{
+                  bc: '$accent1Dark',
+                  color: '$accent12Dark',
+                }}
+                $theme-light={{
+                  bc: '$accent1Light',
+                  color: '$accent12Light',
+                }}
+              />
             </Checkbox.Indicator>
           </Checkbox>
         </XStack>

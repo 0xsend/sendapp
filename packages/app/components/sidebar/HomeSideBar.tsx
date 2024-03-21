@@ -26,23 +26,23 @@ const links = [
   {
     icon: <IconSLogo size={'$1'} />,
     text: 'send',
-    href: 'send',
+    href: '/send',
   },
   {
     icon: <IconActivity size={'$1'} />,
     text: 'activity',
-    href: 'activity',
+    href: '/activity',
   },
   {
     icon: <IconAccount size={'$1'} />,
     text: 'account',
-    href: 'account',
+    href: '/account',
   },
   __DEV__ || baseMainnet.id === 84532
     ? {
         icon: <Paragraph px="$1">🔒</Paragraph>,
         text: 'secret shop',
-        href: 'secret-shop',
+        href: '/secret-shop',
       }
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]

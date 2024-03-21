@@ -129,7 +129,9 @@ export default defineConfig({
           [sepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [base.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base mainnet
-          [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
+          [baseSepolia.id]: '0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680', // base sepolia
+          // maybe bring back once bridging is supported https://github.com/base-org/guides/issues/15
+          // [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
           845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base localnet
         },
         ...deployments,

@@ -63,14 +63,17 @@ export const secretShopRouter = createTRPCRouter({
         client: secretShopClient,
       })
 
-      const [ethBal, sendBal, usdcBal, ssEthBal] = await Promise.all([
+      const [ethBal, sendBal, usdcBal, ssEthBal, ssUsdcBal, ssSendBal] = await Promise.all([
         secretShopClient.getBalance({ address }),
         sendToken.read.balanceOf([address]),
         usdcToken.read.balanceOf([address]),
         secretShopClient.getBalance({ address: secretShopAccount.address }),
+        usdcToken.read.balanceOf([secretShopAccount.address]),
+        sendToken.read.balanceOf([secretShopAccount.address]),
       ] as const)
 
       // fund account where balances are low
+
       // eth
       let ethTxHash = null
       const eth = parseEther('0.1')
@@ -78,10 +81,10 @@ export const secretShopRouter = createTRPCRouter({
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Insufficient ETH in secret shop' })
       }
       if (ethBal < eth) {
-        const receipt = await secretShopClient
+        await secretShopClient
           .sendTransaction({
             to: address,
-            value: eth,
+            value: eth - ethBal, // only transfer the difference
             chain: baseMainnet,
           })
           .then((hash) => {
@@ -89,46 +92,64 @@ export const secretShopRouter = createTRPCRouter({
               hash,
             })
           })
-        ethTxHash = receipt.transactionHash
+          .then((receipt) => {
+            ethTxHash = receipt.transactionHash
+          })
+          .catch((e) => {
+            ethTxHash = e.message
+          })
       }
       // usdc
       let usdcTxHash = null
       const usdc = BigInt(5e6) // $5 worth of USDC
       if (usdcBal < usdc) {
-        if ((await usdcToken.read.balanceOf([secretShopAccount.address])) < usdc) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Insufficient USDC in secret shop' })
-        }
-        const receipt = await usdcToken.write
-          .transfer([address, usdc], {
-            chain: baseMainnet,
-          })
-          .then((hash) => {
-            return waitForTransactionReceipt(secretShopClient, {
-              hash,
+        if (ssUsdcBal < usdc) {
+          usdcTxHash = 'Error: Insufficient USDC in secret shop'
+        } else {
+          await usdcToken.write
+            // only transfer the difference
+            .transfer([address, usdc - usdcBal], {
+              chain: baseMainnet,
             })
-          })
-        usdcTxHash = receipt.transactionHash
+            .then((hash) => {
+              return waitForTransactionReceipt(secretShopClient, {
+                hash,
+              })
+            })
+            .then((receipt) => {
+              usdcTxHash = receipt.transactionHash
+            })
+            .catch((e) => {
+              usdcTxHash = e.message
+            })
+        }
       }
 
       // send
-      // @todo fund with send token
-      // biome-ignore lint/style/useConst: we need to reassign the variable eventually
       let sendTxHash = null
-      // if (sendBal < BigInt(1e6)) {
-      //   if ((await sendToken.read.balanceOf([secretShopAccount.address])) < BigInt(1e6)) {
-      //     throw new TRPCError({ code: 'BAD_REQUEST', message: 'Insufficient SEND in secret shop' })
-      //   }
-      //   const receipt = await sendToken.write
-      //     .transfer([address, BigInt(1e6)], {
-      //       chain: baseMainnet,
-      //     })
-      //     .then((hash) => {
-      //       return waitForTransactionReceipt(secretShopClient, {
-      //         hash,
-      //       })
-      //     })
-      //   sendTxHash = receipt.transactionHash
-      // }
+      const send = BigInt(1e5) // 100K SEND
+      if (sendBal < send) {
+        if (ssSendBal < send) {
+          sendTxHash = 'Error: Insufficient SEND in secret shop'
+        } else {
+          await sendToken.write
+            // only transfer the difference
+            .transfer([address, send - sendBal], {
+              chain: baseMainnet,
+            })
+            .then((hash) => {
+              return waitForTransactionReceipt(secretShopClient, {
+                hash,
+              })
+            })
+            .then((receipt) => {
+              sendTxHash = receipt.transactionHash
+            })
+            .catch((e) => {
+              sendTxHash = e.message
+            })
+        }
+      }
 
       return {
         ethTxHash,

@@ -1,7 +1,7 @@
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
-import { Fieldset, Label, TextArea, TextAreaProps, Theme, useThemeName } from 'tamagui'
+import { Fieldset, Label, TextArea, TextAreaProps, Theme, ThemeName, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
 
@@ -17,10 +17,11 @@ export const TextAreaField = (
     formState: { isSubmitting },
   } = useTsController<string>()
   const { label, isOptional, placeholder } = useStringFieldInfo()
-  const themeName = useThemeName()
   const id = useId()
   const disabled = isSubmitting
+  const defaultTheme = useThemeName() as string
   const { resolvedTheme } = useThemeSetting()
+  const themeName = (resolvedTheme ?? defaultTheme) as ThemeName
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -32,6 +33,7 @@ export const TextAreaField = (
             lineHeight={52}
             htmlFor={id}
             textTransform={'uppercase'}
+            color="$olive"
           >
             {label} {isOptional && '(Optional)'}
           </Label>
@@ -41,18 +43,32 @@ export const TextAreaField = (
             disabled={disabled}
             borderWidth={0}
             borderRadius={'$4'}
-            backgroundColor={'$charcoal'}
-            color={'$color12'}
-            placeholderTextColor="$color05"
+            $theme-dark={{
+              bc: '$charcoal',
+              color: '$gray12Dark',
+              // placeholderTextColor fails in test env for some reason
+              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Dark' } : {}),
+            }}
+            $theme-light={{
+              bc: '$gray3Light',
+              color: '$gray12Light',
+              // placeholderTextColor fails in test env for some reason
+              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Light' } : {}),
+            }}
+            // @todo use the theme colors if we ever have the palette scales
+            // bc={'$color2'}
+            // color={'$color12'}
+            // placeholderTextColor={'$color10'}
             value={field.value}
             onChangeText={(text) => field.onChange(text)}
             onBlur={field.onBlur}
             ref={field.ref}
             placeholder={placeholder}
             id={id}
-            rows={1}
-            // temp fix
-            // height={150}
+            focusStyle={{
+              fontStyle: 'italic',
+              borderColor: '$color12',
+            }}
             {...props}
           />
         </Shake>
