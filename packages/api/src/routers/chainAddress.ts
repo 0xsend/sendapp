@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { verifyAddressMsg } from 'app/features/account/sendtag/checkout/screen'
+import { verifyAddressMsg } from 'app/features/account/sendtag/checkout/checkout-utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { verifyMessage, isAddress, getAddress } from 'viem'
 import { z } from 'zod'
@@ -15,7 +15,10 @@ export const chainAddressRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx: { session }, input: { address: addressInput, signature } }) => {
       if (!isAddress(addressInput, { strict: false })) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid address.' })
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid address.',
+        })
       }
       const address = getAddress(addressInput)
       const verified = await verifyMessage({
@@ -27,7 +30,10 @@ export const chainAddressRouter = createTRPCRouter({
       })
 
       if (!verified) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Signature verification failed.' })
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Signature verification failed.',
+        })
       }
 
       const { data: results, error } = await supabaseAdmin.from('chain_addresses').insert({
@@ -37,8 +43,14 @@ export const chainAddressRouter = createTRPCRouter({
 
       if (error) {
         if (error.message.includes('duplicate key value violates unique constraint'))
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Address already exists.' })
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Address already exists.',
+          })
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
+        })
       }
 
       return results

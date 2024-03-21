@@ -1,9 +1,22 @@
 import { Tables } from '@my/supabase/database.types'
-import { Container, H3, Label, ListItem, Paragraph, Spinner, Stack, YStack, Link } from '@my/ui'
+import {
+  Container,
+  H3,
+  Label,
+  ListItem,
+  Paragraph,
+  Spinner,
+  Stack,
+  YStack,
+  Button,
+  ButtonText,
+} from '@my/ui'
 
 import { useUser } from 'app/utils/useUser'
+import { maxNumSendTags } from './checkout/checkout-utils'
 
-const maxNumSendTags = 5
+import { IconPlus } from 'app/components/icons'
+import { useRouter } from 'solito/router'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
@@ -13,7 +26,6 @@ export function SendTagScreen() {
     confirmedTags === undefined
       ? new Array(maxNumSendTags).fill(undefined)
       : [...confirmedTags, ...Array.from({ length: maxNumSendTags - confirmedTags.length })]
-  const nextTagIndex = allTags?.findIndex((tag) => tag === undefined)
 
   if (isLoading)
     return (
@@ -30,7 +42,7 @@ export function SendTagScreen() {
         $theme-dark={{ btc: '$gray7Dark' }}
         $theme-light={{ btc: '$gray4Light' }}
       >
-        <Stack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
+        <YStack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
           <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>
             REGISTERED SENDTAGS [
             <Paragraph fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$primary' }}>
@@ -38,37 +50,62 @@ export function SendTagScreen() {
             </Paragraph>
             ]
           </Label>
-        </Stack>
-        <YStack gap="$5">
-          {allTags.map((tag, i) => (
-            <TagItem key={tag?.name} tag={tag} isNextTag={i === nextTagIndex} />
-          ))}
         </YStack>
+        <SendtagList allTags={allTags} confirmedTags={confirmedTags} />
       </YStack>
     </Container>
   )
 }
 
-function TagItem({ tag, isNextTag }: { tag?: Tables<'tags'>; isNextTag: boolean }) {
-  if (isNextTag)
-    return (
-      <Link
-        href={'/account/sendtag/checkout'}
-        w={200}
-        h={54}
-        br={12}
-        bc={'$primary'}
-        p={0}
-        display="flex"
-        jc="center"
-        ai="center"
-      >
-        <Paragraph fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="accent">
-          + New Tag
-        </Paragraph>
-      </Link>
-    )
+function SendtagList({
+  allTags,
+}: {
+  allTags: (Tables<'tags'> | undefined)[]
 
+  confirmedTags?: Tables<'tags'>[]
+}) {
+  const nextTagIndex = allTags?.findIndex((tag) => tag === undefined)
+
+  return (
+    <YStack gap="$5">
+      {allTags.map((tag, i) =>
+        i === nextTagIndex ? (
+          <AddTagButton key="%add_tag_button" />
+        ) : (
+          <TagItem key={tag?.name} tag={tag} />
+        )
+      )}
+    </YStack>
+  )
+}
+
+function AddTagButton() {
+  const { push } = useRouter()
+  return (
+    <Button
+      onPress={() =>
+        push({
+          pathname: '/account/sendtag/checkout',
+        })
+      }
+      w={200}
+      h={54}
+      br={12}
+      bc={'$primary'}
+      p={0}
+      display="flex"
+      jc="center"
+      ai="center"
+      icon={<IconPlus color={'black'} />}
+    >
+      <ButtonText fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="accent">
+        New Tag
+      </ButtonText>
+    </Button>
+  )
+}
+
+function TagItem({ tag }: { tag?: Tables<'tags'> }) {
   if (tag === undefined)
     return (
       <ListItem

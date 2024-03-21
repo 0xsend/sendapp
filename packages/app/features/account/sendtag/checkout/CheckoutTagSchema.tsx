@@ -6,6 +6,5 @@ export const CheckoutTagSchema = z.object({
     .min(1)
     .max(20)
     // English alphabet, numbers, and underscore
-    .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore')
-    .describe('Name // Your Send Tag name'),
+    .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore'),
 })

@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>/send | Tag Checkout</title>
+        <title>/send | Sendtag Checkout</title>
         <meta
           name="description"
           content="Send Tags simplify transactions by replacing long wallet addresses with memorable identifiers."
@@ -23,8 +23,13 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
+const subheader =
+  'Sendtags are personalized names that serve as unique identifiers within the Send platform. You may register up to 5.'
+
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Sendtags" button={ButtonOption.SETTINGS} />}>
+  <HomeLayout
+    TopNav={<TopNav header="Sendtags" subheader={subheader} button={ButtonOption.SETTINGS} />}
+  >
     {children}
   </HomeLayout>
 )

@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server'
 import {
   getPriceInWei,
   getSenderSafeReceivedEvents,
-} from 'app/features/account/sendtag/checkout/screen'
+} from 'app/features/account/sendtag/checkout/checkout-utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
@@ -33,7 +33,10 @@ export const tagRouter = createTRPCRouter({
             message: 'No tags to confirm.',
           })
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: tagsError.message })
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: tagsError.message,
+        })
       }
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
@@ -84,7 +87,10 @@ export const tagRouter = createTRPCRouter({
           }),
         ]).catch((error) => {
           log('transaction error', error)
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          })
         })
 
         // check if transaction is confirmed by at least 2 blocks
@@ -111,7 +117,10 @@ export const tagRouter = createTRPCRouter({
           sender: receipt.from,
         }).catch((error) => {
           log('get events error', error)
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          })
         })
 
         const eventLog = eventLogs.find((e) => e.transactionHash === txHash)
@@ -196,7 +205,10 @@ export const tagRouter = createTRPCRouter({
 
       if (confirmTagsErr) {
         log('confirm tags error', confirmTagsErr)
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: confirmTagsErr.message })
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: confirmTagsErr.message,
+        })
       }
 
       log(
