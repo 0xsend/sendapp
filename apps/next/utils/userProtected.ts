@@ -43,8 +43,9 @@ export function userProtectedGetSSP<
       }
     }
 
-    const needsOnboarding = await userOnboarded(supabase, ctx)
-    if (needsOnboarding) return needsOnboarding
+    // @todo re-introduce once onboarding is ready
+    // const needsOnboarding = await userOnboarded(supabase, ctx)
+    // if (needsOnboarding) return needsOnboarding
 
     const getSSRResult = getServerSideProps ? await getServerSideProps(ctx) : { props: {} as Props }
     if ('props' in getSSRResult) {
