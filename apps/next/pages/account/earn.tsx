@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from 'next-app/pages/_app'
 import { HomeLayout } from 'app/features/home/layout.web'
+import { AccountTopNav } from 'app/features/account/AccountTopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -21,6 +22,7 @@ Page.getLayout = (children) => (
   <HomeLayout
     header="Hold & Earn"
     subheader="Maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. "
+    TopNav={AccountTopNav}
   >
     {children}
   </HomeLayout>

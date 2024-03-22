@@ -10,8 +10,8 @@ const Gear = (props: IconProps) => {
     <Svg
       fill="none"
       color={color as ColorTokens | undefined}
-      width={size}
-      height={size}
+      width={size ?? 20}
+      height={size ?? 20}
       viewBox="0 0 24 24"
       {...rest}
     >

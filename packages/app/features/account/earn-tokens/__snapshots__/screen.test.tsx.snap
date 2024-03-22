@@ -449,7 +449,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "hsla(191, 32%, 15%, 1)",
+                        "color": "hsla(112, 22%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                         "fontWeight": "500",
@@ -810,595 +810,609 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
       </View>
     </View>
   </View>
-  <RCTScrollView
-    scrollEnabled={true}
-    showsHorizontalScrollIndicator={false}
-    showsVerticalScrollIndicator={false}
+  <View
     style={
       {
-        "flex": 0,
-        "overflow": "scroll",
+        "alignSelf": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "paddingLeft": 32,
+        "paddingRight": 32,
+        "width": "100%",
       }
     }
   >
-    <View>
-      <View
-        style={
-          {
-            "flexDirection": "row",
-            "gap": 7,
-            "justifyContent": "space-between",
-            "marginLeft": "auto",
-            "marginRight": "auto",
-            "maxWidth": 1072,
-            "paddingBottom": 7,
-            "paddingTop": 7,
-            "width": "100%",
-          }
+    <RCTScrollView
+      scrollEnabled={true}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={
+        {
+          "flex": 0,
+          "overflow": "scroll",
+          "paddingBottom": 18,
         }
-      >
+      }
+    >
+      <View>
         <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
           style={
             {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
               "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
+              "gap": 7,
+              "justifyContent": "space-between",
+              "marginLeft": "auto",
+              "marginRight": "auto",
+              "maxWidth": 1072,
+              "paddingBottom": 7,
+              "paddingTop": 7,
+              "width": "100%",
             }
           }
         >
-          <Text
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 1
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 1
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 2
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 2
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 3
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 3
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 4
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 4
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 5
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 5
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 6
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 6
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 7
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 7
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 8
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 8
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 9
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          cursor="pointer"
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 9
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
             cursor="pointer"
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 10
-          </Text>
+            <Text
+              cursor="pointer"
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 10
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
-  </RCTScrollView>
+    </RCTScrollView>
+  </View>
 </View>
 `;
