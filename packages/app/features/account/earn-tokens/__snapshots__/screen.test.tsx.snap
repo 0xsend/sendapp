@@ -152,145 +152,25 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     "flex": 1,
                     "flexDirection": "column",
                     "gap": 7,
+                    "maxWidth": 312,
                   }
                 }
               >
                 <Text
-                  cancelable={true}
-                  cursor="default"
-                  focusable={true}
-                  id=":r1:"
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
+                  selectable={true}
                   style={
                     {
-                      "alignItems": "center",
-                      "backgroundColor": "transparent",
-                      "color": "hsla(112, 22%, 59%, 1)",
-                      "display": "flex",
+                      "color": "hsla(191, 32%, 99%, 1)",
                       "fontFamily": "System",
-                      "fontSize": 16.8,
+                      "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
                     }
                   }
                   suppressHighlighting={true}
-                  userSelect="none"
                 >
-                  Valid for
+                  Claims for Round 1 have closed
                 </Text>
-                <View
-                  style={
-                    {
-                      "alignItems": "flex-start",
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "maxWidth": 312,
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    00
-                    D
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    :
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    00
-                    Hr
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    :
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    00
-                    Min
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    :
-                  </Text>
-                  <Text
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 99%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "500",
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    00
-                    Sec
-                  </Text>
-                </View>
               </View>
               <View
                 style={
@@ -303,7 +183,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   cancelable={true}
                   cursor="default"
                   focusable={true}
-                  id=":r2:"
+                  id=":r1:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -419,7 +299,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     cancelable={true}
                     cursor="default"
                     focusable={true}
-                    id=":r3:"
+                    id=":r2:"
                     minPressDuration={0}
                     onBlur={[Function]}
                     onFocus={[Function]}
@@ -512,7 +392,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     cancelable={true}
                     cursor="default"
                     focusable={true}
-                    id=":r4:"
+                    id=":r3:"
                     minPressDuration={0}
                     onBlur={[Function]}
                     onFocus={[Function]}
@@ -595,7 +475,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     cancelable={true}
                     cursor="default"
                     focusable={true}
-                    id=":r5:"
+                    id=":r4:"
                     minPressDuration={0}
                     onBlur={[Function]}
                     onFocus={[Function]}
@@ -687,7 +567,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     cancelable={true}
                     cursor="default"
                     focusable={true}
-                    id=":r6:"
+                    id=":r5:"
                     minPressDuration={0}
                     onBlur={[Function]}
                     onFocus={[Function]}

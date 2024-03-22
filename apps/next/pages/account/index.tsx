@@ -3,7 +3,7 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../_app'
 import { AccountScreen } from 'app/features/account/screen'
-import { AccountTopNav } from 'app/features/account/AccountTopNav'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -23,7 +23,7 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout header="Account" TopNav={AccountTopNav}>
+  <HomeLayout TopNav={<TopNav header="Account" button={ButtonOption.SETTINGS} />}>
     {children}
   </HomeLayout>
 )

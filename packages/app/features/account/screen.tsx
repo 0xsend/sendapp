@@ -70,18 +70,11 @@ export function AccountScreen() {
   return (
     <>
       <Container>
-        <YStack
-          w={'100%'}
-          ai={'center'}
-          gap={'$6'}
-          py="$6"
-          $gtMd={{ pt: '$10' }}
-          $gtLg={{ pt: '$0' }}
-        >
+        <YStack w={'100%'} ai={'center'} gap={'$6'}>
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
               <Avatar size={'$8'} borderRadius={'$3'}>
-                <Avatar.Image accessibilityLabel="" src={avatar_url} />
+                <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
                 <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
                   <IconAccount size="$6" color="$olive" />
                 </Avatar.Fallback>

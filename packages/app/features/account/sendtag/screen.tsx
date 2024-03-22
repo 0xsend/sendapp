@@ -29,7 +29,6 @@ export function SendTagScreen() {
         $lg={{ gap: '$2', ai: 'center' }}
         $theme-dark={{ btc: '$gray7Dark' }}
         $theme-light={{ btc: '$gray4Light' }}
-        $gtSm={{ borderTopWidth: '$1' }}
       >
         <Stack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
           <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>

@@ -3,17 +3,14 @@ import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from '../../_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { SendTagScreen } from 'app/features/account/sendtag/screen'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
         <title>/send | Sendtag</title>
-        <meta
-          name="description"
-          content="Send Tags simplify transactions by replacing long wallet addresses with memorable identifiers."
-          key="desc"
-        />
+        <meta name="description" content={subheader} key="desc" />
       </Head>
       <SendTagScreen />
     </>
@@ -26,7 +23,9 @@ const subheader =
   'Sendtags are personalized names that serve as unique identifiers within the Send platform. You may register up to 5.'
 
 Page.getLayout = (children) => (
-  <HomeLayout header="Sendtag" subheader={subheader}>
+  <HomeLayout
+    TopNav={<TopNav header="Sendtag" subheader={subheader} button={ButtonOption.SETTINGS} />}
+  >
     {children}
   </HomeLayout>
 )
