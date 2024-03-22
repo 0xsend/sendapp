@@ -11,13 +11,15 @@ import {
   useToastController,
   TooltipSimple,
   useMedia,
+  useThemeName,
 } from '@my/ui'
-import { IconCopy, IconDollar, IconGear, IconPlus } from 'app/components/icons'
+import { IconAccount, IconCopy, IconDollar, IconGear, IconPlus } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
-import { Square } from 'tamagui'
 import * as Clipboard from 'expo-clipboard'
 import { useNav } from 'app/routers/params'
+import React, { ElementType } from 'react'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function AccountScreen() {
   const media = useMedia()
@@ -78,17 +80,15 @@ export function AccountScreen() {
         >
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
-              {avatar_url ? (
-                <Avatar size={'$8'} borderRadius={'$3'}>
-                  <Avatar.Image accessibilityLabel="" src={avatar_url} />
-                  <Avatar.Fallback backgroundColor="$blue10" />
-                </Avatar>
-              ) : (
-                <Square size={'$8'} borderRadius={'$3'} backgroundColor="$color" elevation="$4" />
-              )}
+              <Avatar size={'$8'} borderRadius={'$3'}>
+                <Avatar.Image accessibilityLabel="" src={avatar_url} />
+                <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
+                  <IconAccount size="$6" color="$olive" />
+                </Avatar.Fallback>
+              </Avatar>
               <YStack gap={'$2'} $md={{ ai: 'center' }}>
                 <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
-                  {name ? name : 'No Name'}
+                  {name ? name : '---'}
                 </Paragraph>
                 {tags?.[0] ? (
                   <Paragraph fontFamily={'$mono'} opacity={0.6}>
@@ -98,15 +98,15 @@ export function AccountScreen() {
               </YStack>
             </XStack>
             <XStack gap={'$5'} $md={{ display: 'none' }}>
-              <BorderedLink href={'/account/sendtag'} icon={<IconPlus color={'$primary'} />}>
+              <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
                 Send Tags
               </BorderedLink>
-              <BorderedLink href={'/account/earn'} icon={<IconDollar color={'$primary'} />}>
+              <BorderedLink href={'/account/earn'} Icon={IconDollar}>
                 Earn Tokens
               </BorderedLink>
               <BorderedLink
                 href="/account/settings/edit-profile"
-                icon={<IconGear color={'$primary'} size={'$1'} />}
+                Icon={IconGear}
                 // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
                 {...(media.lg
                   ? {
@@ -126,10 +126,10 @@ export function AccountScreen() {
           <Separator w={'100%'} />
           <ProfileFacts facts={facts} />
           <XStack gap={'$5'} display={'none'} $md={{ display: 'flex' }}>
-            <BorderedLink href={'/account/sendtag'} icon={<IconPlus color={'$primary'} />}>
+            <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
               Send Tags
             </BorderedLink>
-            <BorderedLink href={'/account/earn'} icon={<IconDollar color={'$primary'} />}>
+            <BorderedLink href={'/account/earn'} Icon={IconDollar}>
               Earn Tokens
             </BorderedLink>
           </XStack>
@@ -139,12 +139,27 @@ export function AccountScreen() {
   )
 }
 
-const BorderedLink = ({ icon, children, ...props }: { icon?: JSX.Element } & LinkProps) => {
+const BorderedLink = ({
+  Icon,
+  children,
+  ...props
+}: { Icon?: ElementType; children: React.ReactNode } & LinkProps) => {
+  const themeName = useThemeName()
+  const { resolvedTheme } = useThemeSetting()
+  const iconColor = (resolvedTheme ?? themeName)?.startsWith('dark') ? '$color10' : '$color1'
   return (
-    <Link borderWidth={1} borderColor={'$primary'} borderRadius={'$4'} p={'$3'} px="$4" {...props}>
+    <Link
+      borderWidth={1}
+      color={iconColor}
+      theme="accent"
+      borderRadius={'$4'}
+      p={'$3'}
+      px="$4"
+      {...props}
+    >
       <XStack gap={'$1.5'} ai={'center'}>
-        {icon}
-        <Paragraph color={'$primary'} textTransform="uppercase">
+        {Icon && <Icon color={iconColor} />}
+        <Paragraph color={iconColor} textTransform="uppercase">
           {children}
         </Paragraph>
       </XStack>

@@ -260,15 +260,13 @@ const SendBalanceCard = ({
         <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
           Send Balance
         </Label>
-        <Theme inverse>
-          {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
-            <Spinner color={'$color'} />
-          ) : (
-            <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-              {body()}
-            </Paragraph>
-          )}
-        </Theme>
+        {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
+          <Spinner color={'$color'} />
+        ) : (
+          <Paragraph fontFamily={'$mono'} col="$color12" fontSize={'$7'} fontWeight={'500'}>
+            {body()}
+          </Paragraph>
+        )}
       </YStack>
     </Card>
   )
@@ -408,82 +406,91 @@ const DistributionRewardsList = ({
   if (isLoading) return <DistributionRewardsSkeleton />
 
   return (
-    <ScrollView
-      $gtLg={{ f: 1 }}
-      flex={0}
-      overflow="scroll"
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-    >
-      <XStack w="100%" gap="$2" jc={'space-between'} py="$2" maw={1072} mx="auto">
-        {allDistributions?.map((distribution, i) => {
-          return distribution?.id === undefined ? (
-            <Button
-              key={distribution.number}
-              bc={'$darkest'}
-              f={1}
-              maw={84}
-              miw="$7"
-              h="$2"
-              br={6}
-              disabled
-              opacity={0.4}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
-                {`# ${i + 1}`}
-              </ButtonText>
-            </Button>
-          ) : distributionNumberParam === distribution?.number ||
-            (distributionNumberParam === undefined &&
-              distribution?.number === distributions?.length) ? (
-            <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
-              <View
-                position="absolute"
-                top={-5}
-                left={0}
-                right={0}
-                mx="auto"
-                w={0}
-                h={0}
-                borderLeftColor={'transparent'}
-                borderRightColor={'transparent'}
-                borderBottomColor={'$accent12Dark'}
-                borderBottomWidth={8}
-                borderLeftWidth={8}
-                borderRightWidth={8}
-              />
-
+    <Container>
+      <ScrollView
+        $gtLg={{ f: 1 }}
+        flex={0}
+        overflow="scroll"
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        pb="$4"
+      >
+        <XStack w="100%" gap="$2" jc={'space-between'} py="$2" maw={1072} mx="auto">
+          {allDistributions?.map((distribution, i) => {
+            return distribution?.id === undefined ? (
               <Button
-                onPress={() => setDistributionNumberParam(distribution.number)}
-                bc={'$accent12Dark'}
-                br={6}
+                key={distribution.number}
+                bc={'$darkest'}
+                f={1}
+                maw={84}
+                miw="$7"
                 h="$2"
+                br={6}
                 disabled
+                opacity={0.4}
               >
-                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$black">
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
+                  {`# ${i + 1}`}
+                </ButtonText>
+              </Button>
+            ) : distributionNumberParam === distribution?.number ||
+              (distributionNumberParam === undefined &&
+                distribution?.number === distributions?.length) ? (
+              <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
+                <View
+                  position="absolute"
+                  top={-5}
+                  left={0}
+                  right={0}
+                  mx="auto"
+                  w={0}
+                  h={0}
+                  borderLeftColor={'transparent'}
+                  borderRightColor={'transparent'}
+                  borderBottomColor={'$accent12Dark'}
+                  borderBottomWidth={8}
+                  borderLeftWidth={8}
+                  borderRightWidth={8}
+                />
+
+                <Button
+                  onPress={() => setDistributionNumberParam(distribution.number)}
+                  bc={'$accent12Dark'}
+                  br={6}
+                  h="$2"
+                  disabled
+                >
+                  <ButtonText
+                    size={'$1'}
+                    padding={'unset'}
+                    ta="center"
+                    margin={'unset'}
+                    col="$black"
+                  >
+                    {`# ${distribution?.number}  `}
+                  </ButtonText>
+                </Button>
+              </Stack>
+            ) : (
+              <Button
+                key={distribution.number}
+                f={1}
+                bc={'$decay'}
+                maw={84}
+                miw="$7"
+                h="$2"
+                br={6}
+                onPress={() => setDistributionNumberParam(distribution.number)}
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
                   {`# ${distribution?.number}  `}
                 </ButtonText>
               </Button>
-            </Stack>
-          ) : (
-            <Button
-              key={distribution.number}
-              f={1}
-              bc={'$decay'}
-              maw={84}
-              miw="$7"
-              h="$2"
-              br={6}
-              onPress={() => setDistributionNumberParam(distribution.number)}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
-                {`# ${distribution?.number}  `}
-              </ButtonText>
-            </Button>
-          )
-        })}
-      </XStack>
-    </ScrollView>
+            )
+          })}
+        </XStack>
+      </ScrollView>
+    </Container>
   )
 }
 

@@ -59,10 +59,10 @@ export const SignInForm = () => {
             phone: {
               'aria-label': 'Phone number',
               '$theme-dark': {
-                borderBottomColor: '$accent9Light',
+                borderBottomColor: '$accent10Dark',
               },
               '$theme-light': {
-                borderBottomColor: '$black',
+                borderBottomColor: '$accent9Light',
               },
               fontFamily: '$mono',
               fontVariant: ['tabular-nums'],
@@ -72,7 +72,12 @@ export const SignInForm = () => {
               borderRadius: '$0',
               width: '100%',
               backgroundColor: 'transparent',
+              color: '$color12',
               outlineColor: 'transparent',
+              theme: 'accent',
+              focusStyle: {
+                borderBottomColor: '$accent3Light',
+              },
             },
           }}
           renderAfter={({ submit }) => (
@@ -106,9 +111,7 @@ export const SignInForm = () => {
         >
           {(fields) => (
             <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
-              <Theme inverse={true}>
-                <BigHeading col="$background">WELCOME TO SEND</BigHeading>
-              </Theme>
+              <BigHeading color="$color12">WELCOME TO SEND</BigHeading>
               <H3
                 lineHeight={28}
                 $platform-web={{ fontFamily: '$mono' }}
@@ -121,11 +124,9 @@ export const SignInForm = () => {
               </H3>
 
               <YStack gap="$4">
-                <Theme inverse={true}>
-                  <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
-                    Your Phone
-                  </Paragraph>
-                </Theme>
+                <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
+                  Your Phone
+                </Paragraph>
                 <XStack gap="$5">{Object.values(fields)}</XStack>
               </YStack>
             </YStack>

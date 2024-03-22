@@ -69,7 +69,7 @@ export const CountryCodeField = ({
           <Select.Trigger
             f={1}
             $theme-light={{
-              bc: '$white',
+              bc: '$gray6Light',
               hoverStyle: { bc: '$gray8Light' },
             }}
             $theme-dark={{
