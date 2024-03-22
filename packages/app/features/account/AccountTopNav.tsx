@@ -1,4 +1,4 @@
-import { H2, Header, XStack, Stack, useMedia, Button, Container } from '@my/ui'
+import { H2, Header, XStack, Stack, useMedia, Button, Container, Separator } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconSendLogo } from 'app/components/icons'
@@ -36,49 +36,58 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
 
   return (
     <Header w="100%" pb={'$10'} $md={{ pb: '$12' }}>
-      <Container
-        $gtLg={{ jc: 'flex-start', pb: '$2' }}
-        jc="space-between"
-        fd="row"
-        $lg={{ borderBottomColor: '$gray11Light', borderBottomWidth: '$1', py: '$4' }}
-      >
-        <Stack $gtLg={{ display: 'none' }}>
-          {isSubRoute ? (
-            <Button
-              outlineColor={'transparent'}
-              focusStyle={{ outlineColor: 'transparent' }}
-              onPress={handleBack}
-              bg="transparent"
-              ai="flex-start"
-              hoverStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-              pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-              icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
-            />
+      <Stack>
+        <Container
+          $gtLg={{ jc: 'flex-start', pb: '$2' }}
+          jc="space-between"
+          fd="row"
+          $lg={{ py: '$4' }}
+        >
+          <Stack $gtLg={{ display: 'none' }}>
+            {isSubRoute ? (
+              <Button
+                outlineColor={'transparent'}
+                focusStyle={{ outlineColor: 'transparent' }}
+                onPress={handleBack}
+                bg="transparent"
+                ai="flex-start"
+                hoverStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+                pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+                icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
+              />
+            ) : (
+              <Button
+                $gtLg={{ disabled: true, opacity: 0 }} // We need the button to be there for layout purposes
+                onPress={handleHomeBottomSheet}
+                bg="transparent"
+                icon={<IconHamburger size={'$2.5'} color={iconColor} />}
+              />
+            )}
+          </Stack>
+          {header === '' ? (
+            <XStack>
+              <IconSendLogo size={'$2.5'} color={'$color12'} />
+            </XStack>
           ) : (
-            <Button
-              $gtLg={{ disabled: true, opacity: 0 }} // We need the button to be there for layout purposes
-              onPress={handleHomeBottomSheet}
-              bg="transparent"
-              icon={<IconHamburger size={'$2.5'} color={iconColor} />}
-            />
+            <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
+              {media.lg && subheader ? subheader : header}
+            </H2>
           )}
-        </Stack>
-        {header === '' ? (
-          <XStack>
-            <IconSendLogo size={'$2.5'} color={'$color12'} />
-          </XStack>
-        ) : (
-          <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
-            {media.lg && subheader ? subheader : header}
-          </H2>
-        )}
-        <Button
+          <Button
+            $gtLg={{ display: 'none' }}
+            bg="transparent"
+            icon={<IconGear size={'$2.5'} color={iconColor} />}
+            onPress={handleSettingsBottomSheet}
+          />
+        </Container>
+        <Separator
+          w={'100%'}
+          position="absolute"
+          bottom={0}
+          $lg={{ bc: '$black' }}
           $gtLg={{ display: 'none' }}
-          bg="transparent"
-          icon={<IconGear size={'$2.5'} color={iconColor} />}
-          onPress={handleSettingsBottomSheet}
         />
-      </Container>
+      </Stack>
       <SettingsBottomSheet />
     </Header>
   )
