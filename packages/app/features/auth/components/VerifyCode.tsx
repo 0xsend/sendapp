@@ -60,6 +60,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             '$theme-light': {
               borderBottomColor: '$accent9Light',
             },
+
             borderWidth: 0,
             borderBottomWidth: 2,
             borderRadius: '$0',
@@ -79,6 +80,15 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             theme: 'accent',
             focusStyle: {
               borderBottomColor: '$accent3Light',
+              autoFocus: true,
+              focusStyle: {
+                '$theme-dark': {
+                  borderBottomColor: '$accent9Light',
+                },
+                '$theme-light': {
+                  borderBottomColor: '$black',
+                },
+              },
             },
           },
         }}
