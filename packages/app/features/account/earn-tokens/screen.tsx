@@ -94,9 +94,9 @@ const DistributionRewardsSection = ({
         $lg={{ gap: '$2' }}
         $theme-dark={{ btc: '$gray7Dark' }}
         $theme-light={{ btc: '$gray4Light' }}
-        $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
+        $gtSm={{ pt: '$6', gap: '$8' }}
       >
-        <Stack gap="$2" $gtSm={{ pt: '$6', gap: '$6' }}>
+        <Stack gap="$2" $gtSm={{ gap: '$6' }}>
           <Label fontFamily={'$mono'} fontSize={'$5'}>
             ROUND
           </Label>

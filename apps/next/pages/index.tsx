@@ -4,6 +4,7 @@ import { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from './_app'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -33,6 +34,10 @@ function setReferralCodeCookie(context: GetServerSidePropsContext) {
   }
 }
 
-Page.getLayout = (children) => <HomeLayout header="Home">{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.QR} showLogo={true} />}>
+    {children}
+  </HomeLayout>
+)
 
 export default Page

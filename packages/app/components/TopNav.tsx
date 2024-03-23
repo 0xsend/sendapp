@@ -1,29 +1,50 @@
+// TopNav.tsx
 import {
   H2,
   Header,
+  Paragraph,
   XStack,
   Stack,
   useMedia,
   Button,
   Container,
-  Paragraph,
   Separator,
+  useToastController,
 } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconArrowLeft, IconGear, IconHamburger, IconSendLogo } from 'app/components/icons'
+import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
-import { SettingsBottomSheet } from './settings/SettingsBottomSheet'
-import { assert } from 'app/utils/assert'
+import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
 
-// there's not much difference between this and HomeTopNav, but it's too much to refactor in one go
-// @dev handleBack pops to the base of the path instead of the previous path
-export function AccountTopNav({ header, subheader }: { header: string; subheader?: string }) {
+export enum ButtonOption {
+  QR = 'QR',
+  SETTINGS = 'SETTINGS',
+}
+
+interface TopNavProps {
+  header: string
+  subheader?: string
+  showLogo?: boolean
+  /**
+   * Customize the button on the right side of the top nav.
+   */
+  button?: ButtonOption
+}
+
+export function TopNav({
+  header,
+  subheader,
+  showLogo = false,
+  button = ButtonOption.QR,
+}: TopNavProps) {
   const [nav, setNavParam] = useNav()
   const path = usePathname()
+  const parts = path.split('/').filter(Boolean)
   const { push } = useRouter()
   const media = useMedia()
+  const toast = useToastController()
 
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
@@ -34,21 +55,48 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
   }
 
   const handleBack = () => {
-    // URLs should be like /account/settings/edit-profile, so we need to pop to /account
-    const newPath = path.split('/').slice(0, 2).join('/')
-    assert(!!newPath, 'newPath should not be empty')
-    push(newPath)
+    // always pop to the base path. e.g. /account/settings/edit-profile -> /account
+    const newPath = parts.slice(0, 1).join('/')
+    push(`/${newPath}`)
   }
 
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
-  const isSubRoute = path.split('/').length - 1 > 1
+
+  const isSubRoute = parts.length > 1
+
+  const renderButton = () => {
+    switch (button) {
+      case ButtonOption.QR:
+        return (
+          <Button
+            $gtLg={{ display: 'none' }}
+            bg="transparent"
+            icon={<IconQr size={'$2.5'} color={iconColor} />}
+            onPress={() => toast.show('Coming Soon')}
+          />
+        )
+      case ButtonOption.SETTINGS:
+        return (
+          <Button
+            $gtLg={{ display: 'none' }}
+            bg="transparent"
+            icon={<IconGear size={'$2.5'} color={iconColor} />}
+            onPress={handleSettingsBottomSheet}
+          />
+        )
+      default:
+        if (__DEV__) throw new Error(`Unknown button option: ${button}`)
+        return null
+    }
+  }
 
   return (
-    <Header w="100%" $md={{ pb: '$6' }} $gtMd={{ pb: '$10' }}>
+    <Header w="100%" pb="$6">
       <Stack>
         <Container
-          $gtLg={{ jc: 'flex-start', pb: '$2' }}
+          $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
+          ai="center"
           jc="space-between"
           fd="row"
           $lg={{ py: '$4' }}
@@ -60,7 +108,7 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
                 focusStyle={{ outlineColor: 'transparent' }}
                 onPress={handleBack}
                 bg="transparent"
-                ai="flex-start"
+                $gtLg={{ ai: 'flex-start' }}
                 hoverStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
                 pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
                 icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
@@ -75,7 +123,7 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
               />
             )}
           </Stack>
-          {header === '' ? (
+          {showLogo && media.lg ? (
             <XStack>
               <IconSendLogo size={'$2.5'} color={'$color12'} />
             </XStack>
@@ -84,15 +132,11 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
               {header}
             </H2>
           )}
-          <Button
-            $gtLg={{ display: 'none' }}
-            bg="transparent"
-            icon={<IconGear size={'$2.5'} color={iconColor} />}
-            onPress={handleSettingsBottomSheet}
-          />
+          <XStack>{renderButton()}</XStack>
         </Container>
-        <Container>
-          {subheader && (
+        <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
+        {subheader && (
+          <Container fd="column">
             <Paragraph
               fontWeight={'400'}
               fontSize={'$5'}
@@ -100,21 +144,15 @@ export function AccountTopNav({ header, subheader }: { header: string; subheader
               lineHeight={24}
               py="$3"
               $gtSm={{ py: '$6' }}
-              $gtLg={{ ml: '$9', pl: '$1', pb: '$4', pt: '$0' }}
+              $gtLg={{ ml: '$9', pl: '$1', pb: '$6', pt: '$0' }}
               $theme-light={{ col: '$gray10Light' }}
               $theme-dark={{ col: '$gray10Dark' }}
             >
               {subheader}
             </Paragraph>
-          )}
-        </Container>
-        <Separator
-          w={'100%'}
-          position="absolute"
-          bottom={0}
-          $lg={{ bc: '$black' }}
-          $gtLg={{ display: 'none' }}
-        />
+            <Separator w={'100%'} borderColor="$jet" />
+          </Container>
+        )}
       </Stack>
       <SettingsBottomSheet />
     </Header>
