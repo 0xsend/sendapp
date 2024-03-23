@@ -56,7 +56,7 @@ export function EarnTokensScreen() {
     <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
       {selectedDistribution ? (
         <YStack gap="$4" f={2} overflow={'hidden'}>
-          <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
+          <DistributionRewardsSection distribution={selectedDistribution} />
         </YStack>
       ) : (
         <Stack f={1} gap="$6" jc="center" ai="center">
@@ -69,38 +69,24 @@ export function EarnTokensScreen() {
   )
 }
 
+const now = new Date()
+
 const DistributionRewardsSection = ({
   distribution,
-  isLoading,
-}: { distribution: UseDistributionsResultData[number]; isLoading: boolean }) => {
-  const now = new Date()
-  const hasDistribution = !isLoading && distribution
-
-  const isBeforeQualification = hasDistribution && now < distribution.qualification_start
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const isBeforeQualification = now < distribution.qualification_start
   const isDuringQualification =
-    hasDistribution &&
-    now >= distribution.qualification_start &&
-    now <= distribution.qualification_end
-  const isClaimable =
-    hasDistribution && now > distribution.qualification_end && now <= distribution.claim_end
+    now >= distribution.qualification_start && now <= distribution.qualification_end
+  const isClaimable = now > distribution.qualification_end && now <= distribution.claim_end
 
   const timeRemaining = useTimeRemaining(
-    isLoading
-      ? now
-      : isBeforeQualification
-        ? distribution.qualification_start
-        : isDuringQualification
-          ? distribution.qualification_end
-          : isClaimable
-            ? distribution.claim_end
-            : now
-              ? distribution.qualification_start
-              : isDuringQualification
-                ? distribution.qualification_end
-                : isClaimable
-                  ? distribution.claim_end
-                  : now
+    isDuringQualification
+      ? distribution.qualification_end
+      : isClaimable
+        ? distribution.claim_end
+        : now
   )
+
   return (
     <Container>
       <YStack
@@ -136,7 +122,35 @@ const DistributionRewardsSection = ({
               f={1}
               justifyContent="space-between"
             >
-              <ClaimTimeRemaining timeRemaining={timeRemaining} />
+              <YStack gap="$2" f={1} maw={312}>
+                {isDuringQualification && <Label fontFamily={'$mono'}>Valid for</Label>}
+                <Theme inverse>
+                  {(() => {
+                    switch (true) {
+                      case isBeforeQualification:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Qualification for Round ${distribution.number} has not started`}
+                          </Paragraph>
+                        )
+                      case isDuringQualification:
+                        return <DistributionRewardTimer timeRemaining={timeRemaining} />
+                      case isClaimable:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Qualification for Round ${distribution.number} has closed and if you met the requirements, it should now be claimable.`}
+                          </Paragraph>
+                        )
+                      default:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Claims for Round ${distribution.number} have closed`}
+                          </Paragraph>
+                        )
+                    }
+                  })()}
+                </Theme>
+              </YStack>
               <YStack $gtSm={{ ai: 'flex-end' }}>
                 <Label fontFamily={'$mono'}>Status</Label>
                 <Theme inverse>
@@ -165,34 +179,29 @@ const DistributionRewardsSection = ({
   )
 }
 
-const ClaimTimeRemaining = ({ timeRemaining }: { timeRemaining: TimeRemaining }) => {
+const DistributionRewardTimer = ({ timeRemaining }: { timeRemaining: TimeRemaining }) => {
   return (
-    <YStack gap="$2" f={1}>
-      <Label fontFamily={'$mono'}>Valid for</Label>
-      <XStack ai={'flex-start'} jc="space-between" maw={312}>
-        <Theme inverse>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.days).padStart(2, '0')}D
-          </ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>:</ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.hours).padStart(2, '0')}Hr
-          </ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>:</ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.minutes).padStart(2, '0')}Min
-          </ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>:</ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.seconds).padStart(2, '0')}Sec
-          </ClaimTimeRemainingDigit>
-        </Theme>
-      </XStack>
-    </YStack>
+    <XStack ai={'flex-start'} jc="space-between" maw={312}>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.days).padStart(2, '0')}D
+      </DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.hours).padStart(2, '0')}Hr
+      </DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.minutes).padStart(2, '0')}Min
+      </DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.seconds).padStart(2, '0')}Sec
+      </DistributionRewardTimerDigit>
+    </XStack>
   )
 }
 
-const ClaimTimeRemainingDigit = ({ children }: { children?: string | string[] }) => (
+const DistributionRewardTimerDigit = ({ children }: { children?: string | string[] }) => (
   <Text
     fontWeight={'500'}
     fontSize="$5"
