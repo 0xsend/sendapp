@@ -49,6 +49,7 @@ runs:
       shell: bash
       run: |
         bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=preview
+        cp .vercel/.env.preview.local .env.local
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
@@ -88,7 +89,9 @@ runs:
     - name: Setup Production Environment
       if: ${{ inputs.production == 'true' }}
       shell: bash
-      run: bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=production
+      run: |
+        bunx vercel --token=${{ inputs.vercel-token }} -S ${{ inputs.vercel-scope }} pull --yes --environment=production
+        cp .vercel/.env.production.local .env.local
       env:
         VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
         VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}

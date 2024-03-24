@@ -48,6 +48,7 @@ runs:
       run: |
         cp .env.local.template .env.local
         yarn web:prod
+        rm .env.local
     - name: Save Next.js Cache
       if: ${{ inputs.build-nextjs == 'true' }}
       uses: actions/upload-artifact@v4
