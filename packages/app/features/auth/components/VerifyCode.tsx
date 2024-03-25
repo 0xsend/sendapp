@@ -5,7 +5,6 @@ import {
   H3,
   Paragraph,
   SubmitButton,
-  Theme,
   XStack,
   YStack,
 } from '@my/ui'
