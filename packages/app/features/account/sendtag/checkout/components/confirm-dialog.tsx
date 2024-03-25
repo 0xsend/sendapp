@@ -3,6 +3,7 @@ import {
   Anchor,
   AnimatePresence,
   Button,
+  ButtonText,
   Dialog,
   Fieldset,
   Label,
@@ -10,6 +11,7 @@ import {
   ScrollView,
   Sheet,
   Spinner,
+  Stack,
   Theme,
   TooltipSimple,
   Unspaced,
@@ -105,7 +107,6 @@ export function ConfirmDialog({
     () => getPriceInWei(pendingTags ?? [], confirmedTags ?? []),
     [pendingTags, confirmedTags]
   )
-  const ethAmount = useMemo(() => formatEther(weiAmount), [weiAmount])
 
   // when not closeable prevent browser navigation
   useEffect(() => {
@@ -127,45 +128,63 @@ export function ConfirmDialog({
 
   return (
     <Dialog modal open={open} onOpenChange={handleOpenChange}>
-      <YStack width="100%">
-        {(hasPendingTags || needsVerification) && (
-          <YStack
-            animateOnly={['transform', 'opacity']}
-            animation={[
-              'quick',
-              {
-                opacity: {
-                  overshootClamping: true,
-                },
+      {(hasPendingTags || needsVerification) && (
+        <Stack
+          animateOnly={['transform', 'opacity']}
+          animation={[
+            'quick',
+            {
+              opacity: {
+                overshootClamping: true,
               },
-            ]}
-            enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-            exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-            space="$2"
-            w="100%"
-            flex={1}
-          >
-            <YStack maxWidth={600} width="100%">
-              {BigInt(weiAmount) > 0 && (
-                <Paragraph maw="100%" ta="right">
-                  Total: {ethAmount} ETH
-                </Paragraph>
-              )}
-              <Dialog.Trigger asChild>
-                <Button
-                  disabled={!needsVerification && (pendingTags ?? []).length === 0}
-                  space="$1.5"
-                  icon={CheckCircle}
-                  f={1}
-                  width="100%"
-                >
-                  {needsVerification ? 'Verify' : 'Confirm'}
-                </Button>
-              </Dialog.Trigger>
-            </YStack>
+            },
+          ]}
+          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+          w="100%"
+          flex={1}
+          $gtMd={{ fd: 'row', jc: 'space-between' }}
+          fd="column-reverse"
+          jc={'center'}
+          ai={'center'}
+          gap="$4"
+          py="$4"
+        >
+          <YStack maw={200} width="100%">
+            <Dialog.Trigger asChild>
+              <Button
+                disabled={!needsVerification && (pendingTags ?? []).length === 0}
+                space="$1.5"
+                icon={CheckCircle}
+                br={12}
+                f={1}
+              >
+                {needsVerification ? 'Verify' : 'Confirm'}
+              </Button>
+            </Dialog.Trigger>
           </YStack>
-        )}
-      </YStack>
+          <YStack ai="center" $gtMd={{ ai: 'flex-end' }}>
+            <Paragraph
+              fontWeight={'500'}
+              fontSize={'$5'}
+              $theme-dark={{ col: '$gray9Light' }}
+              $theme-light={{ col: '$gray9Dark' }}
+            >
+              Total
+            </Paragraph>
+            <Paragraph
+              fontFamily={'$mono'}
+              fontWeight={'400'}
+              lineHeight={48}
+              fontSize={'$9'}
+              $theme-dark={{ col: '$white' }}
+              $theme-light={{ col: '$black' }}
+            >
+              {formatEther(weiAmount).toLocaleString()} ETH
+            </Paragraph>
+          </YStack>
+        </Stack>
+      )}
 
       <Adapt when="sm" platform="touch">
         <Sheet
@@ -203,7 +222,6 @@ export function ConfirmDialog({
         />
 
         <Dialog.Content
-          bordered
           elevate
           key="content"
           animateOnly={['transform', 'opacity']}
@@ -301,7 +319,9 @@ export function ConfirmFlow() {
   if (baseMainnet.id !== chainId) {
     return (
       <ConfirmDialogContent>
-        <Dialog.Description>Please switch to {baseMainnet.name} in your wallet.</Dialog.Description>
+        <Dialog.Description col={'$white'}>
+          Please switch to {baseMainnet.name} in your wallet.
+        </Dialog.Description>
         <Theme name="error">
           <Button
             onPress={() => {
@@ -309,7 +329,7 @@ export function ConfirmFlow() {
               switchChain({ chainId: baseMainnet.id }, { onError: console.error })
             }}
           >
-            Switch Network
+            <ButtonText color="$color12">Switch Network</ButtonText>{' '}
           </Button>
         </Theme>
       </ConfirmDialogContent>
@@ -388,27 +408,26 @@ export function ConfirmWithVerifiedAddress() {
         <Paragraph>
           You can only verify one wallet address and it cannot be changed for now.
         </Paragraph>
-        <Theme>
-          <Button
-            onPress={() => {
-              assert(!!signMessageAsync, 'signMessageAsync is required')
-              assert(!!connectedAddress, 'connectedAddress is required')
-              signMessageAsync({ message: verifyAddressMsg(connectedAddress) })
-                .then((signature) => verify.mutateAsync({ address: connectedAddress, signature }))
-                .then(() => updateAddresses())
-                .catch((e) => {
-                  if (e instanceof TRPCClientError) {
-                    setError(e.message)
-                  } else {
-                    console.error(e)
-                    setError('Something went wrong')
-                  }
-                })
-            }}
-          >
-            Sign Message
-          </Button>
-        </Theme>
+
+        <Button
+          onPress={() => {
+            assert(!!signMessageAsync, 'signMessageAsync is required')
+            assert(!!connectedAddress, 'connectedAddress is required')
+            signMessageAsync({ message: verifyAddressMsg(connectedAddress) })
+              .then((signature) => verify.mutateAsync({ address: connectedAddress, signature }))
+              .then(() => updateAddresses())
+              .catch((e) => {
+                if (e instanceof TRPCClientError) {
+                  setError(e.message)
+                } else {
+                  console.error(e)
+                  setError('Something went wrong')
+                }
+              })
+          }}
+        >
+          <ButtonText col="$color12">Sign Message</ButtonText>
+        </Button>
 
         <AnimatePresence>
           {(signMsgErr || error) && (
@@ -673,7 +692,6 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
   const pendingTags = usePendingTags()
   const confirmedTags = useConfirmedTags()
   const ethAmount = getPriceInWei(pendingTags ?? [], confirmedTags ?? [])
-
   assert(chainId === undefined || chainId in sendRevenueSafeAddress, 'chainId is required')
 
   const tx = {
