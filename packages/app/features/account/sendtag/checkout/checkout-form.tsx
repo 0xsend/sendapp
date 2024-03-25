@@ -113,7 +113,7 @@ export const CheckoutForm = () => {
               <XStack jc="space-between">
                 <SubmitButton
                   onPress={() => submit()}
-                  $gtMd={{ miw: 200 }}
+                  $gtSm={{ miw: 200 }}
                   br={12}
                   icon={<IconPlus />}
                 >
@@ -251,7 +251,7 @@ export const CheckoutForm = () => {
                   {hasPendingTags ? 'ADD ANOTHER SENDTAG' : 'CREATE A NEW SENDTAG'}
                 </Label>
               )}
-              <YStack>{!has5Tags && Object.values(fields)}</YStack>
+              <XStack>{!has5Tags && Object.values(fields)}</XStack>
             </YStack>
           )
         }}
