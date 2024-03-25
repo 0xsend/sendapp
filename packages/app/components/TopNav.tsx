@@ -6,10 +6,11 @@ import {
   XStack,
   Stack,
   useMedia,
-  Button,
+  Button as ButtonOg,
   Container,
   Separator,
   useToastController,
+  ButtonProps,
 } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -78,7 +79,6 @@ export function TopNav({
         return (
           <Button
             $gtLg={{ display: 'none' }}
-            bg="transparent"
             icon={<IconQr size={'$2.5'} color={iconColor} />}
             onPress={() => toast.show('Coming Soon')}
           />
@@ -87,7 +87,6 @@ export function TopNav({
         return (
           <Button
             $gtLg={{ display: 'none' }}
-            bg="transparent"
             icon={<IconGear size={'$2.5'} color={iconColor} />}
             onPress={handleSettingsBottomSheet}
           />
@@ -111,13 +110,8 @@ export function TopNav({
           <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center">
             {isSubRoute ? (
               <Button
-                outlineColor={'transparent'}
-                focusStyle={{ outlineColor: 'transparent' }}
                 onPress={handleBack}
-                bg="transparent"
                 $gtLg={{ ai: 'flex-start' }}
-                hoverStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-                pressStyle={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
                 icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
                 pl="$0"
               />
@@ -125,7 +119,6 @@ export function TopNav({
               <Button
                 $gtLg={{ disabled: true, opacity: 0 }} // We need the button to be there for layout purposes
                 onPress={handleHomeBottomSheet}
-                bg="transparent"
                 icon={<IconHamburger size={'$2.5'} color={iconColor} />}
               />
             )}
@@ -135,7 +128,7 @@ export function TopNav({
               <IconSendLogo size={'$2.5'} color={'$color12'} />
             </XStack>
           ) : (
-            <H2 fontWeight={'300'} color={'$color05'} lineHeight={32}>
+            <H2 fontWeight={'300'} color={'$color05'} lineHeight={32} $gtLg={{ ml: '$4' }}>
               {header}
             </H2>
           )}
@@ -163,5 +156,26 @@ export function TopNav({
       </Stack>
       <SettingsBottomSheet />
     </Header>
+  )
+}
+
+function Button(props: ButtonProps) {
+  return (
+    <ButtonOg
+      bc="transparent"
+      chromeless
+      circular
+      hoverStyle={{
+        backgroundColor: 'transparent',
+      }}
+      pressStyle={{
+        backgroundColor: 'transparent',
+      }}
+      focusStyle={{
+        backgroundColor: 'transparent',
+      }}
+      theme="accent"
+      {...props}
+    />
   )
 }
