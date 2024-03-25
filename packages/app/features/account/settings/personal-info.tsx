@@ -1,14 +1,4 @@
-import {
-  Fieldset,
-  Input,
-  Label,
-  SubmitButton,
-  YStack,
-  isWeb,
-  useToastController,
-  XStack,
-  Paragraph,
-} from '@my/ui'
+import { SubmitButton, YStack, isWeb, useToastController, XStack, Paragraph } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'

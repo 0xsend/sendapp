@@ -29,8 +29,14 @@ interface TopNavProps {
   showLogo?: boolean
   /**
    * Customize the button on the right side of the top nav.
+   * @default ButtonOption.QR
    */
   button?: ButtonOption
+  /**
+   * Hide the subroute button
+   * @default false
+   */
+  noSubroute?: boolean
 }
 
 export function TopNav({
@@ -38,6 +44,7 @@ export function TopNav({
   subheader,
   showLogo = false,
   button = ButtonOption.QR,
+  noSubroute = false,
 }: TopNavProps) {
   const [nav, setNavParam] = useNav()
   const path = usePathname()
@@ -63,7 +70,7 @@ export function TopNav({
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
 
-  const isSubRoute = parts.length > 1
+  const isSubRoute = !noSubroute && parts.length > 1
 
   const renderButton = () => {
     switch (button) {

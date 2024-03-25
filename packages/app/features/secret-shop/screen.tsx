@@ -5,7 +5,6 @@ import {
   Theme,
   useToastController,
   Button,
-  H3,
   XStack,
   Container,
   Spinner,

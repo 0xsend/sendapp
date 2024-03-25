@@ -9,6 +9,7 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -75,6 +76,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => <HomeLayout header="">{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header="Profile" noSubroute />}>{children}</HomeLayout>
+)
 
 export default Page
