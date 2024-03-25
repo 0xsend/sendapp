@@ -2,21 +2,16 @@ import {
   AnimatePresence,
   Button,
   ButtonText,
-  ColorTokens,
-  KVTable,
   Label,
   Paragraph,
-  Separator,
-  Stack,
   SubmitButton,
   Theme,
-  Tooltip,
   XStack,
   YStack,
   useToastController,
 } from '@my/ui'
-import { baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
-import { AlertTriangle, Clock, X, XCircle } from '@tamagui/lucide-icons'
+
+import { X } from '@tamagui/lucide-icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
@@ -24,7 +19,7 @@ import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
 import React, { useMemo } from 'react'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { formatEther } from 'viem'
 import { z } from 'zod'
 import { ConfirmDialog } from './components/confirm-dialog'
@@ -32,14 +27,6 @@ import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { SendTagPricingDialog } from './SendTagPricingDialog'
 import { maxNumSendTags, tagLengthToWei } from './checkout-utils'
 import { IconPlus } from 'app/components/icons'
-
-/**
-| Send Tag Length | Cost to Confirm |
-| --------------- | --------------- |
-| 5+              | 0.01 ETH        |
-| 4               | 0.02 ETH        |
-| 1-3             | 0.03 ETH        |
- */
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -113,21 +100,31 @@ export const CheckoutForm = () => {
         formProps={{
           justifyContent: 'flex-start',
           f: 0,
+          w: '100%',
           $gtMd: {
             als: 'flex-start',
           },
+          borderBottomWidth: hasPendingTags ? 1 : 0,
+          '$theme-dark': { boc: '$decay' },
         }}
         renderAfter={({ submit }) => (
           <YStack width="100%" gap="$6">
             {!has5Tags && (
               <XStack jc="space-between">
-                <ButtonText fontFamily={'$mono'} col={'$color12'}>
-                  ADD TAG
-                </ButtonText>
+                <SubmitButton
+                  onPress={() => submit()}
+                  $gtMd={{ miw: 200 }}
+                  br={12}
+                  icon={<IconPlus />}
+                >
+                  <ButtonText fontFamily={'$mono'} col={'$color12'}>
+                    ADD TAG
+                  </ButtonText>
+                </SubmitButton>
                 <SendTagPricingDialog name={form.watch('name', '')} />
               </XStack>
             )}
-            {pendingTags?.length ? (
+            {hasPendingTags ? (
               <YStack aria-labelledby="checkout-pending-tags-label">
                 <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>
                   {pendingTags?.length || 0} of {maxNumSendTags - (confirmedTags?.length || 0)}{' '}
@@ -143,10 +140,12 @@ export const CheckoutForm = () => {
                   Your Send Tags are not confirmed until payment is received and your wallet is
                   verified
                 </Paragraph>
-                <XStack btw={1} bbw={1} $theme-dark={{ boc: '$decay' }} py="$2" px="$2">
+                <XStack btw={1} bbw={1} $theme-dark={{ boc: '$decay' }} p="$2">
                   <Paragraph
                     $theme-dark={{ col: '$olive' }}
-                    w="50%"
+                    $gtMd={{ f: 2 }}
+                    f={1}
+                    maw="40%"
                     fontWeight={'bold'}
                     fontFamily={'$mono'}
                   >
@@ -154,7 +153,8 @@ export const CheckoutForm = () => {
                   </Paragraph>
                   <Paragraph
                     $theme-dark={{ col: '$olive' }}
-                    w="25%"
+                    f={1}
+                    maw="30%"
                     ta="center"
                     fontWeight={'400'}
                     fontFamily={'$mono'}
@@ -164,14 +164,13 @@ export const CheckoutForm = () => {
                   <Paragraph
                     $theme-dark={{ col: '$olive' }}
                     f={1}
-                    w="25%"
+                    maw="30%"
                     ta="center"
                     fontWeight={'400'}
                     fontFamily={'$mono'}
                   >
                     Price
                   </Paragraph>
-                  <Stack f={0} />
                 </XStack>
                 {pendingTags
                   ?.sort(
@@ -179,26 +178,36 @@ export const CheckoutForm = () => {
                   )
                   .map((tag) => (
                     <>
-                      <XStack px="$2" ai="center" jc="space-between" f={1} key={tag.name}>
-                        <Theme inverse>
-                          <Paragraph
-                            fontWeight={'bold'}
-                            col="$background"
-                            w="50%"
-                            fontFamily={'$mono'}
-                          >
-                            {tag.name}
+                      <XStack
+                        $gtMd={{ px: '$2' }}
+                        ai="center"
+                        jc="space-between"
+                        f={1}
+                        key={tag.name}
+                      >
+                        <Paragraph
+                          fontWeight={'bold'}
+                          col="$color12"
+                          f={2}
+                          maw="40%"
+                          fontFamily={'$mono'}
+                        >
+                          {tag.name}
+                        </Paragraph>
+                        <Paragraph col="$color12" ta="center" f={1} maw="30%" fontFamily={'$mono'}>
+                          <HoldingTime created={new Date(tag.created_at)} />
+                        </Paragraph>
+                        <XStack
+                          ai="center"
+                          $gtMd={{ gap: '$3' }}
+                          gap="$2"
+                          f={1}
+                          maw="30%"
+                          jc="flex-end"
+                        >
+                          <Paragraph fontFamily={'$mono'} col="$color12">
+                            <ConfirmTagPrice tag={tag} />
                           </Paragraph>
-                          <Paragraph col="$background" ta="center" w="25%" fontFamily={'$mono'}>
-                            <HoldingTime created={new Date(tag.created_at)} />
-                          </Paragraph>
-                        </Theme>
-                        <XStack ai="center" gap="$3" w="25%" jc="flex-end">
-                          <Theme inverse>
-                            <Paragraph col="$background" fontFamily={'$mono'}>
-                              <ConfirmTagPrice tag={tag} />
-                            </Paragraph>
-                          </Theme>
                           <Button
                             // @ts-expect-error tamagui doesn't support this yet
                             type="button"
@@ -237,9 +246,11 @@ export const CheckoutForm = () => {
         {(fields) => {
           return (
             <YStack mb="-$8" width="100%">
-              <Label py="$4">
-                {pendingTags?.length ? 'ADD ANOTHER SENDTAG' : 'CREATE A NEW SENDTAG'}
-              </Label>
+              {!has5Tags && (
+                <Label $gtMd={{ py: '$4' }}>
+                  {hasPendingTags ? 'ADD ANOTHER SENDTAG' : 'CREATE A NEW SENDTAG'}
+                </Label>
+              )}
               <YStack>{!has5Tags && Object.values(fields)}</YStack>
             </YStack>
           )
@@ -247,7 +258,9 @@ export const CheckoutForm = () => {
       </SchemaForm>
       <Theme name="accent">
         <AnimatePresence>
-          <ConfirmDialog onConfirmed={onConfirmed} needsVerification={needsVerification} />
+          <XStack w="100%">
+            <ConfirmDialog onConfirmed={onConfirmed} needsVerification={needsVerification} />
+          </XStack>
         </AnimatePresence>
       </Theme>
     </FormProvider>
@@ -263,54 +276,6 @@ function HoldingTime({ created }: { created: Date }) {
   if (diffInMs <= 0) return 'Claimable'
 
   return `${minutes} m ${seconds} s`
-
-  // return (
-
-  //     <Tooltip>
-  //       {diffInMs <= 0 && (
-  //         <Tooltip.Trigger>
-  //           <XStack ai="center" jc="space-between" space="$1.5" theme="red">
-  //             <AlertTriangle color="$orange11" />
-  //             <Paragraph>Claimable</Paragraph>
-  //           </XStack>
-  //         </Tooltip.Trigger>
-  //       )}
-  //       {diffInMs > 0 && (
-  //         <Tooltip.Trigger>
-  //           <XStack ai="center" jc="space-between" space="$1.5" theme="red">
-  //             <Clock />
-  //             <Paragraph>
-
-  //             </Paragraph>
-  //           </XStack>
-  //         </Tooltip.Trigger>
-  //       )}
-
-  {
-    /* <Tooltip.Content
-          enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-          scale={1}
-          x={0}
-          y={0}
-          opacity={1}
-          animation={[
-            'quick',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-        >
-          <Tooltip.Arrow />
-          <Paragraph size="$2" maw="$20">
-            Each Send Tag is reserved for 30 minutes. If you do not claim it within that time, it is
-            claimable by someone else.
-          </Paragraph>
-        </Tooltip.Content>
-      </Tooltip> */
-  }
 }
 
 function ConfirmTagPrice({ tag }: { tag: { name: string } }) {

@@ -11,7 +11,6 @@ import {
   Unspaced,
   XStack,
   ButtonText,
-  Theme,
 } from '@my/ui'
 import { Info, X } from '@tamagui/lucide-icons'
 import React, { useMemo } from 'react'

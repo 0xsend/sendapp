@@ -5,6 +5,7 @@ export const CheckoutTagSchema = z.object({
   name: formFields.text
     .min(1)
     .max(20)
+    .trim()
     // English alphabet, numbers, and underscore
     .regex(/^[a-zA-Z0-9_]+$/, 'Only English alphabet, numbers, and underscore'),
 })

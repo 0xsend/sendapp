@@ -28,7 +28,7 @@ const subheader =
 
 Page.getLayout = (children) => (
   <HomeLayout
-    TopNav={<TopNav header="Sendtags" subheader={subheader} button={ButtonOption.SETTINGS} />}
+    TopNav={<TopNav header="Sendtag" subheader={subheader} button={ButtonOption.SETTINGS} />}
   >
     {children}
   </HomeLayout>
