@@ -879,6 +879,31 @@ contract TokenPaymaster6Test is Test {
         assertEq(deFactoExchangeRate, expectedPrice, "deFactoExchangeRate");
     }
 
+    // @note this test case does not make much sense because it's impossible to approve the tokens before the account exists.
+    // should sponsor the UserOp with initCode
+    function testShouldSponsorUserOperationWithInitCode() external {
+        address newAccount = factory.getAddress(user, 123);
+        token.sudoMint(newAccount, 1e18);
+        token.sudoApprove(newAccount, address(paymaster), 1e18);
+        PackedUserOperation memory op = fillUserOp(
+            SimpleAccount(payable(newAccount)),
+            userKey,
+            address(counter),
+            0,
+            abi.encodeWithSelector(TestCounter.count.selector)
+        );
+        op.preVerificationGas = 0; // should also cover calldata cost.
+        // accountGasLimits = verificationGasLimit | callGasLimit
+        op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(200000)), bytes16(uint128(300000))));
+        op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(300000), uint128(300000));
+        op.initCode = abi.encodePacked(
+            address(factory), abi.encodeWithSelector(SimpleAccountFactory.createAccount.selector, user, 123)
+        );
+        op.signature = signUserOp(op, userKey);
+
+        submitUserOp(op);
+    }
+
     function getRequiredPrefund(PackedUserOperation memory op) internal pure returns (uint256 requiredPrefund) {
         uint256 verificationGasLimit = uint256(uint128(bytes16(op.accountGasLimits)));
         uint256 callGasLimit = uint256(uint128(uint256(op.accountGasLimits)));
