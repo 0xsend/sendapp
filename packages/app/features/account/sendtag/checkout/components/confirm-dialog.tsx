@@ -42,7 +42,7 @@ import {
   useSwitchChain,
   useWaitForTransactionReceipt,
 } from 'wagmi'
-import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../screen'
+import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../checkout-utils'
 import { assert } from 'app/utils/assert'
 
 export interface ConfirmContextType {
