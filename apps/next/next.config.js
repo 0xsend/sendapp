@@ -81,6 +81,7 @@ export default () => {
       'expo-linking',
       'expo-constants',
       'expo-clipboard',
+      'expo-sharing',
       'expo-modules-core',
       'expo-device',
       'expo-image-picker',
