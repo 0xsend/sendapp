@@ -1,6 +1,6 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { AccountScreen } from './screen'
-import { render } from '@testing-library/react-native'
+import { render, screen, act } from '@testing-library/react-native'
 
 jest.mock('app/utils/useUser')
 jest.mock('app/utils/getReferralLink', () => ({
@@ -10,13 +10,17 @@ jest.mock('app/routers/params', () => ({
   useNav: jest.fn().mockReturnValue([undefined, jest.fn()]),
 }))
 describe('AccountScreen', () => {
-  it('renders the account screen', () => {
-    const tree = render(
+  it('renders the account screen', async () => {
+    jest.useFakeTimers()
+    render(
       <Wrapper>
         <AccountScreen />
       </Wrapper>
     )
+    await act(async () => {
+      jest.runAllTimers()
+    })
 
-    expect(tree.toJSON()).toMatchSnapshot('AccountScreen')
+    expect(screen.toJSON()).toMatchSnapshot('AccountScreen')
   })
 })

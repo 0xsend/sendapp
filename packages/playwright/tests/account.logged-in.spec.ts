@@ -1,11 +1,26 @@
+import { assert } from 'app/utils/assert'
 import { expect, test } from './fixtures/send-accounts'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/account')
 })
 
-test('can visit account page', async ({ page }) => {
+test('can visit account page', async ({ page, context, user: { profile } }) => {
+  assert(!!profile, 'profile not found')
+  assert(!!profile.referral_code, 'referral code not found')
   await expect(page).toHaveURL('/account')
+
+  // copy referral code
+  const referralCode = page.getByRole('button', { name: 'Copy' })
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  await referralCode.click()
+  await expect(page.getByText('Copy')).toBeVisible()
+  const handle = await page.evaluateHandle(() => navigator.clipboard.readText())
+  const clipboardContent = await handle.jsonValue()
+  const url = new URL(page.url())
+  url.searchParams.set('referral', profile.referral_code)
+  url.pathname = ''
+  expect(clipboardContent).toBe(url.toString())
 })
 
 test('can update profile', async ({ page, supabase }) => {

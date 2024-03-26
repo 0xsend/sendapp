@@ -12,13 +12,22 @@ import {
   TooltipSimple,
   useMedia,
   useThemeName,
+  Theme,
 } from '@my/ui'
-import { IconAccount, IconCopy, IconDollar, IconGear, IconPlus } from 'app/components/icons'
+import {
+  IconAccount,
+  IconCopy,
+  IconDollar,
+  IconGear,
+  IconPlus,
+  IconShare,
+} from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
+import * as Sharing from 'expo-sharing'
 import { useNav } from 'app/routers/params'
-import React, { ElementType } from 'react'
+import React, { ElementType, useEffect, useState } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export function AccountScreen() {
@@ -31,8 +40,21 @@ export function AccountScreen() {
   const refCode = profile?.referral_code ?? ''
   const referralHref = getReferralHref(refCode)
   const [, setNavParam] = useNav()
+  const [canShare, setCanShare] = useState(false)
 
-  const clickToCopy = async () => {
+  useEffect(() => {
+    const canShare = async () => {
+      const canShare = await Sharing.isAvailableAsync()
+      setCanShare(canShare)
+    }
+    canShare()
+  }, [])
+
+  const shareOrCopyOnPress = async () => {
+    if (canShare) {
+      return await Sharing.shareAsync(referralHref)
+    }
+
     await Clipboard.setStringAsync(referralHref)
       .then(() => toast.show('Copied your referral link to the clipboard'))
       .catch(() =>
@@ -51,14 +73,25 @@ export function AccountScreen() {
     {
       label: 'Referral Code',
       value: (
-        <TooltipSimple label="Copy to clipboard">
+        <TooltipSimple label={canShare ? 'Share' : 'Copy'}>
           <Button
+            accessibilityLabel={canShare ? 'Share' : 'Copy'}
             f={1}
             fd="row"
             unstyled
-            onPress={clickToCopy}
+            onPress={shareOrCopyOnPress}
             color="$color12"
-            iconAfter={<IconCopy size="$1" $platform-web={{ cursor: 'pointer' }} />}
+            iconAfter={
+              canShare ? (
+                <Theme name="accent">
+                  <IconShare color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
+                </Theme>
+              ) : (
+                <Theme name="accent">
+                  <IconCopy color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
+                </Theme>
+              )
+            }
           >
             <Button.Text>{refCode}</Button.Text>
           </Button>

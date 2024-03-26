@@ -368,6 +368,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           suppressHighlighting={true}
         >
           <View
+            accessibilityLabel="Share"
             accessibilityRole="button"
             cancelable={true}
             focusable={[Function]}
@@ -418,7 +419,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               align="xMidYMid"
               bbHeight="20"
               bbWidth="20"
-              color="hsla(112, 22%, 100%, 1)"
+              color="hsla(125, 96%, 40%, 1)"
               fill="none"
               focusable={false}
               height={20}
@@ -433,7 +434,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                     "borderWidth": 0,
                   },
                   {
-                    "color": "hsla(112, 22%, 100%, 1)",
+                    "color": "hsla(125, 96%, 40%, 1)",
                   },
                   {
                     "flex": 0,
@@ -442,9 +443,9 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   },
                 ]
               }
-              tintColor="hsla(112, 22%, 100%, 1)"
-              vbHeight={16}
-              vbWidth={16}
+              tintColor="hsla(125, 96%, 40%, 1)"
+              vbHeight={24}
+              vbWidth={24}
               width={20}
             >
               <RNSVGGroup
@@ -458,20 +459,28 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 strokeWidth="2"
               >
                 <RNSVGPath
-                  d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
+                  d="M4.19995 10.8V18.48C4.19995 18.9892 4.40224 19.4776 4.76231 19.8376C5.12238 20.1977 5.61074 20.4 6.11995 20.4H17.64C18.1492 20.4 18.6375 20.1977 18.9976 19.8376C19.3577 19.4776 19.56 18.9892 19.56 18.48V10.8M15.72 7.43998L11.88 3.59998M11.88 3.59998L8.03995 7.43998M11.88 3.59998V13.68"
                   fill={
                     {
-                      "type": 2,
+                      "payload": 4278190080,
+                      "type": 0,
                     }
                   }
                   propList={
                     [
-                      "fill",
+                      "stroke",
                       "strokeWidth",
                       "strokeLinecap",
+                      "strokeLinejoin",
                     ]
                   }
+                  stroke={
+                    {
+                      "type": 2,
+                    }
+                  }
                   strokeLinecap={1}
+                  strokeLinejoin={1}
                   strokeWidth="2"
                 />
               </RNSVGGroup>
@@ -604,6 +613,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           suppressHighlighting={true}
         >
           <View
+            accessibilityLabel="Share"
             accessibilityRole="button"
             cancelable={true}
             focusable={[Function]}
@@ -654,7 +664,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               align="xMidYMid"
               bbHeight="20"
               bbWidth="20"
-              color="hsla(112, 22%, 100%, 1)"
+              color="hsla(125, 96%, 40%, 1)"
               fill="none"
               focusable={false}
               height={20}
@@ -669,7 +679,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                     "borderWidth": 0,
                   },
                   {
-                    "color": "hsla(112, 22%, 100%, 1)",
+                    "color": "hsla(125, 96%, 40%, 1)",
                   },
                   {
                     "flex": 0,
@@ -678,9 +688,9 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   },
                 ]
               }
-              tintColor="hsla(112, 22%, 100%, 1)"
-              vbHeight={16}
-              vbWidth={16}
+              tintColor="hsla(125, 96%, 40%, 1)"
+              vbHeight={24}
+              vbWidth={24}
               width={20}
             >
               <RNSVGGroup
@@ -694,20 +704,28 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 strokeWidth="2"
               >
                 <RNSVGPath
-                  d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
+                  d="M4.19995 10.8V18.48C4.19995 18.9892 4.40224 19.4776 4.76231 19.8376C5.12238 20.1977 5.61074 20.4 6.11995 20.4H17.64C18.1492 20.4 18.6375 20.1977 18.9976 19.8376C19.3577 19.4776 19.56 18.9892 19.56 18.48V10.8M15.72 7.43998L11.88 3.59998M11.88 3.59998L8.03995 7.43998M11.88 3.59998V13.68"
                   fill={
                     {
-                      "type": 2,
+                      "payload": 4278190080,
+                      "type": 0,
                     }
                   }
                   propList={
                     [
-                      "fill",
+                      "stroke",
                       "strokeWidth",
                       "strokeLinecap",
+                      "strokeLinejoin",
                     ]
                   }
+                  stroke={
+                    {
+                      "type": 2,
+                    }
+                  }
                   strokeLinecap={1}
+                  strokeLinejoin={1}
                   strokeWidth="2"
                 />
               </RNSVGGroup>
