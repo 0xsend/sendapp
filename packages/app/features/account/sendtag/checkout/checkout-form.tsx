@@ -8,6 +8,7 @@ import {
   Theme,
   XStack,
   YStack,
+  useMedia,
   useToastController,
 } from '@my/ui'
 
@@ -24,7 +25,7 @@ import { formatEther } from 'viem'
 import type { z } from 'zod'
 import { ConfirmDialog } from './components/confirm-dialog'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
-import { SendTagPricingDialog } from './SendTagPricingDialog'
+import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 import { maxNumSendTags, tagLengthToWei } from './checkout-utils'
 import { IconPlus } from 'app/components/icons'
 
@@ -38,6 +39,7 @@ export const CheckoutForm = () => {
   const toast = useToastController()
   const has5Tags = user?.tags?.length === 5
   const [needsVerification, setNeedsVerification] = React.useState(false)
+  const media = useMedia()
 
   const { data: addresses } = useChainAddresses()
 
@@ -120,7 +122,11 @@ export const CheckoutForm = () => {
                     ADD TAG
                   </ButtonText>
                 </SubmitButton>
-                <SendTagPricingDialog name={form.watch('name', '')} />
+                {media.gtMd ? (
+                  <SendTagPricingTooltip name={form.watch('name', '')} />
+                ) : (
+                  <SendTagPricingDialog name={form.watch('name', '')} />
+                )}
               </XStack>
             )}
             {hasPendingTags ? (
