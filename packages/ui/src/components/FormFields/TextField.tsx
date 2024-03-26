@@ -47,6 +47,7 @@ export const TextField = (props: InputProps) => {
         )}
         <Shake shakeKey={error?.errorMessage}>
           {/* @todo: We should make it so that placement can be passed from props */}
+          {/* @todo Write a native component. tooltip doesn't work on native. Maybe wrap into field error */}
           <Tooltip open={error !== undefined} placement={media.gtMd ? 'right' : 'bottom'}>
             <Tooltip.Content
               enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
