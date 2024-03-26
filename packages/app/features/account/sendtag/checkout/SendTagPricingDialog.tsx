@@ -24,6 +24,7 @@ import { getPriceInWei } from './checkout-utils'
 import { formatEther } from 'viem'
 import { useUser } from 'app/utils/useUser'
 import { IconInfoGreenCircle } from 'app/components/icons'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const { tags } = useUser()
@@ -137,21 +138,11 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
         </Tooltip.Trigger>
         {isOpen && (
           <Separator
-            enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-            exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-            animation={[
-              'quick',
-              {
-                opacity: {
-                  overshootClamping: true,
-                },
-              },
-            ]}
             w={68}
             boc={'$color10'}
             borderStyle="dashed"
             pos={'absolute'}
-            right={-72}
+            right={-69}
             top="50%"
             transform="translateY(-50%)"
           />
@@ -288,6 +279,8 @@ const SendTagPricingButton = ({
   name,
   price,
 }: { isOpen: boolean; name: string; price: bigint }) => {
+  const { resolvedTheme } = useThemeSetting()
+
   return (
     <Button
       als="flex-end"

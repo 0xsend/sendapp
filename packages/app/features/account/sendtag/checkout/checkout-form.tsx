@@ -145,7 +145,13 @@ export const CheckoutForm = () => {
                   Your Sendtags are not confirmed until payment is received and your wallet is
                   verified
                 </Paragraph>
-                <XStack btw={1} bbw={1} $theme-dark={{ boc: '$decay' }} p="$2">
+                <XStack
+                  btw={1}
+                  bbw={1}
+                  $theme-dark={{ boc: '$decay' }}
+                  py="$2"
+                  $gtMd={{ px: '$2' }}
+                >
                   <Paragraph
                     $theme-dark={{ col: '$olive' }}
                     $gtMd={{ f: 2 }}
