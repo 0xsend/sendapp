@@ -12,9 +12,7 @@ exports[`OnboardingScreen 1`] = `
     }
   }
 >
-  <View
-    style={{}}
-  >
+  <View>
     <RNSVGSvgView
       align="xMidYMid"
       bbHeight="28"
@@ -334,7 +332,7 @@ exports[`OnboardingScreen 1`] = `
                         "isSubmitSuccessful": false,
                         "isSubmitted": false,
                         "isSubmitting": false,
-                        "isValid": false,
+                        "isValid": true,
                         "isValidating": false,
                         "submitCount": 0,
                         "touchedFields": {},
@@ -366,7 +364,7 @@ exports[`OnboardingScreen 1`] = `
                         "errors": true,
                         "isDirty": false,
                         "isSubmitting": true,
-                        "isValid": false,
+                        "isValid": true,
                         "isValidating": false,
                         "touchedFields": false,
                       },
@@ -423,6 +421,7 @@ exports[`OnboardingScreen 1`] = `
                       "unregister": [Function],
                     }
                   }
+                  focusVisibleStyle={{}}
                   focusable={true}
                   fontVariant={
                     [
@@ -434,7 +433,6 @@ exports[`OnboardingScreen 1`] = `
                   onBlur={[Function]}
                   onChangeText={[Function]}
                   onFocus={[Function]}
-                  outlineWidth={0}
                   placeholder="My Send Account"
                   placeholderTextColor="hsla(191, 32%, 50%, 1)"
                   readOnly={false}
@@ -462,12 +460,24 @@ exports[`OnboardingScreen 1`] = `
                       "minWidth": 0,
                       "paddingLeft": 16,
                       "paddingRight": 16,
+                      "position": "relative",
                       "width": "100%",
                     }
                   }
                   value="mock"
                 />
               </View>
+              <View
+                style={
+                  {
+                    "gap": 7,
+                    "position": "absolute",
+                    "right": 18,
+                    "top": "50%",
+                    "transform": "translateY(-50%)",
+                  }
+                }
+              />
             </View>
             <View
               pointerEvents="none"
@@ -483,6 +493,7 @@ exports[`OnboardingScreen 1`] = `
             <Text
               accessibilityRole="link"
               cancelable={true}
+              disabled={false}
               focusable={true}
               minPressDuration={0}
               onMouseEnter={[Function]}
@@ -543,6 +554,7 @@ exports[`OnboardingScreen 1`] = `
             <Text
               accessibilityRole="link"
               cancelable={true}
+              disabled={false}
               focusable={true}
               minPressDuration={0}
               onMouseEnter={[Function]}
@@ -572,8 +584,8 @@ exports[`OnboardingScreen 1`] = `
                 }
               }
               cancelable={true}
-              cursor="pointer"
               disabled={false}
+              focusVisibleStyle={{}}
               focusable={[Function]}
               minPressDuration={0}
               onBlur={[Function]}
@@ -616,7 +628,6 @@ exports[`OnboardingScreen 1`] = `
               testID="SubmitButton"
             >
               <Text
-                cursor="pointer"
                 lineBreakMode="clip"
                 numberOfLines={1}
                 style={
@@ -634,7 +645,6 @@ exports[`OnboardingScreen 1`] = `
                 userSelect="none"
               >
                 <Text
-                  cursor="pointer"
                   lineBreakMode="clip"
                   numberOfLines={1}
                   style={

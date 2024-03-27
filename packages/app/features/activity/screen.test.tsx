@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { TamaguiProvider, View as MockView, config } from '@my/ui'
-import { act, render, screen, fireEvent } from '@testing-library/react-native'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
 
 jest.mock('app/utils/supabase/useSupabase', () => ({
@@ -25,12 +25,16 @@ jest.mock('solito/link', () => ({
   ),
 }))
 
-test('ActivityScreen', () => {
+test('ActivityScreen', async () => {
+  jest.useFakeTimers()
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <ActivityScreen />
     </TamaguiProvider>
   )
+  await act(async () => {
+    jest.runAllTimers()
+  })
   expect(screen.toJSON()).toMatchSnapshot('ActivityScreen')
 })
 
@@ -42,12 +46,17 @@ test('ActivityScreen: search', async () => {
     </TamaguiProvider>
   )
   const searchInput = screen.getByPlaceholderText('Search')
-  fireEvent.changeText(searchInput, 'test')
   act(() => {
+    fireEvent.changeText(searchInput, 'test')
     jest.runAllTimers()
   })
+
+  await waitFor(() => screen.findByTestId('tag-search-test'))
+
   expect(searchInput.props.value).toBe('test')
+  await waitFor(() => screen.findByTestId('tag-search-test'))
   const searchResults = await screen.findByTestId('tag-search-test')
+
   expect(searchResults).toHaveTextContent('??test')
   expect(screen.toJSON()).toMatchSnapshot('ActivityScreen: search')
 })
