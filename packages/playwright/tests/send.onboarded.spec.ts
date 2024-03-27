@@ -31,7 +31,7 @@ test('can send ETH to user on profile', async ({ page, seed }) => {
   await profilePage.sendButton.click()
 
   // @todo create send form fixture
-  const sendDialog = page.getByRole('dialog', { name: 'Send' })
+  const sendDialog = page.getByTestId('sendDialogContainer')
   await expect(sendDialog).toBeVisible()
   const amountInput = sendDialog.getByLabel('Amount')
   await expect(amountInput).toBeVisible()
@@ -62,7 +62,7 @@ test('can send USDC to user on profile', async ({ page, seed }) => {
   await profilePage.sendButton.click()
 
   // @todo create send form fixture
-  const sendDialog = page.getByRole('dialog', { name: 'Send' })
+  const sendDialog = page.getByTestId('sendDialogContainer')
   await expect(sendDialog).toBeVisible()
   const amountInput = sendDialog.getByLabel('Amount')
   await expect(amountInput).toBeVisible()
