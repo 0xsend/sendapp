@@ -1,4 +1,6 @@
+import '@rainbow-me/rainbowkit/styles.css'
 import '../public/reset.css'
+import '../styles/globals.css'
 
 import 'raf/polyfill'
 import '@my/ui/src/config/fonts.css'
@@ -9,6 +11,7 @@ import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 
 import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
@@ -58,7 +61,7 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {getLayout(<Component {...pageProps} />)}
+          <RainbowKitProvider>{getLayout(<Component {...pageProps} />)}</RainbowKitProvider>
         </Provider>
       </NextThemeProvider>
     </>
