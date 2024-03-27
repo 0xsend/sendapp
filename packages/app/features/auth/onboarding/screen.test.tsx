@@ -102,14 +102,14 @@ afterEach(() => {
 
 jest.useFakeTimers()
 jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
-test(OnboardingScreen.name, () => {
+test(OnboardingScreen.name, async () => {
   jest.spyOn(Date.prototype, 'toLocaleString').mockReturnValue('foobar')
   const tree = render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <OnboardingScreen />
     </TamaguiProvider>
   ).toJSON()
-  act(() => {
+  await act(async () => {
     jest.runAllTimers()
   })
   expect(tree).toMatchSnapshot()

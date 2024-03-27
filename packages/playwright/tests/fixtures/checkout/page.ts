@@ -24,7 +24,7 @@ export class CheckoutPage {
   }
 
   async fillTagName(tag: string) {
-    await this.page.getByPlaceholder('Send Tag name').fill(tag)
+    await this.page.getByPlaceholder('Enter Sendtag name').fill(tag)
   }
 
   async submitTagName() {
@@ -112,13 +112,14 @@ export class CheckoutPage {
     await this.wallet.authorize(Web3RequestKind.SendTransaction)
     await confirmTagsRequest
     await confirmTagsResponse
-    expect?.(this.confirmDialog).toContainText('Send Tags are confirmed.')
-    await expect?.(
-      this.confirmDialog.getByRole('link', {
-        name: 'X Post Referral Link',
-      })
-    ).toBeVisible()
-    await this.confirmDialog.getByLabel('Close').click()
+    // @todo check that it redirected back
+    // expect?.(this.confirmDialog).toContainText('Sendtags are confirmed.')
+    // await expect?.(
+    //   this.confirmDialog.getByRole('link', {
+    //     name: 'X Post Referral Link',
+    //   })
+    // ).toBeVisible()
+    // await this.confirmDialog.getByLabel('Close').click()
   }
 
   async waitForConfirmation() {

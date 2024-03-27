@@ -191,6 +191,7 @@ export const CheckoutForm = () => {
                           f={2}
                           maw="40%"
                           fontFamily={'$mono'}
+                          accessibilityLabel={`Pending Sendtag ${tag.name}`}
                         >
                           {tag.name}
                         </Paragraph>

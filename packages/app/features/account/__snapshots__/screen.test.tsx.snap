@@ -371,6 +371,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             accessibilityLabel="Share"
             accessibilityRole="button"
             cancelable={true}
+            disabled={false}
             focusable={[Function]}
             minPressDuration={0}
             onMouseEnter={[Function]}
@@ -387,7 +388,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             }
           >
             <Text
-              cursor="pointer"
               lineBreakMode="clip"
               numberOfLines={1}
               style={
@@ -616,6 +616,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             accessibilityLabel="Share"
             accessibilityRole="button"
             cancelable={true}
+            disabled={false}
             focusable={[Function]}
             minPressDuration={0}
             onMouseEnter={[Function]}
@@ -632,7 +633,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             }
           >
             <Text
-              cursor="pointer"
               lineBreakMode="clip"
               numberOfLines={1}
               style={
