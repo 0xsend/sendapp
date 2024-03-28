@@ -1,5 +1,5 @@
 import '../public/reset.css'
-
+import '@rainbow-me/rainbowkit/styles.css'
 import 'raf/polyfill'
 import '@my/ui/src/config/fonts.css'
 

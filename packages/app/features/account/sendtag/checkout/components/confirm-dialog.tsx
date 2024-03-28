@@ -46,6 +46,7 @@ import {
 } from 'wagmi'
 import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../checkout-utils'
 import { assert } from 'app/utils/assert'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 
 export interface ConfirmContextType {
   open: boolean
@@ -259,7 +260,8 @@ export function ConfirmDialog({
 
 export function ConfirmFlow() {
   const { isConnected, chainId } = useAccount()
-  const { connect, connectors, error: connectError } = useConnect()
+  const { error: connectError } = useConnect()
+  const { openConnectModal } = useConnectModal()
   const { switchChain } = useSwitchChain()
   const { isLoadingTags } = useUser()
 
@@ -281,8 +283,8 @@ export function ConfirmFlow() {
         <Button
           w="100%"
           onPress={() => {
-            assert(!!connectors[0], 'No connectors found')
-            connect({ connector: connectors[0] })
+            assert(!!openConnectModal, 'No rainbowkit connect modal')
+            openConnectModal()
           }}
         >
           Connect Wallet
