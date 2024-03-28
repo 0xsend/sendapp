@@ -3,7 +3,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import {
   Fieldset,
   Input,
-  InputProps,
+  type InputProps,
   Label,
   TamaguiElement,
   Theme,

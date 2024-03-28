@@ -1,6 +1,6 @@
 import { YStack } from '@my/ui'
-import { ColorTokens } from '@my/ui/types'
-import { IconProps, themed } from '@tamagui/helpers-icon'
+import type { ColorTokens } from '@my/ui/types'
+import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 

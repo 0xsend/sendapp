@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { assert } from './assert'
 import {
-  Hex,
+  type Hex,
   encodeFunctionData,
   erc20Abi,
   isAddress,
@@ -17,7 +17,7 @@ import {
   entryPointAddress,
   // tokenPaymasterAddress,
 } from '@my/wagmi'
-import { UserOperation, getUserOperationHash } from 'permissionless'
+import { type UserOperation, getUserOperationHash } from 'permissionless'
 import { USEROP_VALID_UNTIL, USEROP_VERSION, signUserOp } from './userop'
 
 export type UseUserOpTransferMutationArgs = {

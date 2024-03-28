@@ -1,7 +1,7 @@
-import { MergeDeep } from 'type-fest'
-import { Database as DatabaseGenerated } from './database-generated.types'
+import type { MergeDeep } from 'type-fest'
+import type { Database as DatabaseGenerated } from './database-generated.types'
 export type { Json } from './database-generated.types'
-import { PostgrestError } from '@supabase/supabase-js'
+import type { PostgrestError } from '@supabase/supabase-js'
 
 export type PgBytea = `\\x${string}`
 

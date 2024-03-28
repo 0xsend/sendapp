@@ -3,7 +3,7 @@ import { useId } from 'react'
 import {
   Fieldset,
   Input,
-  InputProps,
+  type InputProps,
   Label,
   Paragraph,
   Stack,

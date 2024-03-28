@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
 import { test } from '@my/playwright/fixtures/snaplet'
-import { debug, Debugger } from 'debug'
+import { debug, type Debugger } from 'debug'
 import { assert } from 'app/utils/assert'
 import { userOnboarded } from '@my/snaplet/src/models'
 import { ProfilePage } from './fixtures/profiles'

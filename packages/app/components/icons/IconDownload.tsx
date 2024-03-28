@@ -1,7 +1,7 @@
-import { IconProps, themed } from '@tamagui/helpers-icon'
+import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
-import { ColorTokens } from '@my/ui'
+import type { ColorTokens } from '@my/ui'
 
 const Download = (props: IconProps) => {
   const { size, color, ...rest } = props

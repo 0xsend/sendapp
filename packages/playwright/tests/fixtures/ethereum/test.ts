@@ -2,8 +2,8 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { testBaseClient } from '../viem'
 
 import { test as base } from '@playwright/test'
-import { Web3ProviderBackend, injectHeadlessWeb3Provider } from 'headless-web3-provider'
-import { Account, parseEther } from 'viem'
+import { type Web3ProviderBackend, injectHeadlessWeb3Provider } from 'headless-web3-provider'
+import { type Account, parseEther } from 'viem'
 import { assert } from 'app/utils/assert'
 
 if (!process.env.NEXT_PUBLIC_BASE_CHAIN_ID) {

@@ -1,5 +1,5 @@
-import { ButtonProps } from '@my/ui'
-import React from 'react'
+import type { ButtonProps } from '@my/ui'
+import type React from 'react'
 
 export interface INumPadProps {
   value: string

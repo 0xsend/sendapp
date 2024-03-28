@@ -1,5 +1,5 @@
-import { ReactElement } from 'react'
-import { XStack, XStackProps, YStackProps } from 'tamagui'
+import type { ReactElement } from 'react'
+import { XStack, type XStackProps, type YStackProps } from 'tamagui'
 
 export const SideBarWrapper = ({
   children,

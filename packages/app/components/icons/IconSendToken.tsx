@@ -1,4 +1,4 @@
-import { ColorTokens } from '@my/ui/types'
+import type { ColorTokens } from '@my/ui/types'
 import { themed } from '@tamagui/helpers-icon'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { useThemeSetting } from '@tamagui/next-theme'

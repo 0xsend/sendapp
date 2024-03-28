@@ -1,6 +1,6 @@
 import { useBytecode } from 'wagmi'
 import { test } from '@jest/globals'
-import { SendAccountQuery } from './send-accounts/useSendAccounts'
+import type { SendAccountQuery } from './send-accounts/useSendAccounts'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { useSendAccountInitCode } from './useSendAccountInitCode'
 import { assert } from './assert'

@@ -1,5 +1,5 @@
-import { Tables } from '@my/supabase/database.types'
-import { baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
+import type { Tables } from '@my/supabase/database.types'
+import { type baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
 import { parseEther } from 'viem'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>

@@ -11,7 +11,7 @@ import debug from 'debug'
 const log = debug('app:features:onboarding:screen')
 import crypto from 'node:crypto'
 import {
-  Hex,
+  type Hex,
   bytesToHex,
   concat,
   encodeAbiParameters,
@@ -38,7 +38,7 @@ import {
   verifier,
 } from 'app/utils/userop'
 import { numberToBytes } from 'viem'
-import { getSenderAddress, getUserOperationHash, UserOperation } from 'permissionless'
+import { getSenderAddress, getUserOperationHash, type UserOperation } from 'permissionless'
 import nock from 'nock'
 const sendAccountFactory = getContract({
   abi: sendAccountFactoryAbi,

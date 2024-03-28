@@ -20,9 +20,9 @@ import {
 
 import React from 'react'
 
-import { UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
+import { type UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
-import { TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
+import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
 import { useChainAddresses } from 'app/utils/useChainAddresses'

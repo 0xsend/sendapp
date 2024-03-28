@@ -3,7 +3,7 @@ import {
   Button,
   Container,
   Dialog,
-  DialogProps,
+  type DialogProps,
   Sheet,
   SizableText,
   XStack,
@@ -12,7 +12,7 @@ import {
 } from '@my/ui'
 import { IconClose } from 'app/components/icons'
 import { AvatarProfile } from './AvatarProfile'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
+import type { useProfileLookup } from 'app/utils/useProfileLookup'
 import { Provider } from 'app/provider'
 import { SendForm } from './SendForm'
 

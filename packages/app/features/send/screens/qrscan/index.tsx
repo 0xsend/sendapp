@@ -9,7 +9,7 @@ import {
   TransferProvider,
   useSubScreenContext,
 } from 'app/features/send/providers'
-import { QRScreenType } from 'app/features/send/types'
+import type { QRScreenType } from 'app/features/send/types'
 
 const screens = {
   home: QRScanScreen,

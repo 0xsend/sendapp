@@ -4,7 +4,7 @@
  * Currently, Playwright browsers do no support WebAuthn, so we mock the call to the WebAuthn API.
  */
 
-import { Attestation } from '@0xsend/webauthn-authenticator/types'
+import type { Attestation } from '@0xsend/webauthn-authenticator/types'
 import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
 import { assert } from 'app/utils/assert'
 import cbor from 'cbor'

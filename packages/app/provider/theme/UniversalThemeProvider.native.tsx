@@ -1,13 +1,16 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import { ThemeProviderProps, useThemeSetting as next_useThemeSetting } from '@tamagui/next-theme'
+import type {
+  ThemeProviderProps,
+  useThemeSetting as next_useThemeSetting,
+} from '@tamagui/next-theme'
 import {
-  ThemePreference,
+  type ThemePreference,
   setThemePreference,
   useThemePreference,
 } from '@vonovak/react-native-theme-control'
 import { StatusBar } from 'expo-status-bar'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { AppState, ColorSchemeName, useColorScheme } from 'react-native'
+import { AppState, type ColorSchemeName, useColorScheme } from 'react-native'
 
 export const ThemeContext = createContext<
   (ThemeProviderProps & { current: ThemeName | null }) | null

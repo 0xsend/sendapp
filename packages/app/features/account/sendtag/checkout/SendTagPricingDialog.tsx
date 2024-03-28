@@ -1,4 +1,4 @@
-import { Tables } from '@my/supabase/database.types'
+import type { Tables } from '@my/supabase/database.types'
 import {
   Adapt,
   Button,

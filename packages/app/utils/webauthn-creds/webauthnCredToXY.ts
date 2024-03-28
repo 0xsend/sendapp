@@ -1,7 +1,7 @@
 import { COSEECDHAtoXY } from '../passkeys'
 import { base16 } from '@scure/base'
 import { assert } from '../assert'
-import { Hex } from 'viem'
+import type { Hex } from 'viem'
 
 /**
  * Given a webauthn credential public key, return the public key as an X, Y pair.

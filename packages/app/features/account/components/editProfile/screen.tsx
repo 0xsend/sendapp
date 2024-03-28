@@ -2,9 +2,9 @@ import { ProfileAvatar, Paragraph, XStack, YStack, SubmitButton, Separator, Spin
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useProfileMutation, ProfileSchema } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
-import { UploadAvatar, UploadAvatarRefObject } from '../uploadProfileImage/screen'
+import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/screen'
 import { useRef } from 'react'
-import { Tables } from '@my/supabase/database.types'
+import type { Tables } from '@my/supabase/database.types'
 
 export const EditProfile = () => {
   const { profile } = useUser()

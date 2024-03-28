@@ -1,9 +1,9 @@
 import { HomeScreen } from 'app/features/home/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
-import { GetServerSidePropsContext } from 'next'
+import type { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from './_app'
+import type { NextPageWithLayout } from './_app'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {

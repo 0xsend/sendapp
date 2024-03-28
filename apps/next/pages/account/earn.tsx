@@ -1,7 +1,7 @@
 import { EarnTokensScreen } from 'app/features/account/earn-tokens/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from 'next-app/pages/_app'
+import type { NextPageWithLayout } from 'next-app/pages/_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
 

@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import type { BrowserContext, Locator, Page } from '@playwright/test'
 import debug from 'debug'
 

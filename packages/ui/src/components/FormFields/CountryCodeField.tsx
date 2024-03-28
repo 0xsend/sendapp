@@ -9,7 +9,7 @@ import {
   Adapt,
   Fieldset,
   Select,
-  SelectProps,
+  type SelectProps,
   Sheet,
   Text,
   Theme,

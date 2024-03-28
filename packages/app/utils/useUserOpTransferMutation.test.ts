@@ -1,5 +1,5 @@
 import {
-  UseUserOpTransferMutationArgs,
+  type UseUserOpTransferMutationArgs,
   useUserOpTransferMutation,
 } from './useUserOpTransferMutation'
 import { Wrapper } from './__mocks__/Wrapper'

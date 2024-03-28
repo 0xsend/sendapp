@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from '../../_app'
+import type { NextPageWithLayout } from '../../_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { SendTagScreen } from 'app/features/account/sendtag/screen'
 import { ButtonOption, TopNav } from 'app/components/TopNav'

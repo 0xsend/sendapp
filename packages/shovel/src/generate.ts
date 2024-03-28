@@ -1,6 +1,6 @@
 import { toJSON } from '@indexsupply/shovel-config'
 import { config } from '.'
-import { parseArgs } from 'util'
+import { parseArgs } from 'node:util'
 
 const { values } = parseArgs({
   args: Bun.argv,

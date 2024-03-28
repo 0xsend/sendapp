@@ -1,4 +1,4 @@
-import { Avatar, AvatarProps } from 'tamagui'
+import { Avatar, type AvatarProps } from 'tamagui'
 
 export function ProfileAvatar({ avatarUrl, ...props }: AvatarProps & { avatarUrl?: string }) {
   return (

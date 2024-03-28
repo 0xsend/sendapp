@@ -17,9 +17,9 @@ import {
   Unspaced,
   XStack,
   YStack,
-  YStackProps,
+  type YStackProps,
 } from '@my/ui'
-import { baseMainnet, baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
+import { baseMainnet, type baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
 import { CheckCircle, X } from '@tamagui/lucide-icons'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'

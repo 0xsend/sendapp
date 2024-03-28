@@ -1,6 +1,6 @@
 import { WagmiProvider as OGWagmiProvider } from 'wagmi'
 import { config } from '@my/wagmi'
-import { FC, ReactNode } from 'react'
+import type { FC, ReactNode } from 'react'
 
 export const WagmiProvider: FC<{ children: ReactNode }> = ({
   children,

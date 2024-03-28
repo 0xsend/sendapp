@@ -1,7 +1,7 @@
-import { Adapt, Button, Dialog, Sheet, SizableText, Theme, ThemeName, YStack } from '@my/ui'
+import { Adapt, Button, Dialog, Sheet, SizableText, Theme, type ThemeName, YStack } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconClose } from 'app/components/icons'
-import { IProfileQRModalProps } from 'app/features/send/types'
+import type { IProfileQRModalProps } from 'app/features/send/types'
 
 export const ProfileQRModal = ({ showModal, setShowModal, to }: IProfileQRModalProps) => {
   const { resolvedTheme } = useThemeSetting()

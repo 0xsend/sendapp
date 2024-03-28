@@ -1,5 +1,5 @@
-import { join } from 'path'
-import { Database } from '@my/supabase/database.types'
+import { join } from 'node:path'
+import type { Database } from '@my/supabase/database.types'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { createClient } from '@supabase/supabase-js'
 import debug from 'debug'

@@ -1,5 +1,5 @@
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
-import { SendAccountQuery } from './send-accounts/useSendAccounts'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
+import type { SendAccountQuery } from './send-accounts/useSendAccounts'
 import { useBytecode } from 'wagmi'
 import { assert } from './assert'
 import { isHex } from 'viem'

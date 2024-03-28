@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base",
+  "include": ["tests"],
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "app/*": ["./*"],
+      "@my/ui/*": ["../ui/src/*"],
+      "@my/wagmi/*": ["../wagmi/src/*"],
+      "@my/contracts/out/*": ["../contracts/out/*"],
+      "@my/playwright/*": ["./tests/*"],
+      "@0xsend/webauthn-authenticator/*": ["../webauthn-authenticator/src/*"],
+      "@my/*": ["../*"]
+    }
+  },
+  "references": []
+}

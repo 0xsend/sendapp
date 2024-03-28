@@ -1,4 +1,4 @@
-import { H1, HeadingProps } from 'tamagui'
+import { H1, type HeadingProps } from 'tamagui'
 
 export const BigHeading = ({
   fontSize = 64,

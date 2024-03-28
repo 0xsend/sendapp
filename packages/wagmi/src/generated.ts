@@ -2313,7 +2313,7 @@ export const sendAccountFactoryAbi = [
 export const sendAccountFactoryAddress = {
   8453: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
   84532: '0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C',
-  845337: '0xDf11654D97006885F4D7bff6F2c1260C4d72D984',
+  845337: '0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C',
 } as const
 
 /**

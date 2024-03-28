@@ -1,11 +1,11 @@
-import { Functions } from '@my/supabase/database.types'
+import type { Functions } from '@my/supabase/database.types'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { useDebounce } from '@my/ui'
 import { formFields } from '../../utils/SchemaForm'
-import { PostgrestError } from '@supabase/supabase-js'
+import type { PostgrestError } from '@supabase/supabase-js'
 
 export const SearchSchema = z.object({
   query: formFields.text,

@@ -3,12 +3,12 @@ import { useFieldInfo, useTsController } from '@ts-react/form'
 import { useEffect, useState, useId } from 'react'
 import {
   Checkbox,
-  CheckboxProps,
-  CheckedState,
+  type CheckboxProps,
+  type CheckedState,
   Fieldset,
   Label,
   Theme,
-  ThemeName,
+  type ThemeName,
   XStack,
   useThemeName,
 } from 'tamagui'

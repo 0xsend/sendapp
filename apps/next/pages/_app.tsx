@@ -3,14 +3,14 @@ import '../public/reset.css'
 import 'raf/polyfill'
 import '@my/ui/src/config/fonts.css'
 
-import { ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
+import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 import { Provider } from 'app/provider'
-import { AuthProviderProps } from 'app/provider/auth'
+import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
-import { NextPage } from 'next'
+import type { NextPage } from 'next'
 import Head from 'next/head'
 
-import { ReactElement, ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
 
 if (process.env.NODE_ENV === 'production') {

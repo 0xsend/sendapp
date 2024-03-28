@@ -1,4 +1,4 @@
-import { Tables, Views } from '@my/supabase/database.types'
+import type { Tables, Views } from '@my/supabase/database.types'
 import {
   mainnet,
   sendTokenAddress,
@@ -9,8 +9,8 @@ import {
   useReadSendMerkleDropTrancheActive,
   useReadSendMerkleDropIsClaimed,
 } from '@my/wagmi'
-import { PostgrestError } from '@supabase/supabase-js'
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import type { PostgrestError } from '@supabase/supabase-js'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useBalance, useSimulateContract } from 'wagmi'
 import { api } from './api'

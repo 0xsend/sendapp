@@ -1,11 +1,5 @@
-{
-  /* <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round" class="lucide lucide-menu">
-<line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" />
-</svg> */
-}
-
-import { ColorTokens } from '@my/ui/types'
-import { IconProps, themed } from '@tamagui/helpers-icon'
+import type { ColorTokens } from '@my/ui/types'
+import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Svg, Path } from 'react-native-svg'
 
@@ -15,7 +9,9 @@ const Hamburger = (props: IconProps) => {
     <Svg
       viewBox="0 0 32 33"
       color={color as ColorTokens | undefined}
+      // @ts-expect-error - size is not nullable
       width={size ?? 32}
+      // @ts-expect-error - size is not nullable
       height={size ?? 33}
       fill={'none'}
       strokeWidth={strokeWidth ?? 2}

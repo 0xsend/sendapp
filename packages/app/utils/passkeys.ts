@@ -2,7 +2,7 @@ import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
 import { p256 } from '@noble/curves/p256'
 import { base64 } from '@scure/base'
 import cbor from 'cbor'
-import { Hex, bytesToBigInt, bytesToHex, hexToBytes } from 'viem'
+import { type Hex, bytesToBigInt, bytesToHex, hexToBytes } from 'viem'
 import { assert } from './assert'
 
 /**
@@ -119,7 +119,7 @@ export function parseSignResponse(result: SignResult) {
   const passkeyName = result.passkeyName
   const [accountName, keySlotStr] = passkeyName.split('.') // Assumes account name does not have periods (.) in it.
   assert(!!accountName && !!keySlotStr, 'Invalid passkey name')
-  const keySlot = parseInt(keySlotStr, 10)
+  const keySlot = Number.parseInt(keySlotStr, 10)
   const clientDataJSON = Buffer.from(base64.decode(result.rawClientDataJSONB64)).toString('utf-8')
   const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":"'))
   const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":"'))

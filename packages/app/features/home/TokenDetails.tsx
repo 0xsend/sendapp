@@ -2,9 +2,9 @@ import {
   Paragraph,
   Spinner,
   Tooltip,
-  TooltipProps,
+  type TooltipProps,
   XStack,
-  XStackProps,
+  type XStackProps,
   useToastController,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -12,7 +12,7 @@ import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { UseBalanceReturnType, useBalance } from 'wagmi'
+import { type UseBalanceReturnType, useBalance } from 'wagmi'
 
 const TokenDetails = ({
   coin,

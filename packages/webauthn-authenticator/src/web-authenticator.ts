@@ -5,12 +5,12 @@
  * This is a mock implementation of the WebAuthn API for use in Playwright tests. It only supports ES256 and P-256.
  */
 
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import { base64urlnopad } from '@scure/base'
 import cbor from 'cbor'
 import debug from 'debug'
 import { AAGUID } from './aaguid'
-import {
+import type {
   Attestation,
   CreateWebauthnCredentialOptions,
   CredentialCreationOptionsSerialized,
