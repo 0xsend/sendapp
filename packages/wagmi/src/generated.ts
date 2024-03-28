@@ -3205,6 +3205,573 @@ export const testUsdcAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TokenPaymaster
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ *
+ */
+export const tokenPaymasterAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20Metadata', type: 'address' },
+      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
+      { name: '_wrappedNative', internalType: 'contract IERC20', type: 'address' },
+      { name: '_uniswap', internalType: 'contract ISwapRouter', type: 'address' },
+      {
+        name: '_tokenPaymasterConfig',
+        internalType: 'struct TokenPaymasterConfig',
+        type: 'tuple',
+        components: [
+          { name: 'priceMarkup', internalType: 'uint256', type: 'uint256' },
+          { name: 'minEntryPointBalance', internalType: 'uint128', type: 'uint128' },
+          { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
+          { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
+          { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+        ],
+      },
+      {
+        name: '_rewardsConfig',
+        internalType: 'struct RewardsConfig',
+        type: 'tuple',
+        components: [
+          { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
+          { name: 'rewardsPool', internalType: 'address', type: 'address' },
+        ],
+      },
+      {
+        name: '_oracleHelperConfig',
+        internalType: 'struct OracleHelperConfig',
+        type: 'tuple',
+        components: [
+          { name: 'cacheTimeToLive', internalType: 'uint48', type: 'uint48' },
+          { name: 'maxOracleRoundAge', internalType: 'uint48', type: 'uint48' },
+          { name: 'tokenOracle', internalType: 'contract IOracle', type: 'address' },
+          { name: 'nativeOracle', internalType: 'contract IOracle', type: 'address' },
+          { name: 'tokenToNativeOracle', internalType: 'bool', type: 'bool' },
+          { name: 'tokenOracleReverse', internalType: 'bool', type: 'bool' },
+          { name: 'nativeOracleReverse', internalType: 'bool', type: 'bool' },
+          { name: 'priceUpdateThreshold', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      {
+        name: '_uniswapHelperConfig',
+        internalType: 'struct UniswapHelperConfig',
+        type: 'tuple',
+        components: [
+          { name: 'minSwapAmount', internalType: 'uint256', type: 'uint256' },
+          { name: 'uniswapPoolFee', internalType: 'uint24', type: 'uint24' },
+          { name: 'slippage', internalType: 'uint8', type: 'uint8' },
+        ],
+      },
+      { name: '_owner', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'receive', stateMutability: 'payable' },
+  {
+    type: 'function',
+    inputs: [{ name: 'unstakeDelaySec', internalType: 'uint32', type: 'uint32' }],
+    name: 'addStake',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'cachedPrice',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'cachedPriceTimestamp',
+    outputs: [{ name: '', internalType: 'uint48', type: 'uint48' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'tokenPrice', internalType: 'uint256', type: 'uint256' },
+      { name: 'nativeAssetPrice', internalType: 'uint256', type: 'uint256' },
+      { name: 'tokenOracleReverse', internalType: 'bool', type: 'bool' },
+      { name: 'nativeOracleReverse', internalType: 'bool', type: 'bool' },
+    ],
+    name: 'calculatePrice',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  { type: 'function', inputs: [], name: 'deposit', outputs: [], stateMutability: 'payable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'entryPoint',
+    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDeposit',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'oracleHelperConfig',
+    outputs: [
+      { name: 'cacheTimeToLive', internalType: 'uint48', type: 'uint48' },
+      { name: 'maxOracleRoundAge', internalType: 'uint48', type: 'uint48' },
+      { name: 'tokenOracle', internalType: 'contract IOracle', type: 'address' },
+      { name: 'nativeOracle', internalType: 'contract IOracle', type: 'address' },
+      { name: 'tokenToNativeOracle', internalType: 'bool', type: 'bool' },
+      { name: 'tokenOracleReverse', internalType: 'bool', type: 'bool' },
+      { name: 'nativeOracleReverse', internalType: 'bool', type: 'bool' },
+      { name: 'priceUpdateThreshold', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'mode', internalType: 'enum IPaymaster.PostOpMode', type: 'uint8' },
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256' },
+      { name: 'actualUserOpFeePerGas', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'postOp',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'rewardsConfig',
+    outputs: [
+      { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
+      { name: 'rewardsPool', internalType: 'address', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_oracleHelperConfig',
+        internalType: 'struct OracleHelperConfig',
+        type: 'tuple',
+        components: [
+          { name: 'cacheTimeToLive', internalType: 'uint48', type: 'uint48' },
+          { name: 'maxOracleRoundAge', internalType: 'uint48', type: 'uint48' },
+          { name: 'tokenOracle', internalType: 'contract IOracle', type: 'address' },
+          { name: 'nativeOracle', internalType: 'contract IOracle', type: 'address' },
+          { name: 'tokenToNativeOracle', internalType: 'bool', type: 'bool' },
+          { name: 'tokenOracleReverse', internalType: 'bool', type: 'bool' },
+          { name: 'nativeOracleReverse', internalType: 'bool', type: 'bool' },
+          { name: 'priceUpdateThreshold', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    name: 'setOracleConfiguration',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_rewardsConfig',
+        internalType: 'struct RewardsConfig',
+        type: 'tuple',
+        components: [
+          { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
+          { name: 'rewardsPool', internalType: 'address', type: 'address' },
+        ],
+      },
+    ],
+    name: 'setRewardsConfig',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_tokenPaymasterConfig',
+        internalType: 'struct TokenPaymasterConfig',
+        type: 'tuple',
+        components: [
+          { name: 'priceMarkup', internalType: 'uint256', type: 'uint256' },
+          { name: 'minEntryPointBalance', internalType: 'uint128', type: 'uint128' },
+          { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
+          { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
+          { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+        ],
+      },
+    ],
+    name: 'setTokenPaymasterConfig',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_uniswapHelperConfig',
+        internalType: 'struct UniswapHelperConfig',
+        type: 'tuple',
+        components: [
+          { name: 'minSwapAmount', internalType: 'uint256', type: 'uint256' },
+          { name: 'uniswapPoolFee', internalType: 'uint24', type: 'uint24' },
+          { name: 'slippage', internalType: 'uint8', type: 'uint8' },
+        ],
+      },
+    ],
+    name: 'setUniswapConfiguration',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'token',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'tokenPaymasterConfig',
+    outputs: [
+      { name: 'priceMarkup', internalType: 'uint256', type: 'uint256' },
+      { name: 'minEntryPointBalance', internalType: 'uint128', type: 'uint128' },
+      { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
+      { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
+      { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'price', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'tokenToWei',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'uniswap',
+    outputs: [{ name: '', internalType: 'contract ISwapRouter', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'uniswapHelperConfig',
+    outputs: [
+      { name: 'minSwapAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'uniswapPoolFee', internalType: 'uint24', type: 'uint24' },
+      { name: 'slippage', internalType: 'uint8', type: 'uint8' },
+    ],
+    stateMutability: 'view',
+  },
+  { type: 'function', inputs: [], name: 'unlockStake', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [{ name: 'force', internalType: 'bool', type: 'bool' }],
+    name: 'updateCachedPrice',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'maxCost', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'validatePaymasterUserOp',
+    outputs: [
+      { name: 'context', internalType: 'bytes', type: 'bytes' },
+      { name: 'validationData', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'price', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'weiToToken',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', internalType: 'address payable', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawEth',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'withdrawAddress', internalType: 'address payable', type: 'address' }],
+    name: 'withdrawStake',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'withdrawAddress', internalType: 'address payable', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawToken',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'wrappedNative',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'tokenPaymasterConfig',
+        internalType: 'struct TokenPaymasterConfig',
+        type: 'tuple',
+        components: [
+          { name: 'priceMarkup', internalType: 'uint256', type: 'uint256' },
+          { name: 'minEntryPointBalance', internalType: 'uint128', type: 'uint128' },
+          { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
+          { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
+          { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'ConfigUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'oracleHelperConfig',
+        internalType: 'struct OracleHelperConfig',
+        type: 'tuple',
+        components: [
+          { name: 'cacheTimeToLive', internalType: 'uint48', type: 'uint48' },
+          { name: 'maxOracleRoundAge', internalType: 'uint48', type: 'uint48' },
+          { name: 'tokenOracle', internalType: 'contract IOracle', type: 'address' },
+          { name: 'nativeOracle', internalType: 'contract IOracle', type: 'address' },
+          { name: 'tokenToNativeOracle', internalType: 'bool', type: 'bool' },
+          { name: 'tokenOracleReverse', internalType: 'bool', type: 'bool' },
+          { name: 'nativeOracleReverse', internalType: 'bool', type: 'bool' },
+          { name: 'priceUpdateThreshold', internalType: 'uint256', type: 'uint256' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'OracleConfigUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Received',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'rewardsConfig',
+        internalType: 'struct RewardsConfig',
+        type: 'tuple',
+        components: [
+          { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
+          { name: 'rewardsPool', internalType: 'address', type: 'address' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'RewardsConfigUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'currentPrice', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'previousPrice', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'cachedPriceTimestamp', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'TokenPriceUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'uniswapHelperConfig',
+        internalType: 'struct UniswapHelperConfig',
+        type: 'tuple',
+        components: [
+          { name: 'minSwapAmount', internalType: 'uint256', type: 'uint256' },
+          { name: 'uniswapPoolFee', internalType: 'uint24', type: 'uint24' },
+          { name: 'slippage', internalType: 'uint8', type: 'uint8' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'UniswapConfigUpdated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'tokenIn', internalType: 'address', type: 'address', indexed: false },
+      { name: 'tokenOut', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amountIn', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'amountOutMin', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UniswapReverted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'user', internalType: 'address', type: 'address', indexed: true },
+      { name: 'actualTokenCharge', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'actualGasCost', internalType: 'uint256', type: 'uint256', indexed: false },
+      {
+        name: 'actualTokenPriceWithMarkup',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'baseFee', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'UserOperationSponsored',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'AddressInsufficientBalance',
+  },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+  },
+] as const
+
+/**
+ *
+ */
+export const tokenPaymasterAddress = {
+  845337: '0x60C8bFee4148017F7A1d5141155baA782342A156',
+} as const
+
+/**
+ *
+ */
+export const tokenPaymasterConfig = {
+  address: tokenPaymasterAddress,
+  abi: tokenPaymasterAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // USDC
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -6770,6 +7337,667 @@ export const watchTestUsdcTransferEvent = /*#__PURE__*/ createWatchContractEvent
   abi: testUsdcAbi,
   eventName: 'Transfer',
 })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const readTokenPaymaster = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"cachedPrice"`
+ *
+ *
+ */
+export const readTokenPaymasterCachedPrice = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'cachedPrice',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"cachedPriceTimestamp"`
+ *
+ *
+ */
+export const readTokenPaymasterCachedPriceTimestamp = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'cachedPriceTimestamp',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"calculatePrice"`
+ *
+ *
+ */
+export const readTokenPaymasterCalculatePrice = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'calculatePrice',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"entryPoint"`
+ *
+ *
+ */
+export const readTokenPaymasterEntryPoint = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"getDeposit"`
+ *
+ *
+ */
+export const readTokenPaymasterGetDeposit = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'getDeposit',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"oracleHelperConfig"`
+ *
+ *
+ */
+export const readTokenPaymasterOracleHelperConfig = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'oracleHelperConfig',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"owner"`
+ *
+ *
+ */
+export const readTokenPaymasterOwner = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"rewardsConfig"`
+ *
+ *
+ */
+export const readTokenPaymasterRewardsConfig = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'rewardsConfig',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"token"`
+ *
+ *
+ */
+export const readTokenPaymasterToken = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenPaymasterConfig"`
+ *
+ *
+ */
+export const readTokenPaymasterTokenPaymasterConfig = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'tokenPaymasterConfig',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenToWei"`
+ *
+ *
+ */
+export const readTokenPaymasterTokenToWei = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'tokenToWei',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"uniswap"`
+ *
+ *
+ */
+export const readTokenPaymasterUniswap = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'uniswap',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"uniswapHelperConfig"`
+ *
+ *
+ */
+export const readTokenPaymasterUniswapHelperConfig = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'uniswapHelperConfig',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"weiToToken"`
+ *
+ *
+ */
+export const readTokenPaymasterWeiToToken = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'weiToToken',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"wrappedNative"`
+ *
+ *
+ */
+export const readTokenPaymasterWrappedNative = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'wrappedNative',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const writeTokenPaymaster = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ *
+ */
+export const writeTokenPaymasterAddStake = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ *
+ */
+export const writeTokenPaymasterDeposit = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ *
+ */
+export const writeTokenPaymasterPostOp = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const writeTokenPaymasterRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setOracleConfiguration"`
+ *
+ *
+ */
+export const writeTokenPaymasterSetOracleConfiguration = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setOracleConfiguration',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
+ *
+ *
+ */
+export const writeTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setRewardsConfig',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setTokenPaymasterConfig"`
+ *
+ *
+ */
+export const writeTokenPaymasterSetTokenPaymasterConfig = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setTokenPaymasterConfig',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setUniswapConfiguration"`
+ *
+ *
+ */
+export const writeTokenPaymasterSetUniswapConfiguration = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setUniswapConfiguration',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const writeTokenPaymasterTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ *
+ */
+export const writeTokenPaymasterUnlockStake = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"updateCachedPrice"`
+ *
+ *
+ */
+export const writeTokenPaymasterUpdateCachedPrice = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'updateCachedPrice',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ *
+ */
+export const writeTokenPaymasterValidatePaymasterUserOp = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'validatePaymasterUserOp',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawEth"`
+ *
+ *
+ */
+export const writeTokenPaymasterWithdrawEth = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawEth',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ *
+ */
+export const writeTokenPaymasterWithdrawStake = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ *
+ */
+export const writeTokenPaymasterWithdrawTo = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const writeTokenPaymasterWithdrawToken = /*#__PURE__*/ createWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const prepareWriteTokenPaymaster = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterAddStake = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterDeposit = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterPostOp = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterRenounceOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setOracleConfiguration"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterSetOracleConfiguration =
+  /*#__PURE__*/ createSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'setOracleConfiguration',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setRewardsConfig',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setTokenPaymasterConfig"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterSetTokenPaymasterConfig =
+  /*#__PURE__*/ createSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'setTokenPaymasterConfig',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setUniswapConfiguration"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterSetUniswapConfiguration =
+  /*#__PURE__*/ createSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'setUniswapConfiguration',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterTransferOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterUnlockStake = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"updateCachedPrice"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterUpdateCachedPrice = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'updateCachedPrice',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterValidatePaymasterUserOp =
+  /*#__PURE__*/ createSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawEth"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterWithdrawEth = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawEth',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterWithdrawStake = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterWithdrawTo = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const prepareWriteTokenPaymasterWithdrawToken = /*#__PURE__*/ createSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const watchTokenPaymasterEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"ConfigUpdated"`
+ *
+ *
+ */
+export const watchTokenPaymasterConfigUpdatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'ConfigUpdated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"OracleConfigUpdated"`
+ *
+ *
+ */
+export const watchTokenPaymasterOracleConfigUpdatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'OracleConfigUpdated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ *
+ */
+export const watchTokenPaymasterOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'OwnershipTransferred',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"Received"`
+ *
+ *
+ */
+export const watchTokenPaymasterReceivedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'Received',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"RewardsConfigUpdated"`
+ *
+ *
+ */
+export const watchTokenPaymasterRewardsConfigUpdatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'RewardsConfigUpdated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"TokenPriceUpdated"`
+ *
+ *
+ */
+export const watchTokenPaymasterTokenPriceUpdatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'TokenPriceUpdated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"UniswapConfigUpdated"`
+ *
+ *
+ */
+export const watchTokenPaymasterUniswapConfigUpdatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'UniswapConfigUpdated',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"UniswapReverted"`
+ *
+ *
+ */
+export const watchTokenPaymasterUniswapRevertedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'UniswapReverted',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"UserOperationSponsored"`
+ *
+ *
+ */
+export const watchTokenPaymasterUserOperationSponsoredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'UserOperationSponsored',
+  })
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link usdcAbi}__
@@ -10490,6 +11718,670 @@ export const useWatchTestUsdcTransferEvent = /*#__PURE__*/ createUseWatchContrac
   abi: testUsdcAbi,
   eventName: 'Transfer',
 })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const useReadTokenPaymaster = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"cachedPrice"`
+ *
+ *
+ */
+export const useReadTokenPaymasterCachedPrice = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'cachedPrice',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"cachedPriceTimestamp"`
+ *
+ *
+ */
+export const useReadTokenPaymasterCachedPriceTimestamp = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'cachedPriceTimestamp',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"calculatePrice"`
+ *
+ *
+ */
+export const useReadTokenPaymasterCalculatePrice = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'calculatePrice',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"entryPoint"`
+ *
+ *
+ */
+export const useReadTokenPaymasterEntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"getDeposit"`
+ *
+ *
+ */
+export const useReadTokenPaymasterGetDeposit = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'getDeposit',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"oracleHelperConfig"`
+ *
+ *
+ */
+export const useReadTokenPaymasterOracleHelperConfig = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'oracleHelperConfig',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"owner"`
+ *
+ *
+ */
+export const useReadTokenPaymasterOwner = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"rewardsConfig"`
+ *
+ *
+ */
+export const useReadTokenPaymasterRewardsConfig = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'rewardsConfig',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"token"`
+ *
+ *
+ */
+export const useReadTokenPaymasterToken = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenPaymasterConfig"`
+ *
+ *
+ */
+export const useReadTokenPaymasterTokenPaymasterConfig = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'tokenPaymasterConfig',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenToWei"`
+ *
+ *
+ */
+export const useReadTokenPaymasterTokenToWei = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'tokenToWei',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"uniswap"`
+ *
+ *
+ */
+export const useReadTokenPaymasterUniswap = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'uniswap',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"uniswapHelperConfig"`
+ *
+ *
+ */
+export const useReadTokenPaymasterUniswapHelperConfig = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'uniswapHelperConfig',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"weiToToken"`
+ *
+ *
+ */
+export const useReadTokenPaymasterWeiToToken = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'weiToToken',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"wrappedNative"`
+ *
+ *
+ */
+export const useReadTokenPaymasterWrappedNative = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'wrappedNative',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const useWriteTokenPaymaster = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterAddStake = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterDeposit = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterPostOp = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setOracleConfiguration"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterSetOracleConfiguration = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setOracleConfiguration',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setRewardsConfig',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setTokenPaymasterConfig"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterSetTokenPaymasterConfig = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setTokenPaymasterConfig',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setUniswapConfiguration"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterSetUniswapConfiguration = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setUniswapConfiguration',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterUnlockStake = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"updateCachedPrice"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterUpdateCachedPrice = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'updateCachedPrice',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterValidatePaymasterUserOp = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'validatePaymasterUserOp',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawEth"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterWithdrawEth = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawEth',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterWithdrawStake = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterWithdrawTo = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const useWriteTokenPaymasterWithdrawToken = /*#__PURE__*/ createUseWriteContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const useSimulateTokenPaymaster = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"addStake"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterAddStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'addStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"deposit"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterDeposit = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"postOp"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterPostOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'postOp',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setOracleConfiguration"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterSetOracleConfiguration =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'setOracleConfiguration',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'setRewardsConfig',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setTokenPaymasterConfig"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterSetTokenPaymasterConfig =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'setTokenPaymasterConfig',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setUniswapConfiguration"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterSetUniswapConfiguration =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'setUniswapConfiguration',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"unlockStake"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterUnlockStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'unlockStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"updateCachedPrice"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterUpdateCachedPrice = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'updateCachedPrice',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"validatePaymasterUserOp"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterValidatePaymasterUserOp =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    functionName: 'validatePaymasterUserOp',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawEth"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterWithdrawEth = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawEth',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawStake"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterWithdrawStake = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawStake',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawTo"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterWithdrawTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const useSimulateTokenPaymasterWithdrawToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__
+ *
+ *
+ */
+export const useWatchTokenPaymasterEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"ConfigUpdated"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterConfigUpdatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'ConfigUpdated',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"OracleConfigUpdated"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterOracleConfigUpdatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'OracleConfigUpdated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"Received"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterReceivedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  eventName: 'Received',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"RewardsConfigUpdated"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterRewardsConfigUpdatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'RewardsConfigUpdated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"TokenPriceUpdated"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterTokenPriceUpdatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'TokenPriceUpdated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"UniswapConfigUpdated"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterUniswapConfigUpdatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'UniswapConfigUpdated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"UniswapReverted"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterUniswapRevertedEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: tokenPaymasterAbi, address: tokenPaymasterAddress, eventName: 'UniswapReverted' }
+)
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"UserOperationSponsored"`
+ *
+ *
+ */
+export const useWatchTokenPaymasterUserOperationSponsoredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: tokenPaymasterAbi,
+    address: tokenPaymasterAddress,
+    eventName: 'UserOperationSponsored',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link usdcAbi}__

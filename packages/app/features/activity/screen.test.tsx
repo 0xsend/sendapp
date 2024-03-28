@@ -33,6 +33,7 @@ test('ActivityScreen', async () => {
     </TamaguiProvider>
   )
   await act(async () => {
+    jest.advanceTimersByTime(2000)
     jest.runAllTimers()
   })
   expect(screen.toJSON()).toMatchSnapshot('ActivityScreen')
@@ -48,6 +49,7 @@ test('ActivityScreen: search', async () => {
   const searchInput = screen.getByPlaceholderText('Search')
   act(() => {
     fireEvent.changeText(searchInput, 'test')
+    jest.advanceTimersByTime(2000)
     jest.runAllTimers()
   })
 

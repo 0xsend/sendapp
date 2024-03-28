@@ -5626,7 +5626,7 @@ __metadata:
     extract-zip: "npm:^2.0.1"
     headless-web3-provider: "npm:^0.2.3"
     jsonwebtoken: "npm:^9.0.2"
-    permissionless: "npm:^0.1.10"
+    permissionless: "npm:^0.1.11"
     pg: "npm:^8.11.3"
     typescript: "npm:^5.1.3"
     viem: "npm:^2.8.10"
@@ -5691,7 +5691,7 @@ __metadata:
     change-case: "npm:^5.4.2"
     debug: "npm:^4.3.4"
     globby: "npm:^14.0.0"
-    permissionless: "npm:^0.1.10"
+    permissionless: "npm:^0.1.11"
     typescript: "npm:^5.1.3"
     viem: "npm:^2.8.10"
     wagmi: "npm:2.5.7"
@@ -12012,7 +12012,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jest-expo: "npm:^49.0.0"
     nock: "npm:^14.0.0-beta.2"
-    permissionless: "npm:^0.1.10"
+    permissionless: "npm:^0.1.11"
     react-hook-form: "npm:^7.48.2"
     react-native-safe-area-context: "npm:4.6.3"
     react-native-svg: "npm:13.9.0"
@@ -24858,12 +24858,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"permissionless@npm:^0.1.10":
-  version: 0.1.10
-  resolution: "permissionless@npm:0.1.10"
+"permissionless@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "permissionless@npm:0.1.11"
   peerDependencies:
     viem: ^2.0.0
-  checksum: 5a59367745a07bda2e4f8630377deeee64e2e59c428fc7859185c9bdf3f38383708764ad7134d7cbb64bc087a733dc4a98a9b92b279d961b37d5173e9dd7d0d3
+  checksum: bee3a22d73621afb4dfb9696371171e800ca48b0dc85a8c2fab056eb1f37245e328d2f972feda9d00dea71040f09acd8cd18bf029b0c7e7a9cb058fe417d3a5f
   languageName: node
   linkType: hard
 
@@ -27951,7 +27951,7 @@ __metadata:
     "@indexsupply/shovel-config": "npm:^0.0.5"
     "@my/wagmi": "workspace:*"
     "@types/bun": "npm:latest"
-    permissionless: "npm:^0.1.10"
+    permissionless: "npm:^0.1.11"
     viem: "npm:^2.8.10"
   peerDependencies:
     typescript: ^5.0.0
