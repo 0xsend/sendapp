@@ -68,8 +68,8 @@
             "column": "factory",
             "filter_op": "contains",
             "filter_arg": [
-              "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC",
-              "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745"
+              "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
+              "0xDf11654D97006885F4D7bff6F2c1260C4d72D984"
             ]
           },
           {

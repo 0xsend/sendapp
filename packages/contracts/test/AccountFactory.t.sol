@@ -4,9 +4,9 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
-import "../src/DaimoAccountFactory.sol";
-import {DaimoAccount} from "../src/DaimoAccount.sol";
-import {DaimoVerifier} from "../src/DaimoVerifier.sol";
+import "../src/SendAccountFactory.sol";
+import {SendAccount} from "../src/SendAccount.sol";
+import {SendVerifier} from "../src/SendVerifier.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
 
@@ -14,13 +14,13 @@ contract AccountFactoryTest is Test {
     using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
-    DaimoAccountFactory public factory;
-    DaimoVerifier public verifier;
+    SendAccountFactory public factory;
+    SendVerifier public verifier;
 
     function setUp() public {
         entryPoint = new EntryPoint();
-        verifier = new DaimoVerifier();
-        factory = new DaimoAccountFactory(entryPoint, verifier);
+        verifier = new SendVerifier();
+        factory = new SendAccountFactory(entryPoint, verifier);
     }
 
     function testDeploy() public {
@@ -28,8 +28,8 @@ contract AccountFactoryTest is Test {
         bytes32[2] memory key1 = [bytes32(0), bytes32(0)];
 
         // deploy account
-        DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
-        DaimoAccount acc = factory.createAccount{value: 0}(0, key1, calls, 42);
+        SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        SendAccount acc = factory.createAccount{value: 0}(0, key1, calls, 42);
         // solhint-disable-next-line
         console.log("new account address:", address(acc));
         assertEq(acc.numActiveKeys(), uint8(1));
@@ -37,7 +37,7 @@ contract AccountFactoryTest is Test {
         // deploy again = just returns the existing address
         // prefund still goes thru to the entrypoint contract
         assertEq(entryPoint.getDepositInfo(address(acc)).deposit, 0);
-        DaimoAccount acc2 = factory.createAccount{value: 9}(0, key1, calls, 42);
+        SendAccount acc2 = factory.createAccount{value: 9}(0, key1, calls, 42);
         assertEq(address(acc), address(acc2));
         assertEq(entryPoint.getDepositInfo(address(acc)).deposit, 9);
 

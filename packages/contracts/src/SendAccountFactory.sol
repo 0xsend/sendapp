@@ -4,23 +4,23 @@ pragma solidity ^0.8.12;
 import "openzeppelin-contracts/contracts/utils/Create2.sol";
 import "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-import "./DaimoAccount.sol";
+import "./SendAccount.sol";
 
 /**
- * This factory deploys ERC-4337 DaimoAccount contracts using CREATE2.
+ * This factory deploys ERC-4337 SendAccount contracts using CREATE2.
  *
  * The factory's createAccount returns the target account address even if it it's already deployed.
  * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
  */
-contract DaimoAccountFactory {
-    DaimoAccount public immutable accountImplementation;
+contract SendAccountFactory {
+    SendAccount public immutable accountImplementation;
     IEntryPoint public immutable entryPoint;
-    DaimoVerifier public immutable verifier;
+    SendVerifier public immutable verifier;
 
-    constructor(IEntryPoint _entryPoint, DaimoVerifier _verifier) {
+    constructor(IEntryPoint _entryPoint, SendVerifier _verifier) {
         entryPoint = _entryPoint;
         verifier = _verifier;
-        accountImplementation = new DaimoAccount(_entryPoint, _verifier);
+        accountImplementation = new SendAccount(_entryPoint, _verifier);
     }
 
     /**
@@ -30,10 +30,10 @@ contract DaimoAccountFactory {
      * This method returns an existing account address so that entryPoint.getSenderAddress() would work even
      * after account creation.
      */
-    function createAccount(uint8 keySlot, bytes32[2] memory key, DaimoAccount.Call[] calldata initCalls, uint256 salt)
+    function createAccount(uint8 keySlot, bytes32[2] memory key, SendAccount.Call[] calldata initCalls, uint256 salt)
         public
         payable
-        returns (DaimoAccount ret)
+        returns (SendAccount ret)
     {
         address addr = getAddress(keySlot, key, initCalls, salt);
 
@@ -45,13 +45,13 @@ contract DaimoAccountFactory {
         // Otherwise, no-op if the account is already deployed
         uint256 codeSize = addr.code.length;
         if (codeSize > 0) {
-            return DaimoAccount(payable(addr));
+            return SendAccount(payable(addr));
         }
 
-        ret = DaimoAccount(
+        ret = SendAccount(
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(
-                    address(accountImplementation), abi.encodeCall(DaimoAccount.initialize, (keySlot, key, initCalls))
+                    address(accountImplementation), abi.encodeCall(SendAccount.initialize, (keySlot, key, initCalls))
                 )
             )
         );
@@ -60,7 +60,7 @@ contract DaimoAccountFactory {
     /**
      * Calculate the counterfactual address of this account as it would be returned by createAccount()
      */
-    function getAddress(uint8 keySlot, bytes32[2] memory key, DaimoAccount.Call[] calldata initCalls, uint256 salt)
+    function getAddress(uint8 keySlot, bytes32[2] memory key, SendAccount.Call[] calldata initCalls, uint256 salt)
         public
         view
         returns (address)
@@ -72,7 +72,7 @@ contract DaimoAccountFactory {
                     type(ERC1967Proxy).creationCode,
                     abi.encode(
                         address(accountImplementation),
-                        abi.encodeCall(DaimoAccount.initialize, (keySlot, key, initCalls))
+                        abi.encodeCall(SendAccount.initialize, (keySlot, key, initCalls))
                     )
                 )
             )

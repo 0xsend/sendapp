@@ -13,7 +13,7 @@ import {
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
-  daimoAccountAbi,
+  sendAccountAbi,
   entryPointAddress,
   // tokenPaymasterAddress,
 } from '@my/wagmi'
@@ -83,7 +83,7 @@ export function useUserOpTransferMutation() {
       let callData: Hex | undefined
       if (!token) {
         callData = encodeFunctionData({
-          abi: daimoAccountAbi,
+          abi: sendAccountAbi,
           functionName: 'executeBatch',
           args: [
             [
@@ -97,7 +97,7 @@ export function useUserOpTransferMutation() {
         })
       } else {
         callData = encodeFunctionData({
-          abi: daimoAccountAbi,
+          abi: sendAccountAbi,
           functionName: 'executeBatch',
           args: [
             [

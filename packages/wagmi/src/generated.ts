@@ -1,592 +1,16 @@
 import {
   createReadContract,
+  createWatchContractEvent,
   createWriteContract,
   createSimulateContract,
-  createWatchContractEvent,
 } from 'wagmi/codegen'
 
 import {
   createUseReadContract,
+  createUseWatchContractEvent,
   createUseWriteContract,
   createUseSimulateContract,
-  createUseWatchContractEvent,
 } from 'wagmi/codegen'
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoAccount
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const daimoAccountAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
-      { name: '_daimoVerifier', internalType: 'contract DaimoVerifier', type: 'address' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  { type: 'receive', stateMutability: 'payable' },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'UPGRADE_INTERFACE_VERSION',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'slot', internalType: 'uint8', type: 'uint8' },
-      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
-    ],
-    name: 'addSigningKey',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'entryPoint',
-    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'calls',
-        internalType: 'struct DaimoAccount.Call[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'dest', internalType: 'address', type: 'address' },
-          { name: 'value', internalType: 'uint256', type: 'uint256' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-    ],
-    name: 'executeBatch',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getActiveSigningKeys',
-    outputs: [
-      { name: 'activeSigningKeys', internalType: 'bytes32[2][]', type: 'bytes32[2][]' },
-      { name: 'activeSigningKeySlots', internalType: 'uint8[]', type: 'uint8[]' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'slot', internalType: 'uint8', type: 'uint8' },
-      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
-      {
-        name: 'initCalls',
-        internalType: 'struct DaimoAccount.Call[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'dest', internalType: 'address', type: 'address' },
-          { name: 'value', internalType: 'uint256', type: 'uint256' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-    ],
-    name: 'initialize',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'message', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'signature', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'isValidSignature',
-    outputs: [{ name: 'magicValue', internalType: 'bytes4', type: 'bytes4' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '', internalType: 'uint8', type: 'uint8' },
-      { name: '', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'keys',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'maxKeys',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'numActiveKeys',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'proxiableUUID',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'slot', internalType: 'uint8', type: 'uint8' }],
-    name: 'removeSigningKey',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'sig',
-        internalType: 'struct Signature',
-        type: 'tuple',
-        components: [
-          { name: 'authenticatorData', internalType: 'bytes', type: 'bytes' },
-          { name: 'clientDataJSON', internalType: 'string', type: 'string' },
-          { name: 'challengeLocation', internalType: 'uint256', type: 'uint256' },
-          { name: 'responseTypeLocation', internalType: 'uint256', type: 'uint256' },
-          { name: 'r', internalType: 'uint256', type: 'uint256' },
-          { name: 's', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-    ],
-    name: 'signatureStruct',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'newImplementation', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'upgradeToAndCall',
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'userOp',
-        internalType: 'struct PackedUserOperation',
-        type: 'tuple',
-        components: [
-          { name: 'sender', internalType: 'address', type: 'address' },
-          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
-          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
-          { name: 'callData', internalType: 'bytes', type: 'bytes' },
-          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
-          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
-          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
-          { name: 'signature', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'missingAccountFunds', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'validateUserOp',
-    outputs: [{ name: 'validationData', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'verifier',
-    outputs: [{ name: '', internalType: 'contract DaimoVerifier', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'entryPoint', internalType: 'contract IEntryPoint', type: 'address', indexed: true },
-    ],
-    name: 'AccountInitialized',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
-    name: 'Initialized',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Received',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'account', internalType: 'contract IAccount', type: 'address', indexed: true },
-      { name: 'keySlot', internalType: 'uint8', type: 'uint8', indexed: false },
-      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]', indexed: false },
-    ],
-    name: 'SigningKeyAdded',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'account', internalType: 'contract IAccount', type: 'address', indexed: true },
-      { name: 'keySlot', internalType: 'uint8', type: 'uint8', indexed: false },
-      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]', indexed: false },
-    ],
-    name: 'SigningKeyRemoved',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
-    name: 'Upgraded',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
-    name: 'ERC1967InvalidImplementation',
-  },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedInnerCall' },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
-  {
-    type: 'error',
-    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'UUPSUnsupportedProxiableUUID',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoAccountFactory
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const daimoAccountFactoryAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
-      { name: '_verifier', internalType: 'contract DaimoVerifier', type: 'address' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'accountImplementation',
-    outputs: [{ name: '', internalType: 'contract DaimoAccount', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'keySlot', internalType: 'uint8', type: 'uint8' },
-      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
-      {
-        name: 'initCalls',
-        internalType: 'struct DaimoAccount.Call[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'dest', internalType: 'address', type: 'address' },
-          { name: 'value', internalType: 'uint256', type: 'uint256' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      { name: 'salt', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'createAccount',
-    outputs: [{ name: 'ret', internalType: 'contract DaimoAccount', type: 'address' }],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'entryPoint',
-    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'keySlot', internalType: 'uint8', type: 'uint8' },
-      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
-      {
-        name: 'initCalls',
-        internalType: 'struct DaimoAccount.Call[]',
-        type: 'tuple[]',
-        components: [
-          { name: 'dest', internalType: 'address', type: 'address' },
-          { name: 'value', internalType: 'uint256', type: 'uint256' },
-          { name: 'data', internalType: 'bytes', type: 'bytes' },
-        ],
-      },
-      { name: 'salt', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'getAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'verifier',
-    outputs: [{ name: '', internalType: 'contract DaimoVerifier', type: 'address' }],
-    stateMutability: 'view',
-  },
-] as const
-
-/**
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const daimoAccountFactoryAddress = {
-  8453: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
-  84532: '0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC',
-  845337: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
-} as const
-
-/**
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const daimoAccountFactoryConfig = {
-  address: daimoAccountFactoryAddress,
-  abi: daimoAccountFactoryAbi,
-} as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoVerifier
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const daimoVerifierAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'UPGRADE_INTERFACE_VERSION',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'implementation',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'initialOwner', internalType: 'address', type: 'address' }],
-    name: 'init',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'proxiableUUID',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newImplementation', internalType: 'address', type: 'address' }],
-    name: 'upgradeTo',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'newImplementation', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
-    ],
-    name: 'upgradeToAndCall',
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'message', internalType: 'bytes', type: 'bytes' },
-      { name: 'signature', internalType: 'bytes', type: 'bytes' },
-      { name: 'x', internalType: 'uint256', type: 'uint256' },
-      { name: 'y', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'verifySignature',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
-    name: 'Initialized',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
-    ],
-    name: 'OwnershipTransferred',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
-    name: 'Upgraded',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
-    name: 'ERC1967InvalidImplementation',
-  },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedInnerCall' },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-  {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
-  },
-  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
-  {
-    type: 'error',
-    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'UUPSUnsupportedProxiableUUID',
-  },
-] as const
-
-/**
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const daimoVerifierAddress = {
-  84532: '0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F',
-  845337: '0xccfe0A37B2f7AFE57159D550E59B0D3da93092a4',
-} as const
-
-/**
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const daimoVerifierConfig = { address: daimoVerifierAddress, abi: daimoVerifierAbi } as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DaimoVerifierProxy
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const daimoVerifierProxyAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: '_logic', internalType: 'address', type: 'address' },
-      { name: '_data', internalType: 'bytes', type: 'bytes' },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  { type: 'fallback', stateMutability: 'payable' },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
-    name: 'Upgraded',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
-    name: 'ERC1967InvalidImplementation',
-  },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedInnerCall' },
-] as const
-
-/**
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const daimoVerifierProxyAddress = {
-  84532: '0xdAAb03239f5CC5b3452837E557295F790D9ab319',
-  845337: '0x93a7df202E82862e61ba5239bC10996FD9a1CBBD',
-} as const
-
-/**
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const daimoVerifierProxyConfig = {
-  address: daimoVerifierProxyAddress,
-  abi: daimoVerifierProxyAbi,
-} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC165
@@ -2532,6 +1956,376 @@ export const iEntryPointSimulationsAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendAccount
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const sendAccountAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
+      { name: '_sendVerifier', internalType: 'contract SendVerifier', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'receive', stateMutability: 'payable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'UPGRADE_INTERFACE_VERSION',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'slot', internalType: 'uint8', type: 'uint8' },
+      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
+    ],
+    name: 'addSigningKey',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'entryPoint',
+    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'calls',
+        internalType: 'struct SendAccount.Call[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'dest', internalType: 'address', type: 'address' },
+          { name: 'value', internalType: 'uint256', type: 'uint256' },
+          { name: 'data', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'executeBatch',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getActiveSigningKeys',
+    outputs: [
+      { name: 'activeSigningKeys', internalType: 'bytes32[2][]', type: 'bytes32[2][]' },
+      { name: 'activeSigningKeySlots', internalType: 'uint8[]', type: 'uint8[]' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'slot', internalType: 'uint8', type: 'uint8' },
+      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
+      {
+        name: 'initCalls',
+        internalType: 'struct SendAccount.Call[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'dest', internalType: 'address', type: 'address' },
+          { name: 'value', internalType: 'uint256', type: 'uint256' },
+          { name: 'data', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+    ],
+    name: 'initialize',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'message', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'signature', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'isValidSignature',
+    outputs: [{ name: 'magicValue', internalType: 'bytes4', type: 'bytes4' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '', internalType: 'uint8', type: 'uint8' },
+      { name: '', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'keys',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'maxKeys',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'numActiveKeys',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'proxiableUUID',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'slot', internalType: 'uint8', type: 'uint8' }],
+    name: 'removeSigningKey',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'sig',
+        internalType: 'struct Signature',
+        type: 'tuple',
+        components: [
+          { name: 'authenticatorData', internalType: 'bytes', type: 'bytes' },
+          { name: 'clientDataJSON', internalType: 'string', type: 'string' },
+          { name: 'challengeLocation', internalType: 'uint256', type: 'uint256' },
+          { name: 'responseTypeLocation', internalType: 'uint256', type: 'uint256' },
+          { name: 'r', internalType: 'uint256', type: 'uint256' },
+          { name: 's', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+    ],
+    name: 'signatureStruct',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'newImplementation', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'upgradeToAndCall',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'userOp',
+        internalType: 'struct PackedUserOperation',
+        type: 'tuple',
+        components: [
+          { name: 'sender', internalType: 'address', type: 'address' },
+          { name: 'nonce', internalType: 'uint256', type: 'uint256' },
+          { name: 'initCode', internalType: 'bytes', type: 'bytes' },
+          { name: 'callData', internalType: 'bytes', type: 'bytes' },
+          { name: 'accountGasLimits', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'preVerificationGas', internalType: 'uint256', type: 'uint256' },
+          { name: 'gasFees', internalType: 'bytes32', type: 'bytes32' },
+          { name: 'paymasterAndData', internalType: 'bytes', type: 'bytes' },
+          { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'userOpHash', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'missingAccountFunds', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'validateUserOp',
+    outputs: [{ name: 'validationData', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'verifier',
+    outputs: [{ name: '', internalType: 'contract SendVerifier', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'entryPoint', internalType: 'contract IEntryPoint', type: 'address', indexed: true },
+    ],
+    name: 'AccountInitialized',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    name: 'Initialized',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
+      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Received',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'contract IAccount', type: 'address', indexed: true },
+      { name: 'keySlot', internalType: 'uint8', type: 'uint8', indexed: false },
+      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]', indexed: false },
+    ],
+    name: 'SigningKeyAdded',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'account', internalType: 'contract IAccount', type: 'address', indexed: true },
+      { name: 'keySlot', internalType: 'uint8', type: 'uint8', indexed: false },
+      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]', indexed: false },
+    ],
+    name: 'SigningKeyRemoved',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  { type: 'error', inputs: [], name: 'InvalidInitialization' },
+  { type: 'error', inputs: [], name: 'NotInitializing' },
+  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
+  {
+    type: 'error',
+    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'UUPSUnsupportedProxiableUUID',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendAccountFactory
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const sendAccountFactoryAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_entryPoint', internalType: 'contract IEntryPoint', type: 'address' },
+      { name: '_verifier', internalType: 'contract SendVerifier', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'accountImplementation',
+    outputs: [{ name: '', internalType: 'contract SendAccount', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'keySlot', internalType: 'uint8', type: 'uint8' },
+      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
+      {
+        name: 'initCalls',
+        internalType: 'struct SendAccount.Call[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'dest', internalType: 'address', type: 'address' },
+          { name: 'value', internalType: 'uint256', type: 'uint256' },
+          { name: 'data', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'salt', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'createAccount',
+    outputs: [{ name: 'ret', internalType: 'contract SendAccount', type: 'address' }],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'entryPoint',
+    outputs: [{ name: '', internalType: 'contract IEntryPoint', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'keySlot', internalType: 'uint8', type: 'uint8' },
+      { name: 'key', internalType: 'bytes32[2]', type: 'bytes32[2]' },
+      {
+        name: 'initCalls',
+        internalType: 'struct SendAccount.Call[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'dest', internalType: 'address', type: 'address' },
+          { name: 'value', internalType: 'uint256', type: 'uint256' },
+          { name: 'data', internalType: 'bytes', type: 'bytes' },
+        ],
+      },
+      { name: 'salt', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'getAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'verifier',
+    outputs: [{ name: '', internalType: 'contract SendVerifier', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const sendAccountFactoryAddress = {
+  8453: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
+  84532: '0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C',
+  845337: '0xDf11654D97006885F4D7bff6F2c1260C4d72D984',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const sendAccountFactoryConfig = {
+  address: sendAccountFactoryAddress,
+  abi: sendAccountFactoryAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendAirdropsSafe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3049,6 +2843,212 @@ export const sendUniswapV3PoolConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendVerifier
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const sendVerifierAbi = [
+  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'UPGRADE_INTERFACE_VERSION',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'implementation',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'initialOwner', internalType: 'address', type: 'address' }],
+    name: 'init',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'proxiableUUID',
+    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newImplementation', internalType: 'address', type: 'address' }],
+    name: 'upgradeTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'newImplementation', internalType: 'address', type: 'address' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'upgradeToAndCall',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'message', internalType: 'bytes', type: 'bytes' },
+      { name: 'signature', internalType: 'bytes', type: 'bytes' },
+      { name: 'x', internalType: 'uint256', type: 'uint256' },
+      { name: 'y', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'verifySignature',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'version', internalType: 'uint64', type: 'uint64', indexed: false }],
+    name: 'Initialized',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  { type: 'error', inputs: [], name: 'InvalidInitialization' },
+  { type: 'error', inputs: [], name: 'NotInitializing' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
+  {
+    type: 'error',
+    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'UUPSUnsupportedProxiableUUID',
+  },
+] as const
+
+/**
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const sendVerifierAddress = {
+  84532: '0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B',
+  845337: '0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B',
+} as const
+
+/**
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const sendVerifierConfig = { address: sendVerifierAddress, abi: sendVerifierAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendVerifierProxy
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const sendVerifierProxyAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_logic', internalType: 'address', type: 'address' },
+      { name: '_data', internalType: 'bytes', type: 'bytes' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'fallback', stateMutability: 'payable' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address', indexed: true }],
+    name: 'Upgraded',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'implementation', internalType: 'address', type: 'address' }],
+    name: 'ERC1967InvalidImplementation',
+  },
+  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+] as const
+
+/**
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const sendVerifierProxyAddress = {
+  84532: '0x6c38612d3f645711dd080711021fC1bA998a5628',
+  845337: '0x6c38612d3f645711dd080711021fC1bA998a5628',
+} as const
+
+/**
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const sendVerifierProxyConfig = {
+  address: sendVerifierProxyAddress,
+  abi: sendVerifierProxyAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SenderCreator
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3059,148 +3059,6 @@ export const senderCreatorAbi = [
     name: 'createSender',
     outputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
     stateMutability: 'nonpayable',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TestUSDC
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const testUsdcAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'spender', internalType: 'address', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
-    stateMutability: 'pure',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'to', internalType: 'address', type: 'address' },
-      { name: 'value', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address', indexed: true },
-      { name: 'spender', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Approval',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
-      { name: 'to', internalType: 'address', type: 'address', indexed: true },
-      { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
-    ],
-    name: 'Transfer',
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'spender', internalType: 'address', type: 'address' },
-      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'ERC20InsufficientAllowance',
-  },
-  {
-    type: 'error',
-    inputs: [
-      { name: 'sender', internalType: 'address', type: 'address' },
-      { name: 'balance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'ERC20InsufficientBalance',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidApprover',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidReceiver',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidSender',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
-    name: 'ERC20InvalidSpender',
   },
 ] as const
 
@@ -3907,626 +3765,6 @@ export const usdcConfig = { address: usdcAddress, abi: usdcAbi } as const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Action
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const readDaimoAccount = /*#__PURE__*/ createReadContract({ abi: daimoAccountAbi })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
- */
-export const readDaimoAccountUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'UPGRADE_INTERFACE_VERSION',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"entryPoint"`
- */
-export const readDaimoAccountEntryPoint = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'entryPoint',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"getActiveSigningKeys"`
- */
-export const readDaimoAccountGetActiveSigningKeys = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'getActiveSigningKeys',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"isValidSignature"`
- */
-export const readDaimoAccountIsValidSignature = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'isValidSignature',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"keys"`
- */
-export const readDaimoAccountKeys = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'keys',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"maxKeys"`
- */
-export const readDaimoAccountMaxKeys = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'maxKeys',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"numActiveKeys"`
- */
-export const readDaimoAccountNumActiveKeys = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'numActiveKeys',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"proxiableUUID"`
- */
-export const readDaimoAccountProxiableUuid = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'proxiableUUID',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"verifier"`
- */
-export const readDaimoAccountVerifier = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'verifier',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const writeDaimoAccount = /*#__PURE__*/ createWriteContract({ abi: daimoAccountAbi })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"addSigningKey"`
- */
-export const writeDaimoAccountAddSigningKey = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'addSigningKey',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"executeBatch"`
- */
-export const writeDaimoAccountExecuteBatch = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'executeBatch',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"initialize"`
- */
-export const writeDaimoAccountInitialize = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'initialize',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"removeSigningKey"`
- */
-export const writeDaimoAccountRemoveSigningKey = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'removeSigningKey',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"signatureStruct"`
- */
-export const writeDaimoAccountSignatureStruct = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'signatureStruct',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const writeDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"validateUserOp"`
- */
-export const writeDaimoAccountValidateUserOp = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'validateUserOp',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const prepareWriteDaimoAccount = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"addSigningKey"`
- */
-export const prepareWriteDaimoAccountAddSigningKey = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'addSigningKey',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"executeBatch"`
- */
-export const prepareWriteDaimoAccountExecuteBatch = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'executeBatch',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"initialize"`
- */
-export const prepareWriteDaimoAccountInitialize = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'initialize',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"removeSigningKey"`
- */
-export const prepareWriteDaimoAccountRemoveSigningKey = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'removeSigningKey',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"signatureStruct"`
- */
-export const prepareWriteDaimoAccountSignatureStruct = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'signatureStruct',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const prepareWriteDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"validateUserOp"`
- */
-export const prepareWriteDaimoAccountValidateUserOp = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'validateUserOp',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const watchDaimoAccountEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"AccountInitialized"`
- */
-export const watchDaimoAccountAccountInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'AccountInitialized',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Initialized"`
- */
-export const watchDaimoAccountInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'Initialized',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Received"`
- */
-export const watchDaimoAccountReceivedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'Received',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"SigningKeyAdded"`
- */
-export const watchDaimoAccountSigningKeyAddedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'SigningKeyAdded',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"SigningKeyRemoved"`
- */
-export const watchDaimoAccountSigningKeyRemovedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'SigningKeyRemoved',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Upgraded"`
- */
-export const watchDaimoAccountUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const readDaimoAccountFactory = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const readDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'accountImplementation',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const readDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'entryPoint',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const readDaimoAccountFactoryGetAddress = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'getAddress',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"verifier"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const readDaimoAccountFactoryVerifier = /*#__PURE__*/ createReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'verifier',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const writeDaimoAccountFactory = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const writeDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createWriteContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'createAccount',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const prepareWriteDaimoAccountFactory = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const prepareWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createSimulateContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'createAccount',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const readDaimoVerifier = /*#__PURE__*/ createReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const readDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'UPGRADE_INTERFACE_VERSION',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"implementation"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const readDaimoVerifierImplementation = /*#__PURE__*/ createReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'implementation',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"owner"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const readDaimoVerifierOwner = /*#__PURE__*/ createReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const readDaimoVerifierProxiableUuid = /*#__PURE__*/ createReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'proxiableUUID',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"verifySignature"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const readDaimoVerifierVerifySignature = /*#__PURE__*/ createReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'verifySignature',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const writeDaimoVerifier = /*#__PURE__*/ createWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const writeDaimoVerifierInit = /*#__PURE__*/ createWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const writeDaimoVerifierRenounceOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const writeDaimoVerifierTransferOwnership = /*#__PURE__*/ createWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const writeDaimoVerifierUpgradeTo = /*#__PURE__*/ createWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const writeDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const prepareWriteDaimoVerifier = /*#__PURE__*/ createSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const prepareWriteDaimoVerifierInit = /*#__PURE__*/ createSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const prepareWriteDaimoVerifierRenounceOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const prepareWriteDaimoVerifierTransferOwnership = /*#__PURE__*/ createSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const prepareWriteDaimoVerifierUpgradeTo = /*#__PURE__*/ createSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const prepareWriteDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const watchDaimoVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Initialized"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const watchDaimoVerifierInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'Initialized',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const watchDaimoVerifierOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'OwnershipTransferred',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Upgraded"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const watchDaimoVerifierUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const watchDaimoVerifierProxyEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierProxyAbi,
-  address: daimoVerifierProxyAddress,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const watchDaimoVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: daimoVerifierProxyAbi,
-  address: daimoVerifierProxyAddress,
-  eventName: 'Upgraded',
-})
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link erc165Abi}__
@@ -6392,6 +5630,363 @@ export const watchIEntryPointSimulationsWithdrawnEvent = /*#__PURE__*/ createWat
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const readSendAccount = /*#__PURE__*/ createReadContract({ abi: sendAccountAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ */
+export const readSendAccountUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"entryPoint"`
+ */
+export const readSendAccountEntryPoint = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"getActiveSigningKeys"`
+ */
+export const readSendAccountGetActiveSigningKeys = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'getActiveSigningKeys',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"isValidSignature"`
+ */
+export const readSendAccountIsValidSignature = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'isValidSignature',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"keys"`
+ */
+export const readSendAccountKeys = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'keys',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"maxKeys"`
+ */
+export const readSendAccountMaxKeys = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'maxKeys',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"numActiveKeys"`
+ */
+export const readSendAccountNumActiveKeys = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'numActiveKeys',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"proxiableUUID"`
+ */
+export const readSendAccountProxiableUuid = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'proxiableUUID',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"verifier"`
+ */
+export const readSendAccountVerifier = /*#__PURE__*/ createReadContract({
+  abi: sendAccountAbi,
+  functionName: 'verifier',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const writeSendAccount = /*#__PURE__*/ createWriteContract({ abi: sendAccountAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"addSigningKey"`
+ */
+export const writeSendAccountAddSigningKey = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'addSigningKey',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"executeBatch"`
+ */
+export const writeSendAccountExecuteBatch = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'executeBatch',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"initialize"`
+ */
+export const writeSendAccountInitialize = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'initialize',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"removeSigningKey"`
+ */
+export const writeSendAccountRemoveSigningKey = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'removeSigningKey',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"signatureStruct"`
+ */
+export const writeSendAccountSignatureStruct = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'signatureStruct',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const writeSendAccountUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"validateUserOp"`
+ */
+export const writeSendAccountValidateUserOp = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'validateUserOp',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const prepareWriteSendAccount = /*#__PURE__*/ createSimulateContract({ abi: sendAccountAbi })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"addSigningKey"`
+ */
+export const prepareWriteSendAccountAddSigningKey = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'addSigningKey',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"executeBatch"`
+ */
+export const prepareWriteSendAccountExecuteBatch = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'executeBatch',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"initialize"`
+ */
+export const prepareWriteSendAccountInitialize = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'initialize',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"removeSigningKey"`
+ */
+export const prepareWriteSendAccountRemoveSigningKey = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'removeSigningKey',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"signatureStruct"`
+ */
+export const prepareWriteSendAccountSignatureStruct = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'signatureStruct',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const prepareWriteSendAccountUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"validateUserOp"`
+ */
+export const prepareWriteSendAccountValidateUserOp = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'validateUserOp',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const watchSendAccountEvent = /*#__PURE__*/ createWatchContractEvent({ abi: sendAccountAbi })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"AccountInitialized"`
+ */
+export const watchSendAccountAccountInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'AccountInitialized',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"Initialized"`
+ */
+export const watchSendAccountInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'Initialized',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"Received"`
+ */
+export const watchSendAccountReceivedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'Received',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"SigningKeyAdded"`
+ */
+export const watchSendAccountSigningKeyAddedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'SigningKeyAdded',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"SigningKeyRemoved"`
+ */
+export const watchSendAccountSigningKeyRemovedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'SigningKeyRemoved',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const watchSendAccountUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const readSendAccountFactory = /*#__PURE__*/ createReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const readSendAccountFactoryAccountImplementation = /*#__PURE__*/ createReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'accountImplementation',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const readSendAccountFactoryEntryPoint = /*#__PURE__*/ createReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const readSendAccountFactoryGetAddress = /*#__PURE__*/ createReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'getAddress',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"verifier"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const readSendAccountFactoryVerifier = /*#__PURE__*/ createReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'verifier',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const writeSendAccountFactory = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const writeSendAccountFactoryCreateAccount = /*#__PURE__*/ createWriteContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'createAccount',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const prepareWriteSendAccountFactory = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const prepareWriteSendAccountFactoryCreateAccount = /*#__PURE__*/ createSimulateContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'createAccount',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendMerkleDropAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
@@ -7179,6 +6774,265 @@ export const watchSendTokenTransferEvent = /*#__PURE__*/ createWatchContractEven
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const readSendVerifier = /*#__PURE__*/ createReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const readSendVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"implementation"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const readSendVerifierImplementation = /*#__PURE__*/ createReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'implementation',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"owner"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const readSendVerifierOwner = /*#__PURE__*/ createReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const readSendVerifierProxiableUuid = /*#__PURE__*/ createReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'proxiableUUID',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"verifySignature"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const readSendVerifierVerifySignature = /*#__PURE__*/ createReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'verifySignature',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const writeSendVerifier = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const writeSendVerifierInit = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const writeSendVerifierRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const writeSendVerifierTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const writeSendVerifierUpgradeTo = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const writeSendVerifierUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const prepareWriteSendVerifier = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const prepareWriteSendVerifierInit = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const prepareWriteSendVerifierRenounceOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const prepareWriteSendVerifierTransferOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const prepareWriteSendVerifierUpgradeTo = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const prepareWriteSendVerifierUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const watchSendVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Initialized"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const watchSendVerifierInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  eventName: 'Initialized',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const watchSendVerifierOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  eventName: 'OwnershipTransferred',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Upgraded"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const watchSendVerifierUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const watchSendVerifierProxyEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifierProxyAbi,
+  address: sendVerifierProxyAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const watchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendVerifierProxyAbi,
+  address: sendVerifierProxyAddress,
+  eventName: 'Upgraded',
+})
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link senderCreatorAbi}__
  */
 export const writeSenderCreator = /*#__PURE__*/ createWriteContract({ abi: senderCreatorAbi })
@@ -7204,138 +7058,6 @@ export const prepareWriteSenderCreator = /*#__PURE__*/ createSimulateContract({
 export const prepareWriteSenderCreatorCreateSender = /*#__PURE__*/ createSimulateContract({
   abi: senderCreatorAbi,
   functionName: 'createSender',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const readTestUsdc = /*#__PURE__*/ createReadContract({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"allowance"`
- */
-export const readTestUsdcAllowance = /*#__PURE__*/ createReadContract({
-  abi: testUsdcAbi,
-  functionName: 'allowance',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"balanceOf"`
- */
-export const readTestUsdcBalanceOf = /*#__PURE__*/ createReadContract({
-  abi: testUsdcAbi,
-  functionName: 'balanceOf',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"decimals"`
- */
-export const readTestUsdcDecimals = /*#__PURE__*/ createReadContract({
-  abi: testUsdcAbi,
-  functionName: 'decimals',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"name"`
- */
-export const readTestUsdcName = /*#__PURE__*/ createReadContract({
-  abi: testUsdcAbi,
-  functionName: 'name',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"symbol"`
- */
-export const readTestUsdcSymbol = /*#__PURE__*/ createReadContract({
-  abi: testUsdcAbi,
-  functionName: 'symbol',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"totalSupply"`
- */
-export const readTestUsdcTotalSupply = /*#__PURE__*/ createReadContract({
-  abi: testUsdcAbi,
-  functionName: 'totalSupply',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const writeTestUsdc = /*#__PURE__*/ createWriteContract({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"approve"`
- */
-export const writeTestUsdcApprove = /*#__PURE__*/ createWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transfer"`
- */
-export const writeTestUsdcTransfer = /*#__PURE__*/ createWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const writeTestUsdcTransferFrom = /*#__PURE__*/ createWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const prepareWriteTestUsdc = /*#__PURE__*/ createSimulateContract({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"approve"`
- */
-export const prepareWriteTestUsdcApprove = /*#__PURE__*/ createSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transfer"`
- */
-export const prepareWriteTestUsdcTransfer = /*#__PURE__*/ createSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const prepareWriteTestUsdcTransferFrom = /*#__PURE__*/ createSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const watchTestUsdcEvent = /*#__PURE__*/ createWatchContractEvent({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link testUsdcAbi}__ and `eventName` set to `"Approval"`
- */
-export const watchTestUsdcApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: testUsdcAbi,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link testUsdcAbi}__ and `eventName` set to `"Transfer"`
- */
-export const watchTestUsdcTransferEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: testUsdcAbi,
-  eventName: 'Transfer',
 })
 
 /**
@@ -8262,627 +7984,6 @@ export const watchUsdcTransferEvent = /*#__PURE__*/ createWatchContractEvent({
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const useReadDaimoAccount = /*#__PURE__*/ createUseReadContract({ abi: daimoAccountAbi })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
- */
-export const useReadDaimoAccountUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'UPGRADE_INTERFACE_VERSION',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"entryPoint"`
- */
-export const useReadDaimoAccountEntryPoint = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'entryPoint',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"getActiveSigningKeys"`
- */
-export const useReadDaimoAccountGetActiveSigningKeys = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'getActiveSigningKeys',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"isValidSignature"`
- */
-export const useReadDaimoAccountIsValidSignature = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'isValidSignature',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"keys"`
- */
-export const useReadDaimoAccountKeys = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'keys',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"maxKeys"`
- */
-export const useReadDaimoAccountMaxKeys = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'maxKeys',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"numActiveKeys"`
- */
-export const useReadDaimoAccountNumActiveKeys = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'numActiveKeys',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"proxiableUUID"`
- */
-export const useReadDaimoAccountProxiableUuid = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'proxiableUUID',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"verifier"`
- */
-export const useReadDaimoAccountVerifier = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountAbi,
-  functionName: 'verifier',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const useWriteDaimoAccount = /*#__PURE__*/ createUseWriteContract({ abi: daimoAccountAbi })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"addSigningKey"`
- */
-export const useWriteDaimoAccountAddSigningKey = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'addSigningKey',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"executeBatch"`
- */
-export const useWriteDaimoAccountExecuteBatch = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'executeBatch',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"initialize"`
- */
-export const useWriteDaimoAccountInitialize = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'initialize',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"removeSigningKey"`
- */
-export const useWriteDaimoAccountRemoveSigningKey = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'removeSigningKey',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"signatureStruct"`
- */
-export const useWriteDaimoAccountSignatureStruct = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'signatureStruct',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const useWriteDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"validateUserOp"`
- */
-export const useWriteDaimoAccountValidateUserOp = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountAbi,
-  functionName: 'validateUserOp',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const useSimulateDaimoAccount = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"addSigningKey"`
- */
-export const useSimulateDaimoAccountAddSigningKey = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'addSigningKey',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"executeBatch"`
- */
-export const useSimulateDaimoAccountExecuteBatch = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'executeBatch',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"initialize"`
- */
-export const useSimulateDaimoAccountInitialize = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'initialize',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"removeSigningKey"`
- */
-export const useSimulateDaimoAccountRemoveSigningKey = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'removeSigningKey',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"signatureStruct"`
- */
-export const useSimulateDaimoAccountSignatureStruct = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'signatureStruct',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
- */
-export const useSimulateDaimoAccountUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountAbi}__ and `functionName` set to `"validateUserOp"`
- */
-export const useSimulateDaimoAccountValidateUserOp = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountAbi,
-  functionName: 'validateUserOp',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__
- */
-export const useWatchDaimoAccountEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"AccountInitialized"`
- */
-export const useWatchDaimoAccountAccountInitializedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoAccountAbi,
-    eventName: 'AccountInitialized',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Initialized"`
- */
-export const useWatchDaimoAccountInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'Initialized',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Received"`
- */
-export const useWatchDaimoAccountReceivedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'Received',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"SigningKeyAdded"`
- */
-export const useWatchDaimoAccountSigningKeyAddedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'SigningKeyAdded',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"SigningKeyRemoved"`
- */
-export const useWatchDaimoAccountSigningKeyRemovedEvent = /*#__PURE__*/ createUseWatchContractEvent(
-  { abi: daimoAccountAbi, eventName: 'SigningKeyRemoved' }
-)
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoAccountAbi}__ and `eventName` set to `"Upgraded"`
- */
-export const useWatchDaimoAccountUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoAccountAbi,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useReadDaimoAccountFactory = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useReadDaimoAccountFactoryAccountImplementation = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'accountImplementation',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useReadDaimoAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'entryPoint',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useReadDaimoAccountFactoryGetAddress = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'getAddress',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"verifier"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useReadDaimoAccountFactoryVerifier = /*#__PURE__*/ createUseReadContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'verifier',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useWriteDaimoAccountFactory = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useWriteDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'createAccount',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useSimulateDaimoAccountFactory = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
- *
- * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
- * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC)
- */
-export const useSimulateDaimoAccountFactoryCreateAccount = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress,
-  functionName: 'createAccount',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useReadDaimoVerifier = /*#__PURE__*/ createUseReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useReadDaimoVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'UPGRADE_INTERFACE_VERSION',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"implementation"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useReadDaimoVerifierImplementation = /*#__PURE__*/ createUseReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'implementation',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"owner"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useReadDaimoVerifierOwner = /*#__PURE__*/ createUseReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useReadDaimoVerifierProxiableUuid = /*#__PURE__*/ createUseReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'proxiableUUID',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"verifySignature"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useReadDaimoVerifierVerifySignature = /*#__PURE__*/ createUseReadContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'verifySignature',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWriteDaimoVerifier = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWriteDaimoVerifierInit = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWriteDaimoVerifierRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWriteDaimoVerifierTransferOwnership = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWriteDaimoVerifierUpgradeTo = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWriteDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useSimulateDaimoVerifier = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"init"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useSimulateDaimoVerifierInit = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'init',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useSimulateDaimoVerifierRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'renounceOwnership',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"transferOwnership"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useSimulateDaimoVerifierTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'transferOwnership',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeTo"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useSimulateDaimoVerifierUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeTo',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link daimoVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useSimulateDaimoVerifierUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  functionName: 'upgradeToAndCall',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWatchDaimoVerifierEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Initialized"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWatchDaimoVerifierInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'Initialized',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWatchDaimoVerifierOwnershipTransferredEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: daimoVerifierAbi,
-    address: daimoVerifierAddress,
-    eventName: 'OwnershipTransferred',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierAbi}__ and `eventName` set to `"Upgraded"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x4fEeA13233e0cEB7B5f872aFBdDA57F463bfD88F)
- */
-export const useWatchDaimoVerifierUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierAbi,
-  address: daimoVerifierAddress,
-  eventName: 'Upgraded',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const useWatchDaimoVerifierProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierProxyAbi,
-  address: daimoVerifierProxyAddress,
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link daimoVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
- *
- * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xdAAb03239f5CC5b3452837E557295F790D9ab319)
- */
-export const useWatchDaimoVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: daimoVerifierProxyAbi,
-  address: daimoVerifierProxyAddress,
-  eventName: 'Upgraded',
-})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc165Abi}__
@@ -10772,6 +9873,366 @@ export const useWatchIEntryPointSimulationsWithdrawnEvent =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const useReadSendAccount = /*#__PURE__*/ createUseReadContract({ abi: sendAccountAbi })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ */
+export const useReadSendAccountUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"entryPoint"`
+ */
+export const useReadSendAccountEntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"getActiveSigningKeys"`
+ */
+export const useReadSendAccountGetActiveSigningKeys = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'getActiveSigningKeys',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"isValidSignature"`
+ */
+export const useReadSendAccountIsValidSignature = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'isValidSignature',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"keys"`
+ */
+export const useReadSendAccountKeys = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'keys',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"maxKeys"`
+ */
+export const useReadSendAccountMaxKeys = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'maxKeys',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"numActiveKeys"`
+ */
+export const useReadSendAccountNumActiveKeys = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'numActiveKeys',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"proxiableUUID"`
+ */
+export const useReadSendAccountProxiableUuid = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'proxiableUUID',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"verifier"`
+ */
+export const useReadSendAccountVerifier = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountAbi,
+  functionName: 'verifier',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const useWriteSendAccount = /*#__PURE__*/ createUseWriteContract({ abi: sendAccountAbi })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"addSigningKey"`
+ */
+export const useWriteSendAccountAddSigningKey = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'addSigningKey',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"executeBatch"`
+ */
+export const useWriteSendAccountExecuteBatch = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'executeBatch',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"initialize"`
+ */
+export const useWriteSendAccountInitialize = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'initialize',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"removeSigningKey"`
+ */
+export const useWriteSendAccountRemoveSigningKey = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'removeSigningKey',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"signatureStruct"`
+ */
+export const useWriteSendAccountSignatureStruct = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'signatureStruct',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const useWriteSendAccountUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"validateUserOp"`
+ */
+export const useWriteSendAccountValidateUserOp = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountAbi,
+  functionName: 'validateUserOp',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const useSimulateSendAccount = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"addSigningKey"`
+ */
+export const useSimulateSendAccountAddSigningKey = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'addSigningKey',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"executeBatch"`
+ */
+export const useSimulateSendAccountExecuteBatch = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'executeBatch',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"initialize"`
+ */
+export const useSimulateSendAccountInitialize = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'initialize',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"removeSigningKey"`
+ */
+export const useSimulateSendAccountRemoveSigningKey = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'removeSigningKey',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"signatureStruct"`
+ */
+export const useSimulateSendAccountSignatureStruct = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'signatureStruct',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ */
+export const useSimulateSendAccountUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountAbi}__ and `functionName` set to `"validateUserOp"`
+ */
+export const useSimulateSendAccountValidateUserOp = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountAbi,
+  functionName: 'validateUserOp',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__
+ */
+export const useWatchSendAccountEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"AccountInitialized"`
+ */
+export const useWatchSendAccountAccountInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: sendAccountAbi, eventName: 'AccountInitialized' }
+)
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"Initialized"`
+ */
+export const useWatchSendAccountInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'Initialized',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"Received"`
+ */
+export const useWatchSendAccountReceivedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'Received',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"SigningKeyAdded"`
+ */
+export const useWatchSendAccountSigningKeyAddedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'SigningKeyAdded',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"SigningKeyRemoved"`
+ */
+export const useWatchSendAccountSigningKeyRemovedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'SigningKeyRemoved',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountAbi}__ and `eventName` set to `"Upgraded"`
+ */
+export const useWatchSendAccountUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountAbi,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useReadSendAccountFactory = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useReadSendAccountFactoryAccountImplementation = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'accountImplementation',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useReadSendAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'entryPoint',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useReadSendAccountFactoryGetAddress = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'getAddress',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"verifier"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useReadSendAccountFactoryVerifier = /*#__PURE__*/ createUseReadContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'verifier',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useWriteSendAccountFactory = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useWriteSendAccountFactoryCreateAccount = /*#__PURE__*/ createUseWriteContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'createAccount',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useSimulateSendAccountFactory = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useSimulateSendAccountFactoryCreateAccount = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  functionName: 'createAccount',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendMerkleDropAbi}__
  *
  * - [__View Contract on Ethereum Etherscan__](https://etherscan.io/address/0xB9310daE45E71c7a160A13D64204623071a8E347)
@@ -11560,6 +11021,266 @@ export const useWatchSendTokenTransferEvent = /*#__PURE__*/ createUseWatchContra
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useReadSendVerifier = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useReadSendVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'UPGRADE_INTERFACE_VERSION',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"implementation"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useReadSendVerifierImplementation = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'implementation',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"owner"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useReadSendVerifierOwner = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useReadSendVerifierProxiableUuid = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'proxiableUUID',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"verifySignature"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useReadSendVerifierVerifySignature = /*#__PURE__*/ createUseReadContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'verifySignature',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWriteSendVerifier = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWriteSendVerifierInit = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWriteSendVerifierRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWriteSendVerifierTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWriteSendVerifierUpgradeTo = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWriteSendVerifierUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useSimulateSendVerifier = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useSimulateSendVerifierInit = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'init',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useSimulateSendVerifierRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useSimulateSendVerifierTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useSimulateSendVerifierUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeTo',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useSimulateSendVerifierUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  functionName: 'upgradeToAndCall',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWatchSendVerifierEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Initialized"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWatchSendVerifierInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  eventName: 'Initialized',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWatchSendVerifierOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: sendVerifierAbi,
+    address: sendVerifierAddress,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Upgraded"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
+ */
+export const useWatchSendVerifierUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendVerifierAbi,
+  address: sendVerifierAddress,
+  eventName: 'Upgraded',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const useWatchSendVerifierProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendVerifierProxyAbi,
+  address: sendVerifierProxyAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
+ *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
+ */
+export const useWatchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendVerifierProxyAbi,
+  address: sendVerifierProxyAddress,
+  eventName: 'Upgraded',
+})
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link senderCreatorAbi}__
  */
 export const useWriteSenderCreator = /*#__PURE__*/ createUseWriteContract({ abi: senderCreatorAbi })
@@ -11585,138 +11306,6 @@ export const useSimulateSenderCreator = /*#__PURE__*/ createUseSimulateContract(
 export const useSimulateSenderCreatorCreateSender = /*#__PURE__*/ createUseSimulateContract({
   abi: senderCreatorAbi,
   functionName: 'createSender',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const useReadTestUsdc = /*#__PURE__*/ createUseReadContract({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"allowance"`
- */
-export const useReadTestUsdcAllowance = /*#__PURE__*/ createUseReadContract({
-  abi: testUsdcAbi,
-  functionName: 'allowance',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"balanceOf"`
- */
-export const useReadTestUsdcBalanceOf = /*#__PURE__*/ createUseReadContract({
-  abi: testUsdcAbi,
-  functionName: 'balanceOf',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"decimals"`
- */
-export const useReadTestUsdcDecimals = /*#__PURE__*/ createUseReadContract({
-  abi: testUsdcAbi,
-  functionName: 'decimals',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"name"`
- */
-export const useReadTestUsdcName = /*#__PURE__*/ createUseReadContract({
-  abi: testUsdcAbi,
-  functionName: 'name',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"symbol"`
- */
-export const useReadTestUsdcSymbol = /*#__PURE__*/ createUseReadContract({
-  abi: testUsdcAbi,
-  functionName: 'symbol',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"totalSupply"`
- */
-export const useReadTestUsdcTotalSupply = /*#__PURE__*/ createUseReadContract({
-  abi: testUsdcAbi,
-  functionName: 'totalSupply',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const useWriteTestUsdc = /*#__PURE__*/ createUseWriteContract({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"approve"`
- */
-export const useWriteTestUsdcApprove = /*#__PURE__*/ createUseWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transfer"`
- */
-export const useWriteTestUsdcTransfer = /*#__PURE__*/ createUseWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useWriteTestUsdcTransferFrom = /*#__PURE__*/ createUseWriteContract({
-  abi: testUsdcAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const useSimulateTestUsdc = /*#__PURE__*/ createUseSimulateContract({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"approve"`
- */
-export const useSimulateTestUsdcApprove = /*#__PURE__*/ createUseSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'approve',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transfer"`
- */
-export const useSimulateTestUsdcTransfer = /*#__PURE__*/ createUseSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'transfer',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testUsdcAbi}__ and `functionName` set to `"transferFrom"`
- */
-export const useSimulateTestUsdcTransferFrom = /*#__PURE__*/ createUseSimulateContract({
-  abi: testUsdcAbi,
-  functionName: 'transferFrom',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link testUsdcAbi}__
- */
-export const useWatchTestUsdcEvent = /*#__PURE__*/ createUseWatchContractEvent({ abi: testUsdcAbi })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link testUsdcAbi}__ and `eventName` set to `"Approval"`
- */
-export const useWatchTestUsdcApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: testUsdcAbi,
-  eventName: 'Approval',
-})
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link testUsdcAbi}__ and `eventName` set to `"Transfer"`
- */
-export const useWatchTestUsdcTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: testUsdcAbi,
-  eventName: 'Transfer',
 })
 
 /**
