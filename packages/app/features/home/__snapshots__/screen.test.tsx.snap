@@ -50,8 +50,6 @@ exports[`HomeScreen 1`] = `
           style={
             {
               "flexDirection": "column",
-              "paddingBottom": 102,
-              "paddingTop": 102,
             }
           }
         >
@@ -61,6 +59,7 @@ exports[`HomeScreen 1`] = `
                 "flexDirection": "column",
                 "gap": 32,
                 "justifyContent": "center",
+                "paddingBottom": 32,
               }
             }
           >
@@ -141,7 +140,8 @@ exports[`HomeScreen 1`] = `
       <View
         accessibilityRole="button"
         cancelable={true}
-        cursor="pointer"
+        disabled={false}
+        focusVisibleStyle={{}}
         focusable={[Function]}
         minPressDuration={0}
         onBlur={[Function]}
@@ -154,7 +154,7 @@ exports[`HomeScreen 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#40FB50",
+            "backgroundColor": "hsla(125, 96%, 47%, 1)",
             "borderBottomColor": "transparent",
             "borderBottomLeftRadius": 9,
             "borderBottomRightRadius": 9,

@@ -1,21 +1,34 @@
 import {
-  BottomSheet,
+  Sheet,
+  Button,
   Nav,
   Paragraph,
+  ScrollView,
+  Separator,
   SheetProps,
   SideBar,
   SideBarWrapper,
+  XStack,
   YStack,
   YStackProps,
   useMedia,
+  isWeb,
 } from '@my/ui'
 import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
+import {
+  IconAccount,
+  IconActivity,
+  IconHome,
+  IconSLogo,
+  IconSendLogo,
+  IconX,
+} from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import { useNav } from 'app/routers/params'
 import { ReactElement } from 'react'
+import { NavSheet } from '../NavSheet'
 
 const links = [
   {
@@ -26,23 +39,23 @@ const links = [
   {
     icon: <IconSLogo size={'$1'} />,
     text: 'send',
-    href: 'send',
+    href: '/send',
   },
   {
     icon: <IconActivity size={'$1'} />,
     text: 'activity',
-    href: 'activity',
+    href: '/activity',
   },
   {
     icon: <IconAccount size={'$1'} />,
     text: 'account',
-    href: 'account',
+    href: '/account',
   },
   __DEV__ || baseMainnet.id === 84532
     ? {
         icon: <Paragraph px="$1">🔒</Paragraph>,
         text: 'secret shop',
-        href: 'secret-shop',
+        href: '/secret-shop',
       }
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
@@ -73,18 +86,52 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
   }
 
   return (
-    <BottomSheet open={nav === 'home'} onOpenChange={onOpenChange}>
+    <NavSheet open={nav === 'home'} onOpenChange={onOpenChange}>
       <Link href={'/'} marginTop={'$4'}>
         <IconSendLogo size={'$2.5'} color={'$color12'} />
       </Link>
-      <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
-          {links.map((link) => (
-            <SideBarNavLink key={link.href} {...link} />
+      <Nav display="flex" flex={2} height="100%" justifyContent={'center'}>
+        <ScrollView gap={'$4'} alignItems="stretch" jc="center" ml="$-5" height="100%">
+          {links.map((link, idx) => (
+            <YStack
+              key={link.href}
+              gap={'$4'}
+              alignItems="stretch"
+              justifyContent="center"
+              f={1}
+              h={'$7'}
+            >
+              <SideBarNavLink key={link.href} {...link} />
+              {idx !== links.length - 1 && (
+                <Separator
+                  width="100%"
+                  pos={'absolute'}
+                  left="$-6"
+                  bottom="$0"
+                  borderColor="$decay"
+                />
+              )}
+            </YStack>
           ))}
-        </YStack>
+        </ScrollView>
       </Nav>
-    </BottomSheet>
+
+      <XStack pos={'absolute'} top={'$7'} right={'$6'}>
+        <Button
+          size="$4"
+          transparent
+          chromeless
+          backgroundColor="transparent"
+          hoverStyle={{ backgroundColor: 'transparent' }}
+          pressStyle={{ backgroundColor: 'transparent' }}
+          focusStyle={{ backgroundColor: 'transparent' }}
+          circular
+          icon={<IconX size="$2" color="$color9" />}
+          onPress={onOpenChange}
+          theme="accent"
+        />
+      </XStack>
+    </NavSheet>
   )
 }
 

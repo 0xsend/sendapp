@@ -10,7 +10,7 @@
     "@indexsupply/shovel-config": "^0.0.5",
     "@my/wagmi": "workspace:*",
     "@types/bun": "latest",
-    "permissionless": "^0.1.10",
+    "permissionless": "^0.1.11",
     "viem": "^2.8.10"
   },
   "peerDependencies": {

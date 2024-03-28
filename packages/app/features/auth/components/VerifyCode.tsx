@@ -5,7 +5,6 @@ import {
   H3,
   Paragraph,
   SubmitButton,
-  Theme,
   XStack,
   YStack,
 } from '@my/ui'
@@ -55,19 +54,18 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           token: {
             accessibilityLabel: 'One-time Password',
             '$theme-dark': {
-              borderBottomColor: '$accent9Light',
+              borderBottomColor: '$accent10Dark',
             },
             '$theme-light': {
-              borderBottomColor: '$black',
+              borderBottomColor: '$accent9Light',
             },
+
             borderWidth: 0,
             borderBottomWidth: 2,
             borderRadius: '$0',
-            placeholder: 'Code',
             width: '100%',
             backgroundColor: 'transparent',
-            color: '$background',
-            themeInverse: true,
+            color: '$color12',
             fontFamily: '$mono',
             fontVariant: ['tabular-nums'],
             fontSize: '$7',
@@ -78,6 +76,19 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             textContentType: 'oneTimeCode',
             autoComplete: 'one-time-code',
             outlineColor: 'transparent',
+            theme: 'accent',
+            focusStyle: {
+              borderBottomColor: '$accent3Light',
+              autoFocus: true,
+              focusStyle: {
+                '$theme-dark': {
+                  borderBottomColor: '$accent9Light',
+                },
+                '$theme-light': {
+                  borderBottomColor: '$black',
+                },
+              },
+            },
           },
         }}
         renderAfter={({ submit }) => (
@@ -111,9 +122,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
       >
         {(fields) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
-            <Theme inverse={true}>
-              <BigHeading col="$background">VERIFY ACCOUNT</BigHeading>
-            </Theme>
+            <BigHeading color="$color12">VERIFY ACCOUNT</BigHeading>
             <H3
               lineHeight={28}
               $platform-web={{ fontFamily: '$mono' }}
@@ -125,11 +134,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
               Enter the code we sent you on your phone.
             </H3>
             <YStack gap="$4">
-              <Theme inverse={true}>
-                <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
-                  Your Code
-                </Paragraph>
-              </Theme>
+              <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
+                Your Code
+              </Paragraph>
               <XStack gap="$2">{Object.values(fields)}</XStack>
             </YStack>
           </YStack>

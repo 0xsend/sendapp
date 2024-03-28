@@ -60,11 +60,11 @@ export default defineConfig({
     /* Test against desktop viewports. */
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 768 } },
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { ...devices['Desktop Firefox'], viewport: { width: 1366, height: 768 } },
     },
     // FIXME: something is wrong with webkit in CI github actions
     // {

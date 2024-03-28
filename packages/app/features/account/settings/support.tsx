@@ -12,7 +12,7 @@ export const SupportScreen = () => {
       <YStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }} gap={'$6'}>
         <XStack ai={'center'} gap={'$3.5'}>
           <IconNote color={'$primary'} />
-          <Link href={'#'} color={'$primary'}>
+          <Link href={'https://go.send.it/support'} color={'$primary'}>
             Submit a Request
           </Link>
         </XStack>

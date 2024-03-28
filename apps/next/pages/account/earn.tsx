@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import { NextPageWithLayout } from 'next-app/pages/_app'
 import { HomeLayout } from 'app/features/home/layout.web'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -17,10 +18,12 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
+const subheader =
+  'Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. '
+
 Page.getLayout = (children) => (
   <HomeLayout
-    header="Hold & Earn"
-    subheader="Maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. "
+    TopNav={<TopNav header="Hold & Earn" subheader={subheader} button={ButtonOption.SETTINGS} />}
   >
     {children}
   </HomeLayout>

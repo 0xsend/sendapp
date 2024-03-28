@@ -4,7 +4,7 @@ pragma solidity ^0.8.23;
 import "forge-std/Test.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
-import "../src/DaimoAccount.sol";
+import "../src/SendAccount.sol";
 
 abstract contract WebAuthnTest is Test {
     struct P256KeyPair {

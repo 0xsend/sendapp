@@ -1,3 +1,4 @@
+import { Tables } from '@my/supabase/database.types'
 import {
   Adapt,
   Button,
@@ -9,11 +10,18 @@ import {
   SizableText,
   Unspaced,
   XStack,
+  ButtonText,
 } from '@my/ui'
 import { Info, X } from '@tamagui/lucide-icons'
-import React from 'react'
+import React, { useMemo } from 'react'
+import { getPriceInWei } from './checkout-utils'
 
-export function SendTagPricingDialog() {
+import { formatEther } from 'viem'
+import { useUser } from 'app/utils/useUser'
+
+export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
+  const { tags } = useUser()
+  const price = useMemo(() => getPriceInWei([{ name }], tags || []), [name, tags])
   return (
     <Dialog modal>
       <Dialog.Trigger asChild>
@@ -21,11 +29,25 @@ export function SendTagPricingDialog() {
           als="flex-end"
           maw="$20"
           chromeless
-          icon={<Info />}
+          iconAfter={<Info size={'$2'} />}
+          px={0}
+          hoverStyle={{ bc: 'transparent', borderColor: 'transparent' }}
+          pressStyle={{ bc: 'transparent', borderColor: 'transparent' }}
           // @ts-expect-error tamagui doesn't support this yet
           type="button"
         >
-          Pricing
+          <ButtonText fontFamily={'$mono'} col={'$color12'} fontSize={'$5'}>
+            {(() => {
+              switch (true) {
+                case name.length === 0:
+                  return 'Pricing'
+                case name.length > 0 && price === BigInt(0):
+                  return 'Free'
+                default:
+                  return `${formatEther(price)} ETH`
+              }
+            })()}
+          </ButtonText>
         </Button>
       </Dialog.Trigger>
 

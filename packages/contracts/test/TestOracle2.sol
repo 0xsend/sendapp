@@ -2,21 +2,34 @@
 pragma solidity ^0.8.23;
 
 import "../src/utils/IOracle.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TestOracle2 is IOracle {
+contract TestOracle2 is IOracle, Ownable {
     int256 public price;
     uint8 private _decimals_;
+    string public name;
 
-    constructor(int256 _price, uint8 _decimals) {
+    //       roundId   uint80 :  18446744073709551850
+    //   answer   int256 :  99995000
+    //   startedAt   uint256 :  1710678777
+    //   updatedAt   uint256 :  1710678777
+    //   answeredInRound   uint80 :  18446744073709551850
+
+    constructor(int256 _price, uint8 _decimals, string memory _name, address _owner) Ownable(_owner) {
         price = _price;
         _decimals_ = _decimals;
+        name = _name;
     }
 
-    function setPrice(int256 _price) external {
+    function description() external view returns (string memory) {
+        return name;
+    }
+
+    function setPrice(int256 _price) external onlyOwner {
         price = _price;
     }
 
-    function setDecimals(uint8 _decimals) external {
+    function setDecimals(uint8 _decimals) external onlyOwner {
         _decimals_ = _decimals;
     }
 

@@ -48,8 +48,8 @@ exports[`shovel config 1`] = `
           {
             "column": "factory",
             "filter_arg": [
-              "0x3ABa34EA7AB643DE0BEd2e15D7Cb97BeedB09bDC",
               "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
+              "0xDf11654D97006885F4D7bff6F2c1260C4d72D984",
             ],
             "filter_op": "contains",
             "indexed": false,
@@ -131,6 +131,7 @@ exports[`shovel config 1`] = `
             "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
             "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
             "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
             "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           ],
@@ -233,6 +234,7 @@ exports[`shovel config 1`] = `
           "column": "log_addr",
           "filter_arg": [
             "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
           ],
           "filter_op": "contains",
           "name": "log_addr",

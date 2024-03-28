@@ -9,14 +9,14 @@ export function SideBarNavLink({
   ...props
 }: { icon?: ReactElement; text: string } & Omit<LinkProps, 'children'>): ReactElement {
   const location = usePathname()
-
+  const parts = location.split('/').filter(Boolean)
   const isActiveRoute =
-    props.href === '/'
-      ? location === props.href.toString()
-      : location.split('/').includes(props.href.toString())
+    location === props.href.toString() ||
+    parts.includes(props.href.toString()) ||
+    props.href.toString().startsWith(`/${parts[0]}`)
 
   const { resolvedTheme } = useThemeSetting()
-  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
+  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$accent3Light'
   const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$color' : '$color12'
 
   return (

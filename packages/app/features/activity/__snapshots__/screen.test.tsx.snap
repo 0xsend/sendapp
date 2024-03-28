@@ -108,7 +108,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "isSubmitSuccessful": false,
                     "isSubmitted": false,
                     "isSubmitting": false,
-                    "isValid": false,
+                    "isValid": true,
                     "isValidating": false,
                     "submitCount": 0,
                     "touchedFields": {},
@@ -142,7 +142,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "errors": true,
                     "isDirty": false,
                     "isSubmitting": true,
-                    "isValid": false,
+                    "isValid": true,
                     "isValidating": false,
                     "touchedFields": false,
                   },
@@ -196,13 +196,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "unregister": [Function],
                 }
               }
+              focusVisibleStyle={{}}
               focusable={true}
               id=":r0:"
               name="query"
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              outlineWidth={0}
               placeholder="Search"
               placeholderTextColor="hsla(191, 32%, 50%, 1)"
               readOnly={false}
@@ -222,7 +222,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 0,
-                  "color": "hsla(112, 22%, 100%, 1)",
+                  "color": "hsl(0, 0%, 93.0%)",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
@@ -230,11 +230,23 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "minWidth": 0,
                   "paddingLeft": 16,
                   "paddingRight": 16,
+                  "position": "relative",
                 }
               }
               value=""
             />
           </View>
+          <View
+            style={
+              {
+                "gap": 7,
+                "position": "absolute",
+                "right": 18,
+                "top": "50%",
+                "transform": "translateY(-50%)",
+              }
+            }
+          />
         </View>
       </View>
       <RNSVGSvgView
@@ -504,10 +516,42 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       animatedStyle={
         {
           "value": {
-            "opacity": 1,
+            "opacity": {
+              "callStart": null,
+              "callback": [Function],
+              "current": 1,
+              "finished": true,
+              "lastTimestamp": 0,
+              "omega0": 14.433756729740644,
+              "omega1": 11.785113019775793,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 1,
+              "timestamp": 0,
+              "toValue": 1,
+              "velocity": 0,
+              "zeta": 0.5773502691896257,
+            },
             "transform": [
               {
-                "translateY": 0,
+                "translateY": {
+                  "callStart": null,
+                  "callback": [Function],
+                  "current": 0,
+                  "finished": true,
+                  "lastTimestamp": 0,
+                  "omega0": 14.433756729740644,
+                  "omega1": 11.785113019775793,
+                  "onFrame": [Function],
+                  "onStart": [Function],
+                  "startTimestamp": 0,
+                  "startValue": 0,
+                  "timestamp": 0,
+                  "toValue": 0,
+                  "velocity": 0,
+                  "zeta": 0.5773502691896257,
+                },
               },
             ],
           },
@@ -571,7 +615,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           horizontal={true}
           scrollEnabled={true}
           showsHorizontalScrollIndicator={false}
-          style={{}}
         >
           <View>
             <View
@@ -2441,7 +2484,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "isSubmitSuccessful": false,
                     "isSubmitted": false,
                     "isSubmitting": false,
-                    "isValid": false,
+                    "isValid": true,
                     "isValidating": false,
                     "name": "query",
                     "submitCount": 0,
@@ -2476,7 +2519,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "errors": true,
                     "isDirty": false,
                     "isSubmitting": true,
-                    "isValid": false,
+                    "isValid": true,
                     "isValidating": false,
                     "touchedFields": false,
                   },
@@ -2530,13 +2573,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "unregister": [Function],
                 }
               }
+              focusVisibleStyle={{}}
               focusable={true}
-              id=":r4:"
+              id=":r3:"
               name="query"
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              outlineWidth={0}
               placeholder="Search"
               placeholderTextColor="hsla(191, 32%, 50%, 1)"
               readOnly={false}
@@ -2556,7 +2599,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 0,
-                  "color": "hsla(112, 22%, 100%, 1)",
+                  "color": "hsl(0, 0%, 93.0%)",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
@@ -2564,11 +2607,23 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "minWidth": 0,
                   "paddingLeft": 16,
                   "paddingRight": 16,
+                  "position": "relative",
                 }
               }
               value="test"
             />
           </View>
+          <View
+            style={
+              {
+                "gap": 7,
+                "position": "absolute",
+                "right": 18,
+                "top": "50%",
+                "transform": "translateY(-50%)",
+              }
+            }
+          />
         </View>
       </View>
       <RNSVGSvgView
@@ -2859,10 +2914,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       animatedStyle={
         {
           "value": {
-            "opacity": 0,
+            "opacity": 0.8573966281386607,
             "transform": [
               {
-                "translateY": -10,
+                "translateY": -1.4260337186133856,
               },
             ],
           },
@@ -2918,7 +2973,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       />
       <View
         data-href="/profile/test"
-        style={{}}
       >
         <View
           style={
@@ -3120,10 +3174,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       animatedStyle={
         {
           "value": {
-            "opacity": 0.4501109005150496,
+            "opacity": -0.0393062088724579,
             "transform": [
               {
-                "translateY": 5.498890994849514,
+                "translateY": 10.393062088724582,
               },
             ],
           },
@@ -3187,7 +3241,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           horizontal={true}
           scrollEnabled={true}
           showsHorizontalScrollIndicator={false}
-          style={{}}
         >
           <View>
             <View

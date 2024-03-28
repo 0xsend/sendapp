@@ -1,9 +1,9 @@
 import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
-  daimoAccountAbi,
-  daimoAccountFactoryAbi,
-  daimoVerifierAbi,
-  daimoVerifierProxyAddress,
+  sendAccountAbi,
+  sendAccountFactoryAbi,
+  sendVerifierAbi,
+  sendVerifierProxyAddress,
   entryPointAddress,
   iEntryPointAbi,
   iEntryPointSimulationsAbi,
@@ -58,12 +58,12 @@ export const entrypointSimulations = getContract({
   client: baseMainnetClient,
 })
 
-export const daimoVerifierAddress = daimoVerifierProxyAddress[845337] // TODO: use chain id
+export const sendVerifierAddress = sendVerifierProxyAddress[845337] // TODO: use chain id
 
 export const verifier = getContract({
-  abi: daimoVerifierAbi,
+  abi: sendVerifierAbi,
   client: baseMainnetClient,
-  address: daimoVerifierAddress,
+  address: sendVerifierAddress,
 })
 
 /**
@@ -94,7 +94,7 @@ export const USEROP_SALT = 0n
 
 export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
   return encodeFunctionData({
-    abi: [getAbiItem({ abi: daimoAccountFactoryAbi, name: 'createAccount' })],
+    abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],
     args: [
       USEROP_KEY_SLOT, // key slot
       publicKey, // public key
@@ -105,7 +105,7 @@ export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
 }
 
 /**
- * Generates a DaimoAccount challenge from a user operation hash.
+ * Generates a SendAccount challenge from a user operation hash.
  */
 export function generateChallenge({
   userOpHash,
@@ -131,7 +131,7 @@ export function generateChallenge({
 
 /**
  * Signs a challenge using the user's passkey and returns the signature in a format that matches the ABI of a signature
- * struct for the DaimoVerifier contract.
+ * struct for the SendVerifier contract.
  */
 export async function signChallenge(challenge: Hex) {
   assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
@@ -158,7 +158,7 @@ export async function signChallenge(challenge: Hex) {
 
   const encodedWebAuthnSig = encodeAbiParameters(
     getAbiItem({
-      abi: daimoAccountAbi,
+      abi: sendAccountAbi,
       name: 'signatureStruct',
     }).inputs,
     [webauthnSig]
@@ -172,7 +172,7 @@ export async function signChallenge(challenge: Hex) {
 }
 
 /**
- * Signs a user operation hash and returns the signature in a format for the DaimoVerifier contract.
+ * Signs a user operation hash and returns the signature in a format for the SendVerifier contract.
  */
 export async function signUserOp({
   userOpHash,

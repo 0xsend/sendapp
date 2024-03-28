@@ -22,6 +22,15 @@ struct TokenPaymasterConfig {
     uint48 refundPostopCost;
     /// @notice Transactions are only valid as long as the cached price is not older than this value
     uint48 priceMaxAge;
+    /// @notice The base fee in tokens that is charged for every transaction up to a max of type(uint40).max = 1099511627775 ~= 1009.5 gwei
+    uint40 baseFee;
+}
+
+struct RewardsConfig {
+    /// @notice The percentage of the base fee that is distributed to the rewards pool (10000 = 100%). Ranges from 0 to 10000
+    uint16 rewardsShare;
+    /// @notice The address of the rewards pool
+    address rewardsPool;
 }
 
 /// @title ERC-20 Token Paymaster for ERC-4337
@@ -40,20 +49,27 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
 
     event ConfigUpdated(TokenPaymasterConfig tokenPaymasterConfig);
 
+    event RewardsConfigUpdated(RewardsConfig rewardsConfig);
+
     event OracleConfigUpdated(OracleHelperConfig oracleHelperConfig);
 
     event UniswapConfigUpdated(UniswapHelperConfig uniswapHelperConfig);
 
     event UserOperationSponsored(
-        address indexed user, uint256 actualTokenCharge, uint256 actualGasCost, uint256 actualTokenPriceWithMarkup
+        address indexed user,
+        uint256 actualTokenCharge,
+        uint256 actualGasCost,
+        uint256 actualTokenPriceWithMarkup,
+        uint256 baseFee
     );
 
     event Received(address indexed sender, uint256 value);
 
-    /// @notice All 'price' variables are multiplied by this value to avoid rounding up
-    uint256 private constant PRICE_DENOM = 1e26;
+    /// @notice All 'balance' or 'price' variables are multiplied by this value to avoid rounding up
+    uint256 private constant DENOM = 1e26;
 
     TokenPaymasterConfig public tokenPaymasterConfig;
+    RewardsConfig public rewardsConfig;
 
     /// @notice Initializes the TokenPaymaster contract with the given parameters.
     /// @param _token The ERC20 token used for transaction fee payments.
@@ -61,6 +77,7 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
     /// @param _wrappedNative The ERC-20 token that wraps the native asset for current chain.
     /// @param _uniswap The Uniswap V3 SwapRouter contract.
     /// @param _tokenPaymasterConfig The configuration for the Token Paymaster.
+    /// @param _rewardsConfig The configuration for the Rewards.
     /// @param _oracleHelperConfig The configuration for the Oracle Helper.
     /// @param _uniswapHelperConfig The configuration for the Uniswap Helper.
     /// @param _owner The address that will be set as the owner of the contract.
@@ -70,6 +87,7 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
         IERC20 _wrappedNative,
         ISwapRouter _uniswap,
         TokenPaymasterConfig memory _tokenPaymasterConfig,
+        RewardsConfig memory _rewardsConfig,
         OracleHelperConfig memory _oracleHelperConfig,
         UniswapHelperConfig memory _uniswapHelperConfig,
         address _owner
@@ -79,6 +97,7 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
         UniswapHelper(_token, _wrappedNative, _uniswap, _uniswapHelperConfig)
     {
         setTokenPaymasterConfig(_tokenPaymasterConfig);
+        setRewardsConfig(_rewardsConfig);
         transferOwnership(_owner);
         updateCachedPrice(true);
     }
@@ -86,10 +105,21 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
     /// @notice Updates the configuration for the Token Paymaster.
     /// @param _tokenPaymasterConfig The new configuration struct.
     function setTokenPaymasterConfig(TokenPaymasterConfig memory _tokenPaymasterConfig) public onlyOwner {
-        require(_tokenPaymasterConfig.priceMarkup <= 2 * PRICE_DENOM, "TPM: price markup too high");
-        require(_tokenPaymasterConfig.priceMarkup >= PRICE_DENOM, "TPM: price markup too low");
+        require(_tokenPaymasterConfig.priceMarkup <= 2 * DENOM, "TPM: price markup too high");
+        require(_tokenPaymasterConfig.priceMarkup >= DENOM, "TPM: price markup too low");
         tokenPaymasterConfig = _tokenPaymasterConfig;
         emit ConfigUpdated(_tokenPaymasterConfig);
+    }
+
+    /// @notice Updates the configuration for the Rewards.
+    /// @param _rewardsConfig The new configuration struct.
+    function setRewardsConfig(RewardsConfig memory _rewardsConfig) public onlyOwner {
+        require(_rewardsConfig.rewardsShare <= 10000, "TPM: invalid rewards share percentage");
+        require(
+            _rewardsConfig.rewardsShare == 0 || _rewardsConfig.rewardsPool != address(0), "TPM: invalid rewards pool"
+        );
+        rewardsConfig = _rewardsConfig;
+        emit RewardsConfigUpdated(_rewardsConfig);
     }
 
     function setUniswapConfiguration(UniswapHelperConfig memory _uniswapHelperConfig) external onlyOwner {
@@ -122,6 +152,7 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
     {
         unchecked {
             uint256 priceMarkup = tokenPaymasterConfig.priceMarkup;
+            uint256 baseFee = tokenPaymasterConfig.baseFee;
             uint256 dataLength = userOp.paymasterAndData.length - PAYMASTER_DATA_OFFSET;
             require(dataLength == 0 || dataLength == 32, "TPM: invalid data length");
             uint256 maxFeePerGas = userOp.unpackMaxFeePerGas();
@@ -129,7 +160,7 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
             require(refundPostopCost < userOp.unpackPostOpGasLimit(), "TPM: postOpGasLimit too low");
             uint256 preChargeNative = requiredPreFund + (refundPostopCost * maxFeePerGas);
             // note: price is in native-asset-per-token increasing it means dividing it by markup
-            uint256 cachedPriceWithMarkup = cachedPrice * PRICE_DENOM / priceMarkup;
+            uint256 cachedPriceWithMarkup = cachedPrice * DENOM / priceMarkup;
             if (dataLength == 32) {
                 uint256 clientSuppliedPrice =
                     uint256(bytes32(userOp.paymasterAndData[PAYMASTER_DATA_OFFSET:PAYMASTER_DATA_OFFSET + 32]));
@@ -139,6 +170,7 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
                 }
             }
             uint256 tokenAmount = weiToToken(preChargeNative, cachedPriceWithMarkup);
+            tokenAmount += baseFee;
             SafeERC20.safeTransferFrom(token, userOp.sender, address(this), tokenAmount);
             context = abi.encode(tokenAmount, userOp.sender);
             validationResult =
@@ -159,10 +191,12 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
     {
         unchecked {
             uint256 priceMarkup = tokenPaymasterConfig.priceMarkup;
+            uint256 baseFee = tokenPaymasterConfig.baseFee;
             (uint256 preCharge, address userOpSender) = abi.decode(context, (uint256, address));
+            preCharge -= baseFee; // don't refund the base fee
             uint256 _cachedPrice = updateCachedPrice(false);
             // note: price is in native-asset-per-token increasing it means dividing it by markup
-            uint256 cachedPriceWithMarkup = _cachedPrice * PRICE_DENOM / priceMarkup;
+            uint256 cachedPriceWithMarkup = _cachedPrice * DENOM / priceMarkup;
             // Refund tokens based on actual gas cost
             uint256 actualChargeNative = actualGasCost + tokenPaymasterConfig.refundPostopCost * actualUserOpFeePerGas;
             uint256 actualTokenNeeded = weiToToken(actualChargeNative, cachedPriceWithMarkup);
@@ -175,7 +209,13 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
                 SafeERC20.safeTransferFrom(token, userOpSender, address(this), actualTokenNeeded - preCharge);
             }
 
-            emit UserOperationSponsored(userOpSender, actualTokenNeeded, actualGasCost, cachedPriceWithMarkup);
+            uint16 rewardsShare = rewardsConfig.rewardsShare;
+            uint256 rewardsAmount = baseFee * DENOM * rewardsShare / 10000 / DENOM;
+            if (rewardsAmount > 0) {
+                SafeERC20.safeTransfer(token, rewardsConfig.rewardsPool, rewardsAmount);
+            }
+
+            emit UserOperationSponsored(userOpSender, actualTokenNeeded, actualGasCost, cachedPriceWithMarkup, baseFee);
             refillEntryPointDeposit(_cachedPrice);
         }
     }

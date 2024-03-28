@@ -1,6 +1,5 @@
 import { Container, Separator, XStack, YStack, useMedia } from '@my/ui'
-import { settingsLinks } from './SettingsBottomSheet'
-import { SettingsNavLink } from './SettingsNavLink'
+import { SettingsLinks } from './SettingsLinks'
 
 export type SettingsLayoutProps = {
   /**
@@ -19,25 +18,25 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
   return (
     <Container>
       {media.gtLg ? (
-        <XStack separator={<Separator vertical />} f={1} gap={'$size.8'} pt={'$4'}>
+        <XStack f={1} pt={'$4'}>
           <YStack
             backgroundColor="$color1"
             // this file is web-only so we can safely use CSS
             style={{
               transition: '200ms ease width',
             }}
+            width="$14"
           >
-            <YStack width={'100%'} gap={'$space.6'}>
-              <YStack jc={'space-between'} zIndex={4}>
-                <YStack h={'inherit'} gap={'$6'}>
-                  {settingsLinks.map((link) => (
-                    <SettingsNavLink key={link.href} {...link} />
-                  ))}
+            <YStack width={'100%'} gap={'$4'}>
+              <YStack jc={'space-between'} zIndex={4} flex={1} width={'100%'}>
+                <YStack h={'inherit'} gap={'$6'} width={'100%'}>
+                  <SettingsLinks />
                 </YStack>
               </YStack>
             </YStack>
           </YStack>
-          <YStack f={1} ai="center">
+          <Separator vertical />
+          <YStack f={1} ai="center" ml="$8">
             <YStack width="100%">{children}</YStack>
           </YStack>
         </XStack>

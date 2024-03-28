@@ -20,12 +20,150 @@ exports[`SendDialog it can send: SendForm 1`] = `
     animatedStyle={
       {
         "value": {
+          "backgroundColor": {
+            "A": {
+              "current": 0.9019607843137255,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0.9019607843137255,
+              "toValue": 0.9019607843137255,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "B": {
+              "current": 0,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0,
+              "toValue": 0,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "G": {
+              "current": 0,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0,
+              "toValue": 0,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "R": {
+              "current": 0,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0,
+              "toValue": 0,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "callStart": null,
+            "callback": [Function],
+            "current": "rgba(0, 0, 0, 0.9019607843137255)",
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 0,
+            "omega1": 0,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": "rgba(0,0,0,0.9)",
+            "velocity": 0,
+            "zeta": 0,
+          },
+          "bottom": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
+          "left": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
           "opacity": 0.7,
+          "right": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
+          "top": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
         },
       }
     }
     cancelable={true}
     collapsable={false}
+    disabled={false}
     focusable={true}
     forwardedRef={[Function]}
     minPressDuration={0}
@@ -63,6 +201,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
     }
     animation="medium"
     collapsable={false}
+    disableClassName={true}
     forwardedRef={[Function]}
     onLayout={[Function]}
     pointerEvents="auto"
@@ -169,7 +308,8 @@ exports[`SendDialog it can send: SendForm 1`] = `
               accessibilityLabel="Dialog Close"
               accessibilityRole="button"
               cancelable={true}
-              cursor="pointer"
+              disabled={false}
+              focusVisibleStyle={{}}
               focusable={[Function]}
               minPressDuration={0}
               onBlur={[Function]}
@@ -462,10 +602,10 @@ exports[`SendDialog it can send: SendForm 1`] = `
             >
               <Text
                 cancelable={true}
-                cursor="default"
+                disabled={false}
                 focusable={true}
-                htmlFor=":rf:"
-                id=":rg:"
+                htmlFor=":rd:"
+                id=":re:"
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -478,7 +618,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                   {
                     "alignItems": "center",
                     "backgroundColor": "transparent",
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "#86AE80",
                     "display": "flex",
                     "fontFamily": "System",
                     "fontSize": 19.2,
@@ -558,7 +698,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         "isSubmitSuccessful": false,
                         "isSubmitted": true,
                         "isSubmitting": false,
-                        "isValid": false,
+                        "isValid": true,
                         "isValidating": false,
                         "name": "amount",
                         "submitCount": 1,
@@ -597,7 +737,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         "errors": true,
                         "isDirty": false,
                         "isSubmitting": true,
-                        "isValid": false,
+                        "isValid": true,
                         "isValidating": false,
                         "touchedFields": false,
                       },
@@ -660,13 +800,13 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       "unregister": [Function],
                     }
                   }
+                  focusVisibleStyle={{}}
                   focusable={true}
-                  id=":rf:"
+                  id=":rd:"
                   name="amount"
                   onBlur={[Function]}
                   onChangeText={[Function]}
                   onFocus={[Function]}
-                  outlineWidth={0}
                   placeholderTextColor="hsla(191, 32%, 50%, 1)"
                   readOnly={false}
                   style={
@@ -685,7 +825,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       "borderTopLeftRadius": 9,
                       "borderTopRightRadius": 9,
                       "borderTopWidth": 0,
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "hsl(0, 0%, 93.0%)",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
@@ -693,11 +833,23 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       "minWidth": 0,
                       "paddingLeft": 16,
                       "paddingRight": 16,
+                      "position": "relative",
                     }
                   }
                   value="3.50"
                 />
               </View>
+              <View
+                style={
+                  {
+                    "gap": 7,
+                    "position": "absolute",
+                    "right": 18,
+                    "top": "50%",
+                    "transform": "translateY(-50%)",
+                  }
+                }
+              />
             </View>
             <View
               style={
@@ -708,10 +860,10 @@ exports[`SendDialog it can send: SendForm 1`] = `
             >
               <Text
                 cancelable={true}
-                cursor="default"
+                disabled={false}
                 focusable={true}
-                htmlFor=":rh:"
-                id=":ri:"
+                htmlFor=":rf:"
+                id=":rg:"
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -768,9 +920,16 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     }
                   }
                   cancelable={true}
-                  cursor="pointer"
                   disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 2,
+                    }
+                  }
                   focusable={[Function]}
+                  id=":rf:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -953,8 +1112,8 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       }
                     }
                     cancelable={true}
-                    cursor="pointer"
                     disabled={false}
+                    focusVisibleStyle={{}}
                     focusable={[Function]}
                     minPressDuration={0}
                     onBlur={[Function]}
@@ -967,7 +1126,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "backgroundColor": "#40FB50",
+                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
                         "borderBottomColor": "transparent",
                         "borderBottomLeftRadius": 16,
                         "borderBottomRightRadius": 16,
@@ -981,7 +1140,6 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         "borderTopLeftRadius": 16,
                         "borderTopRightRadius": 16,
                         "borderTopWidth": 1,
-                        "color": "hsla(125, 96%, 47%, 1)",
                         "flexDirection": "row",
                         "flexWrap": "nowrap",
                         "height": 44,
@@ -993,12 +1151,11 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     testID="SubmitButton"
                   >
                     <Text
-                      cursor="pointer"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
                         {
-                          "color": "hsla(125, 96%, 47%, 1)",
+                          "color": "hsla(191, 32%, 10%, 1)",
                           "flexGrow": 0,
                           "flexShrink": 1,
                           "fontFamily": "System",
@@ -1011,12 +1168,11 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       userSelect="none"
                     >
                       <Text
-                        cursor="pointer"
                         lineBreakMode="clip"
                         numberOfLines={1}
                         style={
                           {
-                            "color": "hsla(125, 96%, 47%, 1)",
+                            "color": "hsla(191, 32%, 10%, 1)",
                             "flexGrow": 0,
                             "flexShrink": 1,
                             "fontFamily": "System",
@@ -1075,6 +1231,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                 }
               }
               collapsable={false}
+              disableClassName={true}
               forwardedRef={[Function]}
               onLayout={[Function]}
               pointerEvents="none"
@@ -1132,8 +1289,9 @@ exports[`SendDialog it can send: SendForm 1`] = `
                       }
                     >
                       <View
-                        accessibilityLabelledBy=":rm:"
+                        accessibilityLabelledBy=":rk:"
                         accessibilityRole="none"
+                        disabled={false}
                         style={
                           {
                             "flexDirection": "column",
@@ -1142,7 +1300,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         }
                       >
                         <View
-                          accessibilityLabelledBy=":rn:"
+                          accessibilityLabelledBy=":rl:"
                           accessibilityState={
                             {
                               "disabled": undefined,
@@ -1150,7 +1308,14 @@ exports[`SendDialog it can send: SendForm 1`] = `
                             }
                           }
                           cancelable={true}
-                          cursor="pointer"
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 1,
+                            }
+                          }
                           focusable={true}
                           minPressDuration={0}
                           onBlur={[Function]}
@@ -1184,7 +1349,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           tabIndex={-1}
                         >
                           <Text
-                            id=":rn:"
+                            id=":rl:"
                             lineBreakMode="clip"
                             numberOfLines={1}
                             style={
@@ -1300,7 +1465,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           }
                         />
                         <View
-                          accessibilityLabelledBy=":ro:"
+                          accessibilityLabelledBy=":rm:"
                           accessibilityState={
                             {
                               "disabled": undefined,
@@ -1308,7 +1473,14 @@ exports[`SendDialog it can send: SendForm 1`] = `
                             }
                           }
                           cancelable={true}
-                          cursor="pointer"
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 1,
+                            }
+                          }
                           focusable={true}
                           minPressDuration={0}
                           onBlur={[Function]}
@@ -1342,7 +1514,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           tabIndex={-1}
                         >
                           <Text
-                            id=":ro:"
+                            id=":rm:"
                             lineBreakMode="clip"
                             numberOfLines={1}
                             style={
@@ -1372,7 +1544,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           }
                         />
                         <View
-                          accessibilityLabelledBy=":rp:"
+                          accessibilityLabelledBy=":rn:"
                           accessibilityState={
                             {
                               "disabled": undefined,
@@ -1380,7 +1552,14 @@ exports[`SendDialog it can send: SendForm 1`] = `
                             }
                           }
                           cancelable={true}
-                          cursor="pointer"
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 1,
+                            }
+                          }
                           focusable={true}
                           minPressDuration={0}
                           onBlur={[Function]}
@@ -1414,7 +1593,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           tabIndex={-1}
                         >
                           <Text
-                            id=":rp:"
+                            id=":rn:"
                             lineBreakMode="clip"
                             numberOfLines={1}
                             style={
@@ -1450,7 +1629,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                     "borderTopLeftRadius": 0,
                     "borderTopRightRadius": 0,
                     "borderTopWidth": 0,
-                    "bottom": "-50%",
+                    "bottom": "-100%",
                     "flex": 1,
                     "flexDirection": "column",
                     "height": 0,
@@ -1483,7 +1662,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
           "borderTopLeftRadius": 0,
           "borderTopRightRadius": 0,
           "borderTopWidth": 0,
-          "bottom": "-50%",
+          "bottom": "-100%",
           "flex": 1,
           "flexDirection": "column",
           "height": 0,
@@ -1527,12 +1706,150 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
     animatedStyle={
       {
         "value": {
+          "backgroundColor": {
+            "A": {
+              "current": 0.9019607843137255,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0.9019607843137255,
+              "toValue": 0.9019607843137255,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "B": {
+              "current": 0,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0,
+              "toValue": 0,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "G": {
+              "current": 0,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0,
+              "toValue": 0,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "R": {
+              "current": 0,
+              "lastTimestamp": 0,
+              "omega0": 7.745966692414834,
+              "omega1": NaN,
+              "onFrame": [Function],
+              "onStart": [Function],
+              "startTimestamp": 0,
+              "startValue": 0,
+              "toValue": 0,
+              "velocity": 0,
+              "zeta": 1.2909944487358056,
+            },
+            "callStart": null,
+            "callback": [Function],
+            "current": "rgba(0, 0, 0, 0.9019607843137255)",
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 0,
+            "omega1": 0,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": "rgba(0,0,0,0.9)",
+            "velocity": 0,
+            "zeta": 0,
+          },
+          "bottom": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
+          "left": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
           "opacity": 0.7,
+          "right": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
+          "top": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 0,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 7.745966692414834,
+            "omega1": NaN,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "startTimestamp": 0,
+            "startValue": 0,
+            "timestamp": 0,
+            "toValue": 0,
+            "velocity": 0,
+            "zeta": 1.2909944487358056,
+          },
         },
       }
     }
     cancelable={true}
     collapsable={false}
+    disabled={false}
     focusable={true}
     forwardedRef={[Function]}
     minPressDuration={0}
@@ -1570,6 +1887,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
     }
     animation="medium"
     collapsable={false}
+    disableClassName={true}
     forwardedRef={[Function]}
     onLayout={[Function]}
     pointerEvents="auto"
@@ -1676,7 +1994,8 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
               accessibilityLabel="Dialog Close"
               accessibilityRole="button"
               cancelable={true}
-              cursor="pointer"
+              disabled={false}
+              focusVisibleStyle={{}}
               focusable={[Function]}
               minPressDuration={0}
               onBlur={[Function]}
@@ -1969,10 +2288,10 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
             >
               <Text
                 cancelable={true}
-                cursor="default"
+                disabled={false}
                 focusable={true}
-                htmlFor=":rf:"
-                id=":rg:"
+                htmlFor=":rd:"
+                id=":re:"
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -1985,7 +2304,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                   {
                     "alignItems": "center",
                     "backgroundColor": "transparent",
-                    "color": "hsla(0, 70%, 93%, 1)",
+                    "color": "#86AE80",
                     "display": "flex",
                     "fontFamily": "System",
                     "fontSize": 19.2,
@@ -2108,7 +2427,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                         "errors": true,
                         "isDirty": false,
                         "isSubmitting": true,
-                        "isValid": false,
+                        "isValid": true,
                         "isValidating": false,
                         "touchedFields": false,
                       },
@@ -2171,13 +2490,13 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       "unregister": [Function],
                     }
                   }
+                  focusVisibleStyle={{}}
                   focusable={true}
-                  id=":rf:"
+                  id=":rd:"
                   name="amount"
                   onBlur={[Function]}
                   onChangeText={[Function]}
                   onFocus={[Function]}
-                  outlineWidth={0}
                   placeholderTextColor="hsla(0, 70%, 50%, 1)"
                   readOnly={false}
                   style={
@@ -2196,7 +2515,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       "borderTopLeftRadius": 9,
                       "borderTopRightRadius": 9,
                       "borderTopWidth": 0,
-                      "color": "hsla(0, 70%, 95%, 1)",
+                      "color": "hsl(0, 0%, 93.0%)",
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "400",
@@ -2204,53 +2523,142 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       "minWidth": 0,
                       "paddingLeft": 16,
                       "paddingRight": 16,
+                      "position": "relative",
                     }
                   }
                   value=""
                 />
               </View>
-              <Text
-                animatedStyle={
-                  {
-                    "value": {
-                      "opacity": 0,
-                      "transform": [
-                        {
-                          "translateY": -4,
-                        },
-                        {
-                          "scaleY": 0.2,
-                        },
-                      ],
-                    },
-                  }
-                }
-                collapsable={false}
-                forwardedRef={[Function]}
-                selectable={true}
+              <View
                 style={
                   {
-                    "color": "hsla(0, 70%, 93%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 16.8,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                    "marginTop": 7,
-                    "opacity": 0,
-                    "transform": [
-                      {
-                        "translateY": -4,
-                      },
-                      {
-                        "scaleY": 0.2,
-                      },
-                    ],
+                    "gap": 7,
+                    "position": "absolute",
+                    "right": 18,
+                    "top": "50%",
+                    "transform": "translateY(-50%)",
                   }
                 }
-                suppressHighlighting={true}
               >
-                Required
-              </Text>
+                <RNSVGSvgView
+                  align="xMidYMid"
+                  bbHeight="24"
+                  bbWidth="24"
+                  fill="none"
+                  focusable={false}
+                  height={24}
+                  meetOrSlice={0}
+                  minX={0}
+                  minY={0}
+                  stroke="#C4292F"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  style={
+                    [
+                      {
+                        "backgroundColor": "transparent",
+                        "borderWidth": 0,
+                      },
+                      {
+                        "color": "#C4292F",
+                      },
+                      {
+                        "flex": 0,
+                        "height": 24,
+                        "width": 24,
+                      },
+                    ]
+                  }
+                  tintColor="#C4292F"
+                  vbHeight={24}
+                  vbWidth={24}
+                  width={24}
+                >
+                  <RNSVGGroup
+                    fill={null}
+                    propList={
+                      [
+                        "fill",
+                        "stroke",
+                        "strokeWidth",
+                        "strokeLinecap",
+                        "strokeLinejoin",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "payload": 4291045679,
+                        "type": 0,
+                      }
+                    }
+                    strokeLinecap={1}
+                    strokeLinejoin={1}
+                    strokeWidth="2"
+                  >
+                    <RNSVGPath
+                      d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "stroke",
+                        ]
+                      }
+                      stroke={
+                        {
+                          "payload": 4291045679,
+                          "type": 0,
+                        }
+                      }
+                    />
+                    <RNSVGPath
+                      d="M12 9v4"
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "stroke",
+                        ]
+                      }
+                      stroke={
+                        {
+                          "payload": 4291045679,
+                          "type": 0,
+                        }
+                      }
+                    />
+                    <RNSVGPath
+                      d="M12 17h.01"
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "stroke",
+                        ]
+                      }
+                      stroke={
+                        {
+                          "payload": 4291045679,
+                          "type": 0,
+                        }
+                      }
+                    />
+                  </RNSVGGroup>
+                </RNSVGSvgView>
+              </View>
             </View>
             <View
               style={
@@ -2261,10 +2669,10 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
             >
               <Text
                 cancelable={true}
-                cursor="default"
+                disabled={false}
                 focusable={true}
-                htmlFor=":rh:"
-                id=":ri:"
+                htmlFor=":rf:"
+                id=":rg:"
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -2321,9 +2729,16 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     }
                   }
                   cancelable={true}
-                  cursor="pointer"
                   disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 2,
+                    }
+                  }
                   focusable={[Function]}
+                  id=":rf:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -2506,8 +2921,8 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       }
                     }
                     cancelable={true}
-                    cursor="pointer"
                     disabled={false}
+                    focusVisibleStyle={{}}
                     focusable={[Function]}
                     minPressDuration={0}
                     onBlur={[Function]}
@@ -2520,7 +2935,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     style={
                       {
                         "alignItems": "center",
-                        "backgroundColor": "#40FB50",
+                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
                         "borderBottomColor": "transparent",
                         "borderBottomLeftRadius": 16,
                         "borderBottomRightRadius": 16,
@@ -2534,7 +2949,6 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                         "borderTopLeftRadius": 16,
                         "borderTopRightRadius": 16,
                         "borderTopWidth": 1,
-                        "color": "hsla(125, 96%, 47%, 1)",
                         "flexDirection": "row",
                         "flexWrap": "nowrap",
                         "height": 44,
@@ -2546,12 +2960,11 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     testID="SubmitButton"
                   >
                     <Text
-                      cursor="pointer"
                       lineBreakMode="clip"
                       numberOfLines={1}
                       style={
                         {
-                          "color": "hsla(125, 96%, 47%, 1)",
+                          "color": "hsla(191, 32%, 10%, 1)",
                           "flexGrow": 0,
                           "flexShrink": 1,
                           "fontFamily": "System",
@@ -2564,12 +2977,11 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       userSelect="none"
                     >
                       <Text
-                        cursor="pointer"
                         lineBreakMode="clip"
                         numberOfLines={1}
                         style={
                           {
-                            "color": "hsla(125, 96%, 47%, 1)",
+                            "color": "hsla(191, 32%, 10%, 1)",
                             "flexGrow": 0,
                             "flexShrink": 1,
                             "fontFamily": "System",
@@ -2659,6 +3071,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                 }
               }
               collapsable={false}
+              disableClassName={true}
               forwardedRef={[Function]}
               onLayout={[Function]}
               pointerEvents="none"
@@ -2716,8 +3129,9 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                       }
                     >
                       <View
-                        accessibilityLabelledBy=":rm:"
+                        accessibilityLabelledBy=":rk:"
                         accessibilityRole="none"
+                        disabled={false}
                         style={
                           {
                             "flexDirection": "column",
@@ -2726,7 +3140,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                         }
                       >
                         <View
-                          accessibilityLabelledBy=":rn:"
+                          accessibilityLabelledBy=":rl:"
                           accessibilityState={
                             {
                               "disabled": undefined,
@@ -2734,7 +3148,14 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                             }
                           }
                           cancelable={true}
-                          cursor="pointer"
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 1,
+                            }
+                          }
                           focusable={true}
                           minPressDuration={0}
                           onBlur={[Function]}
@@ -2768,7 +3189,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           tabIndex={-1}
                         >
                           <Text
-                            id=":rn:"
+                            id=":rl:"
                             lineBreakMode="clip"
                             numberOfLines={1}
                             style={
@@ -2884,7 +3305,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           }
                         />
                         <View
-                          accessibilityLabelledBy=":ro:"
+                          accessibilityLabelledBy=":rm:"
                           accessibilityState={
                             {
                               "disabled": undefined,
@@ -2892,7 +3313,14 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                             }
                           }
                           cancelable={true}
-                          cursor="pointer"
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 1,
+                            }
+                          }
                           focusable={true}
                           minPressDuration={0}
                           onBlur={[Function]}
@@ -2926,7 +3354,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           tabIndex={-1}
                         >
                           <Text
-                            id=":ro:"
+                            id=":rm:"
                             lineBreakMode="clip"
                             numberOfLines={1}
                             style={
@@ -2956,7 +3384,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           }
                         />
                         <View
-                          accessibilityLabelledBy=":rp:"
+                          accessibilityLabelledBy=":rn:"
                           accessibilityState={
                             {
                               "disabled": undefined,
@@ -2964,7 +3392,14 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                             }
                           }
                           cancelable={true}
-                          cursor="pointer"
+                          disabled={false}
+                          focusVisibleStyle={
+                            {
+                              "outlineColor": "$outlineColor",
+                              "outlineStyle": "solid",
+                              "outlineWidth": 1,
+                            }
+                          }
                           focusable={true}
                           minPressDuration={0}
                           onBlur={[Function]}
@@ -2998,7 +3433,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           tabIndex={-1}
                         >
                           <Text
-                            id=":rp:"
+                            id=":rn:"
                             lineBreakMode="clip"
                             numberOfLines={1}
                             style={
@@ -3034,7 +3469,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                     "borderTopLeftRadius": 0,
                     "borderTopRightRadius": 0,
                     "borderTopWidth": 0,
-                    "bottom": "-50%",
+                    "bottom": "-100%",
                     "flex": 1,
                     "flexDirection": "column",
                     "height": 0,
@@ -3067,7 +3502,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
           "borderTopLeftRadius": 0,
           "borderTopRightRadius": 0,
           "borderTopWidth": 0,
-          "bottom": "-50%",
+          "bottom": "-100%",
           "flex": 1,
           "flexDirection": "column",
           "height": 0,

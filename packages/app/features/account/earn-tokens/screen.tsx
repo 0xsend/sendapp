@@ -33,13 +33,17 @@ import formatAmount from 'app/utils/formatAmount'
 
 export function EarnTokensScreen() {
   const { data: distributions, isLoading } = useDistributions()
+
+  const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
+
   const [distributionNumberParam] = useDistributionNumber()
   const selectedDistributionIndex = distributionNumberParam
     ? distributionNumberParam - 1
-    : distributions
-      ? distributions.length - 1
+    : sortedDistributions
+      ? sortedDistributions.length - 1
       : 0
-  const selectedDistribution = distributions?.at(selectedDistributionIndex)
+
+  const selectedDistribution = sortedDistributions?.at(selectedDistributionIndex)
 
   if (isLoading)
     return (
@@ -52,7 +56,7 @@ export function EarnTokensScreen() {
     <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
       {selectedDistribution ? (
         <YStack gap="$4" f={2} overflow={'hidden'}>
-          <DistributionRewardsSection distribution={selectedDistribution} isLoading={isLoading} />
+          <DistributionRewardsSection distribution={selectedDistribution} />
         </YStack>
       ) : (
         <Stack f={1} gap="$6" jc="center" ai="center">
@@ -60,43 +64,29 @@ export function EarnTokensScreen() {
         </Stack>
       )}
 
-      <DistributionRewardsList distributions={distributions} />
+      <DistributionRewardsList distributions={sortedDistributions} />
     </YStack>
   )
 }
 
+const now = new Date()
+
 const DistributionRewardsSection = ({
   distribution,
-  isLoading,
-}: { distribution: UseDistributionsResultData[number]; isLoading: boolean }) => {
-  const now = new Date()
-  const hasDistribution = !isLoading && distribution
-
-  const isBeforeQualification = hasDistribution && now < distribution.qualification_start
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const isBeforeQualification = now < distribution.qualification_start
   const isDuringQualification =
-    hasDistribution &&
-    now >= distribution.qualification_start &&
-    now <= distribution.qualification_end
-  const isClaimable =
-    hasDistribution && now > distribution.qualification_end && now <= distribution.claim_end
+    now >= distribution.qualification_start && now <= distribution.qualification_end
+  const isClaimable = now > distribution.qualification_end && now <= distribution.claim_end
 
   const timeRemaining = useTimeRemaining(
-    isLoading
-      ? now
-      : isBeforeQualification
-        ? distribution.qualification_start
-        : isDuringQualification
-          ? distribution.qualification_end
-          : isClaimable
-            ? distribution.claim_end
-            : now
-              ? distribution.qualification_start
-              : isDuringQualification
-                ? distribution.qualification_end
-                : isClaimable
-                  ? distribution.claim_end
-                  : now
+    isDuringQualification
+      ? distribution.qualification_end
+      : isClaimable
+        ? distribution.claim_end
+        : now
   )
+
   return (
     <Container>
       <YStack
@@ -104,9 +94,9 @@ const DistributionRewardsSection = ({
         $lg={{ gap: '$2' }}
         $theme-dark={{ btc: '$gray7Dark' }}
         $theme-light={{ btc: '$gray4Light' }}
-        $gtSm={{ borderTopWidth: '$1', gap: '$8' }}
+        $gtSm={{ pt: '$6', gap: '$8' }}
       >
-        <Stack gap="$2" $gtSm={{ pt: '$6', gap: '$6' }}>
+        <Stack gap="$2" $gtSm={{ gap: '$6' }}>
           <Label fontFamily={'$mono'} fontSize={'$5'}>
             ROUND
           </Label>
@@ -132,7 +122,35 @@ const DistributionRewardsSection = ({
               f={1}
               justifyContent="space-between"
             >
-              <ClaimTimeRemaining timeRemaining={timeRemaining} />
+              <YStack gap="$2" f={1} maw={312}>
+                {isDuringQualification && <Label fontFamily={'$mono'}>Valid for</Label>}
+                <Theme inverse>
+                  {(() => {
+                    switch (true) {
+                      case isBeforeQualification:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Qualification for Round ${distribution.number} has not started`}
+                          </Paragraph>
+                        )
+                      case isDuringQualification:
+                        return <DistributionRewardTimer timeRemaining={timeRemaining} />
+                      case isClaimable:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Qualification for Round ${distribution.number} has closed and if you met the requirements, it should now be claimable.`}
+                          </Paragraph>
+                        )
+                      default:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Claims for Round ${distribution.number} have closed`}
+                          </Paragraph>
+                        )
+                    }
+                  })()}
+                </Theme>
+              </YStack>
               <YStack $gtSm={{ ai: 'flex-end' }}>
                 <Label fontFamily={'$mono'}>Status</Label>
                 <Theme inverse>
@@ -161,34 +179,29 @@ const DistributionRewardsSection = ({
   )
 }
 
-const ClaimTimeRemaining = ({ timeRemaining }: { timeRemaining: TimeRemaining }) => {
+const DistributionRewardTimer = ({ timeRemaining }: { timeRemaining: TimeRemaining }) => {
   return (
-    <YStack gap="$2" f={1}>
-      <Label fontFamily={'$mono'}>Valid for</Label>
-      <XStack ai={'flex-start'} jc="space-between" maw={312}>
-        <Theme inverse>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.days).padStart(2, '0')}D
-          </ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>:</ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.hours).padStart(2, '0')}Hr
-          </ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>:</ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.minutes).padStart(2, '0')}Min
-          </ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>:</ClaimTimeRemainingDigit>
-          <ClaimTimeRemainingDigit>
-            {String(timeRemaining.seconds).padStart(2, '0')}Sec
-          </ClaimTimeRemainingDigit>
-        </Theme>
-      </XStack>
-    </YStack>
+    <XStack ai={'flex-start'} jc="space-between" maw={312}>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.days).padStart(2, '0')}D
+      </DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.hours).padStart(2, '0')}Hr
+      </DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.minutes).padStart(2, '0')}Min
+      </DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>:</DistributionRewardTimerDigit>
+      <DistributionRewardTimerDigit>
+        {String(timeRemaining.seconds).padStart(2, '0')}Sec
+      </DistributionRewardTimerDigit>
+    </XStack>
   )
 }
 
-const ClaimTimeRemainingDigit = ({ children }: { children?: string | string[] }) => (
+const DistributionRewardTimerDigit = ({ children }: { children?: string | string[] }) => (
   <Text
     fontWeight={'500'}
     fontSize="$5"
@@ -234,11 +247,10 @@ const SendBalanceCard = ({
 
   const body = () => {
     switch (true) {
-      case isLoadingSnapshotBalance || isLoadingChainAddresses:
-        return <Spinner color={'$color'} />
       case snapshotBalance === undefined:
         return 'Error fetching SEND balance'
       default:
+        // @ts-expect-error ts isn't smart enough to know that snapshotBalance is defined
         return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
     }
   }
@@ -257,11 +269,13 @@ const SendBalanceCard = ({
         <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
           Send Balance
         </Label>
-        <Theme inverse>
-          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
+        {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
+          <Spinner color={'$color'} />
+        ) : (
+          <Paragraph fontFamily={'$mono'} col="$color12" fontSize={'$7'} fontWeight={'500'}>
             {body()}
           </Paragraph>
-        </Theme>
+        )}
       </YStack>
     </Card>
   )
@@ -372,10 +386,10 @@ const SendRewardsCard = ({
 const DistributionStatus = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
-  const isClaimActive = distribution.qualification_end < new Date()
+  const isClaimActive = distribution.qualification_end > new Date()
   return (
     <H3 fontSize="$5" $gtMd={{ fontSize: '$7' }} fontWeight={'500'} col="$background">
-      {isClaimActive ? 'Open' : 'Closed'}
+      {isClaimActive ? 'OPEN' : 'CLOSED'}
     </H3>
   )
 }
@@ -383,69 +397,109 @@ const DistributionStatus = ({
 const numOfDistributions = 10
 const DistributionRewardsList = ({
   distributions,
-}: { distributions?: UseDistributionsResultData }) => {
+}: { distributions?: (UseDistributionsResultData[number] | undefined)[] }) => {
   const { isLoading, error } = useDistributions()
   const [distributionNumberParam, setDistributionNumberParam] = useDistributionNumber()
-  const allDistributions = distributions?.concat(
-    Array(numOfDistributions - distributions.length).fill(undefined)
-  )
+
+  const mock = (len: number, start = 0) =>
+    new Array(len).fill(undefined).map((_, i) => ({ number: start + i + 1 }))
+
+  // @ts-expect-error we're mocking the data here
+  const allDistributions: UseDistributionsResultData[number][] =
+    distributions === undefined
+      ? mock(numOfDistributions)
+      : [...distributions, ...mock(numOfDistributions - distributions.length, distributions.length)]
 
   if (error) throw error
 
   if (isLoading) return <DistributionRewardsSkeleton />
 
   return (
-    <ScrollView
-      $gtLg={{ f: 1 }}
-      flex={0}
-      overflow="scroll"
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-    >
-      <XStack w="100%" gap="$2" jc={'space-between'} py="$2" maw={1072} mx="auto">
-        {allDistributions?.map((distribution, i) => {
-          return distribution === undefined ? (
-            <Button bc={'$darkest'} f={1} maw={84} miw="$7" h="$2" br={6} disabled opacity={0.4}>
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
-                {`# ${i + 1}`}
-              </ButtonText>
-            </Button>
-          ) : distributionNumberParam === distribution?.number ||
-            (distributionNumberParam === undefined &&
-              distribution?.number === distributions?.length) ? (
-            <Button
-              key={distribution?.id}
-              f={1}
-              bc={'$accent12Dark'}
-              maw={84}
-              miw="$7"
-              h="$2"
-              br={6}
-              onPress={() => setDistributionNumberParam(distribution.number)}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$black">
-                {`# ${distribution?.number}  `}
-              </ButtonText>
-            </Button>
-          ) : (
-            <Button
-              key={distribution?.id}
-              f={1}
-              bc={'$decay'}
-              maw={84}
-              miw="$7"
-              h="$2"
-              br={6}
-              onPress={() => setDistributionNumberParam(distribution.number)}
-            >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
-                {`# ${distribution?.number}  `}
-              </ButtonText>
-            </Button>
-          )
-        })}
-      </XStack>
-    </ScrollView>
+    <Container>
+      <ScrollView
+        $gtLg={{ f: 1 }}
+        flex={0}
+        overflow="scroll"
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        pb="$4"
+      >
+        <XStack w="100%" gap="$2" jc={'space-between'} py="$2" maw={1072} mx="auto">
+          {allDistributions?.map((distribution, i) => {
+            return distribution?.id === undefined ? (
+              <Button
+                key={distribution.number}
+                bc={'$darkest'}
+                f={1}
+                maw={84}
+                miw="$7"
+                h="$2"
+                br={6}
+                disabled
+                opacity={0.4}
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
+                  {`# ${i + 1}`}
+                </ButtonText>
+              </Button>
+            ) : distributionNumberParam === distribution?.number ||
+              (distributionNumberParam === undefined &&
+                distribution?.number === distributions?.length) ? (
+              <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
+                <View
+                  position="absolute"
+                  top={-5}
+                  left={0}
+                  right={0}
+                  mx="auto"
+                  w={0}
+                  h={0}
+                  borderLeftColor={'transparent'}
+                  borderRightColor={'transparent'}
+                  borderBottomColor={'$accent12Dark'}
+                  borderBottomWidth={8}
+                  borderLeftWidth={8}
+                  borderRightWidth={8}
+                />
+
+                <Button
+                  onPress={() => setDistributionNumberParam(distribution.number)}
+                  bc={'$accent12Dark'}
+                  br={6}
+                  h="$2"
+                  disabled
+                >
+                  <ButtonText
+                    size={'$1'}
+                    padding={'unset'}
+                    ta="center"
+                    margin={'unset'}
+                    col="$black"
+                  >
+                    {`# ${distribution?.number}  `}
+                  </ButtonText>
+                </Button>
+              </Stack>
+            ) : (
+              <Button
+                key={distribution.number}
+                f={1}
+                bc={'$decay'}
+                maw={84}
+                miw="$7"
+                h="$2"
+                br={6}
+                onPress={() => setDistributionNumberParam(distribution.number)}
+              >
+                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
+                  {`# ${distribution?.number}  `}
+                </ButtonText>
+              </Button>
+            )
+          })}
+        </XStack>
+      </ScrollView>
+    </Container>
   )
 }
 

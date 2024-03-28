@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "./BaseSepoliaForkTest.sol";
 import "openzeppelin-contracts/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import "../src/DaimoVerifier.sol";
+import "../src/SendVerifier.sol";
 import "./Utils.sol";
 import {ERC1967Utils} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
@@ -48,7 +48,7 @@ contract UpgradeableVerifierBrick is UUPSUpgradeable, OwnableUpgradeable {
 
 contract VerifierTest is BaseSepoliaForkTest {
     address public implementation;
-    DaimoVerifier public verifier;
+    SendVerifier public verifier;
 
     uint256 public dummyX;
     uint256 public dummyY;
@@ -57,12 +57,12 @@ contract VerifierTest is BaseSepoliaForkTest {
 
     function setUp() public {
         this.createAndSelectFork();
-        implementation = address(new DaimoVerifier{salt: 0}());
+        implementation = address(new SendVerifier{salt: 0}());
         address initOwner = address(this);
-        DaimoVerifierProxy proxy = new DaimoVerifierProxy{salt: 0}(
-            implementation, abi.encodeWithSelector(DaimoVerifier.init.selector, initOwner)
+        SendVerifierProxy proxy = new SendVerifierProxy{salt: 0}(
+            implementation, abi.encodeWithSelector(SendVerifier.init.selector, initOwner)
         );
-        verifier = DaimoVerifier(address(proxy));
+        verifier = SendVerifier(address(proxy));
 
         uint8 version = 1;
         uint48 validUntil = 1e9; // validUntil unix timestamp 1e9
@@ -82,7 +82,7 @@ contract VerifierTest is BaseSepoliaForkTest {
         );
     }
 
-    // only test upgradeability, other functions are tested by DaimoAccount
+    // only test upgradeability, other functions are tested by SendAccount
     function testUpgrade() public {
         // Verifier is a UUPS proxy.
         // Show that the proxy points to the correct implementation.

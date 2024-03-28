@@ -8,14 +8,14 @@ import "account-abstraction/core/Helpers.sol";
 import "account-abstraction/interfaces/IAccount.sol";
 import "account-abstraction/interfaces/IEntryPoint.sol";
 import "p256-verifier/WebAuthn.sol";
-import {DaimoVerifier, Signature} from "./DaimoVerifier.sol";
+import {SendVerifier, Signature} from "./SendVerifier.sol";
 
 /**
- * Daimo ERC-4337 contract account.
+ * Send ERC-4337 contract account, originally based on DaimoAccount.sol.
  *
  * Implements a 1-of-n multisig with P256 keys. Supports key rotation.
  */
-contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
+contract SendAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     struct Call {
         address dest;
         uint256 value;
@@ -30,7 +30,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     /// The ERC-4337 entry point singleton
     IEntryPoint public immutable entryPoint;
     /// Signature verifier contract
-    DaimoVerifier public immutable verifier;
+    SendVerifier public immutable verifier;
 
     /// Maximum number of signing keys
     uint8 public immutable maxKeys = 20;
@@ -67,9 +67,9 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
 
     /// Runs at deploy time. Implementation contract = no init, no state.
     /// All other methods are called via proxy = initialized once, has state.
-    constructor(IEntryPoint _entryPoint, DaimoVerifier _daimoVerifier) {
+    constructor(IEntryPoint _entryPoint, SendVerifier _sendVerifier) {
         entryPoint = _entryPoint;
-        verifier = _daimoVerifier;
+        verifier = _sendVerifier;
         _disableInitializers();
     }
 
@@ -96,30 +96,6 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
         }
     }
 
-    //               _.------------------.
-    //             .'____________________|
-    //             //    _||||  | |  | | |
-    //      ______//_\__j_|||"--" "--" | |  _
-    //     /-----+-|p  ==,|||__________|_|-|W|
-    //    _j,====. |b_____|||  _____     | |W|
-    //   |_) ,---.`.`------'|.',---.`.___|_|W|
-    //     `/ .-. \\`======__// .-. \`-----'""
-    //      \ `-' / """""""   \ `-' /
-    //       `---'             `---'
-    //                     * * * * * * * * * * OOOOOOOOOOOOOOOOOOOOOOOOO
-    //   4 TPG              * * * * * * * * *  :::::::::::::::::::::::::
-    //                     * * * * * * * * * * OOOOOOOOOOOOOOOOOOOOOOOOO
-    //   4 transfers        * * * * * * * * *  :::::::::::::::::::::::::
-    //   per million gas   * * * * * * * * * * OOOOOOOOOOOOOOOOOOOOOOOOO
-    //                      * * * * * * * * *  ::::::::::::::::::::;::::
-    //   Cheap gas on L2,  * * * * * * * * * * OOOOOOOOOOOOOOOOOOOOOOOOO
-    //   land of the free  :::::::::::::::::::::::::::::::::::::::::::::
-    //                     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    //                     :::::::::::::::::::::::::::::::::::::::::::::
-    //                     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    //                     :::::::::::::::::::::::::::::::::::::::::::::
-    //                     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    //
     /// ERC4337: validate userop by verifying a P256 signature.
     function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
         external
@@ -141,7 +117,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
     // Signature structure: [uint8 keySlot, uint8 signatureType, bytes signature]
     // - keySlot: 0-255
     // - signature: abi.encode form of Signature struct
-    /// Validate any Daimo account signature, whether for a userop or ERC1271 user sig.
+    /// Validate any Send account signature, whether for a userop or ERC1271 user sig.
     function _validateSignature(bytes memory message, bytes calldata signature) private view returns (bool) {
         if (signature.length < 1) return false;
 
@@ -155,7 +131,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
         return verifier.verifySignature(message, signature, x, y);
     }
 
-    /// ERC1271: validate a user signature, verifying a valid Daimo account
+    /// ERC1271: validate a user signature, verifying a valid Send account
     /// signature.
     function isValidSignature(bytes32 message, bytes calldata signature)
         external
@@ -169,7 +145,7 @@ contract DaimoAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
         return 0xffffffff;
     }
 
-    /// Validate userop by verifying a Daimo account signature.
+    /// Validate userop by verifying a Send account signature.
     function _validateUseropSignature(PackedUserOperation calldata userOp, bytes32 userOpHash)
         private
         view

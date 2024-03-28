@@ -1,39 +1,120 @@
-import { Avatar, Container, Link, LinkProps, Paragraph, Separator, XStack, YStack } from '@my/ui'
-import { IconDollar, IconGear, IconPlus } from 'app/components/icons'
-import { formatPhoneNumber } from 'app/utils/formatPhoneNumber'
+import {
+  Avatar,
+  Container,
+  Link,
+  LinkProps,
+  Paragraph,
+  Separator,
+  XStack,
+  YStack,
+  Button,
+  useToastController,
+  TooltipSimple,
+  useMedia,
+  useThemeName,
+  Theme,
+} from '@my/ui'
+import {
+  IconAccount,
+  IconCopy,
+  IconDollar,
+  IconGear,
+  IconPlus,
+  IconShare,
+} from 'app/components/icons'
+import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
-import { Square } from 'tamagui'
+import * as Clipboard from 'expo-clipboard'
+import * as Sharing from 'expo-sharing'
+import { useNav } from 'app/routers/params'
+import React, { ElementType, useEffect, useState } from 'react'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function AccountScreen() {
-  const { profile, user, tags } = useUser()
+  const media = useMedia()
+  const toast = useToastController()
+  const { profile, tags } = useUser()
   const name = profile?.name
   const avatar_url = profile?.avatar_url
   const sendTags = tags?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
+  const refCode = profile?.referral_code ?? ''
+  const referralHref = getReferralHref(refCode)
+  const [, setNavParam] = useNav()
+  const [canShare, setCanShare] = useState(false)
+
+  useEffect(() => {
+    const canShare = async () => {
+      const canShare = await Sharing.isAvailableAsync()
+      setCanShare(canShare)
+    }
+    canShare()
+  }, [])
+
+  const shareOrCopyOnPress = async () => {
+    if (canShare) {
+      return await Sharing.shareAsync(referralHref)
+    }
+
+    await Clipboard.setStringAsync(referralHref)
+      .then(() => toast.show('Copied your referral link to the clipboard'))
+      .catch(() =>
+        toast.show('Something went wrong', {
+          message: 'We were unable to copy your referral link to the clipboard',
+          customData: {
+            theme: 'error',
+          },
+        })
+      )
+  }
+
+  const facts = [
+    { label: 'Name', value: name },
+    { label: 'Sendtags', value: sendTags },
+    {
+      label: 'Referral Code',
+      value: (
+        <TooltipSimple label={canShare ? 'Share' : 'Copy'}>
+          <Button
+            accessibilityLabel={canShare ? 'Share' : 'Copy'}
+            f={1}
+            fd="row"
+            unstyled
+            onPress={shareOrCopyOnPress}
+            color="$color12"
+            iconAfter={
+              canShare ? (
+                <Theme name="accent">
+                  <IconShare color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
+                </Theme>
+              ) : (
+                <Theme name="accent">
+                  <IconCopy color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
+                </Theme>
+              )
+            }
+          >
+            <Button.Text>{refCode}</Button.Text>
+          </Button>
+        </TooltipSimple>
+      ),
+    },
+  ]
 
   return (
     <>
       <Container>
-        <YStack
-          w={'100%'}
-          ai={'center'}
-          gap={'$6'}
-          py="$6"
-          $gtMd={{ pt: '$10' }}
-          $gtLg={{ pt: '$0' }}
-        >
+        <YStack w={'100%'} ai={'center'} gap={'$6'}>
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
-              {avatar_url ? (
-                <Avatar size={'$8'} borderRadius={'$3'}>
-                  <Avatar.Image accessibilityLabel="" src={avatar_url} />
-                  <Avatar.Fallback backgroundColor="$blue10" />
-                </Avatar>
-              ) : (
-                <Square size={'$8'} borderRadius={'$3'} backgroundColor="$color" elevation="$4" />
-              )}
+              <Avatar size={'$8'} borderRadius={'$3'}>
+                <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
+                <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
+                  <IconAccount size="$6" color="$olive" />
+                </Avatar.Fallback>
+              </Avatar>
               <YStack gap={'$2'} $md={{ ai: 'center' }}>
                 <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
-                  {name ? name : 'No Name'}
+                  {name ? name : '---'}
                 </Paragraph>
                 {tags?.[0] ? (
                   <Paragraph fontFamily={'$mono'} opacity={0.6}>
@@ -43,92 +124,38 @@ export function AccountScreen() {
               </YStack>
             </XStack>
             <XStack gap={'$5'} $md={{ display: 'none' }}>
-              <BorderedLink href={'/account/sendtag'} icon={<IconPlus color={'$primary'} />}>
+              <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
                 Send Tags
               </BorderedLink>
-              <BorderedLink href={'/account/earn'} icon={<IconDollar color={'$primary'} />}>
+              <BorderedLink href={'/account/earn'} Icon={IconDollar}>
                 Earn Tokens
               </BorderedLink>
               <BorderedLink
-                href={'/account/settings/edit-profile'}
-                icon={<IconGear color={'$primary'} size={'$1'} />}
+                href="/account/settings/edit-profile"
+                Icon={IconGear}
+                // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
+                {...(media.lg
+                  ? {
+                      onPress: (e) => {
+                        if (media.lg) {
+                          e.preventDefault()
+                          setNavParam('settings', { webBehavior: 'replace' })
+                        }
+                      },
+                    }
+                  : {})}
               >
                 Settings
               </BorderedLink>
             </XStack>
           </XStack>
           <Separator w={'100%'} />
-          <XStack w={'100%'} $md={{ jc: 'center' }} $sm={{ display: 'none' }}>
-            <YStack gap={'$5'} w={'$12'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Name
-              </Paragraph>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Sendtags
-              </Paragraph>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Phone
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$5'}>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {name ? name : 'No Name'}
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {sendTags !== '' ? sendTags : 'No tags'}
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-                {formatPhoneNumber(user?.phone) ?? ''}
-              </Paragraph>
-            </YStack>
-          </XStack>
-          <YStack w={'100%'} gap={'$6'} $gtSm={{ display: 'none' }}>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Name
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {name ? name : 'No Name'}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Sendtags
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {sendTags !== '' ? sendTags : 'No tags'}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Send ID
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {profile?.id ?? ''}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Phone
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                {user?.phone ?? ''}
-              </Paragraph>
-            </YStack>
-            <YStack gap={'$2'}>
-              <Paragraph fontSize={'$5'} fontWeight={'500'}>
-                Address
-              </Paragraph>
-              <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-                12, Main street, CA, USA
-              </Paragraph>
-            </YStack>
-          </YStack>
+          <ProfileFacts facts={facts} />
           <XStack gap={'$5'} display={'none'} $md={{ display: 'flex' }}>
-            <BorderedLink href={'/account/sendtag'} icon={<IconPlus color={'$primary'} />}>
+            <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
               Send Tags
             </BorderedLink>
-            <BorderedLink href={'/account/earn'} icon={<IconDollar color={'$primary'} />}>
+            <BorderedLink href={'/account/earn'} Icon={IconDollar}>
               Earn Tokens
             </BorderedLink>
           </XStack>
@@ -138,15 +165,65 @@ export function AccountScreen() {
   )
 }
 
-const BorderedLink = ({ icon, children, ...props }: { icon?: JSX.Element } & LinkProps) => {
+const BorderedLink = ({
+  Icon,
+  children,
+  ...props
+}: { Icon?: ElementType; children: React.ReactNode } & LinkProps) => {
+  const themeName = useThemeName()
+  const { resolvedTheme } = useThemeSetting()
+  const iconColor = (resolvedTheme ?? themeName)?.startsWith('dark') ? '$color10' : '$color1'
   return (
-    <Link borderWidth={1} borderColor={'$primary'} borderRadius={'$4'} p={'$3'} px="$4" {...props}>
+    <Link
+      borderWidth={1}
+      color={iconColor}
+      theme="accent"
+      borderRadius={'$4'}
+      p={'$3'}
+      px="$4"
+      {...props}
+    >
       <XStack gap={'$1.5'} ai={'center'}>
-        {icon}
-        <Paragraph color={'$primary'} textTransform="uppercase">
+        {Icon && <Icon color={iconColor} />}
+        <Paragraph color={iconColor} textTransform="uppercase">
           {children}
         </Paragraph>
       </XStack>
     </Link>
+  )
+}
+
+const ProfileFacts = ({ facts }: { facts: { label: string; value?: React.ReactNode }[] }) => {
+  return (
+    <>
+      <XStack w={'100%'} $md={{ jc: 'center' }} $sm={{ display: 'none' }}>
+        <YStack gap={'$5'} w={'$12'}>
+          {facts.map((fact) => (
+            <Paragraph key={fact.label} fontSize={'$5'} fontWeight={'500'}>
+              {fact.label}
+            </Paragraph>
+          ))}
+        </YStack>
+        <YStack gap={'$5'}>
+          {facts.map((fact) => (
+            <Paragraph key={fact.label} color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
+              {fact.value ? fact.value : `No ${fact.label.toLowerCase()}`}
+            </Paragraph>
+          ))}
+        </YStack>
+      </XStack>
+      <YStack w={'100%'} gap={'$6'} $gtSm={{ display: 'none' }}>
+        {facts.map((fact) => (
+          <YStack key={fact.label} gap={'$2'}>
+            <Paragraph fontSize={'$5'} fontWeight={'500'}>
+              {fact.label}
+            </Paragraph>
+            <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
+              {fact.value ? fact.value : `No ${fact.label.toLowerCase()}`}
+            </Paragraph>
+          </YStack>
+        ))}
+      </YStack>
+    </>
   )
 }

@@ -38,130 +38,121 @@ export function HomeScreen() {
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
   return (
-    <>
-      <Container fd={'column'}>
-        <YStack
-          $gtLg={{ width: 360 }}
-          $sm={{ width: '100%' }}
-          $gtSm={{ width: '100%' }}
-          ai={'center'}
+    <Container fd={'column'} $gtMd={{ pt: '$6' }}>
+      <YStack
+        $gtLg={{ width: 360 }}
+        $sm={{ width: '100%' }}
+        $gtSm={{ width: '100%' }}
+        ai={'center'}
+      >
+        {/* Balance Card */}
+        <XStack
+          w={'100%'}
+          jc={'center'}
+          $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
         >
-          {/* Balance Card */}
-          <XStack
-            w={'100%'}
-            jc={'center'}
-            $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
-          >
-            <XStack w={'100%'} zIndex={4}>
-              <YStack py={'$7'} $md={{ py: '$13' }}>
-                <YStack jc={'center'} gap={'$6'}>
-                  <TooltipGroup delay={{ open: 0, close: 1500 }}>
-                    <Tooltip placement="bottom">
-                      <Tooltip.Trigger>
-                        <Paragraph
-                          fontSize={'$4'}
-                          zIndex={1}
-                          color={'$color05'}
-                          textTransform={'uppercase'}
-                        >
-                          Total Balance
-                        </Paragraph>
-                        <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
-                          {totalBalance === undefined ? (
-                            <Spinner size={'large'} />
-                          ) : (
-                            <Paragraph
-                              color={'$color12'}
-                              fontFamily={'$mono'}
-                              fontSize={'$15'}
-                              lineHeight={'$14'}
-                              fontWeight={'500'}
-                              zIndex={1}
-                            >
-                              {formatAmount(totalBalance, 4, 0)}
-                            </Paragraph>
-                          )}
+          <XStack w={'100%'} zIndex={4}>
+            <YStack>
+              <YStack jc={'center'} gap={'$6'} pb="$6">
+                <TooltipGroup delay={{ open: 0, close: 1500 }}>
+                  <Tooltip placement="bottom">
+                    <Tooltip.Trigger>
+                      <Paragraph
+                        fontSize={'$4'}
+                        zIndex={1}
+                        color={'$color05'}
+                        textTransform={'uppercase'}
+                      >
+                        Total Balance
+                      </Paragraph>
+                      <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
+                        {totalBalance === undefined ? (
+                          <Spinner size={'large'} />
+                        ) : (
                           <Paragraph
                             color={'$color12'}
-                            fontSize={'$6'}
+                            fontFamily={'$mono'}
+                            fontSize={'$15'}
+                            lineHeight={'$14'}
                             fontWeight={'500'}
                             zIndex={1}
                           >
-                            {'USD'}
+                            {formatAmount(totalBalance, 4, 0)}
                           </Paragraph>
-                        </XStack>
-                      </Tooltip.Trigger>
-                      <Tooltip.Content
-                        enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-                        exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-                        scale={1}
-                        x={0}
-                        y={0}
-                        opacity={1}
-                        animation={[
-                          'quick',
-                          {
-                            opacity: {
-                              overshootClamping: true,
-                            },
-                          },
-                        ]}
-                      >
-                        <Tooltip.Arrow />
-                        <Paragraph fontSize={'$6'} fontWeight={'500'}>
-                          {totalBalance === undefined
-                            ? null
-                            : USDollar.format(Number(totalBalance))}
+                        )}
+                        <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
+                          {'USD'}
                         </Paragraph>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </TooltipGroup>
-                </YStack>
+                      </XStack>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content
+                      enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                      exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                      scale={1}
+                      x={0}
+                      y={0}
+                      opacity={1}
+                      animation={[
+                        'quick',
+                        {
+                          opacity: {
+                            overshootClamping: true,
+                          },
+                        },
+                      ]}
+                    >
+                      <Tooltip.Arrow />
+                      <Paragraph fontSize={'$6'} fontWeight={'500'}>
+                        {totalBalance === undefined ? null : USDollar.format(Number(totalBalance))}
+                      </Paragraph>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </TooltipGroup>
               </YStack>
-            </XStack>
+            </YStack>
           </XStack>
-          <XStack w={'100%'} ai={'center'} pt={'$7'}>
-            <Button
-              px={'$3.5'}
-              h={'$8'}
-              width={'100%'}
-              backgroundColor={'$primary'}
-              borderRadius={'$4'}
-              onPress={() => {
-                // @todo onramp / deposit
-                toast.show('Coming Soon: Deposit')
-              }}
-            >
-              <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                <Paragraph
-                  // fontFamily={'$mono'}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  color={'$black'}
-                >
-                  Deposit
-                </Paragraph>
-                <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                  <IconDeposit size={'$2.5'} color={'$black'} />
-                </XStack>
+        </XStack>
+        <XStack w={'100%'} ai={'center'} pt={'$7'}>
+          <Button
+            px={'$3.5'}
+            h={'$8'}
+            width={'100%'}
+            theme="accent"
+            borderRadius={'$4'}
+            onPress={() => {
+              // @todo onramp / deposit
+              toast.show('Coming Soon: Deposit')
+            }}
+          >
+            <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+              <Paragraph
+                // fontFamily={'$mono'}
+                fontWeight={'500'}
+                textTransform={'uppercase'}
+                color={'$black'}
+              >
+                Deposit
+              </Paragraph>
+              <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                <IconDeposit size={'$2.5'} color={'$black'} />
               </XStack>
-            </Button>
-          </XStack>
-          <YStack width={'100%'} $gtLg={{ gap: '$3.5' }} pt={'$6'} pb={'$12'}>
-            {coins.map((coin, index) => (
-              <TokenDetails
-                coin={coin}
-                key={coin.label}
-                jc={'space-between'}
-                ai={'center'}
-                py={'$3.5'}
-                borderColor={separatorColor}
-                borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
-              />
-            ))}
-          </YStack>
+            </XStack>
+          </Button>
+        </XStack>
+        <YStack width={'100%'} $gtLg={{ gap: '$3.5' }} pt={'$6'} pb={'$12'}>
+          {coins.map((coin, index) => (
+            <TokenDetails
+              coin={coin}
+              key={coin.label}
+              jc={'space-between'}
+              ai={'center'}
+              py={'$3.5'}
+              borderColor={separatorColor}
+              borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
+            />
+          ))}
         </YStack>
-      </Container>
-    </>
+      </YStack>
+    </Container>
   )
 }

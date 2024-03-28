@@ -80,6 +80,8 @@ export default () => {
       'react-native-web',
       'expo-linking',
       'expo-constants',
+      'expo-clipboard',
+      'expo-sharing',
       'expo-modules-core',
       'expo-device',
       'expo-image-picker',

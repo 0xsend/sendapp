@@ -266,4 +266,5 @@ export const brandColors = {
   olive: '#86AE80',
   decay: '#3E4A3C',
   darkest: '#081619',
+  jet: '#343434',
 }

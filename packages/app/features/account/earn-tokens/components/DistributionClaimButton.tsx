@@ -1,4 +1,13 @@
-import { Anchor, Button, ButtonText, Paragraph, TooltipSimple, YStack } from '@my/ui'
+import {
+  Anchor,
+  Button as ButtonOg,
+  ButtonText,
+  Paragraph,
+  YStack,
+  ScrollView,
+  ButtonProps,
+} from '@my/ui'
+import { StackProps } from '@my/ui/index'
 import { sendMerkleDropAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import {
@@ -80,10 +89,8 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 
   if (!isConnected) {
     return (
-      <YStack ai="center" w="100%" mx="auto">
+      <Stack>
         <Button
-          w="100%"
-          bc="$accent12Dark"
           onPress={() => {
             assert(!!connectors[0], 'No connectors found')
             connect({ connector: connectors[0] })
@@ -93,16 +100,16 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         </Button>
         {connectError ? (
           connectError.message?.includes('Connector not found') ? (
-            <Paragraph size="$1" theme="alt2">
-              Error finding wallet. Please install a web3 wallet like MetaMask.
-            </Paragraph>
+            <ErrorMessage
+              error={'Error finding wallet. Please install a web3 wallet like MetaMask.'}
+            />
           ) : (
-            <Paragraph size="$1" theme="alt2">
-              Error connecting wallet. Please try again later. {connectError.message}
-            </Paragraph>
+            <ErrorMessage
+              error={`Error connecting wallet. Please try again later. ${connectError.message}`}
+            />
           )
         ) : null}
-      </YStack>
+      </Stack>
     )
   }
 
@@ -110,53 +117,50 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     const distributionChain = chains.find((c) => c.id === distribution.chain_id)
     assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
     return (
-      <YStack ai="center" w="100%" mx="auto">
+      <Stack>
         <Button
-          w="100%"
-          bc="$accent12Dark"
           onPress={() => {
             assert(!!switchChain, 'No switchChain found')
             switchChain(
-              { chainId: distributionChain.id },
+              { chainId: distributionChain.id as keyof typeof sendMerkleDropAddress },
               { onError: (error) => console.error(error) }
             )
           }}
         >
           <ButtonText col="$black">Switch Network</ButtonText>
         </Button>
-        {switchError ? (
-          <Paragraph size="$1" theme="alt2" maw="100%">
-            Error switching network. Please try again later. {switchError.message}
-          </Paragraph>
-        ) : null}
-      </YStack>
+        <ErrorMessage
+          error={
+            switchError
+              ? `Error switching network. Please try again later. ${switchError.message}`
+              : ''
+          }
+        />
+      </Stack>
     )
   }
 
   if (isTrancheActiveLoading || isClaimedLoading) {
     return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Button br={12} disabled f={1} w="100%">
-          Claim Reward
-        </Button>
+      <Stack>
+        <Button disabled>Claim Reward</Button>
         <Paragraph size="$1" theme="alt2">
           Checking claimability...
         </Paragraph>
-      </YStack>
+      </Stack>
     )
   }
 
   if (isTrancheActiveError || isClaimedError) {
     return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Button br={12} disabled f={1} w="100%">
+      <Stack>
+        <Button disabled f={1}>
           Claim Reward
         </Button>
-        <Paragraph size="$1" theme="alt2" width={'100%'}>
-          Error checking eligibility. Please try again later. {isTrancheActiveError?.message}
-          {` ${isClaimedError?.message}`}
-        </Paragraph>
-      </YStack>
+        <ErrorMessage
+          error={`Error checking eligibility. Please try again later. ${isTrancheActiveError?.message} ${isClaimedError?.message}`}
+        />
+      </Stack>
     )
   }
 
@@ -166,25 +170,27 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   // If the user is eligible but has already claimed, show the claim button disabled
   if (isClaimed) {
     return (
-      <Paragraph size="$1" theme="alt2" mx="auto">
-        Already claimed
-        {claimReceiptSuccess && (
-          <Paragraph size="$1" theme="alt2">
-            <Anchor
-              accessibilityLabel="View Claim on Etherscan"
-              href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
-            >
-              {shorten(claimWriteHash)}
-            </Anchor>
-          </Paragraph>
-        )}
-      </Paragraph>
+      <Stack>
+        <Paragraph size="$1" theme="alt2" mx="auto">
+          Already claimed
+          {claimReceiptSuccess && (
+            <Paragraph size="$1" theme="alt2">
+              <Anchor
+                accessibilityLabel="View Claim on Etherscan"
+                href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
+              >
+                {shorten(claimWriteHash)}
+              </Anchor>
+            </Paragraph>
+          )}
+        </Paragraph>
+      </Stack>
     )
   }
 
   if (account !== share?.address) {
     return (
-      <YStack ai="center" w="100%" mx="auto">
+      <Stack>
         <Paragraph size="$1" theme="alt2">
           Please switch to the address you verified previously to claim,{' '}
           <Anchor
@@ -197,7 +203,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           </Anchor>
           .
         </Paragraph>
-        <Paragraph size="$1" theme="alt2" alignSelf="flex-start">
+        <Paragraph size="$1" theme="alt2">
           Connected address:{' '}
           <Anchor
             size="$1"
@@ -208,28 +214,25 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             {shorten(account)}
           </Anchor>
         </Paragraph>
-      </YStack>
+      </Stack>
     )
   }
 
   if (claimWriteConfigError) {
     return (
-      <YStack ai="center" w="100%" mx="auto">
-        <Button br={12} disabled f={1} w="100%">
-          Claim Reward
-        </Button>
-        <Paragraph size="$1" theme="alt2" width={'100%'}>
-          Error preparing claim. Please try again later. {claimWriteConfigError.message}
-        </Paragraph>
-      </YStack>
+      <Stack>
+        <Button disabled>Claim Reward</Button>
+        <ErrorMessage
+          error={`Error preparing claim. Please try again later. ${claimWriteConfigError}`}
+        />
+      </Stack>
     )
   }
 
   // If the user is eligible and the tranche is active, show the claim button
   return (
-    <YStack ai="center" w="100%" mx="auto">
+    <Stack>
       <Button
-        w="100%"
         disabled={
           !writeClaim ||
           isClaimWritePending ||
@@ -249,14 +252,15 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim Reward'}
       </Button>
       {claimReceiptError && (
-        <Paragraph size="$1" theme="alt2" width={'100%'}>
-          Error claiming. Please try again later. {claimReceiptError.message}
-        </Paragraph>
+        <ErrorMessage
+          error={`Error claiming. Please try again later. ${claimReceiptError.message}`}
+        />
       )}
+
       {writeClaimError && (
-        <Paragraph size="$1" theme="alt2" width={'100%'}>
-          Error claiming. Please try again later. {writeClaimError.message}
-        </Paragraph>
+        <ErrorMessage
+          error={`Error claiming. Please try again later. ${writeClaimError.message}`}
+        />
       )}
       {claimReceiptSuccess && (
         <Paragraph size="$1" theme="alt2">
@@ -269,6 +273,25 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           </Anchor>
         </Paragraph>
       )}
-    </YStack>
+    </Stack>
+  )
+}
+
+function Stack(props: StackProps) {
+  return <YStack ai="center" w="100%" mx="auto" pb="$4" {...props} />
+}
+
+function Button(props: ButtonProps) {
+  return <ButtonOg size="$6" bc="$accent12Dark" {...props} />
+}
+
+function ErrorMessage({ error }: { error?: string }) {
+  if (!error) return null
+  return (
+    <ScrollView size="$2" height="$4">
+      <Paragraph size="$1" theme="alt2" w="$20">
+        {error}
+      </Paragraph>
+    </ScrollView>
   )
 }

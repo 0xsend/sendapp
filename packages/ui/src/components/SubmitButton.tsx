@@ -14,7 +14,7 @@ const useIsSubmitting = () => {
  * created to be used in forms
  * will show loading spinners and disable submission when already submitting
  */
-export const SubmitButton = ({ children, ...props }: ButtonProps) => {
+export const SubmitButton = ({ children, theme = 'accent', ...props }: ButtonProps) => {
   const isSubmitting = useIsSubmitting()
 
   return (
@@ -43,8 +43,7 @@ export const SubmitButton = ({ children, ...props }: ButtonProps) => {
         </AnimatePresence>
       }
       disabled={isSubmitting}
-      backgroundColor={'$primary'}
-      color={'$background'}
+      theme={theme}
       {...props}
     >
       {!isSubmitting ? <ButtonText>{children}</ButtonText> : <></>}

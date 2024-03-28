@@ -49,11 +49,11 @@ const deployedSendMerkleDrop = deployments.SendMerkleDrop
 if (!deployedSendMerkleDrop) throw new Error('No SendMerkleDrop found.')
 
 // @ts-expect-error it's parsed JSON
-const accountFactory = deployments.DaimoAccountFactory
-if (!accountFactory) throw new Error('No DaimoAccountFactory found.')
+const accountFactory = deployments.SendAccountFactory
+if (!accountFactory) throw new Error('No SendAccountFactory found.')
 if (accountFactory[base.id])
   throw new Error(
-    'DaimoAccountFactory already deployed on base mainnet. Failing to avoid duplicate.'
+    'SendAccountFactory already deployed on base mainnet. Failing to avoid duplicate.'
   )
 
 export default defineConfig({
@@ -129,7 +129,9 @@ export default defineConfig({
           [sepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [base.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base mainnet
-          [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
+          [baseSepolia.id]: '0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680', // base sepolia
+          // maybe bring back once bridging is supported https://github.com/base-org/guides/issues/15
+          // [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
           845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base localnet
         },
         ...deployments,
@@ -142,17 +144,17 @@ export default defineConfig({
           [baseLocal.id]: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6', // base localnet
           ...deployedSendMerkleDrop,
         },
-        DaimoAccountFactory: {
+        SendAccountFactory: {
           ...accountFactory,
           [base.id]: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745', // not deployed yet
         },
       },
       include: [
         'Send*.sol/*',
-        'Daimo*.sol/*',
         'ERC*.sol/*',
         'IEntryPoint*.sol/*',
         'EntryPointSimulations.sol/*',
+        'TokenPaymaster.sol/*',
       ],
       exclude: [
         'Common.sol/**',
@@ -172,7 +174,7 @@ export default defineConfig({
         'test.sol/**',
         '**.s.sol/*.json',
         '**.t.sol/*.json',
-        'DaimoPaymaster.sol/**', // avoid duplicate IMetaPaymaster
+        'SendPaymaster.sol/**', // avoid duplicate IMetaPaymaster
         'DummyEntryPointSimulations.sol/**', // avoid dummies
       ],
     }),
