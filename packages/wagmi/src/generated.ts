@@ -2229,7 +2229,8 @@ export const sendAccountAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const sendAccountFactoryAbi = [
   {
@@ -2306,15 +2307,18 @@ export const sendAccountFactoryAbi = [
 ] as const
 
 /**
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const sendAccountFactoryAddress = {
   8453: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
+  84532: '0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C',
   845337: '0xDf11654D97006885F4D7bff6F2c1260C4d72D984',
 } as const
 
 /**
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const sendAccountFactoryConfig = {
   address: sendAccountFactoryAddress,
@@ -2843,7 +2847,7 @@ export const sendUniswapV3PoolConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const sendVerifierAbi = [
   { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
@@ -2979,14 +2983,15 @@ export const sendVerifierAbi = [
 ] as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const sendVerifierAddress = {
+  84532: '0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B',
   845337: '0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B',
 } as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const sendVerifierConfig = { address: sendVerifierAddress, abi: sendVerifierAbi } as const
 
@@ -2995,7 +3000,7 @@ export const sendVerifierConfig = { address: sendVerifierAddress, abi: sendVerif
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const sendVerifierProxyAbi = [
   {
@@ -3028,14 +3033,15 @@ export const sendVerifierProxyAbi = [
 ] as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const sendVerifierProxyAddress = {
+  84532: '0x6c38612d3f645711dd080711021fC1bA998a5628',
   845337: '0x6c38612d3f645711dd080711021fC1bA998a5628',
 } as const
 
 /**
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const sendVerifierProxyConfig = {
   address: sendVerifierProxyAddress,
@@ -5878,7 +5884,8 @@ export const watchSendAccountUpgradedEvent = /*#__PURE__*/ createWatchContractEv
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const readSendAccountFactory = /*#__PURE__*/ createReadContract({
   abi: sendAccountFactoryAbi,
@@ -5888,7 +5895,8 @@ export const readSendAccountFactory = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const readSendAccountFactoryAccountImplementation = /*#__PURE__*/ createReadContract({
   abi: sendAccountFactoryAbi,
@@ -5899,7 +5907,8 @@ export const readSendAccountFactoryAccountImplementation = /*#__PURE__*/ createR
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const readSendAccountFactoryEntryPoint = /*#__PURE__*/ createReadContract({
   abi: sendAccountFactoryAbi,
@@ -5910,7 +5919,8 @@ export const readSendAccountFactoryEntryPoint = /*#__PURE__*/ createReadContract
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const readSendAccountFactoryGetAddress = /*#__PURE__*/ createReadContract({
   abi: sendAccountFactoryAbi,
@@ -5921,7 +5931,8 @@ export const readSendAccountFactoryGetAddress = /*#__PURE__*/ createReadContract
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"verifier"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const readSendAccountFactoryVerifier = /*#__PURE__*/ createReadContract({
   abi: sendAccountFactoryAbi,
@@ -5932,7 +5943,8 @@ export const readSendAccountFactoryVerifier = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const writeSendAccountFactory = /*#__PURE__*/ createWriteContract({
   abi: sendAccountFactoryAbi,
@@ -5942,7 +5954,8 @@ export const writeSendAccountFactory = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const writeSendAccountFactoryCreateAccount = /*#__PURE__*/ createWriteContract({
   abi: sendAccountFactoryAbi,
@@ -5953,7 +5966,8 @@ export const writeSendAccountFactoryCreateAccount = /*#__PURE__*/ createWriteCon
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const prepareWriteSendAccountFactory = /*#__PURE__*/ createSimulateContract({
   abi: sendAccountFactoryAbi,
@@ -5963,7 +5977,8 @@ export const prepareWriteSendAccountFactory = /*#__PURE__*/ createSimulateContra
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const prepareWriteSendAccountFactoryCreateAccount = /*#__PURE__*/ createSimulateContract({
   abi: sendAccountFactoryAbi,
@@ -6761,7 +6776,7 @@ export const watchSendTokenTransferEvent = /*#__PURE__*/ createWatchContractEven
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const readSendVerifier = /*#__PURE__*/ createReadContract({
   abi: sendVerifierAbi,
@@ -6771,7 +6786,7 @@ export const readSendVerifier = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const readSendVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createReadContract({
   abi: sendVerifierAbi,
@@ -6782,7 +6797,7 @@ export const readSendVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createReadC
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"implementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const readSendVerifierImplementation = /*#__PURE__*/ createReadContract({
   abi: sendVerifierAbi,
@@ -6793,7 +6808,7 @@ export const readSendVerifierImplementation = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const readSendVerifierOwner = /*#__PURE__*/ createReadContract({
   abi: sendVerifierAbi,
@@ -6804,7 +6819,7 @@ export const readSendVerifierOwner = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const readSendVerifierProxiableUuid = /*#__PURE__*/ createReadContract({
   abi: sendVerifierAbi,
@@ -6815,7 +6830,7 @@ export const readSendVerifierProxiableUuid = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"verifySignature"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const readSendVerifierVerifySignature = /*#__PURE__*/ createReadContract({
   abi: sendVerifierAbi,
@@ -6826,7 +6841,7 @@ export const readSendVerifierVerifySignature = /*#__PURE__*/ createReadContract(
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const writeSendVerifier = /*#__PURE__*/ createWriteContract({
   abi: sendVerifierAbi,
@@ -6836,7 +6851,7 @@ export const writeSendVerifier = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const writeSendVerifierInit = /*#__PURE__*/ createWriteContract({
   abi: sendVerifierAbi,
@@ -6847,7 +6862,7 @@ export const writeSendVerifierInit = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const writeSendVerifierRenounceOwnership = /*#__PURE__*/ createWriteContract({
   abi: sendVerifierAbi,
@@ -6858,7 +6873,7 @@ export const writeSendVerifierRenounceOwnership = /*#__PURE__*/ createWriteContr
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const writeSendVerifierTransferOwnership = /*#__PURE__*/ createWriteContract({
   abi: sendVerifierAbi,
@@ -6869,7 +6884,7 @@ export const writeSendVerifierTransferOwnership = /*#__PURE__*/ createWriteContr
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const writeSendVerifierUpgradeTo = /*#__PURE__*/ createWriteContract({
   abi: sendVerifierAbi,
@@ -6880,7 +6895,7 @@ export const writeSendVerifierUpgradeTo = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const writeSendVerifierUpgradeToAndCall = /*#__PURE__*/ createWriteContract({
   abi: sendVerifierAbi,
@@ -6891,7 +6906,7 @@ export const writeSendVerifierUpgradeToAndCall = /*#__PURE__*/ createWriteContra
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const prepareWriteSendVerifier = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifierAbi,
@@ -6901,7 +6916,7 @@ export const prepareWriteSendVerifier = /*#__PURE__*/ createSimulateContract({
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const prepareWriteSendVerifierInit = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifierAbi,
@@ -6912,7 +6927,7 @@ export const prepareWriteSendVerifierInit = /*#__PURE__*/ createSimulateContract
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const prepareWriteSendVerifierRenounceOwnership = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifierAbi,
@@ -6923,7 +6938,7 @@ export const prepareWriteSendVerifierRenounceOwnership = /*#__PURE__*/ createSim
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const prepareWriteSendVerifierTransferOwnership = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifierAbi,
@@ -6934,7 +6949,7 @@ export const prepareWriteSendVerifierTransferOwnership = /*#__PURE__*/ createSim
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const prepareWriteSendVerifierUpgradeTo = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifierAbi,
@@ -6945,7 +6960,7 @@ export const prepareWriteSendVerifierUpgradeTo = /*#__PURE__*/ createSimulateCon
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const prepareWriteSendVerifierUpgradeToAndCall = /*#__PURE__*/ createSimulateContract({
   abi: sendVerifierAbi,
@@ -6956,7 +6971,7 @@ export const prepareWriteSendVerifierUpgradeToAndCall = /*#__PURE__*/ createSimu
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const watchSendVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifierAbi,
@@ -6966,7 +6981,7 @@ export const watchSendVerifierEvent = /*#__PURE__*/ createWatchContractEvent({
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Initialized"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const watchSendVerifierInitializedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifierAbi,
@@ -6977,7 +6992,7 @@ export const watchSendVerifierInitializedEvent = /*#__PURE__*/ createWatchContra
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const watchSendVerifierOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifierAbi,
@@ -6988,7 +7003,7 @@ export const watchSendVerifierOwnershipTransferredEvent = /*#__PURE__*/ createWa
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const watchSendVerifierUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifierAbi,
@@ -6999,7 +7014,7 @@ export const watchSendVerifierUpgradedEvent = /*#__PURE__*/ createWatchContractE
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const watchSendVerifierProxyEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifierProxyAbi,
@@ -7009,7 +7024,7 @@ export const watchSendVerifierProxyEvent = /*#__PURE__*/ createWatchContractEven
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const watchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendVerifierProxyAbi,
@@ -10115,7 +10130,8 @@ export const useWatchSendAccountUpgradedEvent = /*#__PURE__*/ createUseWatchCont
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useReadSendAccountFactory = /*#__PURE__*/ createUseReadContract({
   abi: sendAccountFactoryAbi,
@@ -10125,7 +10141,8 @@ export const useReadSendAccountFactory = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"accountImplementation"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useReadSendAccountFactoryAccountImplementation = /*#__PURE__*/ createUseReadContract({
   abi: sendAccountFactoryAbi,
@@ -10136,7 +10153,8 @@ export const useReadSendAccountFactoryAccountImplementation = /*#__PURE__*/ crea
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"entryPoint"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useReadSendAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadContract({
   abi: sendAccountFactoryAbi,
@@ -10147,7 +10165,8 @@ export const useReadSendAccountFactoryEntryPoint = /*#__PURE__*/ createUseReadCo
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"getAddress"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useReadSendAccountFactoryGetAddress = /*#__PURE__*/ createUseReadContract({
   abi: sendAccountFactoryAbi,
@@ -10158,7 +10177,8 @@ export const useReadSendAccountFactoryGetAddress = /*#__PURE__*/ createUseReadCo
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"verifier"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useReadSendAccountFactoryVerifier = /*#__PURE__*/ createUseReadContract({
   abi: sendAccountFactoryAbi,
@@ -10169,7 +10189,8 @@ export const useReadSendAccountFactoryVerifier = /*#__PURE__*/ createUseReadCont
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useWriteSendAccountFactory = /*#__PURE__*/ createUseWriteContract({
   abi: sendAccountFactoryAbi,
@@ -10179,7 +10200,8 @@ export const useWriteSendAccountFactory = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useWriteSendAccountFactoryCreateAccount = /*#__PURE__*/ createUseWriteContract({
   abi: sendAccountFactoryAbi,
@@ -10190,7 +10212,8 @@ export const useWriteSendAccountFactoryCreateAccount = /*#__PURE__*/ createUseWr
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useSimulateSendAccountFactory = /*#__PURE__*/ createUseSimulateContract({
   abi: sendAccountFactoryAbi,
@@ -10200,7 +10223,8 @@ export const useSimulateSendAccountFactory = /*#__PURE__*/ createUseSimulateCont
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `functionName` set to `"createAccount"`
  *
- * [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
  */
 export const useSimulateSendAccountFactoryCreateAccount = /*#__PURE__*/ createUseSimulateContract({
   abi: sendAccountFactoryAbi,
@@ -10999,7 +11023,7 @@ export const useWatchSendTokenTransferEvent = /*#__PURE__*/ createUseWatchContra
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useReadSendVerifier = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifierAbi,
@@ -11009,7 +11033,7 @@ export const useReadSendVerifier = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useReadSendVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifierAbi,
@@ -11020,7 +11044,7 @@ export const useReadSendVerifierUpgradeInterfaceVersion = /*#__PURE__*/ createUs
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"implementation"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useReadSendVerifierImplementation = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifierAbi,
@@ -11031,7 +11055,7 @@ export const useReadSendVerifierImplementation = /*#__PURE__*/ createUseReadCont
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useReadSendVerifierOwner = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifierAbi,
@@ -11042,7 +11066,7 @@ export const useReadSendVerifierOwner = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"proxiableUUID"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useReadSendVerifierProxiableUuid = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifierAbi,
@@ -11053,7 +11077,7 @@ export const useReadSendVerifierProxiableUuid = /*#__PURE__*/ createUseReadContr
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"verifySignature"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useReadSendVerifierVerifySignature = /*#__PURE__*/ createUseReadContract({
   abi: sendVerifierAbi,
@@ -11064,7 +11088,7 @@ export const useReadSendVerifierVerifySignature = /*#__PURE__*/ createUseReadCon
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWriteSendVerifier = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifierAbi,
@@ -11074,7 +11098,7 @@ export const useWriteSendVerifier = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWriteSendVerifierInit = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifierAbi,
@@ -11085,7 +11109,7 @@ export const useWriteSendVerifierInit = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWriteSendVerifierRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifierAbi,
@@ -11096,7 +11120,7 @@ export const useWriteSendVerifierRenounceOwnership = /*#__PURE__*/ createUseWrit
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWriteSendVerifierTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifierAbi,
@@ -11107,7 +11131,7 @@ export const useWriteSendVerifierTransferOwnership = /*#__PURE__*/ createUseWrit
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWriteSendVerifierUpgradeTo = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifierAbi,
@@ -11118,7 +11142,7 @@ export const useWriteSendVerifierUpgradeTo = /*#__PURE__*/ createUseWriteContrac
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWriteSendVerifierUpgradeToAndCall = /*#__PURE__*/ createUseWriteContract({
   abi: sendVerifierAbi,
@@ -11129,7 +11153,7 @@ export const useWriteSendVerifierUpgradeToAndCall = /*#__PURE__*/ createUseWrite
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useSimulateSendVerifier = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifierAbi,
@@ -11139,7 +11163,7 @@ export const useSimulateSendVerifier = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"init"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useSimulateSendVerifierInit = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifierAbi,
@@ -11150,7 +11174,7 @@ export const useSimulateSendVerifierInit = /*#__PURE__*/ createUseSimulateContra
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useSimulateSendVerifierRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifierAbi,
@@ -11161,7 +11185,7 @@ export const useSimulateSendVerifierRenounceOwnership = /*#__PURE__*/ createUseS
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useSimulateSendVerifierTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifierAbi,
@@ -11172,7 +11196,7 @@ export const useSimulateSendVerifierTransferOwnership = /*#__PURE__*/ createUseS
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeTo"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useSimulateSendVerifierUpgradeTo = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifierAbi,
@@ -11183,7 +11207,7 @@ export const useSimulateSendVerifierUpgradeTo = /*#__PURE__*/ createUseSimulateC
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendVerifierAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useSimulateSendVerifierUpgradeToAndCall = /*#__PURE__*/ createUseSimulateContract({
   abi: sendVerifierAbi,
@@ -11194,7 +11218,7 @@ export const useSimulateSendVerifierUpgradeToAndCall = /*#__PURE__*/ createUseSi
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWatchSendVerifierEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendVerifierAbi,
@@ -11204,7 +11228,7 @@ export const useWatchSendVerifierEvent = /*#__PURE__*/ createUseWatchContractEve
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Initialized"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWatchSendVerifierInitializedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendVerifierAbi,
@@ -11215,7 +11239,7 @@ export const useWatchSendVerifierInitializedEvent = /*#__PURE__*/ createUseWatch
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWatchSendVerifierOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -11227,7 +11251,7 @@ export const useWatchSendVerifierOwnershipTransferredEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xE269194e41Cd50E2986f82Fc23A2B95D8bAFED2B)
  */
 export const useWatchSendVerifierUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendVerifierAbi,
@@ -11238,7 +11262,7 @@ export const useWatchSendVerifierUpgradedEvent = /*#__PURE__*/ createUseWatchCon
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const useWatchSendVerifierProxyEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendVerifierProxyAbi,
@@ -11248,7 +11272,7 @@ export const useWatchSendVerifierProxyEvent = /*#__PURE__*/ createUseWatchContra
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendVerifierProxyAbi}__ and `eventName` set to `"Upgraded"`
  *
- *
+ * [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0x6c38612d3f645711dd080711021fC1bA998a5628)
  */
 export const useWatchSendVerifierProxyUpgradedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendVerifierProxyAbi,
