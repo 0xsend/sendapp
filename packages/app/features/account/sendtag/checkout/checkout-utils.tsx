@@ -5,7 +5,7 @@ import { parseEther } from 'viem'
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
 
-Send.app`
+Send.it`
 
 //@todo: should probaby fetch this from db
 export const maxNumSendTags = 5

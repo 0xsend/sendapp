@@ -45,5 +45,4 @@ const Providers = compose([
   SafeAreaProvider,
   TamaguiProvider,
   ToastProvider,
-  QueryClientProvider,
 ])

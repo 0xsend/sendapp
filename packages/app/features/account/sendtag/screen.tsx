@@ -72,7 +72,7 @@ function SendtagList({
         i === nextTagIndex ? (
           <AddTagButton key="%add_tag_button" />
         ) : (
-          <TagItem key={tag?.name} tag={tag} />
+          <TagItem key={tag?.name || `%no_tag_name_${i}`} tag={tag} />
         )
       )}
     </YStack>
