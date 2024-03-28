@@ -136,14 +136,18 @@ export function useUserOpTransferMutation() {
         preVerificationGas: 3000000n,
         maxFeePerGas: 1000000n,
         maxPriorityFeePerGas: 1000000n,
+        paymaster: undefined,
         // paymaster,
+        paymasterVerificationGasLimit: undefined,
         // paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit: undefined,
         // paymasterPostOpGasLimit,
+        paymasterData: undefined,
         // paymasterData: '0x',
         signature: '0x',
       }
 
-      console.log('userOp', userOp)
+      // console.log('userOp', userOp)
 
       const userOpHash = getUserOperationHash({
         userOperation: userOp,
@@ -157,11 +161,11 @@ export function useUserOpTransferMutation() {
         validUntil,
       })
 
-      const gasParameters = await baseMainnetBundlerClient.estimateUserOperationGas({
-        userOperation: userOp,
-      })
+      // const gasParameters = await baseMainnetBundlerClient.estimateUserOperationGas({
+      //   userOperation: userOp,
+      // })
 
-      console.log('gasParameters', gasParameters)
+      // console.log('gasParameters', gasParameters)
 
       // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
       // await baseMainnetClient

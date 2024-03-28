@@ -192,6 +192,7 @@ export const CheckoutForm = () => {
                           maw="40%"
                           fontFamily={'$mono'}
                           accessibilityLabel={`Pending Sendtag ${tag.name}`}
+                          aria-label={`Pending Sendtag ${tag.name}`}
                         >
                           {tag.name}
                         </Paragraph>
