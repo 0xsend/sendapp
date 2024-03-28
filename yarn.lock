@@ -12011,6 +12011,7 @@ __metadata:
     expo-sharing: "npm:~11.5.0"
     jest: "npm:^29.7.0"
     jest-expo: "npm:^49.0.0"
+    libphonenumber-js: "npm:^1.10.58"
     nock: "npm:^14.0.0-beta.2"
     permissionless: "npm:^0.1.11"
     react-hook-form: "npm:^7.48.2"
@@ -21888,6 +21889,13 @@ __metadata:
     prelude-ls: "npm:^1.2.1"
     type-check: "npm:~0.4.0"
   checksum: 2e4720ff79f21ae08d42374b0a5c2f664c5be8b6c8f565bb4e1315c96ed3a8acaa9de788ffed82d7f2378cf36958573de07ef92336cb5255ed74d08b8318c9ee
+  languageName: node
+  linkType: hard
+
+"libphonenumber-js@npm:^1.10.58":
+  version: 1.10.59
+  resolution: "libphonenumber-js@npm:1.10.59"
+  checksum: 71bd840fd3f884564fb11dd21355a195908f32c974537531887bc0373045fc98b6fbf7afb9e7c1b71f71da8468acbb24e16e13041aad4faa6c866fd5c0ee1cd5
   languageName: node
   linkType: hard
 
