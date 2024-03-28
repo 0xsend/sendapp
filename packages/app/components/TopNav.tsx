@@ -128,7 +128,13 @@ export function TopNav({
               <IconSendLogo size={'$2.5'} color={'$color12'} />
             </XStack>
           ) : (
-            <H2 fontWeight={'300'} color={'$color05'} lineHeight={32} $gtLg={{ ml: '$4' }}>
+            <H2
+              fontWeight={'300'}
+              $theme-light={{ col: '$gray10Light' }}
+              $theme-dark={{ col: '$gray8Light' }}
+              lineHeight={32}
+              $gtLg={{ ml: '$4' }}
+            >
               {header}
             </H2>
           )}
@@ -146,7 +152,7 @@ export function TopNav({
               $gtSm={{ py: '$6' }}
               $gtLg={{ ml: '$9', pl: '$1', pb: '$6', pt: '$0' }}
               $theme-light={{ col: '$gray10Light' }}
-              $theme-dark={{ col: '$gray10Dark' }}
+              $theme-dark={{ col: '$gray8Light' }}
             >
               {subheader}
             </Paragraph>
