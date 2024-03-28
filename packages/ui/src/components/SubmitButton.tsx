@@ -1,5 +1,5 @@
 import { useFormState } from 'react-hook-form'
-import { AnimatePresence, Button, ButtonProps, ButtonText, Spinner } from 'tamagui'
+import { AnimatePresence, Button, type ButtonProps, ButtonText, Spinner } from 'tamagui'
 
 // hack to prevent it from breaking on the server
 const useIsSubmitting = () => {

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base",
+  "include": ["src", "../app"],
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "jsx": "react-jsx"
+  },
+  "references": []
+}

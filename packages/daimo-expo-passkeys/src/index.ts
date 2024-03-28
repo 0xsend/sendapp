@@ -6,10 +6,10 @@ import { Platform } from 'react-native'
 import ExpoPasskeysModule from './ExpoPasskeysModule'
 import type ExpoPasskeysModuleWeb from './ExpoPasskeysModule.web'
 import {
-  CreateRequest,
-  CreateResult,
-  SignRequest,
-  SignResult,
+  type CreateRequest,
+  type CreateResult,
+  type SignRequest,
+  type SignResult,
   toAndroidCreateRequest,
   toAndroidSignRequest,
   toBase64,

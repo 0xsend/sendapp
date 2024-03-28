@@ -4,7 +4,8 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { decode } from 'base64-arraybuffer'
 import * as ImagePicker from 'expo-image-picker'
-import React, { Ref, forwardRef, useImperativeHandle, useState } from 'react'
+import type React from 'react'
+import { type Ref, forwardRef, useImperativeHandle, useState } from 'react'
 
 export interface UploadAvatarRefObject {
   pickImage: () => void

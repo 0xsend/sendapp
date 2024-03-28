@@ -1,4 +1,4 @@
-import { XStack, XStackProps } from 'tamagui'
+import { XStack, type XStackProps } from 'tamagui'
 
 export const Container: React.FC<XStackProps> = (props: XStackProps) => {
   return (

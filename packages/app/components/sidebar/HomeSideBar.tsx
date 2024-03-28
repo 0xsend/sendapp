@@ -5,12 +5,12 @@ import {
   Paragraph,
   ScrollView,
   Separator,
-  SheetProps,
+  type SheetProps,
   SideBar,
   SideBarWrapper,
   XStack,
   YStack,
-  YStackProps,
+  type YStackProps,
   useMedia,
   isWeb,
 } from '@my/ui'
@@ -27,7 +27,7 @@ import {
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import { useNav } from 'app/routers/params'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { NavSheet } from '../NavSheet'
 
 const links = [

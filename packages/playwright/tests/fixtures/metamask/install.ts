@@ -1,11 +1,11 @@
-import fs from 'fs'
-import path from 'path'
-import { Readable } from 'stream'
+import fs from 'node:fs'
+import path from 'node:path'
+import { Readable } from 'node:stream'
 import { type BrowserContext, chromium } from '@playwright/test'
 import debug from 'debug'
 import extract from 'extract-zip'
-import { access } from 'fs/promises'
-import { finished } from 'stream/promises'
+import { access } from 'node:fs/promises'
+import { finished } from 'node:stream/promises'
 import { MetaMaskPage } from './page'
 
 const log = debug('test:fixtures:metamask:install')

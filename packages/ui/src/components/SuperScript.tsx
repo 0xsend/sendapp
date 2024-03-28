@@ -1,4 +1,4 @@
-import { TextProps, XStack, Text, getTokens } from 'tamagui'
+import { type TextProps, XStack, Text, getTokens } from 'tamagui'
 
 export const Sup = (
   props: TextProps & {

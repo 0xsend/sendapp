@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base",
+  "include": [
+    "features",
+    "components",
+    "data",
+    "provider",
+    "utils",
+    "routers",
+    "index.ts",
+    "types.d.ts",
+    "../ui/src",
+    "../api/src",
+    "../wagmi/src",
+    "jest.config.ts",
+    "jest.setup.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "app/*": ["./*"],
+      "@my/ui/*": ["../ui/src/*"],
+      "@my/wagmi/*": ["../wagmi/src/*"],
+      "@my/contracts/out/*": ["../contracts/out/*"],
+      "@my/*": ["../*"]
+    }
+  },
+  "references": []
+}

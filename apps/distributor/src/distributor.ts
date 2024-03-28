@@ -1,6 +1,6 @@
-import { cpus } from 'os'
-import { Database, Functions, Tables } from '@my/supabase/database.types'
-import { sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
+import { cpus } from 'node:os'
+import type { Database, Functions, Tables } from '@my/supabase/database.types'
+import { type sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
 import type { Logger } from 'pino'
 

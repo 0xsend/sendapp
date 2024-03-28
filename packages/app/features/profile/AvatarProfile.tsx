@@ -1,5 +1,5 @@
-import { Avatar, AvatarProps, SizableText } from '@my/ui'
-import { ProfileProp } from './screen'
+import { Avatar, type AvatarProps, SizableText } from '@my/ui'
+import type { ProfileProp } from './screen'
 
 export function AvatarProfile({ profile, ...rest }: AvatarProps & { profile: ProfileProp }) {
   return (

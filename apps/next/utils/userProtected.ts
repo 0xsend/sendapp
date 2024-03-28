@@ -1,7 +1,7 @@
-import { ParsedUrlQuery } from 'querystring'
-import { Database } from '@my/supabase/database.types'
+import type { ParsedUrlQuery } from 'node:querystring'
+import type { Database } from '@my/supabase/database.types'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { GetServerSideProps, PreviewData } from 'next'
+import type { GetServerSideProps, PreviewData } from 'next'
 
 import debug from 'debug'
 import { userOnboarded } from './userOnboarded'

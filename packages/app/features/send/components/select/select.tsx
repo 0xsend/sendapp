@@ -1,7 +1,7 @@
 import {
   Adapt,
   Select as TamaguiSelect,
-  SelectProps,
+  type SelectProps,
   Sheet,
   XStack,
   YStack,
@@ -10,7 +10,7 @@ import {
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { IconTriangleDown } from 'app/components/icons/IconTriangleDown'
-import { IToken } from 'app/features/send/types'
+import type { IToken } from 'app/features/send/types'
 import { useMemo } from 'react'
 
 export function Select({

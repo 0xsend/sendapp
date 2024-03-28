@@ -1,4 +1,4 @@
-import { SideBar, SideBarWrapper, Stack, Theme, YStack, YStackProps, useMedia } from '@my/ui'
+import { SideBar, SideBarWrapper, Stack, Theme, YStack, type YStackProps, useMedia } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
 import { OnboardingForm } from 'app/features/auth/onboarding/onboarding-form'

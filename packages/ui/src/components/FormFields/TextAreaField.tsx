@@ -1,7 +1,15 @@
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
-import { Fieldset, Label, TextArea, TextAreaProps, Theme, ThemeName, useThemeName } from 'tamagui'
+import {
+  Fieldset,
+  Label,
+  TextArea,
+  type TextAreaProps,
+  Theme,
+  type ThemeName,
+  useThemeName,
+} from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
 

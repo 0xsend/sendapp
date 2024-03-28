@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Paragraph } from '@my/ui'
+import { Button, type ButtonProps, Paragraph } from '@my/ui'
 
 export const GradientButton = ({ children, ...props }: ButtonProps) => {
   return (

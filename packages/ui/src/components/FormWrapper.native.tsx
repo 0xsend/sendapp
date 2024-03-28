@@ -3,9 +3,9 @@ import { createContext, forwardRef, useContext, useState } from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import {
   ScrollView,
-  TamaguiElement,
+  type TamaguiElement,
   YStack,
-  YStackProps,
+  type YStackProps,
   useWindowDimensions,
   withStaticProperties,
 } from 'tamagui'

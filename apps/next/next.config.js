@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 import tamaguiPlugin from '@tamagui/next-plugin'
-import { join } from 'path'
+import { join } from 'node:path'
 import withPlaiceholder from '@plaiceholder/next'
 
 const boolVals = {

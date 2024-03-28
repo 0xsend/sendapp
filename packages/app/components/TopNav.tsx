@@ -10,7 +10,7 @@ import {
   Container,
   Separator,
   useToastController,
-  ButtonProps,
+  type ButtonProps,
 } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'

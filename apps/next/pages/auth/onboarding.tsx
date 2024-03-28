@@ -1,12 +1,12 @@
 import { OnboardingScreen } from 'app/features/auth/onboarding/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from '../_app'
+import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
 import { useContext, useEffect } from 'react'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
-import { InferGetServerSidePropsType } from 'next'
+import type { InferGetServerSidePropsType } from 'next'
 
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
   images,

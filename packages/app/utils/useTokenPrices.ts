@@ -1,4 +1,4 @@
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 const TokenPriceSchema = z.object({

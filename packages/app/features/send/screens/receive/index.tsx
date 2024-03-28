@@ -4,7 +4,7 @@ import {
   TransferProvider,
   useSubScreenContext,
 } from 'app/features/send/providers'
-import { ReceiveScreenType } from 'app/features/send/types'
+import type { ReceiveScreenType } from 'app/features/send/types'
 import { ReceiveAmountScreen } from './receive-amount'
 import { ReceiveQRCodeScreen } from './receive-qrcode'
 import { ReceiveTagScreen } from './receive-tag'

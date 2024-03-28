@@ -1,6 +1,6 @@
 import { useNumberFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
-import { Fieldset, Input, InputProps, Label, Theme, useThemeName } from 'tamagui'
+import { Fieldset, Input, type InputProps, Label, Theme, useThemeName } from 'tamagui'
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
 

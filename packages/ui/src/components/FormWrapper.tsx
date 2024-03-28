@@ -1,5 +1,11 @@
 import { forwardRef } from 'react'
-import { ScrollView, TamaguiElement, YStack, YStackProps, withStaticProperties } from 'tamagui'
+import {
+  ScrollView,
+  type TamaguiElement,
+  YStack,
+  type YStackProps,
+  withStaticProperties,
+} from 'tamagui'
 
 /**
  * this is pretty straightforward on web - check FormWrapper.native

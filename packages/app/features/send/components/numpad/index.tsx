@@ -1,7 +1,7 @@
 import { H1, SizableText, XStack, YStack } from '@my/ui'
 import { Select } from 'app/features/send/components/select'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
-import { INumPadProps } from 'app/features/send/types'
+import type { INumPadProps } from 'app/features/send/types'
 import formatNumpadInput from 'app/utils/formatNumpadInput'
 import { NumpadButton } from './numpad-button'
 

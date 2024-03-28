@@ -5,13 +5,13 @@ import {
   Paragraph,
   YStack,
   ScrollView,
-  ButtonProps,
+  type ButtonProps,
 } from '@my/ui'
-import { StackProps } from '@my/ui/index'
-import { sendMerkleDropAddress } from '@my/wagmi'
+import type { StackProps } from '@my/ui/index'
+import type { sendMerkleDropAddress } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import {
-  UseDistributionsResultData,
+  type UseDistributionsResultData,
   usePrepareSendMerkleDropClaimTrancheWrite,
   useSendMerkleDropIsClaimed,
   useSendMerkleDropTrancheActive,
@@ -288,7 +288,7 @@ function Button(props: ButtonProps) {
 function ErrorMessage({ error }: { error?: string }) {
   if (!error) return null
   return (
-    <ScrollView size="$2" height="$4">
+    <ScrollView height="$4">
       <Paragraph size="$1" theme="alt2" w="$20">
         {error}
       </Paragraph>

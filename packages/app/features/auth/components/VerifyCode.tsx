@@ -8,7 +8,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { MobileOtpType } from '@supabase/supabase-js'
+import type { MobileOtpType } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import React from 'react'

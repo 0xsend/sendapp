@@ -1,4 +1,4 @@
-import { Sheet, SheetProps, isWeb } from '@my/ui'
+import { Sheet, type SheetProps, isWeb } from '@my/ui'
 
 export function NavSheet({ children, ...props }: SheetProps) {
   return (

@@ -1,7 +1,7 @@
 import { CheckoutScreen } from 'app/features/account/sendtag/checkout/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from '../../_app'
+import type { NextPageWithLayout } from '../../_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
 

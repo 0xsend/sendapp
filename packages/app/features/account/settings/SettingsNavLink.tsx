@@ -1,6 +1,6 @@
 import { Link, Paragraph, type LinkProps, Separator, useSheet } from '@my/ui'
 import { usePathname } from 'app/utils/usePathname'
-import { type ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export function SettingsNavLink({

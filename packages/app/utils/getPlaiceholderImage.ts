@@ -1,4 +1,8 @@
-import { getPlaiceholder, GetPlaiceholderOptions, GetPlaiceholderReturn } from 'plaiceholder'
+import {
+  getPlaiceholder,
+  type GetPlaiceholderOptions,
+  type GetPlaiceholderReturn,
+} from 'plaiceholder'
 type img = { src: string; height: number; width: number }
 
 export type GetPlaiceholderImage = ({ img: img } & Omit<GetPlaiceholderReturn, 'metadata'>) | null

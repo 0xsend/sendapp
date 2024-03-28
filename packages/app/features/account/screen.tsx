@@ -2,7 +2,7 @@ import {
   Avatar,
   Container,
   Link,
-  LinkProps,
+  type LinkProps,
   Paragraph,
   Separator,
   XStack,
@@ -27,7 +27,8 @@ import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
 import { useNav } from 'app/routers/params'
-import React, { ElementType, useEffect, useState } from 'react'
+import type React from 'react'
+import { type ElementType, useEffect, useState } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export function AccountScreen() {

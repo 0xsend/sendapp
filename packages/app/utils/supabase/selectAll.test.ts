@@ -16,7 +16,8 @@ test('successfully fetches all rows with pagination', async () => {
   }
 
   // @ts-expect-error: This is a mock
-  const results = await selectAll(mockQueryBuilder)
+  // biome-ignore lint/suspicious/noExplicitAny: this is a mock
+  const results = (await selectAll(mockQueryBuilder)) as any[]
 
   expect(results.length).toBe(totalRows)
   expect(mockData).toEqual(results)
@@ -31,7 +32,8 @@ test('handles empty results', async () => {
   }
 
   // @ts-expect-error: This is a mock
-  const results = await selectAll(mockQueryBuilder)
+  // biome-ignore lint/suspicious/noExplicitAny: this is a mock
+  const results = (await selectAll(mockQueryBuilder)) as any[]
 
   expect(results.length).toBe(0)
   expect(mockQueryBuilder.range).toHaveBeenCalledTimes(1)

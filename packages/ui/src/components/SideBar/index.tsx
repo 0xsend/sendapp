@@ -1,4 +1,4 @@
-import { YStack, YStackProps } from 'tamagui'
+import { YStack, type YStackProps } from 'tamagui'
 
 export const SideBar = ({ children, ...props }: YStackProps) => {
   return (

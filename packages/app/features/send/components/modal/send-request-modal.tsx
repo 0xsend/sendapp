@@ -6,14 +6,18 @@ import {
   Sheet,
   SizableText,
   Theme,
-  ThemeName,
+  type ThemeName,
   XStack,
   YStack,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconClose } from 'app/components/icons'
 import { useSubScreenContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT, ISendRequestModalProps, QRScreen } from 'app/features/send/types'
+import {
+  ANIMATE_DIRECTION_RIGHT,
+  type ISendRequestModalProps,
+  QRScreen,
+} from 'app/features/send/types'
 import { useState } from 'react'
 import { GradientButton } from './GradientButton'
 import { ProfileModal } from './profile-modal'

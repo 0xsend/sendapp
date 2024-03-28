@@ -11,7 +11,7 @@ import {
 
 import {
   http,
-  Hex,
+  type Hex,
   bytesToHex,
   concat,
   createTestClient,

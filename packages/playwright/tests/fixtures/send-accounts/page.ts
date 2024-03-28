@@ -1,4 +1,4 @@
-import { Expect, Page } from '@playwright/test'
+import type { Expect, Page } from '@playwright/test'
 
 export class OnboardingPage {
   constructor(public readonly page: Page) {}

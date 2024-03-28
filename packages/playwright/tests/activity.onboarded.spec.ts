@@ -5,7 +5,7 @@
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import { expect, test } from './fixtures/send-accounts'
 import debug from 'debug'
-import { Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 let log: debug.Debugger
 

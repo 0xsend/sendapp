@@ -1,6 +1,6 @@
 import { IconEthereum, IconUSDC } from 'app/components/icons'
 import { createContext, useContext, useMemo, useState } from 'react'
-import { ITag, IToken, ITransferContext, ITransferContextProviderProps } from '../types'
+import type { ITag, IToken, ITransferContext, ITransferContextProviderProps } from '../types'
 
 const TransferContext = createContext<ITransferContext | undefined>(undefined)
 

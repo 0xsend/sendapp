@@ -1,6 +1,6 @@
 import { Button, ButtonIcon, Link } from '@my/ui'
-import { type LinkProps } from '@my/ui'
-import { type ReactElement } from 'react'
+import type { LinkProps } from '@my/ui'
+import type { ReactElement } from 'react'
 
 export const SideBarFooterLink = ({
   icon,

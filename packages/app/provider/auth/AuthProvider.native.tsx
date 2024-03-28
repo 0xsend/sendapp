@@ -1,10 +1,10 @@
-import { Session, SessionContext as SessionContextHelper } from '@supabase/auth-helpers-react'
-import { AuthError, User } from '@supabase/supabase-js'
+import type { Session, SessionContext as SessionContextHelper } from '@supabase/auth-helpers-react'
+import { AuthError, type User } from '@supabase/supabase-js'
 import { supabase } from 'app/utils/supabase/client.native'
 import { router, useSegments } from 'expo-router'
 import { createContext, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import { AuthProviderProps } from './AuthProvider'
+import type { AuthProviderProps } from './AuthProvider'
 import { AuthStateChangeHandler } from './AuthStateChangeHandler'
 
 export const SessionContext = createContext<SessionContextHelper>({

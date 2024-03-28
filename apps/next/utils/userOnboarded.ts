@@ -1,6 +1,6 @@
-import { ParsedUrlQuery } from 'querystring'
-import { Database } from '@my/supabase/database.types'
-import { GetServerSidePropsContext, PreviewData, Redirect } from 'next'
+import type { ParsedUrlQuery } from 'node:querystring'
+import type { Database } from '@my/supabase/database.types'
+import type { GetServerSidePropsContext, PreviewData, Redirect } from 'next'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import debug from 'debug'
 
