@@ -6,7 +6,7 @@ import { Wrapper } from './__mocks__/Wrapper'
 import { renderHook } from '@testing-library/react-hooks'
 import { describe, test } from '@jest/globals'
 import { act } from '@testing-library/react-native'
-import { baseMainnetBundlerClient, daimoAccountAbi } from '@my/wagmi'
+import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
 import { signUserOp } from './userop'
 import { encodeFunctionData, erc20Abi, isAddress, slice } from 'viem'
 
@@ -97,7 +97,7 @@ describe('useUserOpTransferMutation', () => {
     } as UseUserOpTransferMutationArgs
     baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
       const callData = encodeFunctionData({
-        abi: daimoAccountAbi,
+        abi: sendAccountAbi,
         functionName: 'executeBatch',
         args: [
           [
@@ -161,7 +161,7 @@ describe('useUserOpTransferMutation', () => {
     baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
       assert(!!args.token && isAddress(args.token), 'Invalid token address')
       const callData = encodeFunctionData({
-        abi: daimoAccountAbi,
+        abi: sendAccountAbi,
         functionName: 'executeBatch',
         args: [
           [

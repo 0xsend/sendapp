@@ -9,7 +9,7 @@ import {ERC1967Utils} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC19
 import "p256-verifier/WebAuthn.sol";
 
 /// Proxy using the UUPSUpgradeable pattern. Named for Etherscan verification.
-contract DaimoVerifierProxy is ERC1967Proxy {
+contract SendVerifierProxy is ERC1967Proxy {
     constructor(address _logic, bytes memory _data) ERC1967Proxy(_logic, _data) {}
 }
 
@@ -26,7 +26,7 @@ struct Signature {
 // This contract exists only to enable temporary upgradeability
 // of the Webauthn library. After further audit(s), ownership
 // will be burned, making this verifier library immutable.
-contract DaimoVerifier is OwnableUpgradeable, UUPSUpgradeable {
+contract SendVerifier is OwnableUpgradeable, UUPSUpgradeable {
     constructor() {
         _disableInitializers();
     }

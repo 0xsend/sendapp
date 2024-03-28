@@ -6,7 +6,7 @@ import { COSEECDHAtoXY, parseCreateResponse } from 'app/utils/passkeys'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { encodeCreateAccountData, entrypoint } from 'app/utils/userop'
-import { baseMainnetClient, daimoAccountFactoryAddress } from '@my/wagmi'
+import { baseMainnetClient, sendAccountFactoryAddress } from '@my/wagmi'
 import * as Device from 'expo-device'
 import { concat, zeroAddress } from 'viem'
 import { getSenderAddress } from 'permissionless'
@@ -64,7 +64,7 @@ export const OnboardingForm = () => {
     // store the init code in the database to avoid having to recompute it in case user drops off
     // and does not finish onboarding flow
     const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
-    const factory = daimoAccountFactoryAddress[baseMainnetClient.chain.id]
+    const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
     const factoryData = encodeCreateAccountData(_publicKey)
     const initCode = concat([factory, factoryData])
     const senderAddress = await getSenderAddress(baseMainnetClient, {

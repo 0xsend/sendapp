@@ -3,8 +3,8 @@ import { expect, test } from '@jest/globals'
 import {
   baseMainnetBundlerClient as bundlerClient,
   baseMainnetClient,
-  daimoAccountFactoryAbi,
-  daimoAccountFactoryAddress,
+  sendAccountFactoryAbi,
+  sendAccountFactoryAddress,
 } from '@my/wagmi'
 import debug from 'debug'
 
@@ -23,7 +23,7 @@ import {
   parseEther,
 } from 'viem'
 
-import { daimoAccountAbi } from '@my/wagmi'
+import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import {
   USEROP_KEY_SLOT,
@@ -40,9 +40,9 @@ import {
 import { numberToBytes } from 'viem'
 import { getSenderAddress, getUserOperationHash, UserOperation } from 'permissionless'
 import nock from 'nock'
-const daimoAccountFactory = getContract({
-  abi: daimoAccountFactoryAbi,
-  address: daimoAccountFactoryAddress[845337], // TODO: use chain id
+const sendAccountFactory = getContract({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress[845337], // TODO: use chain id
   client: baseMainnetClient,
 })
 
@@ -52,7 +52,7 @@ jest.mock('@daimo/expo-passkeys', () => ({
 }))
 
 const signatureStruct = getAbiItem({
-  abi: daimoAccountAbi,
+  abi: sendAccountAbi,
   name: 'signatureStruct',
 }).inputs
 
@@ -63,7 +63,7 @@ async function createAccountAndVerifySignature() {
   const pubKeyDer = await crypto.subtle.exportKey('spki', key.publicKey)
   const pubKeyHex = Buffer.from(pubKeyDer).toString('hex')
 
-  // Daimo account
+  // Send account
   const signer = async (challenge: Hex) => {
     const bChallenge = hexToBytes(challenge)
     const challengeB64URL = base64urlnopad.encode(bChallenge)
@@ -120,7 +120,7 @@ async function createAccountAndVerifySignature() {
   const args = [0, [key1, key2], [], salt] as const
 
   // Simulate user depositing funds to new account
-  const address = await daimoAccountFactory.read.getAddress(args)
+  const address = await sendAccountFactory.read.getAddress(args)
   await testClient.setBalance({
     address: address,
     value: parseEther('1'),
@@ -182,12 +182,12 @@ async function createAccountAndVerifySignature() {
 
 export async function generateUserOp(publicKey: [Hex, Hex]) {
   const senderAddress = await getSenderAddress(baseMainnetClient, {
-    factory: daimoAccountFactory.address,
+    factory: sendAccountFactory.address,
     factoryData: encodeCreateAccountData(publicKey),
     entryPoint: entrypoint.address,
   })
 
-  const address = await daimoAccountFactory.read.getAddress([
+  const address = await sendAccountFactory.read.getAddress([
     USEROP_KEY_SLOT,
     publicKey,
     [],
@@ -199,13 +199,13 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
   }
 
   // GENERATE THE CALLDATA
-  // Finally, we should be able to do a userop from our new Daimo account.
+  // Finally, we should be able to do a userop from our new Send account.
   const to = receiverAccount.address
   const value = parseEther('0.01')
   const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
 
   const callData = encodeFunctionData({
-    abi: daimoAccountAbi,
+    abi: sendAccountAbi,
     functionName: 'executeBatch',
     args: [
       [
@@ -220,7 +220,7 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
   const userOp: UserOperation<'v0.7'> = {
     sender: senderAddress,
     nonce: 0n,
-    factory: daimoAccountFactory.address,
+    factory: sendAccountFactory.address,
     factoryData: encodeCreateAccountData(publicKey),
     callData,
     callGasLimit: 300000n,
@@ -303,8 +303,8 @@ test.skip('can get gas user operation gas prices', async () => {
 //   // Deploy account
 //   const { request } = await baseMainnetClient.simulateContract({
 //     account: dummyAccount,
-//     address: daimoAccountFactoryAddress,
-//     abi: daimoAccountFactoryABI,
+//     address: sendAccountFactoryAddress,
+//     abi: sendAccountFactoryABI,
 //     functionName: 'createAccount',
 //     args: args,
 //     value: 0n,

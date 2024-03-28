@@ -5,7 +5,7 @@ import type {
   Integration,
   Table,
 } from '@indexsupply/shovel-config'
-import { daimoAccountFactoryAddress } from '@my/wagmi'
+import { sendAccountFactoryAddress } from '@my/wagmi'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 
 export const sendAcctFactoryTable: Table = {
@@ -63,7 +63,7 @@ export const integration: Omit<Integration, 'sources'> = {
         column: 'factory',
         filter_op: 'contains',
         filter_arg: [
-          ...new Set(Object.values(daimoAccountFactoryAddress)),
+          ...new Set(Object.values(sendAccountFactoryAddress)),
         ].sort() as `0x${string}`[],
       },
       { name: 'paymaster', type: 'address', indexed: false, column: 'paymaster' },

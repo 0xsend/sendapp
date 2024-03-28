@@ -4,8 +4,8 @@ pragma solidity ^0.8.13;
 import "./BaseSepoliaForkTest.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
-import "../src/DaimoAccountFactory.sol";
-import {DaimoAccount} from "../src/DaimoAccount.sol";
+import "../src/SendAccountFactory.sol";
+import {SendAccount} from "../src/SendAccount.sol";
 import "./Utils.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
@@ -19,8 +19,8 @@ contract AccountSendUseropTest is BaseSepoliaForkTest, WebAuthnTest {
     using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
-    DaimoVerifier public verifier;
-    DaimoAccountFactory public factory;
+    SendVerifier public verifier;
+    SendAccountFactory public factory;
 
     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.Initializable")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant INITIALIZABLE_STORAGE = 0xf0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00;
@@ -28,8 +28,8 @@ contract AccountSendUseropTest is BaseSepoliaForkTest, WebAuthnTest {
     function setUp() public {
         this.createAndSelectFork();
         entryPoint = new EntryPoint();
-        verifier = new DaimoVerifier();
-        factory = new DaimoAccountFactory(entryPoint, verifier);
+        verifier = new SendVerifier();
+        factory = new SendAccountFactory(entryPoint, verifier);
         /* solhint-disable */
         console.log("entryPoint address:", address(entryPoint));
         console.log("factory address:", address(factory));
@@ -39,8 +39,8 @@ contract AccountSendUseropTest is BaseSepoliaForkTest, WebAuthnTest {
     function testSimpleOp() public {
         P256KeyPair memory keyPair = demoP256KeyPair();
         bytes32[2] memory key = [bytes32(keyPair.publicKeyX), bytes32(keyPair.publicKeyY)];
-        DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
-        DaimoAccount acc = factory.createAccount(0, key, calls, 42);
+        SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        SendAccount acc = factory.createAccount(0, key, calls, 42);
         // solhint-disable-next-line
         console.log("new account address:", address(acc));
         vm.deal(address(acc), 1 ether);
@@ -91,7 +91,7 @@ contract AccountSendUseropTest is BaseSepoliaForkTest, WebAuthnTest {
 
         // code coverage can't handle indirect calls
         // call validateUserOp directly
-        DaimoAccount a2 = new DaimoAccount(acc.entryPoint(), acc.verifier());
+        SendAccount a2 = new SendAccount(acc.entryPoint(), acc.verifier());
         vm.store(address(a2), INITIALIZABLE_STORAGE, 0); // set _initialized = 0
         a2.initialize(0, key, calls);
         vm.prank(address(entryPoint));
@@ -102,8 +102,8 @@ contract AccountSendUseropTest is BaseSepoliaForkTest, WebAuthnTest {
     function testValidUntil() public {
         P256KeyPair memory keyPair = demoP256KeyPair();
         bytes32[2] memory key = [bytes32(keyPair.publicKeyX), bytes32(keyPair.publicKeyY)];
-        DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
-        DaimoAccount acc = factory.createAccount(0, key, calls, 42);
+        SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        SendAccount acc = factory.createAccount(0, key, calls, 42);
         // solhint-disable-next-line
         console.log("new account address:", address(acc));
         vm.deal(address(acc), 1 ether);

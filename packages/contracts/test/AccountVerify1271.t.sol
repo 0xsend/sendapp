@@ -4,8 +4,8 @@ pragma solidity ^0.8.13;
 import "./BaseSepoliaForkTest.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
-import "../src/DaimoAccountFactory.sol";
-import "../src/DaimoAccount.sol";
+import "../src/SendAccountFactory.sol";
+import "../src/SendAccount.sol";
 import "./Utils.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
@@ -14,15 +14,15 @@ contract AccountVerify1271Test is BaseSepoliaForkTest {
     using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
-    DaimoVerifier public verifier;
-    DaimoAccountFactory public factory;
-    DaimoAccount public account;
+    SendVerifier public verifier;
+    SendAccountFactory public factory;
+    SendAccount public account;
 
     function setUp() public {
         this.createAndSelectFork();
         entryPoint = new EntryPoint();
-        verifier = new DaimoVerifier();
-        factory = new DaimoAccountFactory(entryPoint, verifier);
+        verifier = new SendVerifier();
+        factory = new SendAccountFactory(entryPoint, verifier);
 
         // Create test account with a single signing key
         uint256[2] memory pubKey = [
@@ -30,7 +30,7 @@ contract AccountVerify1271Test is BaseSepoliaForkTest {
             0x4a7a9e4604aa36898209997288e902ac544a555e4b5e0a9efef2b59233f3f437
         ];
         bytes32[2] memory key = [bytes32(pubKey[0]), bytes32(pubKey[1])];
-        account = factory.createAccount(0, key, new DaimoAccount.Call[](0), 0);
+        account = factory.createAccount(0, key, new SendAccount.Call[](0), 0);
 
         /* solhint-disable */
         console.log("entryPoint address:", address(entryPoint));

@@ -4,8 +4,8 @@ pragma solidity ^0.8.20;
 import {Script, console2} from "forge-std/Script.sol";
 import {Helper} from "../src/Helper.sol";
 
-import {DaimoVerifier, DaimoVerifierProxy} from "../src/DaimoVerifier.sol";
-import "../src/DaimoAccountFactory.sol";
+import {SendVerifier, SendVerifierProxy} from "../src/SendVerifier.sol";
+import "../src/SendAccountFactory.sol";
 
 contract DeploySendAccountFactoryScript is Script, Helper {
     function setUp() public {
@@ -13,19 +13,19 @@ contract DeploySendAccountFactoryScript is Script, Helper {
     }
 
     function run() public {
-        address verifier = vm.computeCreate2Address(0, hashInitCode(type(DaimoVerifier).creationCode));
+        address verifier = vm.computeCreate2Address(0, hashInitCode(type(SendVerifier).creationCode));
         address owner = SEND_DEPLOYER; // FIXME: pick a multisig
-        bytes memory args = abi.encode(verifier, abi.encodeWithSelector(DaimoVerifier.init.selector, owner));
-        address verifierProxy = vm.computeCreate2Address(0, hashInitCode(type(DaimoVerifierProxy).creationCode, args));
+        bytes memory args = abi.encode(verifier, abi.encodeWithSelector(SendVerifier.init.selector, owner));
+        address verifierProxy = vm.computeCreate2Address(0, hashInitCode(type(SendVerifierProxy).creationCode, args));
 
         vm.startBroadcast();
         address factory =
-            address(new DaimoAccountFactory{salt: 0}(IEntryPoint(AA_ENTRY_POINT_V0_7), DaimoVerifier(verifierProxy)));
+            address(new SendAccountFactory{salt: 0}(IEntryPoint(AA_ENTRY_POINT_V0_7), SendVerifier(verifierProxy)));
 
         /* solhint-disable no-console */
-        console2.log("DaimoVerifier address:", verifier);
-        console2.log("DaimoVerifierProxy address:", verifierProxy);
-        console2.log("DaimoAccountFactory address:", factory);
+        console2.log("SendVerifier address:", verifier);
+        console2.log("SendVerifierProxy address:", verifierProxy);
+        console2.log("SendAccountFactory address:", factory);
         vm.stopBroadcast();
     }
 }
