@@ -1,4 +1,4 @@
-import { Button, H2, Nav, Paragraph, ScrollView, type SheetProps, XStack, YStack } from '@my/ui'
+import { Button, Nav, Paragraph, ScrollView, type SheetProps, XStack, YStack } from '@my/ui'
 
 import { useNav } from 'app/routers/params'
 import { IconX } from 'app/components/icons'

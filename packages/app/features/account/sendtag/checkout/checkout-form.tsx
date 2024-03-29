@@ -36,7 +36,6 @@ export const CheckoutForm = () => {
   const form = useForm<z.infer<typeof CheckoutTagSchema>>()
   const supabase = useSupabase()
   const toast = useToastController()
-  const hasConfirmedTags = confirmedTags && confirmedTags.length > 0
   const has5Tags = user?.tags?.length === 5
   const [needsVerification, setNeedsVerification] = React.useState(false)
 

@@ -1,5 +1,4 @@
 import {
-  Sheet,
   Button,
   Nav,
   Paragraph,
@@ -12,7 +11,6 @@ import {
   YStack,
   type YStackProps,
   useMedia,
-  isWeb,
 } from '@my/ui'
 import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'

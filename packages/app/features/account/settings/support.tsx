@@ -1,5 +1,8 @@
 import { Link, Paragraph, XStack, YStack } from '@my/ui'
-import { IconFaq, IconNote } from 'app/components/icons'
+import {
+  // IconFaq,
+  IconNote,
+} from 'app/components/icons'
 
 export const SupportScreen = () => {
   return (
@@ -16,12 +19,12 @@ export const SupportScreen = () => {
             Submit a Request
           </Link>
         </XStack>
-        <XStack ai={'center'} gap={'$3.5'}>
+        {/* <XStack ai={'center'} gap={'$3.5'}>
           <IconFaq color={'$primary'} />
           <Link href={'#'} color={'$primary'}>
             FAQs
           </Link>
-        </XStack>
+        </XStack> */}
       </YStack>
     </YStack>
   )
