@@ -17,45 +17,24 @@ import {
   YStack,
   H6,
 } from '@my/ui'
-import { Info, X } from '@tamagui/lucide-icons'
-import React, { useMemo } from 'react'
+import { Info, X, XCircle } from '@tamagui/lucide-icons'
+import React, { useMemo, useState } from 'react'
 import { getPriceInWei } from './checkout-utils'
 
 import { formatEther } from 'viem'
 import { useUser } from 'app/utils/useUser'
+import { IconInfoGreenCircle } from 'app/components/icons'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const { tags } = useUser()
   const price = useMemo(() => getPriceInWei([{ name }], tags || []), [name, tags])
+  const [isOpen, setIsOpen] = useState(false)
   return (
-    <Dialog modal>
-      <Dialog.Trigger asChild>
-        <Button
-          als="flex-end"
-          maw="$20"
-          chromeless
-          iconAfter={<Info size={'$2'} />}
-          px={0}
-          hoverStyle={{ bc: 'transparent', borderColor: 'transparent' }}
-          pressStyle={{ bc: 'transparent', borderColor: 'transparent' }}
-          // @ts-expect-error tamagui doesn't support this yet
-          type="button"
-        >
-          <ButtonText fontFamily={'$mono'} col={'$color12'} fontSize={'$5'}>
-            {(() => {
-              switch (true) {
-                case name.length === 0:
-                  return 'Pricing'
-                case name.length > 0 && price === BigInt(0):
-                  return 'Free'
-                default:
-                  return `${formatEther(price)} ETH`
-              }
-            })()}
-          </ButtonText>
-        </Button>
+    <Dialog modal onOpenChange={setIsOpen}>
+      <Dialog.Trigger>
+        <SendTagPricingButton isOpen={isOpen} name={name} price={price} />
       </Dialog.Trigger>
-
       <Adapt when="sm" platform="touch">
         <Sheet zIndex={200000} modal dismissOnSnapToBottom disableDrag>
           <Sheet.Frame padding="$4" gap="$4">
@@ -155,52 +134,15 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
     <Tooltip placement="right" delay={0} allowFlip={false} offset={84} onOpenChange={setIsOpen}>
       <XStack pos="relative">
         <Tooltip.Trigger>
-          <Button
-            als="flex-end"
-            maw="$20"
-            chromeless
-            iconAfter={<Info size={'$2'} />}
-            px={0}
-            hoverStyle={{ bc: 'transparent', borderColor: 'transparent', scale: 1.05 }}
-            pressStyle={{
-              bc: 'transparent',
-              borderColor: 'transparent',
-              outlineColor: 'transparent',
-            }}
-            // @ts-expect-error tamagui doesn't support this yet
-            type="button"
-          >
-            <ButtonText fontFamily={'$mono'} col={'$color12'} fontSize={'$5'}>
-              {(() => {
-                switch (true) {
-                  case name.length === 0:
-                    return 'Pricing'
-                  case name.length > 0 && price === BigInt(0):
-                    return 'Free'
-                  default:
-                    return `${formatEther(price)} ETH`
-                }
-              })()}
-            </ButtonText>
-          </Button>
+          <SendTagPricingButton isOpen={isOpen} name={name} price={price} />
         </Tooltip.Trigger>
         {isOpen && (
           <Separator
-            enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-            exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-            animation={[
-              'quick',
-              {
-                opacity: {
-                  overshootClamping: true,
-                },
-              },
-            ]}
             w={68}
             boc={'$color10'}
             borderStyle="dashed"
             pos={'absolute'}
-            right={-72}
+            right={-69}
             top="50%"
             transform="translateY(-50%)"
           />
@@ -227,7 +169,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
         $theme-light={{ bc: '$gray4Light' }}
         p={'$5'}
       >
-        <Tooltip.Arrow $theme-dark={{ boc: '$black' }} $theme-light={{ boc: '$gray4Light' }} />
+        <Tooltip.Arrow $theme-dark={{ bc: '$black' }} $theme-light={{ bc: '$gray4Light' }} />
         <YStack gap="$4">
           <H6
             ta={'left'}
@@ -329,5 +271,48 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
         </YStack>
       </Tooltip.Content>
     </Tooltip>
+  )
+}
+
+const SendTagPricingButton = ({
+  isOpen,
+  name,
+  price,
+}: { isOpen: boolean; name: string; price: bigint }) => {
+  const { resolvedTheme } = useThemeSetting()
+
+  return (
+    <Button
+      als="flex-end"
+      maw="$20"
+      chromeless
+      $theme-dark={{
+        iconAfter: isOpen ? (
+          <XCircle color="$primary" size={'$2'} />
+        ) : (
+          <IconInfoGreenCircle color="$white" size={'$2'} />
+        ),
+      }}
+      $theme-light={{
+        iconAfter: isOpen ? <XCircle color="$black" size={'$2'} /> : <Info size={'$2'} />,
+      }}
+      hoverStyle={{ bc: 'transparent' }}
+      pressStyle={{ bc: 'transparent' }}
+      // @ts-expect-error tamagui doesn't support this yet
+      type="button"
+    >
+      <ButtonText fontFamily={'$mono'} col={'$color12'} fontSize={'$5'}>
+        {(() => {
+          switch (true) {
+            case name.length === 0:
+              return 'Pricing'
+            case name.length > 0 && price === BigInt(0):
+              return 'Free'
+            default:
+              return `${formatEther(price)} ETH`
+          }
+        })()}
+      </ButtonText>
+    </Button>
   )
 }
