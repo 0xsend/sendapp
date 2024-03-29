@@ -49,7 +49,7 @@ export const ReceiveTagScreen = () => {
         </SizableText>
       </XStack>
       <XStack ai={'center'}>
-        <CustomInput placeholder="Name, Send Tag, Phone" />
+        <CustomInput placeholder="Name, Sendtag, Phone" />
         <XStack pos={'absolute'} r={'$3.5'} pe={'none'}>
           <IconSearch />
         </XStack>

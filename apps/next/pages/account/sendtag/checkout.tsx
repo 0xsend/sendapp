@@ -12,7 +12,7 @@ export const Page: NextPageWithLayout = () => {
         <title>/send | Sendtag Checkout</title>
         <meta
           name="description"
-          content="Send Tags simplify transactions by replacing long wallet addresses with memorable identifiers."
+          content="Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers."
           key="desc"
         />
       </Head>

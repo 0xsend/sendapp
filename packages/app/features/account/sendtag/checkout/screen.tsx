@@ -29,7 +29,7 @@ export const CheckoutScreen = () => {
         <YStack f={1} als={'stretch'} h="100%" width="100%">
           <YStack gap="$2" py="$4" pb="$4" mx="auto" width="100%" maw={600}>
             <FormWrapper.Body>
-              <Paragraph>You have already reserved 5 Send Tags.</Paragraph>
+              <Paragraph>You have already reserved 5 Sendtags.</Paragraph>
               {user.tags?.map((tag) => (
                 <YStack key={tag.name} space="$2">
                   <Paragraph fontWeight={'bold'}>{tag.name}</Paragraph>

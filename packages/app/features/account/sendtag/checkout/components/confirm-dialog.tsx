@@ -112,7 +112,7 @@ export function ConfirmDialog({
   useEffect(() => {
     if (!closeable) {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-        if (confirm('You have a pending Send Tag transaction. Are you sure you want to leave?')) {
+        if (confirm('You have a pending Sendtag transaction. Are you sure you want to leave?')) {
           return
         }
         e.preventDefault()
@@ -245,7 +245,7 @@ export function ConfirmDialog({
             setCloseable={setCloseable}
             onConfirmed={onConfirmed}
           >
-            <Dialog.Title size="$8">Confirming Send Tags</Dialog.Title>
+            <Dialog.Title size="$8">Confirming Sendtags</Dialog.Title>
             <AnimatePresence>
               <ConfirmFlow />
             </AnimatePresence>
@@ -266,7 +266,7 @@ export function ConfirmFlow() {
   if (isLoadingTags) {
     return (
       <ConfirmDialogContent>
-        <Dialog.Description>Checking your Send Tags...</Dialog.Description>
+        <Dialog.Description>Checking your Sendtags...</Dialog.Description>
         <Spinner color="$color11" />
       </ConfirmDialogContent>
     )
@@ -276,7 +276,7 @@ export function ConfirmFlow() {
     return (
       <ConfirmDialogContent>
         <Dialog.Description>
-          Please connect your wallet to confirm your Send Tags.
+          Please connect your wallet to confirm your Sendtags.
         </Dialog.Description>
         <Button
           w="100%"
@@ -574,7 +574,7 @@ export function ConfirmWithSignTransaction() {
   if (confirmed) {
     return (
       <ConfirmDialogContent>
-        <Dialog.Description>Send Tags are confirmed.</Dialog.Description>
+        <Dialog.Description>Sendtags are confirmed.</Dialog.Description>
         {txReceipt && (
           <YStack space="$2">
             <Paragraph maw="100%">
@@ -601,7 +601,7 @@ export function ConfirmWithSignTransaction() {
     return (
       <ConfirmDialogContent>
         <Dialog.Description>
-          Pardon the interruption, we are loading your Send Tags...
+          Pardon the interruption, we are loading your Sendtags...
         </Dialog.Description>
         <Spinner color="$color11" />
       </ConfirmDialogContent>
@@ -612,7 +612,7 @@ export function ConfirmWithSignTransaction() {
     return (
       <ConfirmDialogContent>
         <Dialog.Description>
-          You have no Send Tags to confirm. Please add some Send Tags.
+          You have no Sendtags to confirm. Please add some Sendtags.
         </Dialog.Description>
       </ConfirmDialogContent>
     )
@@ -647,7 +647,7 @@ export function ConfirmWithSignTransaction() {
         {!error && (
           <XStack space="$2" jc="center" ai="center">
             {!confirm.isPending && <Paragraph>Awaiting transaction confirmation...</Paragraph>}
-            {submitted && confirm.isPending && <Paragraph>Confirming Send Tags...</Paragraph>}
+            {submitted && confirm.isPending && <Paragraph>Confirming Sendtags...</Paragraph>}
             <Spinner color="$color10" />
           </XStack>
         )}
@@ -741,7 +741,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
   return (
     <ConfirmDialogContent>
       <Dialog.Description>
-        Press Sign Transaction below to confirm your Send Tags and sign the transaction in your
+        Press Sign Transaction below to confirm your Sendtags and sign the transaction in your
         wallet.
       </Dialog.Description>
       <Fieldset gap="$4" horizontal>
@@ -772,7 +772,7 @@ export function ConfirmSendTransaction({ onSent }: { onSent: (tx: `0x${string}`)
               sendRevenueSafeAddress[chainId as keyof typeof sendRevenueSafeAddress]
             }`}
           >
-            Send Tag Safe
+            Sendtag Safe
           </Anchor>
         </Paragraph>
       </Fieldset>

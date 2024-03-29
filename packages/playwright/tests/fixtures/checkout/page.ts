@@ -13,8 +13,8 @@ export class CheckoutPage {
     public readonly page: Page,
     public readonly wallet: Web3ProviderBackend
   ) {
-    this.pricingDialog = page.getByLabel('Send Tag Pricing')
-    this.confirmDialog = page.getByLabel('Confirming Send Tags')
+    this.pricingDialog = page.getByLabel('Sendtag Pricing')
+    this.confirmDialog = page.getByLabel('Confirming Sendtags')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
   }
 

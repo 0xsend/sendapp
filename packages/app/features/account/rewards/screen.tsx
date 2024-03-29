@@ -31,7 +31,7 @@ import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 
-export function EarnTokensScreen() {
+export function RewardsScreen() {
   const { data: distributions, isLoading } = useDistributions()
 
   const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
@@ -250,7 +250,6 @@ const SendBalanceCard = ({
       case snapshotBalance === undefined:
         return 'Error fetching SEND balance'
       default:
-        // @ts-expect-error ts isn't smart enough to know that snapshotBalance is defined
         return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
     }
   }
