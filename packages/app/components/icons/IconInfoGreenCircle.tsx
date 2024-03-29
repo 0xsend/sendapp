@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { Svg, Circle as _Circle, Path } from 'react-native-svg'
 import { themed } from '@tamagui/helpers-icon'
-import { ColorTokens } from '@my/ui'
+import type { ColorTokens } from '@my/ui'
 
 const Icon = (props: IconProps) => {
   const { color = 'black', size = 24, ...otherProps } = props
