@@ -25,7 +25,14 @@ export function SideBarNavLink({
         width={'100%'}
         disabled={props.disabled}
         bg={'transparent'}
-        hoverStyle={{ scale: '105%', opacity: 1, backgroundColor: 'transparent', borderWidth: 0 }}
+        hoverStyle={{
+          position: 'relative',
+          left: '2%',
+          scale: '105%',
+          opacity: 1,
+          backgroundColor: 'transparent',
+          borderWidth: 0,
+        }}
         focusStyle={{
           backgroundColor: 'transparent',
           outlineWidth: 0,
