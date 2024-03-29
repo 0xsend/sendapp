@@ -286,7 +286,7 @@ cmd_button(
         "-c",
         "yarn snaplet:seed",
     ],
-    icon_name = "delete_forever",
+    icon_name = "compost",
     location = location.NAV,
     resource = "supabase",
     text = "snaplet seed",
