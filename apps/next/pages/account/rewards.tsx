@@ -1,4 +1,4 @@
-import { EarnTokensScreen } from 'app/features/account/earn-tokens/screen'
+import { RewardsScreen } from 'app/features/account/rewards/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from 'next-app/pages/_app'
@@ -9,9 +9,9 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>/send | Hold & Earn</title>
+        <title>/send | Send it Rewards</title>
       </Head>
-      <EarnTokensScreen />
+      <RewardsScreen />
     </>
   )
 }
@@ -23,7 +23,9 @@ const subheader =
 
 Page.getLayout = (children) => (
   <HomeLayout
-    TopNav={<TopNav header="Hold & Earn" subheader={subheader} button={ButtonOption.SETTINGS} />}
+    TopNav={
+      <TopNav header="Send it Rewards" subheader={subheader} button={ButtonOption.SETTINGS} />
+    }
   >
     {children}
   </HomeLayout>

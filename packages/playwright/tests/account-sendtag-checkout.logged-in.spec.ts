@@ -61,7 +61,7 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
   expect(tags).toHaveLength(1)
 
   // @todo check that it redirected back
-  // await expect(checkoutPage.page.getByLabel('Send Tags Registered')).toBeVisible()
+  // await expect(checkoutPage.page.getByLabel('Sendtags Registered')).toBeVisible()
   // await expect(checkoutPage.page.getByLabel(`Confirmed Sendtag ${tagName}`)).toBeVisible()
 })
 

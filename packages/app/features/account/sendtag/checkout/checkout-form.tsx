@@ -49,10 +49,10 @@ export const CheckoutForm = () => {
     const { error } = await supabase.from('tags').insert({ name })
 
     if (error) {
-      console.error("Couldn't create Send Tag", error)
+      console.error("Couldn't create Sendtag", error)
       switch (error.code) {
         case '23505':
-          form.setError('name', { type: 'custom', message: 'This Send Tag is already taken' })
+          form.setError('name', { type: 'custom', message: 'This Sendtag is already taken' })
           break
         case 'P0001':
           if (error.message?.includes(`You don't got the riz for the tag:`)) {
@@ -137,7 +137,7 @@ export const CheckoutForm = () => {
                   $theme-dark={{ col: '$gray11Dark' }}
                   py="$3"
                 >
-                  Your Send Tags are not confirmed until payment is received and your wallet is
+                  Your Sendtags are not confirmed until payment is received and your wallet is
                   verified
                 </Paragraph>
                 <XStack btw={1} bbw={1} $theme-dark={{ boc: '$decay' }} p="$2">

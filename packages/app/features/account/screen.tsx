@@ -126,10 +126,10 @@ export function AccountScreen() {
             </XStack>
             <XStack gap={'$5'} $md={{ display: 'none' }}>
               <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-                Send Tags
+                Sendtags
               </BorderedLink>
-              <BorderedLink href={'/account/earn'} Icon={IconDollar}>
-                Earn Tokens
+              <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
+                Rewards
               </BorderedLink>
               <BorderedLink
                 href="/account/settings/edit-profile"
@@ -154,10 +154,10 @@ export function AccountScreen() {
           <ProfileFacts facts={facts} />
           <XStack gap={'$5'} display={'none'} $md={{ display: 'flex' }}>
             <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-              Send Tags
+              Sendtags
             </BorderedLink>
-            <BorderedLink href={'/account/earn'} Icon={IconDollar}>
-              Earn Tokens
+            <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
+              Rewards
             </BorderedLink>
           </XStack>
         </YStack>

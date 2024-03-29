@@ -44,7 +44,7 @@ export const tagRouter = createTRPCRouter({
       const ethAmount = getPriceInWei(pendingTags, confirmedTags)
       const isFree = ethAmount === BigInt(0)
 
-      // transaction validation for rare Send Tags
+      // transaction validation for rare Sendtags
       if (!isFree) {
         if (!txHash) {
           log('transaction hash required')

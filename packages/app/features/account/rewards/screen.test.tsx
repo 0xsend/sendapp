@@ -1,5 +1,5 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
-import { EarnTokensScreen } from './screen'
+import { RewardsScreen } from './screen'
 import { render } from '@testing-library/react-native'
 
 jest.mock('app/utils/useUser')
@@ -69,7 +69,7 @@ describe('EarnTokensScreen', () => {
   it('renders', () => {
     const tree = render(
       <Wrapper>
-        <EarnTokensScreen />
+        <RewardsScreen />
       </Wrapper>
     )
 

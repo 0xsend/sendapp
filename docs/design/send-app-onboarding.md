@@ -5,7 +5,7 @@ Send is a mobile app that allows users to send and receive crypto payments. It i
 - buy, sell, send, and spend Ethereum
 - self-custodial onchain payments (tap to pay)
 - custody of $ETH, $USDT, $USDC, and $SEND only
-- p2p transfers by way of Send Tags not addresses
+- p2p transfers by way of Sendtags not addresses
 
 ## Getting Started
 

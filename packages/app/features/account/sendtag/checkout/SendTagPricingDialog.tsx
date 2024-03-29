@@ -88,9 +88,9 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
           width="100%"
           maw={600}
         >
-          <Dialog.Title>Send Tag Pricing</Dialog.Title>
+          <Dialog.Title>Sendtag Pricing</Dialog.Title>
           <Dialog.Description>
-            Send Tags are priced based on their length. The shorter the Send Tag, the more it costs.
+            Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.
           </Dialog.Description>
           <ScrollView>
             <Section>

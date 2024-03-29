@@ -8,7 +8,7 @@
   - Phone Number
   - Notifications
 - Account
-  - Send Tags
+  - Sendtags
   - Profile
     - Bio
     - PFP

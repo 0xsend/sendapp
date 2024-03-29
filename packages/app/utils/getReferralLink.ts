@@ -12,7 +12,7 @@ export const getReferralHref = (referralCode: string) => {
 }
 
 export const getXPostHref = (referralCode: string) => {
-  return `http://x.com/share?text=Just reserved my $Send Tag&url=${getReferralHref(
+  return `http://x.com/share?text=Just reserved my Sendtag $send&url=${getReferralHref(
     referralCode
   )}&hashtags=send`
 }
