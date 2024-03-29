@@ -16,6 +16,7 @@ import {
   XStack,
   YStack,
   useThemeName,
+  isWeb,
 } from 'tamagui'
 
 type SelectItem = {
@@ -79,7 +80,12 @@ export const CountryCodeField = ({
             br={12}
             borderWidth="$0"
             iconAfter={() => <ChevronDown color="$black" />}
-            space="$2"
+            gap="$2"
+            {...(isWeb
+              ? {
+                  type: 'button',
+                }
+              : {})}
           >
             {country ? (
               <Text
@@ -135,7 +141,7 @@ export const CountryCodeField = ({
 
             <Select.Viewport>
               <XStack>
-                <Select.Group space="$0">
+                <Select.Group gap="$0">
                   <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}>
                     Select Country
                   </Select.Label>

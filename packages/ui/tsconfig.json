@@ -1,6 +1,11 @@
 {
   "extends": "../../tsconfig.base",
-  "include": ["src"],
+  "include": [
+    "src",
+    // dirty hack, but we need somehow included app/utils in the build
+    "../app/utils/country",
+    "../app/utils/useGeoIp"
+  ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx"

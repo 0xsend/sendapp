@@ -8,7 +8,7 @@ import { z } from 'zod'
 
 const SignInSchema = z.object({
   countrycode: formFields.countrycode,
-  phone: formFields.text,
+  phone: formFields.text.min(1).max(20),
 })
 export const SignInForm = () => {
   const form = useForm<z.infer<typeof SignInSchema>>()
