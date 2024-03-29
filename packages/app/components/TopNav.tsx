@@ -111,9 +111,7 @@ export function TopNav({
             {isSubRoute ? (
               <Button
                 onPress={handleBack}
-                $gtLg={{ ai: 'flex-start' }}
                 icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
-                pl="$0"
               />
             ) : (
               <Button
@@ -133,7 +131,8 @@ export function TopNav({
               $theme-light={{ col: '$gray10Light' }}
               $theme-dark={{ col: '$gray8Light' }}
               lineHeight={32}
-              $gtLg={{ ml: '$4' }}
+              $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
+              als={'center'}
             >
               {header}
             </H2>
@@ -171,8 +170,11 @@ function Button(props: ButtonProps) {
       bc="transparent"
       chromeless
       circular
+      jc={'center'}
+      ai={'center'}
       hoverStyle={{
         backgroundColor: 'transparent',
+        borderColor: '$background',
       }}
       pressStyle={{
         backgroundColor: 'transparent',
