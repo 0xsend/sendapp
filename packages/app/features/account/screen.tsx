@@ -30,14 +30,16 @@ import { useNav } from 'app/routers/params'
 import type React from 'react'
 import { type ElementType, useEffect, useState } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { useConfirmedTags } from 'app/utils/tags'
 
 export function AccountScreen() {
   const media = useMedia()
   const toast = useToastController()
-  const { profile, tags } = useUser()
+  const { profile } = useUser()
   const name = profile?.name
   const avatar_url = profile?.avatar_url
-  const sendTags = tags?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
+  const tags = useConfirmedTags()
+  const sendTags = useConfirmedTags()?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
   const refCode = profile?.referral_code ?? ''
   const referralHref = getReferralHref(refCode)
   const [, setNavParam] = useNav()
