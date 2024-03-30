@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Account</title>
+        <title>Send | Account</title>
         <meta
           name="description"
           content="Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers."

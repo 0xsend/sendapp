@@ -10,7 +10,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>Send | Home</title>
       </Head>
       <HomeScreen />
     </>

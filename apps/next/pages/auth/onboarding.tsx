@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   return (
     <>
       <Head>
-        <title>/send | Onboarding</title>
+        <title>Send | Onboarding</title>
       </Head>
       <OnboardingScreen />
     </>

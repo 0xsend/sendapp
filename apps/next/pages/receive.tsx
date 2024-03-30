@@ -7,7 +7,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Receive</title>
+        <title>Send | Receive</title>
         <meta name="description" content="Receive" key="desc" />
       </Head>
       <ReceiveScreen />

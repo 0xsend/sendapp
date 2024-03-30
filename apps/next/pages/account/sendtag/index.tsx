@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>/send | Sendtag</title>
+        <title>Send | Sendtag</title>
         <meta name="description" content={subheader} key="desc" />
       </Head>
       <SendTagScreen />
