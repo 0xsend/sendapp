@@ -1,6 +1,6 @@
 {
-  "name": "/send",
-  "short_name": "/send",
+  "name": "Send",
+  "short_name": "Send",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#40fb50",
-  "background_color": "#40fb50",
+  "theme_color": "#122023",
+  "background_color": "#122023",
   "display": "standalone"
 }
