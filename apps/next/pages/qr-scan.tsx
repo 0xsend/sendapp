@@ -7,7 +7,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>QRScan</title>
+        <title>Send | QRScan</title>
         <meta name="description" content="QRScan" key="desc" />
       </Head>
       <QRScreen />

@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   return (
     <>
       <Head>
-        <title>/send | Sign In</title>
+        <title>Send | Sign In</title>
         <meta name="description" content="Future Cash. Sign in to Send." key="desc" />
       </Head>
       <SignInScreen />

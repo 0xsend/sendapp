@@ -10,7 +10,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Personal Information</title>
+        <title>Send | Personal Information</title>
         <meta name="description" content="Personal Information" key="desc" />
       </Head>
       <PersonalInfoScreen />
