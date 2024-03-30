@@ -47,10 +47,10 @@ function MyApp({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
         <link rel="manifest" href="/favicon/site.webmanifest" />
         <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#122023" />
-        <meta name="msapplication-TileColor" content="#2b5797" />
+        <meta name="msapplication-TileColor" content="#122023" />
         <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#122023" media="(prefers-color-scheme: dark)" />
-        <meta property="og:image" content="https://0xsend.github.io/assets/sendtags.png" />
+        <meta property="og:image" content="https://0xsend.github.io/assets/2024/03/sendtag.png" />
       </Head>
       <NextThemeProvider
         onChangeTheme={(next) => {
