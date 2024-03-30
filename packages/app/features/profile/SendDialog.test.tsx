@@ -1,4 +1,4 @@
-import { jest, describe, test, beforeEach, expect } from '@jest/globals'
+import { describe, test, beforeEach, expect } from '@jest/globals'
 import { act, render, userEvent, screen, waitFor } from '@testing-library/react-native'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { SendDialog } from './SendDialog'
@@ -30,8 +30,11 @@ jest.mock('app/utils/useSendAccountInitCode', () => ({
     error: null,
   }),
 }))
-jest.mock('wagmi')
-
+jest.mock('permissionless', () => ({
+  _esModule: true,
+  ...jest.requireActual('permissionless'),
+  getAccountNonce: jest.fn().mockReturnValue(Promise.resolve(BigInt(0))),
+}))
 describe('SendDialog', () => {
   beforeEach(() => {
     jest.useFakeTimers()
@@ -119,7 +122,6 @@ describe('SendDialog', () => {
       token: '',
       amount: 3500000000000000000n,
       to: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
-      initCode: `0x${'3'.repeat(60)}`,
       nonce: 0n,
     })
   })

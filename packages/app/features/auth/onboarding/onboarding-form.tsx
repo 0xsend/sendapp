@@ -1,57 +1,46 @@
 import { createPasskey } from '@daimo/expo-passkeys'
-import { base16, base64 } from '@scure/base'
-import { assert } from 'app/utils/assert'
-import { base64ToBase16 } from 'app/utils/base64ToBase16'
-import { COSEECDHAtoXY, parseCreateResponse } from 'app/utils/passkeys'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useUser } from 'app/utils/useUser'
-import { encodeCreateAccountData, entrypoint } from 'app/utils/userop'
-import { baseMainnetClient, sendAccountFactoryAddress } from '@my/wagmi'
-import * as Device from 'expo-device'
-import { concat, zeroAddress } from 'viem'
-import { getSenderAddress } from 'permissionless'
 import {
   Anchor,
-  YStack,
+  BigHeading,
+  ButtonText,
+  H3,
+  Paragraph,
+  SubmitButton,
   Theme,
   XStack,
-  SubmitButton,
-  ButtonText,
-  Paragraph,
-  BigHeading,
-  H3,
+  YStack,
 } from '@my/ui'
+import { base16, base64 } from '@scure/base'
+import { TRPCClientError } from '@trpc/client'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { z } from 'zod'
-import { useForm, FormProvider } from 'react-hook-form'
+import { api } from 'app/utils/api'
+import { assert } from 'app/utils/assert'
+import { base64ToBase16 } from 'app/utils/base64ToBase16'
+import { parseCreateResponse } from 'app/utils/passkeys'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { useRouter } from 'solito/router'
 import { useIsClient } from 'app/utils/useIsClient'
+import { useUser } from 'app/utils/useUser'
+import * as Device from 'expo-device'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { z } from 'zod'
 
 const OnboardingSchema = z.object({
   accountName: formFields.text,
 })
 
-/**
- * Create a send account but not onchain, yet.
- */
 export const OnboardingForm = () => {
-  // REMOTE / SUPABASE STATE
-  const supabase = useSupabase()
+  const sendAccountCreate = api.sendAccount.create.useMutation()
   const { user } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
   const { refetch: refetchSendAccounts } = useSendAccounts()
   const { replace } = useRouter()
-
-  // PASSKEY / ACCOUNT CREATION STATE
   const deviceName = Device.deviceName
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
 
-  // TODO: split creating the on-device and remote creation to introduce retries in-case of failures
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     assert(!!user?.id, 'No user id')
-
     const keySlot = 0
     const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
     const [rawCred, authData] = await createPasskey({
@@ -61,47 +50,37 @@ export const OnboardingForm = () => {
       passkeyDisplayTitle: `Send App: ${accountName}`,
     }).then((r) => [r, parseCreateResponse(r)] as const)
 
-    // store the init code in the database to avoid having to recompute it in case user drops off
-    // and does not finish onboarding flow
-    const _publicKey = COSEECDHAtoXY(authData.COSEPublicKey)
-    const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
-    const factoryData = encodeCreateAccountData(_publicKey)
-    const initCode = concat([factory, factoryData])
-    const senderAddress = await getSenderAddress(baseMainnetClient, {
-      factory,
-      factoryData,
-      entryPoint: entrypoint.address,
-    })
-    assert(!!senderAddress, 'No sender address')
-    assert(senderAddress !== zeroAddress, 'Zero sender address')
-    const { error } = await supabase.rpc('create_send_account', {
-      send_account: {
-        address: senderAddress,
-        chain_id: baseMainnetClient.chain.id,
-        init_code: `\\x${initCode.slice(2)}`,
-      },
-      webauthn_credential: {
-        name: passkeyName,
-        display_name: accountName,
-        raw_credential_id: `\\x${base64ToBase16(rawCred.credentialIDB64)}`,
-        public_key: `\\x${base16.encode(authData.COSEPublicKey)}`,
-        sign_count: 0,
-        attestation_object: `\\x${base64ToBase16(rawCred.rawAttestationObjectB64)}`,
-        key_type: 'ES256',
-      },
-      key_slot: keySlot,
-    })
-
-    if (error) {
-      throw error
-    }
-    try {
-      const { data: sendAccts, error: refetchError } = await refetchSendAccounts()
-      if (refetchError) throw refetchError
-      if (sendAccts?.length && sendAccts.length > 0) replace('/')
-    } catch (e) {
-      throw Error(`Sorry something went wrong \n\n ${e}`)
-    }
+    await sendAccountCreate
+      .mutateAsync({
+        accountName,
+        passkeyName,
+        rawCredentialIDB16: base64ToBase16(rawCred.credentialIDB64),
+        cosePublicKeyB16: base16.encode(authData.COSEPublicKey),
+        rawAttestationObjectB16: base64ToBase16(rawCred.rawAttestationObjectB64),
+        keySlot,
+      })
+      .then(async () => {
+        // success refetch accounts to check if account was created
+        const { data: sendAccts, error: refetchError } = await refetchSendAccounts()
+        if (refetchError) throw refetchError
+        if (sendAccts?.length && sendAccts.length > 0) {
+          replace('/')
+          return
+        }
+        form.setError('accountName', {
+          type: 'custom',
+          message: 'Account not created. Please try again.',
+        })
+      })
+      .catch((error) => {
+        console.error('Error creating account', error)
+        if (error instanceof TRPCClientError) {
+          form.setError('accountName', { type: 'custom', message: error.message })
+          return
+        }
+        form.setError('accountName', { type: 'custom', message: error?.message ?? 'Unknown error' })
+        return
+      })
   }
   const isClient = useIsClient()
   if (!isClient) return null
@@ -200,7 +179,7 @@ export const OnboardingForm = () => {
                   Passkey Name
                 </Paragraph>
               </Theme>
-              <YStack space="$4" f={1}>
+              <YStack gap="$4" f={1}>
                 {Object.values(fields)}
                 <Anchor
                   $theme-dark={{

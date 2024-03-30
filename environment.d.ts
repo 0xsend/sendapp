@@ -23,6 +23,14 @@ declare global {
       NEXT_PUBLIC_MAINNET_CHAIN_ID: string
       NEXT_PUBLIC_BASE_CHAIN_ID: string
       SNAPLET_HASH_KEY: string
+      /**
+       * Private key for the Secret Shop wallet client used to fund accounts on testnet and localnet.
+       */
+      SECRET_SHOP_PRIVATE_KEY: string
+      /**
+       * Private key for the Send Account Factory wallet client used to create Send Accounts
+       */
+      SEND_ACCOUNT_FACTORY_PRIVATE_KEY: string
     }
   }
   /**

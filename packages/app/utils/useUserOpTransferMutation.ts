@@ -1,21 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
 import { assert } from './assert'
-import {
-  type Hex,
-  encodeFunctionData,
-  erc20Abi,
-  isAddress,
-  isHex,
-  size,
-  slice,
-  // maxUint256
-} from 'viem'
+import { type Hex, encodeFunctionData, erc20Abi, isAddress } from 'viem'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   sendAccountAbi,
   entryPointAddress,
-  // tokenPaymasterAddress,
+  tokenPaymasterAddress,
 } from '@my/wagmi'
 import { type UserOperation, getUserOperationHash } from 'permissionless'
 import { USEROP_VALID_UNTIL, USEROP_VERSION, signUserOp } from './userop'
@@ -26,7 +17,6 @@ export type UseUserOpTransferMutationArgs = {
   amount: bigint
   to: Hex
   validUntil?: number
-  initCode: Hex
   nonce: bigint
 }
 
@@ -41,7 +31,6 @@ export type UseUserOpTransferMutationArgs = {
  * @param amount The amount to transfer in the smallest unit of the token.
  * @param to The address to transfer to.
  * @param validUntil The valid until timestamp for the user op.
- * @param initCode The init code for the send account or 0x if account is already initialized.
  * @param nonce The nonce for the user op.
  */
 export function useUserOpTransferMutation() {
@@ -52,32 +41,13 @@ export function useUserOpTransferMutation() {
       amount,
       to,
       validUntil = USEROP_VALID_UNTIL,
-      initCode,
       nonce,
     }: UseUserOpTransferMutationArgs) => {
       assert(isAddress(sender), 'Invalid send account address')
       assert(isAddress(to), 'Invalid to address')
       assert(!token || isAddress(token), 'Invalid token address')
-      assert(isHex(initCode), 'Invalid init code')
       assert(typeof amount === 'bigint' && amount > 0n, 'Invalid amount')
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
-
-      if (nonce === 0n) {
-        assert(initCode.length > 2, 'Must provide init code for new account')
-      }
-
-      if (nonce > 0n) {
-        assert(initCode === '0x', 'Init code must be 0x for existing account')
-      }
-
-      // @todo implement gas estimation
-      // @todo implement paymaster and data
-      const chainId = baseMainnetClient.chain.id
-      const entryPoint = entryPointAddress[chainId]
-      // // @ts-expect-error paymaster only deployed on localnet
-      // const paymaster = tokenPaymasterAddress[chainId]
-      // const paymasterVerificationGasLimit = 20000n
-      // const paymasterPostOpGasLimit = 50000n
 
       // GENERATE THE CALLDATA
       let callData: Hex | undefined
@@ -101,16 +71,6 @@ export function useUserOpTransferMutation() {
           functionName: 'executeBatch',
           args: [
             [
-              // approve Paymaster to spend token
-              // {
-              //   dest: token,
-              //   value: 0n,
-              //   data: encodeFunctionData({
-              //     abi: erc20Abi,
-              //     functionName: 'approve',
-              //     args: [paymaster, maxUint256],
-              //   }),
-              // },
               {
                 dest: token,
                 value: 0n,
@@ -125,29 +85,42 @@ export function useUserOpTransferMutation() {
         })
       }
 
+      const gasPrices = await baseMainnetClient.getGasPrice()
+
+      // @todo implement gas estimation
+      // @todo implement paymaster and data
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+      const paymaster = tokenPaymasterAddress[chainId]
+      const paymasterVerificationGasLimit = 500000n
+      const paymasterPostOpGasLimit = 500000n
       const userOp: UserOperation<'v0.7'> = {
         sender,
         nonce,
-        factory: size(initCode) ? slice(initCode, 0, 20) : undefined,
-        factoryData: size(initCode) ? slice(initCode, 20) : undefined,
         callData,
-        callGasLimit: 300000n,
-        verificationGasLimit: 2000000n,
-        preVerificationGas: 3000000n,
-        maxFeePerGas: 1000000n,
-        maxPriorityFeePerGas: 1000000n,
-        paymaster: undefined,
-        // paymaster,
-        paymasterVerificationGasLimit: undefined,
-        // paymasterVerificationGasLimit,
-        paymasterPostOpGasLimit: undefined,
-        // paymasterPostOpGasLimit,
-        paymasterData: undefined,
+        callGasLimit: 100000n,
+        verificationGasLimit: 170000n,
+        preVerificationGas: 50000n,
+        maxFeePerGas: 0n,
+        maxPriorityFeePerGas: 10000000n,
+        // paymaster: undefined,
+        paymaster,
+        // paymasterVerificationGasLimit: undefined,
+        paymasterVerificationGasLimit,
+        // paymasterPostOpGasLimit: undefined,
+        paymasterPostOpGasLimit,
+        // paymasterData: undefined,
         // paymasterData: '0x',
         signature: '0x',
       }
 
-      // console.log('userOp', userOp)
+      const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
+        userOperation: userOp,
+      })
+
+      console.log('userOp', userOp)
+      console.log('gasPrices', gasPrices)
+      console.log('gasEstimate', gasEstimate)
 
       const userOpHash = getUserOperationHash({
         userOperation: userOp,
