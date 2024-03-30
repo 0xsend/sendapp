@@ -24,10 +24,12 @@ jest.mock('@my/wagmi', () => ({
       id: 845337,
     },
     simulateContract: jest.fn().mockResolvedValue({}),
+    getGasPrice: jest.fn().mockReturnValue(Promise.resolve(BigInt(0))),
   },
   baseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
     waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),
+    estimateUserOperationGas: jest.fn().mockReturnValue(Promise.resolve(BigInt(0))),
   },
 }))
 
@@ -40,50 +42,6 @@ describe('useUserOpTransferMutation', () => {
     baseMainnetBundlerClient.waitForUserOperationReceipt.mockReset()
     // @ts-expect-error mock
     signUserOp.mockReset()
-  })
-
-  test('should return error when nonce is greater than 1 when uninitialized account', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 1n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow(
-      'Init code must be 0x for existing account'
-    )
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should return error when nonce is 0 and initCode is not defined when uninitialized account', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: '0x',
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow(
-      'Must provide init code for new account'
-    )
-    await act(async () => {
-      jest.runAllTimers()
-    })
   })
 
   test('should send user op transfer in native currency when no token', async () => {
@@ -113,19 +71,16 @@ describe('useUserOpTransferMutation', () => {
         userOperation: {
           sender: args.sender,
           nonce: args.nonce,
-          factory: slice(args.initCode, 0, 20),
-          factoryData: slice(args.initCode, 20),
           callData,
-          callGasLimit: 300000n,
-          verificationGasLimit: 2000000n,
-          preVerificationGas: 3000000n,
-          maxFeePerGas: 1000000n,
-          maxPriorityFeePerGas: 1000000n,
-          paymaster: undefined,
-          paymasterData: undefined,
-          paymasterPostOpGasLimit: undefined,
-          paymasterVerificationGasLimit: undefined,
+          callGasLimit: 100000n,
+          maxFeePerGas: 0n,
+          maxPriorityFeePerGas: 10000000n,
+          paymaster: '0x60C8bFee4148017F7A1d5141155baA782342A156',
+          paymasterPostOpGasLimit: 500000n,
+          paymasterVerificationGasLimit: 500000n,
+          preVerificationGas: 50000n,
           signature: '0x123',
+          verificationGasLimit: 170000n,
         },
       })
       return Promise.resolve('0x123')
@@ -181,18 +136,15 @@ describe('useUserOpTransferMutation', () => {
         userOperation: {
           sender: args.sender,
           nonce: args.nonce,
-          factory: slice(args.initCode, 0, 20),
-          factoryData: slice(args.initCode, 20),
           callData,
-          callGasLimit: 300000n,
-          verificationGasLimit: 2000000n,
-          preVerificationGas: 3000000n,
-          maxFeePerGas: 1000000n,
-          maxPriorityFeePerGas: 1000000n,
-          paymaster: undefined,
-          paymasterData: undefined,
-          paymasterPostOpGasLimit: undefined,
-          paymasterVerificationGasLimit: undefined,
+          callGasLimit: 100000n,
+          verificationGasLimit: 170000n,
+          maxFeePerGas: 0n,
+          maxPriorityFeePerGas: 10000000n,
+          paymaster: '0x60C8bFee4148017F7A1d5141155baA782342A156',
+          paymasterPostOpGasLimit: 500000n,
+          paymasterVerificationGasLimit: 500000n,
+          preVerificationGas: 50000n,
           signature: '0x123',
         },
       })
@@ -334,27 +286,6 @@ describe('useUserOpTransferMutation', () => {
 
     expect(result.current).toBeDefined()
     expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid to address')
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should return error when initCode is not a valid hex', async () => {
-    // @ts-expect-error mock
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: '123',
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid init code')
     await act(async () => {
       jest.runAllTimers()
     })

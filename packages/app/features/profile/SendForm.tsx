@@ -7,12 +7,13 @@ import { type Hex, formatUnits, parseUnits, isAddress, isHex } from 'viem'
 import { baseMainnet, sendTokenAddress, usdcAddress as usdcAddresses } from '@my/wagmi'
 import { useState } from 'react'
 import type { ProfileProp } from './SendDialog'
-import { useBalance, useTransactionCount } from 'wagmi'
+import { useBalance } from 'wagmi'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountInitCode } from 'app/utils/useSendAccountInitCode'
 import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { assert } from 'app/utils/assert'
 import { Link } from 'solito/link'
+import { useAccountNonce } from 'app/utils/userop'
 
 // @todo add currency field
 const SendFormSchema = z.object({
@@ -40,21 +41,17 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
     chainId: baseMainnet.id,
   })
   // need init code in case this is a new account
-  const {
-    data: initCode,
-    // isSuccess: initCodeIsSuccess,
-    error: initCodeError,
-  } = useSendAccountInitCode({ sendAccount })
+  // const {
+  //   data: initCode,
+  //   // isSuccess: initCodeIsSuccess,
+  //   error: initCodeError,
+  // } = useSendAccountInitCode({ sendAccount })
   // need nonce to send transaction
   const {
     data: nonce,
     // isSuccess: nonceIsSuccess,
     error: nonceError,
-  } = useTransactionCount({
-    address: sendAccount?.address,
-    query: { enabled: !!sendAccount?.address },
-    chainId: baseMainnet.id,
-  })
+  } = useAccountNonce({ sender: sendAccount?.address })
   const {
     mutateAsync: sendUserOp,
     // isPending: isSendUserOpPending,
@@ -65,8 +62,6 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
   async function onSubmit({ token, amount: amountStr }: z.infer<typeof SendFormSchema>) {
     try {
       assert(!!balance, 'Balance is not available')
-      assert(initCodeError === null, `Failed to get init code: ${initCodeError}`)
-      assert(isHex(initCode), 'Init code is not available')
       assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
       assert(nonce !== undefined, 'Nonce is not available')
 
@@ -80,8 +75,7 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         token: token as `0x${string}`,
         amount,
         to: profile.address,
-        initCode,
-        nonce: BigInt(nonce),
+        nonce,
       })
       assert(receipt.success, 'Failed to send user op')
       setSentUserOpTxHash(receipt.receipt.transactionHash)

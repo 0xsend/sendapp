@@ -7,6 +7,9 @@ import {
   entryPointAddress,
   iEntryPointAbi,
   iEntryPointSimulationsAbi,
+  sendTokenAbi,
+  tokenPaymasterAddress,
+  usdcAddress,
 } from '@my/wagmi'
 
 import {
@@ -24,11 +27,14 @@ import {
   numberToBytes,
   isHex,
   publicActions,
+  maxUint256,
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
 import { baseMainnetClient } from './viem'
 import { assert } from './assert'
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { getAccountNonce } from 'permissionless'
 
 // TODO: remove this wallet client and test client
 const privateKey = generatePrivateKey()
@@ -93,12 +99,25 @@ export const USEROP_KEY_SLOT = 0
 export const USEROP_SALT = 0n
 
 export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
+  const initCalls = [
+    // approve USDC to paymaster
+    {
+      dest: usdcAddress[baseMainnetClient.chain.id],
+      value: 0n,
+      data: encodeFunctionData({
+        abi: sendTokenAbi,
+        functionName: 'approve',
+        args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
+      }),
+    },
+  ]
+
   return encodeFunctionData({
     abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],
     args: [
       USEROP_KEY_SLOT, // key slot
       publicKey, // public key
-      [], // init calls
+      initCalls, // init calls
       USEROP_SALT, // salt
     ],
   })
@@ -196,4 +215,17 @@ export async function signUserOp({
     hexToBytes(encodedWebAuthnSig),
   ])
   return bytesToHex(signature)
+}
+
+export function useAccountNonce({ sender }): UseQueryResult<bigint, Error> {
+  return useQuery({
+    queryKey: ['accountNonce', sender],
+    queryFn: async () => {
+      const nonce = await getAccountNonce(baseMainnetClient, {
+        sender,
+        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
+      })
+      return nonce
+    },
+  })
 }
