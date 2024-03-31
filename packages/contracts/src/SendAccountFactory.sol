@@ -17,6 +17,8 @@ contract SendAccountFactory {
     IEntryPoint public immutable entryPoint;
     SendVerifier public immutable verifier;
 
+    event AccountCreated(address indexed account);
+
     constructor(IEntryPoint _entryPoint, SendVerifier _verifier) {
         entryPoint = _entryPoint;
         verifier = _verifier;
@@ -55,6 +57,8 @@ contract SendAccountFactory {
                 )
             )
         );
+
+        emit AccountCreated(address(ret));
     }
 
     /**

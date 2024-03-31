@@ -201,6 +201,22 @@ type Override = {
       name?: string;
     };
   }
+  send_account_created?: {
+    name?: string;
+    fields?: {
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      user_op_hash?: string;
+      tx_hash?: string;
+      account?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+    };
+  }
   send_account_credentials?: {
     name?: string;
     fields?: {
@@ -210,26 +226,6 @@ type Override = {
       created_at?: string;
       send_accounts?: string;
       webauthn_credentials?: string;
-    };
-  }
-  send_account_deployed?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      chain_id?: string;
-      log_addr?: string;
-      block_time?: string;
-      tx_hash?: string;
-      user_op_hash?: string;
-      sender?: string;
-      factory?: string;
-      paymaster?: string;
-      ig_name?: string;
-      src_name?: string;
-      block_num?: string;
-      tx_idx?: string;
-      log_idx?: string;
-      abi_idx?: string;
     };
   }
   send_account_transfers?: {
@@ -527,20 +523,18 @@ export interface Fingerprint {
   supabaseMigrationsSchemaMigrations?: {
 
   }
-  sendAccountCredentials?: {
-    keySlot?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    account?: FingerprintRelationField;
-    credential?: FingerprintRelationField;
-  }
-  sendAccountDeployeds?: {
-    id?: FingerprintNumberField;
+  sendAccountCreateds?: {
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     blockNum?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
-    abiIdx?: FingerprintNumberField;
+  }
+  sendAccountCredentials?: {
+    keySlot?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    account?: FingerprintRelationField;
+    credential?: FingerprintRelationField;
   }
   sendAccountTransfers?: {
     id?: FingerprintNumberField;

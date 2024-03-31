@@ -1,7 +1,7 @@
 import { makeConfig } from '@indexsupply/shovel-config'
 import type { Source, Integration } from '@indexsupply/shovel-config'
 import {
-  sendAccountDeployedIntegration,
+  sendAccountCreatedIntegration,
   sendAccountTransfersIntegration,
   // sendAccountTransactionsIntegration,
   sendTokenTransfersIntegration,
@@ -29,7 +29,7 @@ export const sources: Source[] = [baseSrcBlockHeaders, baseSrcLogs]
 
 export const integrations: Integration[] = [
   {
-    ...sendAccountDeployedIntegration,
+    ...sendAccountCreatedIntegration,
     // @ts-expect-error start is bigint but we will load it from env
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },

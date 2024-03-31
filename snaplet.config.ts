@@ -88,7 +88,7 @@ export default defineConfig({
       send_account_transfers({ row }) {
         return {}
       },
-      send_account_deployed({ row }) {
+      send_account_created({ row }) {
         return {}
       },
       send_token_transfers({ row }) {
