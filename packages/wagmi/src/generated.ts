@@ -2304,6 +2304,12 @@ export const sendAccountFactoryAbi = [
     outputs: [{ name: '', internalType: 'contract SendVerifier', type: 'address' }],
     stateMutability: 'view',
   },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'account', internalType: 'address', type: 'address', indexed: true }],
+    name: 'AccountCreated',
+  },
 ] as const
 
 /**
@@ -2313,7 +2319,7 @@ export const sendAccountFactoryAbi = [
 export const sendAccountFactoryAddress = {
   8453: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745',
   84532: '0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C',
-  845337: '0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C',
+  845337: '0xe4C5EF95e8cDA5DB09393a08E30645F883e187B8',
 } as const
 
 /**
@@ -5984,6 +5990,29 @@ export const prepareWriteSendAccountFactoryCreateAccount = /*#__PURE__*/ createS
   abi: sendAccountFactoryAbi,
   address: sendAccountFactoryAddress,
   functionName: 'createAccount',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const watchSendAccountFactoryEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `eventName` set to `"AccountCreated"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const watchSendAccountFactoryAccountCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+  eventName: 'AccountCreated',
 })
 
 /**
@@ -10231,6 +10260,30 @@ export const useSimulateSendAccountFactoryCreateAccount = /*#__PURE__*/ createUs
   address: sendAccountFactoryAddress,
   functionName: 'createAccount',
 })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountFactoryAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useWatchSendAccountFactoryEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendAccountFactoryAbi,
+  address: sendAccountFactoryAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendAccountFactoryAbi}__ and `eventName` set to `"AccountCreated"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745)
+ * - [__View Contract on Base Sepolia Blockscout__](https://base-sepolia.blockscout.com/address/0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C)
+ */
+export const useWatchSendAccountFactoryAccountCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: sendAccountFactoryAbi,
+    address: sendAccountFactoryAddress,
+    eventName: 'AccountCreated',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendMerkleDropAbi}__

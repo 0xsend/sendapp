@@ -23,7 +23,9 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
+            "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
+            "0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C",
+            "0xe4C5EF95e8cDA5DB09393a08E30645F883e187B8",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -34,39 +36,16 @@ exports[`shovel config 1`] = `
         "anonymous": false,
         "inputs": [
           {
-            "column": "user_op_hash",
+            "column": "account",
             "indexed": true,
-            "name": "userOpHash",
-            "type": "bytes32",
-          },
-          {
-            "column": "sender",
-            "indexed": true,
-            "name": "sender",
-            "type": "address",
-          },
-          {
-            "column": "factory",
-            "filter_arg": [
-              "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
-              "0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C",
-            ],
-            "filter_op": "contains",
-            "indexed": false,
-            "name": "factory",
-            "type": "address",
-          },
-          {
-            "column": "paymaster",
-            "indexed": false,
-            "name": "paymaster",
+            "name": "account",
             "type": "address",
           },
         ],
-        "name": "AccountDeployed",
+        "name": "AccountCreated",
         "type": "event",
       },
-      "name": "send_account_deployed",
+      "name": "send_account_created",
       "sources": [
         {
           "name": "base_logs",
@@ -96,19 +75,11 @@ exports[`shovel config 1`] = `
             "type": "bytea",
           },
           {
-            "name": "sender",
-            "type": "bytea",
-          },
-          {
-            "name": "factory",
-            "type": "bytea",
-          },
-          {
-            "name": "paymaster",
+            "name": "account",
             "type": "bytea",
           },
         ],
-        "name": "send_account_deployed",
+        "name": "send_account_created",
       },
     },
     {
@@ -147,8 +118,8 @@ exports[`shovel config 1`] = `
             "column": "f",
             "filter_op": "contains",
             "filter_ref": {
-              "column": "sender",
-              "integration": "send_account_deployed",
+              "column": "account",
+              "integration": "send_account_created",
             },
             "indexed": true,
             "name": "from",
@@ -158,8 +129,8 @@ exports[`shovel config 1`] = `
             "column": "t",
             "filter_op": "contains",
             "filter_ref": {
-              "column": "sender",
-              "integration": "send_account_deployed",
+              "column": "account",
+              "integration": "send_account_created",
             },
             "indexed": true,
             "name": "to",

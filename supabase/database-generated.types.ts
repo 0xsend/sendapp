@@ -336,6 +336,48 @@ export type Database = {
           },
         ]
       }
+      send_account_created: {
+        Row: {
+          account: string | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          src_name: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+          user_op_hash: string | null
+        }
+        Insert: {
+          account?: string | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          user_op_hash?: string | null
+        }
+        Update: {
+          account?: string | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          user_op_hash?: string | null
+        }
+        Relationships: []
+      }
       send_account_credentials: {
         Row: {
           account_id: string
@@ -371,60 +413,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      send_account_deployed: {
-        Row: {
-          abi_idx: number | null
-          block_num: number | null
-          block_time: number | null
-          chain_id: number | null
-          factory: string | null
-          id: number
-          ig_name: string | null
-          log_addr: string | null
-          log_idx: number | null
-          paymaster: string | null
-          sender: string | null
-          src_name: string | null
-          tx_hash: string | null
-          tx_idx: number | null
-          user_op_hash: string | null
-        }
-        Insert: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          factory?: string | null
-          id?: number
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          paymaster?: string | null
-          sender?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          user_op_hash?: string | null
-        }
-        Update: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          factory?: string | null
-          id?: number
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          paymaster?: string | null
-          sender?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          user_op_hash?: string | null
-        }
-        Relationships: []
       }
       send_account_transfers: {
         Row: {

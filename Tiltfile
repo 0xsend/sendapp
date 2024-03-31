@@ -203,25 +203,8 @@ local_resource(
     ),
 )
 
-local_resource(
-    name = "shovel:test",
-    allow_parallel = True,
-    auto_init = not CI,
-    cmd = "yarn workspace shovel test",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "shovel:generate-config",
-    ],
-    trigger_mode = CI and TRIGGER_MODE_MANUAL or TRIGGER_MODE_AUTO,
-    deps = files_matching(
-        os.path.join("packages", "shovel", "etc"),
-        lambda f: f.endswith(".json"),
-    ),
-)
-
 cmd_button(
-    name = "shovel:update-config",
+    name = "shovel:update-snapshot",
     argv = [
         "/bin/sh",
         "-c",
@@ -278,6 +261,20 @@ cmd_button(
     location = location.NAV,
     resource = "supabase",
     text = "supabase db reset",
+)
+
+cmd_button(
+    "supabase:db migrate",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "bunx supabase db push --local --include-all",
+    ],
+    dir = "supabase",
+    icon_name = "play_arrow",
+    location = location.RESOURCE,
+    resource = "supabase",
+    text = "supabase db migrate",
 )
 
 cmd_button(
@@ -802,6 +799,23 @@ local_resource(
         "contracts:test",
     ],
     deps = contract_files,
+)
+
+local_resource(
+    name = "shovel:test",
+    allow_parallel = True,
+    auto_init = not CI,
+    cmd = "yarn workspace shovel test",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "shovel:generate-config",
+    ],
+    trigger_mode = CI and TRIGGER_MODE_MANUAL or TRIGGER_MODE_AUTO,
+    deps = files_matching(
+        os.path.join("packages", "shovel", "etc"),
+        lambda f: f.endswith(".json"),
+    ),
 )
 
 local_resource(
