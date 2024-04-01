@@ -6,7 +6,7 @@ import 'raf/polyfill'
 import '@my/ui/src/config/fonts.css'
 
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
-import { Provider } from 'app/provider'
+import { Provider } from 'app/provider/index.web'
 import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
