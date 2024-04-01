@@ -10,32 +10,27 @@ Send.it`
 //@todo: should probaby fetch this from db
 export const maxNumSendTags = 5
 
-export function getPriceInWei(pendingTags: { name: string }[], currentTags: Tables<'tags'>[]) {
-  let hasFreeTag = currentTags.length === 0 || currentTags.every((tag) => tag.name.length < 6)
-
+export function getPriceInWei(pendingTags: { name: string }[]) {
   return pendingTags.reduce((acc, { name }) => {
-    const total = acc + tagLengthToWei(name.length, hasFreeTag)
-    if (name.length >= 6) {
-      hasFreeTag = false
-    }
+    const total = acc + tagLengthToWei(name.length)
+
     return total
   }, BigInt(0))
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function tagLengthToWei(length: number, isFree: boolean) {
-  if (length > 6 && isFree) {
-    return BigInt(0)
-  }
+export function tagLengthToWei(length: number) {
   switch (length) {
+    case 5:
+      return parseEther('0.005')
     case 4:
-      return parseEther('0.02')
+      return parseEther('0.01')
     case 3:
     case 2:
     case 1:
-      return parseEther('0.03')
+      return parseEther('0.02')
     default:
-      return parseEther('0.01')
+      return parseEther('0.002')
   }
 }
 

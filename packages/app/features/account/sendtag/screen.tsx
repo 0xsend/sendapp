@@ -30,7 +30,7 @@ export function SendTagScreen() {
   if (isLoading)
     return (
       <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
-        <Spinner color="$color" size="large" />
+        <Spinner color="$primary" size="large" />
       </Stack>
     )
 

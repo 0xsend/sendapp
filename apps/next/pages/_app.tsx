@@ -15,6 +15,7 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 
 import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
+import { baseMainnetClient } from 'app/utils/viem'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -61,7 +62,9 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          <RainbowKitProvider>{getLayout(<Component {...pageProps} />)}</RainbowKitProvider>
+          <RainbowKitProvider initialChain={baseMainnetClient.chain}>
+            {getLayout(<Component {...pageProps} />)}
+          </RainbowKitProvider>
         </Provider>
       </NextThemeProvider>
     </>

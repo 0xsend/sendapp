@@ -6,7 +6,7 @@ import { SafeAreaProvider } from './safe-area'
 import { TamaguiProvider } from './tamagui'
 import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
-import { WagmiProvider } from './wagmi'
+import { WagmiProvider } from 'wagmi'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
@@ -47,10 +47,12 @@ export function Provider({
 }) {
   return (
     <AuthProvider initialSession={initialSession}>
-      <Providers>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </Providers>
+      <WagmiProvider config={config}>
+        <Providers>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Providers>
+      </WagmiProvider>
     </AuthProvider>
   )
 }
@@ -68,7 +70,6 @@ const compose = (providers: React.FC<{ children: React.ReactNode }>[]) =>
   })
 
 const Providers = compose([
-  WagmiProvider,
   UniversalThemeProvider,
   SafeAreaProvider,
   TamaguiProvider,
