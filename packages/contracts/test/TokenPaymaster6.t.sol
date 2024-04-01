@@ -572,8 +572,8 @@ contract TokenPaymaster6Test is Test {
         uint256 addedPostOpCost = maxFeePerGas * 40000;
         uint256 expectedTokenPriceWithMarkup =
             PRICE_DENOM * uint256(initialTokenPrice) / uint256(initialNativeAssetPrice) * 10 / 15;
-        uint256 expectedTokenCharge =
-            (actualGasCostPaymaster + addedPostOpCost) * PRICE_DENOM / expectedTokenPriceWithMarkup + baseFee;
+        uint256 expectedTokenCharge = (actualGasCostPaymaster + addedPostOpCost) * PRICE_DENOM
+            / expectedTokenPriceWithMarkup / 10 ** (18 - token.decimals()) + baseFee;
         uint256 postOpGasCost = actualGasCostEntryPoint - actualGasCostPaymaster;
 
         assertEq(actualTokenChargeEvents, actualTokenCharge + baseFee, "actualTokenChargeEvents != actualTokenCharge");
@@ -668,13 +668,13 @@ contract TokenPaymaster6Test is Test {
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256)) - BASE_FEE_DEFAULT;
         uint256 requiredPrefund = getRequiredPrefund(op) + 40000 * maxFeePerGas; // 40000 is the refundPostopCost
         uint256 preChargeTokenPrice = requiredPrefund * PRICE_DENOM / preChargeTokens;
-        uint256 roundingError = 63461538;
+        uint256 roundingError = 63461843566555608440425194351895; // 0.000000634618436% error
 
         // console2.log("price", price);
         // console2.log("overridePrice", overridePrice);
         // console2.log("preChargeTokenPrice", preChargeTokenPrice);
 
-        assertApproxEqAbs(preChargeTokenPrice, overridePrice, roundingError);
+        assertApproxEqAbs(preChargeTokenPrice, overridePrice * 10 ** (18 - token.decimals()), roundingError);
     }
 
     // should use cached token price if the one supplied by the client is worse
@@ -712,7 +712,12 @@ contract TokenPaymaster6Test is Test {
         // console2.log("overridePrice", overridePrice);
         // console2.log("preChargeTokenPrice", preChargeTokenPrice);
 
-        assertEq(preChargeTokenPrice, price * 10 / 15);
+        assertApproxEqAbs(
+            preChargeTokenPrice,
+            price * 10 / 15 * 10 ** (18 - token.decimals()),
+            333333333333, // 0.33% error
+            "preChargeTokenPrice"
+        );
     }
 
     // should charge the overdraft tokens if the pre-charge ended up lower than the final transaction cost
@@ -788,7 +793,7 @@ contract TokenPaymaster6Test is Test {
         token.sudoApprove(address(account), address(paymaster), type(uint256).max);
 
         vm.startPrank(operator);
-        // Ether price increased 100 times!
+        // Ether price increased 1000 times!
         tokenOracle.setPrice(int256(initialTokenPrice));
         nativeAssetOracle.setPrice(int256(initialNativeAssetPrice * 100));
         vm.stopPrank();
@@ -796,7 +801,11 @@ contract TokenPaymaster6Test is Test {
 
         // Withdraw most of the tokens the account has inside the inner transaction
         PackedUserOperation memory op = fillUserOp(
-            account, userKey, address(token), 0, abi.encodeWithSelector(ERC20.transfer.selector, alice, 0.009 ether)
+            account,
+            userKey,
+            address(token),
+            0,
+            abi.encodeWithSelector(ERC20.transfer.selector, alice, 0.0099999999999 ether)
         );
         // accountGasLimits = verificationGasLimit | callGasLimit
         op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(150000)), bytes16(uint128(62348))));
@@ -824,9 +833,8 @@ contract TokenPaymaster6Test is Test {
         );
 
         (, bytes memory revertReason) = abi.decode(entries[4].data, (uint256, bytes));
-        bytes memory expectedRevertReason = abi.encodeWithSelector(
-            IERC20Errors.ERC20InsufficientBalance.selector, address(account), 3449889999950000, 113483640000000000
-        );
+        bytes memory expectedRevertReason =
+            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, address(account), 43450, 128967);
         assertEq(
             revertReason,
             abi.encodeWithSelector(IEntryPoint.PostOpReverted.selector, expectedRevertReason),
@@ -876,8 +884,9 @@ contract TokenPaymaster6Test is Test {
         );
         (uint256 amountIn, uint256 amountOut,,) = abi.decode(entries[4].data, (uint256, uint256, address, address));
         uint256 deFactoExchangeRate = amountOut / amountIn;
-        uint256 expectedPrice = uint256(initialTokenPrice) / uint256(initialNativeAssetPrice);
-        assertEq(deFactoExchangeRate, expectedPrice, "deFactoExchangeRate");
+        uint256 expectedPrice =
+            uint256(initialTokenPrice) * 10 ** (18 - token.decimals()) / uint256(initialNativeAssetPrice);
+        assertApproxEqAbs(deFactoExchangeRate, expectedPrice, 1003896155, "deFactoExchangeRate");
     }
 
     // @note this test case does not make much sense because it's impossible to approve the tokens before the account exists.
@@ -905,6 +914,97 @@ contract TokenPaymaster6Test is Test {
         submitUserOp(op);
     }
 
+    function testShouldSponserUserOperationExample() external {
+        // use real-life example ETH/USD + USDC/USD
+        vm.startPrank(operator);
+        // [USDC/USD](https://basescan.org/address/0x7e860098f58bbfc8648a4311b374b1d669a2bc6b#readContract#F10)
+        // roundId   uint80 :  18446744073709551865
+        // answer   int256 :  100000642
+        // startedAt   uint256 :  1711975037
+        // updatedAt   uint256 :  1711975037
+        // answeredInRound   uint80 :  18446744073709551865
+        tokenOracle.setPrice(100000642);
+        // [ETH/USD](https://basescan.org/address/0x71041dddad3595f9ced3d8cfbe3d1f4b0a16b2b7#readContract#F10)
+        // roundId   uint80 :  18446744073709587622
+        // answer   int256 :  343902000000
+        // startedAt   uint256 :  1711991445
+        // updatedAt   uint256 :  1711991445
+        // answeredInRound   uint80 :  18446744073709587622
+        nativeAssetOracle.setPrice(343902000000);
+        paymaster.updateCachedPrice(true);
+        vm.stopPrank();
+
+        token.sudoMint(address(account), 10e18);
+        token.sudoApprove(address(account), address(paymaster), 10e18);
+        PackedUserOperation memory op =
+            fillUserOp(account, userKey, address(counter), 0, abi.encodeWithSelector(TestCounter.count.selector));
+        // accountGasLimits = verificationGasLimit | callGasLimit
+        op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(170000)), bytes16(uint128(100000))));
+        op.preVerificationGas = 50000; // should also cover calldata cost.
+        // gasFees = maxFeePerGas | maxPriorityFeePerGas
+        op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(10000000)), bytes16(uint128(10000000))));
+        op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(500000), uint128(500000));
+        op.signature = signUserOp(op, userKey);
+
+        uint256 maxFeePerGas = UserOperationLib.unpackLow128(op.gasFees);
+        vm.fee(maxFeePerGas);
+        vm.txGasPrice(maxFeePerGas);
+        vm.recordLogs();
+        submitUserOp(op);
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+
+        assertEq(entries.length, 5, "entries.length != 5");
+        assertEq(entries[0].topics[0], keccak256("Transfer(address,address,uint256)"), "precharge transfer");
+        assertEq(entries[2].topics[0], keccak256("Transfer(address,address,uint256)"), "postOp transfer");
+        assertEq(entries[3].topics.length, 2, "entries[3].topics.length != 2");
+        assertEq(
+            entries[3].topics[0],
+            keccak256("UserOperationSponsored(address,uint256,uint256,uint256,uint256)"),
+            "UserOperationSponsored"
+        );
+        assertEq(entries[3].topics[1], bytes32(uint256(uint160(address(account)))));
+        assertEq(
+            entries[4].topics[0],
+            keccak256("UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"),
+            "UserOperationEvent"
+        );
+
+        uint256 preChargeTokens = abi.decode(entries[0].data, (uint256));
+        uint256 refundTokens = abi.decode(entries[2].data, (uint256));
+        (uint256 actualTokenCharge, uint256 actualGasCostPaymaster, uint256 actualTokenPriceWithMarkup, uint256 baseFee)
+        = abi.decode(entries[3].data, (uint256, uint256, uint256, uint256));
+        uint256 actualTokenChargeEvents = preChargeTokens - refundTokens;
+        (, bool success, uint256 actualGasCostEntryPoint,) =
+            abi.decode(entries[4].data, (uint256, bool, uint256, uint256));
+        assertEq(success, true, "success");
+        assertEq(token.balanceOf(address(account)), 10e18 - actualTokenCharge - baseFee, "token balance");
+
+        uint256 addedPostOpCost = maxFeePerGas * 40000;
+        uint256 expectedTokenPriceWithMarkup = PRICE_DENOM * uint256(100000642) / uint256(343902000000) * 10 / 15;
+        uint256 expectedTokenCharge = (actualGasCostPaymaster + addedPostOpCost) * PRICE_DENOM
+            / expectedTokenPriceWithMarkup / 10 ** (18 - token.decimals()) + baseFee;
+        uint256 postOpGasCost = actualGasCostEntryPoint - actualGasCostPaymaster;
+
+        assertApproxEqAbs(
+            actualTokenChargeEvents,
+            actualTokenCharge + baseFee,
+            10 ** token.decimals(),
+            "actualTokenChargeEvents != actualTokenCharge"
+        );
+        assertApproxEqAbs(
+            actualTokenChargeEvents,
+            expectedTokenCharge,
+            10 ** token.decimals(),
+            "actualTokenChargeEvents != expectedTokenCharge"
+        );
+        assertEq(
+            actualTokenPriceWithMarkup,
+            expectedTokenPriceWithMarkup,
+            "actualTokenPriceWithMarkup != expectedTokenPriceWithMarkup"
+        );
+        assertApproxEqAbs(postOpGasCost / tx.gasprice, 71836, 20000);
+    }
+
     function getRequiredPrefund(PackedUserOperation memory op) internal pure returns (uint256 requiredPrefund) {
         uint256 verificationGasLimit = uint256(uint128(bytes16(op.accountGasLimits)));
         uint256 callGasLimit = uint256(uint128(uint256(op.accountGasLimits)));
@@ -929,8 +1029,8 @@ contract TokenPaymaster6Test is Test {
         // accountGasLimits = verificationGasLimit | callGasLimit
         op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(150000)), bytes16(uint128(21000))));
         op.preVerificationGas = 21000; // should also cover calldata cost.
-        // gasFees = maxFeePerGas | maxGas
-        op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(0)), bytes16(uint128(1e9))));
+        // gasFees = maxFeePerGas | maxPriorityFeePerGas
+        op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(1e9)), bytes16(uint128(block.basefee + 1e9))));
         op.signature = signUserOp(op, _key);
         return op;
     }
