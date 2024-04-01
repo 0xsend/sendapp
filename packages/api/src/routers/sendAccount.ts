@@ -13,10 +13,24 @@ import { TRPCError } from '@trpc/server'
 import { waitForTransactionReceipt } from '@wagmi/core'
 import { base16Regex } from 'app/utils/base16Regex'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { USEROP_KEY_SLOT, USEROP_SALT, encodeCreateAccountData, entrypoint } from 'app/utils/userop'
+import {
+  USEROP_KEY_SLOT,
+  USEROP_SALT,
+  getSendAccountCreateArgs,
+  entrypoint,
+} from 'app/utils/userop'
 import debug from 'debug'
 import { getSenderAddress } from 'permissionless'
-import { concat, createWalletClient, encodeFunctionData, http, maxUint256, zeroAddress } from 'viem'
+import {
+  concat,
+  createWalletClient,
+  encodeFunctionData,
+  http,
+  maxUint256,
+  zeroAddress,
+  publicActions,
+  getAbiItem,
+} from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
@@ -33,7 +47,7 @@ const sendAccountFactoryClient = createWalletClient({
   account,
   chain: baseMainnet,
   transport: http(baseMainnetClient.transport.url),
-})
+}).extend(publicActions)
 
 export const sendAccountRouter = createTRPCRouter({
   create: protectedProcedure
@@ -62,7 +76,10 @@ export const sendAccountRouter = createTRPCRouter({
       }) => {
         const xyPubKey = COSEECDHAtoXY(base16.decode(cosePublicKeyB16))
         const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
-        const factoryData = encodeCreateAccountData(xyPubKey)
+        const factoryData = encodeFunctionData({
+          abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],
+          args: getSendAccountCreateArgs(xyPubKey),
+        })
         const initCode = concat([factory, factoryData])
         const senderAddress = await getSenderAddress(baseMainnetClient, {
           factory,
@@ -133,22 +150,20 @@ export const sendAccountRouter = createTRPCRouter({
         ]
 
         log('initCalls', initCalls)
-
-        const hash = await sendAccountFactoryClient.sendTransaction({
-          to: sendAccountFactoryAddress[baseMainnetClient.chain.id],
+        const { request } = await sendAccountFactoryClient.simulateContract({
+          address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
+          abi: sendAccountFactoryAbi,
+          functionName: 'createAccount',
+          args: [
+            USEROP_KEY_SLOT, // key slot
+            xyPubKey, // public key
+            initCalls, // init calls
+            USEROP_SALT, // salt
+          ],
           value: 0n,
-          data: encodeFunctionData({
-            abi: sendAccountFactoryAbi,
-            functionName: 'createAccount',
-            args: [
-              USEROP_KEY_SLOT, // key slot
-              xyPubKey, // public key
-              initCalls, // init calls
-              USEROP_SALT, // salt
-            ],
-          }),
-          chainId: baseMainnetClient.chain.id,
         })
+
+        const hash = await sendAccountFactoryClient.writeContract(request)
 
         log('hash', hash)
 

@@ -1,48 +1,64 @@
 import { expect, test } from '@jest/globals'
 
 import {
-  baseMainnetBundlerClient as bundlerClient,
   baseMainnetClient,
+  baseMainnetBundlerClient as bundlerClient,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
+  sendTokenAbi,
+  tokenPaymasterAbi,
+  tokenPaymasterAddress,
+  usdcAddress,
 } from '@my/wagmi'
 import debug from 'debug'
-
-const log = debug('app:features:onboarding:screen')
 import crypto from 'node:crypto'
 import {
-  type Hex,
   bytesToHex,
   concat,
+  createWalletClient,
   encodeAbiParameters,
   encodeFunctionData,
-  formatEther,
+  erc20Abi,
+  formatUnits,
   getAbiItem,
   getContract,
   hexToBytes,
-  parseEther,
+  http,
+  maxUint256,
+  type Account,
+  type Hex,
+  type PublicClient,
+  type WalletClient,
 } from 'viem'
+
+const log = debug('app:features:onboarding:screen')
+
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
+import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import {
-  USEROP_KEY_SLOT,
-  USEROP_SALT,
   USEROP_VALID_UNTIL,
   USEROP_VERSION,
-  encodeCreateAccountData,
   entrypoint,
   generateChallenge,
-  receiverAccount,
+  getSendAccountCreateArgs,
   testClient,
   verifier,
 } from 'app/utils/userop'
-import { numberToBytes } from 'viem'
-import { getSenderAddress, getUserOperationHash, type UserOperation } from 'permissionless'
 import nock from 'nock'
+import {
+  getRequiredPrefund,
+  getSenderAddress,
+  getUserOperationHash,
+  type UserOperation,
+} from 'permissionless'
+import { numberToBytes } from 'viem'
+
 const sendAccountFactory = getContract({
+  address: sendAccountFactoryAddress[baseMainnetClient.chain.id],
   abi: sendAccountFactoryAbi,
-  address: sendAccountFactoryAddress[845337], // TODO: use chain id
   client: baseMainnetClient,
 })
 
@@ -114,21 +130,65 @@ async function createAccountAndVerifySignature() {
     throw new Error('Invalid public key, wrong length')
   }
 
+  const keyslot = 0
   const key1 = `0x${pubKey.subarray(0, 32).toString('hex')}` as Hex
   const key2 = `0x${pubKey.subarray(32).toString('hex')}` as Hex
   const salt = 0n
-  const args = [0, [key1, key2], [], salt] as const
+  const initCalls = [
+    // approve USDC to paymaster
+    {
+      dest: usdcAddress[baseMainnetClient.chain.id],
+      value: 0n,
+      data: encodeFunctionData({
+        abi: sendTokenAbi,
+        functionName: 'approve',
+        args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
+      }),
+    },
+  ]
+  const args = [keyslot, [key1, key2], initCalls, salt] as const
 
   // Simulate user depositing funds to new account
   const address = await sendAccountFactory.read.getAddress(args)
-  await testClient.setBalance({
-    address: address,
-    value: parseEther('1'),
+  log('address', address)
+  // await testClient.setBalance({
+  //   address: address,
+  //   value: parseEther('1'),
+  // })
+  // expect(await baseMainnetClient.getBalance({ address })).toBe(parseEther('1'))
+
+  // console.log('[API] Faucet deposit prefund')
+  // const depositTxHash = await walletClient.writeContract({
+  //   address: entrypoint.address,
+  //   abi: iEntryPointAbi,
+  //   functionName: 'depositTo',
+  //   args: [address],
+  //   value: parseEther('1'), // 0.01 ETH
+  // })
+  // console.log(`[API] Faucet deposited prefund: ${depositTxHash}`)
+  // await waitForTx(baseMainnetClient as PublicClient, depositTxHash)
+
+  // Deploy account
+  const { request } = await baseMainnetClient.simulateContract({
+    account: sendAccountFactoryAccount,
+    address: sendAccountFactoryAddress[baseMainnetClient.chain.id],
+    abi: sendAccountFactoryAbi,
+    functionName: 'createAccount',
+    args: args,
+    value: 0n,
   })
+  const hash = await walletClient.writeContract(request)
+  console.log(`[API] deploy transaction ${hash}`)
+  const tx = await baseMainnetClient.waitForTransactionReceipt({ hash, confirmations: 3 })
+  console.log(`[API] deploy transaction ${tx.status}`)
 
-  expect(await baseMainnetClient.getBalance({ address })).toBe(parseEther('1'))
-
-  // await deployAccount(args, publicClient, addr)
+  // fund with USDC
+  await setERC20Balance({
+    client: testClient,
+    tokenAddress: usdcAddress[baseMainnetClient.chain.id],
+    address: address,
+    value: BigInt(100e6), // 100 USDC
+  })
 
   const { userOp, userOpHash } = await generateUserOp([key1, key2])
 
@@ -181,59 +241,125 @@ async function createAccountAndVerifySignature() {
 }
 
 export async function generateUserOp(publicKey: [Hex, Hex]) {
+  const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
+  const factoryData = encodeFunctionData({
+    abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],
+    args: getSendAccountCreateArgs(publicKey),
+  })
   const senderAddress = await getSenderAddress(baseMainnetClient, {
-    factory: sendAccountFactory.address,
-    factoryData: encodeCreateAccountData(publicKey),
+    factory,
+    factoryData,
     entryPoint: entrypoint.address,
   })
 
-  const address = await sendAccountFactory.read.getAddress([
-    USEROP_KEY_SLOT,
-    publicKey,
-    [],
-    USEROP_SALT,
-  ])
-
-  if (address !== senderAddress) {
-    throw new Error('Address mismatch')
-  }
+  log('senderAddress', senderAddress)
 
   // GENERATE THE CALLDATA
   // Finally, we should be able to do a userop from our new Send account.
   const to = receiverAccount.address
-  const value = parseEther('0.01')
-  const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
 
+  // eth transfer calldata
+  // const value = parseEther('0.01')
+  // const data: Hex = '0x68656c6c6f' // "hello" encoded to utf-8 bytes
+  // const callData = encodeFunctionData({
+  //   abi: sendAccountAbi,
+  //   functionName: 'executeBatch',
+  //   args: [
+  //     [
+  //       {
+  //         dest: to,
+  //         value: value,
+  //         data: data,
+  //       },
+  //     ],
+  //   ],
+  // })
+
+  // usdc transfer calldata
   const callData = encodeFunctionData({
     abi: sendAccountAbi,
     functionName: 'executeBatch',
     args: [
       [
         {
-          dest: to,
-          value: value,
-          data: data,
+          dest: usdcAddress[baseMainnetClient.chain.id],
+          value: 0n,
+          data: encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'transfer',
+            args: [to, BigInt(1e6)],
+          }),
         },
       ],
     ],
   })
+  const paymaster = tokenPaymasterAddress[baseMainnetClient.chain.id]
+  const paymasterVerificationGasLimit = 500000n
+  const paymasterPostOpGasLimit = 500000n
   const userOp: UserOperation<'v0.7'> = {
     sender: senderAddress,
     nonce: 0n,
-    factory: sendAccountFactory.address,
-    factoryData: encodeCreateAccountData(publicKey),
+    // factory,
+    // factoryData,
     callData,
-    callGasLimit: 300000n,
-    verificationGasLimit: 700000n,
-    preVerificationGas: 300000n,
-    maxFeePerGas: 1000000n,
-    maxPriorityFeePerGas: 1000000n,
-    paymaster: undefined,
-    paymasterData: undefined,
-    paymasterPostOpGasLimit: undefined,
-    paymasterVerificationGasLimit: undefined,
+    callGasLimit: 100000n,
+    verificationGasLimit: 170000n,
+    preVerificationGas: 50000n,
+    maxFeePerGas: 10000000n,
+    maxPriorityFeePerGas: 10000000n,
+    paymaster,
+    paymasterVerificationGasLimit,
+    paymasterPostOpGasLimit,
     signature: '0x',
   }
+
+  const requiredPreFund = getRequiredPrefund({
+    userOperation: userOp,
+    entryPoint: entrypoint.address,
+  })
+  log('requiredPreFund', requiredPreFund)
+
+  // calculate the required usdc balance
+  const [priceMarkup, minEntryPointBalance, refundPostopCost, priceMaxAge, baseFee] =
+    await baseMainnetClient.readContract({
+      address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+      abi: tokenPaymasterAbi,
+      functionName: 'tokenPaymasterConfig',
+      args: [],
+    })
+  log(
+    'paymasterConfig',
+    'priceMarkup=',
+    priceMarkup,
+    'minEntryPointBalance=',
+    minEntryPointBalance,
+    'refundPostopCost=',
+    refundPostopCost,
+    'priceMaxAge=',
+    priceMaxAge,
+    'baseFee=',
+    baseFee
+  )
+  const cachedPrice = await baseMainnetClient.readContract({
+    address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+    abi: tokenPaymasterAbi,
+    functionName: 'cachedPrice',
+    args: [],
+  })
+  log('cachedPrice', cachedPrice)
+
+  const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * userOp.maxFeePerGas
+  log('preChargeNative', preChargeNative)
+  const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
+  log('cachedPriceWithMarkup', cachedPriceWithMarkup)
+
+  const requiredUsdcBalance = await baseMainnetClient.readContract({
+    address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+    abi: tokenPaymasterAbi,
+    functionName: 'weiToToken',
+    args: [preChargeNative, cachedPriceWithMarkup],
+  })
+  log('requiredUsdcBalance', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
 
   // get userop hash
   const userOpHash = getUserOperationHash({
@@ -247,6 +373,15 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
   }
 }
 
+let sendAccountFactoryAccount: Account
+const receiverAccount = privateKeyToAccount(generatePrivateKey())
+type walletClientType = WalletClient<
+  ReturnType<typeof http>,
+  typeof baseMainnetClient.chain,
+  Account
+>
+let walletClient: walletClientType
+
 beforeEach(async () => {
   nock.enableNetConnect()
 })
@@ -256,13 +391,34 @@ afterEach(async () => {
   nock.disableNetConnect()
 })
 
-test.skip('can create a new account', async () => {
+test('can create a new account', async () => {
+  sendAccountFactoryAccount = privateKeyToAccount(
+    process.env.SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
+  )
+  walletClient = createWalletClient({
+    chain: baseMainnetClient.chain,
+    transport: http(baseMainnetClient.transport.url),
+    account: sendAccountFactoryAccount,
+  })
   const { userOp } = await createAccountAndVerifySignature()
-  // submit userop
   const _userOpHash = await bundlerClient.sendUserOperation({ userOperation: userOp })
-  const senderBalA = await baseMainnetClient.getBalance({ address: userOp.sender })
-  const receiverBalA = await baseMainnetClient.getBalance({
-    address: receiverAccount.address,
+  //   const senderBalA = await baseMainnetClient.getBalance({
+  //     address: userOp.sender,
+  // })
+  const senderBalA = await baseMainnetClient.readContract({
+    address: usdcAddress[baseMainnetClient.chain.id],
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [userOp.sender],
+  })
+  // const receiverBalA = await baseMainnetClient.getBalance({
+  //   address: receiverAccount.address,
+  // })
+  const receiverBalA = await baseMainnetClient.readContract({
+    address: usdcAddress[baseMainnetClient.chain.id],
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [receiverAccount.address],
   })
 
   const userOpReceipt = await bundlerClient.waitForUserOperationReceipt({ hash: _userOpHash })
@@ -270,15 +426,28 @@ test.skip('can create a new account', async () => {
     hash: userOpReceipt.receipt.transactionHash,
   })
 
-  const senderBalB = await baseMainnetClient.getBalance({ address: userOp.sender })
-  const receiverBaB = await baseMainnetClient.getBalance({
-    address: receiverAccount.address,
+  // const senderBalB = await baseMainnetClient.getBalance({ address: userOp.sender })
+  const senderBalB = await baseMainnetClient.readContract({
+    address: usdcAddress[baseMainnetClient.chain.id],
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [userOp.sender],
+  })
+  // const receiverBaB = await baseMainnetClient.getBalance({
+  //   address: receiverAccount.address,
+  // })
+  const receiverBaB = await baseMainnetClient.readContract({
+    address: usdcAddress[baseMainnetClient.chain.id],
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: [receiverAccount.address],
   })
 
   expect(txReceipt.status).toBe('success')
+  expect(userOpReceipt.success).toBe(true)
   expect(senderBalB).toBeLessThan(senderBalA)
   expect(receiverBaB).toBeGreaterThan(receiverBalA)
-  expect(formatEther(receiverBaB - receiverBalA)).toBe('0.01')
+  expect(formatUnits(receiverBaB - receiverBalA, 6)).toBe('1')
 }, 30_000)
 
 test.skip('can create a new account with bundler', async () => {
@@ -294,42 +463,11 @@ test.skip('can get gas user operation gas prices', async () => {
   log('gasPrice', gasPrice)
 })
 
-// async function deployAccount(args: , publicClient, addr: string) {
-//   await testClient.setBalance({
-//     address: dummyAccount.address,
-//     value: parseEther('100'),
-//   })
-
-//   // Deploy account
-//   const { request } = await baseMainnetClient.simulateContract({
-//     account: dummyAccount,
-//     address: sendAccountFactoryAddress,
-//     abi: sendAccountFactoryABI,
-//     functionName: 'createAccount',
-//     args: args,
-//     value: 0n,
-//   })
-//   const hash = await walletClient.writeContract(request)
-//   console.log(`[API] deploy transaction ${hash}`)
-//   const tx = await publicClient.waitForTransactionReceipt({ hash, confirmations: 3 })
-//   console.log(`[API] deploy transaction ${tx.status}`)
-
-//   const depositTxHash = await walletClient.writeContract({
-//     address: entrypoint.address,
-//     abi: iEntryPointAbi,
-//     functionName: 'depositTo',
-//     args: [addr],
-//     value: parseEther('1'), // 0.01 ETH
-//   })
-//   console.log(`Faucet deposited prefund: ${depositTxHash}`)
-//   await waitForTx(publicClient as PublicClient, depositTxHash)
-// }
-
 // async function waitForTx(publicClient: PublicClient, hash: Hex) {
 //   const receipt = await publicClient.waitForTransactionReceipt({
 //     hash,
 //     timeout: 30000,
-//     confirmations: 3,
+//     // confirmations: 3,
 //   })
 //   console.log(`...status: ${receipt.status}`)
 // }

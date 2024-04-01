@@ -3322,6 +3322,13 @@ export const tokenPaymasterAbi = [
   {
     type: 'function',
     inputs: [],
+    name: 'tokenDecimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
     name: 'tokenPaymasterConfig',
     outputs: [
       { name: 'priceMarkup', internalType: 'uint256', type: 'uint256' },
@@ -3340,7 +3347,7 @@ export const tokenPaymasterAbi = [
     ],
     name: 'tokenToWei',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure',
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -3412,7 +3419,14 @@ export const tokenPaymasterAbi = [
     ],
     name: 'weiToToken',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'pure',
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'wethDecimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -3624,7 +3638,7 @@ export const tokenPaymasterAbi = [
  *
  */
 export const tokenPaymasterAddress = {
-  845337: '0x60C8bFee4148017F7A1d5141155baA782342A156',
+  845337: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
 } as const
 
 /**
@@ -7199,6 +7213,17 @@ export const readTokenPaymasterToken = /*#__PURE__*/ createReadContract({
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenDecimals"`
+ *
+ *
+ */
+export const readTokenPaymasterTokenDecimals = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'tokenDecimals',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenPaymasterConfig"`
  *
  *
@@ -7251,6 +7276,17 @@ export const readTokenPaymasterWeiToToken = /*#__PURE__*/ createReadContract({
   abi: tokenPaymasterAbi,
   address: tokenPaymasterAddress,
   functionName: 'weiToToken',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"wethDecimals"`
+ *
+ *
+ */
+export const readTokenPaymasterWethDecimals = /*#__PURE__*/ createReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'wethDecimals',
 })
 
 /**
@@ -11471,6 +11507,17 @@ export const useReadTokenPaymasterToken = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenDecimals"`
+ *
+ *
+ */
+export const useReadTokenPaymasterTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'tokenDecimals',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"tokenPaymasterConfig"`
  *
  *
@@ -11523,6 +11570,17 @@ export const useReadTokenPaymasterWeiToToken = /*#__PURE__*/ createUseReadContra
   abi: tokenPaymasterAbi,
   address: tokenPaymasterAddress,
   functionName: 'weiToToken',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"wethDecimals"`
+ *
+ *
+ */
+export const useReadTokenPaymasterWethDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: tokenPaymasterAbi,
+  address: tokenPaymasterAddress,
+  functionName: 'wethDecimals',
 })
 
 /**
