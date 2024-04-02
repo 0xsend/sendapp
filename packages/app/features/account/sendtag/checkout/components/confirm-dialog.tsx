@@ -23,7 +23,7 @@ import { baseMainnet, type baseMainnetClient, sendRevenueSafeAddress } from '@my
 import { CheckCircle, X } from '@tamagui/lucide-icons'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'
-import { getXPostHref } from 'app/utils/getReferralLink'
+import { getXPostHref } from 'app/utils/getLink'
 import { shorten } from 'app/utils/strings'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
