@@ -237,6 +237,7 @@ export type Database = {
           is_public: boolean | null
           name: string | null
           referral_code: string | null
+          send_id: number | null
         }
         Insert: {
           about?: string | null
@@ -245,6 +246,7 @@ export type Database = {
           is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
+          send_id?: number | null
         }
         Update: {
           about?: string | null
@@ -253,6 +255,7 @@ export type Database = {
           is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
+          send_id?: number | null
         }
         Relationships: [
           {

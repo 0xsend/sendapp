@@ -1,6 +1,6 @@
 import { getBaseUrl } from './getBaseUrl'
 
-export const getReferralHref = (referralCode: string) => {
+export const getShareableLink = (linkType: string, Code: string) => {
   let baseUrl = getBaseUrl()
 
   if (!baseUrl && typeof window !== 'undefined') {
@@ -8,11 +8,12 @@ export const getReferralHref = (referralCode: string) => {
     baseUrl = `${protocol}//${hostname}${port ? `:${port}` : ''}`
   }
 
-  return `${baseUrl}/?referral=${referralCode}`
+  return `${baseUrl}/${linkType}/${Code}`
 }
 
 export const getXPostHref = (referralCode: string) => {
-  return `http://x.com/share?text=Just reserved my Sendtag $send&url=${getReferralHref(
+  return `http://x.com/share?text=Just reserved my Sendtag $send&url=${getShareableLink(
+    'referrer',
     referralCode
   )}&hashtags=send`
 }

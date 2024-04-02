@@ -8,7 +8,8 @@ create or replace function public.profile_lookup(tag text)
     tag_name citext,
     address citext,
     chain_id integer,
-    is_public boolean)
+    is_public boolean,
+    send_id integer)
   language plpgsql
   immutable
   security definer
@@ -23,6 +24,7 @@ begin
     p.name::text as name,
     p.about::text as about,
     p.referral_code as referral_code,
+    p.send_id as send_id,
     t.name as tag_name,
     sa.address as address,
     sa.chain_id as chain_id,

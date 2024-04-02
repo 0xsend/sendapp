@@ -159,6 +159,7 @@ type Override = {
       about?: string;
       referral_code?: string;
       is_public?: string;
+      send_id?: number;
       users?: string;
       referrals_referrals_referred_idToprofiles?: string;
       referrals_referrals_referrer_idToprofiles?: string;
@@ -504,6 +505,7 @@ export interface Fingerprint {
     bucket?: FingerprintRelationField;
   }
   profiles?: {
+    sendId?: FingerprintNumberField;
     i?: FingerprintRelationField;
     referralsByReferredId?: FingerprintRelationField;
     referralsByReferrerId?: FingerprintRelationField;

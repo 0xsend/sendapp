@@ -22,7 +22,7 @@ import {
   IconPlus,
   IconShare,
 } from 'app/components/icons'
-import { getReferralHref } from 'app/utils/getReferralLink'
+import { getShareableLink } from 'app/utils/getLink'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
@@ -37,11 +37,13 @@ export function AccountScreen() {
   const toast = useToastController()
   const { profile } = useUser()
   const name = profile?.name
+  const send_id = profile?.send_id ?? ''
   const avatar_url = profile?.avatar_url
   const tags = useConfirmedTags()
   const sendTags = useConfirmedTags()?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
   const refCode = profile?.referral_code ?? ''
-  const referralHref = getReferralHref(refCode)
+  const referralHref = getShareableLink('referral', refCode)
+  const sendidHref = getShareableLink('send_id', send_id.toString())
   const [, setNavParam] = useNav()
   const [canShare, setCanShare] = useState(false)
 
@@ -53,16 +55,16 @@ export function AccountScreen() {
     canShare()
   }, [])
 
-  const shareOrCopyOnPress = async () => {
+  const shareOrCopyOnPress = async (linkType, sharedLink) => {
     if (canShare) {
-      return await Sharing.shareAsync(referralHref)
+      return await Sharing.shareAsync(sharedLink)
     }
 
-    await Clipboard.setStringAsync(referralHref)
-      .then(() => toast.show('Copied your referral link to the clipboard'))
+    await Clipboard.setStringAsync(sharedLink)
+      .then(() => toast.show(`Copied your ${linkType} link to the clipboard`))
       .catch(() =>
         toast.show('Something went wrong', {
-          message: 'We were unable to copy your referral link to the clipboard',
+          message: `We were unable to copy your ${linkType} link to the clipboard`,
           customData: {
             theme: 'error',
           },
@@ -71,7 +73,34 @@ export function AccountScreen() {
   }
 
   const facts = [
-    { label: 'Name', value: name },
+    {
+      label: 'Send ID',
+      value: (
+        <TooltipSimple label={canShare ? 'Share' : 'Copy'}>
+          <Button
+            accessibilityLabel={canShare ? 'Share' : 'Copy'}
+            f={1}
+            fd="row"
+            unstyled
+            onPress={() => shareOrCopyOnPress('send ID', sendidHref)}
+            color="$color12"
+            iconAfter={
+              canShare ? (
+                <Theme name="accent">
+                  <IconShare color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
+                </Theme>
+              ) : (
+                <Theme name="accent">
+                  <IconCopy color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
+                </Theme>
+              )
+            }
+          >
+            <Button.Text>{send_id}</Button.Text>
+          </Button>
+        </TooltipSimple>
+      ),
+    },
     { label: 'Sendtags', value: sendTags },
     {
       label: 'Referral Code',
@@ -82,7 +111,7 @@ export function AccountScreen() {
             f={1}
             fd="row"
             unstyled
-            onPress={shareOrCopyOnPress}
+            onPress={() => shareOrCopyOnPress('referral', referralHref)}
             color="$color12"
             iconAfter={
               canShare ? (
