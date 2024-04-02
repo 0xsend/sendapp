@@ -142,6 +142,20 @@ tilt up
 
 This command will start all the services defined in the [Tiltfile](/Tiltfile), building and deploying your application in a local development environment.
 
+##### Efficient Tilt Usage
+
+Running `tilt up` will start all services defined in the [Tiltfile](/Tiltfile), building and deploying your application in a local development environment. This command will also start a local Postgres database, Supabase, local Ethereum node, and local Base node. It also starts the unit tests for the application.
+
+To save some resources on your local machine, you can limit the amount of resources used by Tilt by specifying them on the command line or disabling them in the [Tilt UI](http://localhost:10350).
+
+This command for example will only start the Next.js web app and it's dependencies:
+
+```console
+tilt up next:web
+```
+
+You can always re-enable the disabled resources by re-running the `tilt up` command or manually enabling them in the [Tilt UI](http://localhost:10350).
+
 #### 2. Monitoring and Logs
 
 You can monitor the build process and access logs directly through the Tilt UI. Simply navigate to `http://localhost:10350` in your web browser to view the status of your services.
