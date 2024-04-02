@@ -115,7 +115,7 @@ export function HomeScreen() {
         <XStack w={'100%'} ai={'center'} pt={'$7'}>
           <Button
             px={'$3.5'}
-            h={'$8'}
+            h={'$6'}
             width={'100%'}
             theme="accent"
             borderRadius={'$4'}
@@ -139,7 +139,7 @@ export function HomeScreen() {
             </XStack>
           </Button>
         </XStack>
-        <YStack width={'100%'} $gtLg={{ gap: '$3.5' }} pt={'$6'} pb={'$12'}>
+        <YStack width={'100%'} pt={'$6'} pb={'$12'}>
           {coins.map((coin, index) => (
             <TokenDetails
               coin={coin}
