@@ -66,8 +66,17 @@ Here are some things to keep in mind about thee SEND philosophy when contributin
 <details style="padding: 1rem 0">
 <summary style="font-size:20px;font-weight: bold;"><h2 style="display:inline;padding:0 1rem;">Prerequisites</h2></summary>
 
+When cloning the repo, you will need to initialize the submodules:
+
 ```console
-git clone https://github.com/0xsend/sendapp.git && cd sendapp
+git clone --recurse-submodules https://github.com/0xsend/sendapp.git && cd sendapp
+```
+
+If you missed the `--recurse-submodules` flag, you can initialize them manually:
+
+```console
+git submodule deinit --force .
+git submodule update --init --recursive
 ```
 
 ### Tools
@@ -144,7 +153,7 @@ This command will start all the services defined in the [Tiltfile](/Tiltfile), b
 
 ##### Efficient Tilt Usage
 
-Running `tilt up` will start all services defined in the [Tiltfile](/Tiltfile), building and deploying your application in a local development environment. This command will also start a local Postgres database, Supabase, local Ethereum node, and local Base node. It also starts the unit tests for the application.
+`tilt up` will start a local Postgres database, Supabase, local Ethereum node, and local Base node. It also starts the unit tests for the application.
 
 To save some resources on your local machine, you can limit the amount of resources used by Tilt by specifying them on the command line or disabling them in the [Tilt UI](http://localhost:10350).
 
