@@ -4,12 +4,13 @@ import {
   ButtonText,
   Label,
   Paragraph,
+  Stack,
   SubmitButton,
   Theme,
   XStack,
   YStack,
-  useMedia,
   useToastController,
+  useMedia,
 } from '@my/ui'
 
 import { X } from '@tamagui/lucide-icons'
@@ -23,11 +24,13 @@ import React, { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { formatEther } from 'viem'
 import type { z } from 'zod'
-import { ConfirmDialog } from './components/confirm-dialog'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
-import { maxNumSendTags, tagLengthToWei } from './checkout-utils'
+import { getPriceInWei, maxNumSendTags, tagLengthToWei } from './checkout-utils'
 import { IconPlus } from 'app/components/icons'
+import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
+import { ConfirmButton } from './components/checkout-confirm-button'
+import { useRouter } from 'solito/router'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -40,6 +43,7 @@ export const CheckoutForm = () => {
   const has5Tags = user?.tags?.length === 5
   const [needsVerification, setNeedsVerification] = React.useState(false)
   const media = useMedia()
+  const router = useRouter()
 
   const { data: addresses } = useChainAddresses()
 
@@ -80,6 +84,7 @@ export const CheckoutForm = () => {
 
   function onConfirmed() {
     user?.updateProfile()
+    router.replace('/account/sendtag')
   }
 
   return (
@@ -188,68 +193,66 @@ export const CheckoutForm = () => {
                     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                   )
                   .map((tag) => (
-                    <>
-                      <XStack
-                        $gtMd={{ px: '$2' }}
-                        ai="center"
-                        jc="space-between"
-                        f={1}
-                        key={tag.name}
+                    <XStack
+                      $gtMd={{ px: '$2' }}
+                      ai="center"
+                      jc="space-between"
+                      f={1}
+                      key={tag.name}
+                    >
+                      <Paragraph
+                        fontWeight={'bold'}
+                        col="$color12"
+                        f={2}
+                        maw="40%"
+                        fontFamily={'$mono'}
+                        accessibilityLabel={`Pending Sendtag ${tag.name}`}
+                        aria-label={`Pending Sendtag ${tag.name}`}
                       >
-                        <Paragraph
-                          fontWeight={'bold'}
-                          col="$color12"
-                          f={2}
-                          maw="40%"
-                          fontFamily={'$mono'}
-                          accessibilityLabel={`Pending Sendtag ${tag.name}`}
-                          aria-label={`Pending Sendtag ${tag.name}`}
-                        >
-                          {tag.name}
+                        {tag.name}
+                      </Paragraph>
+                      <Paragraph col="$color12" ta="center" f={1} maw="30%" fontFamily={'$mono'}>
+                        <HoldingTime created={new Date(tag.created_at)} />
+                      </Paragraph>
+                      <XStack
+                        ai="center"
+                        $gtMd={{ gap: '$3' }}
+                        gap="$2"
+                        f={1}
+                        maw="30%"
+                        jc="flex-end"
+                      >
+                        <Paragraph fontFamily={'$mono'} col="$color12">
+                          <ConfirmTagPrice tag={tag} />
                         </Paragraph>
-                        <Paragraph col="$color12" ta="center" f={1} maw="30%" fontFamily={'$mono'}>
-                          <HoldingTime created={new Date(tag.created_at)} />
-                        </Paragraph>
-                        <XStack
-                          ai="center"
-                          $gtMd={{ gap: '$3' }}
-                          gap="$2"
-                          f={1}
-                          maw="30%"
-                          jc="flex-end"
+                        <Button
+                          // @ts-expect-error tamagui doesn't support this yet
+                          type="button"
+                          bg="transparent"
+                          maw="100%"
+                          p="$0"
+                          hoverStyle={{
+                            bg: 'transparent',
+                          }}
+                          onPress={() => {
+                            supabase
+                              .from('tags')
+                              .delete()
+                              .eq('name', tag.name)
+                              .then(({ data, error }) => {
+                                if (error) {
+                                  throw error
+                                }
+                                return data
+                              })
+                              .then(() => toast.show('Released'))
+                              .then(() => user?.updateProfile())
+                          }}
                         >
-                          <Paragraph fontFamily={'$mono'} col="$color12">
-                            <ConfirmTagPrice tag={tag} />
-                          </Paragraph>
-                          <Button
-                            // @ts-expect-error tamagui doesn't support this yet
-                            type="button"
-                            bg="transparent"
-                            maw="100%"
-                            p="$0"
-                            hoverStyle={{
-                              bg: 'transparent',
-                            }}
-                            onPress={() => {
-                              supabase
-                                .from('tags')
-                                .delete()
-                                .eq('name', tag.name)
-                                .then(({ data, error }) => {
-                                  if (error) {
-                                    throw error
-                                  }
-                                  return data
-                                })
-                                .then(() => toast.show('Released'))
-                                .then(() => user?.updateProfile())
-                            }}
-                          >
-                            <X color="$red500" size={16} />
-                          </Button>
-                        </XStack>
+                          <X color="$red500" size={16} />
+                        </Button>
                       </XStack>
-                    </>
+                    </XStack>
                   ))}
               </YStack>
             ) : null}
@@ -269,13 +272,67 @@ export const CheckoutForm = () => {
           )
         }}
       </SchemaForm>
-      <Theme name="accent">
-        <AnimatePresence>
-          <XStack w="100%">
-            <ConfirmDialog onConfirmed={onConfirmed} needsVerification={needsVerification} />
-          </XStack>
-        </AnimatePresence>
-      </Theme>
+      {hasPendingTags && (
+        <Theme name="accent">
+          <AnimatePresence>
+            <XStack w="100%">
+              <Stack
+                animateOnly={['transform', 'opacity']}
+                animation={[
+                  'quick',
+                  {
+                    opacity: {
+                      overshootClamping: true,
+                    },
+                  },
+                ]}
+                enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+                exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+                w="100%"
+                flex={1}
+                $gtMd={{ fd: 'row', jc: 'space-between' }}
+                fd="column-reverse"
+                jc={'center'}
+                ai={'center'}
+                gap="$4"
+                py="$4"
+              >
+                <Stack
+                  animateOnly={['transform', 'opacity']}
+                  animation={[
+                    'quick',
+                    {
+                      opacity: {
+                        overshootClamping: true,
+                      },
+                    },
+                  ]}
+                  enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+                  exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+                  w="100%"
+                  flex={1}
+                  $gtMd={{ fd: 'row', jc: 'space-between' }}
+                  fd="column-reverse"
+                  jc={'center'}
+                  ai={'center'}
+                  gap="$4"
+                  py="$4"
+                >
+                  <YStack maw={200} width="100%">
+                    <OpenConnectModalWrapper>
+                      <ConfirmButton
+                        onConfirmed={onConfirmed}
+                        needsVerification={needsVerification}
+                      />
+                    </OpenConnectModalWrapper>
+                  </YStack>
+                </Stack>
+                <TotalPrice />
+              </Stack>
+            </XStack>
+          </AnimatePresence>
+        </Theme>
+      )}
     </FormProvider>
   )
 }
@@ -292,21 +349,36 @@ function HoldingTime({ created }: { created: Date }) {
 }
 
 function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
-  const confirmedTags = useConfirmedTags() ?? []
-  const pendingTags = usePendingTags() ?? []
-  const commonTags = pendingTags.filter((t) => t.name.length >= 6)
+  const price = useMemo(() => tagLengthToWei(tag?.name.length), [tag])
 
-  // could be free if tag name is greater than 6 characters
-  let hasFreeTag = tag.name.length >= 6
+  return `${formatEther(price).toLocaleString()} ETH`
+}
 
-  // check if there are any confirmed tags that are 6 characters or longer
-  hasFreeTag =
-    hasFreeTag && (confirmedTags?.length === 0 || confirmedTags.every((tag) => tag.name.length < 6))
+function TotalPrice() {
+  const pendingTags = usePendingTags()
 
-  // this tag is free if it's the first tag greater than 6 characters
-  hasFreeTag = hasFreeTag && commonTags[0]?.name === tag.name
+  const weiAmount = useMemo(() => getPriceInWei(pendingTags ?? []), [pendingTags])
 
-  const price = useMemo(() => tagLengthToWei(tag?.name.length, hasFreeTag), [tag, hasFreeTag])
-
-  return price === BigInt(0) ? 'Free' : `${formatEther(price).toLocaleString()} ETH`
+  return (
+    <YStack ai="center" $gtMd={{ ai: 'flex-end' }}>
+      <Paragraph
+        fontWeight={'500'}
+        fontSize={'$5'}
+        $theme-dark={{ col: '$gray9Light' }}
+        $theme-light={{ col: '$gray9Dark' }}
+      >
+        Total
+      </Paragraph>
+      <Paragraph
+        fontFamily={'$mono'}
+        fontWeight={'400'}
+        lineHeight={48}
+        fontSize={'$9'}
+        $theme-dark={{ col: '$white' }}
+        $theme-light={{ col: '$black' }}
+      >
+        {formatEther(weiAmount).toLocaleString()} ETH
+      </Paragraph>
+    </YStack>
+  )
 }

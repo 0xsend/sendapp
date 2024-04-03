@@ -2,13 +2,29 @@ import { baseMainnet, mainnet } from './chains'
 import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
 import { mainnetClient, baseMainnetClient } from './client'
 import { createConfig } from 'wagmi'
-import { injected } from 'wagmi/connectors'
+import { injected, walletConnect, coinbaseWallet, safe } from 'wagmi/connectors'
 
 export const config = createConfig({
   connectors: [
     injected({
       shimDisconnect: true,
     }),
+    walletConnect({
+      projectId:
+        process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '3fcc6bba6f1de962d911bb5b5c3dba68',
+      metadata: {
+        name: '/send',
+        description: 'Send ',
+        url: 'https://send.it',
+        icons: [
+          'https://github.com/0xsend/sendapp/blob/188fffab9b4d9ab6d332baad09ca14da3308f554/apps/next/public/favicon/apple-touch-icon.png',
+        ],
+      },
+    }),
+    coinbaseWallet({
+      appName: '/send',
+    }),
+    safe({ allowedDomains: [/app.safe.global$/] }),
   ],
   chains: [baseMainnet, mainnet, baseMainnetOg, mainnetOg],
   client({ chain: { id: chainId } }) {

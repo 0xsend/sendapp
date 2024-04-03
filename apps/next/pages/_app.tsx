@@ -1,17 +1,21 @@
+import '@rainbow-me/rainbowkit/styles.css'
 import '../public/reset.css'
+import '../styles/globals.css'
 
 import 'raf/polyfill'
 import '@my/ui/src/config/fonts.css'
 
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
-import { Provider } from 'app/provider'
+import { Provider } from 'app/provider/index.web'
 import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 
 import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
+import { baseMainnetClient } from 'app/utils/viem'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -58,7 +62,9 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {getLayout(<Component {...pageProps} />)}
+          <RainbowKitProvider initialChain={baseMainnetClient.chain}>
+            {getLayout(<Component {...pageProps} />)}
+          </RainbowKitProvider>
         </Provider>
       </NextThemeProvider>
     </>

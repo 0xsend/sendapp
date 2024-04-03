@@ -30,7 +30,7 @@ export function SendTagScreen() {
   if (isLoading)
     return (
       <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
-        <Spinner color="$color" size="large" />
+        <Spinner color="$primary" size="large" />
       </Stack>
     )
 
@@ -72,7 +72,7 @@ function SendtagList({
         i === nextTagIndex ? (
           <AddTagButton key="%add_tag_button" />
         ) : (
-          <TagItem key={tag?.name} tag={tag} />
+          <TagItem key={tag?.name || `%no_tag_name_${i}`} tag={tag} />
         )
       )}
     </YStack>
