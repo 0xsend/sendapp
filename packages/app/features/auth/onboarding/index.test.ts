@@ -1,8 +1,10 @@
 import { expect, test } from '@jest/globals'
 
 import {
+  baseMainnetBundlerClient,
   baseMainnetClient,
   baseMainnetBundlerClient as bundlerClient,
+  iEntryPointSimulationsAbi,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
@@ -27,7 +29,6 @@ import {
   maxUint256,
   type Account,
   type Hex,
-  type PublicClient,
   type WalletClient,
 } from 'viem'
 
@@ -178,16 +179,16 @@ async function createAccountAndVerifySignature() {
     value: 0n,
   })
   const hash = await walletClient.writeContract(request)
-  console.log(`[API] deploy transaction ${hash}`)
+  log(`[API] deploy transaction ${hash}`)
   const tx = await baseMainnetClient.waitForTransactionReceipt({ hash, confirmations: 3 })
-  console.log(`[API] deploy transaction ${tx.status}`)
+  log(`[API] deploy transaction ${tx.status}`)
 
   // fund with USDC
   await setERC20Balance({
     client: testClient,
     tokenAddress: usdcAddress[baseMainnetClient.chain.id],
     address: address,
-    value: BigInt(100e6), // 100 USDC
+    value: BigInt(10000e6), // 100 USDC
   })
 
   const { userOp, userOpHash } = await generateUserOp([key1, key2])
@@ -294,8 +295,9 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     ],
   })
   const paymaster = tokenPaymasterAddress[baseMainnetClient.chain.id]
-  const paymasterVerificationGasLimit = 500000n
-  const paymasterPostOpGasLimit = 500000n
+  log('paymaster', paymaster)
+  const paymasterVerificationGasLimit = 600000n
+  const paymasterPostOpGasLimit = 600000n
   const userOp: UserOperation<'v0.7'> = {
     sender: senderAddress,
     nonce: 0n,
@@ -303,13 +305,14 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     // factoryData,
     callData,
     callGasLimit: 100000n,
-    verificationGasLimit: 170000n,
+    verificationGasLimit: 185000n,
     preVerificationGas: 50000n,
-    maxFeePerGas: 10000000n,
-    maxPriorityFeePerGas: 10000000n,
+    maxFeePerGas: 1000000007n,
+    maxPriorityFeePerGas: 1000000007n,
     paymaster,
     paymasterVerificationGasLimit,
     paymasterPostOpGasLimit,
+    paymasterData: '0x',
     signature: '0x',
   }
 
@@ -317,6 +320,13 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     userOperation: userOp,
     entryPoint: entrypoint.address,
   })
+  const gasPrices = await baseMainnetClient.getGasPrice()
+  const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
+    userOperation: userOp,
+  })
+
+  log('gasEstimate', gasEstimate)
+  log('gasPrices', gasPrices)
   log('requiredPreFund', requiredPreFund)
 
   // calculate the required usdc balance
@@ -448,7 +458,7 @@ test('can create a new account', async () => {
   expect(senderBalB).toBeLessThan(senderBalA)
   expect(receiverBaB).toBeGreaterThan(receiverBalA)
   expect(formatUnits(receiverBaB - receiverBalA, 6)).toBe('1')
-}, 30_000)
+}, 45_000)
 
 test.skip('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
