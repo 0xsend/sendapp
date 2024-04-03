@@ -7,6 +7,7 @@ import { TamaguiProvider } from './tamagui'
 import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
 import { WagmiProvider } from './wagmi'
+import { RainbowkitProvider } from './rainbowkit'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
@@ -41,6 +42,7 @@ const compose = (providers: React.FC<{ children: React.ReactNode }>[]) =>
 
 const Providers = compose([
   WagmiProvider,
+  RainbowkitProvider,
   UniversalThemeProvider,
   SafeAreaProvider,
   TamaguiProvider,

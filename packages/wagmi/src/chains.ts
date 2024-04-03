@@ -68,6 +68,7 @@ export const mainnet: typeof mainnetViem | typeof localhost | typeof sepolia =
       }
       return chain
     }
+    // @ts-expect-error __DEV__ so we can share some react native code
     if (__DEV__ || process.env.CI) {
       return localhost
     }
@@ -83,6 +84,7 @@ export const baseMainnet: typeof baseMainnetViem | typeof baseLocal | typeof bas
       }
       return chain
     }
+    // @ts-expect-error __DEV__ so we can share some react native code
     if (__DEV__ || process.env.CI) {
       return baseLocal
     }
