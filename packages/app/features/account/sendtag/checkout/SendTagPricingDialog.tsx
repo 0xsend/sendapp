@@ -3,9 +3,6 @@ import {
   Adapt,
   Button,
   Dialog,
-  KVTable,
-  ScrollView,
-  Section,
   Sheet,
   SizableText,
   Unspaced,
@@ -16,6 +13,7 @@ import {
   Separator,
   YStack,
   H6,
+  ButtonIcon,
 } from '@my/ui'
 import { Info, X, XCircle } from '@tamagui/lucide-icons'
 import React, { useMemo, useState } from 'react'
@@ -27,8 +25,7 @@ import { IconInfoGreenCircle } from 'app/components/icons'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
-  const { tags } = useUser()
-  const price = useMemo(() => getPriceInWei([{ name }], tags || []), [name, tags])
+  const price = useMemo(() => getPriceInWei([{ name }]), [name])
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Dialog modal onOpenChange={setIsOpen}>
@@ -71,53 +68,125 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
           gap="$4"
           width="100%"
           maw={600}
+          $theme-dark={{ bc: '$black' }}
+          $theme-light={{ bc: '$gray4Light' }}
         >
-          <Dialog.Title>Sendtag Pricing</Dialog.Title>
-          <Dialog.Description>
+          <Dialog.Title
+            ta={'left'}
+            $theme-dark={{ col: '$white' }}
+            $theme-light={{ col: '$black' }}
+            fontFamily={'$mono'}
+          >
+            Sendtag Pricing
+          </Dialog.Title>
+          <Dialog.Description
+            size={'$4'}
+            $theme-dark={{ col: '$white' }}
+            $theme-light={{ col: '$black' }}
+          >
             Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.
           </Dialog.Description>
-          <ScrollView>
-            <Section>
-              <KVTable>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">5+ characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>{(0.01).toLocaleString()} ETH</SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">4 characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>{(0.02).toLocaleString()} ETH</SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-                <KVTable.Row>
-                  <KVTable.Key>
-                    <SizableText fontWeight="900">1-3 characters</SizableText>
-                  </KVTable.Key>
-                  <KVTable.Value>
-                    <SizableText>{(0.03).toLocaleString()} ETH</SizableText>
-                  </KVTable.Value>
-                </KVTable.Row>
-              </KVTable>
-            </Section>
-          </ScrollView>
+          <YStack gap="$4" jc="center">
+            <XStack>
+              <SizableText
+                fontWeight="900"
+                $theme-dark={{ col: '$white' }}
+                $theme-light={{ col: '$black' }}
+                w="50%"
+                fontFamily={'$mono'}
+              >
+                6+ characters
+              </SizableText>
+
+              <SizableText
+                f={1}
+                ta="left"
+                $theme-dark={{ col: '$primary' }}
+                $theme-light={{ col: '$color12' }}
+                fontFamily={'$mono'}
+              >
+                {(0.002).toLocaleString()} ETH
+              </SizableText>
+            </XStack>
+            <XStack>
+              <SizableText
+                fontWeight="900"
+                $theme-dark={{ col: '$white' }}
+                $theme-light={{ col: '$black' }}
+                w="50%"
+                fontFamily={'$mono'}
+              >
+                5 characters
+              </SizableText>
+
+              <SizableText
+                f={1}
+                ta="left"
+                $theme-dark={{ col: '$primary' }}
+                $theme-light={{ col: '$color12' }}
+                fontFamily={'$mono'}
+              >
+                {(0.005).toLocaleString()} ETH
+              </SizableText>
+            </XStack>
+            <XStack>
+              <SizableText
+                fontWeight="900"
+                $theme-dark={{ col: '$white' }}
+                $theme-light={{ col: '$black' }}
+                w="50%"
+                fontFamily={'$mono'}
+              >
+                4 characters
+              </SizableText>
+              <SizableText
+                f={1}
+                ta="left"
+                $theme-dark={{ col: '$primary' }}
+                $theme-light={{ col: '$color12' }}
+                fontFamily={'$mono'}
+              >
+                {(0.01).toLocaleString()} ETH
+              </SizableText>
+            </XStack>
+            <XStack>
+              <SizableText
+                fontWeight="900"
+                $theme-dark={{ col: '$white' }}
+                $theme-light={{ col: '$black' }}
+                w="50%"
+                fontFamily={'$mono'}
+              >
+                1-3 characters
+              </SizableText>
+
+              <SizableText
+                f={1}
+                ta="left"
+                $theme-dark={{ col: '$primary' }}
+                $theme-light={{ col: '$color12' }}
+                fontFamily={'$mono'}
+              >
+                {(0.02).toLocaleString()} ETH
+              </SizableText>
+            </XStack>
+          </YStack>
 
           <XStack alignSelf="flex-end" gap="$4">
             <Dialog.Close displayWhenAdapted asChild>
-              <Button theme="alt1" aria-label="Close">
-                Ok
+              <Button aria-label="Close">
+                <ButtonText color="$color12">OK</ButtonText>
               </Button>
             </Dialog.Close>
           </XStack>
 
           <Unspaced>
             <Dialog.Close asChild>
-              <Button position="absolute" top="$3" right="$3" size="$2" circular icon={X} />
+              <Button position="absolute" top="$3" right="$3" size="$2" circular>
+                <ButtonIcon>
+                  <X size={16} color="$color12" />
+                </ButtonIcon>
+              </Button>
             </Dialog.Close>
           </Unspaced>
         </Dialog.Content>
@@ -127,8 +196,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
 }
 
 export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['name'] }) {
-  const { tags } = useUser()
-  const price = useMemo(() => getPriceInWei([{ name }], tags || []), [name, tags])
+  const price = useMemo(() => getPriceInWei([{ name }]), [name])
   const [isOpen, setIsOpen] = React.useState(false)
   return (
     <Tooltip placement="right" delay={0} allowFlip={false} offset={84} onOpenChange={setIsOpen}>
@@ -139,6 +207,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
         {isOpen && (
           <Separator
             w={68}
+            theme="accent"
             boc={'$color10'}
             borderStyle="dashed"
             pos={'absolute'}
@@ -202,7 +271,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
                 $theme-light={{ col: '$color12' }}
                 fontFamily={'$mono'}
               >
-                {(0.005).toLocaleString()} ETH
+                {(0.002).toLocaleString()} ETH
               </SizableText>
             </XStack>
             <XStack>
@@ -223,7 +292,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
                 $theme-light={{ col: '$color12' }}
                 fontFamily={'$mono'}
               >
-                {(0.01).toLocaleString()} ETH
+                {(0.005).toLocaleString()} ETH
               </SizableText>
             </XStack>
             <XStack>
@@ -243,7 +312,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
                 $theme-light={{ col: '$color12' }}
                 fontFamily={'$mono'}
               >
-                {(0.02).toLocaleString()} ETH
+                {(0.01).toLocaleString()} ETH
               </SizableText>
             </XStack>
             <XStack>
@@ -264,7 +333,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
                 $theme-light={{ col: '$color12' }}
                 fontFamily={'$mono'}
               >
-                {(0.03).toLocaleString()} ETH
+                {(0.02).toLocaleString()} ETH
               </SizableText>
             </XStack>
           </YStack>
