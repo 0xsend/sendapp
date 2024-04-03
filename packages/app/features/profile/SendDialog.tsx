@@ -13,7 +13,7 @@ import {
 import { IconClose } from 'app/components/icons'
 import { AvatarProfile } from './AvatarProfile'
 import type { useProfileLookup } from 'app/utils/useProfileLookup'
-import { Provider } from 'app/provider'
+import { Provider } from 'app/provider/index.web'
 import { SendForm } from './SendForm'
 
 export type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>

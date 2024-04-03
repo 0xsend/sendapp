@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@plaiceholder/next": "^3.0.0",
+    "@rainbow-me/rainbowkit": "^2.0.4",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
     "@supabase/supabase-js": "^2.39.3",
