@@ -22,9 +22,6 @@ on:
       STAGING_SUPABASE_DB_PASSWORD:
         description: 'Staging Supabase db password'
         required: true
-      SECRET_SHOP_PRIVATE_KEY:
-        description: 'Secret shop private key'
-        required: false
       CI_QA_NOTIFICATION_URL:
         description: 'QA notification url'
         required: true
