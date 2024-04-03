@@ -7,5 +7,5 @@ export {
   mainnet,
   baseMainnet,
 } from './chains'
-export { config } from './config'
+export { config, chains, client } from './config'
 export { mainnetClient, baseMainnetClient, baseMainnetBundlerClient } from './client'
