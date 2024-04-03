@@ -1,46 +1,22 @@
-import { Container, FormWrapper, Paragraph, Stack, YStack } from '@my/ui'
+import { Container, FormWrapper, Paragraph, Stack, XStack, YStack } from '@my/ui'
 
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 
 import { useUser } from 'app/utils/useUser'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { CheckoutForm } from './checkout-form'
+import { useRouter } from 'solito/router'
 
 export const CheckoutScreen = () => {
-  const user = useUser()
-  const pendingTags = usePendingTags()
   const confirmedTags = useConfirmedTags()
-  const hasPendingTags = pendingTags && pendingTags.length > 0
+  const router = useRouter()
 
-  // manage the scroll state when new tags are added but ensure the name input is always visible
   useEffect(() => {
-    if (hasPendingTags) {
-      window?.scrollTo({
-        top: document?.body?.scrollHeight - 140,
-        behavior: 'smooth',
-      })
+    if (confirmedTags?.length === 5) {
+      router.replace('/account/sendtag')
     }
-  }, [hasPendingTags])
-
-  if (confirmedTags?.length === 5) {
-    return (
-      <YStack h="100%" width="100%">
-        <YStack f={1} als={'stretch'} h="100%" width="100%">
-          <YStack gap="$2" py="$4" pb="$4" mx="auto" width="100%" maw={600}>
-            <FormWrapper.Body>
-              <Paragraph>You have already reserved 5 Sendtags.</Paragraph>
-              {user.tags?.map((tag) => (
-                <YStack key={tag.name} space="$2">
-                  <Paragraph fontWeight={'bold'}>{tag.name}</Paragraph>
-                </YStack>
-              ))}
-            </FormWrapper.Body>
-          </YStack>
-        </YStack>
-      </YStack>
-    )
-  }
+  }, [confirmedTags, router])
 
   return (
     <Container>

@@ -331,7 +331,7 @@ export function ConfirmFlow() {
               switchChain({ chainId: baseMainnet.id }, { onError: console.error })
             }}
           >
-            <ButtonText color="$color12">Switch Network</ButtonText>{' '}
+            <ButtonText color="$color12">Switch Network</ButtonText>
           </Button>
         </Theme>
       </ConfirmDialogContent>
@@ -471,10 +471,13 @@ export function ConfirmWithSignTransaction() {
   const confirm = api.tag.confirm.useMutation()
   const { chain } = useAccount()
   const [sentTx, setSentTx] = useState<`0x${string}`>()
+
   const { data: txReceipt, error: txWaitError } = useWaitForTransactionReceipt({
+    query: { enabled: !!sentTx },
     hash: sentTx,
     confirmations: 2,
   })
+
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string>()
   const [confirmed, setConfirmed] = useState(false)
