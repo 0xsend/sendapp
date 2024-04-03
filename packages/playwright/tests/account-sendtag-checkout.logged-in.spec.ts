@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { expect, test } from './fixtures/checkout'
+import { devices } from '@playwright/test'
 
 let log: debug.Debugger | undefined
 
@@ -12,12 +13,14 @@ const debugAuthSession = async (page: Page) => {
 }
 
 const pricingText = [
-  '5+ characters',
-  '0.01 ETH',
+  '6+ characters',
+  '0.002 ETH',
+  '5 characters',
+  '0.005 ETH',
   '4 characters',
-  '0.02 ETH',
+  '0.01 ETH',
   '1-3 characters',
-  '0.03 ETH',
+  '0.02 ETH',
 ]
 
 test.beforeEach(async ({ checkoutPage }) => {
@@ -26,12 +29,20 @@ test.beforeEach(async ({ checkoutPage }) => {
   await debugAuthSession(checkoutPage.page)
 })
 
-test('can visit checkout page', async ({ checkoutPage }) => {
+test('can visit checkout page', async ({ page, checkoutPage }) => {
+  await checkoutPage.openPricingTooltip()
+  await expect(checkoutPage.pricingTooltip).toBeVisible()
+  for (const text of pricingText) {
+    await expect(checkoutPage.pricingTooltip).toContainText(text)
+  }
+  // check pricing dialog
+  await page.setViewportSize(devices['Pixel 5'].viewport)
   await checkoutPage.openPricingDialog()
   for (const text of pricingText) {
     await expect(checkoutPage.pricingDialog).toContainText(text)
   }
   await checkoutPage.pricingDialog.getByLabel('Dialog Close').click()
+  await expect(checkoutPage.pricingDialog).toBeHidden()
 })
 
 test('can add a pending tag', async ({ checkoutPage }) => {

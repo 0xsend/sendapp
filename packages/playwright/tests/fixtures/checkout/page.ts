@@ -7,6 +7,7 @@ const log = debug('test:fixtures:checkout:page')
 
 export class CheckoutPage {
   public readonly pricingDialog: Locator
+  public readonly pricingTooltip: Locator
   public readonly confirmDialog: Locator
   public readonly submitTagButton: Locator
   constructor(
@@ -14,6 +15,7 @@ export class CheckoutPage {
     public readonly wallet: Web3ProviderBackend
   ) {
     this.pricingDialog = page.getByLabel('Sendtag Pricing')
+    this.pricingTooltip = page.getByTestId('SendTagPricingTooltipContent')
     this.confirmDialog = page.getByLabel('Confirming Sendtags')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
   }
@@ -47,8 +49,12 @@ export class CheckoutPage {
   }
 
   async openPricingDialog() {
-    await this.page.getByRole('button', { name: 'Pricing' }).click()
+    await this.page.getByRole('button', { name: 'Pricing', exact: true }).first().click()
     await this.pricingDialog.isVisible()
+  }
+
+  async openPricingTooltip() {
+    await this.page.getByRole('button', { name: 'Pricing' }).hover()
   }
 
   async confirmTags(expect: Expect<CheckoutPage>) {
