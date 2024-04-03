@@ -196,14 +196,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
   const price = useMemo(() => getPriceInWei([{ name }]), [name])
   const [isOpen, setIsOpen] = React.useState(false)
   return (
-    <Tooltip
-      open={true}
-      placement="right"
-      delay={0}
-      allowFlip={false}
-      offset={84}
-      onOpenChange={setIsOpen}
-    >
+    <Tooltip placement="right" delay={0} allowFlip={false} offset={84} onOpenChange={setIsOpen}>
       <XStack pos="relative">
         <Tooltip.Trigger>
           <SendTagPricingButton isOpen={isOpen} name={name} price={price} />

@@ -59,7 +59,6 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
 })
 
 test('can confirm a tag', async ({ checkoutPage, supabase }) => {
-  test.fail()
   // test.setTimeout(60_000) // 60 seconds
   const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
   await checkoutPage.addPendingTag(tagName)
@@ -71,9 +70,8 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
   expect(error).toBeFalsy()
   expect(tags).toHaveLength(1)
 
-  // @todo check that it redirected back
-  // await expect(checkoutPage.page.getByLabel('Sendtags Registered')).toBeVisible()
-  // await expect(checkoutPage.page.getByLabel(`Confirmed Sendtag ${tagName}`)).toBeVisible()
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+  await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
