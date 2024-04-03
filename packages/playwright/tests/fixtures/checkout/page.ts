@@ -7,6 +7,7 @@ const log = debug('test:fixtures:checkout:page')
 
 export class CheckoutPage {
   public readonly pricingDialog: Locator
+  public readonly pricingTooltip: Locator
   public readonly confirmDialog: Locator
   public readonly submitTagButton: Locator
   constructor(
@@ -14,6 +15,7 @@ export class CheckoutPage {
     public readonly wallet: Web3ProviderBackend
   ) {
     this.pricingDialog = page.getByLabel('Sendtag Pricing')
+    this.pricingTooltip = page.getByTestId('SendTagPricingTooltipContent')
     this.confirmDialog = page.getByLabel('Confirming Sendtags')
     this.submitTagButton = page.getByRole('button', { name: 'Add Tag' })
   }
@@ -47,23 +49,27 @@ export class CheckoutPage {
   }
 
   async openPricingDialog() {
-    await this.page.getByRole('button', { name: 'Pricing' }).click()
+    await this.page.getByRole('button', { name: 'Pricing', exact: true }).first().click()
     await this.pricingDialog.isVisible()
   }
 
-  async confirmTags(expect: Expect<CheckoutPage>) {
-    log('confirmTags')
-    const confirmButton = this.page.getByRole('button', { name: 'Confirm' })
-    expect?.(confirmButton).toBeEnabled()
-    await this.page.bringToFront()
-    await confirmButton.click()
+  async openPricingTooltip() {
+    await this.page.getByRole('button', { name: 'Pricing' }).hover()
+  }
 
+  async confirmTags(expect: Expect<CheckoutPage>) {
     // click connect wallet
     log('click connect wallet')
     const connectButton = this.page.getByRole('button', { name: 'Connect Wallet' })
     expect?.(connectButton).toBeEnabled()
     await this.page.bringToFront()
     await connectButton.click()
+
+    // select Browser Wallet
+    log('select Browser Wallet')
+    const browserWalletButton = this.page.getByTestId('rk-wallet-option-injected')
+    expect?.(browserWalletButton).toBeEnabled()
+    await browserWalletButton.click()
     await this.wallet.authorize(Web3RequestKind.RequestAccounts)
 
     // switch network
@@ -76,7 +82,7 @@ export class CheckoutPage {
 
     // sign message to verify address
     log('sign message to verify address')
-    const signMessageButton = this.page.getByRole('button', { name: 'Sign Message' })
+    const verifyWalletButton = this.page.getByRole('button', { name: 'Verify Wallet' })
     const verifyAddressRequest = this.page.waitForRequest((request) => {
       log('verify address request', request.url(), request.method(), request.postDataJSON())
       return request.url().includes('/api/trpc/chainAddress.verify') && request.method() === 'POST'
@@ -85,9 +91,9 @@ export class CheckoutPage {
       log('verify address response', response.url(), response.status(), await response.text())
       return response.url().includes('/api/trpc/chainAddress.verify')
     })
-    expect?.(signMessageButton).toBeEnabled()
+    expect?.(verifyWalletButton).toBeEnabled()
     await this.page.bringToFront()
-    await signMessageButton.click()
+    await verifyWalletButton.click()
     await this.wallet.authorize(Web3RequestKind.SignMessage)
     await verifyAddressRequest
     await verifyAddressResponse
@@ -105,7 +111,7 @@ export class CheckoutPage {
         response.url().includes('/api/trpc/tag.confirm') && json?.[0]?.result?.data?.json === ''
       )
     })
-    const signTransactionButton = this.page.getByRole('button', { name: 'Sign Transaction' })
+    const signTransactionButton = this.page.getByRole('button', { name: 'Confirm' })
     expect?.(signTransactionButton).toBeEnabled()
     await this.page.bringToFront()
     await signTransactionButton.click()

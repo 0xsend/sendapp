@@ -28,7 +28,7 @@ test('can update profile', async ({ page, supabase }) => {
   await editProfileButton.click()
 
   await page.waitForURL('/account/settings/edit-profile')
-  await expect(page).toHaveTitle('Edit Profile')
+  await expect(page).toHaveTitle('Send | Edit Profile')
 
   await page.getByLabel('Name').fill('LeO')
   await page.getByLabel('Bio').fill('Sender')

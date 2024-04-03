@@ -27,8 +27,8 @@
     "@my/supabase": "workspace:*",
     "@openzeppelin/merkle-tree": "1.0.5",
     "@supabase/supabase-js": "^2.39.3",
+    "@types/bun": "latest",
     "@uniswap/v3-periphery": "^1.4.4",
-    "bun-types": "latest",
     "debug": "^4.3.4",
     "solhint": "^3.6.2",
     "zx": "^7.2.3"

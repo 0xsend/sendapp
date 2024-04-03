@@ -3,8 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["bun-types"]
+    "moduleResolution": "Bundler"
   },
   "compileOnSave": false,
   "ts-node": {

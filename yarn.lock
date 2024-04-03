@@ -5696,8 +5696,8 @@ __metadata:
     "@my/supabase": "workspace:*"
     "@openzeppelin/merkle-tree": "npm:1.0.5"
     "@supabase/supabase-js": "npm:^2.39.3"
+    "@types/bun": "npm:latest"
     "@uniswap/v3-periphery": "npm:^1.4.4"
-    bun-types: "npm:latest"
     debug: "npm:^4.3.4"
     solhint: "npm:^3.6.2"
     zx: "npm:^7.2.3"
@@ -10508,7 +10508,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:*, @types/ws@npm:^8.5.10, @types/ws@npm:~8.5.10":
+"@types/ws@npm:^8.5.10, @types/ws@npm:~8.5.10":
   version: 8.5.10
   resolution: "@types/ws@npm:8.5.10"
   dependencies:
@@ -13594,17 +13594,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bun-types@npm:latest":
-  version: 1.0.20
-  resolution: "bun-types@npm:1.0.20"
-  dependencies:
-    "@types/node": "npm:*"
-    "@types/ws": "npm:*"
-    undici-types: "npm:^5.26.4"
-  checksum: fc00dd0f157b75a070aa6248e5fd8fa39513fe8f26563f6ca6360d66f05e7e8a15488b4f8fd0e1036242d029685a60058492726f03b79f32b0e57e43ffbfb80c
-  languageName: node
-  linkType: hard
-
 "bundle-name@npm:^3.0.0":
   version: 3.0.0
   resolution: "bundle-name@npm:3.0.0"
@@ -15596,11 +15585,11 @@ __metadata:
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
     "@supabase/supabase-js": "npm:^2.39.3"
+    "@types/bun": "npm:latest"
     "@types/express": "npm:^4"
     "@types/supertest": "npm:^2.0.16"
     "@wagmi/core": "npm:2.6.5"
     app: "workspace:*"
-    bun-types: "npm:latest"
     debug: "npm:^4.3.4"
     dotenv-cli: "npm:^7.3.0"
     express: "npm:^4.18.2"
@@ -30983,13 +30972,6 @@ __metadata:
   version: 0.1.3
   resolution: "uncrypto@npm:0.1.3"
   checksum: 0020f74b0ce34723196d8982a73bb7f40cff455a41b8f88ae146b86885f4e66e41a1241fe80a887505c3bd2c7f07ed362b6ed041968370073c40a98496e6a737
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:^5.26.4":
-  version: 5.28.2
-  resolution: "undici-types@npm:5.28.2"
-  checksum: 490faa27fa121cff7d8be4f5491bed868aff67846b3a4ffc87f84e2e03c9e06cfc46f011b58ef37d734e36188778b2d7944354ce085d2c8cc80a383dd4a76ce8
   languageName: node
   linkType: hard
 

@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { expect, test } from './fixtures/checkout'
+import { devices } from '@playwright/test'
 
 let log: debug.Debugger | undefined
 
@@ -12,12 +13,14 @@ const debugAuthSession = async (page: Page) => {
 }
 
 const pricingText = [
-  '5+ characters',
-  '0.01 ETH',
+  '6+ characters',
+  '0.002 ETH',
+  '5 characters',
+  '0.005 ETH',
   '4 characters',
-  '0.02 ETH',
+  '0.01 ETH',
   '1-3 characters',
-  '0.03 ETH',
+  '0.02 ETH',
 ]
 
 test.beforeEach(async ({ checkoutPage }) => {
@@ -26,12 +29,20 @@ test.beforeEach(async ({ checkoutPage }) => {
   await debugAuthSession(checkoutPage.page)
 })
 
-test('can visit checkout page', async ({ checkoutPage }) => {
+test('can visit checkout page', async ({ page, checkoutPage }) => {
+  await checkoutPage.openPricingTooltip()
+  await expect(checkoutPage.pricingTooltip).toBeVisible()
+  for (const text of pricingText) {
+    await expect(checkoutPage.pricingTooltip).toContainText(text)
+  }
+  // check pricing dialog
+  await page.setViewportSize(devices['Pixel 5'].viewport)
   await checkoutPage.openPricingDialog()
   for (const text of pricingText) {
     await expect(checkoutPage.pricingDialog).toContainText(text)
   }
   await checkoutPage.pricingDialog.getByLabel('Dialog Close').click()
+  await expect(checkoutPage.pricingDialog).toBeHidden()
 })
 
 test('can add a pending tag', async ({ checkoutPage }) => {
@@ -48,7 +59,6 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
 })
 
 test('can confirm a tag', async ({ checkoutPage, supabase }) => {
-  test.fail()
   // test.setTimeout(60_000) // 60 seconds
   const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
   await checkoutPage.addPendingTag(tagName)
@@ -60,9 +70,8 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
   expect(error).toBeFalsy()
   expect(tags).toHaveLength(1)
 
-  // @todo check that it redirected back
-  // await expect(checkoutPage.page.getByLabel('Sendtags Registered')).toBeVisible()
-  // await expect(checkoutPage.page.getByLabel(`Confirmed Sendtag ${tagName}`)).toBeVisible()
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+  await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
