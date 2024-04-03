@@ -886,6 +886,7 @@ export type Database = {
           address: string
           chain_id: number
           is_public: boolean
+          send_id: number
         }[]
       }
       tag_search: {

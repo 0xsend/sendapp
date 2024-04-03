@@ -83,6 +83,7 @@ export type Database = MergeDeep<
             address: `0x${string}`
             chain_id: number
             is_public: boolean | null
+            send_id: number | null
           }[]
         }
       }

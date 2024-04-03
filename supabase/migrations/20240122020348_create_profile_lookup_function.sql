@@ -24,13 +24,13 @@ begin
     p.name::text as name,
     p.about::text as about,
     p.referral_code as referral_code,
-    p.send_id as send_id,
     t.name as tag_name,
     sa.address as address,
     sa.chain_id as chain_id,
     case when current_setting('role')::text = 'service_role' then
       p.is_public
-    end as is_public
+    end as is_public,
+    p.send_id as send_id
   from
     profiles p
     join tags t on t.user_id = p.id

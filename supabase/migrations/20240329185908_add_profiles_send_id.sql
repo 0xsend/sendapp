@@ -23,3 +23,4 @@ update public.profiles
 CREATE SEQUENCE profiles_send_id_seq;
 SELECT setval('profiles_send_id_seq', coalesce(max(send_id), 0) + 1, false) FROM profiles;
 ALTER TABLE profiles ALTER COLUMN send_id SET DEFAULT nextval('profiles_send_id_seq');
+create index concurrently on profiles(send_id);
