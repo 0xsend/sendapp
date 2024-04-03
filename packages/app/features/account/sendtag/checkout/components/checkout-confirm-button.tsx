@@ -228,13 +228,12 @@ export function ConfirmButton({
   // We will need to seperate this logic so that we can switch between web and native
   if (!connectedAddress) {
     return (
-      <ConfirmButtonError buttonText={'Connect Wallet'} onPress={openConnectModal}>
-        <YStack gap="$2" ai="center">
-          <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            Please connect your wallet to confirm your Send Tags.
-          </Paragraph>
-        </YStack>
-      </ConfirmButtonError>
+      <Button space="$1.5" onPress={openConnectModal} br={12} f={1}>
+        <ButtonText space="$1.5">Connect Wallet</ButtonText>
+        <ButtonIcon>
+          <AlertTriangle color={'$red500'} />
+        </ButtonIcon>
+      </Button>
     )
   }
 

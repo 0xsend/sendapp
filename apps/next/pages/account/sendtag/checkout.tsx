@@ -23,8 +23,7 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
-const subheader =
-  'Sendtags are personalized names that serve as unique identifiers within the Send platform. You may register up to 5.'
+const subheader = 'Sendtags are usernames within the Send platform. You may register up to 5.'
 
 Page.getLayout = (children) => (
   <HomeLayout
