@@ -40,8 +40,8 @@ export const integrations: Integration[] = [
   },
   {
     ...sendTokenTransfersIntegration,
-    // start is block of first transfer on base
-    sources: [{ name: baseSrcLogs.name, start: 9475780n }],
+    // @ts-expect-error start is bigint but we will load it from env
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   // @todo split this into two integrations, one for Receive and one for UserOperationEvent
   // {

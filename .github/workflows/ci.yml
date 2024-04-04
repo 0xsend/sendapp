@@ -96,7 +96,6 @@ jobs:
     name: Playwright Tests
     runs-on: ubuntu-latest
     needs: [cache-deps]
-    timeout-minutes: 30
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
@@ -141,7 +140,7 @@ jobs:
         run: |
           # set debug logs if runner.debug is set
           if [ "${{runner.debug}}" == "1" ]; then
-            export DEBUG=test:*,app:*
+            export DEBUG="test:*,app:*,api:*,next:*"
           fi
           nohup tilt up playwright:deps &
           echo waiting for tilt to be ready
@@ -151,7 +150,7 @@ jobs:
           done
           sleep 1
           echo tilt is ready
-          tilt wait --timeout 5m --for=condition=Ready "uiresource/playwright:deps"
+          time tilt wait --timeout 5m --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
       - name: Playwright Report
         uses: actions/upload-artifact@v4

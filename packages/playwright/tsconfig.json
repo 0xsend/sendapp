@@ -1,6 +1,13 @@
 {
   "extends": "../../tsconfig.base",
-  "include": ["tests"],
+  "include": [
+    "tests",
+    "playwright.config.ts",
+    "../snaplet/src",
+    "../app",
+    "../wagmi",
+    "../contracts"
+  ],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,
@@ -11,6 +18,7 @@
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/contracts/out/*": ["../contracts/out/*"],
       "@my/playwright/*": ["./tests/*"],
+      "@my/snaplet/*": ["../snaplet/src/*"],
       "@0xsend/webauthn-authenticator/*": ["../webauthn-authenticator/src/*"],
       "@my/*": ["../*"]
     }

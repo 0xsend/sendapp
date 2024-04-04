@@ -23,10 +23,15 @@ const sendAccountTest = base.extend<{
 }>({
   page: async ({ page, context, supabase }, use) => {
     log = debug(`test:send-accounts:${test.info().workerIndex}}`)
+    log('start onboarding')
 
     // @todo use webauthn authenticator and supabase API to create a send account
     const onboardingPage = new OnboardingPage(await context.newPage())
-    await onboardingPage.completeOnboarding(expect)
+    await onboardingPage.completeOnboarding(expect).catch((e) => {
+      log('onboarding error', e)
+      throw e
+    })
+    log('onboarding complete')
 
     const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
     if (error) {
@@ -37,15 +42,23 @@ const sendAccountTest = base.extend<{
     assert(sendAccount.address !== zeroAddress, 'send account address is zero')
 
     log('fund send account', sendAccount.address)
-    await testBaseClient.setBalance({
-      address: sendAccount.address,
-      value: parseEther('1'),
-    })
+    await testBaseClient
+      .setBalance({
+        address: sendAccount.address,
+        value: parseEther('1'),
+      })
+      .catch((e) => {
+        log('setBalance error', e)
+        throw e
+      })
     await setERC20Balance({
       client: testBaseClient,
       address: sendAccount.address,
       tokenAddress: usdcAddress[testBaseClient.chain.id],
       value: 100n * 10n ** 6n,
+    }).catch((e) => {
+      log('setERC20Balance error', e)
+      throw e
     })
     await onboardingPage.page.close() // close the onboarding page
 

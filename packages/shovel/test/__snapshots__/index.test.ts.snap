@@ -270,7 +270,7 @@ exports[`shovel config 1`] = `
       "sources": [
         {
           "name": "base_logs",
-          "start": 9475780n,
+          "start": "$BASE_BLOCK_START",
         },
       ],
       "table": {
