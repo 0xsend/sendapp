@@ -25,6 +25,12 @@ declare global {
       SNAPLET_HASH_KEY: string
     }
   }
+  /**
+   * This variable is set to true when react-native is running in Dev mode
+   * @example
+   * if (__DEV__) console.log('Running in dev mode')
+   */
+  const __DEV__: boolean
 }
 
 export type {}

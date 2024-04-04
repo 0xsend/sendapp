@@ -40,8 +40,7 @@ export const tagRouter = createTRPCRouter({
       }
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
-      const confirmedTags = tags.filter((t) => t.status === 'confirmed')
-      const ethAmount = getPriceInWei(pendingTags, confirmedTags)
+      const ethAmount = getPriceInWei(pendingTags)
       const isFree = ethAmount === BigInt(0)
 
       // transaction validation for rare Sendtags
