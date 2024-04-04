@@ -317,7 +317,7 @@
       "sources": [
         {
           "name": "base_logs",
-          "start": "9475780"
+          "start": "$BASE_BLOCK_START"
         }
       ]
     }

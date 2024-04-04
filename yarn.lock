@@ -4786,10 +4786,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@indexsupply/shovel-config@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@indexsupply/shovel-config@npm:0.0.5"
-  checksum: 51ade4ca8191ab1d9967d035f2dcb808f687d70d9e254658c49539f073925433300397a72587cd3f14587010b56062a6ae3b5ee908a0833f6729bbe7011752b6
+"@indexsupply/shovel-config@npm:^0.0.8":
+  version: 0.0.8
+  resolution: "@indexsupply/shovel-config@npm:0.0.8"
+  checksum: fb1e4d149e0481dbaabfff279da32cea81a1c6eb6c49c1e8c32214fd9f148d0cf069df59926204c828cf35abbcf9305e2cb1e0411db095f937e7c5f2853e071e
   languageName: node
   linkType: hard
 
@@ -28571,7 +28571,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "shovel@workspace:packages/shovel"
   dependencies:
-    "@indexsupply/shovel-config": "npm:^0.0.5"
+    "@indexsupply/shovel-config": "npm:^0.0.8"
     "@my/wagmi": "workspace:*"
     "@types/bun": "npm:latest"
     permissionless: "npm:^0.1.11"
