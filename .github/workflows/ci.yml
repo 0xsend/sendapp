@@ -138,7 +138,7 @@ jobs:
         run: |
           # set debug logs if runner.debug is set
           if [ "${{runner.debug}}" == "1" ]; then
-            export DEBUG=test:*,app:*
+            export DEBUG="test:*,app:*,api:*,next:*"
           fi
           nohup tilt up playwright:deps &
           echo waiting for tilt to be ready
@@ -155,7 +155,7 @@ jobs:
         run: |
           # set debug logs if runner.debug is set
           if [ "${{runner.debug}}" == "1" ]; then
-            export DEBUG=test:*,app:*
+            export DEBUG="test:*,app:*,api:*,next:*"
           fi
           yarn playwright test
       - name: Playwright Report
