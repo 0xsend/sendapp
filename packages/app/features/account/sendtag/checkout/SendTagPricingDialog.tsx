@@ -2,27 +2,24 @@ import type { Tables } from '@my/supabase/database.types'
 import {
   Adapt,
   Button,
-  Dialog,
-  Sheet,
-  SizableText,
-  Unspaced,
-  XStack,
+  ButtonIcon,
   ButtonText,
-  Tooltip,
+  Dialog,
+  H6,
   Paragraph,
   Separator,
+  Sheet,
+  SizableText,
+  Tooltip,
+  Unspaced,
+  XStack,
   YStack,
-  H6,
-  ButtonIcon,
 } from '@my/ui'
 import { Info, X, XCircle } from '@tamagui/lucide-icons'
-import React, { useMemo, useState } from 'react'
-import { getPriceInWei } from './checkout-utils'
-
-import { formatEther } from 'viem'
-import { useUser } from 'app/utils/useUser'
 import { IconInfoGreenCircle } from 'app/components/icons'
-import { useThemeSetting } from '@tamagui/next-theme'
+import React, { useMemo, useState } from 'react'
+import { formatEther } from 'viem'
+import { getPriceInWei } from './checkout-utils'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => getPriceInWei([{ name }]), [name])
@@ -239,7 +236,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
         p={'$5'}
       >
         <Tooltip.Arrow $theme-dark={{ bc: '$black' }} $theme-light={{ bc: '$gray4Light' }} />
-        <YStack gap="$4">
+        <YStack testID="SendTagPricingTooltipContent" gap="$4">
           <H6
             ta={'left'}
             $theme-dark={{ col: '$white' }}
@@ -348,8 +345,6 @@ const SendTagPricingButton = ({
   name,
   price,
 }: { isOpen: boolean; name: string; price: bigint }) => {
-  const { resolvedTheme } = useThemeSetting()
-
   return (
     <Button
       als="flex-end"

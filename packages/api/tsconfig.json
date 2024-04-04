@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.base",
-  "include": ["src", "../app"],
+  "include": ["src", "../app", "../wagmi/src", "../ui/src"],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,

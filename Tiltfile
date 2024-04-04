@@ -221,7 +221,7 @@ local_resource(
 )
 
 cmd_button(
-    name = "shovel:generate-config",
+    name = "shovel:update-config",
     argv = [
         "/bin/sh",
         "-c",
@@ -229,7 +229,7 @@ cmd_button(
     ],
     icon_name = "restart_alt",
     location = location.RESOURCE,
-    resource = "shovel:generate-config",
+    resource = "shovel:test",
     text = "shovel update-snapshot",
 )
 
@@ -814,7 +814,6 @@ local_resource(
         "supabase:test",
         "contracts:test",
         "contracts:cov",
-        "next:web",
         "distributor:test",
     ],
 )

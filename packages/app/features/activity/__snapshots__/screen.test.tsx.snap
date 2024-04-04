@@ -2916,10 +2916,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       animatedStyle={
         {
           "value": {
-            "opacity": 0.5498890994849505,
+            "opacity": 0,
             "transform": [
               {
-                "translateY": -4.501109005150486,
+                "translateY": -10,
               },
             ],
           },
@@ -3176,10 +3176,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       animatedStyle={
         {
           "value": {
-            "opacity": -0.0393062088724579,
+            "opacity": 0.4501109005150496,
             "transform": [
               {
-                "translateY": 10.393062088724582,
+                "translateY": 5.498890994849514,
               },
             ],
           },

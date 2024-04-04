@@ -1,12 +1,8 @@
-import { Container, FormWrapper, Paragraph, Stack, XStack, YStack } from '@my/ui'
-
-import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
-
-import { useUser } from 'app/utils/useUser'
+import { Container, Stack } from '@my/ui'
+import { useConfirmedTags } from 'app/utils/tags'
 import { useEffect } from 'react'
-
-import { CheckoutForm } from './checkout-form'
 import { useRouter } from 'solito/router'
+import { CheckoutForm } from './checkout-form'
 
 export const CheckoutScreen = () => {
   const confirmedTags = useConfirmedTags()

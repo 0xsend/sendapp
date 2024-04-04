@@ -1,8 +1,8 @@
+import debug from 'debug'
 import { defineChain } from 'viem'
 import { base as baseMainnetViem, mainnet as mainnetViem, baseSepolia, sepolia } from 'viem/chains'
 
-// @ts-expect-error __DEV__ so we can share some react native code
-globalThis.__DEV__ = globalThis.__DEV__ ?? false
+const log = debug('wagmi:chains')
 
 export const localhost = defineChain({
   id: 1_337,
@@ -14,6 +14,7 @@ export const localhost = defineChain({
   },
   rpcUrls: {
     default: { http: ['http://127.0.0.1:8545'] },
+    public: { http: ['http://127.0.0.1:8545'] },
   },
   blockExplorers: {
     default: {
@@ -47,15 +48,47 @@ export const baseLocal = defineChain({
   },
 })
 
+// allow for creating private RPC url
+const MAINNET_RPC_URL =
+  process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'
+
 const mainnetChains = {
-  [String(mainnetViem.id)]: mainnetViem,
-  [String(sepolia.id)]: sepolia,
+  [String(mainnetViem.id)]: {
+    ...mainnetViem,
+    rpcUrls: {
+      default: { http: [MAINNET_RPC_URL] },
+      public: { http: [MAINNET_RPC_URL] },
+    },
+  } as typeof mainnetViem,
+  [String(sepolia.id)]: {
+    ...sepolia,
+    rpcUrls: {
+      default: { http: [MAINNET_RPC_URL] },
+      public: { http: [MAINNET_RPC_URL] },
+    },
+  } as typeof sepolia,
   [String(localhost.id)]: localhost,
 } as const
 
+// allow for creating private RPC url
+const BASE_RPC_URL =
+  process.env.BASE_RPC_URL ?? process.env.NEXT_PUBLIC_BASE_RPC_URL ?? 'http://127.0.0.1:8546/'
+
 const baseChains = {
-  [String(baseMainnetViem.id)]: baseMainnetViem,
-  [String(baseSepolia.id)]: baseSepolia,
+  [String(baseMainnetViem.id)]: {
+    ...baseMainnetViem,
+    rpcUrls: {
+      default: { http: [BASE_RPC_URL] },
+      public: { http: [BASE_RPC_URL] },
+    },
+  } as typeof baseMainnetViem,
+  [String(baseSepolia.id)]: {
+    ...baseSepolia,
+    rpcUrls: {
+      default: { http: [BASE_RPC_URL] },
+      public: { http: [BASE_RPC_URL] },
+    },
+  } as typeof baseSepolia,
   [String(baseLocal.id)]: baseLocal,
 } as const
 
@@ -63,15 +96,16 @@ export const mainnet: typeof mainnetViem | typeof localhost | typeof sepolia =
   (function mainnetFromEnv() {
     if (process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID) {
       const chain = mainnetChains[process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID]
+      log('mainnetFromEnv', `chain=${chain?.name} (${chain?.id})`)
       if (!chain) {
         throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID}`)
       }
       return chain
     }
-    // @ts-expect-error __DEV__ so we can share some react native code
     if (__DEV__ || process.env.CI) {
       return localhost
     }
+    log('mainnetFromEnv', 'using mainnetViem')
     return mainnetViem
   })()
 
@@ -79,14 +113,15 @@ export const baseMainnet: typeof baseMainnetViem | typeof baseLocal | typeof bas
   (function baseMainnetFromEnv() {
     if (process.env.NEXT_PUBLIC_BASE_CHAIN_ID) {
       const chain = baseChains[process.env.NEXT_PUBLIC_BASE_CHAIN_ID]
+      log('baseMainnetFromEnv', `chain=${chain?.name} (${chain?.id})`)
       if (!chain) {
         throw new Error(`Unknown chain id: ${process.env.NEXT_PUBLIC_BASE_CHAIN_ID}`)
       }
       return chain
     }
-    // @ts-expect-error __DEV__ so we can share some react native code
     if (__DEV__ || process.env.CI) {
       return baseLocal
     }
+    log('baseMainnetFromEnv', 'using baseMainnetViem')
     return baseMainnetViem
   })()

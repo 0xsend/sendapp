@@ -7,7 +7,7 @@
     "test": "bun test"
   },
   "devDependencies": {
-    "@indexsupply/shovel-config": "^0.0.5",
+    "@indexsupply/shovel-config": "^0.0.8",
     "@my/wagmi": "workspace:*",
     "@types/bun": "latest",
     "permissionless": "^0.1.11",

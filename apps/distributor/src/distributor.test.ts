@@ -4,6 +4,7 @@ globalThis.__DEV__ = true
 import request from 'supertest'
 import { describe, expect, it } from 'bun:test'
 import app from './app'
+import { supabaseAdmin } from './distributor'
 
 describe('Root Route', () => {
   it('should return correct response for the root route', async () => {
@@ -33,6 +34,25 @@ describe('Distributor Route', () => {
   })
 
   it('should perform distributor logic correctly', async () => {
+    const { data: distributions, error } = await supabaseAdmin
+      .from('distributions')
+      .select(
+        `*,
+        distribution_verification_values (*)`
+      )
+      .lte('qualification_start', new Date().toISOString())
+      .gte('qualification_end', new Date().toISOString())
+
+    if (error) {
+      throw error
+    }
+
+    if (distributions.length === 0) {
+      throw new Error('No distributions found')
+    }
+
+    expect(distributions.length).toBeGreaterThan(0)
+
     // get latest distribution id from API
     let lastDistributionId: number
     while (true) {
