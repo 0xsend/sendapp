@@ -693,7 +693,7 @@ local_resource(
         "anvil:send-account-fixtures",
         "aa_bundler:base",
         "snaplet:generate",
-        "next:web",
+        # "next:web",
         "supabase",
     ],
 )
@@ -814,7 +814,6 @@ local_resource(
         "supabase:test",
         "contracts:test",
         "contracts:cov",
-        "next:web",
         "distributor:test",
     ],
 )
