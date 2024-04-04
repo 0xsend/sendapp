@@ -134,7 +134,9 @@ jobs:
       #   shell: bash
       #   run: git diff --exit-code
       # this is on purpose so we get github annotations
-      - name: Playwright Deps
+      - name: Playwright Tests
+        id: playwright
+        shell: bash
         run: |
           # set debug logs if runner.debug is set
           if [ "${{runner.debug}}" == "1" ]; then
@@ -149,14 +151,6 @@ jobs:
           sleep 1
           echo tilt is ready
           time tilt wait --timeout 5m --for=condition=Ready "uiresource/playwright:deps"
-      - name: Playwright Tests
-        id: playwright
-        shell: bash
-        run: |
-          # set debug logs if runner.debug is set
-          if [ "${{runner.debug}}" == "1" ]; then
-            export DEBUG="test:*,app:*,api:*,next:*"
-          fi
           yarn playwright test
       - name: Playwright Report
         uses: actions/upload-artifact@v4
