@@ -79,8 +79,8 @@ jobs:
       - name: Load Next.js Build Cache
         uses: actions/download-artifact@v4
         with:
-          name: nextjs-build-cache
-          path: ${{ github.workspace }}/apps/next/.next/cache
+          name: nextjs-build
+          path: ${{ github.workspace }}/apps/next/.next
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
@@ -123,8 +123,8 @@ jobs:
       - name: Load Next.js Build Cache
         uses: actions/download-artifact@v4
         with:
-          name: nextjs-build-cache
-          path: ${{ github.workspace }}/apps/next/.next/cache
+          name: nextjs-build
+          path: ${{ github.workspace }}/apps/next/.next
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
@@ -187,8 +187,8 @@ jobs:
       - name: Load Next.js Build Cache
         uses: actions/download-artifact@v4
         with:
-          name: nextjs-build-cache
-          path: ${{ github.workspace }}/apps/next/.next/cache
+          name: nextjs-build
+          path: ${{ github.workspace }}/apps/next/.next
       - name: Get Supabase Database Branch
         if: github.base_ref == 'dev'
         uses: 0xbigboss/supabase-branch-gh-action@v1

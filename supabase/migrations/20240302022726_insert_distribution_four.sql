@@ -43,7 +43,7 @@ VALUES (
     1000,
     '2024-03-01T00:00:00Z',
     (
-      select '2024-04-01T00:00:00Z'::timestamp with time zone - interval '1 second'
+      select '2024-04-15T00:00:00Z'::timestamp with time zone - interval '1 second'
     ),
     --  100,000 SEND
     100000,

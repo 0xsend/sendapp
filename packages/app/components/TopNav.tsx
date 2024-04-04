@@ -149,7 +149,7 @@ export function TopNav({
               lineHeight={24}
               py="$3"
               $gtSm={{ py: '$6' }}
-              $gtLg={{ ml: '$9', pl: '$1', pb: '$6', pt: '$0' }}
+              $gtLg={{ pl: '$1', pb: '$6', pt: '$0', ...{ ml: isSubRoute ? '$10' : '$1' } }}
               $theme-light={{ col: '$gray10Light' }}
               $theme-dark={{ col: '$gray8Light' }}
             >
