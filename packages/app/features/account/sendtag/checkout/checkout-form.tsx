@@ -208,6 +208,7 @@ export const CheckoutForm = () => {
                         fontFamily={'$mono'}
                         accessibilityLabel={`Pending Sendtag ${tag.name}`}
                         aria-label={`Pending Sendtag ${tag.name}`}
+                        testID={`Pending Sendtag ${tag.name}`}
                       >
                         {tag.name}
                       </Paragraph>
