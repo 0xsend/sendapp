@@ -36,7 +36,7 @@
     "removeComments": false,
     "strict": true,
     "skipLibCheck": true,
-    "typeRoots": ["node_modules/@types", "environment.d.ts"],
+    "typeRoots": ["node_modules/@types", "environment.d.ts", "globals.d.ts"],
     "sourceMap": false,
     "target": "ESNext",
     "types": ["node"],

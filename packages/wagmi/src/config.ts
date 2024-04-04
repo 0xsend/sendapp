@@ -3,12 +3,11 @@ import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
 import { mainnetClient, baseMainnetClient } from './client'
 import { createConfig } from 'wagmi'
 
-export const chains = [baseMainnet, mainnet, baseMainnetOg, mainnetOg] as const
+export const chains = [baseMainnet, mainnet] as const
 
 export const client = ({ chain: { id: chainId } }) => {
   if (chainId === mainnet.id) return mainnetClient
   if (chainId === baseMainnet.id) return baseMainnetClient
-  // @ts-expect-error __DEV__ is a react native thing which we're not importing the types in this package
   // handle __DEV__ mode
   if (__DEV__) {
     if (chainId === baseMainnetOg.id) {
