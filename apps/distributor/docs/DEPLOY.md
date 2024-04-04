@@ -39,13 +39,15 @@ corepack enable
 
 ### Install Shovel
 
+We use shovel to aid in indexing onchain data.
+
 ```shell
 # linux/amd64, darwin/arm64, darwin/amd64, windows/amd64
-curl -LO https://indexsupply.net/bin/main/linux/amd64/shovel
+curl -LO https://indexsupply.net/bin/1.0/linux/amd64/shovel
 chmod +x shovel
 mv shovel /usr/local/bin/shovel
 shovel -version
-# vmain 0ec8
+# v1.0 7602
 ```
 
 ### Install Caddy
