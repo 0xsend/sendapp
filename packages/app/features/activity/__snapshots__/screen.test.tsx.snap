@@ -2973,6 +2973,27 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           }
         }
       />
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(191, 32%, 46%, 1)",
+            "fontFamily": "System",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": 24,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        tag_matches
+      </Text>
       <View
         data-href="/profile/test"
       >

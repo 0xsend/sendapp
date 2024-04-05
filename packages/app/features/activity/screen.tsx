@@ -147,7 +147,7 @@ function SearchResults() {
         result.phone_matches?.length === 0 && <Text>No results for {query}... 😢</Text>}
       {['send_id_matches', 'tag_matches', 'phone_matches'].map(
         (key) =>
-          result[key].length > 0 && (
+          result[key]?.length > 0 && (
             <>
               <H4 theme={'alt2'}>{key}</H4>
               {result[key].map((result) => (

@@ -28,12 +28,14 @@ rm -f ./supabase/migrations/20240113035231_users_referrals_count.sql
 rm -f ./supabase/migrations/20240116215010_create_tag_search_function.sql
 rm -f ./supabase/migrations/20240122020348_create_profile_lookup_function.sql
 rm -f ./supabase/migrations/20240129215957_update_tags_before_insert_or_update_func.sql
+rm -f ./supabase/migrations/20240329185908_add_profiles_send_id.sql
 
 # now run the snapshot restore command
 bunx supabase db reset && \
 bunx snaplet snapshot restore --no-reset --latest && \
 git checkout ./supabase/migrations && \
 bunx supabase db push --local --include-all
+PGPASSWORD=postgres psql -U postgres -d postgres -h localhost -p 54322 -c "insert into send_accounts (user_id, address, chain_id, init_code) select u.id as user_id, c.address, '845337' as chain_id, CONCAT( '\\x00', upper( CONCAT( md5(random() :: text), md5(random() :: text), md5(random() :: text), md5(random() :: text) ) ) ) :: bytea as init_code from auth.users u join chain_addresses c on c.user_id = u.id where user_id not in ( select user_id from send_accounts );"
 ```
 
 ## Capturing snapshots
