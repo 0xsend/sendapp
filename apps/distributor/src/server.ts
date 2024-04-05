@@ -1,5 +1,5 @@
 // @ts-expect-error set __DEV__ for code shared between server and client
-globalThis.__DEV__ = process.env.NODE_ENV === 'development'
+globalThis.__DEV__ = process.env.NODE_ENV !== 'production'
 
 import app from './app'
 
