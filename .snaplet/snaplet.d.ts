@@ -229,6 +229,7 @@ interface Table_public_profiles {
   about: string | null;
   referral_code: string | null;
   is_public: boolean | null;
+  send_id: number;
 }
 interface Table_public_receipts {
   hash: string;

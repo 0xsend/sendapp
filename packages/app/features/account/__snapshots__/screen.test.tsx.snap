@@ -283,7 +283,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Name
+          Send ID
         </Text>
         <Text
           selectable={true}
@@ -337,7 +337,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          No Name
+          No send id
         </Text>
         <Text
           selectable={true}
@@ -519,7 +519,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Name
+          Send ID
         </Text>
         <Text
           selectable={true}
@@ -534,7 +534,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          No Name
+          No send id
         </Text>
       </View>
       <View

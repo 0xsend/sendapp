@@ -37,6 +37,7 @@ export function AccountScreen() {
   const toast = useToastController()
   const { profile } = useUser()
   const name = profile?.name
+  const send_id = profile?.send_id
   const avatar_url = profile?.avatar_url
   const tags = useConfirmedTags()
   const sendTags = useConfirmedTags()?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
@@ -71,7 +72,7 @@ export function AccountScreen() {
   }
 
   const facts = [
-    { label: 'Name', value: name },
+    { label: 'Send ID', value: send_id },
     { label: 'Sendtags', value: sendTags },
     {
       label: 'Referral Code',
