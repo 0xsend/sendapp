@@ -127,6 +127,8 @@ function SearchResults() {
     return null
   }
 
+  const result = results[0] // Access the first element of the results array
+
   return (
     <YStack
       testID="searchResults"
@@ -140,29 +142,39 @@ function SearchResults() {
       }}
     >
       <H4 theme={'alt2'}>Results</H4>
-      {results.length === 0 && <Text>No results for {query}... 😢</Text>}
-      {results.map((result) => (
-        <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
-          <XStack testID={`tag-search-${result.tag_name}`} ai="center" space="$4">
-            <Avatar size="$4" br="$4" space="$2">
-              <Avatar.Image src={result.avatar_url} />
-              <Avatar.Fallback>
-                <Avatar>
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
-                  />
-                  <Avatar.Fallback>
-                    <Paragraph>??</Paragraph>
-                  </Avatar.Fallback>
-                </Avatar>
-              </Avatar.Fallback>
-            </Avatar>
-            <YStack space="$1">
-              <Text>{result.tag_name}</Text>
-            </YStack>
-          </XStack>
-        </Link>
-      ))}
+      {result.send_id_matches?.length === 0 &&
+        result.tag_matches?.length === 0 &&
+        result.phone_matches?.length === 0 && <Text>No results for {query}... 😢</Text>}
+      {['send_id_matches', 'tag_matches', 'phone_matches'].map(
+        (key) =>
+          result[key].length > 0 && (
+            <>
+              <H4 theme={'alt2'}>{key}</H4>
+              {result[key].map((result) => (
+                <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
+                  <XStack testID={`tag-search-${result.tag_name}`} ai="center" space="$4">
+                    <Avatar size="$4" br="$4" space="$2">
+                      <Avatar.Image src={result.avatar_url} />
+                      <Avatar.Fallback>
+                        <Avatar>
+                          <Avatar.Image
+                            src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
+                          />
+                          <Avatar.Fallback>
+                            <Paragraph>??</Paragraph>
+                          </Avatar.Fallback>
+                        </Avatar>
+                      </Avatar.Fallback>
+                    </Avatar>
+                    <YStack space="$1">
+                      <Text>{result.tag_name}</Text>
+                    </YStack>
+                  </XStack>
+                </Link>
+              ))}
+            </>
+          )
+      )}
     </YStack>
   )
 }

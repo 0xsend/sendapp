@@ -85,6 +85,32 @@ export type Database = MergeDeep<
             is_public: boolean | null
             send_id: number | null
           }[]
+          tag_search: {
+            Returns: {
+              send_id_matches: [
+                {
+                  send_id: number | null
+                  tag_name: string
+                  avatar_url: string | null
+                },
+              ]
+              tag_matches: [
+                {
+                  tag_name: string
+                  avatar_url: string | null
+                  send_id: number | null
+                },
+              ]
+              phone_matches: [
+                {
+                  phone: string
+                  avatar_url: string | null
+                  send_id: number | null
+                  tag_name: string | null
+                },
+              ]
+            }
+          }
         }
       }
     }

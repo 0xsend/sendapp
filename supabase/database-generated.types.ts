@@ -892,10 +892,13 @@ export type Database = {
       tag_search: {
         Args: {
           query: string
+          limit_val?: number
+          offset_val?: number
         }
         Returns: {
-          avatar_url: string
-          tag_name: string
+          send_id_matches: Json
+          tag_matches: Json
+          phone_matches: Json
         }[]
       }
       update_distribution_shares: {
