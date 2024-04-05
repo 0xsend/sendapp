@@ -154,6 +154,7 @@ contract TokenPaymaster6Test is Test {
         uint48 _priceMaxAge,
         uint40 _baseFee
     ) external {
+        _priceMarkup = bound(_priceMarkup, PRICE_DENOM, 2 * PRICE_DENOM);
         vm.assume(_priceMarkup <= 2 * PRICE_DENOM); // TPM: price markup too high
         vm.assume(_priceMarkup >= PRICE_DENOM); // TPM: price markup too low"
         TokenPaymasterConfig memory tcp = TokenPaymasterConfig({
