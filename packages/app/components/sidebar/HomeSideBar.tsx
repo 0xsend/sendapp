@@ -16,9 +16,9 @@ import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
-  IconActivity,
+  // IconActivity,
   IconHome,
-  IconSLogo,
+  // IconSLogo,
   IconSendLogo,
   IconX,
 } from 'app/components/icons'
@@ -34,16 +34,16 @@ const links = [
     text: 'home',
     href: '/',
   },
-  {
-    icon: <IconSLogo size={'$1'} />,
-    text: 'send',
-    href: '/send',
-  },
-  {
-    icon: <IconActivity size={'$1'} />,
-    text: 'activity',
-    href: '/activity',
-  },
+  // {
+  //   icon: <IconSLogo size={'$1'} />,
+  //   text: 'send',
+  //   href: '/send',
+  // },
+  // {
+  //   icon: <IconActivity size={'$1'} />,
+  //   text: 'activity',
+  //   href: '/activity',
+  // },
   {
     icon: <IconAccount size={'$1'} />,
     text: 'account',
