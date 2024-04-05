@@ -18,6 +18,7 @@ update public.profiles
   from subquery where profiles.id = subquery.user_id
   AND profiles.send_id IS NULL;
 
+ALTER TABLE profiles ALTER COLUMN send_id SET NOT NULL;
 -- Create sequence for next send_ids to auto generate on insert into profiles.
 
 CREATE SEQUENCE profiles_send_id_seq;
@@ -25,19 +26,19 @@ SELECT setval('profiles_send_id_seq', coalesce(max(send_id), 0) + 1, false) FROM
 ALTER TABLE profiles ALTER COLUMN send_id SET DEFAULT nextval('profiles_send_id_seq');
 create index concurrently on profiles(send_id);
 
-
+-- Trigger function to avoid changing send_id
 CREATE OR REPLACE FUNCTION stop_change_send_id()
-  RETURNS trigger AS
-$BODY$
-BEGIN
+  RETURNS TRIGGER LANGUAGE plpgsql security definer
+set search_path = public AS $$ BEGIN 
+
   IF OLD.send_id <> NEW.send_id THEN
     RAISE EXCEPTION 'send_id cannot be changed';
   END IF;
   RETURN NEW;
-$BODY$
+END;
+$$;
 
-
-CREATE TRIGGER avoid_send_id_change
+CREATE OR REPLACE TRIGGER avoid_send_id_change
   BEFORE UPDATE
   ON profiles
   FOR EACH ROW
