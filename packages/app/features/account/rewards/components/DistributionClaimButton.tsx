@@ -25,6 +25,9 @@ import {
   useWaitForTransactionReceipt,
 } from 'wagmi'
 
+import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
+
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
 }
@@ -56,7 +59,8 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
   })
   const { isConnected, address: account, chain: accountChain } = useAccount()
-  const { connect, connectors, error: connectError } = useConnect()
+  const { openConnectModal } = useConnectModal()
+  const { error: connectError } = useConnect()
   const { chains, switchChain, error: switchError } = useSwitchChain()
   const {
     data: claimWriteConfig,
@@ -90,14 +94,12 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (!isConnected) {
     return (
       <Stack>
-        <Button
-          onPress={() => {
-            assert(!!connectors[0], 'No connectors found')
-            connect({ connector: connectors[0] })
-          }}
-        >
-          <ButtonText col="$black">Connect Wallet to Claim</ButtonText>
-        </Button>
+        <OpenConnectModalWrapper>
+          <Button onPress={openConnectModal}>
+            <ButtonText col="$black">Connect Wallet to Claim</ButtonText>
+          </Button>
+        </OpenConnectModalWrapper>
+
         {connectError ? (
           connectError.message?.includes('Connector not found') ? (
             <ErrorMessage
@@ -247,7 +249,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           writeClaim(claimWriteConfig.request)
           refetchIsClaimed()
         }}
-        theme={'active_accent_Button'}
+        theme={'accent'}
       >
         {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim Reward'}
       </Button>
