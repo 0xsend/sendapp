@@ -46,6 +46,9 @@ jest.mock('app/routers/params', () => ({
   useDistributionNumber: () => [1, jest.fn()],
 }))
 jest.mock('wagmi')
+jest.mock('@rainbow-me/rainbowkit', () => ({
+  useConnectModal: jest.fn().mockReturnValue({ openConnectModal: jest.fn() }),
+}))
 jest.mock('@my/wagmi', () => ({
   __esModule: true,
   ...jest.requireActual('@my/wagmi'),
