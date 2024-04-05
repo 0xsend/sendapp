@@ -1,5 +1,5 @@
 import { useFormState } from 'react-hook-form'
-import { AnimatePresence, Button, type ButtonProps, ButtonText, Spinner } from 'tamagui'
+import { AnimatePresence, Button, type ButtonProps, ButtonText, Spinner, Unspaced } from 'tamagui'
 
 // hack to prevent it from breaking on the server
 const useIsSubmitting = () => {
@@ -22,25 +22,27 @@ export const SubmitButton = ({ children, theme = 'accent', ...props }: ButtonPro
       testID={'SubmitButton'}
       aria-busy={isSubmitting}
       iconAfter={
-        <AnimatePresence>
-          {isSubmitting && (
-            <Spinner
-              color="$color"
-              key="loading-spinner"
-              opacity={1}
-              y={0}
-              animation="quick"
-              enterStyle={{
-                opacity: 0,
-                y: 4,
-              }}
-              exitStyle={{
-                opacity: 0,
-                y: 4,
-              }}
-            />
-          )}
-        </AnimatePresence>
+        <Unspaced>
+          <AnimatePresence>
+            {isSubmitting ? (
+              <Spinner
+                color="$color"
+                key="loading-spinner"
+                opacity={1}
+                y={0}
+                animation="quick"
+                enterStyle={{
+                  opacity: 0,
+                  y: 4,
+                }}
+                exitStyle={{
+                  opacity: 0,
+                  y: 4,
+                }}
+              />
+            ) : null}
+          </AnimatePresence>
+        </Unspaced>
       }
       disabled={isSubmitting}
       theme={theme}

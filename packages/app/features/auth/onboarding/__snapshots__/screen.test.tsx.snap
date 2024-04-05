@@ -665,17 +665,6 @@ exports[`OnboardingScreen 1`] = `
                   CREATE PASSKEY
                 </Text>
               </Text>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 0,
-                    "minHeight": 0,
-                    "minWidth": 11.088000000000001,
-                    "width": 11.088000000000001,
-                  }
-                }
-              />
             </View>
           </View>
         </View>

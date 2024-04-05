@@ -1196,17 +1196,6 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         Send
                       </Text>
                     </Text>
-                    <View
-                      pointerEvents="none"
-                      style={
-                        {
-                          "height": 0,
-                          "minHeight": 0,
-                          "minWidth": 11.088000000000001,
-                          "width": 11.088000000000001,
-                        }
-                      }
-                    />
                   </View>
                 </View>
               </View>
@@ -3014,17 +3003,6 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                         Send
                       </Text>
                     </Text>
-                    <View
-                      pointerEvents="none"
-                      style={
-                        {
-                          "height": 0,
-                          "minHeight": 0,
-                          "minWidth": 11.088000000000001,
-                          "width": 11.088000000000001,
-                        }
-                      }
-                    />
                     <View
                       animatedStyle={
                         {
