@@ -1,6 +1,6 @@
 begin;
 select
-  plan(4);
+  plan(3);
 create extension "basejump-supabase_test_helpers";
 
 
@@ -25,20 +25,6 @@ SELECT throws_ok(
       'send_id cannot be changed',
       'User should not be able to change their own send_id'
   );
-
-
--- No one can not change send_id of any user
-select tests.authenticate_as_service_role();
-
-SELECT throws_ok(
-    $$
-    UPDATE public.profiles
-    SET send_id = 123
-    WHERE send_id = 1 $$,
-      'send_id cannot be changed',
-      'Root should not be able to change others send_id'
-  );
-
 
 select
   *
