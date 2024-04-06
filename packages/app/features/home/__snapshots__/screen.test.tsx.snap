@@ -63,23 +63,42 @@ exports[`HomeScreen 1`] = `
               }
             }
           >
-            <Text
-              selectable={true}
+            <View
               style={
                 {
-                  "color": "hsla(0, 0%, 100%, 0.5)",
-                  "fontFamily": "System",
-                  "fontSize": 16.8,
-                  "fontWeight": "400",
-                  "lineHeight": 19,
-                  "textTransform": "uppercase",
-                  "zIndex": 1,
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 10,
                 }
               }
-              suppressHighlighting={true}
             >
-              Total Balance
-            </Text>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#40FB50",
+                    "height": 11,
+                    "width": 11,
+                  }
+                }
+              />
+              <Text
+                selectable={true}
+                style={
+                  {
+                    "color": "hsla(0, 0%, 100%, 0.5)",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                    "zIndex": 1,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Total Balance
+              </Text>
+            </View>
             <View
               style={
                 {
