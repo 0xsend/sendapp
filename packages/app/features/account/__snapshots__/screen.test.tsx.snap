@@ -53,15 +53,15 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               "borderTopLeftRadius": 7,
               "borderTopRightRadius": 7,
               "flexDirection": "column",
-              "height": 84,
+              "height": 104,
               "justifyContent": "center",
-              "maxHeight": 84,
-              "maxWidth": 84,
-              "minHeight": 84,
-              "minWidth": 84,
+              "maxHeight": 104,
+              "maxWidth": 104,
+              "minHeight": 104,
+              "minWidth": 104,
               "overflow": "hidden",
               "position": "relative",
-              "width": 84,
+              "width": 104,
             }
           }
         >
@@ -90,8 +90,8 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               }
               style={
                 {
-                  "height": 84,
-                  "width": 84,
+                  "height": 104,
+                  "width": 104,
                 }
               }
             />

@@ -1,5 +1,6 @@
 import { SizableText, YStack } from '@my/ui'
 import { IconRefresh } from 'app/components/icons'
+import { Camera } from '@tamagui/lucide-icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { decode } from 'base64-arraybuffer'
@@ -89,6 +90,8 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
     await updateProfile()
   }
 
+  console.log('user.profile?.avatar_url : ', user.profile?.avatar_url)
+
   return (
     <YStack gap={'$4'}>
       <YStack
@@ -112,7 +115,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
           <YStack
             backgroundColor="$black"
             opacity={0.66}
-            borderRadius="$3"
+            borderRadius={'$3'}
             position="absolute"
             left={0}
             right={0}
@@ -120,7 +123,11 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
             bottom={0}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
-            <IconRefresh color="primary" />
+            {user.profile?.avatar_url ? (
+              <IconRefresh color="primary" />
+            ) : (
+              <Camera color="primary" size={'$4'} />
+            )}
           </YStack>
         </YStack>
       </YStack>
