@@ -18,7 +18,7 @@ export function SettingsNavLink({
 
   const { resolvedTheme } = useThemeSetting()
   const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$accent3Light'
-  const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$color' : '$color12'
+  const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$gray5Light' : '$color12'
 
   return (
     <Link
