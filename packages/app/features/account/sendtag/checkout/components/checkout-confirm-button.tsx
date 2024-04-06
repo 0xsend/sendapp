@@ -12,11 +12,12 @@ import {
 } from '@my/ui'
 
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
-import { useEffect, useMemo, useState } from 'react'
-import { getPriceInWei, verifyAddressMsg } from '../checkout-utils'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../checkout-utils'
 import {
   useAccount,
   useBalance,
+  useBlockNumber,
   useConnect,
   useEstimateGas,
   usePublicClient,
@@ -52,25 +53,52 @@ export function ConfirmButton({
   const { openConnectModal } = useConnectModal()
   const { openChainModal } = useChainModal()
   const { error: connectError } = useConnect()
-
-  //Verify
   const publicClient = usePublicClient()
-
+  const {
+    data: addresses,
+    isLoading: isLoadingAddresses,
+    isRefetching: isRefetchingAddresses,
+    refetch: updateAddresses,
+  } = useChainAddresses()
   const { address: connectedAddress } = useAccount()
   const { data: ethBalance } = useBalance({
     address: connectedAddress,
     chainId: baseMainnetClient.chain.id,
   })
-
   const weiAmount = useMemo(() => getPriceInWei(pendingTags ?? []), [pendingTags])
-
   const canAffordTags = ethBalance && ethBalance.value >= weiAmount
-
-  // Confirm
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
-  const { refetch: refetchReceipts } = useReceipts()
+  const { receipts, refetch: refetchReceipts, isLoading: isLoadingReceipts } = useReceipts()
+  const receiptHashes = useMemo(() => receipts?.map((r) => r.hash) ?? [], [receipts])
   const [sentTx, setSentTx] = useState<`0x${string}`>()
+
+  const { data: block } = useBlockNumber()
+  const lookupSafeReceivedEvent = useCallback(async () => {
+    if (!addresses || addresses.length === 0) return
+    const address = addresses[0].address
+    if (isLoadingReceipts) return
+    if (receipts === undefined) return
+    if (!publicClient) return
+
+    const events = await getSenderSafeReceivedEvents({
+      publicClient: publicClient as typeof baseMainnetClient,
+      sender: address,
+    })
+    const event = events.filter(
+      (e) => e.args.value === weiAmount && !receiptHashes.includes(e.transactionHash)
+    )?.[0]
+
+    // check it against the receipts
+    if (event?.transactionHash) {
+      submitTxToDb(event.transactionHash)
+    }
+  }, [receipts, publicClient, addresses, weiAmount, isLoadingReceipts, receiptHashes])
+  useEffect(() => {
+    if (block) {
+      lookupSafeReceivedEvent()
+    }
+  }, [block, lookupSafeReceivedEvent])
 
   const {
     data: txReceipt,
@@ -174,13 +202,6 @@ export function ConfirmButton({
       },
     },
   })
-
-  const {
-    data: addresses,
-    isLoading: isLoadingAddresses,
-    isRefetching: isRefetchingAddresses,
-    refetch: updateAddresses,
-  } = useChainAddresses()
 
   const [savedAddress, setSavedAddress] = useState(addresses?.[0]?.address) //this only works cause we limit to 1 address\
 
