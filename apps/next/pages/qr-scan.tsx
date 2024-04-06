@@ -15,9 +15,6 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps = guestOnlyGetSSP(async () => {
-  // disable for now
-  return { redirect: { destination: '/', permanent: false } }
-})
+export const getServerSideProps = guestOnlyGetSSP()
 
 export default Page

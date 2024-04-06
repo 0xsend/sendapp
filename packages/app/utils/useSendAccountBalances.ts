@@ -6,9 +6,8 @@ import {
   usdcAbi,
 } from '@my/wagmi'
 import { useBalance, useReadContracts } from 'wagmi'
+import { useSendAccounts } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
-// import { useSendAccounts } from './send-accounts'
-import { useChainAddresses } from './useChainAddresses'
 
 const usdcBaseContract = {
   address: usdcAddresses[baseMainnet.id],
@@ -24,10 +23,8 @@ const sendBaseContract = {
 
 export const useSendAccountBalances = () => {
   const { data: tokenPrices } = useTokenPrices()
-  // const { data: sendAccounts } = useSendAccounts()
-  // const sendAccount = sendAccounts?.[0]
-  const { data: chainAddresses } = useChainAddresses()
-  const sendAccount = chainAddresses?.[0]
+  const { data: sendAccounts } = useSendAccounts()
+  const sendAccount = sendAccounts?.[0]
 
   //@todo this is improper use of a hook. Hooks should always be used at top level of component
   const { data: tokenBalances, isPending: isPendingTokenBalances } = useReadContracts({
