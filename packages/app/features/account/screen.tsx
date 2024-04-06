@@ -111,7 +111,13 @@ export function AccountScreen() {
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
               <Avatar $gtMd={{ size: 133.5 }} size={'$10'} borderRadius={'$3'}>
-                <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
+                <Avatar.Image
+                  $gtMd={{ w: 133.5, h: 133.5 }}
+                  w={'$10'}
+                  h="$10"
+                  accessibilityLabel=""
+                  src={avatar_url ?? ''}
+                />
                 <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
                   <IconAccount size="$6" color="$olive" />
                 </Avatar.Fallback>
@@ -183,7 +189,7 @@ const BorderedLink = ({
       color={iconColor}
       theme="accent"
       borderRadius={'$4'}
-      p={'$4'}
+      p={'$3'}
       px="$4"
       {...props}
     >
