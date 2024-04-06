@@ -9,14 +9,14 @@ import {
   Adapt,
   Fieldset,
   Select,
-  SelectProps,
+  type SelectProps,
   Sheet,
-  Spinner,
   Text,
   Theme,
   XStack,
   YStack,
   useThemeName,
+  isWeb,
 } from 'tamagui'
 
 type SelectItem = {
@@ -67,11 +67,32 @@ export const CountryCodeField = ({
           value={country ? country.name : undefined}
           {...props}
         >
-          <Select.Trigger f={1} iconAfter={ChevronDown} space="$3s">
+          <Select.Trigger
+            f={1}
+            $theme-light={{
+              bc: '$gray6Light',
+              hoverStyle: { bc: '$gray8Light' },
+            }}
+            $theme-dark={{
+              bc: '$gray8Light',
+              hoverStyle: { bc: '$gray8Dark' },
+            }}
+            br={12}
+            borderWidth="$0"
+            iconAfter={() => <ChevronDown color="$black" />}
+            gap="$2"
+            {...(isWeb
+              ? {
+                  type: 'button',
+                }
+              : {})}
+          >
             {country ? (
               <Text
-                fontSize="$4"
-                fontWeight="normal"
+                fontSize="$7"
+                fontWeight="bold"
+                fontFamily={'$mono'}
+                col={'$black'}
                 style={{
                   textTransform: 'uppercase',
                 }}
@@ -79,7 +100,7 @@ export const CountryCodeField = ({
                 {country?.flag} +{country?.dialCode}
               </Text>
             ) : (
-              <Text fontSize="$2" fontWeight="normal">
+              <Text fontSize="$2" fontWeight="normal" col={'$black'}>
                 Country
               </Text>
             )}
@@ -120,7 +141,7 @@ export const CountryCodeField = ({
 
             <Select.Viewport>
               <XStack>
-                <Select.Group space="$0">
+                <Select.Group gap="$0">
                   <Select.Label color={resolvedTheme?.startsWith('dark') ? '$white' : '$black'}>
                     Select Country
                   </Select.Label>

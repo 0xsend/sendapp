@@ -1,8 +1,9 @@
 import { expect } from '@playwright/test'
 import { test } from '@my/playwright/fixtures/snaplet'
-import { debug, Debugger } from 'debug'
+import { debug, type Debugger } from 'debug'
 import { assert } from 'app/utils/assert'
 import { userOnboarded } from '@my/snaplet/src/models'
+import { ProfilePage } from './fixtures/profiles'
 
 let log: Debugger
 
@@ -14,12 +15,17 @@ test('anon user can visit public profile', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   assert(!!tag, 'tag not found')
+  const profile = plan.profiles[0]
+  assert(!!profile, 'profile not found')
+  assert(!!profile.name, 'profile name not found')
+  assert(!!profile.about, 'profile about not found')
   await page.goto(`/profile/${tag.name}`)
   const title = await page.title()
   expect(title).toBe('Send | Profile')
   await expect(page.getByRole('heading', { name: tag.name })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Send' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Request' })).toBeVisible()
+  const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
+  await expect(profilePage.sendButton).toBeVisible()
+  await expect(profilePage.requestButton).toBeVisible()
 })
 
 test('anon user cannot visit private profile', async ({ page, seed }) => {

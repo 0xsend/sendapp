@@ -1,5 +1,5 @@
-import { Database } from '@my/supabase/database.types'
-import { Session, createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
+import type { Database } from '@my/supabase/database.types'
+import { type Session, createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 import { AuthStateChangeHandler } from './AuthStateChangeHandler'

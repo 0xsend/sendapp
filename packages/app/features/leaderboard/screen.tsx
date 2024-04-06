@@ -1,4 +1,4 @@
-import { Button, Container, KVTable, Paragraph, XStack, YStack } from '@my/ui'
+import { Container, Paragraph, XStack, YStack } from '@my/ui'
 
 const users = [
   {
@@ -107,7 +107,7 @@ function LeaderBoardHeader() {
         Rank
       </Paragraph>
       <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" color={'$gray8'} ta="center">
-        Send Tag
+        Sendtag
       </Paragraph>
       <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" color={'$gray8'} ta="center">
         Points

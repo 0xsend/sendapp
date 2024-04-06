@@ -1,6 +1,6 @@
-import { ParsedUrlQuery } from 'querystring'
-import { Database } from '@my/supabase/database.types'
-import { GetServerSidePropsContext, PreviewData, Redirect } from 'next'
+import type { ParsedUrlQuery } from 'node:querystring'
+import type { Database } from '@my/supabase/database.types'
+import type { GetServerSidePropsContext, PreviewData, Redirect } from 'next'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import debug from 'debug'
 
@@ -34,7 +34,7 @@ export async function userOnboarded<
     log('no send accounts')
     return {
       redirect: {
-        destination: '/onboarding', // @todo add query param to redirect back to page after onboarding
+        destination: '/auth/onboarding', // @todo add query param to redirect back to page after onboarding
         permanent: false,
       },
     }

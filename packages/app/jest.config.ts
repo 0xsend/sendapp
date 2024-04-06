@@ -125,7 +125,7 @@ const config: Config = {
   // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
-  // rootDir: undefined,
+  // rootDir: '.',
 
   // A list of paths to directories that Jest should use to search for files in
   // roots: [
@@ -164,7 +164,7 @@ const config: Config = {
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|moti|sentry-expo|native-base|react-native-svg|solito|@wagmi|wagmi/*|viem|viem/*|@tamagui/animations-moti)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|moti|sentry-expo|native-base|react-native-svg|solito|@rainbow-me/rainbowkit|@wagmi|wagmi/*|viem|viem/*|@tamagui/animations-moti)',
   ],
 
   moduleNameMapper: {
@@ -194,7 +194,7 @@ const config: Config = {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  // verbose: undefined,
+  verbose: true,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],

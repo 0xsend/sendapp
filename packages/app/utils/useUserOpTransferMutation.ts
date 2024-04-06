@@ -1,13 +1,23 @@
 import { useMutation } from '@tanstack/react-query'
 import { assert } from './assert'
-import { Hex, encodeFunctionData, erc20Abi, isAddress, isHex, size, slice } from 'viem'
+import {
+  type Hex,
+  encodeFunctionData,
+  erc20Abi,
+  isAddress,
+  isHex,
+  size,
+  slice,
+  // maxUint256
+} from 'viem'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
-  daimoAccountAbi,
+  sendAccountAbi,
   entryPointAddress,
+  // tokenPaymasterAddress,
 } from '@my/wagmi'
-import { UserOperation, getUserOperationHash } from 'permissionless'
+import { type UserOperation, getUserOperationHash } from 'permissionless'
 import { USEROP_VALID_UNTIL, USEROP_VERSION, signUserOp } from './userop'
 
 export type UseUserOpTransferMutationArgs = {
@@ -60,11 +70,20 @@ export function useUserOpTransferMutation() {
         assert(initCode === '0x', 'Init code must be 0x for existing account')
       }
 
+      // @todo implement gas estimation
+      // @todo implement paymaster and data
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+      // // @ts-expect-error paymaster only deployed on localnet
+      // const paymaster = tokenPaymasterAddress[chainId]
+      // const paymasterVerificationGasLimit = 20000n
+      // const paymasterPostOpGasLimit = 50000n
+
       // GENERATE THE CALLDATA
       let callData: Hex | undefined
       if (!token) {
         callData = encodeFunctionData({
-          abi: daimoAccountAbi,
+          abi: sendAccountAbi,
           functionName: 'executeBatch',
           args: [
             [
@@ -78,10 +97,20 @@ export function useUserOpTransferMutation() {
         })
       } else {
         callData = encodeFunctionData({
-          abi: daimoAccountAbi,
+          abi: sendAccountAbi,
           functionName: 'executeBatch',
           args: [
             [
+              // approve Paymaster to spend token
+              // {
+              //   dest: token,
+              //   value: 0n,
+              //   data: encodeFunctionData({
+              //     abi: erc20Abi,
+              //     functionName: 'approve',
+              //     args: [paymaster, maxUint256],
+              //   }),
+              // },
               {
                 dest: token,
                 value: 0n,
@@ -96,8 +125,6 @@ export function useUserOpTransferMutation() {
         })
       }
 
-      // @todo implement gas estimation
-      // @todo implement paymaster and data
       const userOp: UserOperation<'v0.7'> = {
         sender,
         nonce,
@@ -105,19 +132,23 @@ export function useUserOpTransferMutation() {
         factoryData: size(initCode) ? slice(initCode, 20) : undefined,
         callData,
         callGasLimit: 300000n,
-        verificationGasLimit: 700000n,
-        preVerificationGas: 300000n,
+        verificationGasLimit: 2000000n,
+        preVerificationGas: 3000000n,
         maxFeePerGas: 1000000n,
         maxPriorityFeePerGas: 1000000n,
         paymaster: undefined,
-        paymasterData: undefined,
-        paymasterPostOpGasLimit: undefined,
+        // paymaster,
         paymasterVerificationGasLimit: undefined,
+        // paymasterVerificationGasLimit,
+        paymasterPostOpGasLimit: undefined,
+        // paymasterPostOpGasLimit,
+        paymasterData: undefined,
+        // paymasterData: '0x',
         signature: '0x',
       }
 
-      const chainId = baseMainnetClient.chain.id
-      const entryPoint = entryPointAddress[chainId]
+      // console.log('userOp', userOp)
+
       const userOpHash = getUserOperationHash({
         userOperation: userOp,
         entryPoint,
@@ -129,6 +160,12 @@ export function useUserOpTransferMutation() {
         version: USEROP_VERSION,
         validUntil,
       })
+
+      // const gasParameters = await baseMainnetBundlerClient.estimateUserOperationGas({
+      //   userOperation: userOp,
+      // })
+
+      // console.log('gasParameters', gasParameters)
 
       // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
       // await baseMainnetClient

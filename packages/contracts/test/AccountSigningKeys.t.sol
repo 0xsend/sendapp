@@ -4,8 +4,8 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 // solhint-disable-next-line
 import "forge-std/console2.sol";
-import "../src/DaimoAccountFactory.sol";
-import "../src/DaimoAccount.sol";
+import "../src/SendAccountFactory.sol";
+import "../src/SendAccount.sol";
 
 import "account-abstraction/core/EntryPoint.sol";
 
@@ -13,13 +13,13 @@ contract AccountSigningKeysTest is Test {
     using UserOperationLib for PackedUserOperation;
 
     EntryPoint public entryPoint;
-    DaimoVerifier public verifier;
-    DaimoAccountFactory public factory;
+    SendVerifier public verifier;
+    SendAccountFactory public factory;
 
     function setUp() public {
         entryPoint = new EntryPoint();
-        verifier = new DaimoVerifier();
-        factory = new DaimoAccountFactory(entryPoint, verifier);
+        verifier = new SendVerifier();
+        factory = new SendAccountFactory(entryPoint, verifier);
     }
 
     event SigningKeyAdded(IAccount indexed account, uint8 keySlot, bytes32[2] key);
@@ -39,8 +39,8 @@ contract AccountSigningKeysTest is Test {
         bytes32[2] memory key1 = [bytes32(key1u[0]), bytes32(key1u[1])];
         bytes32[2] memory key2 = [bytes32(key2u[0]), bytes32(key2u[1])];
 
-        DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
-        DaimoAccount acc = factory.createAccount(0, key1, calls, 42);
+        SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        SendAccount acc = factory.createAccount(0, key1, calls, 42);
         // solhint-disable-next-line
         console.log("new account address:", address(acc));
         assertTrue(acc.numActiveKeys() == uint8(1));
@@ -91,8 +91,8 @@ contract AccountSigningKeysTest is Test {
         bytes32[2] memory key1 = [bytes32(key1u[0]), bytes32(key1u[1])];
         bytes32[2] memory key2 = [bytes32(key2u[0]), bytes32(key2u[1])];
 
-        DaimoAccount.Call[] memory calls = new DaimoAccount.Call[](0);
-        DaimoAccount acc = factory.createAccount(0, key1, calls, 42);
+        SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        SendAccount acc = factory.createAccount(0, key1, calls, 42);
         assertTrue(acc.numActiveKeys() == uint8(1));
 
         // ensure initial key retrieves correctly

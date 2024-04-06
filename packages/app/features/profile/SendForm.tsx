@@ -3,10 +3,10 @@ import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { Hex, formatUnits, parseUnits, isAddress, isHex } from 'viem'
-import { baseMainnet, usdcAddress as usdcAddresses } from '@my/wagmi'
+import { type Hex, formatUnits, parseUnits, isAddress, isHex } from 'viem'
+import { baseMainnet, sendTokenAddress, usdcAddress as usdcAddresses } from '@my/wagmi'
 import { useState } from 'react'
-import { ProfileProp } from './SendDialog'
+import type { ProfileProp } from './SendDialog'
 import { useBalance, useTransactionCount } from 'wagmi'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountInitCode } from 'app/utils/useSendAccountInitCode'
@@ -105,6 +105,7 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
             options: [
               { name: 'ETH', value: '' },
               { name: 'USDC', value: usdcAddresses[baseMainnet.id] },
+              { name: 'SEND', value: sendTokenAddress[baseMainnet.id] },
             ],
           },
         }}

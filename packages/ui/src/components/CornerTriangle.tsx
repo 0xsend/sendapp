@@ -1,4 +1,4 @@
-import { StackProps, Stack } from 'tamagui'
+import { type StackProps, Stack } from 'tamagui'
 
 type CornerProp = { corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' }
 

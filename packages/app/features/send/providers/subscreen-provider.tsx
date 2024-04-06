@@ -1,13 +1,13 @@
 import { createContext, useContext, useState } from 'react'
 import {
-  ANIMATE_DIRECTION,
+  type ANIMATE_DIRECTION,
   ANIMATE_DIRECTION_LEFT,
-  ISubScreenContext,
-  ISubScreenContextProviderProps,
+  type ISubScreenContext,
+  type ISubScreenContextProviderProps,
   QRScreen,
-  QRScreenType,
-  ReceiveScreenType,
-  SendScreenType,
+  type QRScreenType,
+  type ReceiveScreenType,
+  type SendScreenType,
 } from '../types'
 
 const SubScreenContext = createContext<ISubScreenContext | undefined>(undefined)

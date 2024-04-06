@@ -1,10 +1,10 @@
 import {
   Authenticator,
-  CredentialCreationOptionsSerialized,
-  CredentialRequestOptionsSerialized,
+  type CredentialCreationOptionsSerialized,
+  type CredentialRequestOptionsSerialized,
 } from '@0xsend/webauthn-authenticator'
-import { type WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
-import { type BrowserContext, Page, test as base } from '@playwright/test'
+import type { WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
+import { type BrowserContext, type Page, test as base } from '@playwright/test'
 import debug from 'debug'
 
 let log: debug.Debugger

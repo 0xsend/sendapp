@@ -1,25 +1,8 @@
 import type { IconProps } from '@tamagui/helpers-icon'
 import { themed } from '@tamagui/helpers-icon'
-import PropTypes from 'prop-types'
 import React, { memo } from 'react'
-import {
-  Circle as _Circle,
-  Defs,
-  Ellipse,
-  G,
-  Line,
-  LinearGradient,
-  Path,
-  Polygon,
-  Polyline,
-  RadialGradient,
-  Rect,
-  Stop,
-  Svg,
-  Text as _Text,
-  Use,
-} from 'react-native-svg'
-import { ColorTokens } from '@my/ui/types'
+import { Line, Path, Polyline, Svg } from 'react-native-svg'
+import type { ColorTokens } from '@my/ui/types'
 
 const Icon = (props: IconProps) => {
   const { color, size, ...otherProps } = props

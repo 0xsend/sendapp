@@ -1,83 +1,76 @@
 import {
-  BottomSheet,
   Button,
-  ButtonIcon,
   Nav,
-  SheetProps,
+  Paragraph,
+  ScrollView,
+  Separator,
+  type SheetProps,
   SideBar,
   SideBarWrapper,
   XStack,
   YStack,
-  YStackProps,
+  type YStackProps,
   useMedia,
 } from '@my/ui'
 import { Link } from '@my/ui'
+import { baseMainnet } from '@my/wagmi/chains'
 import {
-  IconActivity,
-  IconDashboard,
-  IconDistributions,
-  IconGear,
-  IconSLogo,
+  IconAccount,
+  // IconActivity,
+  IconHome,
+  // IconSLogo,
   IconSendLogo,
-  IconTelegramLogo,
-  IconXLogo,
+  IconX,
 } from 'app/components/icons'
-import { SideBarFooterLink } from 'app/components/sidebar/SideBarFooterLink'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
-import { telegram as telegramSocial, twitter as twitterSocial } from 'app/data/socialLinks'
 
 import { useNav } from 'app/routers/params'
+import type { ReactElement } from 'react'
+import { NavSheet } from '../NavSheet'
+
+const links = [
+  {
+    icon: <IconHome size={'$1.75'} />,
+    text: 'home',
+    href: '/',
+  },
+  // {
+  //   icon: <IconSLogo size={'$1'} />,
+  //   text: 'send',
+  //   href: '/send',
+  // },
+  // {
+  //   icon: <IconActivity size={'$1'} />,
+  //   text: 'activity',
+  //   href: '/activity',
+  // },
+  {
+    icon: <IconAccount size={'$1'} />,
+    text: 'account',
+    href: '/account',
+  },
+  __DEV__ || baseMainnet.id === 84532
+    ? {
+        icon: <Paragraph px="$1">🔒</Paragraph>,
+        text: 'secret shop',
+        href: '/secret-shop',
+      }
+    : undefined,
+].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props}>
-      <Link href={'/'} marginTop={'$10'}>
-        <Button borderRadius={9999} w={'$11'} h={'$11'} bg={'transparent'}>
-          {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
-          <ButtonIcon>
-            <IconSLogo size={'$10'} />
-          </ButtonIcon>
-        </Button>
-      </Link>
-      <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="stretch" justifyContent="center" w={'100%'} f={1}>
-          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
-          <SideBarNavLink
-            icon={<IconActivity size={'$2'} />}
-            text={'Activity'}
-            href={'/activity'}
-          />
-          <SideBarNavLink
-            icon={<IconDistributions size={'$2'} />}
-            text={'Distributions'}
-            href={'/distributions'}
-          />
-          <SideBarNavLink icon={<IconGear size={'$2'} />} text={'Settings'} href={'/settings'} />
-          <SideBarNavLink
-            icon={<IconSLogo size={'$2'} />}
-            text={'Leaderboard'}
-            href={'/leaderboard'}
-            hoverStyle={{ cursor: 'not-allowed' }}
-          />
+      <Nav display="flex" flex={1}>
+        <Link href={'/'} display="flex" pl={'$4.5'}>
+          <IconSendLogo size={'$2.5'} color={'$color12'} />
+        </Link>
+        <YStack gap={'$4'} pt={'$10'} alignItems="stretch" w={'100%'} f={1}>
+          {links.map((link) => (
+            <SideBarNavLink key={link.href} {...link} />
+          ))}
         </YStack>
       </Nav>
-      <YStack gap="$4" alignItems="center">
-        <IconSendLogo size={'$4'} />
-        <XStack gap="$2">
-          <SideBarFooterLink
-            icon={<IconXLogo />}
-            href={twitterSocial}
-            target="_blank"
-            borderRadius={9999}
-          />
-          <SideBarFooterLink
-            icon={<IconTelegramLogo />}
-            href={telegramSocial}
-            target="_blank"
-            borderRadius={9999}
-          />
-        </XStack>
-      </YStack>
     </SideBar>
   )
 }
@@ -91,67 +84,77 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
   }
 
   return (
-    <BottomSheet open={nav === 'home'} onOpenChange={onOpenChange}>
+    <NavSheet open={nav === 'home'} onOpenChange={onOpenChange}>
       <Link href={'/'} marginTop={'$4'}>
-        <Button borderRadius={9999} w={'$11'} h={'$11'} bg={'transparent'}>
-          {/* TODO: Implement Radial Gradient UI Element. Curently not in TamaGUI */}
-          <ButtonIcon>
-            <IconSLogo size={'$10'} />
-          </ButtonIcon>
-        </Button>
+        <IconSendLogo size={'$2.5'} color={'$color12'} />
       </Link>
-      <Nav display="flex" flex={2} justifyContent={'center'} alignItems="center">
-        <YStack gap={'$4'} alignItems="stretch" justifyContent="center">
-          <SideBarNavLink icon={<IconDashboard size={'$2'} />} text={'Dashboard'} href={'/'} />
-          <SideBarNavLink
-            icon={<IconActivity size={'$2'} />}
-            text={'Activity'}
-            href={'/activity'}
-          />
-          <SideBarNavLink
-            icon={<IconDistributions size={'$2'} />}
-            text={'Distributions'}
-            href={'/distributions'}
-          />
-          <SideBarNavLink
-            icon={<IconDistributions size={'$2'} />}
-            text={'Settings'}
-            href={'/settings'}
-          />
-          <SideBarNavLink
-            icon={<IconSLogo size={'$2'} />}
-            text={'Leaderboard'}
-            href={'/leaderboard'}
-            disabled={true}
-            hoverStyle={{ cursor: 'not-allowed' }}
-          />
-        </YStack>
+      <Nav display="flex" flex={2} height="100%" justifyContent={'center'}>
+        <ScrollView gap={'$4'} alignItems="stretch" jc="center" ml="$-5" height="100%">
+          {links.map((link, idx) => (
+            <YStack
+              key={link.href}
+              gap={'$4'}
+              alignItems="stretch"
+              justifyContent="center"
+              f={1}
+              h={'$7'}
+            >
+              <SideBarNavLink key={link.href} {...link} />
+              {idx !== links.length - 1 && (
+                <Separator
+                  width="100%"
+                  pos={'absolute'}
+                  left="$-6"
+                  bottom="$0"
+                  borderColor="$decay"
+                />
+              )}
+            </YStack>
+          ))}
+        </ScrollView>
       </Nav>
-      <YStack gap="$4" py="$4" alignItems="center">
-        <IconSendLogo size={'$4'} />
-        <XStack gap="$2">
-          <SideBarFooterLink
-            icon={<IconXLogo />}
-            href={twitterSocial}
-            target="_blank"
-            borderRadius={9999}
-          />
-          <SideBarFooterLink
-            icon={<IconTelegramLogo />}
-            href={telegramSocial}
-            target="_blank"
-            borderRadius={9999}
-          />
-        </XStack>
-      </YStack>
-    </BottomSheet>
+
+      <XStack pos={'absolute'} top={'$7'} right={'$6'}>
+        <Button
+          size="$4"
+          transparent
+          chromeless
+          backgroundColor="transparent"
+          hoverStyle={{ backgroundColor: 'transparent' }}
+          pressStyle={{ backgroundColor: 'transparent' }}
+          focusStyle={{ backgroundColor: 'transparent' }}
+          circular
+          icon={<IconX size="$2" color="$color9" />}
+          onPress={onOpenChange}
+          theme="accent"
+        />
+      </XStack>
+    </NavSheet>
   )
 }
 
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
 
-  if (media.gtLg) return <SideBarWrapper sidebar={<HomeSideBar />}>{children}</SideBarWrapper>
+  if (media.gtLg)
+    return (
+      <SideBarWrapper
+        sidebar={
+          <HomeSideBar
+            $theme-dark={{ backgroundColor: '$charcoal' }}
+            $theme-light={{ backgroundColor: '$gray3Light' }}
+            width={208}
+            minWidth={208}
+            btlr={0}
+            bblr={0}
+            pt={80}
+            jc="flex-start"
+          />
+        }
+      >
+        {children}
+      </SideBarWrapper>
+    )
   return (
     <>
       <HomeBottomSheet />

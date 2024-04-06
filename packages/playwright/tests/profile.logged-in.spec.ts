@@ -1,10 +1,11 @@
 import { expect, test as authTest } from './fixtures/auth'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { debug, Debugger } from 'debug'
+import { debug, type Debugger } from 'debug'
 import { OnboardingPage } from './fixtures/send-accounts'
 import { mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { userOnboarded } from '@my/snaplet/src/models'
+import { ProfilePage } from './fixtures/profiles'
 
 const test = mergeTests(snapletTest, authTest)
 
@@ -19,6 +20,10 @@ test('logged in user needs onboarding before visiting profile', async ({ page, s
   log(plan.tags)
   const tag = plan.tags[0]
   assert(!!tag, 'tag not found')
+  const profile = plan.profiles[0]
+  assert(!!profile, 'profile not found')
+  assert(!!profile.name, 'profile name not found')
+  assert(!!profile.about, 'profile about not found')
   await page.goto(`/profile/${tag.name}`)
   expect(await page.title()).toBe('Send | Onboarding')
   await new OnboardingPage(page).completeOnboarding(expect)
@@ -27,7 +32,9 @@ test('logged in user needs onboarding before visiting profile', async ({ page, s
 
   await page.goto(`/profile/${tag.name}`)
 
+  const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
+
   expect(await page.title()).toBe('Send | Profile')
   await expect(page.getByRole('heading', { name: tag.name })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Send' })).toBeVisible()
+  await expect(profilePage.sendButton).toBeVisible()
 })

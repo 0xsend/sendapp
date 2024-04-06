@@ -1,5 +1,5 @@
-import { ColorTokens } from '@my/ui/types'
-import { IconProps, themed } from '@tamagui/helpers-icon'
+import type { ColorTokens } from '@my/ui/types'
+import { type IconProps, themed } from '@tamagui/helpers-icon'
 import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
@@ -8,9 +8,10 @@ const Gear = (props: IconProps) => {
   const { size, color, ...rest } = props
   return (
     <Svg
+      fill="none"
       color={color as ColorTokens | undefined}
-      width={size}
-      height={size}
+      width={size ?? 20}
+      height={size ?? 20}
       viewBox="0 0 24 24"
       {...rest}
     >

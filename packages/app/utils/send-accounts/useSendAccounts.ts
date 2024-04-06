@@ -1,7 +1,7 @@
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from '../supabase/useSupabase'
 import { useUser } from '../useUser'
-import { Tables } from '@my/supabase/database.types'
+import type { Tables } from '@my/supabase/database.types'
 
 export type SendAccountQuery = Tables<'send_accounts'> & {
   send_account_credentials: Tables<'send_account_credentials'>[]

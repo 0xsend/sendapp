@@ -1,7 +1,7 @@
 import { mergeTests } from '@playwright/test'
 import { test as sendAccountTest, expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { debug, Debugger } from 'debug'
+import { debug, type Debugger } from 'debug'
 import { assert } from 'app/utils/assert'
 import { userOnboarded } from '@my/snaplet/src/models'
 import { ProfilePage } from './fixtures/profiles'
@@ -31,7 +31,7 @@ test('can send ETH to user on profile', async ({ page, seed }) => {
   await profilePage.sendButton.click()
 
   // @todo create send form fixture
-  const sendDialog = page.getByRole('dialog', { name: 'Send' })
+  const sendDialog = page.getByTestId('sendDialogContainer')
   await expect(sendDialog).toBeVisible()
   const amountInput = sendDialog.getByLabel('Amount')
   await expect(amountInput).toBeVisible()
@@ -62,7 +62,7 @@ test('can send USDC to user on profile', async ({ page, seed }) => {
   await profilePage.sendButton.click()
 
   // @todo create send form fixture
-  const sendDialog = page.getByRole('dialog', { name: 'Send' })
+  const sendDialog = page.getByTestId('sendDialogContainer')
   await expect(sendDialog).toBeVisible()
   const amountInput = sendDialog.getByLabel('Amount')
   await expect(amountInput).toBeVisible()

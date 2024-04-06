@@ -1,4 +1,4 @@
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from './supabase/useSupabase'
 import type { Functions } from '@my/supabase/database.types'
 import type { PostgrestError } from '@supabase/supabase-js'

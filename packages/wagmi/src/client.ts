@@ -11,13 +11,9 @@ log(
   `hostname=${new URL(mainnet.rpcUrls.default.http[0]).hostname}`
 )
 
-// allow for creating private RPC url
-const MAINNET_RPC_URL =
-  process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'
-
 export const mainnetClient = createPublicClient({
   chain: mainnet,
-  transport: http(MAINNET_RPC_URL),
+  transport: http(mainnet.rpcUrls.default.http[0]),
 })
 
 log(
@@ -26,13 +22,9 @@ log(
   `hostname=${new URL(baseMainnet.rpcUrls.default.http[0]).hostname}`
 )
 
-// allow for creating private RPC url
-const BASE_RPC_URL =
-  process.env.BASE_RPC_URL ?? process.env.NEXT_PUBLIC_BASE_RPC_URL ?? 'http://127.0.0.1:8546/'
-
 export const baseMainnetClient = createPublicClient({
   chain: baseMainnet,
-  transport: http(BASE_RPC_URL),
+  transport: http(baseMainnet.rpcUrls.default.http[0]),
 })
 
 const BUNDLER_RPC_URL =

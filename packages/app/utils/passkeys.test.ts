@@ -1,9 +1,9 @@
-import crypto from 'crypto'
-import { CreateResult, SignResult } from '@daimo/expo-passkeys'
+import crypto from 'node:crypto'
+import type { CreateResult, SignResult } from '@daimo/expo-passkeys'
 import { describe, it } from '@jest/globals'
 import { p256 } from '@noble/curves/p256'
 import { base64 } from '@scure/base'
-import { Hex, bytesToHex } from 'viem'
+import { type Hex, bytesToHex } from 'viem'
 import {
   contractFriendlyKeyToDER,
   createResponseToDER,

@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base",
   "include": [
-    "src"
+    "src",
+    // dirty hack, but we need somehow included app/utils in the build
+    "../app/utils/country",
+    "../app/utils/useGeoIp"
   ],
   "compilerOptions": {
     "composite": true,

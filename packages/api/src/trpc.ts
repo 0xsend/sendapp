@@ -1,7 +1,7 @@
-import { Database } from '@my/supabase/database.types'
+import type { Database } from '@my/supabase/database.types'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { TRPCError, initTRPC } from '@trpc/server'
-import { type CreateNextContextOptions } from '@trpc/server/adapters/next'
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import superJson from 'superjson'
 
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {

@@ -1,5 +1,5 @@
-import { ColorTokens } from '@my/ui'
-import { IconProps, themed } from '@tamagui/helpers-icon'
+import type { ColorTokens } from '@my/ui'
+import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
 
@@ -17,7 +17,6 @@ const SendLogo = (props: IconProps) => {
       height={size}
       viewBox="0 0 132 48"
       color={color as ColorTokens | undefined}
-      xmlns="http://www.w3.org/2000/svg"
       {...rest}
     >
       <G clipPath="url(#clip0_12_4001)">

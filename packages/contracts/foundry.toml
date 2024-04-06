@@ -8,23 +8,29 @@ solc_version = "0.8.23"
 optimizer = true
 optimizer_runs = 999_999
 
+[profile.ci]
+verbosity = 4
+fuzz.runs = 512
+
 [profile.deploy]
 via_ir = true
 
 [profile.mainnet]
 evm_version = "shanghai"
 # should be updated after releases
-fork_block_number = 19299339
+fork_block_number = 19582866
 
 [profile.base]
 # should be updated after releases
-fork_block_number = 11005692
+fork_block_number = 12736275
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 
 [rpc_endpoints]
-mainnet = "${MAINNET_RPC_URL}"
-base = "${BASE_RPC_URL}"
+mainnet = "${FOUNDRY_MAINNET_RPC_URL}"
+base = "${FOUNDRY_BASE_RPC_URL}"
+base-sepolia = "${FOUNDRY_BASE_SEPOLIA_RPC_URL}"
+base-local = "http://127.0.0.1:8546"
 
 [etherscan]
 # mainnet = { key = "${ETHERSCAN_API_KEY}" }

@@ -1,6 +1,6 @@
 import { createParam } from 'solito'
 
-type Nav = { nav?: 'home' }
+type Nav = { nav?: 'home' | 'settings' }
 
 const { useParam: useNavParam } = createParam<Nav>()
 
@@ -15,5 +15,31 @@ export const useNavParams = () => {
 
   return {
     nav,
+  }
+}
+
+type Distribution = { distribution: number }
+
+const { useParam: useDistributionNumberParam } = createParam<Distribution>()
+
+export const useDistributionNumber = () => {
+  const [distributionNumber, setDistributionNumberParam] = useDistributionNumberParam(
+    'distribution',
+    {
+      initial: undefined,
+      parse: (value) => Number(value),
+    }
+  )
+
+  return [distributionNumber, setDistributionNumberParam] as const
+}
+
+export const useDistributionNumberParams = () => {
+  const [distributionNumber] = useDistributionNumberParam('distribution', {
+    initial: undefined,
+    parse: (value) => Number(value),
+  })
+  return {
+    distributionNumber,
   }
 }

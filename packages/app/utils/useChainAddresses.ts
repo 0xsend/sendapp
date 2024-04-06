@@ -1,5 +1,5 @@
-import { Tables } from '@my/supabase/database.types'
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import type { Tables } from '@my/supabase/database.types'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from './supabase/useSupabase'
 import { useUser } from './useUser'
 export function useChainAddresses(): UseQueryResult<Tables<'chain_addresses'>[], Error> {

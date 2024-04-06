@@ -1,5 +1,5 @@
-import { join } from 'path'
-import { Database } from '@my/supabase/database.types'
+import { join } from 'node:path'
+import type { Database } from '@my/supabase/database.types'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { createClient } from '@supabase/supabase-js'
 import debug from 'debug'
@@ -7,7 +7,7 @@ import { config } from 'dotenv'
 
 const log = debug('contracts:script:gen-merkle-tree')
 
-const dotenvPath = join(__dirname, '..', '..', '..', '.env.production.local')
+const dotenvPath = join(__dirname, '..', '..', '..', '.env.local')
 config({ path: dotenvPath, override: true })
 
 log(`Loaded environment variables from ${dotenvPath}`)

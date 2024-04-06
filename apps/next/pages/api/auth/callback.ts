@@ -1,5 +1,5 @@
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { NextApiHandler } from 'next'
+import type { NextApiHandler } from 'next'
 
 const handler: NextApiHandler = async (req, res) => {
   const { code } = req.query

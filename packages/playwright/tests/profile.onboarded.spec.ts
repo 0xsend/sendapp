@@ -1,7 +1,7 @@
 import { mergeTests } from '@playwright/test'
 import { test as sendAccountTest, expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { debug, Debugger } from 'debug'
+import { debug, type Debugger } from 'debug'
 import { assert } from 'app/utils/assert'
 import { userOnboarded } from '@my/snaplet/src/models'
 import { ProfilePage } from './fixtures/profiles'
@@ -26,7 +26,7 @@ test('can visit other user profile', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
   await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
-  await expect(page.getByRole('dialog', { name: 'Send' })).toBeVisible()
+  await expect(page.getByTestId('sendDialogContainer')).toBeVisible()
 })
 
 test('can visit my own profile', async ({

@@ -53,7 +53,7 @@ export const SendTagScreen = () => {
         </SizableText>
       </XStack>
       <XStack ai={'center'}>
-        <CustomInput placeholder="Name, Send Tag, Phone" />
+        <CustomInput placeholder="Send ID, Sendtag, Phone" />
         <XStack pos={'absolute'} r={'$3.5'} pe={'none'}>
           <IconSearch />
         </XStack>

@@ -1,7 +1,8 @@
-import { type GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
-import { Dispatch, SetStateAction, createContext, useContext } from 'react'
+import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
+import { type Dispatch, type SetStateAction, createContext, useContext } from 'react'
 
 export type CarouselImage = { src: string; height: number; width: number; base64?: string }
+
 export interface AuthCarouselContext {
   carouselImages: GetPlaiceholderImage[]
   setCarouselImages: Dispatch<SetStateAction<GetPlaiceholderImage[]>>

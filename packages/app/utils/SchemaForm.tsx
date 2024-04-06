@@ -7,7 +7,7 @@ import {
   CountryCodeField,
   FieldError,
   Form,
-  FormProps,
+  type FormProps,
   FormWrapper,
   NumberField,
   OTPField,
@@ -16,7 +16,7 @@ import {
   TextField,
   Theme,
 } from '@my/ui'
-import { ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 

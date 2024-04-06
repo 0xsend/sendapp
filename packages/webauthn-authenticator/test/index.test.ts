@@ -1,10 +1,10 @@
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 import * as cbor from 'cbor'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   COSE_PUB_KEY_ALG,
   type CredentialCreationOptionsSerialized,
-  CredentialRequestOptionsSerialized,
+  type CredentialRequestOptionsSerialized,
 } from '../src'
 
 describe('Webauthn Credential Functions', () => {

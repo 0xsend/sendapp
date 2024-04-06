@@ -7,16 +7,15 @@ import {
   Sheet,
   SizableText,
   Theme,
-  ThemeName,
+  type ThemeName,
   XStack,
   YStack,
   styled,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconClose } from 'app/components/icons'
-import { SendButton } from 'app/components/layout/footer/components/SendButton'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
-import { IConfirmModalProps } from 'app/features/send/types'
+import type { IConfirmModalProps } from 'app/features/send/types'
 
 const CustomInput = styled(Input, {
   name: 'CustomInput',
@@ -122,7 +121,7 @@ export const SendConfirmModal = ({ showModal, setShowModal }: IConfirmModalProps
                   <CustomInput placeholder="Type here..." />
                 </YStack>
                 <YStack fg={1} jc={'flex-end'}>
-                  <SendButton height={'$6'} borderRadius={'$9'} />
+                  <Button height={'$6'} borderRadius={'$9'} />
                 </YStack>
               </YStack>
             </YStack>

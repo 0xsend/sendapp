@@ -1,19 +1,18 @@
-import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { HomeScreen } from 'app/features/home/screen'
-import { GetServerSidePropsContext } from 'next'
+import { HomeLayout } from 'app/features/home/layout.web'
+import type { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from './_app'
+import type { NextPageWithLayout } from './_app'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>Send | Home</title>
       </Head>
-      <HomeSideBarWrapper>
-        <HomeScreen />
-      </HomeSideBarWrapper>
+      <HomeScreen />
     </>
   )
 }
@@ -34,5 +33,11 @@ function setReferralCodeCookie(context: GetServerSidePropsContext) {
     )
   }
 }
+
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.QR} showLogo={true} />}>
+    {children}
+  </HomeLayout>
+)
 
 export default Page

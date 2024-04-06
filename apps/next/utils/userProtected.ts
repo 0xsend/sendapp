@@ -1,7 +1,7 @@
-import { ParsedUrlQuery } from 'querystring'
-import { Database } from '@my/supabase/database.types'
+import type { ParsedUrlQuery } from 'node:querystring'
+import type { Database } from '@my/supabase/database.types'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { GetServerSideProps, PreviewData } from 'next'
+import type { GetServerSideProps, PreviewData } from 'next'
 
 import debug from 'debug'
 import { userOnboarded } from './userOnboarded'
@@ -37,14 +37,15 @@ export function userProtectedGetSSP<
       log('no session')
       return {
         redirect: {
-          destination: '/sign-in', // @todo add query param to redirect back to page after sign in
+          destination: '/auth/sign-in', // @todo add query param to redirect back to page after sign in
           permanent: false,
         },
       }
     }
 
-    const needsOnboarding = await userOnboarded(supabase, ctx)
-    if (needsOnboarding) return needsOnboarding
+    // @todo re-introduce once onboarding is ready
+    // const needsOnboarding = await userOnboarded(supabase, ctx)
+    // if (needsOnboarding) return needsOnboarding
 
     const getSSRResult = getServerSideProps ? await getServerSideProps(ctx) : { props: {} as Props }
     if ('props' in getSSRResult) {

@@ -7,7 +7,7 @@ import {
   Fieldset,
   Label,
   Select,
-  SelectProps,
+  type SelectProps,
   Sheet,
   Theme,
   XStack,

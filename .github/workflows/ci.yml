@@ -5,6 +5,7 @@ on:
   pull_request:
   push:
     branches: [main, dev]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.ref }}
@@ -20,20 +21,38 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         with:
-          install-foundry: false
-          install-bun: false
+          build-nextjs: true
+        env:
+          YARN_ENABLE_HARDENED_MODE: 0
+      - name: Show github refs
+        run: |
+          echo github.ref=${{ github.ref }}
+          echo github.head_ref=${{ github.head_ref }}
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: [cache-deps]
+    env:
+      YARN_ENABLE_HARDENED_MODE: 0
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
         env:
           YARN_ENABLE_HARDENED_MODE: 0
           SKIP_YARN_POST_INSTALL: 1
+      - name: Lint
+        run: yarn lint
 
-  ci:
-    # skip if on dev and main (but not PRS to dev or main)
-    if: ${{ !(contains(github.ref, 'dev') || contains(github.ref, 'main')) }}
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
+      FOUNDRY_BASE_SEPOLIA_RPC_URL: ${{ secrets.CI_FOUNDRY_BASE_SEPOLIA_RPC_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
 
     steps:
@@ -42,7 +61,7 @@ jobs:
           submodules: recursive
       # No idea how homebrew bundle broke with tilt depending on python so installing manually
       - name: Install Tilt
-        run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+        uses: ./.github/actions/install-tilt
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -57,17 +76,63 @@ jobs:
           YARN_ENABLE_HARDENED_MODE: 0
         with:
           yarn-install: false
+      - name: Load Next.js Build Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: ${{ github.workspace }}/apps/next/.next
+      - name: Snaplet Login
+        shell: bash
+        run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Tilt CI
         shell: bash
-        run: tilt ci unit-tests:tests
-      - name: All Changes Committed
-        shell: bash
-        run: git diff --exit-code
+        run: tilt ci unit-tests
+      # @todo anvil fixtures cause dirty repo, but only in github actions 😢
+      # - name: All Changes Committed
+      #   shell: bash
+      #   run: git diff --exit-code
+
+  playwright-tests:
+    name: Playwright Tests
+    runs-on: ubuntu-latest
+    needs: [cache-deps]
+    env:
+      ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
+      ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
+      YARN_ENABLE_HARDENED_MODE: 0
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Tilt
+        uses: ./.github/actions/install-tilt
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: Brew Bundle
+        id: brew-bundle
+        run: |
+          brew bundle
+          brew cleanup
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+        env:
+          YARN_ENABLE_HARDENED_MODE: 0
+      - name: Load Next.js Build Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: ${{ github.workspace }}/apps/next/.next
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
+      # @todo anvil fixtures cause dirty repo, but only in github actions 😢
+      # - name: All Changes Committed
+      #   shell: bash
+      #   run: git diff --exit-code
       # this is on purpose so we get github annotations
       - name: Playwright Tests
         id: playwright
@@ -75,7 +140,7 @@ jobs:
         run: |
           # set debug logs if runner.debug is set
           if [ "${{runner.debug}}" == "1" ]; then
-            export DEBUG=test:*,app:*
+            export DEBUG="test:*,app:*,api:*,next:*"
           fi
           nohup tilt up playwright:deps &
           echo waiting for tilt to be ready
@@ -83,8 +148,9 @@ jobs:
             curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i failed, trying again..."
             sleep 1
           done
+          sleep 1
           echo tilt is ready
-          tilt wait --timeout 60s --for=condition=Ready "uiresource/playwright:deps"
+          time tilt wait --timeout 5m --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
       - name: Playwright Report
         uses: actions/upload-artifact@v4
@@ -96,7 +162,7 @@ jobs:
 
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
-    if: ${{ !(contains(github.ref, 'dev') || contains(github.ref, 'main') || contains(github.head_ref, 'dev') || contains(github.head_ref, 'main')) }}
+    if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
     runs-on: ubuntu-latest
     needs: [cache-deps]
 
@@ -117,14 +183,97 @@ jobs:
           yarn-install: false
         env:
           YARN_ENABLE_HARDENED_MODE: 0
+      - name: Load Next.js Build Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: ${{ github.workspace }}/apps/next/.next
+      - name: Get Supabase Database Branch
+        if: github.base_ref == 'dev'
+        uses: 0xbigboss/supabase-branch-gh-action@v1
+        id: supabase-branch
+        with:
+          supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
+          supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
+          wait-for-migrations: false # Optional. Default is false.
+          timeout: 60 # Optional. Default is 60.
+      - name: Add SMS provider to Supabase branch
+        if: github.base_ref == 'dev'
+        uses: 0xbigboss/supabase-manager-script-gh-action@v1
+        id: add-sms-provider
+        with:
+          supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
+          script: |
+            const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
+              ref: process.env.SUPABASE_PARENT_PROJECT_ID,
+            });
+
+            core.info('Enabling Twilio verify external phone auth provider');
+
+            await supabaseManager.projectsConfig.updateV1AuthConfig({
+              ref: process.env.SUPABASE_PROJECT_ID,
+              requestBody: {
+                external_phone_enabled: true,
+                sms_provider: parentAuthConfig.sms_provider,
+                sms_twilio_verify_account_sid:
+                  parentAuthConfig.sms_twilio_verify_account_sid,
+                sms_twilio_verify_auth_token: parentAuthConfig.sms_twilio_verify_auth_token,
+                sms_twilio_verify_message_service_sid:
+                  parentAuthConfig.sms_twilio_verify_message_service_sid,
+              },
+            });
+
+            core.info('Done');
+
+            return "success";
+        env:
+          SUPABASE_PROJECT_ID: ${{ steps.supabase-branch.outputs.project_ref }}
+          SUPABASE_PARENT_PROJECT_ID: ${{ steps.supabase-branch.outputs.parent_project_ref }}
       - name: Extract branch name
         id: extract-branch
         uses: ./.github/actions/extract-branch
       - name: Set Public Hostname
         id: public-hostname
         run: echo "public-hostname=sendapp-${{steps.extract-branch.outputs.branch}}-0xsend.vercel.app" >> $GITHUB_OUTPUT
-      - name: Vercel Deploy
-        id: vercel-deploy
+      - name: Vercel Deploy Preview with Supabase Branch
+        if: github.base_ref == 'dev'
+        id: vercel-deploy-with-branch
+        uses: ./.github/actions/vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
+          deploy-preview-extra-args: >-
+            -e SUPABASE_DB_URL="postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres" 
+            -e SUPABASE_JWT_SECRET="${{steps.supabase-branch.outputs.jwt_secret}}" 
+            -e SUPABASE_SERVICE_ROLE="${{ steps.supabase-branch.outputs.service_role_key }}" 
+            -e NEXT_PUBLIC_SUPABASE_URL="https://${{ steps.supabase-branch.outputs.project_ref }}.supabase.co" 
+            -e NEXT_PUBLIC_SUPABASE_PROJECT_ID="${{steps.supabase-branch.outputs.project_ref}}" 
+            -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="${{steps.supabase-branch.outputs.graphql_url}}" 
+            -e NEXT_PUBLIC_BASE_CHAIN_ID="84532" 
+            -e NEXT_PUBLIC_MAINNET_CHAIN_ID="11155111" 
+            -e NEXT_PUBLIC_BASE_RPC_URL="${{ secrets.BASE_SEPOLIA_RPC_URL }}" 
+            -e NEXT_PUBLIC_MAINNET_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com" 
+            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ steps.supabase-branch.outputs.anon_key }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
+          VERCEL_GIT_COMMIT_REF: ${{ github.head_ref }}
+          VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
+          SUPABASE_DB_URL: postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres
+          SUPABASE_JWT_SECRET: ${{steps.supabase-branch.outputs.jwt_secret}}
+          SUPABASE_SERVICE_ROLE: ${{ steps.supabase-branch.outputs.service_role_key }}
+          NEXT_PUBLIC_SUPABASE_URL: https://${{ steps.supabase-branch.outputs.project_ref }}.supabase.co
+          NEXT_PUBLIC_SUPABASE_PROJECT_ID: ${{steps.supabase-branch.outputs.project_ref}}
+          NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: ${{steps.supabase-branch.outputs.graphql_url}}
+          NEXT_PUBLIC_BASE_CHAIN_ID: 84532
+          NEXT_PUBLIC_MAINNET_CHAIN_ID: 11155111
+          NEXT_PUBLIC_BASE_RPC_URL: ${{ secrets.BASE_SEPOLIA_RPC_URL }}
+          NEXT_PUBLIC_MAINNET_RPC_URL: https://ethereum-sepolia-rpc.publicnode.com
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase-branch.outputs.anon_key }}
+      - name: Vercel Deploy Preview
+        if: github.base_ref != 'dev'
+        id: vercel-deploy-preview
         uses: ./.github/actions/vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -132,12 +281,29 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_GIT_COMMIT_SHA: ${{ github.sha }}
+          VERCEL_GIT_COMMIT_REF: ${{ github.head_ref }}
+          VERCEL_GIT_PULL_REQUEST_ID: ${{ github.event.pull_request.number }}
+
       - uses: mshick/add-pr-comment@v2
+        if: github.base_ref == 'dev'
         with:
           message-id: vercel-preview-url
+          refresh-message-position: true
           message: |
-            Vercel Unique URL: [${{ steps.vercel-deploy.outputs.deployment-url }}](${{ steps.vercel-deploy.outputs.deployment-url }})
+            Vercel Unique URL: [${{ steps.vercel-deploy-with-branch.outputs.deployment-url }}](${{ steps.vercel-deploy-with-branch.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
+            Last Commit: ${{ github.event.pull_request.head.sha }}
+
+      - uses: mshick/add-pr-comment@v2
+        if: github.base_ref != 'dev'
+        with:
+          message-id: vercel-preview-url
+          refresh-message-position: true
+          message: |
+            Vercel Unique URL: [${{ steps.vercel-deploy-preview.outputs.deployment-url }}](${{ steps.vercel-deploy-preview.outputs.deployment-url }})
+            Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
+            Last Commit: ${{ github.event.pull_request.head.sha }}
 
   deploy-staging:
     if: github.ref == 'refs/heads/dev'
@@ -150,3 +316,17 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       STAGING_SUPABASE_PROJECT_ID: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
       STAGING_SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
+      CI_QA_NOTIFICATION_URL: ${{ secrets.CI_QA_NOTIFICATION_URL }}
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    needs: [cache-deps]
+    uses: ./.github/workflows/deploy-production.yml
+    secrets:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PRODUCTION_SUPABASE_PROJECT_ID: ${{ secrets.PRODUCTION_SUPABASE_PROJECT_ID }}
+      PRODUCTION_SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_SUPABASE_DB_PASSWORD }}
+      CI_QA_NOTIFICATION_URL: ${{ secrets.CI_QA_NOTIFICATION_URL }}

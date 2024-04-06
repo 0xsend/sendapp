@@ -2,13 +2,14 @@ import { ProfileScreen } from 'app/features/profile/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import { NextPageWithLayout } from '../_app'
-import { GetServerSideProps, GetServerSidePropsContext } from 'next'
-import { Database } from '@my/supabase/database.types'
+import type { NextPageWithLayout } from '../_app'
+import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
+import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
-import { CheckoutTagSchema } from 'app/features/checkout/CheckoutTagSchema'
+import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -23,6 +24,9 @@ export const Page: NextPageWithLayout = () => {
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
+  // disable for now
+  return { redirect: { destination: '/', permanent: false } }
+  /*
   const { tag } = ctx.params ?? {}
 
   // ensure tag is valid before proceeding
@@ -73,8 +77,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   return {
     props: {},
   }
+  */
 }) satisfies GetServerSideProps
 
-Page.getLayout = (children) => <HomeLayout header="">{children}</HomeLayout>
+Page.getLayout = (children) => (
+  <HomeLayout TopNav={<TopNav header="Profile" noSubroute />}>{children}</HomeLayout>
+)
 
 export default Page

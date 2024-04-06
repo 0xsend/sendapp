@@ -1,5 +1,5 @@
 import { TamaguiProvider, config } from '@my/ui'
-import { QueryClient, QueryClientConfig, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, type QueryClientConfig, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 
 /**
@@ -16,7 +16,7 @@ export function Wrapper({
           ...defaultOptions,
           queries: {
             retry: false,
-            gcTime: Infinity,
+            gcTime: Number.POSITIVE_INFINITY,
             ...defaultOptions?.queries,
           },
         },

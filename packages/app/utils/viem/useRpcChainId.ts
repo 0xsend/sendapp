@@ -10,7 +10,9 @@ export const useRpcChainId = () => {
   const publicClient = usePublicClient()
 
   useEffect(() => {
-    publicClient.getChainId().then(setChainId).catch(setError)
+    if (publicClient) {
+      publicClient.getChainId().then(setChainId).catch(setError)
+    }
   }, [publicClient])
 
   return {

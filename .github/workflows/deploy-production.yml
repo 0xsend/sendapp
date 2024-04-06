@@ -1,0 +1,49 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      VERCEL_TOKEN:
+        description: 'Vercel token'
+        required: true
+      VERCEL_PROJECT_ID:
+        description: 'Vercel project id'
+        required: true
+      VERCEL_ORG_ID:
+        description: 'Vercel org id'
+        required: true
+      SUPABASE_ACCESS_TOKEN:
+        description: 'Supabase access token'
+        required: true
+      PRODUCTION_SUPABASE_PROJECT_ID:
+        description: 'Production Supabase project id'
+        required: true
+      PRODUCTION_SUPABASE_DB_PASSWORD:
+        description: 'Production Supabase db password'
+        required: true
+      CI_QA_NOTIFICATION_URL:
+        description: 'QA notification url'
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Deploy
+        uses: ./.github/actions/deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          production: true
+          supabase-project-id: ${{ secrets.PRODUCTION_SUPABASE_PROJECT_ID }}
+          supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          supabase-db-password: ${{ secrets.PRODUCTION_SUPABASE_DB_PASSWORD }}
+          qa-notification-url: ${{ secrets.CI_QA_NOTIFICATION_URL }}

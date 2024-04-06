@@ -14,19 +14,6 @@ type Inflection = {
   oppositeBaseNameMap?: Record<string, string>;
 };
 type Override = {
-  _http_response?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      status_code?: string;
-      content_type?: string;
-      headers?: string;
-      content?: string;
-      timed_out?: string;
-      error_msg?: string;
-      created?: string;
-    };
-  }
   buckets?: {
     name?: string;
     fields?: {
@@ -113,6 +100,8 @@ type Override = {
       hodler_min_balance?: string;
       created_at?: string;
       updated_at?: string;
+      snapshot_block_num?: string;
+      chain_id?: string;
       distribution_shares?: string;
       distribution_verification_values?: string;
       distribution_verifications?: string;
@@ -126,17 +115,6 @@ type Override = {
       hook_name?: string;
       created_at?: string;
       request_id?: string;
-    };
-  }
-  http_request_queue?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      method?: string;
-      url?: string;
-      headers?: string;
-      body?: string;
-      timeout_milliseconds?: string;
     };
   }
   storage_migrations?: {
@@ -181,6 +159,7 @@ type Override = {
       about?: string;
       referral_code?: string;
       is_public?: string;
+      send_id?: string;
       users?: string;
       referrals_referrals_referred_idToprofiles?: string;
       referrals_referrals_referrer_idToprofiles?: string;
@@ -233,6 +212,45 @@ type Override = {
       webauthn_credentials?: string;
     };
   }
+  send_account_deployed?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      user_op_hash?: string;
+      sender?: string;
+      factory?: string;
+      paymaster?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
+  send_account_transfers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      f?: string;
+      t?: string;
+      v?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
   send_accounts?: {
     name?: string;
     fields?: {
@@ -246,6 +264,33 @@ type Override = {
       deleted_at?: string;
       users?: string;
       send_account_credentials?: string;
+    };
+  }
+  send_liquidity_pools?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      address?: string;
+      chain_id?: string;
+    };
+  }
+  send_token_transfers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      f?: string;
+      t?: string;
+      v?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
     };
   }
   send_transfer_logs?: {
@@ -380,12 +425,6 @@ interface FingerprintNumberField {
   }
 }
 export interface Fingerprint {
-  HttpResponses?: {
-    id?: FingerprintNumberField;
-    statusCode?: FingerprintNumberField;
-    headers?: FingerprintJsonField;
-    created?: FingerprintDateField;
-  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
@@ -439,6 +478,8 @@ export interface Fingerprint {
     hodlerMinBalance?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
+    snapshotBlockNum?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
     distributionShares?: FingerprintRelationField;
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
@@ -448,11 +489,6 @@ export interface Fingerprint {
     hookTableId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     requestId?: FingerprintNumberField;
-  }
-  httpRequestQueues?: {
-    id?: FingerprintNumberField;
-    headers?: FingerprintJsonField;
-    timeoutMilliseconds?: FingerprintNumberField;
   }
   storageMigrations?: {
     id?: FingerprintNumberField;
@@ -469,6 +505,7 @@ export interface Fingerprint {
     bucket?: FingerprintRelationField;
   }
   profiles?: {
+    sendId?: FingerprintNumberField;
     i?: FingerprintRelationField;
     referralsByReferredId?: FingerprintRelationField;
     referralsByReferrerId?: FingerprintRelationField;
@@ -496,6 +533,25 @@ export interface Fingerprint {
     account?: FingerprintRelationField;
     credential?: FingerprintRelationField;
   }
+  sendAccountDeployeds?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendAccountTransfers?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
   sendAccounts?: {
     chainId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
@@ -503,6 +559,20 @@ export interface Fingerprint {
     deletedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
     sendAccountCredentialsByAccountId?: FingerprintRelationField;
+  }
+  sendLiquidityPools?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+  }
+  sendTokenTransfers?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
   }
   sendTransferLogs?: {
     value?: FingerprintNumberField;

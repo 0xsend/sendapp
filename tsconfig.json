@@ -1,34 +1,24 @@
 {
+  "files": [],
   "compilerOptions": {
     // "noErrorTruncation": true, // uncomment if you want to see full error messages
-    "strictNullChecks": true,
-    "noUncheckedIndexedAccess": true,
-    "strict": true,
-    "jsx": "preserve",
-    "paths": {
-      "app/*": ["./packages/app/*"],
-      "@my/ui/*": ["./packages/ui/src/*"],
-      "@my/wagmi/*": ["./packages/wagmi/src/*"],
-      "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"],
-      "@0xsend/webauthn-authenticator/*": ["./packages/webauthn-authenticator/src/*"],
-      "@my/playwright/*": ["./packages/playwright/tests/*"],
-      "@my/snaplet/*": ["./packages/snaplet/*"],
-    },
-    "plugins": [
-      {
-        // docs: https://github.com/nderscore/tamagui-typescript-plugin#readme
-        "name": "@nderscore/tamagui-typescript-plugin",
-        "pathToApp": "apps/next"
-      }
-    ]
+    "outDir": "/tmp",
+    "typeRoots": ["node_modules/@types"],
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "noEmit": true
   },
-  "extends": "expo/tsconfig.base",
-  "exclude": [
-    "**/node_modules",
-    "**/dist",
-    "**/types",
-    "apps/next/out",
-    "apps/next/.next",
-    "apps/next/.tamagui"
+  "references": [
+    { "path": "apps/expo" },
+    { "path": "apps/next" },
+    { "path": "packages/app" },
+    { "path": "packages/ui" },
+    { "path": "packages/api" },
+    { "path": "packages/webauthn-authenticator" },
+    { "path": "packages/contracts" },
+    { "path": "packages/shovel" },
+    { "path": "packages/playwright" },
+    { "path": "packages/daimo-expo-passkeys" },
+    { "path": "packages/wagmi" }
   ]
 }

@@ -6,7 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
-// Fake SEND Token for testnet and local development.
+// SEND Token for testnet and local development this also generates the ABI for Wagmi
 contract SendToken is ERC20 {
     constructor() ERC20("send", "SEND") {
         // 100 billion

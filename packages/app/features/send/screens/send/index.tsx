@@ -4,7 +4,7 @@ import {
   TransferProvider,
   useSubScreenContext,
 } from 'app/features/send/providers'
-import { SendScreenType } from 'app/features/send/types'
+import type { SendScreenType } from 'app/features/send/types'
 import { MainScreen } from './send'
 import { SendItScreen } from './send-it'
 import { SendTagScreen } from './send-tag'

@@ -1,6 +1,8 @@
 const mockWagmi = {
   useChainId: jest.fn().mockReturnValue(845337),
-  createConfig: jest.fn().mockReturnValue({}),
+  createConfig: jest.fn().mockReturnValue({
+    chains: [845337],
+  }),
   useBalance: jest.fn().mockReturnValue({
     data: {
       decimals: 6,
@@ -22,6 +24,50 @@ const mockWagmi = {
     isSuccess: true,
     error: null,
   }),
+  useAccount: jest.fn().mockReturnValue({
+    isConnected: true,
+    address: '0x123',
+    chain: 845337,
+  }),
+  useConnect: jest.fn().mockReturnValue({
+    connect: jest.fn(),
+    connectors: [],
+    error: null,
+  }),
+  useSwitchChain: jest.fn().mockReturnValue({
+    chains: [
+      {
+        id: 845337,
+        name: 'Base',
+      },
+    ],
+    switchChain: jest.fn(),
+    error: null,
+  }),
+  useWriteContract: jest.fn().mockReturnValue({
+    data: '0x123',
+    writeContract: jest.fn(),
+    isPending: false,
+    error: null,
+  }),
+  useWaitForTransactionReceipt: jest.fn().mockReturnValue({
+    data: {
+      blockHash: '0x123',
+      blockNumber: 123,
+      contractAddress: '0x123',
+      cumulativeGasUsed: 123,
+      from: '0x123',
+      gasUsed: 123,
+      logs: [],
+      logsBloom: '0x123',
+      status: 1,
+      to: '0x123',
+      transactionHash: '0x123',
+      transactionIndex: 123,
+    },
+    isSuccess: true,
+    error: null,
+  }),
 }
 
 export const useChainId = mockWagmi.useChainId
@@ -29,5 +75,9 @@ export const createConfig = mockWagmi.createConfig
 export const useBalance = mockWagmi.useBalance
 export const useBytecode = mockWagmi.useBytecode
 export const useTransactionCount = mockWagmi.useTransactionCount
-
+export const useAccount = mockWagmi.useAccount
+export const useConnect = mockWagmi.useConnect
+export const useSwitchChain = mockWagmi.useSwitchChain
+export const useWriteContract = mockWagmi.useWriteContract
+export const useWaitForTransactionReceipt = mockWagmi.useWaitForTransactionReceipt
 export default mockWagmi

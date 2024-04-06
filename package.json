@@ -15,7 +15,7 @@
     "web:prod": "yarn workspace next-app build",
     "web:prod:serve": "yarn workspace next-app serve",
     "fix": "manypkg fix",
-    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && yarn build)",
+    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && turbo build --filter='!next-app')",
     "build": "yarn workspaces foreach --all --exclude next-app run build",
     "biome:check": "biome check .",
     "biome:check:fix": "biome check . --apply",
@@ -31,14 +31,17 @@
     "playwright": "yarn workspace @my/playwright",
     "distributor": "yarn workspace distributor",
     "snaplet:seed": "DRY=0 bunx tsx ./packages/snaplet/seed.ts",
-    "snaplet:snapshot:restore": "bunx snaplet snapshot restore --no-reset --latest"
+    "snaplet:snapshot:restore": "bunx snaplet snapshot restore --no-reset --latest",
+    "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-refresh": "^0.14.0",
-    "react-native-svg": "13.9.0",
-    "react-native-web": "~0.19.6"
+    "react-native-svg": "14.1.0",
+    "react-native-web": "~0.19.10",
+    "@babel/core": "^7.20.2",
+    "babel-loader": "^8.3.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.18.9",
@@ -48,14 +51,14 @@
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
     "pierre": "^2.0.0-alpha.8",
-    "react-native-ios-modal": "^0.1.8",
     "turbo": "^1.10.3",
-    "typescript": "^5.1.3"
+    "typescript": "^5.3.3"
   },
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
-    "@biomejs/biome": "1.5.3",
+    "@biomejs/biome": "^1.6.3",
     "jest": "^29.7.0",
+    "jest-expo": "^50.0.0",
     "lefthook": "^1.5.5"
   }
 }

@@ -1,10 +1,10 @@
+<!-- markdownlint-disable MD033 -->
+
 # Contribution Guide
 
 ## Preface
 
 Send Stack uses bleeding-edge web development technology to deliver great DX to our contributors, quick iteration cycles, and clean code.
-
-**Send Stack**
 
 - **Typescript** (strict mode)
 - **Bun** Package Manager
@@ -22,6 +22,7 @@ Send Stack uses bleeding-edge web development technology to deliver great DX to 
 Here is a quick peek at the send stack. Quickly jump to any of the submodules by clicking the links below.
 
 <pre>
+<code>
 .
 ├── apps
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/apps/distributor">distributor</a>
@@ -39,7 +40,7 @@ Here is a quick peek at the send stack. Quickly jump to any of the submodules by
 │   ├── <a href="https://github.com/0xsend/sendapp/tree/main/packages/wagmi">wagmi</a>
 │   └── <a href="https://github.com/0xsend/sendapp/tree/main/packages/webauthn-authenticator">webauthn-authenticator</a>
 └── <a href="https://github.com/0xsend/sendapp/tree/main/supabase">supabase</a>
- </code>
+</code>
 </pre>
 
 <details padding="1rem 0">
@@ -48,7 +49,7 @@ Here is a quick peek at the send stack. Quickly jump to any of the submodules by
 Here are some things to keep in mind about thee SEND philosophy when contributing
   <ul>
      <li>
-  Simplicity over complexity (K.I.S.S)
+      Simplicity over complexity (K.I.S.S)
      </li>
      <li>
      Don't repeat yourself (DRY)
@@ -59,22 +60,34 @@ Here are some things to keep in mind about thee SEND philosophy when contributin
      <li>
      Write once, Run everywhere
      </li>
-     </ul>
+   </ul>
 </details>
 
 <details style="padding: 1rem 0">
-
 <summary style="font-size:20px;font-weight: bold;"><h2 style="display:inline;padding:0 1rem;">Prerequisites</h2></summary>
 
+When cloning the repo, you will need to initialize the submodules:
+
 ```console
-git clone https://github.com/0xsend/sendapp.git && cd sendapp
+git clone --recurse-submodules https://github.com/0xsend/sendapp.git && cd sendapp
 ```
+
+If you missed the `--recurse-submodules` flag, you can initialize them manually:
+
+```console
+git submodule deinit --force .
+git submodule update --init --recursive
+```
+
+### Tools
 
 You'll need a basic understanding of JS tooling
 
 Required JS Runtime: [Node >= 20.9.0](https://nodejs.org/en/download)
 
-#### [yarn package manager](https://yarnpkg.com/)
+#### [Yarn Package Manager](https://yarnpkg.com/)
+
+See [yarn package manager](https://yarnpkg.com/). We are using Yarn 4 with workspaces.
 
 ```console
 corepack enable
@@ -108,7 +121,8 @@ curl -fsSL https://bun.sh/install | bash
 
 #### Brew Bundle
 
-Many other dependencies are installed via [Homebrew](https://brew.sh/). To install all dependencies, run from the project root:
+Many other dependencies are installed via [Homebrew](https://brew.sh/). To install all dependencies, run from the
+project root:
 
 ```console
 brew bundle
@@ -137,6 +151,20 @@ tilt up
 
 This command will start all the services defined in the [Tiltfile](/Tiltfile), building and deploying your application in a local development environment.
 
+##### Efficient Tilt Usage
+
+`tilt up` will start a local Postgres database, Supabase, local Ethereum node, and local Base node. It also starts the unit tests for the application.
+
+To save some resources on your local machine, you can limit the amount of resources used by Tilt by specifying them on the command line or disabling them in the [Tilt UI](http://localhost:10350).
+
+This command for example will only start the Next.js web app and it's dependencies:
+
+```console
+tilt up next:web
+```
+
+You can always re-enable the disabled resources by re-running the `tilt up` command or manually enabling them in the [Tilt UI](http://localhost:10350).
+
 #### 2. Monitoring and Logs
 
 You can monitor the build process and access logs directly through the Tilt UI. Simply navigate to `http://localhost:10350` in your web browser to view the status of your services.
@@ -148,6 +176,23 @@ With Tilt, you can make changes to your codebase, and Tilt will automatically de
 #### 4. Shutting Down
 
 Once you're done developing, you can shut down all services by pressing `Ctrl+C` in the terminal where you ran `tilt up`.
+
+It will leave somethings running in the background. To stop all services, run `tilt down`.
+
+```console
+❯ tilt down
+Loading Tiltfile at: /Users/bigboss/src/0xsend/sendapp/Tiltfile
+Loading environment from .env
+Loading environment from .env.local
+local: sh -c "yarn supabase stop --no-backup\n    # can be removed once supabase stop --no-backup is fixed\n    docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}"
+ → Stopping containers...
+ → Stopped supabase local development setup.
+ → Local data are backed up to docker volume. Use docker to show them: docker volume ls --filter label=com.supabase.cli.project=send
+ → supabase_storage_send
+local: yarn clean
+ → Done in 0s 663ms
+Successfully loaded Tiltfile (3.632166166s)
+```
 
 By leveraging Tilt, you can focus more on coding and less on the setup, significantly improving your development experience with the Send Stack.
 

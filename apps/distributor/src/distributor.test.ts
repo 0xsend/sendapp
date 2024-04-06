@@ -1,6 +1,10 @@
+// @ts-expect-error set __DEV__ for code shared between server and client
+globalThis.__DEV__ = true
+
 import request from 'supertest'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import app from './app'
+import { supabaseAdmin } from './distributor'
 
 describe('Root Route', () => {
   it('should return correct response for the root route', async () => {
@@ -30,11 +34,37 @@ describe('Distributor Route', () => {
   })
 
   it('should perform distributor logic correctly', async () => {
-    const res = await request(app)
-      .post('/distributor')
-      .send({ id: 1 })
-      .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)
+    const { data: distributions, error } = await supabaseAdmin
+      .from('distributions')
+      .select(
+        `*,
+        distribution_verification_values (*)`
+      )
+      .lte('qualification_start', new Date().toISOString())
+      .gte('qualification_end', new Date().toISOString())
 
-    expect(res.statusCode).toBe(200)
+    if (error) {
+      throw error
+    }
+
+    if (distributions.length === 0) {
+      throw new Error('No distributions found')
+    }
+
+    expect(distributions.length).toBeGreaterThan(0)
+
+    // get latest distribution id from API
+    let lastDistributionId: number
+    while (true) {
+      const res = await request(app).get('/distributor')
+      expect(res.statusCode).toBe(200)
+      if (res.body.lastDistributionId) {
+        lastDistributionId = res.body.lastDistributionId
+        break
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+
+    expect(lastDistributionId).toBeDefined()
   }, 10_000)
 })

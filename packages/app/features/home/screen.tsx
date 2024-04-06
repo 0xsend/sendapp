@@ -1,363 +1,162 @@
 import {
-  Anchor,
-  Avatar,
   Button,
-  Card,
   Container,
-  ListItem,
   Paragraph,
-  ScrollView,
-  Theme,
+  Spinner,
+  Tooltip,
+  TooltipGroup,
   XStack,
   YStack,
+  useToastController,
+  Stack,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
 import {
-  IconArrowDown,
-  IconClose,
-  IconDeposit,
-  IconEthereum,
-  IconReceive,
-  IconSend,
-  IconSendTile,
-  IconUSDC,
-} from 'app/components/icons'
-import { MainLayout } from 'app/components/layout'
-import { CommentsTime } from 'app/utils/dateHelper'
-import { useState } from 'react'
-import { Square } from 'tamagui'
+  baseMainnet,
+  usdcAddress as usdcAddresses,
+  sendTokenAddress as sendAddresses,
+} from '@my/wagmi'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import formatAmount from 'app/utils/formatAmount'
+import TokenDetails from './TokenDetails'
+
 export function HomeScreen() {
-  const { resolvedTheme } = useThemeSetting()
+  const { totalBalance } = useSendAccountBalances()
+
+  const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   })
-  const [expandBalance, setExpandBalance] = useState(false)
-  const actionButtons = [
-    { label: 'Deposit', iconPNGPath: <IconDeposit />, href: '/' },
-    { label: 'Recieve', iconPNGPath: <IconReceive />, href: '/receive' },
-    { label: 'Send', iconPNGPath: <IconSendTile />, href: '/send' },
+  const coins = [
+    { label: 'USDC', token: usdcAddresses[baseMainnet.id], icon: <IconUSDC size={'$2.5'} /> },
+    { label: 'Ethereum', token: undefined, icon: <IconEthereum size={'$2.5'} /> },
+    { label: 'Send', token: sendAddresses[baseMainnet.id], icon: <IconSend size={'$2.5'} /> },
   ]
-  const balanceViewButtons = [
-    { label: 'Ethereum', onPress: () => {} },
-    { label: 'Cards', onPress: () => {} },
-  ]
-  const transactions = [
-    {
-      id: 1,
-      user: {
-        sendTag: 'ethantree',
-      },
-      type: 'inbound',
-      amount: 200,
-      currency: 'USDT',
-      amountInUSD: 199.98,
-      created_on: '',
-    },
-    {
-      id: 2,
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-    {
-      id: 3,
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-    {
-      id: 4,
-      user: {
-        sendTag: 'You',
-      },
-      type: 'outbound',
-      amount: 1,
-      currency: 'ETH',
-      amountInUSD: 1985.56,
-      created_on: '',
-    },
-  ]
-  const balanceDetails = [
-    {
-      currency: 'Ethereum',
-      symbol: 'eth',
-      balance: 1.45,
-    },
-    {
-      currency: 'USDC',
-      symbol: 'usdc',
-      balance: 125,
-    },
-    {
-      currency: 'SEND',
-      symbol: 'send',
-      balance: 71454457,
-    },
-    {
-      currency: 'SEND',
-      symbol: 'send',
-      balance: 4412,
-    },
-    {
-      currency: 'USDC',
-      symbol: 'usdc',
-      balance: 2.0,
-    },
-  ]
-  const navigateToScreen = (href: string) => {
-    window.location.href = href
-  }
+
+  const { resolvedTheme } = useThemeSetting()
+  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+
   return (
-    <>
-      <MainLayout scrollable={true}>
-        <YStack
-          $gtLg={{ width: 600 }}
-          $sm={{ width: '100vw' }}
-          $gtSm={{ width: '100vw' }}
-          ai={'center'}
-          paddingTop={'$6'}
-          gap={'$space.6'}
+    <Container fd={'column'} $gtMd={{ pt: '$6' }}>
+      <YStack
+        $gtLg={{ width: 360 }}
+        $sm={{ width: '100%' }}
+        $gtSm={{ width: '100%' }}
+        ai={'center'}
+      >
+        {/* Balance Card */}
+        <XStack
+          w={'100%'}
+          jc={'center'}
+          $md={{ borderColor: separatorColor, borderBottomWidth: 1 }}
         >
-          {/* Balance Card */}
-          <XStack w={'90%'} ai={'center'} jc={'space-between'} zIndex={4}>
-            <Card
-              cur={'pointer'}
-              w={'100%'}
-              h={'$13'}
-              borderRadius={'$8'}
-              shadowColor={'rgba(0, 0, 0, 0.1)'}
-              shadowOffset={{ width: 0, height: 4 }}
-              shadowRadius={8}
-              shadowOpacity={0.1}
-              onPress={() => {
-                !expandBalance && setExpandBalance(!expandBalance)
-              }}
-            >
-              <YStack m={'$3'}>
-                <XStack jc={'flex-end'} height={'$2.5'} zIndex={5}>
-                  {!expandBalance && <IconArrowDown />}
-                </XStack>
-                <YStack ai={'center'} jc={'center'}>
-                  <Paragraph fontSize={'$4'} zIndex={1}>
-                    Total Balance
-                  </Paragraph>
-                  <XStack style={{ color: 'white' }}>
-                    <Paragraph color={'white'} fontSize={'$6'} zIndex={1}>
-                      {'$'}
-                    </Paragraph>
-                    <Paragraph
-                      fontWeight={'700'}
-                      color={'white'}
-                      fontSize={'$10'}
-                      lineHeight={'$8'}
-                      zIndex={1}
-                      p={'$1'}
-                    >
-                      {USDollar.format(6990).replace('$', '').split('.')[0]}
-                    </Paragraph>
-                    <Paragraph color={'white'} fontSize={'$6'} zIndex={1}>
-                      {'.00'}
-                    </Paragraph>
-                  </XStack>
-                </YStack>
-              </YStack>
-              <Card.Background
-                borderRadius={'$8'}
-                backgroundColor={resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,0.5)' : '$khaki900'}
-              />
-            </Card>
-          </XStack>
-          {expandBalance && (
-            <YStack
-              position={'absolute'}
-              top={210}
-              left={0}
-              width={'100%'}
-              height={'100%'}
-              backgroundColor={
-                resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,0.1)' : 'rgb(255,255,255,0.1)'
-              }
-              style={{ backdropFilter: 'blur(15px)' }}
-              zIndex={3}
-              alignItems="center"
-            >
-              <Card
-                cur={'pointer'}
-                w={'90%'}
-                h={'$18'}
-                borderRadius={'$8'}
-                shadowColor={'rgba(0, 0, 0, 0.3)'}
-                shadowOffset={{ width: 0, height: 4 }}
-                shadowRadius={8}
-                shadowOpacity={0.1}
-                overflow={'scroll'}
-                paddingVertical={'$3'}
-                paddingBottom={'$7'}
-              >
-                <ScrollView zi={4} bc={'transparent'}>
-                  <YStack m={'$1'}>
-                    {balanceDetails.map((balance) => (
-                      <ListItem key={balance.id} bc={'transparent'}>
-                        <XStack
-                          f={1}
-                          h={'100%'}
-                          paddingLeft={'$3'}
-                          paddingRight={'$3'}
-                          paddingTop={'$2'}
-                          alignItems="center"
-                          jc={'space-between'}
-                          zi={4}
+          <XStack w={'100%'} zIndex={4}>
+            <YStack>
+              <YStack jc={'center'} gap={'$6'} pb="$6">
+                <TooltipGroup delay={{ open: 0, close: 1500 }}>
+                  <Tooltip placement="bottom">
+                    <Tooltip.Trigger>
+                      <XStack ai="center" gap="$2.5">
+                        <Stack w={11} h={11} bc="$primary" />
+                        <Paragraph
+                          fontSize={'$4'}
+                          zIndex={1}
+                          color={'$color05'}
+                          textTransform={'uppercase'}
                         >
-                          <XStack alignItems="center" jc={'space-between'} gap={'$2'}>
-                            {balance.currency === 'Ethereum' ? (
-                              <IconEthereum size={30} />
-                            ) : balance.currency === 'USDC' ? (
-                              <IconUSDC size={30} />
-                            ) : (
-                              <IconSend size={30} />
-                            )}
-                            <Paragraph size={'$4'} fontWeight={'400'} color={'$white'}>
-                              {`${balance.currency}`}
-                            </Paragraph>
-                          </XStack>
+                          Total Balance
+                        </Paragraph>
+                      </XStack>
+                      <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
+                        {totalBalance === undefined ? (
+                          <Spinner size={'large'} />
+                        ) : (
                           <Paragraph
-                            size={'$3'}
-                            fontWeight={'400'}
-                            color={'$white'}
-                          >{`${balance.balance}`}</Paragraph>
-                        </XStack>
-                      </ListItem>
-                    ))}
-                  </YStack>
-                </ScrollView>
-                <Card.Background
-                  borderRadius={'$8'}
-                  backgroundColor={resolvedTheme?.startsWith('dark') ? 'rgb(0,0,0,1)' : '$khaki900'}
-                >
-                  {/* <Image source={{ uri: './balanceCard.png' }} width={"100%"} height={"100%"} /> */}
-                </Card.Background>
-              </Card>
-              <YStack width={'$3'} height={'$3'} mt={'$4'} onPress={() => setExpandBalance(false)}>
-                <IconClose color={'$gray10'} />
+                            color={'$color12'}
+                            fontFamily={'$mono'}
+                            fontSize={'$15'}
+                            lineHeight={'$14'}
+                            fontWeight={'500'}
+                            zIndex={1}
+                          >
+                            {formatAmount(totalBalance, 4, 0)}
+                          </Paragraph>
+                        )}
+                        <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
+                          {'USD'}
+                        </Paragraph>
+                      </XStack>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content
+                      enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                      exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+                      scale={1}
+                      x={0}
+                      y={0}
+                      opacity={1}
+                      animation={[
+                        'quick',
+                        {
+                          opacity: {
+                            overshootClamping: true,
+                          },
+                        },
+                      ]}
+                    >
+                      <Tooltip.Arrow />
+                      <Paragraph fontSize={'$6'} fontWeight={'500'}>
+                        {totalBalance === undefined ? null : USDollar.format(Number(totalBalance))}
+                      </Paragraph>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </TooltipGroup>
               </YStack>
             </YStack>
-          )}
-          {/* D-R-S Buttons */}
-          <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$4'}>
-            {actionButtons.map((actionButton) => (
-              <YStack f={1} w={'inherit'} gap={'$2'} key={actionButton.label}>
-                <Card
-                  f={1}
-                  h={'$12'}
-                  borderRadius={'$8'}
-                  $sm={{ height: '$10' }}
-                  shadowColor={'rgba(0, 0, 0, 0.1)'}
-                  shadowOffset={{ width: 0, height: 4 }}
-                  shadowRadius={8}
-                  shadowOpacity={0.1}
-                  onPress={() => navigateToScreen(actionButton.href)}
-                >
-                  <XStack f={1} alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                    {actionButton.iconPNGPath}
-                  </XStack>
-                  <Card.Background
-                    borderRadius={'$8'}
-                    backgrounded
-                    backgroundColor={resolvedTheme?.startsWith('dark') ? '$cinereous' : 'white'}
-                  />
-                </Card>
-                <Paragraph textAlign={'center'}>{actionButton.label}</Paragraph>
-              </YStack>
-            ))}
           </XStack>
-          {/* Etheruem-Cards Buttons */}
-          <XStack w={'90%'} ai={'center'} jc={'space-evenly'} gap={'$2'}>
-            {balanceViewButtons.map((balanceViewButton) => {
-              return (
-                <Button
-                  key={balanceViewButton.label}
-                  f={1}
-                  br={'$true'}
-                  bw={'$0.5'}
-                  borderColor={'rgba(195, 171, 142, 0.3)'}
-                  bg={'transparent'}
-                  shadowColor={'rgba(0, 0, 0, 0.1)'}
-                  shadowOffset={{ width: 0, height: 4 }}
-                  shadowRadius={8}
-                  shadowOpacity={0.1}
-                  onPress={balanceViewButton.onPress}
-                >
-                  <Paragraph fontWeight={'700'}>{balanceViewButton.label}</Paragraph>
-                </Button>
-              )
-            })}
-          </XStack>
-          {/* Transactions */}
-          <YStack w={'90%'} gap={'$3'} mb={'$7'}>
-            <XStack jc={'space-between'}>
-              <Paragraph opacity={0.6}>{'TRANSACTIONS'}</Paragraph>
-              <Anchor>See All</Anchor>
-            </XStack>
-            {transactions.map((transaction) => (
-              <Card
-                key={transaction.id}
-                h={'$6'}
-                borderRadius={'$4'}
-                shadowColor={'rgba(0, 0, 0, 0.1)'}
-                shadowOffset={{ width: 0, height: 4 }}
-                shadowRadius={8}
-                shadowOpacity={0.1}
-                backgroundColor={resolvedTheme?.startsWith('dark') ? '$cinereous' : 'white'}
+        </XStack>
+        <XStack w={'100%'} ai={'center'} pt={'$7'}>
+          <Button
+            px={'$3.5'}
+            h={'$6'}
+            width={'100%'}
+            theme="accent"
+            borderRadius={'$4'}
+            onPress={() => {
+              // @todo onramp / deposit
+              toast.show('Coming Soon: Deposit')
+            }}
+          >
+            <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+              <Paragraph
+                // fontFamily={'$mono'}
+                fontWeight={'500'}
+                textTransform={'uppercase'}
+                color={'$black'}
               >
-                <XStack h={'inherit'} ai="center" padding={'$2'} paddingRight={'$3'}>
-                  <Avatar br={'$4'} size={'$4.5'}>
-                    <Square size={'$2'} backgroundColor="$color" elevation="$4" />
-                    <Avatar.Fallback />
-                  </Avatar>
-                  <YStack f={1}>
-                    <XStack
-                      f={1}
-                      h={'Inherit'}
-                      paddingLeft={'$3'}
-                      paddingTop={'$2'}
-                      alignItems="center"
-                      jc={'space-between'}
-                    >
-                      <XStack alignItems="center" jc={'space-between'} gap={'$2'}>
-                        <Paragraph size={'$4'} fontWeight={'400'}>
-                          {transaction.user.sendTag}
-                        </Paragraph>
-                        <Avatar size={'$0.9'}>
-                          {transaction.type === 'inbound' ? <IconReceive /> : <IconSendTile />}
-                        </Avatar>
-                      </XStack>
-                      <Paragraph size={'$3'} fontWeight={'400'}>{`${transaction.amount} ${
-                        transaction.currency
-                      } (${USDollar.format(transaction.amountInUSD)})`}</Paragraph>
-                    </XStack>
-                    <XStack f={1} h={'Inherit'} alignItems="center" jc={'flex-end'}>
-                      <Paragraph opacity={0.6} size={'$1'} fontWeight={'400'}>
-                        {CommentsTime(new Date().toISOString())}
-                      </Paragraph>
-                    </XStack>
-                  </YStack>
-                </XStack>
-              </Card>
-            ))}
-          </YStack>
+                Deposit
+              </Paragraph>
+              <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                <IconDeposit size={'$2.5'} color={'$black'} />
+              </XStack>
+            </XStack>
+          </Button>
+        </XStack>
+        <YStack width={'100%'} pt={'$6'} pb={'$12'}>
+          {coins.map((coin, index) => (
+            <TokenDetails
+              coin={coin}
+              key={coin.label}
+              jc={'space-between'}
+              ai={'center'}
+              py={'$3.5'}
+              borderColor={separatorColor}
+              borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
+            />
+          ))}
         </YStack>
-      </MainLayout>
-    </>
+      </YStack>
+    </Container>
   )
 }

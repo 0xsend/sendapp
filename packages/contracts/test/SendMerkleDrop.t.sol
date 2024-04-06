@@ -12,7 +12,7 @@ contract SendMerkleDropTest is Test, Helper {
     address constant KNOWN_BOT = 0xae2Fc483527B8EF99EB5D9B44875F005ba1FaE13;
     uint256 constant INITIAL_MAX_BUY = 8000000;
 
-    uint256 constant TRANCHE_ID = 0;
+    uint256 constant TRANCHE_ID = 3;
     uint256 constant TRANCHE_AMOUNT = 653359200;
     bytes32 constant TRANCHE_MERKLE_ROOT = 0x8f9787b27bc7ebe82a8ba2ebe0bd7a85a941c1ff90f1969e0d9ce7125b0cfbf8;
 

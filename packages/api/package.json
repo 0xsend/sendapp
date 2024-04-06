@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@my/supabase": "workspace:*",
+    "@my/wagmi": "workspace:*",
     "@tanstack/react-query": "^5.18.1",
     "@trpc/client": "11.0.0-next-beta.264",
     "@trpc/next": "11.0.0-next-beta.264",
@@ -12,6 +13,7 @@
     "@trpc/server": "11.0.0-next-beta.264",
     "app": "workspace:*",
     "superjson": "^1.13.1",
+    "viem": "^2.8.10",
     "zod": "^3.22.4"
   }
 }

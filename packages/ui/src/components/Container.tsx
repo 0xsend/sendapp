@@ -1,26 +1,30 @@
-import { XStack, XStackProps } from 'tamagui'
+import { XStack, type XStackProps } from 'tamagui'
 
 export const Container: React.FC<XStackProps> = (props: XStackProps) => {
   return (
     <XStack
       px="$6"
-      $gtSm={{
-        maxWidth: 768,
-      }}
-      $gtMd={{
-        maxWidth: 960,
-      }}
-      $gtLg={{
-        maxWidth: 1200,
-        px: '$8',
-      }}
-      $gtXl={{
-        maxWidth: 1440,
-      }}
       als="center"
       f={1}
       width={'100%'}
       {...props}
+      $gtSm={{
+        maxWidth: 768,
+        ...(props.$gtSm ?? {}),
+      }}
+      $gtMd={{
+        maxWidth: 960,
+        ...(props.$gtMd ?? {}),
+      }}
+      $gtLg={{
+        maxWidth: 1440,
+        px: '$11',
+        ...(props.$gtLg ?? {}),
+      }}
+      $gtXl={{
+        maxWidth: 1920,
+        ...(props.$gtXl ?? {}),
+      }}
     >
       {props.children}
     </XStack>

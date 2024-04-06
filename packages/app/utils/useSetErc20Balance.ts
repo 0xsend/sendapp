@@ -11,7 +11,7 @@ import {
   erc20Abi,
 } from 'viem'
 
-import { type testClient } from './userop'
+import type { testClient } from './userop'
 
 type SetErcBalanceParameters = {
   client: typeof testClient

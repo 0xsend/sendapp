@@ -1,7 +1,7 @@
 import { SendScreen } from 'app/features/send/screens/send'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
-import { NextPageWithLayout } from './_app'
+import type { NextPageWithLayout } from './_app'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -15,6 +15,9 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP()
+export const getServerSideProps = userProtectedGetSSP(async () => {
+  // disable for now
+  return { redirect: { destination: '/', permanent: false } }
+})
 
 export default Page

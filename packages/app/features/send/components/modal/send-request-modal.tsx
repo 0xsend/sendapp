@@ -6,15 +6,18 @@ import {
   Sheet,
   SizableText,
   Theme,
-  ThemeName,
+  type ThemeName,
   XStack,
   YStack,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconClose } from 'app/components/icons'
-import { SendButton } from 'app/components/layout/footer/components/SendButton'
 import { useSubScreenContext } from 'app/features/send/providers'
-import { ANIMATE_DIRECTION_RIGHT, ISendRequestModalProps, QRScreen } from 'app/features/send/types'
+import {
+  ANIMATE_DIRECTION_RIGHT,
+  type ISendRequestModalProps,
+  QRScreen,
+} from 'app/features/send/types'
 import { useState } from 'react'
 import { GradientButton } from './GradientButton'
 import { ProfileModal } from './profile-modal'
@@ -150,11 +153,9 @@ export const SendRequestModal = ({ showModal, setShowModal, to }: ISendRequestMo
                       mt: '$5',
                     }}
                   >
-                    <SendButton
+                    <Button
                       height={'$5'}
                       borderRadius={'$6'}
-                      iconHeight={12}
-                      blackIcon
                       onPress={() =>
                         setCurrentComponent([QRScreen.QR_AMOUNT, ANIMATE_DIRECTION_RIGHT, 'Send'])
                       }

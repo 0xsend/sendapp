@@ -1,7 +1,10 @@
 import { TRPCError } from '@trpc/server'
-import { getPriceInWei, getSenderSafeReceivedEvents } from 'app/features/checkout/screen'
+import {
+  getPriceInWei,
+  getSenderSafeReceivedEvents,
+} from 'app/features/account/sendtag/checkout/checkout-utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { mainnetClient } from '@my/wagmi'
+import { baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
 import { isAddressEqual } from 'viem'
 import { z } from 'zod'
@@ -30,15 +33,17 @@ export const tagRouter = createTRPCRouter({
             message: 'No tags to confirm.',
           })
         }
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: tagsError.message })
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: tagsError.message,
+        })
       }
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
-      const confirmedTags = tags.filter((t) => t.status === 'confirmed')
-      const ethAmount = getPriceInWei(pendingTags, confirmedTags)
+      const ethAmount = getPriceInWei(pendingTags)
       const isFree = ethAmount === BigInt(0)
 
-      // transaction validation for rare Send Tags
+      // transaction validation for rare Sendtags
       if (!isFree) {
         if (!txHash) {
           log('transaction hash required')
@@ -73,15 +78,18 @@ export const tagRouter = createTRPCRouter({
 
         // get transaction receipt
         const [receipt, confirmations] = await Promise.all([
-          mainnetClient.getTransactionReceipt({
+          baseMainnetClient.getTransactionReceipt({
             hash: txHash as `0x${string}`,
           }),
-          mainnetClient.getTransactionConfirmations({
+          baseMainnetClient.getTransactionConfirmations({
             hash: txHash as `0x${string}`,
           }),
         ]).catch((error) => {
           log('transaction error', error)
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          })
         })
 
         // check if transaction is confirmed by at least 2 blocks
@@ -104,11 +112,14 @@ export const tagRouter = createTRPCRouter({
 
         // validate transaction is payment for tags
         const eventLogs = await getSenderSafeReceivedEvents({
-          publicClient: mainnetClient,
+          publicClient: baseMainnetClient,
           sender: receipt.from,
         }).catch((error) => {
           log('get events error', error)
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: error.message })
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          })
         })
 
         const eventLog = eventLogs.find((e) => e.transactionHash === txHash)
@@ -193,7 +204,10 @@ export const tagRouter = createTRPCRouter({
 
       if (confirmTagsErr) {
         log('confirm tags error', confirmTagsErr)
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: confirmTagsErr.message })
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: confirmTagsErr.message,
+        })
       }
 
       log(

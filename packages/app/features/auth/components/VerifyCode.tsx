@@ -1,17 +1,14 @@
 import {
+  BigHeading,
   ButtonText,
   FormWrapper,
-  H1,
-  H2,
   H3,
-  H4,
   Paragraph,
   SubmitButton,
-  Theme,
   XStack,
   YStack,
 } from '@my/ui'
-import { MobileOtpType } from '@supabase/supabase-js'
+import type { MobileOtpType } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import React from 'react'
@@ -55,47 +52,91 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         defaultValues={{ token: '' }}
         props={{
           token: {
-            'aria-label': 'One-time Password',
-            borderBottomColor: '$accent9Light',
+            accessibilityLabel: 'One-time Password',
+            '$theme-dark': {
+              borderBottomColor: '$accent10Dark',
+            },
+            '$theme-light': {
+              borderBottomColor: '$accent9Light',
+            },
+
             borderWidth: 0,
             borderBottomWidth: 2,
             borderRadius: '$0',
-            placeholder: 'Code',
             width: '100%',
             backgroundColor: 'transparent',
-            color: '$background',
-            themeInverse: true,
-            fontSize: '$6',
-            w: '60%',
+            color: '$color12',
+            fontFamily: '$mono',
+            fontVariant: ['tabular-nums'],
+            fontSize: '$7',
+            $sm: {
+              w: '60%',
+            },
+            // @todo move these to OTP form when that becomes stable
+            textContentType: 'oneTimeCode',
+            autoComplete: 'one-time-code',
             outlineColor: 'transparent',
+            theme: 'accent',
+            focusStyle: {
+              borderBottomColor: '$accent3Light',
+              autoFocus: true,
+              focusStyle: {
+                '$theme-dark': {
+                  borderBottomColor: '$accent9Light',
+                },
+                '$theme-light': {
+                  borderBottomColor: '$black',
+                },
+              },
+            },
           },
         }}
         renderAfter={({ submit }) => (
-          <XStack f={1} mt={'0'} jc={'flex-end'} $sm={{ jc: 'center' }} ai={'flex-start'}>
-            <SubmitButton onPress={() => submit()} br="$3" bc={'$accent9Light'} w={'$12'}>
+          <XStack
+            f={1}
+            mt={'0'}
+            jc={'flex-end'}
+            $sm={{ jc: 'center', height: '100%' }}
+            ai={'flex-start'}
+          >
+            <SubmitButton
+              onPress={() => submit()}
+              br="$3"
+              bc={'$accent9Light'}
+              $sm={{ w: '100%' }}
+              $gtMd={{
+                mt: '0',
+                als: 'flex-end',
+                mx: 0,
+                ml: 'auto',
+                w: '$10.5',
+                h: '$3.5',
+              }}
+            >
               <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                {'Verify Account'}
+                {'VERIFY ACCOUNT'}
               </ButtonText>
             </SubmitButton>
           </XStack>
         )}
       >
         {(fields) => (
-          <YStack gap="$5" jc="center" p="$7">
-            <Theme inverse={true}>
-              <H1 col="$background" size="$11">
-                VERIFY ACCOUNT
-              </H1>
-            </Theme>
-            <H3 fontWeight="normal" theme="active" $sm={{ size: '$4' }}>
-              Enter the verification code we sent you
+          <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
+            <BigHeading color="$color12">VERIFY ACCOUNT</BigHeading>
+            <H3
+              lineHeight={28}
+              $platform-web={{ fontFamily: '$mono' }}
+              $theme-light={{ col: '$gray10Light' }}
+              $theme-dark={{ col: '$olive' }}
+              fontWeight={'300'}
+              $sm={{ size: '$5' }}
+            >
+              Enter the code we sent you on your phone.
             </H3>
-            <YStack gap="$2">
-              <Theme inverse={true}>
-                <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
-                  Your Code
-                </Paragraph>
-              </Theme>
+            <YStack gap="$4">
+              <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
+                Your Code
+              </Paragraph>
               <XStack gap="$2">{Object.values(fields)}</XStack>
             </YStack>
           </YStack>

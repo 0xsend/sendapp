@@ -19,9 +19,10 @@ export const NativeToast = () => {
       opacity={1}
       scale={1}
       animation="quick"
+      theme={currentToast?.customData?.theme}
     >
       <YStack py="$1.5" px="$2">
-        <Toast.Title lh="$1">{currentToast.title}</Toast.Title>
+        <Toast.Title>{currentToast.title}</Toast.Title>
         {!!currentToast.message && <Toast.Description>{currentToast.message}</Toast.Description>}
       </YStack>
     </Toast>

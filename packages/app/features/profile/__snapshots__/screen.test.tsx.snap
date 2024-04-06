@@ -198,7 +198,8 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           <View
             accessibilityRole="button"
             cancelable={true}
-            cursor="pointer"
+            disabled={false}
+            focusVisibleStyle={{}}
             focusable={[Function]}
             minPressDuration={0}
             onBlur={[Function]}
@@ -238,7 +239,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             testID="openSendDialogButton"
           >
             <Text
-              cursor="pointer"
               lineBreakMode="clip"
               numberOfLines={1}
               style={
@@ -261,7 +261,8 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           <View
             accessibilityRole="button"
             cancelable={true}
-            cursor="pointer"
+            disabled={false}
+            focusVisibleStyle={{}}
             focusable={[Function]}
             minPressDuration={0}
             onBlur={[Function]}
@@ -300,7 +301,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             }
           >
             <Text
-              cursor="pointer"
               lineBreakMode="clip"
               numberOfLines={1}
               style={
@@ -353,6 +353,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       }
       animation="medium"
       collapsable={false}
+      disableClassName={true}
       forwardedRef={[Function]}
       onLayout={[Function]}
       pointerEvents="none"
@@ -405,7 +406,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             "borderTopLeftRadius": 0,
             "borderTopRightRadius": 0,
             "borderTopWidth": 0,
-            "bottom": "-50%",
+            "bottom": "-100%",
             "flex": 1,
             "flexDirection": "column",
             "height": 0,

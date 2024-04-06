@@ -1,4 +1,4 @@
-import { XStack, XStackProps, YStack, YStackProps, withStaticProperties } from 'tamagui'
+import { XStack, type XStackProps, YStack, type YStackProps, withStaticProperties } from 'tamagui'
 
 const KVTableFrame = (props: YStackProps) => <YStack gap="$4" {...props} />
 

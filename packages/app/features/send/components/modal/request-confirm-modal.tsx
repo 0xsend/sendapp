@@ -7,7 +7,7 @@ import {
   Sheet,
   SizableText,
   Theme,
-  ThemeName,
+  type ThemeName,
   XStack,
   YStack,
   styled,
@@ -15,7 +15,7 @@ import {
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconClose } from 'app/components/icons'
 import { useTransferContext } from 'app/features/send/providers/transfer-provider'
-import { IConfirmModalProps } from 'app/features/send/types'
+import type { IConfirmModalProps } from 'app/features/send/types'
 import { GradientButton } from './GradientButton'
 
 const CustomInput = styled(Input, {

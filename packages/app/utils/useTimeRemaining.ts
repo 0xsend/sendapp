@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-type TimeRemaining = {
+export type TimeRemaining = {
   days: number
   hours: number
   minutes: number
@@ -14,6 +14,7 @@ export function useTimeRemaining(targetDate?: Date, interval = 1000): TimeRemain
   )
 
   useEffect(() => {
+    setTimeRemaining(getTimeRemaining(targetDate))
     const id = setInterval(() => {
       setTimeRemaining(getTimeRemaining(targetDate))
     }, interval)

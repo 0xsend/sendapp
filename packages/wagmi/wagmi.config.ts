@@ -8,6 +8,9 @@ import { localhost, baseLocal } from './src/chains'
 import { iEntryPointAbi } from './src'
 
 const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
+
+if (!broadcasts.length) throw new Error('No broadcasts found.')
+
 const deployments = await broadcasts.reduce(async (accP, file) => {
   const acc = await accP
   const data = await import(file, {
@@ -40,68 +43,56 @@ const deployments = await broadcasts.reduce(async (accP, file) => {
 
 console.log({ deployments })
 
+// @ts-expect-error it's parsed JSON
+const deployedSendMerkleDrop = deployments.SendMerkleDrop
+
+if (!deployedSendMerkleDrop) throw new Error('No SendMerkleDrop found.')
+
+// @ts-expect-error it's parsed JSON
+const accountFactory = deployments.SendAccountFactory
+if (!accountFactory) throw new Error('No SendAccountFactory found.')
+if (accountFactory[base.id])
+  throw new Error(
+    'SendAccountFactory already deployed on base mainnet. Failing to avoid duplicate.'
+  )
+
 export default defineConfig({
   out: 'src/generated.ts',
   contracts: [
+    /**
+     * [Send: Revenue](https://basescan.org/address/0x71fa02bb11e4b119bEDbeeD2f119F62048245301)
+     **/
     {
       name: 'SendRevenueSafe',
-      address: '0xBB253919a15C5E0C9986d83f205A9279b4247E3d',
+      address: {
+        [baseLocal.id]: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+        [base.id]: '0x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+        [baseSepolia.id]: '0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7',
+      },
       abi: [],
     },
     {
       /**
-       * [Send: DEX & CEX Listings](https://etherscan.io/address/0xF530e6E60e7a65Ea717f843a8b2e6fcdC727aC9E)
-       **/
-      name: 'SendEXListingsSafe',
-      address: '0xF530e6E60e7a65Ea717f843a8b2e6fcdC727aC9E',
-      abi: [],
-    },
-    {
-      /**
-       * [Send: Treasury](https://etherscan.io/address/0x4bB2f4c771ccB60723a78a974a2537AD339071c7)
+       * [Send: Treasury](https://basescan.org/address/0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE)
        **/
       name: 'SendTreasurySafe',
-      address: '0x4bB2f4c771ccB60723a78a974a2537AD339071c7',
+      address: '0x05CEa6C36f3a44944A4F4bA39B1820677AcB97EE',
       abi: [],
     },
     {
       /**
-       * [Send: Airdrops](https://etherscan.io/address/0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7)
+       * [Send: Airdrops](https://basescan.org/address/0x077c4E5983e5c495599C1Eb5c1511A52C538eB50)
        **/
       name: 'SendAirdropsSafe',
-      address: '0x6204Bc0662ccd8a9A762d59fe7906733f251E3b7',
+      address: '0x077c4E5983e5c495599C1Eb5c1511A52C538eB50',
       abi: [],
     },
     {
       /**
-       * [Send: Core Team](https://etherscan.io/address/0xE52D0967A2eE242098d11c209f53C8158E329eCC)
-       **/
-      name: 'SendCoreTeamSafe',
-      address: '0xE52D0967A2eE242098d11c209f53C8158E329eCC',
-      abi: [],
-    },
-    {
-      /**
-       * [Send: Contributor Incentives](https://etherscan.io/address/0x4F30818f5c1a20803AB2075B813DBDE810e51b98)
-       **/
-      name: 'SendContributorIncentivesSafe',
-      address: '0x4F30818f5c1a20803AB2075B813DBDE810e51b98',
-      abi: [],
-    },
-    {
-      /**
-       * [Send: Multisig Signer Payouts](https://etherscan.io/address/0x5355c409fa3D0901292231Ddb953C949C2211D96)
-       **/
-      name: 'SendMultisigSignerPayoutsSafe',
-      address: '0x5355c409fa3D0901292231Ddb953C949C2211D96',
-      abi: [],
-    },
-    {
-      /**
-       * [UniswapV3Pool: send](https://etherscan.io/address/0x14F59C715C205002c6e3F36766D302c1a19bacC8)
+       * [UniswapV3Pool: send](https://basescan.org/address/0xa1b2457c0b627f97f6cc892946a382451e979014)
        **/
       name: 'SendUniswapV3Pool',
-      address: '0x14F59C715C205002c6e3F36766D302c1a19bacC8',
+      address: '0xa1b2457c0b627f97f6cc892946a382451e979014',
       abi: [],
     },
     {
@@ -109,7 +100,7 @@ export default defineConfig({
       address: {
         [mainnet.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet
         [localhost.id]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // mainnet localhost fork
-        [sepolia.id]: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // mainnet staging fork
+        [sepolia.id]: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // sepolia
         [baseLocal.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', //  base mainnet fork
         [base.id]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // base mainnet
         [baseSepolia.id]: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // base sepolia
@@ -135,25 +126,35 @@ export default defineConfig({
       deployments: {
         SendToken: {
           1: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-          8008: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
+          [sepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           1337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
           [base.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base mainnet
-          [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
+          [baseSepolia.id]: '0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680', // base sepolia
+          // maybe bring back once bridging is supported https://github.com/base-org/guides/issues/15
+          // [baseSepolia.id]: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base sepolia
           845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A', // base localnet
         },
+        ...deployments,
         SendMerkleDrop: {
           1: '0xB9310daE45E71c7a160A13D64204623071a8E347',
-          8008: '0xB9310daE45E71c7a160A13D64204623071a8E347',
+          [sepolia.id]: '0xB9310daE45E71c7a160A13D64204623071a8E347',
           1337: '0xB9310daE45E71c7a160A13D64204623071a8E347',
+          [base.id]: '0x240761104aF5DAeDFd9025810FfEB741fEB316B3', // base mainnet
+          [baseSepolia.id]: '0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE', // base sepolia
+          [baseLocal.id]: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6', // base localnet
+          ...deployedSendMerkleDrop,
         },
-        ...deployments,
+        SendAccountFactory: {
+          ...accountFactory,
+          [base.id]: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745', // not deployed yet
+        },
       },
       include: [
         'Send*.sol/*',
-        'Daimo*.sol/*',
         'ERC*.sol/*',
         'IEntryPoint*.sol/*',
         'EntryPointSimulations.sol/*',
+        'TokenPaymaster.sol/*',
       ],
       exclude: [
         'Common.sol/**',
@@ -173,7 +174,7 @@ export default defineConfig({
         'test.sol/**',
         '**.s.sol/*.json',
         '**.t.sol/*.json',
-        'DaimoPaymaster.sol/**', // avoid duplicate IMetaPaymaster
+        'SendPaymaster.sol/**', // avoid duplicate IMetaPaymaster
         'DummyEntryPointSimulations.sol/**', // avoid dummies
       ],
     }),

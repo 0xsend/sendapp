@@ -1,15 +1,16 @@
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { testMainnetClient } from '../viem'
+import { testBaseClient } from '../viem'
 
-import { mergeTests, test as base } from '@playwright/test'
-import { Web3ProviderBackend, injectHeadlessWeb3Provider } from 'headless-web3-provider'
-import { Account, parseEther } from 'viem'
+import { test as base } from '@playwright/test'
+import { type Web3ProviderBackend, injectHeadlessWeb3Provider } from 'headless-web3-provider'
+import { type Account, parseEther } from 'viem'
+import { assert } from 'app/utils/assert'
 
-if (!process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID) {
-  throw new Error('NEXT_PUBLIC_MAINNET_CHAIN_ID is not set')
+if (!process.env.NEXT_PUBLIC_BASE_CHAIN_ID) {
+  throw new Error('NEXT_PUBLIC_BASE_CHAIN_ID is not set')
 }
 
-const NEXT_PUBLIC_MAINNET_CHAIN_ID = Number(process.env.NEXT_PUBLIC_MAINNET_CHAIN_ID)
+const NEXT_PUBLIC_BASE_CHAIN_ID = Number(process.env.NEXT_PUBLIC_BASE_CHAIN_ID)
 
 type InjectWeb3Provider = (privateKeys?: string[]) => Promise<Web3ProviderBackend>
 
@@ -28,9 +29,9 @@ export const test = base.extend<{
     const accounts = signers.map((k) => privateKeyToAccount(k as `0x${string}`))
     // set balance for accounts
     for (const account of accounts) {
-      await testMainnetClient.setBalance({
+      await testBaseClient.setBalance({
         address: account.address as `0x${string}`,
-        value: parseEther('10000'),
+        value: parseEther('10'),
       })
     }
     await use(accounts)
@@ -38,13 +39,10 @@ export const test = base.extend<{
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- accounts funds the wallet
   injectWeb3Provider: async ({ page, accounts, signers }, use) => {
+    const rpcUrl = testBaseClient.transport.url
+    assert(rpcUrl !== undefined, 'testBaseClient.transport.url is not set')
     await use((privateKeys = signers) =>
-      injectHeadlessWeb3Provider(
-        page,
-        privateKeys,
-        NEXT_PUBLIC_MAINNET_CHAIN_ID,
-        'http://127.0.0.1:8545'
-      )
+      injectHeadlessWeb3Provider(page, privateKeys, NEXT_PUBLIC_BASE_CHAIN_ID, rpcUrl)
     )
   },
 })

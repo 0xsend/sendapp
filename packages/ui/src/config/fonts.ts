@@ -1,46 +1,146 @@
-import { createInterFont } from '@tamagui/font-inter'
+import { createFont, isWeb } from 'tamagui'
 
-export const headingFont = createInterFont({
+export const headingFont = createFont({
+  family: isWeb
+    ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif '
+    : 'DM Sans, sans-serif',
   size: {
-    6: 15,
-    15: 101,
+    1: 11,
+    2: 12,
+    3: 13,
+    4: 14,
+    true: 14,
+    5: 16,
+    6: 18,
+    7: 20,
+    8: 23,
+    9: 30,
+    10: 40,
+    11: 55,
+    12: 62,
+    13: 72,
+    14: 92,
+    15: 114,
+    16: 134,
   },
-  transform: {
-    6: 'uppercase',
-    7: 'none',
-  },
-  weight: {
-    6: '400',
-    7: '700',
-  },
-  color: {
-    6: '$colorFocus',
-    7: '$color',
-  },
-  letterSpacing: {
-    5: 2,
-    6: 1,
-    7: 0,
-    8: -1,
-    9: -2,
-    10: -3,
-    12: -4,
-    14: -5,
-    15: -6,
+  lineHeight: {
+    1: 11 + 10,
+    2: 12 + 10,
+    3: 13 + 10,
+    4: 14 + 10,
+    true: 14 + 10,
+    5: 16 + 10,
+    6: 18 + 10,
+    7: 20 + 10,
+    8: 23 + 10,
+    9: 30 + 10,
+    10: 40 + 10,
+    11: 46 + 10,
+    12: 55 + 10,
+    13: 62 + 10,
+    14: 72 + 10,
+    15: 92 + 10,
+    16: 114 + 10,
   },
   face: {
-    700: { normal: 'InterBold' },
+    900: { normal: 'DM Sans Bold' },
   },
 })
 
-export const bodyFont = createInterFont(
-  {
-    face: {
-      700: { normal: 'InterBold' },
-    },
+export const bodyFont = createFont({
+  family: isWeb
+    ? 'DM Sans, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+    : 'DM Sans, sans-serif',
+  size: {
+    1: 11,
+    2: 12,
+    3: 13,
+    4: 14,
+    true: 14,
+    5: 16,
+    6: 18,
+    7: 20,
+    8: 23,
+    9: 30,
+    10: 40,
+    11: 46,
+    12: 55,
+    13: 62,
+    14: 72,
+    15: 92,
+    16: 114,
   },
-  {
-    sizeSize: (size) => Math.round(size * 1.1),
-    sizeLineHeight: (size) => Math.round(size * 1.1 + (size > 20 ? 10 : 10)),
-  }
-)
+  lineHeight: {
+    1: 11 + 10,
+    2: 12 + 10,
+    3: 13 + 10,
+    4: 14 + 10,
+    true: 14 + 10,
+    5: 16 + 10,
+    6: 18 + 10,
+    7: 20 + 10,
+    8: 23 + 10,
+    9: 30 + 10,
+    10: 40 + 10,
+    11: 46 + 10,
+    12: 55 + 10,
+    13: 62 + 10,
+    14: 72 + 10,
+    15: 92 + 10,
+    16: 114 + 10,
+  },
+  face: {
+    900: { normal: 'DM Sans Bold' },
+  },
+})
+export const monoFont = createFont({
+  family: isWeb
+    ? 'DM Mono, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, monospace'
+    : 'DM Mono, monospace',
+  size: {
+    1: 11,
+    2: 12,
+    3: 13,
+    4: 14,
+    true: 14,
+    5: 16,
+    6: 18,
+    7: 20,
+    8: 23,
+    9: 30,
+    10: 40,
+    11: 46,
+    12: 55,
+    13: 62,
+    14: 72,
+    15: 92,
+    16: 114,
+  },
+  lineHeight: {
+    1: 11 + 10,
+    2: 12 + 10,
+    3: 13 + 10,
+    4: 14 + 10,
+    true: 14 + 10,
+    5: 16 + 10,
+    6: 18 + 10,
+    7: 20 + 10,
+    8: 23 + 10,
+    9: 30 + 10,
+    10: 40 + 10,
+    11: 46 + 10,
+    12: 55 + 10,
+    13: 62 + 10,
+    14: 72 + 10,
+    15: 92 + 10,
+    16: 114 + 10,
+  },
+  weight: {
+    3: '300',
+    4: '400',
+    5: '500',
+  },
+  face: {
+    500: { normal: 'DM Mono' },
+  },
+})

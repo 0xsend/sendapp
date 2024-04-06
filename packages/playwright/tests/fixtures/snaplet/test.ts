@@ -1,8 +1,8 @@
 import { test as baseTest } from '@playwright/test'
 import { createSeedClient } from '@snaplet/seed'
-import { models, SeedClient } from '@my/snaplet'
+import { models, type SeedClient } from '@my/snaplet'
 import { Client as PgClient } from 'pg'
-import { debug, Debugger } from 'debug'
+import { debug, type Debugger } from 'debug'
 import { copycat } from '@snaplet/copycat'
 
 let log: Debugger

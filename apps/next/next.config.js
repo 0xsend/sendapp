@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 import tamaguiPlugin from '@tamagui/next-plugin'
-import { join } from 'path'
+import { join } from 'node:path'
 import withPlaiceholder from '@plaiceholder/next'
 
 const boolVals = {
@@ -80,6 +80,8 @@ export default () => {
       'react-native-web',
       'expo-linking',
       'expo-constants',
+      'expo-clipboard',
+      'expo-sharing',
       'expo-modules-core',
       'expo-device',
       'expo-image-picker',

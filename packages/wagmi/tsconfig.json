@@ -5,5 +5,5 @@
     "target": "es2022",
     "resolveJsonModule": true
   },
-  "include": ["src", "wagmi.config.ts"]
+  "include": ["src", "wagmi.config.ts", "../../globals.d.ts"]
 }

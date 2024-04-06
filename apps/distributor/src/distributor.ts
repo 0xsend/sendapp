@@ -1,11 +1,8 @@
-import { cpus } from 'os'
-import { Database, Functions, Tables } from '@my/supabase/database.types'
-import { sendTokenAbi, sendTokenAddress } from '@my/wagmi'
+import { cpus } from 'node:os'
+import type { Database, Functions, Tables } from '@my/supabase/database.types'
+import { type sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
-import { LRUCache } from 'lru-cache'
 import type { Logger } from 'pino'
-import { http, createPublicClient, getContract } from 'viem'
-import { mainnet } from 'viem/chains'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -27,11 +24,6 @@ export const supabaseAdmin = createClient<Database>(
   { auth: { persistSession: false } }
 )
 
-const client = createPublicClient({
-  chain: mainnet,
-  transport: http(process.env.NEXT_PUBLIC_MAINNET_RPC_URL),
-})
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const cpuCount = cpus().length
@@ -51,121 +43,15 @@ function calculatePercentageWithBips(value: bigint, bips: bigint) {
 export class DistributorWorker {
   private log: Logger
   private running: boolean
-  private lastBlockNumber = 17579999n // send token deployment block
-  private lastBlockNumberAt: Date
   private id: string
+  private lastDistributionId: number | null = null
   private workerPromise: Promise<void>
-  private blockTimestamps = new LRUCache<`0x${string}`, bigint>({
-    max: 100,
-  })
 
   constructor(log: Logger) {
     this.id = Math.random().toString(36).substring(7)
     this.log = log.child({ module: 'distributor', id: this.id })
     this.running = true
-    this.lastBlockNumberAt = new Date()
     this.workerPromise = this.worker()
-  }
-
-  private async saveTransfers(from: bigint, to: bigint) {
-    this.log.debug(`Getting transfers for block ${from}-${to}...`)
-
-    const transfers = await client.getLogs({
-      event: {
-        type: 'event',
-        inputs: [
-          {
-            name: 'from',
-            type: 'address',
-            indexed: true,
-          },
-          {
-            name: 'to',
-            type: 'address',
-            indexed: true,
-          },
-          {
-            name: 'value',
-            type: 'uint256',
-            indexed: false,
-          },
-        ],
-        name: 'Transfer',
-      },
-      address: sendTokenAddress[client.chain.id],
-      strict: true,
-      fromBlock: from,
-      toBlock: to,
-    })
-
-    if (transfers.length === 0) {
-      this.log.debug('No transfers found.')
-      return
-    }
-
-    this.log.debug(`Got ${transfers.length} transfers.`)
-
-    // fetch the block timestamps in batches
-    const batches = inBatches(transfers).flatMap(async (transfers) => {
-      return await Promise.all(
-        transfers.map(async (transfer) => {
-          const { blockHash, blockNumber, transactionHash, logIndex, args } = transfer
-          const { from, to, value }: { from: string; to: string; value: bigint } = args
-          const blockTimestamp = await this.getBlockTimestamp(blockHash)
-          return {
-            block_hash: blockHash,
-            block_number: blockNumber.toString(),
-            block_timestamp: new Date(Number(blockTimestamp) * 1000),
-            tx_hash: transactionHash,
-            log_index: logIndex.toString(),
-            from,
-            to,
-            value: value.toString(),
-          }
-        })
-      )
-    })
-    let rows: {
-      block_hash: `0x${string}`
-      block_number: string
-      block_timestamp: Date
-      tx_hash: `0x${string}`
-      log_index: string
-      from: string
-      to: string
-      value: string
-    }[] = []
-    for await (const batch of batches) {
-      rows = rows.concat(...batch)
-    }
-
-    if (rows.length === 0) {
-      this.log.debug('No transfers found.')
-      return []
-    }
-
-    this.log.debug({ rows: rows[0] }, `Saving ${rows.length} transfers...`)
-
-    const { error } = await supabaseAdmin
-      .from('send_transfer_logs')
-      // @ts-expect-error supabase-js does not support bigint
-      .upsert(rows, { onConflict: 'block_hash,tx_hash,log_index' })
-
-    if (error) {
-      this.log.error({ error: error.message, code: error.code }, 'Error saving transfers.')
-      throw error
-    }
-  }
-
-  private async getBlockTimestamp(blockHash: `0x${string}`) {
-    const cachedTimestamp = this.blockTimestamps.get(blockHash)
-    if (cachedTimestamp) {
-      return cachedTimestamp
-    }
-    const { timestamp } = await client.getBlock({ blockHash })
-    this.blockTimestamps.set(blockHash, timestamp)
-    // biome-ignore lint/style/noNonNullAssertion: we know timestamp is defined
-    return this.blockTimestamps.get(blockHash)!
   }
 
   /**
@@ -206,6 +92,17 @@ export class DistributorWorker {
       await this._calculateDistributionShares(distribution).catch((error) => errors.push(error))
     }
 
+    if (distributions.length > 0) {
+      const lastDistribution = distributions[distributions.length - 1]
+      this.lastDistributionId = lastDistribution?.id ?? null
+    } else {
+      this.lastDistributionId = null
+    }
+    this.log.info(
+      { lastDistributionId: this.lastDistributionId },
+      'Finished calculating distributions.'
+    )
+
     if (errors.length > 0) {
       this.log.error(`Error calculating distribution shares. Encountered ${errors.length} errors.`)
       throw errors[0]
@@ -220,6 +117,9 @@ export class DistributorWorker {
       distribution_verification_values: Tables<'distribution_verification_values'>[]
     }
   ) {
+    const log = this.log.child({ distribution_id: distribution.id })
+    log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
+
     // fetch all verifications
     const verifications: Tables<'distribution_verifications'>[] = await (async () => {
       const _verifications: Tables<'distribution_verifications'>[] = []
@@ -235,10 +135,7 @@ export class DistributorWorker {
           .range(page, page + pageSize)
 
         if (error) {
-          this.log.error(
-            { error: error.message, code: error.code },
-            'Error fetching verifications.'
-          )
+          log.error({ error: error.message, code: error.code }, 'Error fetching verifications.')
           throw error
         }
 
@@ -253,8 +150,8 @@ export class DistributorWorker {
       return _verifications
     })()
 
-    this.log.info(`Found ${verifications.length} verifications.`)
-    this.log.debug({ verifications })
+    log.info(`Found ${verifications.length} verifications.`)
+    log.debug({ verifications })
 
     const verificationValues = distribution.distribution_verification_values.reduce(
       (acc, verification) => {
@@ -278,8 +175,8 @@ export class DistributorWorker {
       {} as Record<string, Database['public']['Tables']['distribution_verifications']['Row'][]>
     )
 
-    this.log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
-    this.log.debug({ verificationsByUserId })
+    log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
+    log.debug({ verificationsByUserId })
 
     const hodlerAddresses: Functions<'distribution_hodler_addresses'> = await (async () => {
       const _hodlerAddresses: Functions<'distribution_hodler_addresses'> = []
@@ -300,7 +197,7 @@ export class DistributorWorker {
           .range(page, page + pageSize)
 
         if (error) {
-          this.log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
+          log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
           throw error
         }
 
@@ -330,23 +227,23 @@ export class DistributorWorker {
       {} as Record<string, string>
     )
 
-    this.log.info(`Found ${hodlerAddresses.length} addresses.`)
-    this.log.debug({ hodlerAddresses })
+    log.info(`Found ${hodlerAddresses.length} addresses.`)
+    log.debug({ hodlerAddresses })
 
     // lookup balances of all hodler addresses in qualification period
-    const sendTokenContract = getContract({
-      abi: sendTokenAbi,
-      address: sendTokenAddress[client.chain.id],
-      client,
-    })
-
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
       return await Promise.all(
         addresses.map(async ({ user_id, address }) => {
-          const balance = await sendTokenContract.read.balanceOf([address as `0x${string}`])
+          const balance = await readSendTokenBalanceOf(config, {
+            args: [address],
+            chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+            blockNumber: distribution.snapshot_block_num
+              ? BigInt(distribution.snapshot_block_num)
+              : undefined,
+          })
           return {
             user_id,
-            address: address as `0x${string}`,
+            address,
             balance: balance.toString(),
           }
         })
@@ -358,16 +255,18 @@ export class DistributorWorker {
       balances = balances.concat(...batch)
     }
 
-    this.log.info(`Found ${balances.length} balances.`)
-    this.log.debug({ balances })
+    log.info(`Found ${balances.length} balances.`)
+    log.debug({ balances })
 
     // Filter out hodler with not enough send token balance
     balances = balances.filter(
       ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
     )
 
-    this.log.info(`Found ${balances.length} balances after filtering.`)
-    this.log.debug({ balances })
+    log.info(
+      `Found ${balances.length} balances after filtering hodler_min_balance of ${distribution.hodler_min_balance}`
+    )
+    log.debug({ balances })
 
     // Calculate hodler pool share weights
     const amount = BigInt(distribution.amount)
@@ -390,14 +289,14 @@ export class DistributorWorker {
     const hodlerPoolAvailableAmount = calculatePercentageWithBips(amount, hodlerPoolBips)
     const weightPerSend = (totalWeight * 10000n) / hodlerPoolAvailableAmount
 
-    this.log.info(
+    log.info(
       { totalWeight, hodlerPoolAvailableAmount, weightPerSend },
       `Calculated ${Object.keys(poolWeights).length} weights.`
     )
-    this.log.debug({ poolWeights })
+    log.debug({ poolWeights })
 
     if (totalWeight === 0n) {
-      this.log.warn('Total weight is 0. Skipping distribution.')
+      log.warn('Total weight is 0. Skipping distribution.')
       return
     }
 
@@ -421,7 +320,7 @@ export class DistributorWorker {
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]
       if (!hodler || !hodler.address) {
-        this.log.debug({ userId }, 'Hodler not found for user Skipping verification.')
+        log.debug({ userId }, 'Hodler not found for user Skipping verification.')
         continue
       }
       const { address } = hodler
@@ -451,13 +350,13 @@ export class DistributorWorker {
     let totalBonusPoolAmount = 0n
     let totalFixedPoolAmount = 0n
 
-    this.log.info(
+    log.info(
       {
         maxBonusPoolBips,
       },
       'Calculated fixed & bonus pool amounts.'
     )
-    this.log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
+    log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
 
     const shares = hodlerShares
       .map((share) => {
@@ -472,11 +371,11 @@ export class DistributorWorker {
         totalFixedPoolAmount += fixedPoolAmount
 
         if (!userId) {
-          this.log.debug({ share }, 'Hodler not found for address. Skipping share.')
+          log.debug({ share }, 'Hodler not found for address. Skipping share.')
           return null
         }
 
-        this.log.debug(
+        log.debug(
           {
             address: share.address,
             balance: balancesByAddress[share.address],
@@ -501,7 +400,7 @@ export class DistributorWorker {
       })
       .filter(Boolean)
 
-    this.log.info(
+    log.info(
       {
         totalAmount,
         totalHodlerPoolAmount,
@@ -513,14 +412,14 @@ export class DistributorWorker {
       },
       'Distribution totals'
     )
-    this.log.info(`Calculated ${shares.length} shares.`)
-    this.log.debug({ shares })
+    log.info(`Calculated ${shares.length} shares.`)
+    log.debug({ shares })
     const { error } = await supabaseAdmin.rpc('update_distribution_shares', {
       distribution_id: distribution.id,
       shares,
     })
     if (error) {
-      this.log.error({ error: error.message, code: error.code }, 'Error saving shares.')
+      log.error({ error: error.message, code: error.code }, 'Error saving shares.')
       throw error
     }
     return shares
@@ -529,101 +428,22 @@ export class DistributorWorker {
   private async worker() {
     this.log.info('Starting distributor...', { id: this.id })
 
-    // lookup last block number
-    const { data: latestTransfer, error } = await supabaseAdmin
-      .from('send_transfer_logs')
-      .select('*')
-      .order('block_number', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    if (error) {
-      this.log.error(
-        { error: error.message, code: error.code, details: error.details },
-        'Error fetching last block number.'
-      )
-      if (error.code !== 'PGRST116') {
-        throw error
-      }
-    }
-
-    if (latestTransfer) {
-      this.log.debug({ latestTransfer }, 'Found latest transfer.')
-      this.lastBlockNumber = BigInt(latestTransfer.block_number)
-    } else {
-      this.log.debug('No transfers found. Using default block number.')
-    }
-
-    this.log.info(`Using last block number ${this.lastBlockNumber}.`)
-
-    let latestBlockNumber = await client.getBlockNumber().catch((error) => {
-      this.log.error(error, 'Error fetching latest block number.')
-      process.exit(1)
-    })
-    const cancel = client.watchBlocks({
-      onBlock: async (block) => {
-        if (block.number <= this.lastBlockNumber) {
-          return
-        }
-        this.log.info(`New block ${block.number}`)
-        latestBlockNumber = block.number
-      },
-    })
-
     while (this.running) {
       try {
-        if (latestBlockNumber <= this.lastBlockNumber) {
-          if (new Date().getTime() - this.lastBlockNumberAt.getTime() > 30000) {
-            this.log.warn('No new blocks found')
-          }
-          await sleep(client.pollingInterval)
-          continue
-        }
-
-        this.log.info(`Processing block ${latestBlockNumber}`)
-
-        // Always analyze back to finalized block handle reorgs/forked blocks
-        const { number: finalizedBlockNumber } = await client.getBlock({ blockTag: 'finalized' })
-        const from =
-          this.lastBlockNumber < finalizedBlockNumber ? this.lastBlockNumber : finalizedBlockNumber
-        const to = latestBlockNumber
-        await this.saveTransfers(from, to)
         await this.calculateDistributions()
-
-        // update last block number
-        this.lastBlockNumberAt = new Date()
-        this.lastBlockNumber = latestBlockNumber
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
-        await sleep(client.pollingInterval)
-        // skip to next block
       }
+      await sleep(60_000) // sleep for 1 minute
     }
 
-    cancel()
-
-    this.log.info('Distributor stopped.', {
-      lastBlockNumber: this.lastBlockNumber,
-      lastBlockNumberAt: this.lastBlockNumberAt,
-    })
+    this.log.info('Distributor stopped.')
   }
 
   public async stop() {
     this.log.info('Stopping distributor...')
     this.running = false
     return await this.workerPromise
-  }
-
-  public isRunning() {
-    return this.running
-  }
-
-  public getLastBlockNumber() {
-    return this.lastBlockNumber
-  }
-
-  public getLastBlockNumberAt() {
-    return this.lastBlockNumberAt
   }
 
   public async calculateDistribution(id: string) {
@@ -650,10 +470,8 @@ export class DistributorWorker {
   public toJSON() {
     return {
       id: this.id,
-      lastBlockNumber: this.lastBlockNumber.toString(),
-      lastBlockNumberAt: this.lastBlockNumberAt.toISOString(),
       running: this.running,
-      calculateDistribution: this.calculateDistribution.bind(this),
+      lastDistributionId: this.lastDistributionId,
     }
   }
 }

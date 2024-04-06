@@ -21,6 +21,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'warn',
     'react/no-unescaped-entities': 'warn',
     'react-hooks/rules-of-hooks': 'warn',
+    'react-hooks/exhaustive-deps': 'off',
     'no-extra-semi': 'off',
   },
   settings: {
