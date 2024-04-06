@@ -42,8 +42,8 @@ export async function getSenderSafeReceivedEvents({
   sender: `0x${string}`
 }) {
   const fromBlock = {
-    [8453]: BigInt(11269822), // base mainnet send revenue contract creation block
-    [845337]: BigInt(11269822), // base mainnet fork send revenue contract creation block
+    [8453]: BigInt(12817000), // base mainnet send revenue contract creation block
+    [845337]: BigInt(12817000), // base mainnet fork send revenue contract creation block
     [84532]: BigInt(7469197), // base sepolia send revenue contract creation block
   }[publicClient.chain.id]
   return await publicClient.getLogs({
