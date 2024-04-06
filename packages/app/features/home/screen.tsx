@@ -8,6 +8,7 @@ import {
   XStack,
   YStack,
   useToastController,
+  Stack,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
@@ -57,14 +58,17 @@ export function HomeScreen() {
                 <TooltipGroup delay={{ open: 0, close: 1500 }}>
                   <Tooltip placement="bottom">
                     <Tooltip.Trigger>
-                      <Paragraph
-                        fontSize={'$4'}
-                        zIndex={1}
-                        color={'$color05'}
-                        textTransform={'uppercase'}
-                      >
-                        Total Balance
-                      </Paragraph>
+                      <XStack ai="center" gap="$2.5">
+                        <Stack w={11} h={11} bc="$primary" />
+                        <Paragraph
+                          fontSize={'$4'}
+                          zIndex={1}
+                          color={'$color05'}
+                          textTransform={'uppercase'}
+                        >
+                          Total Balance
+                        </Paragraph>
+                      </XStack>
                       <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
                         {totalBalance === undefined ? (
                           <Spinner size={'large'} />
