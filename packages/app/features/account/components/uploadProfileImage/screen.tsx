@@ -16,7 +16,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
   { children }: { children: React.ReactNode },
   ref: Ref<UploadAvatarRefObject>
 ) {
-  const { user, updateProfile } = useUser()
+  const { user, profile, updateProfile } = useUser()
   const supabase = useSupabase()
   const [errMsg, setErrMsg] = useState('')
 
@@ -90,8 +90,6 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
     await updateProfile()
   }
 
-  console.log('user.profile?.avatar_url : ', user.profile?.avatar_url)
-
   return (
     <YStack gap={'$4'}>
       <YStack
@@ -123,7 +121,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
             bottom={0}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
-            {user.profile?.avatar_url ? (
+            {profile?.avatar_url ? (
               <IconRefresh color="primary" />
             ) : (
               <Camera color="primary" size={'$4'} />
