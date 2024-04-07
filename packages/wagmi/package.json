@@ -33,7 +33,7 @@
     "@my/contracts": "workspace:*",
     "@wagmi/core": "2.6.5",
     "change-case": "^5.4.2",
-    "permissionless": "^0.1.11",
+    "permissionless": "^0.1.14",
     "viem": "^2.8.10",
     "wagmi": "2.5.7"
   }

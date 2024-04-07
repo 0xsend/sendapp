@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "cbor": "^9.0.1",
-    "permissionless": "^0.1.11",
+    "permissionless": "^0.1.14",
     "pg": "^8.11.3",
     "typescript": "^5.3.3"
   }
