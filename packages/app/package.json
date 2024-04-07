@@ -46,7 +46,7 @@
     "expo-secure-store": "~12.8.1",
     "expo-sharing": "~11.5.0",
     "libphonenumber-js": "^1.10.58",
-    "permissionless": "^0.1.11",
+    "permissionless": "^0.1.14",
     "react-hook-form": "^7.48.2",
     "react-native": "0.73.6",
     "react-native-safe-area-context": "4.8.2",
