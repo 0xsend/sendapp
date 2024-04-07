@@ -17,12 +17,6 @@ via_ir = true
 
 [profile.mainnet]
 evm_version = "shanghai"
-# should be updated after releases
-fork_block_number = 19582866
-
-[profile.base]
-# should be updated after releases
-fork_block_number = 12817027
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 

@@ -28578,6 +28578,7 @@ __metadata:
     "@types/bun": "npm:latest"
     permissionless: "npm:^0.1.14"
     viem: "npm:^2.8.10"
+    zx: "npm:^7.2.3"
   peerDependencies:
     typescript: ^5.0.0
   languageName: unknown
