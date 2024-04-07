@@ -1,16 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler"
-  },
-  "compileOnSave": false,
-  "ts-node": {
-    "esm": true,
-    "compilerOptions": {
-      "module": "nodenext",
-      "moduleResolution": "nodenext"
-    }
+    "types": ["bun"]
   }
 }
