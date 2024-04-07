@@ -303,15 +303,6 @@ cmd_button(
     text = "snaplet snapshot restore",
 )
 
-mainnet_fork_block_number = str(local(
-    "cat packages/contracts/foundry.toml | yj -tj | jq .profile.mainnet.fork_block_number",
-    echo_off = True,
-    quiet = True,
-)).strip()
-
-if (mainnet_fork_block_number == ""):
-    fail("mainnet_fork_block_number is empty")
-
 local_resource(
     "anvil:mainnet",
     allow_parallel = True,
@@ -334,8 +325,8 @@ local_resource(
         "--port=8545",
         "--chain-id=" + os.getenv("NEXT_PUBLIC_MAINNET_CHAIN_ID", "1337"),
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
-        "--fork-block-number=" + mainnet_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
+        "--no-storage-caching",
         os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
     ] if cmd],
 )
@@ -369,15 +360,6 @@ local_resource(
     """,
 )
 
-base_fork_block_number = str(local(
-    "cat packages/contracts/foundry.toml | yj -tj | jq .profile.base.fork_block_number",
-    echo_off = True,
-    quiet = True,
-)).strip()
-
-if (base_fork_block_number == ""):
-    fail("base_fork_block_number is empty")
-
 local_resource(
     "anvil:base",
     allow_parallel = True,
@@ -400,8 +382,8 @@ local_resource(
         "--port=8546",
         "--chain-id=" + os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
-        "--fork-block-number=" + base_fork_block_number,
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
+        "--no-storage-caching",
         os.getenv("ANVIL_BASE_EXTRA_ARGS", "--silent"),
     ] if cmd],
 )
@@ -501,27 +483,8 @@ local_resource(
         "supabase:test",
         "shovel:generate-config",
     ],
-    serve_cmd = """
-    docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
-    docker pull docker.io/indexsupply/shovel:latest || true
-    docker run --rm \
-        --name shovel \
-        --add-host=host.docker.internal:host-gateway \
-        -p 8383:80 \
-        --env DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres \
-        --env BASE_NAME=base \
-        --env BASE_RPC_URL=http://host.docker.internal:8546 \
-        --env BASE_CHAIN_ID={chain_id} \
-        --env BASE_BLOCK_START={bn} \
-        --env DASHBOARD_ROOT_PASSWORD=shoveladmin \
-        -v ./packages/shovel/etc:/etc/shovel \
-        --entrypoint /usr/local/bin/shovel \
-        -w /usr/local/bin \
-        docker.io/indexsupply/shovel -l :80 -config /etc/shovel/config.json
-    """.format(
-        bn = base_fork_block_number,
-        chain_id = os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
-    ),
+    serve_cmd = "yarn run shovel:tilt",
+    serve_dir = "packages/shovel",
     trigger_mode = TRIGGER_MODE_MANUAL,
     deps = [
         "packages/shovel/etc/config.json",

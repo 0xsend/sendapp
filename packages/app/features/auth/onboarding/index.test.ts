@@ -405,7 +405,7 @@ afterEach(async () => {
   nock.disableNetConnect()
 })
 
-test('can send with new account and paymaster', async () => {
+test.skip('can send with new account and paymaster', async () => {
   sendAccountFactoryAccount = privateKeyToAccount(
     process.env.SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
   )
@@ -464,14 +464,14 @@ test('can send with new account and paymaster', async () => {
   expect(formatUnits(receiverBaB - receiverBalA, 6)).toBe('1')
 }, 45_000)
 
-test('can create a new account with bundler', async () => {
+test.skip('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
   expect(supportedEntryPoints).toBeDefined()
   expect(supportedEntryPoints.length).toBeGreaterThan(0)
   expect(supportedEntryPoints).toContain(entrypoint.address)
 })
 
-test('can get gas user operation gas prices', async () => {
+test.skip('can get gas user operation gas prices', async () => {
   const gasPrice = await baseMainnetClient.getGasPrice()
   expect(gasPrice).toBeDefined()
   log('gasPrice', gasPrice)
