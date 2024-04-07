@@ -9,13 +9,15 @@ const AIRDROP_MULTISIG_SAFE = '0x077c4E5983e5c495599C1Eb5c1511A52C538eB50'
 void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))
   await $`cast rpc --rpc-url http://localhost:8546 evm_setAutomine true`
-  console.log(chalk.blue('Deploying SendMerkleDrop contract...'))
-  await $`forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
-              -vvvv \
-              --fork-url http://localhost:8546 \
-              --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-              --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-              --broadcast`
+
+  // merkle drop is deployed to base 🎉
+  // console.log(chalk.blue('Deploying SendMerkleDrop contract...'))
+  // await $`forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
+  //             -vvvv \
+  //             --fork-url http://localhost:8546 \
+  //             --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+  //             --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+  //             --broadcast`
 
   console.log(chalk.blue('Sending 10 ether to the airdrop multisig...'))
   await $`cast send --rpc-url http://localhost:8546 \
@@ -32,7 +34,7 @@ void (async function main() {
   // parse merkle drop address from broadcast folder
   const broadcast = JSON.parse(
     await Bun.file(
-      `${import.meta.dir}/../broadcast/DeploySendMerkleDrop.s.sol/845337/run-latest.json`
+      `${import.meta.dir}/../broadcast/DeploySendMerkleDrop.s.sol/8453/run-latest.json`
     ).text()
   ) as {
     transactions: {
