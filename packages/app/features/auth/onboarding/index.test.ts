@@ -4,7 +4,6 @@ import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   baseMainnetBundlerClient as bundlerClient,
-  iEntryPointSimulationsAbi,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
@@ -158,7 +157,7 @@ async function createAccountAndVerifySignature() {
   // })
   // expect(await baseMainnetClient.getBalance({ address })).toBe(parseEther('1'))
 
-  // console.log('[API] Faucet deposit prefund')
+  // log('[API] Faucet deposit prefund')
   // const depositTxHash = await walletClient.writeContract({
   //   address: entrypoint.address,
   //   abi: iEntryPointAbi,
@@ -166,7 +165,7 @@ async function createAccountAndVerifySignature() {
   //   args: [address],
   //   value: parseEther('1'), // 0.01 ETH
   // })
-  // console.log(`[API] Faucet deposited prefund: ${depositTxHash}`)
+  // log(`[API] Faucet deposited prefund: ${depositTxHash}`)
   // await waitForTx(baseMainnetClient as PublicClient, depositTxHash)
 
   // Deploy account
@@ -233,7 +232,7 @@ async function createAccountAndVerifySignature() {
   //     }
   //     const validationResult = cause.data.args?.[0]
   //     if ((validationResult as { sigFailed: boolean })?.sigFailed) {
-  //       console.log('Validation result: ', validationResult)
+  //       log('Validation result: ', validationResult)
   //       throw new Error('Signature failed')
   //     }
   //   })
@@ -294,10 +293,10 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
       ],
     ],
   })
-  const paymaster = tokenPaymasterAddress[baseMainnetClient.chain.id]
+  const paymaster = tokenPaymasterAddress[baseMainnetClient.chain.id] as `0x${string}`
+
   log('paymaster', paymaster)
-  const paymasterVerificationGasLimit = 600000n
-  const paymasterPostOpGasLimit = 600000n
+
   const userOp: UserOperation<'v0.7'> = {
     sender: senderAddress,
     nonce: 0n,
@@ -305,16 +304,18 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     // factoryData,
     callData,
     callGasLimit: 100000n,
-    verificationGasLimit: 185000n,
-    preVerificationGas: 50000n,
-    maxFeePerGas: 1000000007n,
-    maxPriorityFeePerGas: 1000000007n,
+    verificationGasLimit: 550000n,
+    preVerificationGas: 70000n,
+    maxFeePerGas: 10000000n,
+    maxPriorityFeePerGas: 10000000n,
     paymaster,
-    paymasterVerificationGasLimit,
-    paymasterPostOpGasLimit,
+    paymasterVerificationGasLimit: 150000n,
+    paymasterPostOpGasLimit: 50000n,
     paymasterData: '0x',
     signature: '0x',
   }
+
+  log('userOp', userOp)
 
   const requiredPreFund = getRequiredPrefund({
     userOperation: userOp,
@@ -377,6 +378,9 @@ export async function generateUserOp(publicKey: [Hex, Hex]) {
     entryPoint: entrypoint.address,
     chainId: baseMainnetClient.chain.id,
   })
+
+  log('userOpHash', userOpHash)
+
   return {
     userOp,
     userOpHash,
@@ -401,7 +405,7 @@ afterEach(async () => {
   nock.disableNetConnect()
 })
 
-test('can create a new account', async () => {
+test('can send with new account and paymaster', async () => {
   sendAccountFactoryAccount = privateKeyToAccount(
     process.env.SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
   )
@@ -460,14 +464,14 @@ test('can create a new account', async () => {
   expect(formatUnits(receiverBaB - receiverBalA, 6)).toBe('1')
 }, 45_000)
 
-test.skip('can create a new account with bundler', async () => {
+test('can create a new account with bundler', async () => {
   const supportedEntryPoints = await bundlerClient.supportedEntryPoints()
   expect(supportedEntryPoints).toBeDefined()
   expect(supportedEntryPoints.length).toBeGreaterThan(0)
   expect(supportedEntryPoints).toContain(entrypoint.address)
 })
 
-test.skip('can get gas user operation gas prices', async () => {
+test('can get gas user operation gas prices', async () => {
   const gasPrice = await baseMainnetClient.getGasPrice()
   expect(gasPrice).toBeDefined()
   log('gasPrice', gasPrice)
@@ -479,5 +483,5 @@ test.skip('can get gas user operation gas prices', async () => {
 //     timeout: 30000,
 //     // confirmations: 3,
 //   })
-//   console.log(`...status: ${receipt.status}`)
+//   log(`...status: ${receipt.status}`)
 // }
