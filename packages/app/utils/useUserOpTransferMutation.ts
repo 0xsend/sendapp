@@ -100,20 +100,19 @@ export async function sendUserOpTransfer({
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
   const paymaster = tokenPaymasterAddress[chainId]
-  const paymasterVerificationGasLimit = 500000n
-  const paymasterPostOpGasLimit = 500000n
   const userOp: UserOperation<'v0.7'> = {
     sender,
     nonce,
     callData,
     callGasLimit: 100000n,
-    verificationGasLimit: 170000n,
-    preVerificationGas: 50000n,
+    verificationGasLimit: 550000n,
+    preVerificationGas: 70000n,
     maxFeePerGas: 10000000n,
     maxPriorityFeePerGas: 10000000n,
     paymaster,
-    paymasterVerificationGasLimit,
-    paymasterPostOpGasLimit,
+    paymasterVerificationGasLimit: 150000n,
+    paymasterPostOpGasLimit: 50000n,
+    paymasterData: '0x',
     signature: '0x',
   }
 

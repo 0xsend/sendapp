@@ -33,6 +33,19 @@ jest.mock('@my/wagmi', () => ({
   },
 }))
 
+const defaultUserOp = {
+  callGasLimit: 100000n,
+  maxFeePerGas: 10000000n,
+  maxPriorityFeePerGas: 10000000n,
+  paymaster: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+  paymasterData: '0x',
+  paymasterPostOpGasLimit: 50000n,
+  paymasterVerificationGasLimit: 150000n,
+  preVerificationGas: 70000n,
+  signature: '0x123',
+  verificationGasLimit: 550000n,
+}
+
 describe('useUserOpTransferMutation', () => {
   beforeEach(() => {
     jest.useFakeTimers()
@@ -72,15 +85,7 @@ describe('useUserOpTransferMutation', () => {
           sender: args.sender,
           nonce: args.nonce,
           callData,
-          callGasLimit: 100000n,
-          maxFeePerGas: 10000000n,
-          maxPriorityFeePerGas: 10000000n,
-          paymaster: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
-          paymasterPostOpGasLimit: 500000n,
-          paymasterVerificationGasLimit: 500000n,
-          preVerificationGas: 50000n,
-          signature: '0x123',
-          verificationGasLimit: 170000n,
+          ...defaultUserOp,
         },
       })
       return Promise.resolve('0x123')
@@ -137,15 +142,7 @@ describe('useUserOpTransferMutation', () => {
           sender: args.sender,
           nonce: args.nonce,
           callData,
-          callGasLimit: 100000n,
-          verificationGasLimit: 170000n,
-          maxFeePerGas: 10000000n,
-          maxPriorityFeePerGas: 10000000n,
-          paymaster: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
-          paymasterPostOpGasLimit: 500000n,
-          paymasterVerificationGasLimit: 500000n,
-          preVerificationGas: 50000n,
-          signature: '0x123',
+          ...defaultUserOp,
         },
       })
       return Promise.resolve('0x123')
