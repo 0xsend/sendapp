@@ -41,7 +41,7 @@ contract DeployTokenPaymasterScript is Script {
 
         OracleHelperConfig memory ohc = OracleHelperConfig({
             cacheTimeToLive: 3600, // 1 hour
-            maxOracleRoundAge: 43200, // 12 hours
+            maxOracleRoundAge: 86400, // 1 day
             nativeOracle: IOracle(nativeOracle),
             priceUpdateThreshold: PRICE_DENOM * 12 / 100, // 20%
             tokenOracle: IOracle(tokenOracle),

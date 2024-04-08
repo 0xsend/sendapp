@@ -3638,7 +3638,7 @@ export const tokenPaymasterAbi = [
  *
  */
 export const tokenPaymasterAddress = {
-  845337: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+  845337: '0xb6a372E90788d6Afe1C75dbeDF5A57f1E78823A0',
 } as const
 
 /**
