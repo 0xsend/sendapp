@@ -1,7 +1,6 @@
 import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
   sendAccountAbi,
-  sendAccountFactoryAbi,
   sendVerifierAbi,
   sendVerifierProxyAddress,
   entryPointAddress,
@@ -18,7 +17,6 @@ import {
   bytesToHex,
   concat,
   createTestClient,
-  createWalletClient,
   encodeAbiParameters,
   encodeFunctionData,
   getAbiItem,
