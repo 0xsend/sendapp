@@ -326,6 +326,7 @@ local_resource(
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
         "--no-storage-caching",
+        "--prune-history",
         os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
     ] if cmd],
 )
@@ -383,6 +384,7 @@ local_resource(
         "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
         "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
         "--no-storage-caching",
+        "--prune-history",
         os.getenv("ANVIL_BASE_EXTRA_ARGS", "--silent"),
     ] if cmd],
 )
