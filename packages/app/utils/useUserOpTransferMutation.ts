@@ -3,17 +3,19 @@ import {
   baseMainnetClient,
   entryPointAddress,
   sendAccountAbi,
+  tokenPaymasterAbi,
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation } from '@tanstack/react-query'
 import {
+  getRequiredPrefund,
   getUserOperationHash,
   type GetUserOperationReceiptReturnType,
   type UserOperation,
 } from 'permissionless'
-import { encodeFunctionData, erc20Abi, isAddress, type Hex } from 'viem'
+import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from 'viem'
 import { assert } from './assert'
-import { USEROP_VALID_UNTIL, USEROP_VERSION, signUserOp } from './userop'
+import { USEROP_VALID_UNTIL, USEROP_VERSION, entrypoint, signUserOp } from './userop'
 
 export type UseUserOpTransferMutationArgs = {
   sender: Hex
@@ -93,8 +95,6 @@ export async function sendUserOpTransfer({
     })
   }
 
-  const gasPrices = await baseMainnetClient.getGasPrice()
-
   // @todo implement gas estimation
   // @todo implement paymaster and data
   const chainId = baseMainnetClient.chain.id
@@ -116,78 +116,64 @@ export async function sendUserOpTransfer({
     signature: '0x',
   }
 
-  const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
-    userOperation: userOp,
-  })
+  const { verificationGasLimit, callGasLimit, preVerificationGas } =
+    await baseMainnetBundlerClient.estimateUserOperationGas({
+      userOperation: userOp,
+    })
 
-  console.log('userOp', userOp)
-  console.log('gasPrices', gasPrices)
-  console.log('gasEstimate', gasEstimate)
+  const increaseBy5Percent = (gasLimit: bigint) => gasLimit + (gasLimit * 500n) / 10000n
 
   const userOpHash = getUserOperationHash({
-    userOperation: userOp,
+    userOperation: {
+      ...userOp,
+      verificationGasLimit: increaseBy5Percent(verificationGasLimit),
+      callGasLimit: increaseBy5Percent(callGasLimit),
+      preVerificationGas: increaseBy5Percent(preVerificationGas),
+    },
     entryPoint,
     chainId,
   })
+
+  // @todo refactor to a new hook useUserOpGasEstimate
+  // const gasPrices = await baseMainnetClient.getGasPrice()
+  const requiredPreFund = getRequiredPrefund({
+    userOperation: userOp,
+    entryPoint: entrypoint.address,
+  })
+  // calculate the required usdc balance
+  const [priceMarkup, , refundPostopCost, , baseFee] = await baseMainnetClient.readContract({
+    address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+    abi: tokenPaymasterAbi,
+    functionName: 'tokenPaymasterConfig',
+    args: [],
+  })
+  const cachedPrice = await baseMainnetClient.readContract({
+    address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+    abi: tokenPaymasterAbi,
+    functionName: 'cachedPrice',
+    args: [],
+  })
+  const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * userOp.maxFeePerGas
+  const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
+  const requiredUsdcBalance = await baseMainnetClient.readContract({
+    address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+    abi: tokenPaymasterAbi,
+    functionName: 'weiToToken',
+    args: [preChargeNative, cachedPriceWithMarkup],
+  })
+  console.log('usdc for gas', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
+  console.log(
+    'total + base fee',
+    requiredUsdcBalance + BigInt(baseFee),
+    formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
+  )
+  // end
 
   userOp.signature = await signUserOp({
     userOpHash,
     version: USEROP_VERSION,
     validUntil,
   })
-
-  // const gasParameters = await baseMainnetBundlerClient.estimateUserOperationGas({
-  //   userOperation: userOp,
-  // })
-
-  // console.log('gasParameters', gasParameters)
-
-  // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
-  // await baseMainnetClient
-  //   .simulateContract({
-  //     address: entryPoint,
-  //     functionName: 'simulateValidation',
-  //     abi: entryPointAbi,
-  //     args: [userOp],
-  //   })
-  //   .catch((e: ContractFunctionExecutionError) => {
-  //     const cause: ContractFunctionRevertedError = e.cause
-  //     if (cause.data?.errorName === 'ValidationResult') {
-  //       const data = cause.data
-  //       if ((data.args?.[0] as { sigFailed: boolean }).sigFailed) {
-  //         throw new Error('Signature failed')
-  //       }
-  //       // console.log('ValidationResult', data)
-  //       return data
-  //     }
-  //     throw e
-  //   })
-
-  // [simulateHandleOp](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L203)
-  // await baseMainnetClient
-  //   .simulateContract({
-  //     address: entryPoint,
-  //     functionName: 'simulateHandleOp',
-  //     abi: entryPointAbi,
-  //     args: [
-  //       userOp,
-  //       '0x0000000000000000000000000000000000000000',
-  //       '0x', // target calldata
-  //     ],
-  //   })
-  //   .catch((e: ContractFunctionExecutionError) => {
-  //     const cause: ContractFunctionRevertedError = e.cause
-  //     if (cause.data?.errorName === 'ExecutionResult') {
-  //       const data = cause.data
-  //       if ((data.args?.[0] as { success: boolean }).success) {
-  //         throw new Error('Handle op failed')
-  //       }
-  //       // console.log('ExecutionResult', data)
-  //       // @todo use to estimate gas
-  //       return data
-  //     }
-  //     throw e
-  //   })
 
   const hash = await baseMainnetBundlerClient.sendUserOperation({
     userOperation: userOp,
