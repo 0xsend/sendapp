@@ -20,8 +20,10 @@ let log: debug.Debugger
 
 const sendAccountTest = base.extend<{
   page: Page
+  setEthBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
+  setUsdcBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
 }>({
-  page: async ({ page, context, supabase }, use) => {
+  page: async ({ page, context, supabase, setEthBalance, setUsdcBalance }, use) => {
     log = debug(`test:send-accounts:${test.info().workerIndex}}`)
     log('start onboarding')
 
@@ -41,28 +43,39 @@ const sendAccountTest = base.extend<{
     assert(!!sendAccount, 'no send account found')
     assert(sendAccount.address !== zeroAddress, 'send account address is zero')
 
-    log('fund send account', sendAccount.address)
-    await testBaseClient
-      .setBalance({
-        address: sendAccount.address,
-        value: parseEther('1'),
-      })
-      .catch((e) => {
-        log('setBalance error', e)
-        throw e
-      })
-    await setERC20Balance({
-      client: testBaseClient,
-      address: sendAccount.address,
-      tokenAddress: usdcAddress[testBaseClient.chain.id],
-      value: 100n * 10n ** 6n,
-    }).catch((e) => {
-      log('setERC20Balance error', e)
-      throw e
-    })
+    await setEthBalance({ address: sendAccount.address, value: parseEther('1') })
+    await setUsdcBalance({ address: sendAccount.address, value: 100n * 10n ** 6n })
+
     await onboardingPage.page.close() // close the onboarding page
 
     await use(page)
+  },
+  // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
+  setEthBalance: async ({}, use) => {
+    use(async ({ address, value }) => {
+      log('fund send account with eth', `address=${address} value=${value}`)
+      await testBaseClient
+        .setBalance({
+          address,
+          value,
+        })
+        .catch((e) => {
+          log('setBalance error', e)
+          throw e
+        })
+    })
+  },
+  // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
+  setUsdcBalance: async ({}, use) => {
+    use(async ({ address, value }) => {
+      log('fund send account with usdc', `address=${address} value=${value}`)
+      await setERC20Balance({
+        client: testBaseClient,
+        address,
+        tokenAddress: usdcAddress[testBaseClient.chain.id],
+        value,
+      })
+    })
   },
 })
 export const test = sendAccountTest
