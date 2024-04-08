@@ -95,8 +95,6 @@ export async function sendUserOpTransfer({
     })
   }
 
-  // @todo implement gas estimation
-  // @todo implement paymaster and data
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
   const paymaster = tokenPaymasterAddress[chainId]
