@@ -20,6 +20,7 @@ export const models: SeedClientOptions['models'] = {
   sendAccounts: {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
+      chainId: 845337,
     },
   },
 }
@@ -31,5 +32,9 @@ export const userOnboarded: usersInputs = {
       status: 'confirmed',
     },
   ],
-  sendAccounts: [{}],
+  sendAccounts: [
+    {
+      chainId: 845337,
+    },
+  ],
 }
