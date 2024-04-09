@@ -243,7 +243,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
             $theme-light={{ col: '$black' }}
             fontFamily={'$mono'}
           >
-            Send Tag Pricing
+            Sendtag Pricing
           </H6>
           <Paragraph size={'$4'} $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
             Sendtag price is based on length — the shorter it is, the higher the price.

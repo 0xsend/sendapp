@@ -123,7 +123,7 @@ const DistributionRewardsSection = ({
               justifyContent="space-between"
             >
               <YStack gap="$2" f={1} maw={312}>
-                {isDuringQualification && <Label fontFamily={'$mono'}>Valid for</Label>}
+                {isDuringQualification && <Label fontFamily={'$mono'}>Closing in</Label>}
                 <Theme inverse>
                   {(() => {
                     switch (true) {
