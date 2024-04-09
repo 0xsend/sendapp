@@ -30,6 +30,8 @@ import { DistributionClaimButton } from './components/DistributionClaimButton'
 import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
+import { X } from '@tamagui/lucide-icons'
+import { useSendPrice } from 'app/utils/coin-gecko'
 
 export function RewardsScreen() {
   const { data: distributions, isLoading } = useDistributions()
@@ -261,6 +263,7 @@ const SendBalanceCard = ({
       br={12}
       borderColor={'$decay'}
       p="$4"
+      $xs={{ p: '$2.5' }}
       $gtLg={{ p: '$4' }}
       jc="center"
     >
@@ -286,6 +289,7 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) 
     borderWidth={1}
     br={12}
     borderColor={'$decay'}
+    $xs={{ p: '$2.5' }}
     p="$4"
     $gtLg={{ p: '$4' }}
     jc="center"
@@ -307,17 +311,6 @@ const ReferralsCard = () => {
   const { referralsCount, isLoading, error } = useUserReferralsCount()
   if (error) throw error
 
-  const body = () => {
-    switch (true) {
-      case isLoading:
-        return <Spinner color={'$color'} />
-      case referralsCount === undefined:
-        return 'Fetch Error'
-      default:
-        return referralsCount
-    }
-  }
-
   return (
     <Card
       f={1}
@@ -325,6 +318,7 @@ const ReferralsCard = () => {
       borderWidth={1}
       br={12}
       borderColor={'$decay'}
+      $xs={{ p: '$2.5' }}
       p="$4"
       $gtLg={{ p: '$4' }}
       jc="center"
@@ -335,7 +329,16 @@ const ReferralsCard = () => {
         </Label>
         <Theme inverse>
           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {body()}
+            {(() => {
+              switch (true) {
+                case isLoading:
+                  return <Spinner color={'$color'} />
+                case referralsCount === undefined:
+                  return 'Fetch Error'
+                default:
+                  return referralsCount
+              }
+            })()}
           </Paragraph>
         </Theme>
       </YStack>
@@ -347,6 +350,10 @@ const SendRewardsCard = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
   const shareAmount = distribution.distribution_shares?.[0]?.amount
+  const { data: sendPrice } = useSendPrice()
+  const pricePerSend = sendPrice?.['send-token'].usd
+  const rewardValue = pricePerSend && shareAmount ? shareAmount * pricePerSend : undefined
+
   return (
     <Card
       f={1}
@@ -375,6 +382,11 @@ const SendRewardsCard = ({
               {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
             </Paragraph>
           </Theme>
+          {rewardValue && (
+            <Paragraph fontFamily={'$mono'} col="$color8" opacity={0.6}>
+              {`~$${rewardValue.toFixed(2)}`}
+            </Paragraph>
+          )}
         </Stack>
         <DistributionClaimButton distribution={distribution} />
       </YStack>
