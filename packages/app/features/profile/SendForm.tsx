@@ -11,7 +11,7 @@ import { useBalance } from 'wagmi'
 import formatAmount from 'app/utils/formatAmount'
 import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { assert } from 'app/utils/assert'
-import { Link } from 'solito/link'
+import { useLink } from 'solito/link'
 import { useAccountNonce } from 'app/utils/userop'
 
 // @todo add currency field
@@ -41,6 +41,9 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
   // need nonce to send transaction
   const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
   const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
+  const sentTxLink = useLink({
+    href: `${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`,
+  })
   async function onSubmit({ token, amount: amountStr }: z.infer<typeof SendFormSchema>) {
     try {
       assert(!!balance, 'Balance is not available')
@@ -93,11 +96,9 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
         }}
         renderAfter={({ submit }) =>
           sentUserOpTxHash ? (
-            <Link href={`${baseMainnet.blockExplorers.default.url}tx/${sentUserOpTxHash}`}>
-              <Button>
-                <Button.Text>View on {baseMainnet.blockExplorers.default.name}</Button.Text>
-              </Button>
-            </Link>
+            <Button {...sentTxLink}>
+              <Button.Text>View on {baseMainnet.blockExplorers.default.name}</Button.Text>
+            </Button>
           ) : (
             <XStack>
               <SubmitButton theme="accent" onPress={submit}>

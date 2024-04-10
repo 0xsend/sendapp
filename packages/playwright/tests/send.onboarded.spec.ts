@@ -15,7 +15,6 @@ test.beforeAll(async () => {
 })
 
 test('can send ETH to user on profile', async ({ page, seed }) => {
-  test.slow() // Easy way to triple the default timeout
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
@@ -46,7 +45,6 @@ test('can send ETH to user on profile', async ({ page, seed }) => {
 })
 
 test('can send USDC to user on profile', async ({ page, seed }) => {
-  test.slow() // Easy way to triple the default timeout
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
