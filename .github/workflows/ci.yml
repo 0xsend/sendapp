@@ -15,6 +15,9 @@ jobs:
   # set yarn cache
   cache-deps:
     runs-on: self-hosted
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:linux
+      options: --user root
 
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +34,9 @@ jobs:
 
   lint:
     runs-on: self-hosted
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:linux
+      options: --user root
     needs: [cache-deps]
     env:
       YARN_ENABLE_HARDENED_MODE: 0
@@ -48,6 +54,9 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: self-hosted
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:linux
+      options: --user root
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -95,6 +104,9 @@ jobs:
   playwright-tests:
     name: Playwright Tests
     runs-on: self-hosted
+    container:
+      image: mcr.microsoft.com/devcontainers/universal:linux
+      options: --user root
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
