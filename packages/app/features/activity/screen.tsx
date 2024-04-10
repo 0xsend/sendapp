@@ -222,7 +222,7 @@ function RecentActivity() {
 function TableLabel({
   textAlign = 'left',
   children,
-}: PropsWithChildren & { textAlign?: 'left' | 'right' }) {
+}: { textAlign?: 'left' | 'right' } & PropsWithChildren) {
   return (
     <H4
       color={'$olive'}
@@ -237,7 +237,7 @@ function TableLabel({
   )
 }
 
-function RowLabel({ children }) {
+function RowLabel({ children }: PropsWithChildren) {
   return (
     <H4 color="hsl(0, 0%, 42.5%)" fontFamily={'$mono'} fontWeight={'500'} size={'$5'} mt="$3">
       {children}
