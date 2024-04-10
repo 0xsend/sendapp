@@ -470,7 +470,6 @@ local_resource(
 local_resource(
     "shovel",
     allow_parallel = True,
-    auto_init = False,  # shovel eats a lot of RPCs, so we don't want it to start automatically
     labels = labels,
     links = ["http://localhost:8383/"],
     readiness_probe = probe(
@@ -496,7 +495,6 @@ local_resource(
 local_resource(
     "otterscan:base",
     allow_parallel = True,
-    auto_init = False,
     labels = labels,
     links = [link("http://localhost:5101/", "Otterscan Base")],
     readiness_probe = probe(

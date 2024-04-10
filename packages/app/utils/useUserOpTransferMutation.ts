@@ -17,6 +17,26 @@ import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from '
 import { assert } from './assert'
 import { USEROP_VALID_UNTIL, USEROP_VERSION, entrypoint, signUserOp } from './userop'
 
+// move to a useUserOp hook
+export const defaultUserOp: Pick<
+  UserOperation<'v0.7'>,
+  | 'callGasLimit'
+  | 'verificationGasLimit'
+  | 'preVerificationGas'
+  | 'maxFeePerGas'
+  | 'maxPriorityFeePerGas'
+  | 'paymasterVerificationGasLimit'
+  | 'paymasterPostOpGasLimit'
+> = {
+  callGasLimit: 100000n,
+  verificationGasLimit: 550000n,
+  preVerificationGas: 70000n,
+  maxFeePerGas: 10000000n,
+  maxPriorityFeePerGas: 10000000n,
+  paymasterVerificationGasLimit: 150000n,
+  paymasterPostOpGasLimit: 50000n,
+}
+
 export type UseUserOpTransferMutationArgs = {
   sender: Hex
   token?: Hex
@@ -99,41 +119,33 @@ export async function sendUserOpTransfer({
   const entryPoint = entryPointAddress[chainId]
   const paymaster = tokenPaymasterAddress[chainId]
   const userOp: UserOperation<'v0.7'> = {
+    ...defaultUserOp,
     sender,
     nonce,
     callData,
-    callGasLimit: 100000n,
-    verificationGasLimit: 550000n,
-    preVerificationGas: 70000n,
-    maxFeePerGas: 10000000n,
-    maxPriorityFeePerGas: 10000000n,
     paymaster,
-    paymasterVerificationGasLimit: 150000n,
-    paymasterPostOpGasLimit: 50000n,
     paymasterData: '0x',
     signature: '0x',
   }
 
-  const { verificationGasLimit, callGasLimit, preVerificationGas } =
-    await baseMainnetBundlerClient.estimateUserOperationGas({
-      userOperation: userOp,
-    })
-
-  const increaseBy5Percent = (gasLimit: bigint) => gasLimit + (gasLimit * 500n) / 10000n
-
   const userOpHash = getUserOperationHash({
-    userOperation: {
-      ...userOp,
-      verificationGasLimit: increaseBy5Percent(verificationGasLimit),
-      callGasLimit: increaseBy5Percent(callGasLimit),
-      preVerificationGas: increaseBy5Percent(preVerificationGas),
-    },
+    userOperation: userOp,
     entryPoint,
     chainId,
   })
 
   // @todo refactor to a new hook useUserOpGasEstimate
-  // const gasPrices = await baseMainnetClient.getGasPrice()
+  const feesPerGas = await baseMainnetClient.estimateFeesPerGas()
+
+  console.log('feesPerGas', {
+    maxFeePerGas: `${formatUnits(userOp.maxFeePerGas, 9)} gwei`,
+    maxPriorityFeePerGas: `${formatUnits(userOp.maxPriorityFeePerGas, 9)} gwei`,
+  })
+  console.log('feesPerGas [network]', {
+    maxFeePerGas: `${formatUnits(feesPerGas.maxFeePerGas ?? 0n, 9)} gwei`,
+    maxPriorityFeePerGas: `${formatUnits(feesPerGas.maxPriorityFeePerGas ?? 0n, 9)} gwei`,
+  })
+
   const requiredPreFund = getRequiredPrefund({
     userOperation: userOp,
     entryPoint: entrypoint.address,
@@ -165,8 +177,26 @@ export async function sendUserOpTransfer({
     requiredUsdcBalance + BigInt(baseFee),
     formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
   )
+  if ((feesPerGas.maxFeePerGas ?? 0n) > 0) {
+    const maxFeePerGas = feesPerGas.maxFeePerGas ?? 0n
+    const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * maxFeePerGas
+    const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
+    const requiredUsdcBalance = await baseMainnetClient.readContract({
+      address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+      abi: tokenPaymasterAbi,
+      functionName: 'weiToToken',
+      args: [preChargeNative, cachedPriceWithMarkup],
+    })
+    console.log('usdc for gas [network]', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
+    console.log(
+      'total + base fee [network]',
+      requiredUsdcBalance + BigInt(baseFee),
+      formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
+    )
+  }
   // end
 
+  // @todo move to a sign user op hook
   userOp.signature = await signUserOp({
     userOpHash,
     version: USEROP_VERSION,
