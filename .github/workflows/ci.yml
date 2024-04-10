@@ -14,7 +14,7 @@ concurrency:
 jobs:
   # set yarn cache
   cache-deps:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
           echo github.head_ref=${{ github.head_ref }}
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [cache-deps]
     env:
       YARN_ENABLE_HARDENED_MODE: 0
@@ -47,7 +47,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -94,7 +94,7 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -163,7 +163,7 @@ jobs:
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [cache-deps]
 
     permissions:
