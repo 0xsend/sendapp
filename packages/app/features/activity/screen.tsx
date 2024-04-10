@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react'
 import {
   AnimatePresence,
   Avatar,
@@ -194,95 +195,87 @@ function RecentActivity() {
   return (
     <YStack gap="$5" mb="$4">
       <XStack ai="center" jc="space-between">
-        <H4 color={'$olive'} theme={'alt2'} fontWeight={'300'} size={'$8'}>
-          Transactions
-        </H4>
+        <TableLabel>Transactions</TableLabel>
         <XStack gap="$4">
-          <H4
-            color={'$olive'}
-            theme={'alt2'}
-            fontWeight={'300'}
-            size={'$8'}
-            minWidth={'$14'}
-            textAlign="right"
-          >
-            Date
-          </H4>
-          <H4
-            color={'$olive'}
-            theme={'alt2'}
-            fontWeight={'300'}
-            size={'$8'}
-            minWidth={'$14'}
-            textAlign="right"
-          >
-            Amount
-          </H4>
+          <TableLabel textAlign="right">Date</TableLabel>
+          <TableLabel textAlign="right">Amount</TableLabel>
         </XStack>
       </XStack>
 
-      <H4 color="#666666" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
-        PENDING
-      </H4>
-      {activities.map((activity) => (
-        <XStack key={activity.time} ai="center" jc="space-between" gap="$4">
-          <XStack gap="$4.5">
-            <Avatar size="$4" br="$4" space="$2">
-              <Avatar.Image src={activity.avatar} />
-              <Avatar.Fallback jc="center">
-                <Spinner size="small" color="$send1" />
-              </Avatar.Fallback>
-            </Avatar>
+      {/* @TODO: Update with real values/filtering */}
+      <RowLabel>PENDING</RowLabel>
 
-            <YStack gap="$1.5">
-              <Text color="$white">{activity.username}</Text>
-              <Text theme="alt2" color="$olive" fontFamily={'$mono'} fontSize={12}>
-                @{activity.username}
-              </Text>
-            </YStack>
-          </XStack>
-          <XStack gap="$4">
-            <Text color="$white" minWidth={'$14'} textAlign="right">
-              {activity.time}
-            </Text>
-            <Text color="$white" minWidth={'$14'} textAlign="right">
-              {activity.amount}
-            </Text>
-          </XStack>
-        </XStack>
+      {activities.map((activity) => (
+        <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
       ))}
 
-      <H4 color="hsl(0, 0%, 42.5%)" fontFamily={'$mono'} fontWeight={'500'} size={'$5'} mt="$3">
-        12 FEBRUARY 2024
-      </H4>
-      {activities.map((activity) => (
-        <XStack key={activity.time} ai="center" jc="space-between" space="$4">
-          <XStack gap="$4.5">
-            <Avatar size="$4" br="$4" space="$2">
-              <Avatar.Image src={activity.avatar} />
-              <Avatar.Fallback jc="center">
-                <Spinner size="small" color="$send1" />
-              </Avatar.Fallback>
-            </Avatar>
+      <RowLabel>12 FEBRUARY 2024</RowLabel>
 
-            <YStack gap="$1.5">
-              <Text color="$white">{activity.username}</Text>
-              <Text theme="alt2" color="$olive" fontFamily={'$mono'} fontSize={12}>
-                @{activity.username}
-              </Text>
-            </YStack>
-          </XStack>
-          <XStack gap="$4">
-            <Text color="$white" minWidth={'$14'} textAlign="right">
-              {activity.time}
-            </Text>
-            <Text color="$white" minWidth={'$14'} textAlign="right">
-              {activity.amount}
-            </Text>
-          </XStack>
-        </XStack>
+      {activities.map((activity) => (
+        // @TODO: Replace key with unique id
+        <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
       ))}
     </YStack>
+  )
+}
+
+function TableLabel({
+  textAlign = 'left',
+  children,
+}: PropsWithChildren & { textAlign?: 'left' | 'right' }) {
+  return (
+    <H4
+      color={'$olive'}
+      theme={'alt2'}
+      fontWeight={'300'}
+      size={'$8'}
+      minWidth={'$14'}
+      textAlign={textAlign}
+    >
+      {children}
+    </H4>
+  )
+}
+
+function RowLabel({ children }) {
+  return (
+    <H4 color="hsl(0, 0%, 42.5%)" fontFamily={'$mono'} fontWeight={'500'} size={'$5'} mt="$3">
+      {children}
+    </H4>
+  )
+}
+
+function Row({
+  activity,
+}: {
+  activity: (typeof activities)[number]
+}) {
+  return (
+    <XStack key={activity.time} ai="center" jc="space-between" gap="$4">
+      <XStack gap="$4.5">
+        <Avatar size="$4" br="$4" space="$2">
+          <Avatar.Image src={activity.avatar} />
+          <Avatar.Fallback jc="center">
+            <Spinner size="small" color="$send1" />
+          </Avatar.Fallback>
+        </Avatar>
+
+        <YStack gap="$1.5">
+          <Text color="$white">{activity.username}</Text>
+          <Text theme="alt2" color="$olive" fontFamily={'$mono'} fontSize={12}>
+            @{activity.username}
+          </Text>
+        </YStack>
+      </XStack>
+      <XStack gap="$4">
+        <Text color="$white" minWidth={'$14'} textAlign="right">
+          {activity.time}
+        </Text>
+        <Text color="$white" minWidth={'$14'} textAlign="right">
+          {activity.amount}
+        </Text>
+      </XStack>
+    </XStack>
   )
 }
 
