@@ -34,7 +34,7 @@ export enum ButtonOption {
 }
 
 interface TopNavProps {
-  header: string
+  header?: string
   subheader?: string
   showLogo?: boolean
   showReferral?: boolean
@@ -51,7 +51,7 @@ interface TopNavProps {
 }
 
 export function TopNav({
-  header,
+  header = '',
   subheader,
   showLogo = false,
   showReferral = false,

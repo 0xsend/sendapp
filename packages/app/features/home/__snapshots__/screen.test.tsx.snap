@@ -75,7 +75,6 @@ exports[`HomeScreen 1`] = `
               <View
                 style={
                   {
-                    "backgroundColor": "#40FB50",
                     "height": 11,
                     "width": 11,
                   }
