@@ -376,17 +376,7 @@ local_resource(
         period_secs = 2,
         timeout_secs = 5,
     ),
-    serve_cmd = [cmd for cmd in [
-        "anvil",
-        "--host=0.0.0.0",
-        "--port=8546",
-        "--chain-id=" + os.getenv("NEXT_PUBLIC_BASE_CHAIN_ID", "845337"),
-        "--fork-url=" + os.getenv("ANVIL_BASE_FORK_URL", "https://base-pokt.nodies.app"),
-        "--block-time=" + os.getenv("ANVIL_BASE_BLOCK_TIME", "2"),
-        "--no-storage-caching",
-        "--prune-history",
-        os.getenv("ANVIL_BASE_EXTRA_ARGS", "--silent"),
-    ] if cmd],
+    serve_cmd = "yarn contracts dev:anvil-base-node",
 )
 
 local_resource(
