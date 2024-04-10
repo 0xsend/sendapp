@@ -113,7 +113,7 @@ function ActivityBody() {
             y: 10,
           }}
         >
-          {/* <Suggestions /> */}
+          <Suggestions />
           <RecentActivity />
         </YStack>
       )}
@@ -171,8 +171,8 @@ function SearchResults() {
 // TODO: Replace with dynamic list
 function Suggestions() {
   return (
-    <YStack space="$2">
-      <H4 theme={'alt2'}>Suggested...</H4>
+    <YStack gap="$2" display="flex" $gtMd={{ display: 'none' }}>
+      <TableLabel>Suggestions</TableLabel>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {suggestions.map((user) => (
           <XStack key={user.username} ai="center" mx="$4" space="$2">
@@ -182,7 +182,9 @@ function Suggestions() {
                 <Spinner size="small" color="$send1" />
               </Avatar.Fallback>
             </Avatar>
-            <Paragraph>@{user.username}</Paragraph>
+            <Paragraph color="$white" fontFamily="$mono">
+              @{user.username}
+            </Paragraph>
           </XStack>
         ))}
       </ScrollView>
@@ -196,7 +198,7 @@ function RecentActivity() {
     <YStack gap="$5" mb="$4">
       <XStack ai="center" jc="space-between">
         <TableLabel>Transactions</TableLabel>
-        <XStack gap="$4">
+        <XStack gap="$4" display="none" $gtMd={{ display: 'flex' }}>
           <TableLabel textAlign="right">Date</TableLabel>
           <TableLabel textAlign="right">Amount</TableLabel>
         </XStack>
@@ -253,7 +255,7 @@ function Row({
   return (
     <XStack key={activity.time} ai="center" jc="space-between" gap="$4">
       <XStack gap="$4.5">
-        <Avatar size="$4" br="$4" space="$2">
+        <Avatar size="$4" br="$4" gap="$2">
           <Avatar.Image src={activity.avatar} />
           <Avatar.Fallback jc="center">
             <Spinner size="small" color="$send1" />
@@ -268,7 +270,13 @@ function Row({
         </YStack>
       </XStack>
       <XStack gap="$4">
-        <Text color="$white" minWidth={'$14'} textAlign="right">
+        <Text
+          color="$white"
+          display="none"
+          minWidth={'$14'}
+          textAlign="right"
+          $gtMd={{ display: 'inline' }}
+        >
           {activity.time}
         </Text>
         <Text color="$white" minWidth={'$14'} textAlign="right">
