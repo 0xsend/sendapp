@@ -263,7 +263,7 @@ if config.tilt_subcommand == "down":
     yarn supabase stop --no-backup
     # can be removed once supabase stop --no-backup is fixed
     docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
-    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs docker rm -f
+    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
     """)
     local("yarn clean")
 
