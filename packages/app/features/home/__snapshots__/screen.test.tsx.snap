@@ -381,6 +381,15 @@ exports[`HomeScreen 1`] = `
       }
     >
       <View
+        cancelable={true}
+        disabled={false}
+        focusable={true}
+        minPressDuration={0}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
         style={
           {
             "alignItems": "center",
@@ -567,6 +576,15 @@ exports[`HomeScreen 1`] = `
         </View>
       </View>
       <View
+        cancelable={true}
+        disabled={false}
+        focusable={true}
+        minPressDuration={0}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
         style={
           {
             "alignItems": "center",
@@ -825,6 +843,15 @@ exports[`HomeScreen 1`] = `
         </View>
       </View>
       <View
+        cancelable={true}
+        disabled={false}
+        focusable={true}
+        minPressDuration={0}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
         style={
           {
             "alignItems": "center",

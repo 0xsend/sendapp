@@ -1,22 +1,19 @@
-import {
-  Paragraph,
-  Spinner,
-  Tooltip,
-  type TooltipProps,
-  XStack,
-  type XStackProps,
-  useToastController,
-} from '@my/ui'
+import { Paragraph, Spinner, Tooltip, type TooltipProps, XStack, type XStackProps } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
+import { createParam } from 'solito'
+
+const { useParam } = createParam<{ token: `0x${string}` | 'eth' }>()
 
 export const TokenBalanceList = ({
   coins,
-}: { coins: { label: string; token: `0x${string}` | undefined; icon: JSX.Element }[] }) => {
+}: { coins: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }[] }) => {
+  const [, setToken] = useParam('token')
+
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
@@ -28,6 +25,7 @@ export const TokenBalanceList = ({
       ai={'center'}
       py={'$3.5'}
       borderColor={separatorColor}
+      onPress={() => setToken(coin.token)}
       borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
     />
   ))
@@ -37,14 +35,14 @@ const TokenBalanceItem = ({
   coin,
   ...props
 }: {
-  coin: { label: string; token: `0x${string}` | undefined; icon: JSX.Element }
+  coin: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }
 } & XStackProps) => {
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
   const balance = useBalance({
     address: sendAccount?.address,
-    token: coin.token,
+    token: coin.token === 'eth' ? undefined : coin.token,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
@@ -70,8 +68,6 @@ const TokenBalanceItem = ({
 }
 
 const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
-  const toast = useToastController()
-
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
 
@@ -102,15 +98,8 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
           )}
         </Paragraph>
 
-        <XStack
-          $lg={{ display: 'none' }}
-          cursor={'pointer'}
-          onPress={() => {
-            // @todo go to balance details
-            toast.show('Coming Soon: Balance details')
-          }}
-        >
-          <IconArrowRight color={iconColor} />
+        <XStack $lg={{ display: 'none' }}>
+          <IconArrowRight $group-hover={{ x: 5 }} color={iconColor} />
         </XStack>
       </>
     )
