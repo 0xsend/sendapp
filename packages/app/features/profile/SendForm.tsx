@@ -9,7 +9,11 @@ import { useState } from 'react'
 import type { ProfileProp } from './SendDialog'
 import { useBalance } from 'wagmi'
 import formatAmount from 'app/utils/formatAmount'
-import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
+import {
+  useGenerateTransferUserOp,
+  useUserOpGasEstimate,
+  useUserOpTransferMutation,
+} from 'app/utils/useUserOpTransferMutation'
 import { assert } from 'app/utils/assert'
 import { useLink } from 'solito/link'
 import { useAccountNonce } from 'app/utils/userop'
@@ -38,29 +42,36 @@ export function SendForm({ profile }: { profile: ProfileProp }) {
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
+  const amount = parseUnits(form.watch('amount') ?? '0', balance?.decimals ?? 0)
   // need nonce to send transaction
   const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
+  const { data: userOp } = useGenerateTransferUserOp({
+    sender: sendAccount?.address,
+    to: profile?.address,
+    token,
+    amount: BigInt(amount),
+    nonce: nonce ?? 0n,
+  })
+  const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
   const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
   const sentTxLink = useLink({
     href: `${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`,
   })
-  async function onSubmit({ token, amount: amountStr }: z.infer<typeof SendFormSchema>) {
+  console.log('gasEstimate', gasEstimate)
+  console.log('userOp', userOp)
+  async function onSubmit() {
     try {
+      assert(!!userOp, 'User op is required')
       assert(!!balance, 'Balance is not available')
       assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
       assert(nonce !== undefined, 'Nonce is not available')
 
-      const amount = parseUnits(amountStr, balance.decimals)
       assert(balance.value >= amount, 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
 
       const receipt = await sendUserOp({
-        sender,
-        token: token as `0x${string}`,
-        amount,
-        to: profile.address,
-        nonce,
+        userOp,
       })
       assert(receipt.success, 'Failed to send user op')
       setSentUserOpTxHash(receipt.receipt.transactionHash)

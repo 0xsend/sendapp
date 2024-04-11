@@ -732,6 +732,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                         "unMount": Set {},
                         "watch": Set {
                           "token",
+                          "amount",
                         },
                         "watchAll": false,
                       },
@@ -2420,6 +2421,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                         "unMount": Set {},
                         "watch": Set {
                           "token",
+                          "amount",
                         },
                         "watchAll": false,
                       },
