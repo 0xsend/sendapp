@@ -14,7 +14,7 @@ concurrency:
 jobs:
   # set yarn cache
   cache-deps:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
           echo github.head_ref=${{ github.head_ref }}
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [cache-deps]
     env:
       YARN_ENABLE_HARDENED_MODE: 0
@@ -47,7 +47,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -85,8 +85,14 @@ jobs:
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Tilt CI
+        id: tilt-ci
         shell: bash
         run: tilt ci unit-tests
+      - name: Tilt Down
+        # always run tilt down if tilt ci started
+        if: always() && steps.tilt-ci.outcome != 'skipped'
+        shell: bash
+        run: tilt down
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
@@ -94,7 +100,7 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -152,6 +158,11 @@ jobs:
           echo tilt is ready
           time tilt wait --timeout 5m --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
+      - name: Tilt Down
+        # always run tilt down if tilt ci started
+        if: always() && steps.playwright.outcome != 'skipped'
+        shell: bash
+        run: tilt down
       - name: Playwright Report
         uses: actions/upload-artifact@v4
         if: always() && steps.playwright.outcome == 'failure'
