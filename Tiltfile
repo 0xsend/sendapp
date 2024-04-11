@@ -263,6 +263,7 @@ if config.tilt_subcommand == "down":
     yarn supabase stop --no-backup
     # can be removed once supabase stop --no-backup is fixed
     docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
+    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
     """)
     local("yarn clean")
 
@@ -361,7 +362,7 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs docker rm -f
+    docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs -r docker rm -f
     docker run --rm \
         --name otterscan-mainnet \
         -p 5100:80 \
@@ -462,7 +463,7 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs docker rm -f
+    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
@@ -503,7 +504,7 @@ local_resource(
         "shovel:generate-config",
     ],
     serve_cmd = """
-    docker ps -a | grep shovel | awk '{{print $1}}' | xargs docker rm -f
+    docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
     docker pull docker.io/indexsupply/shovel:latest || true
     docker run --rm \
         --name shovel \
@@ -548,7 +549,7 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep otterscan-base | awk '{print $1}' | xargs docker rm -f
+    docker ps -a | grep otterscan-base | awk '{print $1}' | xargs -r docker rm -f
     docker run --rm \
         --name otterscan-base \
         -p 5101:80 \
