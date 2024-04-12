@@ -247,6 +247,7 @@ if config.tilt_subcommand == "down":
     # can be removed once supabase stop --no-backup is fixed
     docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
     docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
+    docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
     """)
     local("yarn clean")
 
@@ -418,6 +419,19 @@ local_resource(
         "contracts:build",
     ],
     trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
+local_resource(
+    "anvil:fixtures",
+    "echo 🥳",
+    labels = labels,
+    resource_deps = [
+        "anvil:mainnet",
+        "anvil:base",
+        "anvil:send-account-fixtures",
+        "anvil:anvil-add-send-merkle-drop-fixtures",
+        "anvil:anvil-add-token-paymaster-fixtures",
+    ],
 )
 
 local_resource(
@@ -642,7 +656,7 @@ local_resource(
     resource_deps = [
         "anvil:mainnet",
         "anvil:base",
-        "anvil:send-account-fixtures",
+        "anvil:fixtures",
         "aa_bundler:base",
         "snaplet:generate",
         "next:web",
