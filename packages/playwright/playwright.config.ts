@@ -50,7 +50,7 @@ export default defineConfig({
 
     /* Configure the video recording. */
     // video: {
-    //   size: { width: 1920, height: 1080 },
+    //   size: { width: 1366, height: 768 },
     //   mode: 'on',
     // },
   },
