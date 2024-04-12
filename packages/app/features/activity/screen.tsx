@@ -182,7 +182,7 @@ function Suggestions() {
                 <Spinner size="small" color="$send1" />
               </Avatar.Fallback>
             </Avatar>
-            <Paragraph color="$white" fontFamily="$mono">
+            <Paragraph color="$color12" fontFamily="$mono">
               @{user.username}
             </Paragraph>
           </XStack>
@@ -241,7 +241,14 @@ function TableLabel({
 
 function RowLabel({ children }: PropsWithChildren) {
   return (
-    <H4 color="hsl(0, 0%, 42.5%)" fontFamily={'$mono'} fontWeight={'500'} size={'$5'} mt="$3">
+    <H4
+      // @TODO: Update with theme color variable
+      color="hsl(0, 0%, 42.5%)"
+      fontFamily={'$mono'}
+      fontWeight={'500'}
+      size={'$5'}
+      mt="$3"
+    >
       {children}
     </H4>
   )
@@ -263,7 +270,7 @@ function Row({
         </Avatar>
 
         <YStack gap="$1.5">
-          <Text color="$white">{activity.username}</Text>
+          <Text color="$color12">{activity.username}</Text>
           <Text theme="alt2" color="$olive" fontFamily={'$mono'} fontSize={12}>
             @{activity.username}
           </Text>
@@ -271,7 +278,7 @@ function Row({
       </XStack>
       <XStack gap="$4">
         <Text
-          color="$white"
+          color="$color12"
           display="none"
           minWidth={'$14'}
           textAlign="right"
@@ -279,7 +286,7 @@ function Row({
         >
           {activity.time}
         </Text>
-        <Text color="$white" minWidth={'$14'} textAlign="right">
+        <Text color="$color12" minWidth={'$14'} textAlign="right">
           {activity.amount}
         </Text>
       </XStack>
