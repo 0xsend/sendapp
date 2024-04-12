@@ -18,6 +18,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       {
         "flex": 1,
         "flexDirection": "column",
+        "gap": 18,
         "paddingBottom": 18,
         "paddingTop": 18,
         "width": "100%",
@@ -502,17 +503,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       </RNSVGSvgView>
     </View>
     <View
-      pointerEvents="none"
-      style={
-        {
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
-        }
-      }
-    />
-    <View
       animatedStyle={
         {
           "value": {
@@ -564,6 +554,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       style={
         {
           "flexDirection": "column",
+          "gap": 18,
           "marginBottom": 18,
           "marginTop": 39,
           "opacity": 1,
@@ -618,6 +609,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -632,6 +624,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -675,17 +668,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -713,22 +695,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -746,6 +717,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -760,6 +732,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -803,17 +776,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -841,22 +803,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -874,6 +825,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -888,6 +840,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -931,17 +884,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -969,22 +911,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1002,6 +933,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -1016,6 +948,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -1059,17 +992,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -1097,22 +1019,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1130,6 +1041,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -1144,6 +1056,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -1187,17 +1100,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -1225,22 +1127,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1258,6 +1149,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -1272,6 +1164,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -1315,17 +1208,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -1353,22 +1235,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1384,17 +1255,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           </View>
         </RCTScrollView>
       </View>
-      <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
       <View
         style={
           {
@@ -1622,7 +1482,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -1656,7 +1516,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -1670,7 +1530,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -1791,7 +1651,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -1825,7 +1685,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -1839,7 +1699,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -1960,7 +1820,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -1994,7 +1854,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -2008,7 +1868,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -2129,7 +1989,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -2163,7 +2023,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -2177,7 +2037,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -2298,7 +2158,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -2332,7 +2192,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -2346,7 +2206,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -2487,7 +2347,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -2521,7 +2381,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -2535,7 +2395,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -2656,7 +2516,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -2690,7 +2550,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -2704,7 +2564,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -2825,7 +2685,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -2859,7 +2719,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -2873,7 +2733,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -2994,7 +2854,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -3028,7 +2888,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -3042,7 +2902,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -3163,7 +3023,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -3197,7 +3057,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -3211,7 +3071,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -3247,6 +3107,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       {
         "flex": 1,
         "flexDirection": "column",
+        "gap": 18,
         "paddingBottom": 18,
         "paddingTop": 18,
         "width": "100%",
@@ -3734,17 +3595,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       </RNSVGSvgView>
     </View>
     <View
-      pointerEvents="none"
-      style={
-        {
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
-        }
-      }
-    />
-    <View
       style={
         {
           "flexDirection": "column",
@@ -3783,6 +3633,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       style={
         {
           "flexDirection": "column",
+          "gap": 18,
           "marginBottom": 18,
           "opacity": 0,
           "transform": [
@@ -3816,17 +3667,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         Results
       </Text>
       <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <View
         data-href="/profile/test"
       >
         <View
@@ -3834,6 +3674,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
             }
           }
           testID="tag-search-test"
@@ -3847,6 +3688,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 "borderTopLeftRadius": 9,
                 "borderTopRightRadius": 9,
                 "flexDirection": "column",
+                "gap": 7,
                 "height": 44,
                 "justifyContent": "center",
                 "maxHeight": 44,
@@ -3889,17 +3731,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 }
               />
             </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -3993,20 +3824,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             </View>
           </View>
           <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
             style={
               {
                 "flexDirection": "column",
+                "gap": 2,
               }
             }
           >
@@ -4043,6 +3864,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       style={
         {
           "flexDirection": "column",
+          "gap": 18,
           "marginBottom": 18,
           "marginTop": 39,
           "opacity": 1,
@@ -4097,6 +3919,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -4111,6 +3934,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -4154,17 +3978,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -4192,22 +4005,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4225,6 +4027,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -4239,6 +4042,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -4282,17 +4086,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -4320,22 +4113,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4353,6 +4135,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -4367,6 +4150,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -4410,17 +4194,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -4448,22 +4221,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4481,6 +4243,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -4495,6 +4258,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -4538,17 +4302,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -4576,22 +4329,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4609,6 +4351,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -4623,6 +4366,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -4666,17 +4410,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -4704,22 +4437,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4737,6 +4459,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -4751,6 +4474,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -4794,17 +4518,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -4832,22 +4545,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4863,17 +4565,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           </View>
         </RCTScrollView>
       </View>
-      <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
       <View
         style={
           {
@@ -5101,7 +4792,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -5135,7 +4826,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -5149,7 +4840,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -5270,7 +4961,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -5304,7 +4995,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -5318,7 +5009,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -5439,7 +5130,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -5473,7 +5164,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -5487,7 +5178,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -5608,7 +5299,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -5642,7 +5333,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -5656,7 +5347,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -5777,7 +5468,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -5811,7 +5502,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -5825,7 +5516,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -5966,7 +5657,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -6000,7 +5691,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -6014,7 +5705,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -6135,7 +5826,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -6169,7 +5860,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -6183,7 +5874,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -6304,7 +5995,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -6338,7 +6029,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -6352,7 +6043,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -6473,7 +6164,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -6507,7 +6198,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -6521,7 +6212,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
@@ -6642,7 +6333,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                   }
                 }
@@ -6676,7 +6367,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "display": "none",
                   "fontFamily": "System",
                   "minWidth": 184,
@@ -6690,7 +6381,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             <Text
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
                   "minWidth": 184,
                   "textAlign": "right",
