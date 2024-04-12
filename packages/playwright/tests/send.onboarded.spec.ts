@@ -43,7 +43,7 @@ test('can send ETH to user on profile', async ({ page, seed }) => {
   await expect(sendDialog.getByText(/Sent user op [0-9a-f]+/).first()).toBeVisible({
     timeout: 20000,
   })
-  await expect(sendDialog.getByRole('button', { name: 'View on Otterscan' })).toBeVisible()
+  await expect(sendDialog.getByRole('link', { name: 'View on Otterscan' })).toBeVisible()
 })
 
 test('can send USDC to user on profile', async ({ page, seed }) => {
@@ -76,7 +76,7 @@ test('can send USDC to user on profile', async ({ page, seed }) => {
   await expect(sendDialog.getByText(/Sent user op [0-9a-f]+/).first()).toBeVisible({
     timeout: 20000,
   })
-  await expect(sendDialog.getByRole('button', { name: 'View on Otterscan' })).toBeVisible()
+  await expect(sendDialog.getByRole('link', { name: 'View on Otterscan' })).toBeVisible()
 })
 
 test('can send USDC to user on profile using paymaster', async ({
