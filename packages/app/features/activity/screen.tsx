@@ -171,12 +171,22 @@ function SearchResults() {
 // TODO: Replace with dynamic list
 function Suggestions() {
   return (
-    <YStack gap="$2" display="flex" $gtMd={{ display: 'none' }}>
-      <TableLabel>Suggestions</TableLabel>
+    <YStack gap="$5" display="flex" $gtMd={{ display: 'none' }}>
+      <MobileSectionLabel>SUGGESTIONS</MobileSectionLabel>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {suggestions.map((user) => (
-          <XStack key={user.username} ai="center" mx="$4" gap="$2">
-            <Avatar size="$4" br="$4" gap="$2">
+          <XStack
+            key={user.username}
+            ai="center"
+            mr="$4"
+            borderColor="$decay"
+            borderWidth={1}
+            pr="$3.5"
+            gap="$3.5"
+            borderRadius={'$11'}
+            ml="$1.5"
+          >
+            <Avatar size="$4.5" br="$4" gap="$2" circular ml="$-1.5">
               <Avatar.Image src={user.avatar} />
               <Avatar.Fallback jc="center">
                 <Spinner size="small" color="$send1" />
@@ -196,9 +206,9 @@ function Suggestions() {
 function RecentActivity() {
   return (
     <YStack gap="$5" mb="$4">
-      <XStack ai="center" jc="space-between">
+      <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
         <TableLabel>Transactions</TableLabel>
-        <XStack gap="$4" display="none" $gtMd={{ display: 'flex' }}>
+        <XStack gap="$4">
           <TableLabel textAlign="right">Date</TableLabel>
           <TableLabel textAlign="right">Amount</TableLabel>
         </XStack>
@@ -206,6 +216,8 @@ function RecentActivity() {
 
       {/* @TODO: Update with real values/filtering */}
       <RowLabel>PENDING</RowLabel>
+
+      <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
 
       {activities.map((activity) => (
         <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
@@ -248,6 +260,24 @@ function RowLabel({ children }: PropsWithChildren) {
       fontWeight={'500'}
       size={'$5'}
       mt="$3"
+      display="none"
+      $gtMd={{ display: 'inline' }}
+    >
+      {children}
+    </H4>
+  )
+}
+
+function MobileSectionLabel({ children }: PropsWithChildren) {
+  return (
+    <H4
+      color="$olive"
+      fontFamily={'$mono'}
+      fontWeight={'500'}
+      size={'$5'}
+      mt="$3"
+      display="inline"
+      $gtMd={{ display: 'none' }}
     >
       {children}
     </H4>
@@ -260,9 +290,18 @@ function Row({
   activity: (typeof activities)[number]
 }) {
   return (
-    <XStack key={activity.time} ai="center" jc="space-between" gap="$4">
+    <XStack
+      key={activity.time}
+      ai="center"
+      jc="space-between"
+      gap="$4"
+      borderBottomWidth={1}
+      pb="$5"
+      borderBottomColor={'$decay'}
+      $gtMd={{ borderBottomWidth: 0, pb: '0' }}
+    >
       <XStack gap="$4.5">
-        <Avatar size="$4" br="$4" gap="$2">
+        <Avatar size="$4.5" br="$4" gap="$2">
           <Avatar.Image src={activity.avatar} />
           <Avatar.Fallback jc="center">
             <Spinner size="small" color="$send1" />
@@ -270,8 +309,16 @@ function Row({
         </Avatar>
 
         <YStack gap="$1.5">
-          <Text color="$color12">{activity.username}</Text>
-          <Text theme="alt2" color="$olive" fontFamily={'$mono'} fontSize={12}>
+          <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
+            {activity.username}
+          </Text>
+          <Text
+            theme="alt2"
+            color="$olive"
+            fontFamily={'$mono'}
+            fontSize="$4"
+            $gtMd={{ fontSize: '$2' }}
+          >
             @{activity.username}
           </Text>
         </YStack>
@@ -286,7 +333,14 @@ function Row({
         >
           {activity.time}
         </Text>
-        <Text color="$color12" minWidth={'$14'} textAlign="right">
+        <Text
+          color="$color12"
+          minWidth={'$14'}
+          textAlign="right"
+          fontSize="$7"
+          // @TODO: Different font familia on Md
+          $gtMd={{ fontSize: '$5' }}
+        >
           {activity.amount}
         </Text>
       </XStack>
