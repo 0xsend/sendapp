@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react'
 import {
   AnimatePresence,
   Avatar,
@@ -68,7 +69,7 @@ export function ActivityScreen() {
   return (
     <Container>
       <TagSearchProvider>
-        <YStack f={1} width={'100%'} py="$4" space="$4">
+        <YStack f={1} width={'100%'} py="$4" gap="$4">
           <XStack alignItems="center" width={'100%'} gap="$6">
             <Search />
             <IconQRCode />
@@ -93,7 +94,7 @@ function ActivityBody() {
       )}
 
       {error && (
-        <YStack key="error" space="$4" mb="$4">
+        <YStack key="error" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
           <Text>{error.message}</Text>
         </YStack>
@@ -104,8 +105,9 @@ function ActivityBody() {
         <YStack
           key="suggestions"
           animation="quick"
-          space="$4"
+          gap="$4"
           mb="$4"
+          mt="$7"
           exitStyle={{
             opacity: 0,
             y: 10,
@@ -132,7 +134,7 @@ function SearchResults() {
       testID="searchResults"
       key="searchResults"
       animation="quick"
-      space="$4"
+      gap="$4"
       mb="$4"
       enterStyle={{
         opacity: 0,
@@ -143,8 +145,8 @@ function SearchResults() {
       {results.length === 0 && <Text>No results for {query}... 😢</Text>}
       {results.map((result) => (
         <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
-          <XStack testID={`tag-search-${result.tag_name}`} ai="center" space="$4">
-            <Avatar size="$4" br="$4" space="$2">
+          <XStack testID={`tag-search-${result.tag_name}`} ai="center" gap="$4">
+            <Avatar size="$4" br="$4" gap="$2">
               <Avatar.Image src={result.avatar_url} />
               <Avatar.Fallback>
                 <Avatar>
@@ -157,7 +159,7 @@ function SearchResults() {
                 </Avatar>
               </Avatar.Fallback>
             </Avatar>
-            <YStack space="$1">
+            <YStack gap="$1">
               <Text>{result.tag_name}</Text>
             </YStack>
           </XStack>
@@ -169,18 +171,20 @@ function SearchResults() {
 // TODO: Replace with dynamic list
 function Suggestions() {
   return (
-    <YStack space="$2">
-      <H4 theme={'alt2'}>Suggested...</H4>
+    <YStack gap="$2" display="flex" $gtMd={{ display: 'none' }}>
+      <TableLabel>Suggestions</TableLabel>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {suggestions.map((user) => (
-          <XStack key={user.username} ai="center" mx="$4" space="$2">
-            <Avatar size="$4" br="$4" space="$2">
+          <XStack key={user.username} ai="center" mx="$4" gap="$2">
+            <Avatar size="$4" br="$4" gap="$2">
               <Avatar.Image src={user.avatar} />
               <Avatar.Fallback jc="center">
                 <Spinner size="small" color="$send1" />
               </Avatar.Fallback>
             </Avatar>
-            <Paragraph>@{user.username}</Paragraph>
+            <Paragraph color="$color12" fontFamily="$mono">
+              @{user.username}
+            </Paragraph>
           </XStack>
         ))}
       </ScrollView>
@@ -191,26 +195,102 @@ function Suggestions() {
 // TODO: Replace with dynamic list
 function RecentActivity() {
   return (
-    <YStack space="$4" mb="$4">
-      <H4 theme={'alt2'}>Recent Activity</H4>
-      {activities.map((activity) => (
-        <XStack key={activity.time} ai="center" space="$4">
-          <Avatar size="$4" br="$4" space="$2">
-            <Avatar.Image src={activity.avatar} />
-            <Avatar.Fallback jc="center">
-              <Spinner size="small" color="$send1" />
-            </Avatar.Fallback>
-          </Avatar>
-          <YStack space="$1">
-            <Text>{activity.username}</Text>
-            <Text theme="alt2">
-              ${activity.amount} (${activity.value})
-            </Text>
-          </YStack>
-          <Text theme="alt2">{activity.time}</Text>
+    <YStack gap="$5" mb="$4">
+      <XStack ai="center" jc="space-between">
+        <TableLabel>Transactions</TableLabel>
+        <XStack gap="$4" display="none" $gtMd={{ display: 'flex' }}>
+          <TableLabel textAlign="right">Date</TableLabel>
+          <TableLabel textAlign="right">Amount</TableLabel>
         </XStack>
+      </XStack>
+
+      {/* @TODO: Update with real values/filtering */}
+      <RowLabel>PENDING</RowLabel>
+
+      {activities.map((activity) => (
+        <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
+      ))}
+
+      <RowLabel>12 FEBRUARY 2024</RowLabel>
+
+      {activities.map((activity) => (
+        // @TODO: Replace key with unique id
+        <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
       ))}
     </YStack>
+  )
+}
+
+function TableLabel({
+  textAlign = 'left',
+  children,
+}: { textAlign?: 'left' | 'right' } & PropsWithChildren) {
+  return (
+    <H4
+      color={'$olive'}
+      theme={'alt2'}
+      fontWeight={'300'}
+      size={'$8'}
+      minWidth={'$14'}
+      textAlign={textAlign}
+    >
+      {children}
+    </H4>
+  )
+}
+
+function RowLabel({ children }: PropsWithChildren) {
+  return (
+    <H4
+      // @TODO: Update with theme color variable
+      color="hsl(0, 0%, 42.5%)"
+      fontFamily={'$mono'}
+      fontWeight={'500'}
+      size={'$5'}
+      mt="$3"
+    >
+      {children}
+    </H4>
+  )
+}
+
+function Row({
+  activity,
+}: {
+  activity: (typeof activities)[number]
+}) {
+  return (
+    <XStack key={activity.time} ai="center" jc="space-between" gap="$4">
+      <XStack gap="$4.5">
+        <Avatar size="$4" br="$4" gap="$2">
+          <Avatar.Image src={activity.avatar} />
+          <Avatar.Fallback jc="center">
+            <Spinner size="small" color="$send1" />
+          </Avatar.Fallback>
+        </Avatar>
+
+        <YStack gap="$1.5">
+          <Text color="$color12">{activity.username}</Text>
+          <Text theme="alt2" color="$olive" fontFamily={'$mono'} fontSize={12}>
+            @{activity.username}
+          </Text>
+        </YStack>
+      </XStack>
+      <XStack gap="$4">
+        <Text
+          color="$color12"
+          display="none"
+          minWidth={'$14'}
+          textAlign="right"
+          $gtMd={{ display: 'inline' }}
+        >
+          {activity.time}
+        </Text>
+        <Text color="$color12" minWidth={'$14'} textAlign="right">
+          {activity.amount}
+        </Text>
+      </XStack>
+    </XStack>
   )
 }
 
