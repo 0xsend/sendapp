@@ -74,6 +74,21 @@ export const sendAccountRouter = createTRPCRouter({
           keySlot,
         },
       }) => {
+        const { error: sendAcctCountErr, count: sendAcctCount } = await supabase
+          .from('send_accounts')
+          .select('*', { count: 'exact', head: true })
+
+        if (sendAcctCountErr) {
+          throw sendAcctCountErr
+        }
+
+        if (sendAcctCount !== null && sendAcctCount > 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Account already exists',
+          })
+        }
+
         const xyPubKey = COSEECDHAtoXY(base16.decode(cosePublicKeyB16))
         const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
         const factoryData = encodeFunctionData({
@@ -106,7 +121,8 @@ export const sendAccountRouter = createTRPCRouter({
           (!uid && uid !== session.user.id) || // user id is not the same as the session user id
           !keySlotStr || // key slot is not a string
           !Number.isSafeInteger(Number(keySlotStr)) || // key slot is not a number
-          !(Number(keySlotStr) >= 0 && Number(keySlotStr) <= 255) // key slot is not between 0 and 255
+          !(Number(keySlotStr) >= 0 && Number(keySlotStr) <= 255) || // key slot is not between 0 and 255
+          !(keySlot === Number(keySlotStr)) // key slot is not the same as the one in the passkey name
         ) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
@@ -155,7 +171,7 @@ export const sendAccountRouter = createTRPCRouter({
           abi: sendAccountFactoryAbi,
           functionName: 'createAccount',
           args: [
-            USEROP_KEY_SLOT, // key slot
+            keySlot, // key slot
             xyPubKey, // public key
             initCalls, // init calls
             USEROP_SALT, // salt
