@@ -6,6 +6,7 @@ import {
   H4,
   Paragraph,
   ScrollView,
+  Separator,
   Spinner,
   Text,
   XStack,
@@ -67,18 +68,18 @@ const suggestions = [
 
 export function ActivityScreen() {
   return (
-    <Container>
-      <TagSearchProvider>
-        <YStack f={1} width={'100%'} py="$4" gap="$4">
+    <TagSearchProvider>
+      <YStack f={1} width={'100%'} py="$4" gap="$4">
+        <Container>
           <XStack alignItems="center" width={'100%'} gap="$6">
             <Search />
             <IconQRCode />
           </XStack>
+        </Container>
 
-          <ActivityBody />
-        </YStack>
-      </TagSearchProvider>
-    </Container>
+        <ActivityBody />
+      </YStack>
+    </TagSearchProvider>
   )
 }
 
@@ -105,15 +106,17 @@ function ActivityBody() {
         <YStack
           key="suggestions"
           animation="quick"
-          gap="$4"
+          gap="$size.2.5"
           mb="$4"
-          mt="$7"
+          mt="$size.0.5"
           exitStyle={{
             opacity: 0,
             y: 10,
           }}
         >
+          <Separator $gtMd={{ display: 'none' }} />
           <Suggestions />
+          <Separator $gtMd={{ display: 'none' }} />
           <RecentActivity />
         </YStack>
       )}
@@ -171,65 +174,69 @@ function SearchResults() {
 // TODO: Replace with dynamic list
 function Suggestions() {
   return (
-    <YStack gap="$5" display="flex" $gtMd={{ display: 'none' }}>
-      <MobileSectionLabel>SUGGESTIONS</MobileSectionLabel>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {suggestions.map((user) => (
-          <XStack
-            key={user.username}
-            ai="center"
-            mr="$4"
-            borderColor="$decay"
-            borderWidth={1}
-            pr="$3.5"
-            gap="$3.5"
-            borderRadius={'$11'}
-            ml="$1.5"
-          >
-            <Avatar size="$4.5" br="$4" gap="$2" circular ml="$-1.5">
-              <Avatar.Image src={user.avatar} />
-              <Avatar.Fallback jc="center">
-                <Spinner size="small" color="$send1" />
-              </Avatar.Fallback>
-            </Avatar>
-            <Paragraph color="$color12" fontFamily="$mono">
-              @{user.username}
-            </Paragraph>
-          </XStack>
-        ))}
-      </ScrollView>
-    </YStack>
+    <Container>
+      <YStack gap="$size.1" display="flex" $gtMd={{ display: 'none' }} width={'100%'}>
+        <MobileSectionLabel>SUGGESTIONS</MobileSectionLabel>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {suggestions.map((user) => (
+            <XStack
+              key={user.username}
+              ai="center"
+              mr="$4"
+              borderColor="$decay"
+              borderWidth={1}
+              pr="$3.5"
+              gap="$3.5"
+              borderRadius={'$11'}
+              ml="$1.5"
+            >
+              <Avatar size="$4.5" br="$4" gap="$2" circular ml="$-1.5">
+                <Avatar.Image src={user.avatar} />
+                <Avatar.Fallback jc="center">
+                  <Spinner size="small" color="$send1" />
+                </Avatar.Fallback>
+              </Avatar>
+              <Paragraph color="$color12" fontFamily="$mono">
+                @{user.username}
+              </Paragraph>
+            </XStack>
+          ))}
+        </ScrollView>
+      </YStack>
+    </Container>
   )
 }
 
 // TODO: Replace with dynamic list
 function RecentActivity() {
   return (
-    <YStack gap="$5" mb="$4">
-      <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
-        <TableLabel>Transactions</TableLabel>
-        <XStack gap="$4">
-          <TableLabel textAlign="right">Date</TableLabel>
-          <TableLabel textAlign="right">Amount</TableLabel>
+    <Container>
+      <YStack gap="$5" mb="$4" width={'100%'}>
+        <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
+          <TableLabel>Transactions</TableLabel>
+          <XStack gap="$4">
+            <TableLabel textAlign="right">Date</TableLabel>
+            <TableLabel textAlign="right">Amount</TableLabel>
+          </XStack>
         </XStack>
-      </XStack>
 
-      {/* @TODO: Update with real values/filtering */}
-      <RowLabel>PENDING</RowLabel>
+        {/* @TODO: Update with real values/filtering */}
+        <RowLabel>PENDING</RowLabel>
 
-      <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
+        <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
 
-      {activities.map((activity) => (
-        <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
-      ))}
+        {activities.map((activity) => (
+          <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
+        ))}
 
-      <RowLabel>12 FEBRUARY 2024</RowLabel>
+        <RowLabel>12 FEBRUARY 2024</RowLabel>
 
-      {activities.map((activity) => (
-        // @TODO: Replace key with unique id
-        <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
-      ))}
-    </YStack>
+        {activities.map((activity) => (
+          // @TODO: Replace key with unique id
+          <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
+        ))}
+      </YStack>
+    </Container>
   )
 }
 
@@ -275,7 +282,6 @@ function MobileSectionLabel({ children }: PropsWithChildren) {
       fontFamily={'$mono'}
       fontWeight={'500'}
       size={'$5'}
-      mt="$3"
       display="inline"
       $gtMd={{ display: 'none' }}
     >
@@ -338,8 +344,9 @@ function Row({
           minWidth={'$14'}
           textAlign="right"
           fontSize="$7"
-          // @TODO: Different font familia on Md
-          $gtMd={{ fontSize: '$5' }}
+          // @FIX: font families don't change at breakpoint
+          fontFamily={'$mono'}
+          $gtMd={{ fontSize: '$5', fontFamily: '$body' }}
         >
           {activity.amount}
         </Text>
