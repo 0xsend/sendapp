@@ -70,7 +70,7 @@ export function ActivityScreen() {
   return (
     <TagSearchProvider>
       <YStack f={1} width={'100%'} py="$4" gap="$4">
-        <Container>
+        <Container f={0}>
           <XStack alignItems="center" width={'100%'} gap="$6">
             <Search />
             <IconQRCode />
