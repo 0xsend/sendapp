@@ -69,7 +69,7 @@ export function ActivityScreen() {
   return (
     <Container>
       <TagSearchProvider>
-        <YStack f={1} width={'100%'} py="$4" space="$4">
+        <YStack f={1} width={'100%'} py="$4" gap="$4">
           <XStack alignItems="center" width={'100%'} gap="$6">
             <Search />
             <IconQRCode />
@@ -94,7 +94,7 @@ function ActivityBody() {
       )}
 
       {error && (
-        <YStack key="error" space="$4" mb="$4">
+        <YStack key="error" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
           <Text>{error.message}</Text>
         </YStack>
@@ -105,7 +105,7 @@ function ActivityBody() {
         <YStack
           key="suggestions"
           animation="quick"
-          space="$4"
+          gap="$4"
           mb="$4"
           mt="$7"
           exitStyle={{
@@ -134,7 +134,7 @@ function SearchResults() {
       testID="searchResults"
       key="searchResults"
       animation="quick"
-      space="$4"
+      gap="$4"
       mb="$4"
       enterStyle={{
         opacity: 0,
@@ -145,8 +145,8 @@ function SearchResults() {
       {results.length === 0 && <Text>No results for {query}... 😢</Text>}
       {results.map((result) => (
         <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
-          <XStack testID={`tag-search-${result.tag_name}`} ai="center" space="$4">
-            <Avatar size="$4" br="$4" space="$2">
+          <XStack testID={`tag-search-${result.tag_name}`} ai="center" gap="$4">
+            <Avatar size="$4" br="$4" gap="$2">
               <Avatar.Image src={result.avatar_url} />
               <Avatar.Fallback>
                 <Avatar>
@@ -159,7 +159,7 @@ function SearchResults() {
                 </Avatar>
               </Avatar.Fallback>
             </Avatar>
-            <YStack space="$1">
+            <YStack gap="$1">
               <Text>{result.tag_name}</Text>
             </YStack>
           </XStack>
@@ -175,8 +175,8 @@ function Suggestions() {
       <TableLabel>Suggestions</TableLabel>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {suggestions.map((user) => (
-          <XStack key={user.username} ai="center" mx="$4" space="$2">
-            <Avatar size="$4" br="$4" space="$2">
+          <XStack key={user.username} ai="center" mx="$4" gap="$2">
+            <Avatar size="$4" br="$4" gap="$2">
               <Avatar.Image src={user.avatar} />
               <Avatar.Fallback jc="center">
                 <Spinner size="small" color="$send1" />
