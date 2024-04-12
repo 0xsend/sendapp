@@ -429,7 +429,6 @@ local_resource(
         "anvil:mainnet",
         "anvil:base",
         "anvil:send-account-fixtures",
-        "anvil:anvil-add-send-merkle-drop-fixtures",
         "anvil:anvil-add-token-paymaster-fixtures",
     ],
 )
@@ -548,13 +547,9 @@ local_resource(
         "ui:build",
         "ui:generate-theme",
         "daimo-expo-passkeys:build",
+        "anvil:fixtures",
     ] + ([
-        "anvil:mainnet",
-        "anvil:base",
         "aa_bundler:base",
-        "anvil:send-account-fixtures",
-        # "anvil:anvil-add-send-merkle-drop-fixtures",
-        "anvil:anvil-add-token-paymaster-fixtures",
     ] if not CI else []),
     serve_cmd =
         "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
