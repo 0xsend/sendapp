@@ -5695,7 +5695,7 @@ __metadata:
   dependencies:
     "@my/supabase": "workspace:*"
     "@openzeppelin/merkle-tree": "npm:1.0.5"
-    "@supabase/supabase-js": "npm:^2.39.3"
+    "@supabase/supabase-js": "npm:2.41.1"
     "@types/bun": "npm:latest"
     "@uniswap/v3-periphery": "npm:^1.4.4"
     debug: "npm:^4.3.4"
@@ -5714,7 +5714,7 @@ __metadata:
     "@my/snaplet": "workspace:*"
     "@my/supabase": "workspace:*"
     "@playwright/test": "npm:^1.41.1"
-    "@supabase/supabase-js": "npm:^2.39.3"
+    "@supabase/supabase-js": "npm:2.41.1"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@types/pg": "npm:^8"
     app: "workspace:*"
@@ -7844,15 +7844,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:^1.9.2":
-  version: 1.14.0
-  resolution: "@supabase/postgrest-js@npm:1.14.0"
-  dependencies:
-    "@supabase/node-fetch": "npm:^2.6.14"
-  checksum: 831fafda5f20a51328b073468b027c7dd991769334e1619af6f97e882ddd3e79e3786805307b172b648e68e9bdceee66c633e7ba383a22af9692689aec00b98e
-  languageName: node
-  linkType: hard
-
 "@supabase/realtime-js@npm:2.9.3":
   version: 2.9.3
   resolution: "@supabase/realtime-js@npm:2.9.3"
@@ -7907,6 +7898,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@supabase/supabase-js@npm:2.41.1":
+  version: 2.41.1
+  resolution: "@supabase/supabase-js@npm:2.41.1"
+  dependencies:
+    "@supabase/auth-js": "npm:2.63.0"
+    "@supabase/functions-js": "npm:2.2.2"
+    "@supabase/node-fetch": "npm:2.6.15"
+    "@supabase/postgrest-js": "npm:1.9.2"
+    "@supabase/realtime-js": "npm:2.9.3"
+    "@supabase/storage-js": "npm:2.5.5"
+  checksum: 2b8e0d1a9e06eddafd878342040bc699a4e963bdf309cd1dc9c816e2aeb51cfd18a856d0c385c618b88fa5112929e3820f97044e602b3e107af9506ac3c2209d
+  languageName: node
+  linkType: hard
+
 "@supabase/supabase-js@npm:^2.38.0":
   version: 2.38.4
   resolution: "@supabase/supabase-js@npm:2.38.4"
@@ -7918,20 +7923,6 @@ __metadata:
     "@supabase/realtime-js": "npm:^2.8.4"
     "@supabase/storage-js": "npm:^2.5.4"
   checksum: 533311f09c968315a1a33adb520584c04c5c2fcf06ce149582adb583c69e4c637356b122408d0989671f213fa287d3b6d0e90b2bc6956203aa92d9d7e48c136d
-  languageName: node
-  linkType: hard
-
-"@supabase/supabase-js@npm:^2.39.3":
-  version: 2.41.1
-  resolution: "@supabase/supabase-js@npm:2.41.1"
-  dependencies:
-    "@supabase/auth-js": "npm:2.63.0"
-    "@supabase/functions-js": "npm:2.2.2"
-    "@supabase/node-fetch": "npm:2.6.15"
-    "@supabase/postgrest-js": "npm:1.9.2"
-    "@supabase/realtime-js": "npm:2.9.3"
-    "@supabase/storage-js": "npm:2.5.5"
-  checksum: 2b8e0d1a9e06eddafd878342040bc699a4e963bdf309cd1dc9c816e2aeb51cfd18a856d0c385c618b88fa5112929e3820f97044e602b3e107af9506ac3c2209d
   languageName: node
   linkType: hard
 
@@ -12398,8 +12389,8 @@ __metadata:
     "@scure/base": "npm:^1.1.5"
     "@supabase/auth-helpers-nextjs": "npm:^0.9.0"
     "@supabase/auth-helpers-react": "npm:^0.4.2"
-    "@supabase/postgrest-js": "npm:^1.9.2"
-    "@supabase/supabase-js": "npm:^2.39.3"
+    "@supabase/postgrest-js": "npm:1.9.2"
+    "@supabase/supabase-js": "npm:2.41.1"
     "@tamagui/animations-react-native": "npm:^1.93.2"
     "@tamagui/colors": "npm:^1.93.2"
     "@tamagui/helpers-icon": "npm:^1.93.2"
@@ -15584,7 +15575,8 @@ __metadata:
   dependencies:
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
-    "@supabase/supabase-js": "npm:^2.39.3"
+    "@openzeppelin/merkle-tree": "npm:1.0.5"
+    "@supabase/supabase-js": "npm:2.41.1"
     "@types/bun": "npm:latest"
     "@types/express": "npm:^4"
     "@types/supertest": "npm:^2.0.16"
@@ -24020,7 +24012,7 @@ __metadata:
     "@rainbow-me/rainbowkit": "npm:^2.0.4"
     "@supabase/auth-helpers-react": "npm:^0.4.2"
     "@supabase/ssr": "npm:^0.0.9"
-    "@supabase/supabase-js": "npm:^2.39.3"
+    "@supabase/supabase-js": "npm:2.41.1"
     "@tamagui/next-plugin": "npm:^1.93.2"
     "@tamagui/next-theme": "npm:^1.93.2"
     "@tanstack/react-query": "npm:^5.18.1"

@@ -7,7 +7,7 @@
     "@my/snaplet": "workspace:*",
     "@my/supabase": "workspace:*",
     "@playwright/test": "^1.41.1",
-    "@supabase/supabase-js": "^2.39.3",
+    "@supabase/supabase-js": "2.41.1",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/pg": "^8",
     "app": "workspace:*",

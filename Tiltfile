@@ -424,6 +424,7 @@ local_resource(
 local_resource(
     "anvil:anvil-add-send-merkle-drop-fixtures",
     "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
+    auto_init = False,
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -587,7 +588,7 @@ local_resource(
         "anvil:base",
         "aa_bundler:base",
         "anvil:send-account-fixtures",
-        "anvil:anvil-add-send-merkle-drop-fixtures",
+        # "anvil:anvil-add-send-merkle-drop-fixtures",
         "anvil:anvil-add-token-paymaster-fixtures",
     ] if not CI else []),
     serve_cmd =
