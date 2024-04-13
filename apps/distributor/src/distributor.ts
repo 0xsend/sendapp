@@ -1,8 +1,9 @@
 import { cpus } from 'node:os'
-import type { Database, Functions, Tables } from '@my/supabase/database.types'
+import type { Database, Tables } from '@my/supabase/database.types'
 import { type sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
 import type { Logger } from 'pino'
+import { selectAll } from 'app/utils/supabase/selectAll'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -121,34 +122,20 @@ export class DistributorWorker {
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
     // fetch all verifications
-    const verifications: Tables<'distribution_verifications'>[] = await (async () => {
-      const _verifications: Tables<'distribution_verifications'>[] = []
-      let page = 0
-      let totalCount: number | null = null
-      const pageSize = 100
+    const { data: verifications, error: verificationsError } = await selectAll(
+      supabaseAdmin
+        .from('distribution_verifications')
+        .select('*', { count: 'exact' })
+        .eq('distribution_id', distribution.id)
+    )
 
-      do {
-        const { data, count, error } = await supabaseAdmin
-          .from('distribution_verifications')
-          .select('*', { count: 'exact' })
-          .eq('distribution_id', distribution.id)
-          .range(page, page + pageSize)
+    if (verificationsError) {
+      throw verificationsError
+    }
 
-        if (error) {
-          log.error({ error: error.message, code: error.code }, 'Error fetching verifications.')
-          throw error
-        }
-
-        if (totalCount === null) {
-          totalCount = count
-        }
-
-        _verifications.push(...data)
-        page += pageSize
-      } while (totalCount && _verifications.length < totalCount)
-
-      return _verifications
-    })()
+    if (verifications === null || verifications.length === 0) {
+      throw new Error('No verifications found')
+    }
 
     log.info(`Found ${verifications.length} verifications.`)
     log.debug({ verifications })
@@ -178,39 +165,24 @@ export class DistributorWorker {
     log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
     log.debug({ verificationsByUserId })
 
-    const hodlerAddresses: Functions<'distribution_hodler_addresses'> = await (async () => {
-      const _hodlerAddresses: Functions<'distribution_hodler_addresses'> = []
-      let page = 0
-      let totalCount: number | null = null
-      const pageSize = 100
+    const { data: hodlerAddresses, error: hodlerAddressesError } = await selectAll(
+      supabaseAdmin
+        .rpc(
+          'distribution_hodler_addresses',
+          {
+            distribution_id: distribution.id,
+          },
+          { count: 'exact' }
+        )
+        .select('*')
+    )
+    if (hodlerAddressesError) {
+      throw hodlerAddressesError
+    }
 
-      do {
-        const { data, count, error } = await supabaseAdmin
-          .rpc(
-            'distribution_hodler_addresses',
-            {
-              distribution_id: distribution.id,
-            },
-            { count: 'exact' }
-          )
-          .select('*')
-          .range(page, page + pageSize)
-
-        if (error) {
-          log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
-          throw error
-        }
-
-        if (totalCount === null) {
-          totalCount = count
-        }
-
-        _hodlerAddresses.push(...data)
-        page += pageSize
-      } while (totalCount && _hodlerAddresses.length < totalCount)
-
-      return _hodlerAddresses
-    })()
+    if (hodlerAddresses === null || hodlerAddresses.length === 0) {
+      throw new Error('No hodler addresses found')
+    }
 
     const hodlerAddressesByUserId = hodlerAddresses.reduce(
       (acc, address) => {

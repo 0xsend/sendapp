@@ -11,31 +11,33 @@ test('successfully fetches all rows with pagination', async () => {
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation((start, end) => {
       const pageData = mockData.slice(start, end + 1)
-      return Promise.resolve({ data: pageData, count: totalRows })
+      return Promise.resolve({ data: pageData, count: totalRows, error: null })
     }),
   }
 
   // @ts-expect-error: This is a mock
-  // biome-ignore lint/suspicious/noExplicitAny: this is a mock
-  const results = (await selectAll(mockQueryBuilder)) as any[]
+  const { data, count, error } = (await selectAll(mockQueryBuilder)) as ReturnType<typeof selectAll>
 
-  expect(results.length).toBe(totalRows)
-  expect(mockData).toEqual(results)
+  expect(data?.length).toBe(totalRows)
+  expect(mockData).toEqual(data)
+  expect(count).toBe(totalRows)
+  expect(error).toBe(null)
   expect(mockQueryBuilder.range).toHaveBeenCalledTimes(Math.ceil(totalRows / pageSize))
 })
 
 test('handles empty results', async () => {
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation(() => {
-      return Promise.resolve({ data: [], count: 0 })
+      return Promise.resolve({ data: [], count: 0, error: null })
     }),
   }
 
   // @ts-expect-error: This is a mock
-  // biome-ignore lint/suspicious/noExplicitAny: this is a mock
-  const results = (await selectAll(mockQueryBuilder)) as any[]
+  const { data, count, error } = (await selectAll(mockQueryBuilder)) as ReturnType<typeof selectAll>
 
-  expect(results.length).toBe(0)
+  expect(data?.length).toBe(0)
+  expect(count).toBe(0)
+  expect(error).toBe(null)
   expect(mockQueryBuilder.range).toHaveBeenCalledTimes(1)
 })
 
@@ -55,14 +57,16 @@ test('handles actual page size smaller than default', async () => {
       }
       const pageData = mockData.slice(start, start + pageSize)
       firstPage = false
-      return Promise.resolve({ data: pageData, count: totalRows })
+      return Promise.resolve({ data: pageData, count: totalRows, error: null })
     }),
   }
 
   // @ts-expect-error: This is a mock
-  const results = await selectAll(mockQueryBuilder)
+  const { data, count, error } = (await selectAll(mockQueryBuilder)) as ReturnType<typeof selectAll>
 
-  expect(results).toEqual(mockData)
+  expect(data).toEqual(mockData)
+  expect(count).toBe(totalRows)
+  expect(error).toBe(null)
   expect(mockQueryBuilder.range).toHaveBeenCalledTimes(5)
 })
 
@@ -70,14 +74,16 @@ test('handles one page of results', async () => {
   const mockData = [{ id: 1 }, { id: 2 }, { id: 3 }]
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation(() => {
-      return Promise.resolve({ data: mockData, count: mockData.length })
+      return Promise.resolve({ data: mockData, count: mockData.length, error: null })
     }),
   }
 
   // @ts-expect-error: This is a mock
-  const results = await selectAll(mockQueryBuilder)
+  const { data, count, error } = (await selectAll(mockQueryBuilder)) as ReturnType<typeof selectAll>
 
-  expect(results).toEqual(mockData)
+  expect(data).toEqual(mockData)
+  expect(count).toBe(mockData.length)
+  expect(error).toBe(null)
   expect(mockQueryBuilder.range).toHaveBeenCalledTimes(1)
 })
 
@@ -85,21 +91,31 @@ test('handles errors from the query builder', async () => {
   const errorMessage = 'Error fetching data'
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation(() => {
-      return Promise.reject(new Error(errorMessage))
+      return Promise.resolve({ data: null, count: null, error: { message: errorMessage } })
     }),
   }
 
   // @ts-expect-error: This is a mock
-  await expect(selectAll(mockQueryBuilder)).rejects.toThrow(errorMessage)
+  const { data, count, error } = (await selectAll(mockQueryBuilder)) as ReturnType<typeof selectAll>
+
+  expect(data).toBe(null)
+  expect(count).toBe(null)
+  expect(error?.message).toBe(errorMessage)
 })
 
 test('asserts count is not null', async () => {
   const mockQueryBuilder = {
     range: jest.fn().mockImplementation(() => {
-      return Promise.resolve({ count: null })
+      return Promise.resolve({ data: [], count: null, error: null })
     }),
   }
 
   // @ts-expect-error: This is a mock
-  await expect(selectAll(mockQueryBuilder)).rejects.toThrow('Count is null')
+  const { data, count, error } = (await selectAll(mockQueryBuilder)) as ReturnType<typeof selectAll>
+
+  expect(data).toBe(null)
+  expect(count).toBe(null)
+  expect(error?.message).toBe(
+    'Count is null. Be sure to use the "exact" option when calling selectAll'
+  )
 })

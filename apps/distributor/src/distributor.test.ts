@@ -67,4 +67,17 @@ describe('Distributor Route', () => {
 
     expect(lastDistributionId).toBeDefined()
   }, 10_000)
+
+  // it('should return a merkle root', async () => {
+  //   const res = await request(app)
+  //     .post('/distributor/merkle')
+  //     .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)
+  //     .send({ id: '4' })
+
+  //   expect(res.statusCode).toBe(200)
+  //   expect(res.body).toMatchObject({
+  //     root: expect.stringMatching(/^0x[a-f0-9]{64}$/),
+  //     total: expect.any(Number),
+  //   })
+  // })
 })
