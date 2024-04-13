@@ -68,6 +68,12 @@ jest.mock('@my/wagmi', () => ({
     error: null,
   }),
 }))
+jest.mock('app/utils/coin-gecko', () => ({
+  useSendPrice: jest
+    .fn()
+    .mockReturnValue({ data: { 'send-token': { usd: 1 } }, isSuccess: true, error: null }),
+}))
+
 describe('EarnTokensScreen', () => {
   it('renders', () => {
     const tree = render(
