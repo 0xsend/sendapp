@@ -14,13 +14,28 @@ export const distributionRouter = createTRPCRouter({
     )
     .query(async ({ ctx: { session }, input: { distributionId } }) => {
       // lookup active distribution shares
-      const shares = await selectAll(
+      const { data: shares, error: sharesError } = await selectAll(
         supabaseAdmin
           .from('distribution_shares')
           .select('index, address, amount, user_id', { count: 'exact' })
           .eq('distribution_id', distributionId)
           .order('index', { ascending: true })
       )
+
+      if (sharesError) {
+        console.error('Error fetching distribution shares', sharesError)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: sharesError.message,
+        })
+      }
+
+      if (shares === null || shares.length === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `No shares found for distribution ${distributionId}`,
+        })
+      }
 
       const myShare = shares.find(({ user_id }) => user_id === session?.user.id)
 
