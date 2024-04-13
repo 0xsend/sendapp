@@ -43,3 +43,19 @@ export const useDistributionNumberParams = () => {
     distributionNumber,
   }
 }
+
+const { useParam: useTokenParam } = createParam<{ token: `0x${string}` | 'eth' }>()
+
+export const useToken = () => {
+  const [token, setTokenParam] = useTokenParam('token')
+
+  return [token, setTokenParam] as const
+}
+
+export const useTokenParams = () => {
+  const [token] = useTokenParam('token')
+
+  return {
+    token,
+  }
+}
