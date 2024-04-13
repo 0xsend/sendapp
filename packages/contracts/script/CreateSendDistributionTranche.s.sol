@@ -13,13 +13,16 @@ contract CreateSendDistributionTrancheScript is Script, Helper {
 
     function run() public {
         address smdAddr = vm.envAddress("SEND_MERKLE_DROP_ADDRESS");
+        bytes32 merkleRoot = vm.envBytes32("MERKLE_ROOT");
+        uint256 amount = vm.envUint("AMOUNT");
         require(smdAddr != address(0), "SEND_MERKLE_DROP_ADDRESS not set");
+        require(merkleRoot != bytes32(0), "MERKLE_ROOT not set");
+        require(amount > 0, "AMOUNT not set");
         vm.startBroadcast();
         SendMerkleDrop sendMerkleDrop = SendMerkleDrop(smdAddr);
         SendToken send = SendToken(SEND_TOKEN);
-        send.approve(smdAddr, 585002498);
-        // TODO: figure out an easier way to test this
-        sendMerkleDrop.addTranche(0x74e8d928d7453878f3d2b0628db0ed202cf0b177154d655e0dd0b509e7dc60ca, 585002498);
+        send.approve(smdAddr, amount);
+        sendMerkleDrop.addTranche(merkleRoot, amount);
         vm.stopBroadcast();
     }
 }
