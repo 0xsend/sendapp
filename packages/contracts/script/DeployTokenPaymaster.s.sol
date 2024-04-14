@@ -32,10 +32,7 @@ contract DeployTokenPaymasterScript is Script {
             refundPostopCost: 40000,
             minEntryPointBalance: 1000 gwei,
             priceMarkup: PRICE_DENOM * 15 / 10, // 50%,
-            baseFee: BASE_FEE_DEFAULT
-        });
-        RewardsConfig memory rc = RewardsConfig({
-            rewardsShare: 3300, // 33% of base fee
+            baseFee: BASE_FEE_DEFAULT,
             rewardsPool: address(0x71fa02bb11e4b119bEDbeeD2f119F62048245301) // Send Revenues Safe
         });
 
@@ -59,7 +56,6 @@ contract DeployTokenPaymasterScript is Script {
             IERC20(weth),
             ISwapRouter(uniswap),
             tpc,
-            rc,
             ohc,
             uhc,
             msg.sender

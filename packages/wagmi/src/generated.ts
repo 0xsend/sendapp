@@ -3093,14 +3093,6 @@ export const tokenPaymasterAbi = [
           { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
           { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
           { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
-        ],
-      },
-      {
-        name: '_rewardsConfig',
-        internalType: 'struct RewardsConfig',
-        type: 'tuple',
-        components: [
-          { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
           { name: 'rewardsPool', internalType: 'address', type: 'address' },
         ],
       },
@@ -3226,16 +3218,6 @@ export const tokenPaymasterAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'rewardsConfig',
-    outputs: [
-      { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
-      { name: 'rewardsPool', internalType: 'address', type: 'address' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [
       {
         name: '_oracleHelperConfig',
@@ -3261,23 +3243,6 @@ export const tokenPaymasterAbi = [
     type: 'function',
     inputs: [
       {
-        name: '_rewardsConfig',
-        internalType: 'struct RewardsConfig',
-        type: 'tuple',
-        components: [
-          { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
-          { name: 'rewardsPool', internalType: 'address', type: 'address' },
-        ],
-      },
-    ],
-    name: 'setRewardsConfig',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
         name: '_tokenPaymasterConfig',
         internalType: 'struct TokenPaymasterConfig',
         type: 'tuple',
@@ -3287,6 +3252,7 @@ export const tokenPaymasterAbi = [
           { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
           { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
           { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+          { name: 'rewardsPool', internalType: 'address', type: 'address' },
         ],
       },
     ],
@@ -3336,6 +3302,7 @@ export const tokenPaymasterAbi = [
       { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
       { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
       { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+      { name: 'rewardsPool', internalType: 'address', type: 'address' },
     ],
     stateMutability: 'view',
   },
@@ -3486,6 +3453,7 @@ export const tokenPaymasterAbi = [
           { name: 'refundPostopCost', internalType: 'uint48', type: 'uint48' },
           { name: 'priceMaxAge', internalType: 'uint48', type: 'uint48' },
           { name: 'baseFee', internalType: 'uint40', type: 'uint40' },
+          { name: 'rewardsPool', internalType: 'address', type: 'address' },
         ],
         indexed: false,
       },
@@ -3532,23 +3500,6 @@ export const tokenPaymasterAbi = [
       { name: 'value', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
     name: 'Received',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'rewardsConfig',
-        internalType: 'struct RewardsConfig',
-        type: 'tuple',
-        components: [
-          { name: 'rewardsShare', internalType: 'uint16', type: 'uint16' },
-          { name: 'rewardsPool', internalType: 'address', type: 'address' },
-        ],
-        indexed: false,
-      },
-    ],
-    name: 'RewardsConfigUpdated',
   },
   {
     type: 'event',
@@ -3638,7 +3589,7 @@ export const tokenPaymasterAbi = [
  *
  */
 export const tokenPaymasterAddress = {
-  845337: '0xb6a372E90788d6Afe1C75dbeDF5A57f1E78823A0',
+  845337: '0x85f874D9da566bc66AeC5bD62293de963bab88B0',
 } as const
 
 /**
@@ -7191,17 +7142,6 @@ export const readTokenPaymasterOwner = /*#__PURE__*/ createReadContract({
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"rewardsConfig"`
- *
- *
- */
-export const readTokenPaymasterRewardsConfig = /*#__PURE__*/ createReadContract({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  functionName: 'rewardsConfig',
-})
-
-/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"token"`
  *
  *
@@ -7363,17 +7303,6 @@ export const writeTokenPaymasterSetOracleConfiguration = /*#__PURE__*/ createWri
   abi: tokenPaymasterAbi,
   address: tokenPaymasterAddress,
   functionName: 'setOracleConfiguration',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
- *
- *
- */
-export const writeTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createWriteContract({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  functionName: 'setRewardsConfig',
 })
 
 /**
@@ -7553,17 +7482,6 @@ export const prepareWriteTokenPaymasterSetOracleConfiguration =
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
- *
- *
- */
-export const prepareWriteTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createSimulateContract({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  functionName: 'setRewardsConfig',
-})
-
-/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setTokenPaymasterConfig"`
  *
  *
@@ -7728,17 +7646,6 @@ export const watchTokenPaymasterReceivedEvent = /*#__PURE__*/ createWatchContrac
   abi: tokenPaymasterAbi,
   address: tokenPaymasterAddress,
   eventName: 'Received',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"RewardsConfigUpdated"`
- *
- *
- */
-export const watchTokenPaymasterRewardsConfigUpdatedEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  eventName: 'RewardsConfigUpdated',
 })
 
 /**
@@ -11485,17 +11392,6 @@ export const useReadTokenPaymasterOwner = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"rewardsConfig"`
- *
- *
- */
-export const useReadTokenPaymasterRewardsConfig = /*#__PURE__*/ createUseReadContract({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  functionName: 'rewardsConfig',
-})
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"token"`
  *
  *
@@ -11657,17 +11553,6 @@ export const useWriteTokenPaymasterSetOracleConfiguration = /*#__PURE__*/ create
   abi: tokenPaymasterAbi,
   address: tokenPaymasterAddress,
   functionName: 'setOracleConfiguration',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
- *
- *
- */
-export const useWriteTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createUseWriteContract({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  functionName: 'setRewardsConfig',
 })
 
 /**
@@ -11847,17 +11732,6 @@ export const useSimulateTokenPaymasterSetOracleConfiguration =
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setRewardsConfig"`
- *
- *
- */
-export const useSimulateTokenPaymasterSetRewardsConfig = /*#__PURE__*/ createUseSimulateContract({
-  abi: tokenPaymasterAbi,
-  address: tokenPaymasterAddress,
-  functionName: 'setRewardsConfig',
-})
-
-/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `functionName` set to `"setTokenPaymasterConfig"`
  *
  *
@@ -12025,18 +11899,6 @@ export const useWatchTokenPaymasterReceivedEvent = /*#__PURE__*/ createUseWatchC
   address: tokenPaymasterAddress,
   eventName: 'Received',
 })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"RewardsConfigUpdated"`
- *
- *
- */
-export const useWatchTokenPaymasterRewardsConfigUpdatedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: tokenPaymasterAbi,
-    address: tokenPaymasterAddress,
-    eventName: 'RewardsConfigUpdated',
-  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link tokenPaymasterAbi}__ and `eventName` set to `"TokenPriceUpdated"`
