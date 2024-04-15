@@ -1,9 +1,9 @@
 import { cpus } from 'node:os'
 import type { Database, Tables } from '@my/supabase/database.types'
-import { type sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
+import { config, readSendTokenBalanceOf, type sendTokenAddress } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
-import type { Logger } from 'pino'
 import { selectAll } from 'app/utils/supabase/selectAll'
+import type { Logger } from 'pino'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -117,12 +117,16 @@ export class DistributorWorker {
     distribution: Tables<'distributions'> & {
       distribution_verification_values: Tables<'distribution_verification_values'>[]
     }
-  ) {
+  ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
     // fetch all verifications
-    const { data: verifications, error: verificationsError } = await selectAll(
+    const {
+      data: verifications,
+      error: verificationsError,
+      count,
+    } = await selectAll(
       supabaseAdmin
         .from('distribution_verifications')
         .select('*', { count: 'exact' })
@@ -134,7 +138,12 @@ export class DistributorWorker {
     }
 
     if (verifications === null || verifications.length === 0) {
-      throw new Error('No verifications found')
+      log.warn('No verifications found. Skipping distribution.')
+      return
+    }
+
+    if (count !== verifications.length) {
+      throw new Error('Verifications count does not match expected count')
     }
 
     log.info(`Found ${verifications.length} verifications.`)
