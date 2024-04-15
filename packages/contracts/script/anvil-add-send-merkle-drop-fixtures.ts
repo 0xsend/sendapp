@@ -1,4 +1,5 @@
 import 'zx/globals'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 /**
  * This script is used to deploy the SendMerkleDrop contract and add a tranche to the airdrop. It should be adapted as things are deployed to mainnet.
@@ -44,8 +45,33 @@ void (async function main() {
   const merkleDropAddress = broadcast.transactions[0].contractAddress // should be the first transaction
   console.log(chalk.blue(`Merkle drop address: ${merkleDropAddress}`))
 
+  // get latest distribution id from API
+  const { data: distribution, error: distributionError } = await supabaseAdmin
+    .from('distributions')
+    .select('*')
+    .order('id', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (distributionError) {
+    throw distributionError
+  }
+
+  const { root, total } = await fetch('http://localhost:3050/distributor/merkle', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`,
+    },
+    body: JSON.stringify({ id: distribution.id }),
+  }).then((res) => (res.ok ? res.json() : Promise.reject(res)))
+
+  $.env.MERKLE_ROOT = root
+  $.env.AMOUNT = total
+  $.env.SEND_MERKLE_DROP_ADDRESS = merkleDropAddress
+
   console.log(chalk.blue('Adding a tranche to the airdrop...'))
-  await $`SEND_MERKLE_DROP_ADDRESS=${merkleDropAddress} forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
+  await $`forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
               -vvvv \
               --fork-url http://localhost:8546 \
               --unlocked \
@@ -63,5 +89,24 @@ void (async function main() {
     $.env.ANVIL_BLOCK_TIME ?? '2'
   }` // mimics Tiltfile default
 
+  console.log(chalk.blue('Update all chain ids to use local...'))
+  console.log(chalk.blue('base mainnet -> base local'))
+  const { error } = await supabaseAdmin
+    .from('distributions')
+    .update({ chain_id: 845337 })
+    .filter('chain_id', 'eq', 8453)
+  if (error) {
+    console.log('error updating chain_id', error)
+    throw error
+  }
+  console.log(chalk.blue('eth mainnet -> eth local'))
+  const { error: error2 } = await supabaseAdmin
+    .from('distributions')
+    .update({ chain_id: 1337 })
+    .filter('chain_id', 'eq', 1)
+  if (error2) {
+    console.log('error updating chain_id', error2)
+    throw error2
+  }
   console.log(chalk.green('Done!'))
 })()

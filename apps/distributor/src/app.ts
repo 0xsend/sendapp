@@ -1,6 +1,8 @@
 import express, { type Request, type Response, Router } from 'express'
 import pino from 'pino'
-import { DistributorWorker } from './distributor'
+import { DistributorWorker, supabaseAdmin } from './distributor'
+import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
+import { selectAll } from 'app/utils/supabase/selectAll'
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -37,6 +39,62 @@ const checkAuthorization = (req: Request, res: Response, next: () => void) => {
   }
   next()
 }
+
+distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: Response) => {
+  const { id } = req.body as { id: string }
+
+  if (!id) {
+    res.status(400).json('Missing id')
+    return
+  }
+
+  logger.info({ id }, 'Received request to distribution merkle root')
+
+  const { data: shares, error: sharesError } = await selectAll(
+    supabaseAdmin
+      .from('distribution_shares')
+      .select('index, address, amount', { count: 'exact' })
+      .eq('distribution_id', id)
+      .order('index', { ascending: true })
+  )
+  if (sharesError) {
+    logger.error(sharesError, 'Error fetching distribution shares')
+    res.status(500).json({ error: 'Error fetching distribution shares' })
+    return
+  }
+
+  if (shares === null || shares.length === 0) {
+    logger.error('No shares found for distribution', { id })
+    res.status(500).json({ error: 'No shares found for distribution' })
+    return
+  }
+
+  logger.info(`Found ${shares.length} shares for distribution ${id}`)
+
+  const tree = StandardMerkleTree.of(
+    shares.map(({ index, address, amount }, i) => [index, address, amount]),
+    ['uint256', 'address', 'uint256']
+  )
+
+  // this is what the user will need to submit to claim their tokens
+  const proofs: string[][] = []
+  for (const [i] of tree.entries()) {
+    const proof = tree.getProof(i)
+    proofs[i] = proof
+  }
+
+  const total = shares.reduce((acc, { amount }) => acc + amount, 0)
+  const result = {
+    id,
+    root: tree.root,
+    total,
+    proofs,
+    shares,
+    tree: tree.dump(),
+  }
+
+  res.json(result)
+})
 
 distributorRouter.post('/', checkAuthorization, async (req, res) => {
   const { id } = req.body as { id: string }

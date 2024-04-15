@@ -1,7 +1,8 @@
 import { cpus } from 'node:os'
-import type { Database, Functions, Tables } from '@my/supabase/database.types'
-import { type sendTokenAddress, readSendTokenBalanceOf, config } from '@my/wagmi'
+import type { Database, Tables } from '@my/supabase/database.types'
+import { config, readSendTokenBalanceOf, type sendTokenAddress } from '@my/wagmi'
 import { createClient } from '@supabase/supabase-js'
+import { selectAll } from 'app/utils/supabase/selectAll'
 import type { Logger } from 'pino'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -116,39 +117,34 @@ export class DistributorWorker {
     distribution: Tables<'distributions'> & {
       distribution_verification_values: Tables<'distribution_verification_values'>[]
     }
-  ) {
+  ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
     // fetch all verifications
-    const verifications: Tables<'distribution_verifications'>[] = await (async () => {
-      const _verifications: Tables<'distribution_verifications'>[] = []
-      let page = 0
-      let totalCount: number | null = null
-      const pageSize = 100
+    const {
+      data: verifications,
+      error: verificationsError,
+      count,
+    } = await selectAll(
+      supabaseAdmin
+        .from('distribution_verifications')
+        .select('*', { count: 'exact' })
+        .eq('distribution_id', distribution.id)
+    )
 
-      do {
-        const { data, count, error } = await supabaseAdmin
-          .from('distribution_verifications')
-          .select('*', { count: 'exact' })
-          .eq('distribution_id', distribution.id)
-          .range(page, page + pageSize)
+    if (verificationsError) {
+      throw verificationsError
+    }
 
-        if (error) {
-          log.error({ error: error.message, code: error.code }, 'Error fetching verifications.')
-          throw error
-        }
+    if (verifications === null || verifications.length === 0) {
+      log.warn('No verifications found. Skipping distribution.')
+      return
+    }
 
-        if (totalCount === null) {
-          totalCount = count
-        }
-
-        _verifications.push(...data)
-        page += pageSize
-      } while (totalCount && _verifications.length < totalCount)
-
-      return _verifications
-    })()
+    if (count !== verifications.length) {
+      throw new Error('Verifications count does not match expected count')
+    }
 
     log.info(`Found ${verifications.length} verifications.`)
     log.debug({ verifications })
@@ -178,39 +174,24 @@ export class DistributorWorker {
     log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
     log.debug({ verificationsByUserId })
 
-    const hodlerAddresses: Functions<'distribution_hodler_addresses'> = await (async () => {
-      const _hodlerAddresses: Functions<'distribution_hodler_addresses'> = []
-      let page = 0
-      let totalCount: number | null = null
-      const pageSize = 100
+    const { data: hodlerAddresses, error: hodlerAddressesError } = await selectAll(
+      supabaseAdmin
+        .rpc(
+          'distribution_hodler_addresses',
+          {
+            distribution_id: distribution.id,
+          },
+          { count: 'exact' }
+        )
+        .select('*')
+    )
+    if (hodlerAddressesError) {
+      throw hodlerAddressesError
+    }
 
-      do {
-        const { data, count, error } = await supabaseAdmin
-          .rpc(
-            'distribution_hodler_addresses',
-            {
-              distribution_id: distribution.id,
-            },
-            { count: 'exact' }
-          )
-          .select('*')
-          .range(page, page + pageSize)
-
-        if (error) {
-          log.error({ error: error.message, code: error.code }, 'Error fetching addresses.')
-          throw error
-        }
-
-        if (totalCount === null) {
-          totalCount = count
-        }
-
-        _hodlerAddresses.push(...data)
-        page += pageSize
-      } while (totalCount && _hodlerAddresses.length < totalCount)
-
-      return _hodlerAddresses
-    })()
+    if (hodlerAddresses === null || hodlerAddresses.length === 0) {
+      throw new Error('No hodler addresses found')
+    }
 
     const hodlerAddressesByUserId = hodlerAddresses.reduce(
       (acc, address) => {
