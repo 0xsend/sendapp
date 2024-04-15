@@ -35,7 +35,6 @@ import type React from 'react'
 import { type ElementType, useEffect, useState } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useConfirmedTags } from 'app/utils/tags'
-import { useSendAccounts } from 'app/utils/send-accounts'
 
 export function AccountScreen() {
   const media = useMedia()
@@ -271,20 +270,10 @@ const NoTagsMessage = () => {
 }
 
 const BottomButtonRow = () => {
+  const tags = useConfirmedTags()
   const media = useMedia()
-  if (media.md)
-    return (
-      <XStack gap={'$5'} f={1} $md={{ display: 'flex', jc: 'center' }}>
-        <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-          Sendtags
-        </BorderedLink>
-        <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-          Rewards
-        </BorderedLink>
-      </XStack>
-    )
 
-  return (
+  if (media.gtMd && (tags === undefined || tags.length === 0))
     <Stack f={1} jc="center" $md={{ display: 'none' }}>
       <Link
         href={'/account/sendtag/checkout'}
@@ -303,5 +292,15 @@ const BottomButtonRow = () => {
         </XStack>
       </Link>
     </Stack>
+
+  return (
+    <XStack gap={'$5'} f={1} $md={{ display: 'flex', jc: 'center' }}>
+      <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
+        Sendtags
+      </BorderedLink>
+      <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
+        Rewards
+      </BorderedLink>
+    </XStack>
   )
 }
