@@ -7,6 +7,7 @@ import { parseEther, zeroAddress } from 'viem'
 import { debug } from 'debug'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { usdcAddress } from '../viem'
+import type { testClient } from 'app/utils/userop'
 
 let log: debug.Debugger
 
@@ -16,11 +17,11 @@ const sendAccountTest = base.extend<{
   setUsdcBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
 }>({
   page: async ({ page, context, supabase, setEthBalance, setUsdcBalance }, use) => {
-    log = debug(`test:send-accounts:${test.info().workerIndex}}`)
+    log = debug(`test:send-accounts:${test.info().workerIndex}`)
     log('start onboarding')
 
     // @todo use webauthn authenticator and supabase API to create a send account
-    const onboardingPage = new OnboardingPage(await context.newPage())
+    const onboardingPage = new OnboardingPage(await context.newPage(), log)
     await onboardingPage.completeOnboarding(expect).catch((e) => {
       log('onboarding error', e)
       throw e
@@ -62,7 +63,7 @@ const sendAccountTest = base.extend<{
     use(async ({ address, value }) => {
       log('fund send account with usdc', `address=${address} value=${value}`)
       await setERC20Balance({
-        client: testBaseClient,
+        client: testBaseClient as typeof testClient,
         address,
         tokenAddress: usdcAddress[testBaseClient.chain.id],
         value,

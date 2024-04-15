@@ -1,6 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// @ts-expect-error - set global __DEV__ variable to handle app react native imports
 globalThis.__DEV__ = false
 
 // validate environment ensuring we aren't talking to prod or staging or something
@@ -34,9 +33,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
-  // workers: process.env.CI ? 1 : undefined,
-  // parallelism broke once we introduced creating send accounts on the server
-  workers: 1,
+  workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     process.env.CI ? ['github'] : ['list'],

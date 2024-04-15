@@ -30,6 +30,7 @@ import {
   zeroAddress,
   publicActions,
   getAbiItem,
+  withRetry,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { z } from 'zod'
@@ -166,39 +167,66 @@ export const sendAccountRouter = createTRPCRouter({
         ]
 
         log('initCalls', initCalls)
-        const { request } = await sendAccountFactoryClient.simulateContract({
-          address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
-          abi: sendAccountFactoryAbi,
-          functionName: 'createAccount',
-          args: [
-            keySlot, // key slot
-            xyPubKey, // public key
-            initCalls, // init calls
-            USEROP_SALT, // salt
-          ],
-          value: 0n,
-        })
 
-        const hash = await sendAccountFactoryClient.writeContract(request)
+        const createOnchain = async () => {
+          const { request } = await sendAccountFactoryClient.simulateContract({
+            address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
+            abi: sendAccountFactoryAbi,
+            functionName: 'createAccount',
+            args: [
+              keySlot, // key slot
+              xyPubKey, // public key
+              initCalls, // init calls
+              USEROP_SALT, // salt
+            ],
+            value: 0n,
+          })
 
-        log('hash', hash)
+          const hash = await sendAccountFactoryClient.writeContract(request)
 
-        await waitForTransactionReceipt(config, {
-          chainId: baseMainnetClient.chain.id,
-          hash,
-        }).catch((e) => {
+          log('hash', hash)
+
+          await waitForTransactionReceipt(config, {
+            chainId: baseMainnetClient.chain.id,
+            hash,
+          }).catch((e) => {
+            log('waitForTransactionReceipt', e)
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: e.message })
+          })
+        }
+
+        await withRetry(
+          async () => {
+            log('withRetry', 'start')
+            await createOnchain()
+            log('waitForTransactionReceipt', 'done')
+          },
+          {
+            retryCount: 20,
+            delay: ({ count, error }) => {
+              const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
+              log('delay', 'backoff', `count=${count} backoff=${backoff} error=${error}`)
+              return backoff
+            },
+            shouldRetry({ count, error }) {
+              // @todo handle other errors like balance not enough, invalid nonce, etc
+              log('shouldRetry', count, error)
+              if (error.message.includes('Failed to create send account')) {
+                return false
+              }
+              return true
+            },
+          }
+        ).catch((e) => {
           log('waitForTransactionReceipt', e)
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: e.message })
         })
-
-        log('waitForTransactionReceipt', 'done')
 
         const { error } = await supabase.rpc('create_send_account', {
           send_account: {
             address: senderAddress,
             chain_id: baseMainnetClient.chain.id,
             init_code,
-            // @todo add hash
           },
           webauthn_credential: {
             name: passkeyName,

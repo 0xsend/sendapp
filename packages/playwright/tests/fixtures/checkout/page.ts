@@ -31,12 +31,18 @@ export class CheckoutPage {
 
   async submitTagName() {
     const request = this.page.waitForRequest((request) => {
-      log('submitTagName request', request.url(), request.method(), request.postDataJSON())
-      return request.url().includes('/rest/v1/tags') && request.method() === 'POST'
+      if (request.url().includes('/rest/v1/tags') && request.method() === 'POST') {
+        log('submitTagName request', request.url(), request.method(), request.postDataJSON())
+        return true
+      }
+      return false
     })
     const response = this.page.waitForEvent('response', async (response) => {
-      log('submitTagName response', response.url(), response.status(), await response.text())
-      return response.url().includes('/rest/v1/tags')
+      if (response.url().includes('/rest/v1/tags')) {
+        log('submitTagName response', response.url(), response.status(), await response.text())
+        return true
+      }
+      return false
     })
     await this.submitTagButton.click()
     await request
