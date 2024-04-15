@@ -18,8 +18,6 @@ import {
   YStack,
 } from '@my/ui'
 
-import React from 'react'
-
 import { type UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
 import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
@@ -30,7 +28,6 @@ import { DistributionClaimButton } from './components/DistributionClaimButton'
 import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
-import { X } from '@tamagui/lucide-icons'
 import { useSendPrice } from 'app/utils/coin-gecko'
 
 export function RewardsScreen() {
@@ -358,35 +355,38 @@ const SendRewardsCard = ({
     <Card
       f={1}
       mih={198}
-      $gtLg={{ f: 1 }}
+      p="$6"
+      $gtLg={{ f: 1, p: '$6' }}
       $gtMd={{ f: 2 }}
       $theme-dark={{ bc: '$darkest' }}
       $theme-light={{ bc: '$gray3Light' }}
       br={12}
       jc="center"
     >
-      <YStack w={'100%'} gap="$8" mx="auto" jc="center" ai="center">
+      <YStack gap="$4" mx="auto" jc="center" ai="center">
         <Stack gap="$6">
           <Label fontFamily={'$mono'} col="$olive" ta="left" fontSize={'$5'}>
             Rewards
           </Label>
-          <Theme inverse>
-            <Paragraph
-              fontFamily={'$mono'}
-              col="$background"
-              $gtXs={{ fontSize: '$10' }}
-              fontSize={'$9'}
-              fontWeight={'500'}
-              lh={40}
-            >
-              {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
-            </Paragraph>
-          </Theme>
-          {rewardValue && (
-            <Paragraph fontFamily={'$mono'} col="$color8" opacity={0.6}>
-              {`~$${rewardValue.toFixed(2)}`}
-            </Paragraph>
-          )}
+          <Stack>
+            <Theme inverse>
+              <Paragraph
+                fontFamily={'$mono'}
+                col="$background"
+                $gtXs={{ fontSize: '$10' }}
+                fontSize={'$9'}
+                fontWeight={'500'}
+                lh={40}
+              >
+                {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+              </Paragraph>
+            </Theme>
+            {rewardValue && (
+              <Paragraph fontFamily={'$mono'} col="$color8" opacity={0.6}>
+                {`${rewardValue.toFixed(2)} USD`}
+              </Paragraph>
+            )}
+          </Stack>
         </Stack>
         <DistributionClaimButton distribution={distribution} />
       </YStack>

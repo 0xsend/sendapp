@@ -91,9 +91,57 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 
   if (!isEligible) return null
 
+  // If the user is eligible but has already claimed, show the claim button disabled
+  if (isClaimed) {
+    return (
+      <>
+        <Paragraph size="$1" theme="alt2" mx="auto">
+          Already claimed
+          {claimReceiptSuccess && (
+            <Paragraph size="$1" theme="alt2">
+              <Anchor
+                accessibilityLabel="View Claim on Etherscan"
+                href={`${accountChain?.blockExplorers?.default.url}/tx/${claimWriteHash}`}
+              >
+                {shorten(claimWriteHash)}
+              </Anchor>
+            </Paragraph>
+          )}
+        </Paragraph>
+      </>
+    )
+  }
+
+  if (isTrancheActiveLoading || isClaimedLoading) {
+    return (
+      <>
+        <Button disabled>Claim Reward</Button>
+        <Paragraph size="$1" theme="alt2">
+          Checking claimability...
+        </Paragraph>
+      </>
+    )
+  }
+
+  if (isTrancheActiveError || isClaimedError) {
+    return (
+      <>
+        <Button disabled f={1}>
+          Claim Reward
+        </Button>
+        <ErrorMessage
+          error={`Error checking eligibility. Please try again later. ${isTrancheActiveError?.message} ${isClaimedError?.message}`}
+        />
+      </>
+    )
+  }
+
+  // If the user is eligible but the tranche is inactive, show the claim button disabled
+  if (!isTrancheActive) null
+
   if (!isConnected) {
     return (
-      <Stack>
+      <>
         <OpenConnectModalWrapper>
           <Button onPress={openConnectModal}>
             <ButtonText col="$black">Connect Wallet to Claim</ButtonText>
@@ -111,7 +159,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             />
           )
         ) : null}
-      </Stack>
+      </>
     )
   }
 
@@ -119,7 +167,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     const distributionChain = chains.find((c) => c.id === distribution.chain_id)
     assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
     return (
-      <Stack>
+      <>
         <Button
           onPress={() => {
             assert(!!switchChain, 'No switchChain found')
@@ -138,68 +186,20 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
               : ''
           }
         />
-      </Stack>
-    )
-  }
-
-  if (isTrancheActiveLoading || isClaimedLoading) {
-    return (
-      <Stack>
-        <Button disabled>Claim Reward</Button>
-        <Paragraph size="$1" theme="alt2">
-          Checking claimability...
-        </Paragraph>
-      </Stack>
-    )
-  }
-
-  if (isTrancheActiveError || isClaimedError) {
-    return (
-      <Stack>
-        <Button disabled f={1}>
-          Claim Reward
-        </Button>
-        <ErrorMessage
-          error={`Error checking eligibility. Please try again later. ${isTrancheActiveError?.message} ${isClaimedError?.message}`}
-        />
-      </Stack>
-    )
-  }
-
-  // If the user is eligible but the tranche is inactive, show the claim button disabled
-  if (!isTrancheActive) null
-
-  // If the user is eligible but has already claimed, show the claim button disabled
-  if (isClaimed) {
-    return (
-      <Stack>
-        <Paragraph size="$1" theme="alt2" mx="auto">
-          Already claimed
-          {claimReceiptSuccess && (
-            <Paragraph size="$1" theme="alt2">
-              <Anchor
-                accessibilityLabel="View Claim on Etherscan"
-                href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
-              >
-                {shorten(claimWriteHash)}
-              </Anchor>
-            </Paragraph>
-          )}
-        </Paragraph>
-      </Stack>
+      </>
     )
   }
 
   if (account !== share?.address) {
     return (
-      <Stack>
+      <>
         <Paragraph size="$1" theme="alt2">
           Please switch to the address you verified previously to claim,{' '}
           <Anchor
             size="$1"
             target="_blank"
             accessibilityLabel="View on Etherscan"
-            href={`${accountChain.blockExplorers.default.url}/address/${share?.address}`}
+            href={`${accountChain.blockExplorers?.default.url}/address/${share?.address}`}
           >
             {shorten(share?.address)}
           </Anchor>
@@ -211,29 +211,29 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             size="$1"
             target="_blank"
             accessibilityLabel="View on Etherscan"
-            href={`${accountChain.blockExplorers.default.url}/address/${account}`}
+            href={`${accountChain.blockExplorers?.default.url}/address/${account}`}
           >
             {shorten(account)}
           </Anchor>
         </Paragraph>
-      </Stack>
+      </>
     )
   }
 
   if (claimWriteConfigError) {
     return (
-      <Stack>
+      <>
         <Button disabled>Claim Reward</Button>
         <ErrorMessage
           error={`Error preparing claim. Please try again later. ${claimWriteConfigError}`}
         />
-      </Stack>
+      </>
     )
   }
 
   // If the user is eligible and the tranche is active, show the claim button
   return (
-    <Stack>
+    <>
       <Button
         disabled={
           !writeClaim ||
@@ -269,30 +269,26 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           Claimed!{' '}
           <Anchor
             accessibilityLabel="View Claim on Etherscan"
-            href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
+            href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
           >
             {shorten(claimWriteHash)}
           </Anchor>
         </Paragraph>
       )}
-    </Stack>
+    </>
   )
 }
 
-function Stack(props: StackProps) {
-  return <YStack ai="center" w="100%" mx="auto" pb="$4" {...props} />
-}
-
 function Button(props: ButtonProps) {
-  return <ButtonOg size="$6" bc="$accent12Dark" {...props} />
+  return <ButtonOg py="$3.5" w="100%" br={12} bc="$accent12Dark" {...props} />
 }
 
 function ErrorMessage({ error }: { error?: string }) {
   if (!error) return null
   return (
-    <ScrollView height="$4">
-      <Paragraph size="$1" theme="alt2" w="$20">
-        {error}
+    <ScrollView pos="absolute" $gtLg={{ bottom: '$-12' }} bottom="$-10" height="$4">
+      <Paragraph size="$1" w="$20" col={'$red500'} ta="center">
+        {error.split('.').at(0)}
       </Paragraph>
     </ScrollView>
   )
