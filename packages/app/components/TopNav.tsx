@@ -14,20 +14,30 @@ import {
 } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
+import {
+  IconArrowLeft,
+  IconCopy,
+  IconGear,
+  IconHamburger,
+  IconQr,
+  IconSendLogo,
+} from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
+import { ReferralLink } from './ReferralLink'
 
 export enum ButtonOption {
   QR = 'QR',
   SETTINGS = 'SETTINGS',
+  REFERRAL = 'REFERRAL',
 }
 
 interface TopNavProps {
   header: string
   subheader?: string
   showLogo?: boolean
+  showReferral?: boolean
   /**
    * Customize the button on the right side of the top nav.
    * @default ButtonOption.QR
@@ -44,6 +54,7 @@ export function TopNav({
   header,
   subheader,
   showLogo = false,
+  showReferral = false,
   button = ButtonOption.QR,
   noSubroute = false,
 }: TopNavProps) {
@@ -91,6 +102,7 @@ export function TopNav({
             onPress={handleSettingsBottomSheet}
           />
         )
+
       default:
         if (__DEV__) throw new Error(`Unknown button option: ${button}`)
         return null
@@ -107,7 +119,11 @@ export function TopNav({
           fd="row"
           $lg={{ py: '$4' }}
         >
-          <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center">
+          <Stack
+            display={isSubRoute || media.lg ? 'flex' : 'none'}
+            jc="center"
+            $gtLg={{ fd: 'row' }}
+          >
             {isSubRoute ? (
               <Button
                 onPress={handleBack}
@@ -136,6 +152,11 @@ export function TopNav({
             >
               {header}
             </H2>
+          )}
+          {showReferral && media.gtLg && (
+            <XStack jc={'center'} ai={'center'} ml="auto">
+              <Paragraph>Referral Link</Paragraph> <ReferralLink />
+            </XStack>
           )}
           <XStack>{renderButton()}</XStack>
         </Container>
