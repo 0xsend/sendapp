@@ -11,6 +11,7 @@ import {
   Text,
   XStack,
   YStack,
+  useMedia,
 } from '@my/ui'
 import { IconQRCode } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -69,7 +70,7 @@ const suggestions = [
 export function ActivityScreen() {
   return (
     <TagSearchProvider>
-      <YStack f={1} width={'100%'} py="$4" gap="$4">
+      <YStack f={1} width={'100%'} pb="$4" gap="$6">
         <Container f={0}>
           <XStack alignItems="center" width={'100%'} gap="$6">
             <Search />
@@ -89,7 +90,7 @@ function ActivityBody() {
   return (
     <AnimatePresence>
       {isLoading && (
-        <YStack key="loading" space="$4" mb="$4">
+        <YStack key="loading" gap="$4" mb="$4">
           <Spinner size="large" color="$send1" />
         </YStack>
       )}
@@ -106,9 +107,10 @@ function ActivityBody() {
         <YStack
           key="suggestions"
           animation="quick"
-          gap="$size.2.5"
+          gap="$size.1.5"
           mb="$4"
           mt="$size.0.5"
+          $gtSm={{ gap: '$size.2.5' }}
           exitStyle={{
             opacity: 0,
             y: 10,
@@ -196,7 +198,7 @@ function Suggestions() {
                   <Spinner size="small" color="$send1" />
                 </Avatar.Fallback>
               </Avatar>
-              <Paragraph color="$color12" fontFamily="$mono">
+              <Paragraph color="$color12" fontFamily="$mono" fontSize="$2">
                 @{user.username}
               </Paragraph>
             </XStack>
@@ -295,6 +297,8 @@ function Row({
 }: {
   activity: (typeof activities)[number]
 }) {
+  const media = useMedia()
+
   return (
     <XStack
       key={activity.time}
@@ -344,9 +348,9 @@ function Row({
           minWidth={'$14'}
           textAlign="right"
           fontSize="$7"
-          // @FIX: font families don't change at breakpoint
-          fontFamily={'$mono'}
-          $gtMd={{ fontSize: '$5', fontFamily: '$body' }}
+          // @NOTE: font families don't change in `$gtMd` breakpoint
+          fontFamily={media.md ? '$mono' : '$body'}
+          $gtMd={{ fontSize: '$5' }}
         >
           {activity.amount}
         </Text>
