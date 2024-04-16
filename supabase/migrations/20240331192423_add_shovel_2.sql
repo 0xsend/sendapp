@@ -12,7 +12,7 @@ create table "public"."send_account_created" (
     "log_idx" integer
 );
 
-CREATE INDEX shovel_account ON public.send_account_created USING btree (account);
+CREATE INDEX send_account_created_account ON public.send_account_created USING btree (account);
 
 CREATE UNIQUE INDEX u_send_account_created ON public.send_account_created USING btree (ig_name, src_name, block_num, tx_idx, log_idx);
 
