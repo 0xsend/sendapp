@@ -150,6 +150,8 @@ jobs:
           # fi
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
           nohup tilt up playwright:deps &
+          tilt_pid=$!
+          echo "Tilt process started with PID: $tilt_pid"
           echo waiting for tilt to be ready
           for i in {1..10}; do
             curl -s http://localhost:10350 > /dev/null && break || echo "Attempt $i failed, trying again..."
@@ -157,7 +159,28 @@ jobs:
           done
           sleep 1
           echo tilt is ready
-          time tilt wait --timeout 5m --for=condition=Ready "uiresource/playwright:deps"
+          max_attempts=60
+          wait_timeout=5
+          for ((i=1; i<=max_attempts; i++)); do
+            echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
+            
+            # Check if the Tilt process is still running
+            if ! ps -p $tilt_pid > /dev/null; then
+              echo "Tilt process (PID: $tilt_pid) is no longer running, exiting"
+              exit 1
+            fi
+            
+            if tilt wait --timeout "${wait_timeout}s" --for=condition=Ready "uiresource/playwright:deps"; then
+              echo "Tilt is ready"
+              break
+            else
+              echo "Tilt not ready, retrying..."
+            fi
+            if ((i == max_attempts)); then
+              echo "Reached maximum attempts, exiting"
+              exit 1
+            fi
+          done
           yarn playwright test
       - name: Tilt Down
         # always run tilt down if tilt ci started
