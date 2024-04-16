@@ -36,8 +36,6 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 
-const log = debug('api:routers:sendAccount')
-
 const SEND_ACCOUNT_FACTORY_PRIVATE_KEY = process.env
   .SEND_ACCOUNT_FACTORY_PRIVATE_KEY as `0x${string}`
 if (!SEND_ACCOUNT_FACTORY_PRIVATE_KEY) {
@@ -75,6 +73,7 @@ export const sendAccountRouter = createTRPCRouter({
           keySlot,
         },
       }) => {
+        const log = debug(`api:routers:sendAccount:${session.user.id}`)
         const { error: sendAcctCountErr, count: sendAcctCount } = await supabase
           .from('send_accounts')
           .select('*', { count: 'exact', head: true })
