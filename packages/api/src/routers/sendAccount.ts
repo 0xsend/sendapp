@@ -204,7 +204,7 @@ export const sendAccountRouter = createTRPCRouter({
             },
             shouldRetry({ count, error }) {
               // @todo handle other errors like balance not enough, invalid nonce, etc
-              log('shouldRetry', count, error)
+              console.error('createAaccount failed', error)
               if (error.message.includes('Failed to create send account')) {
                 return false
               }
@@ -237,7 +237,7 @@ export const sendAccountRouter = createTRPCRouter({
         log('create_send_account', 'done', '@todo add hash')
 
         if (error) {
-          log('create_send_account error', error)
+          console.error('create_send_account error', error)
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error.message,
