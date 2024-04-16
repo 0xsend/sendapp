@@ -156,7 +156,7 @@ jobs:
           done
           sleep 1
           echo tilt is ready
-          time tilt wait --timeout 7m --for=condition=Ready "uiresource/playwright:deps"
+          time tilt wait --timeout 2m --for=condition=Ready "uiresource/playwright:deps"
           yarn playwright test
       - name: Tilt Down
         # always run tilt down if tilt ci started
