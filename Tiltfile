@@ -76,7 +76,7 @@ local_resource(
     resource_deps = [
         "yarn:install",
         "contracts:build",
-        "anvil:send-account-fixtures",
+        "anvil:fixtures",
     ],
     deps =
         [os.path.join("packages", "wagmi", "wagmi.config.ts")] +
