@@ -274,6 +274,23 @@ type Override = {
       chain_id?: string;
     };
   }
+  send_revenues_safe_receives?: {
+    name?: string;
+    fields?: {
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      sender?: string;
+      v?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
   send_token_transfers?: {
     name?: string;
     fields?: {
@@ -563,6 +580,15 @@ export interface Fingerprint {
   sendLiquidityPools?: {
     id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
+  }
+  sendRevenuesSafeReceives?: {
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
   }
   sendTokenTransfers?: {
     id?: FingerprintNumberField;

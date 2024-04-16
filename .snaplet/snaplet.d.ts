@@ -346,6 +346,20 @@ interface Table_public_send_liquidity_pools {
   address: string;
   chain_id: number;
 }
+interface Table_public_send_revenues_safe_receives {
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  sender: string | null;
+  v: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
 interface Table_public_send_token_transfers {
   id: number;
   chain_id: number | null;
@@ -544,6 +558,7 @@ interface Schema_public {
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;
+  send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_token_transfers: Table_public_send_token_transfers;
   send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;

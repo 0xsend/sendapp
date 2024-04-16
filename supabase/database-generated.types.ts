@@ -536,6 +536,51 @@ export type Database = {
         }
         Relationships: []
       }
+      send_revenues_safe_receives: {
+        Row: {
+          abi_idx: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          sender: string | null
+          src_name: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+          v: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          sender?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          v?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          sender?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+          v?: number | null
+        }
+        Relationships: []
+      }
       send_token_transfers: {
         Row: {
           abi_idx: number | null
