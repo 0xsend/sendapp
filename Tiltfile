@@ -248,7 +248,8 @@ if config.tilt_subcommand == "down":
     docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
     docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
     docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
-    pkill anvil
+    which anvil || echo "anvil not installed"
+    pkill anvil || echo "anvil not running"
     """)
     local("yarn clean")
 
