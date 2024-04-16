@@ -1,4 +1,11 @@
-import { AnimatePresence, Button, ButtonIcon, ButtonText, useToastController } from '@my/ui'
+import {
+  AnimatePresence,
+  Button,
+  ButtonIcon,
+  type ButtonProps,
+  ButtonText,
+  useToastController,
+} from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck } from '@tamagui/lucide-icons'
 import { useEffect, useState } from 'react'
@@ -6,7 +13,7 @@ import { IconCopy } from './icons'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
 
-export function ReferralLink() {
+export function ReferralLink(props: ButtonProps) {
   const { profile } = useUser()
   const referralCode = profile?.referral_code
   const referralHref = `https://send.app?referral=${referralCode}`
@@ -50,8 +57,6 @@ export function ReferralLink() {
   if (!referralCode) return null
   return (
     <Button
-      jc={'center'}
-      ai={'center'}
       bc="transparent"
       chromeless
       hoverStyle={{
@@ -68,6 +73,7 @@ export function ReferralLink() {
         setHasCopied(true)
         shareOrCopyOnPress()
       }}
+      {...props}
     >
       <ButtonText
         fontSize={'$4'}
