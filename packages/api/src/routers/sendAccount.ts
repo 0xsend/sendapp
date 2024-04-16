@@ -167,6 +167,7 @@ export const sendAccountRouter = createTRPCRouter({
 
         await withRetry(
           async function createAccount() {
+            log('withRetry', 'start')
             const { request } = await sendAccountFactoryClient.simulateContract({
               address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
               abi: sendAccountFactoryAbi,
@@ -180,7 +181,7 @@ export const sendAccountRouter = createTRPCRouter({
               value: 0n,
             })
 
-            log('tx request', request)
+            log('withRetry', 'tx request')
 
             const hash = await sendAccountFactoryClient.writeContract(request)
 
