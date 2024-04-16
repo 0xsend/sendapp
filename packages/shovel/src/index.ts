@@ -5,6 +5,7 @@ import {
   sendAccountTransfersIntegration,
   // sendAccountTransactionsIntegration,
   sendTokenTransfersIntegration,
+  sendRevenuesSafeReceives,
 } from './integrations'
 
 // baseSrcBlockHeaders is to be used for integrations that require block headers
@@ -30,23 +31,23 @@ export const sources: Source[] = [baseSrcBlockHeaders, baseSrcLogs]
 export const integrations: Integration[] = [
   {
     ...sendAccountDeployedIntegration,
-    // @ts-expect-error start is bigint but we will load it from env
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   {
     ...sendAccountTransfersIntegration,
-    // @ts-expect-error start is bigint but we will load it from env
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   {
     ...sendTokenTransfersIntegration,
-    // @ts-expect-error start is bigint but we will load it from env
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendRevenuesSafeReceives,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   // @todo split this into two integrations, one for Receive and one for UserOperationEvent
   // {
   //   ...sendAccountTransactionsIntegration,
-  //   // @ts-expect-error start is bigint but we will load it from env
   //   sources: [{ name: baseSrcBlockHeaders.name, start: '$BASE_BLOCK_START' }],
   // },
 ]

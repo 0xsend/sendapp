@@ -11,7 +11,7 @@ import {
   Stack,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconDeposit, IconEthereum, IconSend, IconUSDC } from 'app/components/icons'
+import { IconDeposit, IconEthereum, IconPlus, IconSend, IconUSDC } from 'app/components/icons'
 import {
   baseMainnet,
   usdcAddress as usdcAddresses,
@@ -20,9 +20,12 @@ import {
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import formatAmount from 'app/utils/formatAmount'
 import TokenDetails from './TokenDetails'
+import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
+import { useAccount } from 'wagmi'
 
 export function HomeScreen() {
-  const { totalBalance } = useSendAccountBalances()
+  const { totalBalance, isPending: isTotalBalancePending } = useSendAccountBalances()
+  const { address } = useAccount()
 
   const toast = useToastController()
   const USDollar = new Intl.NumberFormat('en-US', {
@@ -70,23 +73,50 @@ export function HomeScreen() {
                         </Paragraph>
                       </XStack>
                       <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
-                        {totalBalance === undefined ? (
-                          <Spinner size={'large'} />
-                        ) : (
-                          <Paragraph
-                            color={'$color12'}
-                            fontFamily={'$mono'}
-                            fontSize={'$15'}
-                            lineHeight={'$14'}
-                            fontWeight={'500'}
-                            zIndex={1}
-                          >
-                            {formatAmount(totalBalance, 4, 0)}
-                          </Paragraph>
-                        )}
-                        <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
-                          {'USD'}
-                        </Paragraph>
+                        {(() => {
+                          switch (true) {
+                            case address === undefined || address === null:
+                              return (
+                                <Paragraph
+                                  color={'$color12'}
+                                  fontFamily={'$mono'}
+                                  fontSize={'$15'}
+                                  lineHeight={'$14'}
+                                  fontWeight={'500'}
+                                  zIndex={1}
+                                >
+                                  N/A
+                                </Paragraph>
+                              )
+                            case isTotalBalancePending:
+                              return <Spinner size="large" />
+                            case totalBalance === undefined:
+                              return <></>
+                            default:
+                              return (
+                                <>
+                                  <Paragraph
+                                    color={'$color12'}
+                                    fontFamily={'$mono'}
+                                    fontSize={'$15'}
+                                    lineHeight={'$14'}
+                                    fontWeight={'500'}
+                                    zIndex={1}
+                                  >
+                                    {formatAmount(totalBalance, 4, 0)}
+                                  </Paragraph>
+                                  <Paragraph
+                                    color={'$color12'}
+                                    fontSize={'$6'}
+                                    fontWeight={'500'}
+                                    zIndex={1}
+                                  >
+                                    {'USD'}
+                                  </Paragraph>
+                                </>
+                              )
+                          }
+                        })()}
                       </XStack>
                     </Tooltip.Trigger>
                     <Tooltip.Content
@@ -107,7 +137,9 @@ export function HomeScreen() {
                     >
                       <Tooltip.Arrow />
                       <Paragraph fontSize={'$6'} fontWeight={'500'}>
-                        {totalBalance === undefined ? null : USDollar.format(Number(totalBalance))}
+                        {totalBalance === undefined
+                          ? 'Failed to fetch'
+                          : USDollar.format(Number(totalBalance))}
                       </Paragraph>
                     </Tooltip.Content>
                   </Tooltip>
@@ -117,45 +149,54 @@ export function HomeScreen() {
           </XStack>
         </XStack>
         <XStack w={'100%'} ai={'center'} pt={'$7'}>
-          <Button
-            px={'$3.5'}
-            h={'$6'}
-            width={'100%'}
-            theme="accent"
-            borderRadius={'$4'}
-            onPress={() => {
-              // @todo onramp / deposit
-              toast.show('Coming Soon: Deposit')
-            }}
-          >
-            <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-              <Paragraph
-                // fontFamily={'$mono'}
-                fontWeight={'500'}
-                textTransform={'uppercase'}
-                color={'$black'}
-              >
-                Deposit
-              </Paragraph>
-              <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                <IconDeposit size={'$2.5'} color={'$black'} />
+          <OpenConnectModalWrapper h={'$6'} width={'100%'}>
+            <Button
+              px={'$3.5'}
+              h={'$6'}
+              width={'100%'}
+              theme="accent"
+              borderRadius={'$4'}
+              onPress={() => {
+                // @todo onramp / deposit
+                if (address === undefined) return
+                toast.show('Coming Soon: Deposit')
+              }}
+            >
+              <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+                <Paragraph
+                  // fontFamily={'$mono'}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  color={'$black'}
+                >
+                  {address ? 'Deposit' : 'Connect Wallet'}
+                </Paragraph>
+                <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                  {address ? (
+                    <IconDeposit size={'$2.5'} color={'$black'} />
+                  ) : (
+                    <IconPlus size={'$2.5'} color={'$black'} />
+                  )}
+                </XStack>
               </XStack>
-            </XStack>
-          </Button>
+            </Button>
+          </OpenConnectModalWrapper>
         </XStack>
-        <YStack width={'100%'} pt={'$6'} pb={'$12'}>
-          {coins.map((coin, index) => (
-            <TokenDetails
-              coin={coin}
-              key={coin.label}
-              jc={'space-between'}
-              ai={'center'}
-              py={'$3.5'}
-              borderColor={separatorColor}
-              borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
-            />
-          ))}
-        </YStack>
+        {address && (
+          <YStack width={'100%'} pt={'$6'} pb={'$12'}>
+            {coins.map((coin, index) => (
+              <TokenDetails
+                coin={coin}
+                key={coin.label}
+                jc={'space-between'}
+                ai={'center'}
+                py={'$3.5'}
+                borderColor={separatorColor}
+                borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
+              />
+            ))}
+          </YStack>
+        )}
       </YStack>
     </Container>
   )

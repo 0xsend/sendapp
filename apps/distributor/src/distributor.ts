@@ -403,7 +403,6 @@ export class DistributorWorker {
       log.error({ error: error.message, code: error.code }, 'Error saving shares.')
       throw error
     }
-    return shares
   }
 
   private async worker() {
