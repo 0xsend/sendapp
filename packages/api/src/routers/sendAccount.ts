@@ -165,40 +165,34 @@ export const sendAccountRouter = createTRPCRouter({
           },
         ]
 
-        log('initCalls', initCalls)
-
-        const createOnchain = async () => {
-          const { request } = await sendAccountFactoryClient.simulateContract({
-            address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
-            abi: sendAccountFactoryAbi,
-            functionName: 'createAccount',
-            args: [
-              keySlot, // key slot
-              xyPubKey, // public key
-              initCalls, // init calls
-              USEROP_SALT, // salt
-            ],
-            value: 0n,
-          })
-
-          const hash = await sendAccountFactoryClient.writeContract(request)
-
-          log('hash', hash)
-
-          await waitForTransactionReceipt(config, {
-            chainId: baseMainnetClient.chain.id,
-            hash,
-          }).catch((e) => {
-            log('waitForTransactionReceipt', e)
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: e.message })
-          })
-        }
-
         await withRetry(
-          async () => {
-            log('withRetry', 'start')
-            await createOnchain()
-            log('waitForTransactionReceipt', 'done')
+          async function createAccount() {
+            const { request } = await sendAccountFactoryClient.simulateContract({
+              address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
+              abi: sendAccountFactoryAbi,
+              functionName: 'createAccount',
+              args: [
+                keySlot, // key slot
+                xyPubKey, // public key
+                initCalls, // init calls
+                USEROP_SALT, // salt
+              ],
+              value: 0n,
+            })
+
+            log('tx request', request)
+
+            const hash = await sendAccountFactoryClient.writeContract(request)
+
+            log('hash', hash)
+
+            await waitForTransactionReceipt(config, {
+              chainId: baseMainnetClient.chain.id,
+              hash,
+            }).catch((e) => {
+              log('waitForTransactionReceipt', e)
+              throw e
+            })
           },
           {
             retryCount: 20,
