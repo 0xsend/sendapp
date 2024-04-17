@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// @ts-expect-error set __DEV__ for code shared between react-native
 globalThis.__DEV__ = false
 
 // validate environment ensuring we aren't talking to prod or staging or something
@@ -31,7 +32,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   // workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
