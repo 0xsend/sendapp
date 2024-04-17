@@ -64,8 +64,8 @@ contract DeployTokenPaymasterScript is Script {
         // solhint-disable-next-line no-console
         console2.log("Deployed TokenPaymaster at address: ", address(paymaster));
 
-        IEntryPoint(entryPoint).depositTo{value: 1e18}(address(paymaster));
-        paymaster.addStake{value: 1e18}(1);
+        IEntryPoint(entryPoint).depositTo{value: 0.25 ether}(address(paymaster));
+        paymaster.addStake{value: 0.25 ether}(1);
         vm.stopBroadcast();
     }
 }
