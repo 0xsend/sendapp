@@ -43,7 +43,6 @@ const authTest = base.extend<{
   context: BrowserContext
   supabase: SupabaseClient<Database>
   authSession: { token: string; decoded: JwtPayload }
-  userId: string
   user: {
     user: User
     session: Session
