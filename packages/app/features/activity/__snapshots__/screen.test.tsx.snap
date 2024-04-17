@@ -4,11 +4,10 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
 <View
   style={
     {
-      "alignSelf": "center",
       "flex": 1,
-      "flexDirection": "row",
-      "paddingLeft": 32,
-      "paddingRight": 32,
+      "flexDirection": "column",
+      "gap": 32,
+      "paddingBottom": 18,
       "width": "100%",
     }
   }
@@ -16,11 +15,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
   <View
     style={
       {
-        "flex": 1,
-        "flexDirection": "column",
-        "gap": 18,
-        "paddingBottom": 18,
-        "paddingTop": 18,
+        "alignSelf": "center",
+        "flex": 0,
+        "flexDirection": "row",
+        "paddingLeft": 32,
+        "paddingRight": 32,
         "width": "100%",
       }
     }
@@ -502,67 +501,104 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
         </RNSVGGroup>
       </RNSVGSvgView>
     </View>
-    <View
-      animatedStyle={
-        {
-          "value": {
-            "opacity": {
-              "callStart": null,
-              "callback": [Function],
-              "current": 1,
-              "finished": true,
-              "lastTimestamp": 0,
-              "omega0": 14.433756729740644,
-              "omega1": 11.785113019775793,
-              "onFrame": [Function],
-              "onStart": [Function],
-              "reduceMotion": false,
-              "startTimestamp": 0,
-              "startValue": 1,
-              "timestamp": 0,
-              "toValue": 1,
-              "velocity": 0,
-              "zeta": 0.5773502691896257,
-            },
-            "transform": [
-              {
-                "translateY": {
-                  "callStart": null,
-                  "callback": [Function],
-                  "current": 0,
-                  "finished": true,
-                  "lastTimestamp": 0,
-                  "omega0": 14.433756729740644,
-                  "omega1": 11.785113019775793,
-                  "onFrame": [Function],
-                  "onStart": [Function],
-                  "reduceMotion": false,
-                  "startTimestamp": 0,
-                  "startValue": 0,
-                  "timestamp": 0,
-                  "toValue": 0,
-                  "velocity": 0,
-                  "zeta": 0.5773502691896257,
-                },
-              },
-            ],
+  </View>
+  <View
+    animatedStyle={
+      {
+        "value": {
+          "opacity": {
+            "callStart": null,
+            "callback": [Function],
+            "current": 1,
+            "finished": true,
+            "lastTimestamp": 0,
+            "omega0": 14.433756729740644,
+            "omega1": 11.785113019775793,
+            "onFrame": [Function],
+            "onStart": [Function],
+            "reduceMotion": false,
+            "startTimestamp": 0,
+            "startValue": 1,
+            "timestamp": 0,
+            "toValue": 1,
+            "velocity": 0,
+            "zeta": 0.5773502691896257,
           },
-        }
-      }
-      collapsable={false}
-      forwardedRef={[Function]}
-      style={
-        {
-          "flexDirection": "column",
-          "gap": 18,
-          "marginBottom": 18,
-          "marginTop": 39,
-          "opacity": 1,
           "transform": [
             {
-              "translateY": 0,
+              "translateY": {
+                "callStart": null,
+                "callback": [Function],
+                "current": 0,
+                "finished": true,
+                "lastTimestamp": 0,
+                "omega0": 14.433756729740644,
+                "omega1": 11.785113019775793,
+                "onFrame": [Function],
+                "onStart": [Function],
+                "reduceMotion": false,
+                "startTimestamp": 0,
+                "startValue": 0,
+                "timestamp": 0,
+                "toValue": 0,
+                "velocity": 0,
+                "zeta": 0.5773502691896257,
+              },
             },
           ],
+        },
+      }
+    }
+    collapsable={false}
+    forwardedRef={[Function]}
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 24,
+        "marginBottom": 18,
+        "marginTop": 4,
+        "opacity": 1,
+        "transform": [
+          {
+            "translateY": 0,
+          },
+        ],
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+          "borderLeftWidth": 0,
+          "borderRightColor": "hsla(191, 32%, 24%, 1)",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "hsla(191, 32%, 24%, 1)",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignSelf": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "width": "100%",
         }
       }
     >
@@ -571,7 +607,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           {
             "display": "flex",
             "flexDirection": "column",
-            "gap": 7,
+            "gap": 20,
+            "width": "100%",
           }
         }
       >
@@ -581,22 +618,20 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "color": "#86AE80",
+              "display": "inline",
               "fontFamily": "System",
-              "fontSize": 23,
-              "fontWeight": "700",
-              "lineHeight": 27,
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
               "marginBottom": 0,
               "marginLeft": 0,
               "marginRight": 0,
               "marginTop": 0,
-              "minWidth": 184,
-              "textAlign": "left",
-              "textTransform": "none",
             }
           }
           suppressHighlighting={true}
         >
-          Suggestions
+          SUGGESTIONS
         </Text>
         <RCTScrollView
           horizontal={true}
@@ -608,10 +643,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -619,21 +668,26 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -661,8 +715,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -701,7 +755,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -716,10 +770,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -727,21 +795,26 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -769,8 +842,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -809,7 +882,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -824,10 +897,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -835,21 +922,26 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -877,8 +969,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -917,7 +1009,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -932,10 +1024,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -943,21 +1049,26 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -985,8 +1096,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -1025,7 +1136,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -1040,10 +1151,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -1051,21 +1176,26 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -1093,8 +1223,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -1133,7 +1263,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -1148,10 +1278,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -1159,21 +1303,26 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -1201,8 +1350,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -1241,7 +1390,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -1255,12 +1404,50 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           </View>
         </RCTScrollView>
       </View>
+    </View>
+    <View
+      style={
+        {
+          "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+          "borderLeftWidth": 0,
+          "borderRightColor": "hsla(191, 32%, 24%, 1)",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "hsla(191, 32%, 24%, 1)",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignSelf": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "width": "100%",
+        }
+      }
+    >
       <View
         style={
           {
             "flexDirection": "column",
             "gap": 24,
             "marginBottom": 18,
+            "width": "100%",
           }
         }
       >
@@ -1268,6 +1455,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "display": "none",
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -1299,7 +1487,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           <View
             style={
               {
-                "display": "none",
                 "flexDirection": "row",
                 "gap": 18,
               }
@@ -1359,6 +1546,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "color": "hsl(0, 0%, 42.5%)",
+              "display": "none",
               "fontFamily": "System",
               "fontSize": 19.2,
               "fontWeight": "400",
@@ -1373,13 +1561,38 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
         >
           PENDING
         </Text>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "#86AE80",
+              "display": "inline",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ACTIVITIES
+        </Text>
         <View
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -1401,15 +1614,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -1437,8 +1650,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -1484,6 +1697,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -1495,7 +1709,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -1532,7 +1746,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -1546,9 +1760,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -1570,15 +1788,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -1606,8 +1824,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -1653,6 +1871,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -1664,7 +1883,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -1701,7 +1920,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -1715,9 +1934,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -1739,15 +1962,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -1775,8 +1998,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -1822,6 +2045,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -1833,7 +2057,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -1870,7 +2094,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -1884,9 +2108,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -1908,15 +2136,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -1944,8 +2172,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -1991,6 +2219,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -2002,7 +2231,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -2039,7 +2268,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -2053,9 +2282,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -2077,15 +2310,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -2113,8 +2346,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -2160,6 +2393,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -2171,7 +2405,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -2208,7 +2442,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -2224,6 +2458,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "color": "hsl(0, 0%, 42.5%)",
+              "display": "none",
               "fontFamily": "System",
               "fontSize": 19.2,
               "fontWeight": "400",
@@ -2242,9 +2477,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -2266,15 +2505,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -2302,8 +2541,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -2349,6 +2588,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -2360,7 +2600,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -2397,7 +2637,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -2411,9 +2651,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -2435,15 +2679,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -2471,8 +2715,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -2518,6 +2762,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -2529,7 +2774,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -2566,7 +2811,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -2580,9 +2825,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -2604,15 +2853,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -2640,8 +2889,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -2687,6 +2936,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -2698,7 +2948,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -2735,7 +2985,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -2749,9 +2999,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -2773,15 +3027,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -2809,8 +3063,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -2856,6 +3110,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -2867,7 +3122,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -2904,7 +3159,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -2918,9 +3173,13 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -2942,15 +3201,15 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -2978,8 +3237,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -3025,6 +3284,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -3036,7 +3296,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -3073,7 +3333,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -3093,11 +3353,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
 <View
   style={
     {
-      "alignSelf": "center",
       "flex": 1,
-      "flexDirection": "row",
-      "paddingLeft": 32,
-      "paddingRight": 32,
+      "flexDirection": "column",
+      "gap": 32,
+      "paddingBottom": 18,
       "width": "100%",
     }
   }
@@ -3105,11 +3364,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
   <View
     style={
       {
-        "flex": 1,
-        "flexDirection": "column",
-        "gap": 18,
-        "paddingBottom": 18,
-        "paddingTop": 18,
+        "alignSelf": "center",
+        "flex": 0,
+        "flexDirection": "row",
+        "paddingLeft": 32,
+        "paddingRight": 32,
         "width": "100%",
       }
     }
@@ -3594,285 +3853,323 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         </RNSVGGroup>
       </RNSVGSvgView>
     </View>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 18,
+        "marginBottom": 18,
+      }
+    }
+  >
     <View
       style={
         {
           "flexDirection": "column",
-          "marginBottom": 18,
         }
       }
     >
-      <View
-        style={
-          {
-            "flexDirection": "column",
-          }
-        }
-      >
-        <ActivityIndicator
-          color=""
-          size="large"
-        />
-      </View>
+      <ActivityIndicator
+        color=""
+        size="large"
+      />
     </View>
-    <View
-      animatedStyle={
-        {
-          "value": {
-            "opacity": 0,
-            "transform": [
-              {
-                "translateY": -10,
-              },
-            ],
-          },
-        }
-      }
-      collapsable={false}
-      forwardedRef={[Function]}
-      style={
-        {
-          "flexDirection": "column",
-          "gap": 18,
-          "marginBottom": 18,
+  </View>
+  <View
+    animatedStyle={
+      {
+        "value": {
           "opacity": 0,
           "transform": [
             {
               "translateY": -10,
             },
           ],
+        },
+      }
+    }
+    collapsable={false}
+    forwardedRef={[Function]}
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 18,
+        "marginBottom": 18,
+        "opacity": 0,
+        "transform": [
+          {
+            "translateY": -10,
+          },
+        ],
+      }
+    }
+    testID="searchResults"
+  >
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "hsla(191, 32%, 46%, 1)",
+          "fontFamily": "System",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "lineHeight": 24,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
         }
       }
-      testID="searchResults"
+      suppressHighlighting={true}
     >
-      <Text
-        accessibilityRole="header"
-        selectable={true}
+      Results
+    </Text>
+    <View
+      data-href="/profile/test"
+    >
+      <View
         style={
           {
-            "color": "hsla(191, 32%, 46%, 1)",
-            "fontFamily": "System",
-            "fontSize": 20,
-            "fontWeight": "700",
-            "lineHeight": 24,
-            "marginBottom": 0,
-            "marginLeft": 0,
-            "marginRight": 0,
-            "marginTop": 0,
-            "textTransform": "none",
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 18,
           }
         }
-        suppressHighlighting={true}
-      >
-        Results
-      </Text>
-      <View
-        data-href="/profile/test"
+        testID="tag-search-test"
       >
         <View
           style={
             {
               "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 18,
+              "borderBottomLeftRadius": 9,
+              "borderBottomRightRadius": 9,
+              "borderTopLeftRadius": 9,
+              "borderTopRightRadius": 9,
+              "flexDirection": "column",
+              "gap": 7,
+              "height": 44,
+              "justifyContent": "center",
+              "maxHeight": 44,
+              "maxWidth": 44,
+              "minHeight": 44,
+              "minWidth": 44,
+              "overflow": "hidden",
+              "position": "relative",
+              "width": 44,
             }
           }
-          testID="tag-search-test"
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
+                "bottom": 0,
                 "flexDirection": "column",
-                "gap": 7,
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "zIndex": 1,
+              }
+            }
+          >
+            <Image
+              fullscreen={true}
+              onError={[Function]}
+              onLoad={[Function]}
+              source={
+                {
+                  "uri": "https://avatars.githubusercontent.com/u/123",
+                }
+              }
+              style={
+                {
+                  "height": 44,
+                  "width": 44,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              {
+                "bottom": 0,
+                "flexDirection": "column",
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "zIndex": 0,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://avatars.githubusercontent.com/u/123",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
-                    "alignItems": "center",
+                    "bottom": 0,
                     "flexDirection": "column",
-                    "height": 44,
-                    "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
-                    "overflow": "hidden",
-                    "position": "relative",
-                    "width": 44,
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <View
-                  style={
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
                     {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
+                      "uri": "https://ui-avatars.com/api.jpg?name=test&size=256",
                     }
                   }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://ui-avatars.com/api.jpg?name=test&size=256",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 44,
-                        "width": 44,
-                      }
-                    }
-                  />
-                </View>
-                <View
                   style={
                     {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
+                      "height": 44,
+                      "width": 44,
                     }
                   }
-                >
-                  <Text
-                    selectable={true}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 59%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <Text
+                  selectable={true}
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
                     }
-                    suppressHighlighting={true}
-                  >
-                    ??
-                  </Text>
-                </View>
+                  }
+                  suppressHighlighting={true}
+                >
+                  ??
+                </Text>
               </View>
             </View>
           </View>
-          <View
+        </View>
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 2,
+            }
+          }
+        >
+          <Text
             style={
               {
-                "flexDirection": "column",
-                "gap": 2,
+                "color": "hsla(112, 22%, 59%, 1)",
+                "fontFamily": "System",
               }
             }
+            suppressHighlighting={true}
           >
-            <Text
-              style={
-                {
-                  "color": "hsla(112, 22%, 59%, 1)",
-                  "fontFamily": "System",
-                }
-              }
-              suppressHighlighting={true}
-            >
-              test
-            </Text>
-          </View>
+            test
+          </Text>
         </View>
       </View>
     </View>
-    <View
-      animatedStyle={
-        {
-          "value": {
-            "opacity": 0.4501109005150496,
-            "transform": [
-              {
-                "translateY": 5.498890994849514,
-              },
-            ],
-          },
-        }
-      }
-      collapsable={false}
-      forwardedRef={[Function]}
-      style={
-        {
-          "flexDirection": "column",
-          "gap": 18,
-          "marginBottom": 18,
-          "marginTop": 39,
-          "opacity": 1,
+  </View>
+  <View
+    animatedStyle={
+      {
+        "value": {
+          "opacity": 0.4501109005150496,
           "transform": [
             {
-              "translateY": 0,
+              "translateY": 5.498890994849514,
             },
           ],
+        },
+      }
+    }
+    collapsable={false}
+    forwardedRef={[Function]}
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 24,
+        "marginBottom": 18,
+        "marginTop": 4,
+        "opacity": 1,
+        "transform": [
+          {
+            "translateY": 0,
+          },
+        ],
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+          "borderLeftWidth": 0,
+          "borderRightColor": "hsla(191, 32%, 24%, 1)",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "hsla(191, 32%, 24%, 1)",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignSelf": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "width": "100%",
         }
       }
     >
@@ -3881,7 +4178,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           {
             "display": "flex",
             "flexDirection": "column",
-            "gap": 7,
+            "gap": 20,
+            "width": "100%",
           }
         }
       >
@@ -3891,22 +4189,20 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "color": "#86AE80",
+              "display": "inline",
               "fontFamily": "System",
-              "fontSize": 23,
-              "fontWeight": "700",
-              "lineHeight": 27,
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
               "marginBottom": 0,
               "marginLeft": 0,
               "marginRight": 0,
               "marginTop": 0,
-              "minWidth": 184,
-              "textAlign": "left",
-              "textTransform": "none",
             }
           }
           suppressHighlighting={true}
         >
-          Suggestions
+          SUGGESTIONS
         </Text>
         <RCTScrollView
           horizontal={true}
@@ -3918,10 +4214,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -3929,21 +4239,26 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -3971,8 +4286,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -4011,7 +4326,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -4026,10 +4341,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -4037,21 +4366,26 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -4079,8 +4413,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -4119,7 +4453,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -4134,10 +4468,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -4145,21 +4493,26 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -4187,8 +4540,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -4227,7 +4580,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -4242,10 +4595,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -4253,21 +4620,26 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -4295,8 +4667,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -4335,7 +4707,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -4350,10 +4722,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -4361,21 +4747,26 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -4403,8 +4794,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -4443,7 +4834,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -4458,10 +4849,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               style={
                 {
                   "alignItems": "center",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 42,
+                  "borderBottomRightRadius": 42,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 42,
+                  "borderTopRightRadius": 42,
+                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "gap": 7,
-                  "marginLeft": 18,
+                  "gap": 16,
+                  "marginLeft": 4,
                   "marginRight": 18,
+                  "paddingRight": 16,
                 }
               }
             >
@@ -4469,21 +4874,26 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "alignItems": "center",
-                    "borderBottomLeftRadius": 9,
-                    "borderBottomRightRadius": 9,
-                    "borderTopLeftRadius": 9,
-                    "borderTopRightRadius": 9,
+                    "borderBottomLeftRadius": 100000,
+                    "borderBottomRightRadius": 100000,
+                    "borderTopLeftRadius": 100000,
+                    "borderTopRightRadius": 100000,
                     "flexDirection": "column",
                     "gap": 7,
-                    "height": 44,
+                    "height": 48,
                     "justifyContent": "center",
-                    "maxHeight": 44,
-                    "maxWidth": 44,
-                    "minHeight": 44,
-                    "minWidth": 44,
+                    "marginLeft": -4,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
                     "overflow": "hidden",
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "paddingTop": 0,
                     "position": "relative",
-                    "width": 44,
+                    "width": 48,
                   }
                 }
               >
@@ -4511,8 +4921,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                     style={
                       {
-                        "height": 44,
-                        "width": 44,
+                        "height": 48,
+                        "width": 48,
                       }
                     }
                   />
@@ -4551,7 +4961,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "400",
                     "lineHeight": 19,
                   }
@@ -4565,12 +4975,50 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           </View>
         </RCTScrollView>
       </View>
+    </View>
+    <View
+      style={
+        {
+          "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+          "borderLeftWidth": 0,
+          "borderRightColor": "hsla(191, 32%, 24%, 1)",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "hsla(191, 32%, 24%, 1)",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "alignSelf": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "width": "100%",
+        }
+      }
+    >
       <View
         style={
           {
             "flexDirection": "column",
             "gap": 24,
             "marginBottom": 18,
+            "width": "100%",
           }
         }
       >
@@ -4578,6 +5026,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "display": "none",
               "flexDirection": "row",
               "justifyContent": "space-between",
             }
@@ -4609,7 +5058,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           <View
             style={
               {
-                "display": "none",
                 "flexDirection": "row",
                 "gap": 18,
               }
@@ -4669,6 +5117,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "color": "hsl(0, 0%, 42.5%)",
+              "display": "none",
               "fontFamily": "System",
               "fontSize": 19.2,
               "fontWeight": "400",
@@ -4683,13 +5132,38 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         >
           PENDING
         </Text>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "#86AE80",
+              "display": "inline",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ACTIVITIES
+        </Text>
         <View
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -4711,15 +5185,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -4747,8 +5221,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -4794,6 +5268,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -4805,7 +5280,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -4842,7 +5317,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -4856,9 +5331,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -4880,15 +5359,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -4916,8 +5395,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -4963,6 +5442,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -4974,7 +5454,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -5011,7 +5491,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -5025,9 +5505,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -5049,15 +5533,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -5085,8 +5569,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -5132,6 +5616,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -5143,7 +5628,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -5180,7 +5665,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -5194,9 +5679,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -5218,15 +5707,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -5254,8 +5743,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -5301,6 +5790,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -5312,7 +5802,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -5349,7 +5839,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -5363,9 +5853,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -5387,15 +5881,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -5423,8 +5917,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -5470,6 +5964,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -5481,7 +5976,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -5518,7 +6013,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -5534,6 +6029,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "color": "hsl(0, 0%, 42.5%)",
+              "display": "none",
               "fontFamily": "System",
               "fontSize": 19.2,
               "fontWeight": "400",
@@ -5552,9 +6048,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -5576,15 +6076,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -5612,8 +6112,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -5659,6 +6159,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -5670,7 +6171,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -5707,7 +6208,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -5721,9 +6222,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -5745,15 +6250,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -5781,8 +6286,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -5828,6 +6333,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -5839,7 +6345,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -5876,7 +6382,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -5890,9 +6396,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -5914,15 +6424,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -5950,8 +6460,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -5997,6 +6507,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -6008,7 +6519,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -6045,7 +6556,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -6059,9 +6570,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -6083,15 +6598,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -6119,8 +6634,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -6166,6 +6681,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -6177,7 +6693,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -6214,7 +6730,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
@@ -6228,9 +6744,13 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           style={
             {
               "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-between",
+              "paddingBottom": 24,
             }
           }
         >
@@ -6252,15 +6772,15 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   "borderTopRightRadius": 9,
                   "flexDirection": "column",
                   "gap": 7,
-                  "height": 44,
+                  "height": 48,
                   "justifyContent": "center",
-                  "maxHeight": 44,
-                  "maxWidth": 44,
-                  "minHeight": 44,
-                  "minWidth": 44,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
                   "overflow": "hidden",
                   "position": "relative",
-                  "width": 44,
+                  "width": 48,
                 }
               }
             >
@@ -6288,8 +6808,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   style={
                     {
-                      "height": 44,
-                      "width": 44,
+                      "height": 48,
+                      "width": 48,
                     }
                   }
                 />
@@ -6335,6 +6855,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
+                    "fontSize": 24,
                   }
                 }
                 suppressHighlighting={true}
@@ -6346,7 +6867,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   {
                     "color": "#86AE80",
                     "fontFamily": "System",
-                    "fontSize": 12,
+                    "fontSize": 16.8,
                   }
                 }
                 suppressHighlighting={true}
@@ -6383,7 +6904,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
-                  "minWidth": 184,
+                  "fontSize": 24,
                   "textAlign": "right",
                 }
               }
