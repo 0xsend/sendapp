@@ -26,7 +26,6 @@ export const useSendAccountBalances = () => {
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
-  //@todo this is improper use of a hook. Hooks should always be used at top level of component
   const { data: tokenBalances, isPending: isPendingTokenBalances } = useReadContracts({
     query: { enabled: !!sendAccount },
     contracts: [
@@ -42,6 +41,7 @@ export const useSendAccountBalances = () => {
       },
     ],
   })
+
   const { data: ethBalanceOnBase, isPending: isPendingEthBalanceOnBase } = useBalance({
     address: sendAccount?.address,
     query: { enabled: !!sendAccount },
@@ -57,7 +57,7 @@ export const useSendAccountBalances = () => {
       }
 
   if (!tokenPrices) {
-    return { balances, undefined }
+    return { balances, totalBalance: undefined }
   }
   const usdcBalanceInUsd =
     (Number(tokenBalances?.[0].result ?? 0n) / 10 ** 6) * tokenPrices['usd-coin'].usd
@@ -66,5 +66,5 @@ export const useSendAccountBalances = () => {
     (Number(ethBalanceOnBase?.value ?? 0n) / 10 ** 18) * tokenPrices.ethereum.usd
   const totalBalance = usdcBalanceInUsd + sendBalanceInUsd + ethBalanceInUsd
 
-  return { balances, totalBalance }
+  return { balances, totalBalance, isPending }
 }

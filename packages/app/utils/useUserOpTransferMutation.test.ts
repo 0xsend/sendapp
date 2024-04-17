@@ -1,35 +1,77 @@
+import { describe, test } from '@jest/globals'
+import { act, renderHook, waitFor } from '@testing-library/react-native'
+import { baseMainnetClient, baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
+import { signUserOp } from './userop'
+import { encodeFunctionData, erc20Abi } from 'viem'
 import {
-  type UseUserOpTransferMutationArgs,
   useUserOpTransferMutation,
+  useGenerateTransferUserOp,
+  useUserOpGasEstimate,
 } from './useUserOpTransferMutation'
 import { Wrapper } from './__mocks__/Wrapper'
-import { renderHook } from '@testing-library/react-hooks'
-import { describe, test } from '@jest/globals'
-import { act } from '@testing-library/react-native'
-import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
-import { signUserOp } from './userop'
-import { encodeFunctionData, erc20Abi, isAddress, slice } from 'viem'
-
-import { assert } from './assert'
 
 jest.mock('./userop', () => ({
   signUserOp: jest.fn(),
+  entrypoint: {
+    address: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  },
 }))
 jest.mock('wagmi')
 jest.mock('@my/wagmi', () => ({
   __esModule: true,
   ...jest.requireActual('@my/wagmi'),
+  tokenPaymasterAddress: {
+    1: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+    1337: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+    8453: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+    84532: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+    845337: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+  },
   baseMainnetClient: {
     chain: {
       id: 845337,
     },
     simulateContract: jest.fn().mockResolvedValue({}),
+    getGasPrice: jest.fn().mockReturnValue(Promise.resolve(BigInt(0))),
+    estimateFeesPerGas: jest.fn().mockResolvedValue(
+      Promise.resolve({
+        maxFeePerGas: BigInt(0),
+        maxPriorityFeePerGas: BigInt(0),
+      })
+    ),
   },
   baseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
     waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),
+    estimateUserOperationGas: jest.fn().mockReturnValue(
+      Promise.resolve({
+        verificationGasLimit: BigInt(0),
+        callGasLimit: BigInt(0),
+        preVerificationGas: BigInt(0),
+      })
+    ),
+  },
+  entryPointAddress: {
+    1: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+    1337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+    8453: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+    84532: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+    845337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
   },
 }))
+
+const defaultUserOp = {
+  callGasLimit: 100000n,
+  maxFeePerGas: 10000000n,
+  maxPriorityFeePerGas: 10000000n,
+  paymaster: '0xfbbC7F7da495c9957d491F40482710DC5DFd7d85',
+  paymasterData: '0x',
+  paymasterPostOpGasLimit: 50000n,
+  paymasterVerificationGasLimit: 150000n,
+  preVerificationGas: 70000n,
+  signature: '0x123',
+  verificationGasLimit: 550000n,
+} as const
 
 describe('useUserOpTransferMutation', () => {
   beforeEach(() => {
@@ -42,91 +84,16 @@ describe('useUserOpTransferMutation', () => {
     signUserOp.mockReset()
   })
 
-  test('should return error when nonce is greater than 1 when uninitialized account', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 1n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow(
-      'Init code must be 0x for existing account'
-    )
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should return error when nonce is 0 and initCode is not defined when uninitialized account', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
+  test('should send user op transfer', async () => {
+    const userOp = {
+      sender: `0x${'1'.repeat(40)}` as `0x${string}`,
       nonce: 0n,
-      initCode: '0x',
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow(
-      'Must provide init code for new account'
-    )
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should send user op transfer in native currency when no token', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
+      callData: '0x' as `0x${string}`,
+      ...defaultUserOp,
+    }
     baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
-      const callData = encodeFunctionData({
-        abi: sendAccountAbi,
-        functionName: 'executeBatch',
-        args: [
-          [
-            {
-              dest: args.to,
-              value: args.amount,
-              data: '0x',
-            },
-          ],
-        ],
-      })
       expect(_args).toStrictEqual({
-        userOperation: {
-          sender: args.sender,
-          nonce: args.nonce,
-          factory: slice(args.initCode, 0, 20),
-          factoryData: slice(args.initCode, 20),
-          callData,
-          callGasLimit: 300000n,
-          verificationGasLimit: 2000000n,
-          preVerificationGas: 3000000n,
-          maxFeePerGas: 1000000n,
-          maxPriorityFeePerGas: 1000000n,
-          paymaster: undefined,
-          paymasterData: undefined,
-          paymasterPostOpGasLimit: undefined,
-          paymasterVerificationGasLimit: undefined,
-          signature: '0x123',
-        },
+        userOperation: userOp,
       })
       return Promise.resolve('0x123')
     })
@@ -141,262 +108,263 @@ describe('useUserOpTransferMutation', () => {
 
     expect(result.current).toBeDefined()
     await act(async () => {
-      await result.current.mutateAsync(args)
+      await result.current.mutateAsync({ userOp, validUntil: 0 })
       jest.runAllTimers()
     })
     expect(signUserOp).toHaveBeenCalledTimes(1)
     expect(baseMainnetBundlerClient.sendUserOperation).toHaveBeenCalledTimes(1)
     expect(baseMainnetBundlerClient.waitForUserOperationReceipt).toHaveBeenCalledTimes(1)
   })
+})
 
-  test('should send user op transfer in ERC20 token when token is defined', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: `0x${'3'.repeat(40)}`,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
-      assert(!!args.token && isAddress(args.token), 'Invalid token address')
-      const callData = encodeFunctionData({
-        abi: sendAccountAbi,
-        functionName: 'executeBatch',
-        args: [
-          [
-            {
-              dest: args.token,
-              value: 0n,
-              data: encodeFunctionData({
-                abi: erc20Abi,
-                functionName: 'transfer',
-                args: [args.to, args.amount],
-              }),
-            },
-          ],
+describe('useGenerateTransferUserOp', () => {
+  test('should generate user op for native currency transfer', async () => {
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const amount = 1n
+    const nonce = 0n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(result.current).toBeDefined()
+    const userOp = result.current.data
+    expect(userOp).toBeDefined()
+    expect(userOp?.sender).toBe(sender)
+    expect(userOp?.nonce).toBe(nonce)
+    const callData = encodeFunctionData({
+      abi: sendAccountAbi,
+      functionName: 'executeBatch',
+      args: [
+        [
+          {
+            dest: to,
+            value: amount,
+            data: '0x',
+          },
         ],
-      })
-      expect(_args).toStrictEqual({
-        userOperation: {
-          sender: args.sender,
-          nonce: args.nonce,
-          factory: slice(args.initCode, 0, 20),
-          factoryData: slice(args.initCode, 20),
-          callData,
-          callGasLimit: 300000n,
-          verificationGasLimit: 2000000n,
-          preVerificationGas: 3000000n,
-          maxFeePerGas: 1000000n,
-          maxPriorityFeePerGas: 1000000n,
-          paymaster: undefined,
-          paymasterData: undefined,
-          paymasterPostOpGasLimit: undefined,
-          paymasterVerificationGasLimit: undefined,
-          signature: '0x123',
-        },
-      })
-      return Promise.resolve('0x123')
+      ],
     })
-    // @ts-expect-error mock
-    baseMainnetBundlerClient.waitForUserOperationReceipt.mockResolvedValue({ success: true })
-    // @ts-expect-error mock
-    signUserOp.mockResolvedValue('0x123')
-
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    await act(async () => {
-      await result.current.mutateAsync(args)
-      jest.runAllTimers()
-    })
-    expect(signUserOp).toHaveBeenCalledTimes(1)
-    expect(baseMainnetBundlerClient.sendUserOperation).toHaveBeenCalledTimes(1)
-    expect(baseMainnetBundlerClient.waitForUserOperationReceipt).toHaveBeenCalledTimes(1)
+    expect(userOp?.callData).toBe(callData)
   })
 
-  test('should return error when nonce is not a bigint', async () => {
-    // @ts-expect-error mock
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 1,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
+  test('should generate user op for ERC20 token transfer', async () => {
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const token = `0x${'3'.repeat(40)}` as `0x${string}`
+    const amount = 1n
+    const nonce = 0n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid nonce')
-    await act(async () => {
-      jest.runAllTimers()
+    const userOp = result.current.data
+    expect(userOp).toBeDefined()
+    expect(userOp?.sender).toBe(sender)
+    expect(userOp?.nonce).toBe(nonce)
+    const callData = encodeFunctionData({
+      abi: sendAccountAbi,
+      functionName: 'executeBatch',
+      args: [
+        [
+          {
+            dest: token,
+            value: 0n,
+            data: encodeFunctionData({
+              abi: erc20Abi,
+              functionName: 'transfer',
+              args: [to, amount],
+            }),
+          },
+        ],
+      ],
     })
-  })
-
-  test('should return error when nonce is less than 0', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: -1n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid nonce')
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should return error when amount is not a bigint', async () => {
-    // @ts-expect-error mock
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid amount')
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should return error when amount is less than 0', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: -1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid amount')
-    await act(async () => {
-      jest.runAllTimers()
-    })
+    expect(userOp?.callData).toBe(callData)
   })
 
   test('should return error when sender is not a valid address', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(39)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
+    const sender = `0x${'1'.repeat(39)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const amount = 1n
+    const nonce = 0n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+    await waitFor(() => expect(result.current.isError).toBe(true))
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid send account address')
-    await act(async () => {
-      jest.runAllTimers()
-    })
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid send account address')
   })
 
   test('should return error when to is not a valid address', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(39)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(39)}` as `0x${string}`
+    const amount = 1n
+    const nonce = 0n
 
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+    await waitFor(() => expect(result.current.isError).toBe(true))
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid to address')
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  })
-
-  test('should return error when initCode is not a valid hex', async () => {
-    // @ts-expect-error mock
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: '123',
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
-
-    expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid init code')
-    await act(async () => {
-      jest.runAllTimers()
-    })
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid to address')
   })
 
   test('should return error when token is not a valid address', async () => {
-    const args = {
-      sender: `0x${'1'.repeat(40)}`,
-      amount: 1n,
-      token: `0x${'3'.repeat(39)}`,
-      to: `0x${'2'.repeat(40)}`,
-      nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
-      wrapper: Wrapper,
-    })
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const token = `0x${'3'.repeat(39)}` as `0x${string}`
+    const amount = 1n
+    const nonce = 0n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
 
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid token address')
-    await act(async () => {
-      jest.runAllTimers()
-    })
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid token address')
   })
 
-  test('should return error when token is not defined and amount is 0', async () => {
-    const args = {
+  test('should return error when amount is not a bigint', async () => {
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const amount = 1 as unknown as bigint
+    const nonce = 0n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+
+    expect(result.current).toBeDefined()
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid amount')
+  })
+
+  test('should return error when amount is less than or equal to 0', async () => {
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const amount = 0n
+    const nonce = 0n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+
+    expect(result.current).toBeDefined()
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid amount')
+  })
+
+  test('should return error when nonce is not a bigint', async () => {
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const amount = 1n
+    const nonce = 0 as unknown as bigint
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+
+    expect(result.current).toBeDefined()
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid nonce')
+  })
+
+  test('should return error when nonce is less than 0', async () => {
+    const sender = `0x${'1'.repeat(40)}` as `0x${string}`
+    const to = `0x${'2'.repeat(40)}` as `0x${string}`
+    const amount = 1n
+    const nonce = -1n
+
+    const { result } = renderHook(
+      () => useGenerateTransferUserOp({ sender, to, token: undefined, amount, nonce }),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+
+    expect(result.current).toBeDefined()
+    expect(result.current.error).toBeDefined()
+    expect(result.current.error?.message).toBe('Invalid nonce')
+  })
+})
+
+describe('useUserOpGasEstimate', () => {
+  test('should estimate gas for user op', async () => {
+    const userOp = {
       sender: `0x${'1'.repeat(40)}`,
-      amount: 0n,
-      token: undefined,
-      to: `0x${'2'.repeat(40)}`,
       nonce: 0n,
-      initCode: `0x${'3'.repeat(60)}`,
-    } as UseUserOpTransferMutationArgs
-    const { result } = renderHook(() => useUserOpTransferMutation(), {
+      callData: '0x',
+      ...defaultUserOp,
+    } as const
+
+    baseMainnetClient.readContract = jest
+      .fn()
+      .mockResolvedValueOnce([1n, 1n, 1n, 1n, 1n]) // token paymaster config
+      .mockResolvedValueOnce(1n) // cached price
+      .mockResolvedValueOnce(1n) // wei to token
+      .mockResolvedValueOnce(1n) // wei to token
+
+    const { result } = renderHook(() => useUserOpGasEstimate({ userOp }), {
       wrapper: Wrapper,
     })
 
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
     expect(result.current).toBeDefined()
-    expect(result.current.mutateAsync(args)).rejects.toThrow('Invalid amount')
-    await act(async () => {
-      jest.runAllTimers()
-    })
+    const gasEstimate = await result.current.data
+    expect(gasEstimate).toBeDefined()
+    expect(gasEstimate?.userOp.maxFeePerGas).toBe(userOp.maxFeePerGas)
+    expect(gasEstimate?.userOp.maxPriorityFeePerGas).toBe(userOp.maxPriorityFeePerGas)
+    expect(gasEstimate?.networkGasEstimate.maxFeePerGas).toBeDefined()
+    expect(gasEstimate?.networkGasEstimate.maxPriorityFeePerGas).toBeDefined()
+    expect(gasEstimate?.preChargeNative).toBeDefined()
+    expect(gasEstimate?.cachedPriceWithMarkup).toBeDefined()
+    expect(gasEstimate?.requiredUsdcBalance).toBeDefined()
   })
 })

@@ -1,12 +1,14 @@
 import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
   sendAccountAbi,
-  sendAccountFactoryAbi,
   sendVerifierAbi,
   sendVerifierProxyAddress,
   entryPointAddress,
   iEntryPointAbi,
   iEntryPointSimulationsAbi,
+  sendTokenAbi,
+  tokenPaymasterAddress,
+  usdcAddress,
 } from '@my/wagmi'
 
 import {
@@ -15,7 +17,6 @@ import {
   bytesToHex,
   concat,
   createTestClient,
-  createWalletClient,
   encodeAbiParameters,
   encodeFunctionData,
   getAbiItem,
@@ -24,21 +25,13 @@ import {
   numberToBytes,
   isHex,
   publicActions,
+  maxUint256,
 } from 'viem'
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
 import { baseMainnetClient } from './viem'
 import { assert } from './assert'
-
-// TODO: remove this wallet client and test client
-const privateKey = generatePrivateKey()
-export const dummyAccount = privateKeyToAccount(privateKey)
-export const receiverAccount = privateKeyToAccount(generatePrivateKey())
-export const walletClient = createWalletClient({
-  chain: baseMainnetClient.chain,
-  transport: http(baseMainnetClient.transport.url),
-  account: dummyAccount,
-})
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { getAccountNonce } from 'permissionless'
 
 export const testClient = createTestClient({
   chain: baseMainnetClient.chain,
@@ -92,16 +85,35 @@ export const USEROP_VALID_UNTIL = 0
 export const USEROP_KEY_SLOT = 0
 export const USEROP_SALT = 0n
 
-export function encodeCreateAccountData(publicKey: [Hex, Hex]): Hex {
-  return encodeFunctionData({
-    abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],
-    args: [
-      USEROP_KEY_SLOT, // key slot
-      publicKey, // public key
-      [], // init calls
-      USEROP_SALT, // salt
-    ],
-  })
+export function getSendAccountCreateArgs(publicKey: [Hex, Hex]): readonly [
+  number,
+  readonly [`0x${string}`, `0x${string}`],
+  readonly {
+    dest: `0x${string}`
+    value: bigint
+    data: `0x${string}`
+  }[],
+  bigint,
+] {
+  const initCalls = [
+    // approve USDC to paymaster
+    {
+      dest: usdcAddress[baseMainnetClient.chain.id],
+      value: 0n,
+      data: encodeFunctionData({
+        abi: sendTokenAbi,
+        functionName: 'approve',
+        args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
+      }),
+    },
+  ]
+
+  return [
+    USEROP_KEY_SLOT, // key slot
+    publicKey, // public key
+    initCalls, // init calls
+    USEROP_SALT, // salt
+  ]
 }
 
 /**
@@ -196,4 +208,17 @@ export async function signUserOp({
     hexToBytes(encodedWebAuthnSig),
   ])
   return bytesToHex(signature)
+}
+
+export function useAccountNonce({ sender }): UseQueryResult<bigint, Error> {
+  return useQuery({
+    queryKey: ['accountNonce', sender],
+    queryFn: async () => {
+      const nonce = await getAccountNonce(baseMainnetClient, {
+        sender,
+        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
+      })
+      return nonce
+    },
+  })
 }

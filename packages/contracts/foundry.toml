@@ -17,12 +17,6 @@ via_ir = true
 
 [profile.mainnet]
 evm_version = "shanghai"
-# should be updated after releases
-fork_block_number = 19582866
-
-[profile.base]
-# should be updated after releases
-fork_block_number = 12817027
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 
@@ -32,6 +26,7 @@ base = "${FOUNDRY_BASE_RPC_URL}"
 base-sepolia = "${FOUNDRY_BASE_SEPOLIA_RPC_URL}"
 base-local = "http://127.0.0.1:8546"
 
-[etherscan]
+# [etherscan]
 # mainnet = { key = "${ETHERSCAN_API_KEY}" }
-# base = { key = "${ETHERSCAN_API_KEY}" }
+# base = { key = "${BASESCAN_API_KEY}" }
+# base-sepolia = { key = "${BASESCAN_API_KEY}" }

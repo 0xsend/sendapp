@@ -13,6 +13,10 @@ import {
   useMedia,
   useThemeName,
   Theme,
+  H3,
+  ButtonText,
+  FontLanguage,
+  Stack,
 } from '@my/ui'
 import {
   IconAccount,
@@ -107,7 +111,7 @@ export function AccountScreen() {
   return (
     <>
       <Container>
-        <YStack w={'100%'} ai={'center'} gap={'$6'}>
+        <YStack w={'100%'} ai={'center'} gap={'$6'} pb="$6">
           <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
             <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
               <Avatar $gtMd={{ size: 133.5 }} size={'$10'} borderRadius={'$3'}>
@@ -161,14 +165,11 @@ export function AccountScreen() {
           </XStack>
           <Separator w={'100%'} />
           <ProfileFacts facts={facts} />
-          <XStack gap={'$5'} display={'none'} $md={{ display: 'flex' }}>
-            <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-              Sendtags
-            </BorderedLink>
-            <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-              Rewards
-            </BorderedLink>
-          </XStack>
+          <Separator w={'100%'} />
+          <YStack w="100%" gap="$5" f={1}>
+            {tags?.length === 0 ? <NoTagsMessage /> : null}
+            <BottomButtonRow />
+          </YStack>
         </YStack>
       </Container>
     </>
@@ -235,5 +236,71 @@ const ProfileFacts = ({ facts }: { facts: { label: string; value?: React.ReactNo
         ))}
       </YStack>
     </>
+  )
+}
+
+const NoTagsMessage = () => {
+  return (
+    <>
+      <H3 fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
+        Register your Sendtag Today!
+      </H3>
+
+      <YStack w="100%" gap="$2.5" my="auto">
+        <Paragraph fontSize={'$6'} fontWeight={'700'} color={'$color12'} fontFamily={'$mono'}>
+          By registering a Sendtag, you can:
+        </Paragraph>
+        <YStack>
+          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+            1. Qualify for Send it Rewards based on your token balance
+          </Paragraph>
+          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+            2. Send and receive funds using your personalized, easy-to-remember Sendtag
+          </Paragraph>
+          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+            3. Claim your preferred Sendtag before someone else does
+          </Paragraph>
+        </YStack>
+        <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+          Join us in shaping the Future of Finance.
+        </Paragraph>
+      </YStack>
+    </>
+  )
+}
+
+const BottomButtonRow = () => {
+  const tags = useConfirmedTags()
+  const media = useMedia()
+
+  if (media.gtMd && (tags === undefined || tags.length === 0))
+    <Stack f={1} jc="center" $md={{ display: 'none' }}>
+      <Link
+        href={'/account/sendtag/checkout'}
+        theme="accent"
+        borderRadius={'$4'}
+        p={'$3.5'}
+        px="$6"
+        maw={301}
+        bg="$primary"
+      >
+        <XStack gap={'$1.5'} ai={'center'} jc="center">
+          <IconPlus col={'$black'} />
+          <Paragraph textTransform="uppercase" col={'$black'}>
+            SENDTAGS
+          </Paragraph>
+        </XStack>
+      </Link>
+    </Stack>
+
+  return (
+    <XStack gap={'$5'} f={1} $md={{ display: 'flex', jc: 'center' }}>
+      <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
+        Sendtags
+      </BorderedLink>
+      <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
+        Rewards
+      </BorderedLink>
+    </XStack>
   )
 }

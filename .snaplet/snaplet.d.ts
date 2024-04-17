@@ -292,28 +292,24 @@ interface Table_vault_secrets {
   created_at: string;
   updated_at: string;
 }
-interface Table_public_send_account_credentials {
-  account_id: string;
-  credential_id: string;
-  key_slot: number;
-  created_at: string | null;
-}
-interface Table_public_send_account_deployed {
-  id: number;
+interface Table_public_send_account_created {
   chain_id: number | null;
   log_addr: string | null;
   block_time: number | null;
-  tx_hash: string | null;
   user_op_hash: string | null;
-  sender: string | null;
-  factory: string | null;
-  paymaster: string | null;
+  tx_hash: string | null;
+  account: string | null;
   ig_name: string | null;
   src_name: string | null;
   block_num: number | null;
   tx_idx: number | null;
   log_idx: number | null;
-  abi_idx: number | null;
+}
+interface Table_public_send_account_credentials {
+  account_id: string;
+  credential_id: string;
+  key_slot: number;
+  created_at: string | null;
 }
 interface Table_public_send_account_transfers {
   id: number;
@@ -345,6 +341,20 @@ interface Table_public_send_liquidity_pools {
   id: number;
   address: string;
   chain_id: number;
+}
+interface Table_public_send_revenues_safe_receives {
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  sender: string | null;
+  v: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
 }
 interface Table_public_send_token_transfers {
   id: number;
@@ -539,11 +549,12 @@ interface Schema_public {
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
   referrals: Table_public_referrals;
+  send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
-  send_account_deployed: Table_public_send_account_deployed;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;
+  send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_token_transfers: Table_public_send_token_transfers;
   send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;

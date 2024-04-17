@@ -1,8 +1,12 @@
-import { jest, describe, test, beforeEach, expect } from '@jest/globals'
+import { describe, test, beforeEach, expect } from '@jest/globals'
 import { act, render, userEvent, screen, waitFor } from '@testing-library/react-native'
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { SendDialog } from './SendDialog'
-import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
+import {
+  useUserOpTransferMutation,
+  useGenerateTransferUserOp,
+  useUserOpGasEstimate,
+} from 'app/utils/useUserOpTransferMutation'
 import { useBalance } from 'wagmi'
 import { Animated, View } from 'react-native'
 
@@ -19,6 +23,7 @@ const PROFILE = {
   address: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
   chain_id: 845337,
   is_public: true,
+  send_id: 1,
 } as const
 
 jest.mock('app/utils/useUserOpTransferMutation')
@@ -30,8 +35,11 @@ jest.mock('app/utils/useSendAccountInitCode', () => ({
     error: null,
   }),
 }))
-jest.mock('wagmi')
-
+jest.mock('permissionless', () => ({
+  _esModule: true,
+  ...jest.requireActual('permissionless'),
+  getAccountNonce: jest.fn().mockReturnValue(Promise.resolve(BigInt(0))),
+}))
 describe('SendDialog', () => {
   beforeEach(() => {
     jest.useFakeTimers()
@@ -64,6 +72,16 @@ describe('SendDialog', () => {
     // @ts-expect-error mock
     useUserOpTransferMutation.mockReturnValue({
       mutateAsync: mockMutateAsync,
+    })
+
+    // @ts-expect-error mock
+    useGenerateTransferUserOp.mockReturnValue({
+      data: {},
+    })
+
+    // @ts-expect-error mock
+    useUserOpGasEstimate.mockReturnValue({
+      data: {},
     })
 
     render(
@@ -115,12 +133,7 @@ describe('SendDialog', () => {
 
     expect(mockMutateAsync).toHaveBeenCalled()
     expect(mockMutateAsync).toHaveBeenCalledWith({
-      sender: '0xb0b0000000000000000000000000000000000000',
-      token: '',
-      amount: 3500000000000000000n,
-      to: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
-      initCode: `0x${'3'.repeat(60)}`,
-      nonce: 0n,
+      userOp: {},
     })
   })
 })

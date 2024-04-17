@@ -63,16 +63,16 @@ contract TokenPaymaster6Test is Test {
         token = new TestERC20(6);
         nativeAssetOracle = new TestOracle2(initialNativeAssetPrice, 8, "ETH/USD", operator);
         tokenOracle = new TestOracle2(initialTokenPrice, 8, "TOK/USD", operator);
+        address _rewardsPool = makeAddr("rewardsPool");
 
         TokenPaymasterConfig memory tpc = TokenPaymasterConfig({
             priceMaxAge: 86400,
             refundPostopCost: 40000,
             minEntryPointBalance: minEntryPointBalance,
             priceMarkup: PRICE_DENOM * 15 / 10, // 50%,
-            baseFee: BASE_FEE_DEFAULT
+            baseFee: BASE_FEE_DEFAULT,
+            rewardsPool: _rewardsPool
         });
-
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: 0, rewardsPool: address(0)});
 
         OracleHelperConfig memory ohc = OracleHelperConfig({
             cacheTimeToLive: 0,
@@ -87,8 +87,7 @@ contract TokenPaymaster6Test is Test {
 
         UniswapHelperConfig memory uhc = UniswapHelperConfig({minSwapAmount: 1, slippage: 5, uniswapPoolFee: 3});
 
-        paymaster =
-            new TokenPaymaster(token, entryPoint, weth, ISwapRouter(address(uniswap)), tpc, rc, ohc, uhc, operator);
+        paymaster = new TokenPaymaster(token, entryPoint, weth, ISwapRouter(address(uniswap)), tpc, ohc, uhc, operator);
 
         vm.label(address(entryPoint), "entryPoint");
         vm.label(address(epSim), "epSim");
@@ -117,7 +116,7 @@ contract TokenPaymaster6Test is Test {
             uint128 _minEntryPointBalance,
             uint48 refundPostopCost,
             uint48 priceMaxAge,
-            uint256 baseFee
+            uint256 baseFee,
         ) = paymaster.tokenPaymasterConfig();
         assertEq(priceMaxAge, 86400);
         assertEq(refundPostopCost, 40000);
@@ -152,7 +151,8 @@ contract TokenPaymaster6Test is Test {
         uint128 _minEntryPointBalance,
         uint48 _refundPostopCost,
         uint48 _priceMaxAge,
-        uint40 _baseFee
+        uint40 _baseFee,
+        address _rewardsPool
     ) external {
         _priceMarkup = bound(_priceMarkup, PRICE_DENOM, 2 * PRICE_DENOM);
         vm.assume(_priceMarkup <= 2 * PRICE_DENOM); // TPM: price markup too high
@@ -162,7 +162,8 @@ contract TokenPaymaster6Test is Test {
             refundPostopCost: _refundPostopCost,
             minEntryPointBalance: _minEntryPointBalance,
             priceMarkup: _priceMarkup,
-            baseFee: _baseFee
+            baseFee: _baseFee,
+            rewardsPool: _rewardsPool
         });
         vm.startPrank(operator);
         paymaster.setTokenPaymasterConfig(tcp);
@@ -171,7 +172,8 @@ contract TokenPaymaster6Test is Test {
             uint128 __minEntryPointBalance,
             uint48 refundPostopCost,
             uint48 priceMaxAge,
-            uint256 baseFee
+            uint256 baseFee,
+            address rewardsPool
         ) = paymaster.tokenPaymasterConfig();
         vm.stopPrank();
         assertEq(priceMaxAge, tcp.priceMaxAge);
@@ -179,6 +181,7 @@ contract TokenPaymaster6Test is Test {
         assertEq(__minEntryPointBalance, tcp.minEntryPointBalance);
         assertEq(priceMarkup, tcp.priceMarkup);
         assertEq(baseFee, tcp.baseFee);
+        assertEq(rewardsPool, tcp.rewardsPool);
     }
 
     function testFuzz_UpdateTokenPaymasterConfigFailMarkupTooLow(uint256 _priceMarkup, uint40 _baseFee) external {
@@ -188,7 +191,8 @@ contract TokenPaymaster6Test is Test {
             refundPostopCost: 40000,
             minEntryPointBalance: minEntryPointBalance,
             priceMarkup: _priceMarkup,
-            baseFee: _baseFee
+            baseFee: _baseFee,
+            rewardsPool: address(0)
         });
         vm.startPrank(operator);
         vm.expectRevert("TPM: price markup too low");
@@ -203,7 +207,8 @@ contract TokenPaymaster6Test is Test {
             refundPostopCost: 40000,
             minEntryPointBalance: minEntryPointBalance,
             priceMarkup: _priceMarkup,
-            baseFee: _baseFee
+            baseFee: _baseFee,
+            rewardsPool: address(0)
         });
         vm.startPrank(operator);
         vm.expectRevert("TPM: price markup too high");
@@ -257,7 +262,8 @@ contract TokenPaymaster6Test is Test {
             refundPostopCost: 40000,
             minEntryPointBalance: minEntryPointBalance,
             priceMarkup: PRICE_DENOM * 15 / 10,
-            baseFee: BASE_FEE_DEFAULT
+            baseFee: BASE_FEE_DEFAULT,
+            rewardsPool: address(0)
         });
         vm.startPrank(user);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
@@ -290,64 +296,18 @@ contract TokenPaymaster6Test is Test {
         vm.stopPrank();
     }
 
-    function testUpdateRewardsConfig() external {
-        address _rewardsPool = makeAddr("rewardsPool");
-        RewardsConfig memory rc = RewardsConfig({
-            rewardsShare: 50, // 000.05%
-            rewardsPool: _rewardsPool
-        });
-        vm.startPrank(operator);
-        paymaster.setRewardsConfig(rc);
-        (uint256 rewardsShare, address rewardsPool) = paymaster.rewardsConfig();
-        vm.stopPrank();
-        assertEq(rewardsShare, rc.rewardsShare);
-        assertEq(_rewardsPool, rewardsPool);
-    }
-
-    function testFuzzUpdateRewardsConfig(uint16 _rewardsShare, address _rewardsPool) external {
-        vm.assume(_rewardsShare <= 10000);
-        vm.assume(_rewardsPool != address(0));
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: _rewardsShare, rewardsPool: _rewardsPool});
-        vm.startPrank(operator);
-        paymaster.setRewardsConfig(rc);
-        (uint256 rewardsShare, address rewardsPool) = paymaster.rewardsConfig();
-        vm.stopPrank();
-        assertEq(rewardsShare, rc.rewardsShare);
-        assertEq(_rewardsPool, rewardsPool);
-    }
-
-    function testOnlyOwnerCanUpdateRewardsConfig() external {
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: 50, rewardsPool: makeAddr("rewardsPool")});
-        vm.startPrank(user);
-        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
-        paymaster.setRewardsConfig(rc);
-        vm.stopPrank();
-    }
-
-    function testUpdateRewardsConfigInvalidPool() external {
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: 50, rewardsPool: address(0)});
-        vm.startPrank(operator);
-        vm.expectRevert("TPM: invalid rewards pool");
-        paymaster.setRewardsConfig(rc);
-        vm.stopPrank();
-    }
-
-    function testRewardShareTooHigh() external {
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: 10001, rewardsPool: makeAddr("rewardsPool")});
-        vm.startPrank(operator);
-        vm.expectRevert("TPM: invalid rewards share percentage");
-        paymaster.setRewardsConfig(rc);
-        vm.stopPrank();
-    }
-
     function testRewardShareTransfersCorrectAmount() external {
         address _rewardsPool = makeAddr("rewardsPool");
-        RewardsConfig memory rc = RewardsConfig({
-            rewardsShare: 3300, // 33% of base fee
+        TokenPaymasterConfig memory tpc = TokenPaymasterConfig({
+            priceMaxAge: 86400,
+            refundPostopCost: 40000,
+            minEntryPointBalance: minEntryPointBalance,
+            priceMarkup: PRICE_DENOM * 15 / 10, // 50%,
+            baseFee: BASE_FEE_DEFAULT,
             rewardsPool: _rewardsPool
         });
         vm.startPrank(operator);
-        paymaster.setRewardsConfig(rc);
+        paymaster.setTokenPaymasterConfig(tpc);
         vm.stopPrank();
 
         token.sudoMint(address(account), 2e18);
@@ -365,25 +325,23 @@ contract TokenPaymaster6Test is Test {
         Vm.Log[] memory entries = vm.getRecordedLogs();
         assertEq(entries.length, 6, "entries.length != 6");
         // assert reward pool received correct amount of base fee
-        assertEq(token.balanceOf(_rewardsPool), 16500); // 33% of 50000
+        assertEq(token.balanceOf(_rewardsPool), BASE_FEE_DEFAULT);
     }
 
-    function testFuzzRewardShareTransfersCorrectAmount(uint40 _baseFee, uint16 _rewardsShare, uint256 _bal) external {
-        vm.assume(_rewardsShare <= 10000);
+    function testFuzzTransfersCorrectAmountRewardPool(uint40 _baseFee, uint256 _bal) external {
         _bal = bound(_bal, 1e18, token.totalSupply());
         vm.assume(_bal > _baseFee);
         address _rewardsPool = makeAddr("rewardsPool");
-        RewardsConfig memory rc = RewardsConfig({rewardsShare: _rewardsShare, rewardsPool: _rewardsPool});
         TokenPaymasterConfig memory tpc = TokenPaymasterConfig({
             priceMaxAge: 86400,
             refundPostopCost: 40000,
             minEntryPointBalance: minEntryPointBalance,
             priceMarkup: PRICE_DENOM * 15 / 10,
-            baseFee: _baseFee
+            baseFee: _baseFee,
+            rewardsPool: _rewardsPool
         });
         vm.startPrank(operator);
         paymaster.setTokenPaymasterConfig(tpc);
-        paymaster.setRewardsConfig(rc);
         vm.stopPrank();
 
         // ensure account has enough tokens and allowance for user op and base fee
@@ -400,7 +358,7 @@ contract TokenPaymaster6Test is Test {
         vm.recordLogs();
         submitUserOp(op);
         // assert reward pool received correct amount of base fee
-        assertEq(token.balanceOf(_rewardsPool), _baseFee * PRICE_DENOM * _rewardsShare / 10000 / PRICE_DENOM);
+        assertEq(token.balanceOf(_rewardsPool), _baseFee);
     }
 
     // Only owner should withdraw eth from paymaster to destination
@@ -491,7 +449,7 @@ contract TokenPaymaster6Test is Test {
 
     // paymaster should reject if postOpGaSLimit is too low
     function testPaymasterShouldRejectIfPostOpGasLimitIsTooLow() external {
-        (,, uint48 refundPostopCost,,) = paymaster.tokenPaymasterConfig();
+        (,, uint48 refundPostopCost,,,) = paymaster.tokenPaymasterConfig();
         PackedUserOperation memory op =
             fillUserOp(account, userKey, address(counter), 0, abi.encodeWithSelector(TestCounter.count.selector));
         // verification gas limit | paymasterPostOpGasLimit | paymasterData
@@ -512,7 +470,7 @@ contract TokenPaymaster6Test is Test {
         op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(300000), uint128(300000));
         op.signature = signUserOp(op, userKey);
         uint256 prefund = getRequiredPrefund(op);
-        (uint256 priceMarkup,, uint48 refundPostopCost,, uint256 baseFee) = paymaster.tokenPaymasterConfig();
+        (uint256 priceMarkup,, uint48 refundPostopCost,, uint256 baseFee,) = paymaster.tokenPaymasterConfig();
         uint256 maxFeePerGas = UserOperationLib.unpackLow128(op.gasFees); // maxFeePerGas
         uint256 nativeAmount = prefund + (refundPostopCost * maxFeePerGas);
         uint256 priceWithMarkup = (paymaster.cachedPrice() * PRICE_DENOM) / priceMarkup;
@@ -543,18 +501,18 @@ contract TokenPaymaster6Test is Test {
         submitUserOp(op);
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        assertEq(entries.length, 5, "entries.length != 5");
+        assertEq(entries.length, 6, "entries.length != 5");
         assertEq(entries[0].topics[0], keccak256("Transfer(address,address,uint256)"), "precharge transfer");
         assertEq(entries[2].topics[0], keccak256("Transfer(address,address,uint256)"), "postOp transfer");
-        assertEq(entries[3].topics.length, 2, "entries[3].topics.length != 2");
+        assertEq(entries[4].topics.length, 2, "entries[4].topics.length != 2");
         assertEq(
-            entries[3].topics[0],
+            entries[4].topics[0],
             keccak256("UserOperationSponsored(address,uint256,uint256,uint256,uint256)"),
             "UserOperationSponsored"
         );
-        assertEq(entries[3].topics[1], bytes32(uint256(uint160(address(account)))));
+        assertEq(entries[4].topics[1], bytes32(uint256(uint160(address(account)))));
         assertEq(
-            entries[4].topics[0],
+            entries[5].topics[0],
             keccak256("UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"),
             "UserOperationEvent"
         );
@@ -562,18 +520,18 @@ contract TokenPaymaster6Test is Test {
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256));
         uint256 refundTokens = abi.decode(entries[2].data, (uint256));
         (uint256 actualTokenCharge, uint256 actualGasCostPaymaster, uint256 actualTokenPriceWithMarkup, uint256 baseFee)
-        = abi.decode(entries[3].data, (uint256, uint256, uint256, uint256));
+        = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
         uint256 actualTokenChargeEvents = preChargeTokens - refundTokens;
         (, bool success, uint256 actualGasCostEntryPoint,) =
-            abi.decode(entries[4].data, (uint256, bool, uint256, uint256));
+            abi.decode(entries[5].data, (uint256, bool, uint256, uint256));
         assertEq(success, true);
         assertEq(token.balanceOf(address(account)), 1e18 - actualTokenCharge - baseFee);
 
         uint256 addedPostOpCost = maxFeePerGas * 40000;
         uint256 expectedTokenPriceWithMarkup =
             PRICE_DENOM * uint256(initialTokenPrice) / uint256(initialNativeAssetPrice) * 10 / 15;
-        uint256 expectedTokenCharge =
-            (actualGasCostPaymaster + addedPostOpCost) * PRICE_DENOM / expectedTokenPriceWithMarkup + baseFee;
+        uint256 expectedTokenCharge = (actualGasCostPaymaster + addedPostOpCost) * PRICE_DENOM
+            / expectedTokenPriceWithMarkup / 10 ** (18 - token.decimals()) + baseFee;
         uint256 postOpGasCost = actualGasCostEntryPoint - actualGasCostPaymaster;
 
         assertEq(actualTokenChargeEvents, actualTokenCharge + baseFee, "actualTokenChargeEvents != actualTokenCharge");
@@ -610,17 +568,17 @@ contract TokenPaymaster6Test is Test {
         entryPoint.handleOps{gas: 3e7}(ops, beneficiary);
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        assertEq(entries.length, 6, "entries.length != 5");
+        assertEq(entries.length, 7, "entries.length != 5");
         assertEq(entries[0].topics[0], keccak256("Transfer(address,address,uint256)"), "precharge transfer");
         assertEq(entries[2].topics[0], keccak256("TokenPriceUpdated(uint256,uint256,uint256)"), "token price updated");
         assertEq(entries[3].topics[0], keccak256("Transfer(address,address,uint256)"), "postOp transfer");
         assertEq(
-            entries[4].topics[0],
+            entries[5].topics[0],
             keccak256("UserOperationSponsored(address,uint256,uint256,uint256,uint256)"),
             "UserOperationSponsored"
         );
         assertEq(
-            entries[5].topics[0],
+            entries[6].topics[0],
             keccak256("UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"),
             "UserOperationEvent"
         );
@@ -630,7 +588,7 @@ contract TokenPaymaster6Test is Test {
         uint256 oldExpectedPriceWithMarkup = oldExpectedPrice * 10 / 15;
         uint256 newExpectedPriceWithMarkup = oldExpectedPriceWithMarkup / 2;
 
-        (,, uint256 actualTokenPriceWithMarkup,) = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
+        (,, uint256 actualTokenPriceWithMarkup,) = abi.decode(entries[5].data, (uint256, uint256, uint256, uint256));
         (uint256 currentPrice, uint256 previousPrice, uint256 cachedPriceTimestamp) =
             abi.decode(entries[2].data, (uint256, uint256, uint256));
 
@@ -663,18 +621,18 @@ contract TokenPaymaster6Test is Test {
         entryPoint.handleOps{gas: 3e7}(ops, beneficiary);
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        assertEq(entries.length, 5);
+        assertEq(entries.length, 6);
 
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256)) - BASE_FEE_DEFAULT;
         uint256 requiredPrefund = getRequiredPrefund(op) + 40000 * maxFeePerGas; // 40000 is the refundPostopCost
         uint256 preChargeTokenPrice = requiredPrefund * PRICE_DENOM / preChargeTokens;
-        uint256 roundingError = 63461538;
+        uint256 roundingError = 63461843566555608440425194351895; // 0.000000634618436% error
 
         // console2.log("price", price);
         // console2.log("overridePrice", overridePrice);
         // console2.log("preChargeTokenPrice", preChargeTokenPrice);
 
-        assertApproxEqAbs(preChargeTokenPrice, overridePrice, roundingError);
+        assertApproxEqAbs(preChargeTokenPrice, overridePrice * 10 ** (18 - token.decimals()), roundingError);
     }
 
     // should use cached token price if the one supplied by the client is worse
@@ -702,7 +660,7 @@ contract TokenPaymaster6Test is Test {
         entryPoint.handleOps{gas: 3e7}(ops, beneficiary);
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        assertEq(entries.length, 5);
+        assertEq(entries.length, 6);
 
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256)) - BASE_FEE_DEFAULT;
         uint256 requiredPrefund = getRequiredPrefund(op) + 40000 * maxFeePerGas; // 40000 is the refundPostopCost
@@ -712,7 +670,12 @@ contract TokenPaymaster6Test is Test {
         // console2.log("overridePrice", overridePrice);
         // console2.log("preChargeTokenPrice", preChargeTokenPrice);
 
-        assertEq(preChargeTokenPrice, price * 10 / 15);
+        assertApproxEqAbs(
+            preChargeTokenPrice,
+            price * 10 / 15 * 10 ** (18 - token.decimals()),
+            333333333333, // 0.33% error
+            "preChargeTokenPrice"
+        );
     }
 
     // should charge the overdraft tokens if the pre-charge ended up lower than the final transaction cost
@@ -743,17 +706,18 @@ contract TokenPaymaster6Test is Test {
         entryPoint.handleOps{gas: 1e7}(ops, beneficiary);
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        assertEq(entries.length, 6, "log entries length");
+        assertEq(entries.length, 7, "log entries length");
         assertEq(entries[0].topics[0], keccak256("Transfer(address,address,uint256)"), "precharge: transfer"); // precharge
         assertEq(entries[2].topics[0], keccak256("TokenPriceUpdated(uint256,uint256,uint256)"), "token price updated"); // token price updated
         assertEq(entries[3].topics[0], keccak256("Transfer(address,address,uint256)"), "overdraft: transfer"); // overdraft
+        assertEq(entries[4].topics[0], keccak256("Transfer(address,address,uint256)"), "base fee: transfer"); // base fee
         assertEq(
-            entries[4].topics[0],
+            entries[5].topics[0],
             keccak256("UserOperationSponsored(address,uint256,uint256,uint256,uint256)"),
             "sponsored: transfer"
         ); // sponsored
         assertEq(
-            entries[5].topics[0],
+            entries[6].topics[0],
             keccak256("UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"), // event
             "UserOperationEvent"
         );
@@ -763,11 +727,11 @@ contract TokenPaymaster6Test is Test {
         assertEq(entries[0].topics[1], entries[3].topics[1], "from account: transfer");
         assertEq(entries[0].topics[2], entries[3].topics[2], "to paymaster: transfer");
 
-        (, bool success,,) = abi.decode(entries[5].data, (uint256, bool, uint256, uint256));
+        (, bool success,,) = abi.decode(entries[6].data, (uint256, bool, uint256, uint256));
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256));
         uint256 overdraftTokens = abi.decode(entries[3].data, (uint256));
         (uint256 actualTokenCharge,,, uint256 baseFee) =
-            abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
+            abi.decode(entries[5].data, (uint256, uint256, uint256, uint256));
 
         assertEq(success, true, "success");
         assertEq(
@@ -788,7 +752,7 @@ contract TokenPaymaster6Test is Test {
         token.sudoApprove(address(account), address(paymaster), type(uint256).max);
 
         vm.startPrank(operator);
-        // Ether price increased 100 times!
+        // Ether price increased 1000 times!
         tokenOracle.setPrice(int256(initialTokenPrice));
         nativeAssetOracle.setPrice(int256(initialNativeAssetPrice * 100));
         vm.stopPrank();
@@ -796,7 +760,11 @@ contract TokenPaymaster6Test is Test {
 
         // Withdraw most of the tokens the account has inside the inner transaction
         PackedUserOperation memory op = fillUserOp(
-            account, userKey, address(token), 0, abi.encodeWithSelector(ERC20.transfer.selector, alice, 0.009 ether)
+            account,
+            userKey,
+            address(token),
+            0,
+            abi.encodeWithSelector(ERC20.transfer.selector, alice, 0.0099999999999 ether)
         );
         // accountGasLimits = verificationGasLimit | callGasLimit
         op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(150000)), bytes16(uint128(62348))));
@@ -824,9 +792,8 @@ contract TokenPaymaster6Test is Test {
         );
 
         (, bytes memory revertReason) = abi.decode(entries[4].data, (uint256, bytes));
-        bytes memory expectedRevertReason = abi.encodeWithSelector(
-            IERC20Errors.ERC20InsufficientBalance.selector, address(account), 3449889999950000, 113483640000000000
-        );
+        bytes memory expectedRevertReason =
+            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, address(account), 43450, 128951);
         assertEq(
             revertReason,
             abi.encodeWithSelector(IEntryPoint.PostOpReverted.selector, expectedRevertReason),
@@ -867,17 +834,18 @@ contract TokenPaymaster6Test is Test {
 
         Vm.Log[] memory entries = vm.getRecordedLogs();
 
-        assertEq(entries.length, 11, "log entries length");
+        assertEq(entries.length, 12, "log entries length");
 
         assertEq(
-            entries[4].topics[0],
+            entries[5].topics[0],
             keccak256("StubUniswapExchangeEvent(uint256,uint256,address,address)"),
             "UniswapExchangeEvent"
         );
-        (uint256 amountIn, uint256 amountOut,,) = abi.decode(entries[4].data, (uint256, uint256, address, address));
+        (uint256 amountIn, uint256 amountOut,,) = abi.decode(entries[5].data, (uint256, uint256, address, address));
         uint256 deFactoExchangeRate = amountOut / amountIn;
-        uint256 expectedPrice = uint256(initialTokenPrice) / uint256(initialNativeAssetPrice);
-        assertEq(deFactoExchangeRate, expectedPrice, "deFactoExchangeRate");
+        uint256 expectedPrice =
+            uint256(initialTokenPrice) * 10 ** (18 - token.decimals()) / uint256(initialNativeAssetPrice);
+        assertApproxEqAbs(deFactoExchangeRate, expectedPrice, 1184944238, "deFactoExchangeRate");
     }
 
     // @note this test case does not make much sense because it's impossible to approve the tokens before the account exists.
@@ -905,6 +873,97 @@ contract TokenPaymaster6Test is Test {
         submitUserOp(op);
     }
 
+    function testShouldSponserUserOperationExample() external {
+        // use real-life example ETH/USD + USDC/USD
+        vm.startPrank(operator);
+        // [USDC/USD](https://basescan.org/address/0x7e860098f58bbfc8648a4311b374b1d669a2bc6b#readContract#F10)
+        // roundId   uint80 :  18446744073709551865
+        // answer   int256 :  100000642
+        // startedAt   uint256 :  1711975037
+        // updatedAt   uint256 :  1711975037
+        // answeredInRound   uint80 :  18446744073709551865
+        tokenOracle.setPrice(100000642);
+        // [ETH/USD](https://basescan.org/address/0x71041dddad3595f9ced3d8cfbe3d1f4b0a16b2b7#readContract#F10)
+        // roundId   uint80 :  18446744073709587622
+        // answer   int256 :  343902000000
+        // startedAt   uint256 :  1711991445
+        // updatedAt   uint256 :  1711991445
+        // answeredInRound   uint80 :  18446744073709587622
+        nativeAssetOracle.setPrice(343902000000);
+        paymaster.updateCachedPrice(true);
+        vm.stopPrank();
+
+        token.sudoMint(address(account), 10e18);
+        token.sudoApprove(address(account), address(paymaster), 10e18);
+        PackedUserOperation memory op =
+            fillUserOp(account, userKey, address(counter), 0, abi.encodeWithSelector(TestCounter.count.selector));
+        // accountGasLimits = verificationGasLimit | callGasLimit
+        op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(170000)), bytes16(uint128(100000))));
+        op.preVerificationGas = 50000; // should also cover calldata cost.
+        // gasFees = maxFeePerGas | maxPriorityFeePerGas
+        op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(10000000)), bytes16(uint128(10000000))));
+        op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(500000), uint128(500000));
+        op.signature = signUserOp(op, userKey);
+
+        uint256 maxFeePerGas = UserOperationLib.unpackLow128(op.gasFees);
+        vm.fee(maxFeePerGas);
+        vm.txGasPrice(maxFeePerGas);
+        vm.recordLogs();
+        submitUserOp(op);
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+
+        assertEq(entries.length, 6, "entries.length != 5");
+        assertEq(entries[0].topics[0], keccak256("Transfer(address,address,uint256)"), "precharge transfer");
+        assertEq(entries[2].topics[0], keccak256("Transfer(address,address,uint256)"), "postOp transfer");
+        assertEq(entries[4].topics.length, 2, "entries[4].topics.length != 2");
+        assertEq(
+            entries[4].topics[0],
+            keccak256("UserOperationSponsored(address,uint256,uint256,uint256,uint256)"),
+            "UserOperationSponsored"
+        );
+        assertEq(entries[4].topics[1], bytes32(uint256(uint160(address(account)))));
+        assertEq(
+            entries[5].topics[0],
+            keccak256("UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"),
+            "UserOperationEvent"
+        );
+
+        uint256 preChargeTokens = abi.decode(entries[0].data, (uint256));
+        uint256 refundTokens = abi.decode(entries[2].data, (uint256));
+        (uint256 actualTokenCharge, uint256 actualGasCostPaymaster, uint256 actualTokenPriceWithMarkup, uint256 baseFee)
+        = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
+        uint256 actualTokenChargeEvents = preChargeTokens - refundTokens;
+        (, bool success, uint256 actualGasCostEntryPoint,) =
+            abi.decode(entries[5].data, (uint256, bool, uint256, uint256));
+        assertEq(success, true, "success");
+        assertEq(token.balanceOf(address(account)), 10e18 - actualTokenCharge - baseFee, "token balance");
+
+        uint256 addedPostOpCost = maxFeePerGas * 40000;
+        uint256 expectedTokenPriceWithMarkup = PRICE_DENOM * uint256(100000642) / uint256(343902000000) * 10 / 15;
+        uint256 expectedTokenCharge = (actualGasCostPaymaster + addedPostOpCost) * PRICE_DENOM
+            / expectedTokenPriceWithMarkup / 10 ** (18 - token.decimals()) + baseFee;
+        uint256 postOpGasCost = actualGasCostEntryPoint - actualGasCostPaymaster;
+
+        assertApproxEqAbs(
+            actualTokenChargeEvents,
+            actualTokenCharge + baseFee,
+            10 ** token.decimals(),
+            "actualTokenChargeEvents != actualTokenCharge"
+        );
+        assertApproxEqAbs(
+            actualTokenChargeEvents,
+            expectedTokenCharge,
+            10 ** token.decimals(),
+            "actualTokenChargeEvents != expectedTokenCharge"
+        );
+        assertEq(
+            actualTokenPriceWithMarkup,
+            expectedTokenPriceWithMarkup,
+            "actualTokenPriceWithMarkup != expectedTokenPriceWithMarkup"
+        );
+        assertApproxEqAbs(postOpGasCost / tx.gasprice, 93758, 20000);
+    }
+
     function getRequiredPrefund(PackedUserOperation memory op) internal pure returns (uint256 requiredPrefund) {
         uint256 verificationGasLimit = uint256(uint128(bytes16(op.accountGasLimits)));
         uint256 callGasLimit = uint256(uint128(uint256(op.accountGasLimits)));
@@ -929,8 +988,8 @@ contract TokenPaymaster6Test is Test {
         // accountGasLimits = verificationGasLimit | callGasLimit
         op.accountGasLimits = bytes32(abi.encodePacked(bytes16(uint128(150000)), bytes16(uint128(21000))));
         op.preVerificationGas = 21000; // should also cover calldata cost.
-        // gasFees = maxFeePerGas | maxGas
-        op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(0)), bytes16(uint128(1e9))));
+        // gasFees = maxFeePerGas | maxPriorityFeePerGas
+        op.gasFees = bytes32(abi.encodePacked(bytes16(uint128(1e9)), bytes16(uint128(block.basefee + 1e9))));
         op.signature = signUserOp(op, _key);
         return op;
     }

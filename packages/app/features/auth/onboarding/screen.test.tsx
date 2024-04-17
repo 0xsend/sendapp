@@ -25,26 +25,6 @@ jest.mock('expo-router', () => ({
   }),
 }))
 
-// TODO: handle the root provider in a better way
-jest.mock('@vonovak/react-native-theme-control', () => ({
-  useThemePreference: jest.fn().mockReturnValue('light'),
-  setThemePreference: jest.fn(),
-}))
-
-// TODO: handle the root provider in a better way
-jest.mock('@react-native-community/netinfo', () => ({
-  useNetInfo: jest.fn().mockReturnValue({
-    type: 'wifi',
-    isConnected: true,
-  }),
-  addEventListener: jest.fn(),
-}))
-
-jest.mock('@daimo/expo-passkeys', () => ({
-  createPasskey: jest.fn(),
-  signWithPasskey: jest.fn(),
-}))
-
 jest.mock('app/utils/supabase/client.native', () => ({
   supabase: {
     from: jest.fn().mockReturnValue({
@@ -59,15 +39,6 @@ jest.mock('app/utils/supabase/client.native', () => ({
       getSession: jest.fn().mockReturnValue(Promise.resolve({ data: { session: { user: {} } } })),
     },
   },
-}))
-
-// TODO: handle the root provider in a better way
-jest.mock('app/utils/useUser', () => ({
-  useUser: jest.fn().mockReturnValue({
-    user: {
-      id: '123',
-    },
-  }),
 }))
 
 jest.mock('app/utils/useWebauthnCredentials', () => ({
@@ -92,6 +63,18 @@ jest.mock('app/utils/userop', () => ({
   ...jest.requireActual('app/utils/userop'),
   receiverAccount: {
     address: '0x123',
+  },
+}))
+
+jest.mock('app/utils/api', () => ({
+  api: {
+    sendAccount: {
+      create: {
+        useMutation: jest.fn().mockReturnValue({
+          mutateAsync: jest.fn().mockReturnValue(Promise.resolve()),
+        }),
+      },
+    },
   },
 }))
 

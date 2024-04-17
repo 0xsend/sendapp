@@ -43,7 +43,6 @@ const authTest = base.extend<{
   context: BrowserContext
   supabase: SupabaseClient<Database>
   authSession: { token: string; decoded: JwtPayload }
-  userId: string
   user: {
     user: User
     session: Session
@@ -53,7 +52,7 @@ const authTest = base.extend<{
   context: async ({ context, user: { user, session } }, use) => {
     const { parallelIndex } = test.info()
 
-    log = debug(`test:auth:${parallelIndex}`)
+    log = debug(`test:auth:${user.id}:${parallelIndex}`)
 
     if (!config?.use?.baseURL) {
       throw new Error('config.use.baseURL not defined')

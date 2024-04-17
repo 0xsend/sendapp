@@ -19,6 +19,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         "alignItems": "center",
         "flexDirection": "column",
         "gap": 32,
+        "paddingBottom": 32,
         "width": "100%",
       }
     }
@@ -737,12 +738,50 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
     <View
       style={
         {
-          "display": "flex",
-          "flexDirection": "row",
-          "gap": 24,
+          "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+          "borderLeftWidth": 0,
+          "borderRightColor": "hsla(191, 32%, 24%, 1)",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "hsla(191, 32%, 24%, 1)",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+          "width": "100%",
         }
       }
     />
+    <View
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 24,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "display": "flex",
+            "flex": 1,
+            "flexDirection": "row",
+            "gap": 24,
+            "justifyContent": "center",
+          }
+        }
+      />
+    </View>
   </View>
 </View>
 `;

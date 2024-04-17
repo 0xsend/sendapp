@@ -23,7 +23,8 @@ exports[`shovel config 1`] = `
         {
           "column": "log_addr",
           "filter_arg": [
-            "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
+            "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
+            "0xe4C5EF95e8cDA5DB09393a08E30645F883e187B8",
           ],
           "filter_op": "contains",
           "name": "log_addr",
@@ -34,39 +35,16 @@ exports[`shovel config 1`] = `
         "anonymous": false,
         "inputs": [
           {
-            "column": "user_op_hash",
+            "column": "account",
             "indexed": true,
-            "name": "userOpHash",
-            "type": "bytes32",
-          },
-          {
-            "column": "sender",
-            "indexed": true,
-            "name": "sender",
-            "type": "address",
-          },
-          {
-            "column": "factory",
-            "filter_arg": [
-              "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
-              "0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C",
-            ],
-            "filter_op": "contains",
-            "indexed": false,
-            "name": "factory",
-            "type": "address",
-          },
-          {
-            "column": "paymaster",
-            "indexed": false,
-            "name": "paymaster",
+            "name": "account",
             "type": "address",
           },
         ],
-        "name": "AccountDeployed",
+        "name": "AccountCreated",
         "type": "event",
       },
-      "name": "send_account_deployed",
+      "name": "send_account_created",
       "sources": [
         {
           "name": "base_logs",
@@ -96,19 +74,11 @@ exports[`shovel config 1`] = `
             "type": "bytea",
           },
           {
-            "name": "sender",
-            "type": "bytea",
-          },
-          {
-            "name": "factory",
-            "type": "bytea",
-          },
-          {
-            "name": "paymaster",
+            "name": "account",
             "type": "bytea",
           },
         ],
-        "name": "send_account_deployed",
+        "name": "send_account_created",
       },
     },
     {
@@ -147,8 +117,8 @@ exports[`shovel config 1`] = `
             "column": "f",
             "filter_op": "contains",
             "filter_ref": {
-              "column": "sender",
-              "integration": "send_account_deployed",
+              "column": "account",
+              "integration": "send_account_created",
             },
             "indexed": true,
             "name": "from",
@@ -158,8 +128,8 @@ exports[`shovel config 1`] = `
             "column": "t",
             "filter_op": "contains",
             "filter_ref": {
-              "column": "sender",
-              "integration": "send_account_deployed",
+              "column": "account",
+              "integration": "send_account_created",
             },
             "indexed": true,
             "name": "to",
@@ -305,6 +275,87 @@ exports[`shovel config 1`] = `
           },
         ],
         "name": "send_token_transfers",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7",
+            "0x71fa02bb11e4b119bEDbeeD2f119F62048245301",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "v",
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "SafeReceived",
+        "type": "event",
+      },
+      "name": "send_revenues_safe_receives",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "v",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_revenues_safe_receives",
       },
     },
   ],
