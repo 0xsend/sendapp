@@ -13,19 +13,23 @@ contract DeployTestOracle2Script is Script {
         vm.startBroadcast();
         bytes32 salt = bytes32(uint256(1234));
 
-        new TestOracle2{salt: salt}(
+        TestOracle2 usdcUsd = new TestOracle2{salt: salt}(
             100000000, // price 1 USD = 1 USDC
             8, // decimals
             "USDC/USD", // name
             msg.sender // owner
         );
 
-        new TestOracle2{salt: salt}(
+        TestOracle2 ethUsd = new TestOracle2{salt: salt}(
             332282362360, // price 1 ETH = 3322.82362360 USDC
             8, // decimals
             "ETH/USD", // name
             msg.sender // owner
         );
+        // solhint-disable-next-line no-console
+        console2.log("usdcUsd address:", address(usdcUsd));
+        // solhint-disable-next-line no-console
+        console2.log("ethUsd address:", address(ethUsd));
         vm.stopBroadcast();
     }
 }

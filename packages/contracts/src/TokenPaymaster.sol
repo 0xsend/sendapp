@@ -24,11 +24,6 @@ struct TokenPaymasterConfig {
     uint48 priceMaxAge;
     /// @notice The base fee in tokens that is charged for every transaction up to a max of type(uint40).max = 1099511627775 ~= 1009.5 gwei
     uint40 baseFee;
-}
-
-struct RewardsConfig {
-    /// @notice The percentage of the base fee that is distributed to the rewards pool (10000 = 100%). Ranges from 0 to 10000
-    uint16 rewardsShare;
     /// @notice The address of the rewards pool
     address rewardsPool;
 }
@@ -49,8 +44,6 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
 
     event ConfigUpdated(TokenPaymasterConfig tokenPaymasterConfig);
 
-    event RewardsConfigUpdated(RewardsConfig rewardsConfig);
-
     event OracleConfigUpdated(OracleHelperConfig oracleHelperConfig);
 
     event UniswapConfigUpdated(UniswapHelperConfig uniswapHelperConfig);
@@ -69,7 +62,6 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
     uint256 private constant DENOM = 1e26;
 
     TokenPaymasterConfig public tokenPaymasterConfig;
-    RewardsConfig public rewardsConfig;
 
     /// @notice Initializes the TokenPaymaster contract with the given parameters.
     /// @param _token The ERC20 token used for transaction fee payments.
@@ -77,7 +69,6 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
     /// @param _wrappedNative The ERC-20 token that wraps the native asset for current chain.
     /// @param _uniswap The Uniswap V3 SwapRouter contract.
     /// @param _tokenPaymasterConfig The configuration for the Token Paymaster.
-    /// @param _rewardsConfig The configuration for the Rewards.
     /// @param _oracleHelperConfig The configuration for the Oracle Helper.
     /// @param _uniswapHelperConfig The configuration for the Uniswap Helper.
     /// @param _owner The address that will be set as the owner of the contract.
@@ -87,7 +78,6 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
         IERC20 _wrappedNative,
         ISwapRouter _uniswap,
         TokenPaymasterConfig memory _tokenPaymasterConfig,
-        RewardsConfig memory _rewardsConfig,
         OracleHelperConfig memory _oracleHelperConfig,
         UniswapHelperConfig memory _uniswapHelperConfig,
         address _owner
@@ -97,7 +87,6 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
         UniswapHelper(_token, _wrappedNative, _uniswap, _uniswapHelperConfig)
     {
         setTokenPaymasterConfig(_tokenPaymasterConfig);
-        setRewardsConfig(_rewardsConfig);
         transferOwnership(_owner);
         updateCachedPrice(true);
     }
@@ -109,17 +98,6 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
         require(_tokenPaymasterConfig.priceMarkup >= DENOM, "TPM: price markup too low");
         tokenPaymasterConfig = _tokenPaymasterConfig;
         emit ConfigUpdated(_tokenPaymasterConfig);
-    }
-
-    /// @notice Updates the configuration for the Rewards.
-    /// @param _rewardsConfig The new configuration struct.
-    function setRewardsConfig(RewardsConfig memory _rewardsConfig) public onlyOwner {
-        require(_rewardsConfig.rewardsShare <= 10000, "TPM: invalid rewards share percentage");
-        require(
-            _rewardsConfig.rewardsShare == 0 || _rewardsConfig.rewardsPool != address(0), "TPM: invalid rewards pool"
-        );
-        rewardsConfig = _rewardsConfig;
-        emit RewardsConfigUpdated(_rewardsConfig);
     }
 
     function setUniswapConfiguration(UniswapHelperConfig memory _uniswapHelperConfig) external onlyOwner {
@@ -209,10 +187,8 @@ contract TokenPaymaster is BasePaymaster, UniswapHelper, OracleHelper {
                 SafeERC20.safeTransferFrom(token, userOpSender, address(this), actualTokenNeeded - preCharge);
             }
 
-            uint16 rewardsShare = rewardsConfig.rewardsShare;
-            uint256 rewardsAmount = baseFee * DENOM * rewardsShare / 10000 / DENOM;
-            if (rewardsAmount > 0) {
-                SafeERC20.safeTransfer(token, rewardsConfig.rewardsPool, rewardsAmount);
+            if (baseFee > 0) {
+                SafeERC20.safeTransfer(token, tokenPaymasterConfig.rewardsPool, baseFee);
             }
 
             emit UserOperationSponsored(userOpSender, actualTokenNeeded, actualGasCost, cachedPriceWithMarkup, baseFee);

@@ -29,6 +29,9 @@ contract AccountFactoryTest is Test {
 
         // deploy account
         SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        address counterfactual = factory.getAddress(0, key1, calls, 42);
+        vm.expectEmit(true, true, true, true);
+        emit SendAccountFactory.AccountCreated(counterfactual);
         SendAccount acc = factory.createAccount{value: 0}(0, key1, calls, 42);
         // solhint-disable-next-line
         console.log("new account address:", address(acc));
@@ -42,7 +45,6 @@ contract AccountFactoryTest is Test {
         assertEq(entryPoint.getDepositInfo(address(acc)).deposit, 9);
 
         // get the counterfactual address, should be same
-        address counterfactual = factory.getAddress(0, key1, calls, 42);
         assertEq(address(acc), counterfactual);
     }
 }

@@ -21,7 +21,7 @@
   ],
   "integrations": [
     {
-      "name": "send_account_deployed",
+      "name": "send_account_created",
       "enabled": true,
       "block": [
         {
@@ -41,7 +41,8 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0x0000000071727De22E5E9d8BAf0edAc6f37da032"
+            "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
+            "0xe4C5EF95e8cDA5DB09393a08E30645F883e187B8"
           ]
         }
       ],
@@ -50,39 +51,16 @@
         "anonymous": false,
         "inputs": [
           {
-            "name": "userOpHash",
-            "type": "bytes32",
-            "indexed": true,
-            "column": "user_op_hash"
-          },
-          {
-            "name": "sender",
+            "name": "account",
             "type": "address",
             "indexed": true,
-            "column": "sender"
-          },
-          {
-            "name": "factory",
-            "type": "address",
-            "indexed": false,
-            "column": "factory",
-            "filter_op": "contains",
-            "filter_arg": [
-              "0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745",
-              "0xc59A4fa337f2673d58CdA6338f2DdD2cad23961C"
-            ]
-          },
-          {
-            "name": "paymaster",
-            "type": "address",
-            "indexed": false,
-            "column": "paymaster"
+            "column": "account"
           }
         ],
-        "name": "AccountDeployed"
+        "name": "AccountCreated"
       },
       "table": {
-        "name": "send_account_deployed",
+        "name": "send_account_created",
         "columns": [
           {
             "name": "chain_id",
@@ -105,15 +83,7 @@
             "type": "bytea"
           },
           {
-            "name": "sender",
-            "type": "bytea"
-          },
-          {
-            "name": "factory",
-            "type": "bytea"
-          },
-          {
-            "name": "paymaster",
+            "name": "account",
             "type": "bytea"
           }
         ]
@@ -200,8 +170,8 @@
             "column": "f",
             "filter_op": "contains",
             "filter_ref": {
-              "integration": "send_account_deployed",
-              "column": "sender"
+              "integration": "send_account_created",
+              "column": "account"
             }
           },
           {
@@ -211,8 +181,8 @@
             "column": "t",
             "filter_op": "contains",
             "filter_ref": {
-              "integration": "send_account_deployed",
-              "column": "sender"
+              "integration": "send_account_created",
+              "column": "account"
             }
           },
           {

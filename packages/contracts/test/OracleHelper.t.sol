@@ -39,10 +39,9 @@ contract OracleHelperTest is Test {
         refundPostopCost: 40000,
         minEntryPointBalance: 0,
         priceMarkup: PRICE_DENOM * 19 / 10, // 190%
-        baseFee: 0
+        baseFee: 0,
+        rewardsPool: address(0)
     });
-
-    RewardsConfig rc = RewardsConfig({rewardsShare: 0, rewardsPool: address(0)});
 
     UniswapHelperConfig uhc = UniswapHelperConfig({minSwapAmount: 1, slippage: 5, uniswapPoolFee: 3});
 
@@ -129,7 +128,6 @@ contract OracleHelperTest is Test {
             TestWrappedNativeToken(payable(0)),
             ISwapRouter(operator), // cannot approve to zero address
             tpc,
-            rc,
             ohc,
             uhc,
             operator
@@ -163,7 +161,6 @@ contract OracleHelperTest is Test {
             TestWrappedNativeToken(payable(0)),
             ISwapRouter(operator), // cannot approve to zero address
             tpc,
-            rc,
             ohc,
             uhc,
             operator
@@ -182,7 +179,8 @@ contract OracleHelperTest is Test {
 
         uint256 tokenOracleDecimalPower = 10 ** tokenOracle.decimals();
         uint256 expectedPrice = uint256(linkEth.answer) * PRICE_DENOM / tokenOracleDecimalPower;
-        uint256 expectedTokensPerEth = 1 ether * tokenOracleDecimalPower / uint256(linkEth.answer);
+        uint256 expectedTokensPerEth =
+            1 ether * tokenOracleDecimalPower / uint256(linkEth.answer) / 10 ** (18 - token.decimals());
 
         vm.startPrank(operator);
         OracleHelperConfig memory ohc = OracleHelperConfig({
@@ -234,7 +232,7 @@ contract OracleHelperTest is Test {
         paymaster.updateCachedPrice(true);
         vm.stopPrank();
 
-        priceShouldMatch(expectedPrice, expectedTokensPerEth);
+        priceShouldMatch(expectedPrice, expectedTokensPerEth / 10 ** (18 - token.decimals()));
     }
 
     // with two-hops price USD-per-TOKEN and USD-per-ETH using LINK/USD and ETH/USD
@@ -250,7 +248,7 @@ contract OracleHelperTest is Test {
         uint256 nativeOracleDecimalPower = 10 ** nativeAssetOracle.decimals();
         uint256 expectedPrice = PRICE_DENOM * (uint256(linkUsd.answer) * nativeOracleDecimalPower)
             / (uint256(ethUsd.answer) * tokenOracleDecimalPower);
-        uint256 expectedTokensPerEth = 1 ether * PRICE_DENOM / expectedPrice;
+        uint256 expectedTokensPerEth = 1 ether * PRICE_DENOM / expectedPrice / 10 ** (18 - token.decimals());
 
         vm.startPrank(operator);
         OracleHelperConfig memory ohc = OracleHelperConfig({
@@ -283,7 +281,7 @@ contract OracleHelperTest is Test {
         uint256 nativeOracleDecimalPower = 10 ** nativeAssetOracle.decimals();
         uint256 expectedPrice = PRICE_DENOM * (uint256(usdcUsd.answer) * nativeOracleDecimalPower)
             / (uint256(ethUsd.answer) * tokenOracleDecimalPower);
-        uint256 expectedTokensPerEth = 1 ether * PRICE_DENOM / expectedPrice;
+        uint256 expectedTokensPerEth = 1 ether * PRICE_DENOM / expectedPrice / 10 ** (18 - token.decimals());
 
         vm.startPrank(operator);
         OracleHelperConfig memory ohc = OracleHelperConfig({
@@ -332,24 +330,27 @@ contract OracleHelperTest is Test {
         uint256 usdcAmount = paymaster.weiToToken(ethAmount, price);
 
         // 1 ETH should equal $3324.70 USDC
-        uint256 expectedUsdcAmount = 332_470_000_000 * 10 ** (18 - ethUsd.decimals);
+        uint256 expectedUsdcAmount = 3324700000;
         assertApproxEqAbs(usdcAmount, expectedUsdcAmount, 10 ** token.decimals(), "1 ETH should equal $3324.70 USDC");
 
-        usdcAmount = 1000 * 10 ** usdcUsd.decimals; // 1000 USDC
+        usdcAmount = 1000 * 10 ** token.decimals(); // 1000 USDC
         ethAmount = paymaster.tokenToWei(usdcAmount, price);
 
-        // 1000 USDC should equal 0.3007790177 ETH
-        uint256 expectedEthAmount = 300_779_0177;
-        assertApproxEqAbs(ethAmount, expectedEthAmount, 1e18, "1000 USDC should equal 0.3007790177 ETH");
+        // 1000 USDC should equal 0.300779000000000000 ETH
+        uint256 expectedEthAmount = 300779000000000000;
+        assertEq(ethAmount, expectedEthAmount, "1000 USDC should equal 0.300779000000000000 ETH");
 
         ethAmount = 0.5 ether; // 0.5 ETH
         usdcAmount = paymaster.weiToToken(ethAmount, price);
 
-        // 0.5 ETH should equal 1661.411811800000000000 USDC
-        expectedUsdcAmount = 166_235_000_000 * 10 ** (18 - ethUsd.decimals);
-        assertApproxEqAbs(
-            usdcAmount, expectedUsdcAmount, 10 ** token.decimals(), "0.5 ETH should equal 1661.411811800000000000 USDC"
-        );
+        // 0.5 ETH should equal 1,662.35 USDC
+        expectedUsdcAmount = 1662350000;
+        assertApproxEqAbs(usdcAmount, expectedUsdcAmount, 10 ** token.decimals(), "0.5 ETH should equal 1,662.35 USDC");
+
+        // 13200 gwei = 0.0000132 ETH = $0.043886 USDC
+        uint256 requiredPreFund = 13200 gwei;
+        uint256 realExample = paymaster.weiToToken(requiredPreFund, price);
+        assertApproxEqAbs(realExample, 43886, 10 ** token.decimals(), "realExample is not as expected");
     }
 
     function priceShouldMatch(uint256 expectedPrice, uint256 expectedTokensPerEth) internal {
@@ -357,5 +358,8 @@ contract OracleHelperTest is Test {
         uint256 tokensPerEth = paymaster.weiToToken(1 ether, price);
         assertEq(price, expectedPrice, "price is not as expected");
         assertEq(tokensPerEth, expectedTokensPerEth, "tokens per eth is not as expected");
+        // console2.log("price", price);
+        // console2.log("tokensPerEth", tokensPerEth);
+        // console2.log("expectedPrice", expectedPrice);
     }
 }

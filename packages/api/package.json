@@ -11,7 +11,9 @@
     "@trpc/next": "11.0.0-next-beta.264",
     "@trpc/react-query": "11.0.0-next-beta.264",
     "@trpc/server": "11.0.0-next-beta.264",
+    "@wagmi/core": "2.6.5",
     "app": "workspace:*",
+    "debug": "^4.3.4",
     "superjson": "^1.13.1",
     "viem": "^2.8.10",
     "zod": "^3.22.4"

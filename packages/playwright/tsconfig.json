@@ -6,7 +6,8 @@
     "../snaplet/src",
     "../app",
     "../wagmi",
-    "../contracts"
+    "../contracts",
+    "../webauthn-authenticator"
   ],
   "compilerOptions": {
     "noEmit": true,

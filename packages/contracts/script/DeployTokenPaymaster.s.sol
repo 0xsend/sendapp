@@ -32,16 +32,13 @@ contract DeployTokenPaymasterScript is Script {
             refundPostopCost: 40000,
             minEntryPointBalance: 1000 gwei,
             priceMarkup: PRICE_DENOM * 15 / 10, // 50%,
-            baseFee: BASE_FEE_DEFAULT
-        });
-        RewardsConfig memory rc = RewardsConfig({
-            rewardsShare: 3300, // 33% of base fee
+            baseFee: BASE_FEE_DEFAULT,
             rewardsPool: address(0x71fa02bb11e4b119bEDbeeD2f119F62048245301) // Send Revenues Safe
         });
 
         OracleHelperConfig memory ohc = OracleHelperConfig({
             cacheTimeToLive: 3600, // 1 hour
-            maxOracleRoundAge: 43200, // 12 hours
+            maxOracleRoundAge: 86400, // 1 day
             nativeOracle: IOracle(nativeOracle),
             priceUpdateThreshold: PRICE_DENOM * 12 / 100, // 20%
             tokenOracle: IOracle(tokenOracle),
@@ -59,7 +56,6 @@ contract DeployTokenPaymasterScript is Script {
             IERC20(weth),
             ISwapRouter(uniswap),
             tpc,
-            rc,
             ohc,
             uhc,
             msg.sender
@@ -68,8 +64,8 @@ contract DeployTokenPaymasterScript is Script {
         // solhint-disable-next-line no-console
         console2.log("Deployed TokenPaymaster at address: ", address(paymaster));
 
-        IEntryPoint(entryPoint).depositTo{value: 1e18}(address(paymaster));
-        paymaster.addStake{value: 1e18}(1);
+        IEntryPoint(entryPoint).depositTo{value: 0.25 ether}(address(paymaster));
+        paymaster.addStake{value: 0.25 ether}(1);
         vm.stopBroadcast();
     }
 }

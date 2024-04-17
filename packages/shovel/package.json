@@ -4,14 +4,16 @@
   "type": "module",
   "scripts": {
     "generate": "bun run src/generate.ts --path='./etc/config.json'",
-    "test": "bun test"
+    "test": "bun test",
+    "shovel:tilt": "bun run ./bin/shovel.tilt.ts"
   },
   "devDependencies": {
     "@indexsupply/shovel-config": "^0.0.11",
     "@my/wagmi": "workspace:*",
     "@types/bun": "latest",
-    "permissionless": "^0.1.11",
-    "viem": "^2.8.10"
+    "permissionless": "^0.1.14",
+    "viem": "^2.8.10",
+    "zx": "^7.2.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

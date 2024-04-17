@@ -4,6 +4,7 @@ pragma solidity ^0.8.23;
 /* solhint-disable not-rely-on-time */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol";
@@ -31,6 +32,9 @@ abstract contract UniswapHelper {
 
     UniswapHelperConfig public uniswapHelperConfig;
 
+    uint8 public immutable tokenDecimals;
+    uint8 public constant wethDecimals = 18;
+
     constructor(
         IERC20 _token,
         IERC20 _wrappedNative,
@@ -39,6 +43,7 @@ abstract contract UniswapHelper {
     ) {
         _token.approve(address(_uniswap), type(uint256).max);
         token = _token;
+        tokenDecimals = IERC20Metadata(address(_token)).decimals();
         wrappedNative = _wrappedNative;
         uniswap = _uniswap;
         _setUniswapHelperConfiguration(_uniswapHelperConfig);
@@ -64,12 +69,16 @@ abstract contract UniswapHelper {
         return amount * (1000 - slippage) / 1000;
     }
 
-    function tokenToWei(uint256 amount, uint256 price) public pure returns (uint256) {
-        return amount * price / PRICE_DENOMINATOR;
+    function tokenToWei(uint256 amount, uint256 price) public view returns (uint256) {
+        uint256 weiAmount = amount * price / PRICE_DENOMINATOR;
+        weiAmount = weiAmount * (10 ** (18 - tokenDecimals));
+        return weiAmount;
     }
 
-    function weiToToken(uint256 amount, uint256 price) public pure returns (uint256) {
-        return amount * PRICE_DENOMINATOR / price;
+    function weiToToken(uint256 amount, uint256 price) public view returns (uint256) {
+        uint256 tokenAmount = amount * PRICE_DENOMINATOR / price;
+        tokenAmount = tokenAmount / (10 ** (18 - tokenDecimals));
+        return tokenAmount;
     }
 
     function unwrapWeth(uint256 amount) internal {
