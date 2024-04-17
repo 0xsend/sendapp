@@ -345,12 +345,11 @@ function Row({
         </Text>
         <Text
           color="$color12"
-          minWidth={'$14'}
           textAlign="right"
           fontSize="$7"
           // @NOTE: font families don't change in `$gtMd` breakpoint
           fontFamily={media.md ? '$mono' : '$body'}
-          $gtMd={{ fontSize: '$5' }}
+          $gtMd={{ fontSize: '$5', minWidth: '$14' }}
         >
           {activity.amount}
         </Text>
