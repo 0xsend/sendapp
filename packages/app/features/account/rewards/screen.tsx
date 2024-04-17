@@ -20,17 +20,20 @@ import {
 
 import React from 'react'
 
-import { type UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
+import {
+  type UseDistributionsResultData,
+  useDistributions,
+  useSendMerkleDropTrancheActive,
+} from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
 import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { DistributionClaimButton } from './components/DistributionClaimButton'
-import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { type sendMerkleDropAddress, sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
-import { X } from '@tamagui/lucide-icons'
 import { useSendPrice } from 'app/utils/coin-gecko'
 
 export function RewardsScreen() {
@@ -76,9 +79,21 @@ const now = new Date()
 const DistributionRewardsSection = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
+  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const {
+    data: isTrancheActive,
+    isLoading: isTrancheActiveLoading,
+    error: isTrancheActiveError,
+  } = useSendMerkleDropTrancheActive({
+    tranche: trancheId,
+    chainId: chainId,
+  })
+
   const isBeforeQualification = now < distribution.qualification_start
   const isDuringQualification =
     now >= distribution.qualification_start && now <= distribution.qualification_end
+  const isAfterQualification = now > distribution.qualification_end
   const isClaimable = now > distribution.qualification_end && now <= distribution.claim_end
 
   const timeRemaining = useTimeRemaining(
@@ -137,6 +152,24 @@ const DistributionRewardsSection = ({
                         )
                       case isDuringQualification:
                         return <DistributionRewardTimer timeRemaining={timeRemaining} />
+                      case isTrancheActiveLoading:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            Checking claimability...
+                          </Paragraph>
+                        )
+                      case !!isTrancheActiveError:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            Error checking claimability. Please try again later
+                          </Paragraph>
+                        )
+                      case isAfterQualification && !isTrancheActive:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Qualification for Round ${distribution.number} is now closed and will be claimable soon.`}
+                          </Paragraph>
+                        )
                       case isClaimable:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>

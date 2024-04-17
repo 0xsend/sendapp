@@ -5,6 +5,7 @@ import {
   Paragraph,
   YStack,
   ScrollView,
+  Spinner,
   type ButtonProps,
 } from '@my/ui'
 import type { StackProps } from '@my/ui/index'
@@ -145,10 +146,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   if (isTrancheActiveLoading || isClaimedLoading) {
     return (
       <Stack>
-        <Button disabled>Claim Reward</Button>
-        <Paragraph size="$1" theme="alt2">
-          Checking claimability...
-        </Paragraph>
+        <Spinner size="small" />
       </Stack>
     )
   }
@@ -167,7 +165,14 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   }
 
   // If the user is eligible but the tranche is inactive, show the claim button disabled
-  if (!isTrancheActive) null
+  if (!isTrancheActive)
+    return (
+      <Stack>
+        <Button bc="$color5" opacity={0.5} disabled>
+          Not yet claimable
+        </Button>
+      </Stack>
+    )
 
   // If the user is eligible but has already claimed, show the claim button disabled
   if (isClaimed) {
@@ -179,7 +184,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             <Paragraph size="$1" theme="alt2">
               <Anchor
                 accessibilityLabel="View Claim on Etherscan"
-                href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
+                href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
               >
                 {shorten(claimWriteHash)}
               </Anchor>
@@ -199,7 +204,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             size="$1"
             target="_blank"
             accessibilityLabel="View on Etherscan"
-            href={`${accountChain.blockExplorers.default.url}/address/${share?.address}`}
+            href={`${accountChain.blockExplorers?.default.url}/address/${share?.address}`}
           >
             {shorten(share?.address)}
           </Anchor>
@@ -211,7 +216,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
             size="$1"
             target="_blank"
             accessibilityLabel="View on Etherscan"
-            href={`${accountChain.blockExplorers.default.url}/address/${account}`}
+            href={`${accountChain.blockExplorers?.default.url}/address/${account}`}
           >
             {shorten(account)}
           </Anchor>
@@ -269,7 +274,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           Claimed!{' '}
           <Anchor
             accessibilityLabel="View Claim on Etherscan"
-            href={`${accountChain.blockExplorers.default.url}/tx/${claimWriteHash}`}
+            href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
           >
             {shorten(claimWriteHash)}
           </Anchor>
