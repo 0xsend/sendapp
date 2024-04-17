@@ -13,12 +13,7 @@ import { TRPCError } from '@trpc/server'
 import { waitForTransactionReceipt } from '@wagmi/core'
 import { base16Regex } from 'app/utils/base16Regex'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import {
-  USEROP_KEY_SLOT,
-  USEROP_SALT,
-  getSendAccountCreateArgs,
-  entrypoint,
-} from 'app/utils/userop'
+import { USEROP_SALT, getSendAccountCreateArgs, entrypoint } from 'app/utils/userop'
 import debug from 'debug'
 import { getSenderAddress } from 'permissionless'
 import {
@@ -152,46 +147,54 @@ export const sendAccountRouter = createTRPCRouter({
         //   message: 'Address already deployed',
         // })
 
-        const initCalls = [
-          // approve USDC to paymaster
-          {
-            dest: usdcAddress[baseMainnetClient.chain.id],
-            value: 0n,
-            data: encodeFunctionData({
-              abi: sendTokenAbi,
-              functionName: 'approve',
-              args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
-            }),
-          },
-        ]
-
         await withRetry(
           async function createAccount() {
-            log('withRetry', 'start')
-            const { request } = await sendAccountFactoryClient.simulateContract({
-              address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
-              abi: sendAccountFactoryAbi,
-              functionName: 'createAccount',
-              args: [
-                keySlot, // key slot
-                xyPubKey, // public key
-                initCalls, // init calls
-                USEROP_SALT, // salt
-              ],
-              value: 0n,
+            log('createAccount', 'start')
+            const initCalls = [
+              // approve USDC to paymaster
+              {
+                dest: usdcAddress[baseMainnetClient.chain.id],
+                value: 0n,
+                data: encodeFunctionData({
+                  abi: sendTokenAbi,
+                  functionName: 'approve',
+                  args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
+                }),
+              },
+            ]
+
+            const { request } = await sendAccountFactoryClient
+              .simulateContract({
+                address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
+                abi: sendAccountFactoryAbi,
+                functionName: 'createAccount',
+                args: [
+                  keySlot, // key slot
+                  xyPubKey, // public key
+                  initCalls, // init calls
+                  USEROP_SALT, // salt
+                ],
+                value: 0n,
+              })
+              .catch((e) => {
+                log('createAccount', 'simulateContract', e)
+                throw e
+              })
+
+            log('createAccount', 'tx request')
+
+            const hash = await sendAccountFactoryClient.writeContract(request).catch((e) => {
+              log('createAccount', 'writeContract', e)
+              throw e
             })
 
-            log('withRetry', 'tx request')
-
-            const hash = await sendAccountFactoryClient.writeContract(request)
-
-            log('hash', hash)
+            log('createAccount', `hash=${hash}`)
 
             await waitForTransactionReceipt(config, {
               chainId: baseMainnetClient.chain.id,
               hash,
             }).catch((e) => {
-              log('waitForTransactionReceipt', e)
+              log('createAccount', 'waitForTransactionReceipt', e)
               throw e
             })
           },
@@ -199,12 +202,12 @@ export const sendAccountRouter = createTRPCRouter({
             retryCount: 20,
             delay: ({ count, error }) => {
               const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
-              log('delay', 'backoff', `count=${count} backoff=${backoff} error=${error}`)
+              log(`delay count=${count} backoff=${backoff} error=${error}`)
               return backoff
             },
             shouldRetry({ count, error }) {
               // @todo handle other errors like balance not enough, invalid nonce, etc
-              console.error('createAaccount failed', error)
+              console.error('createAccount failed', count, error)
               if (error.message.includes('Failed to create send account')) {
                 return false
               }

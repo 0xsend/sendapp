@@ -53,7 +53,7 @@ const authTest = base.extend<{
   context: async ({ context, user: { user, session } }, use) => {
     const { parallelIndex } = test.info()
 
-    log = debug(`test:auth:${parallelIndex}`)
+    log = debug(`test:auth:${user.id}:${parallelIndex}`)
 
     if (!config?.use?.baseURL) {
       throw new Error('config.use.baseURL not defined')

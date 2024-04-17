@@ -16,8 +16,8 @@ const sendAccountTest = base.extend<{
   setEthBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
   setUsdcBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
 }>({
-  page: async ({ page, context, supabase, setEthBalance, setUsdcBalance }, use) => {
-    log = debug(`test:send-accounts:${test.info().workerIndex}`)
+  page: async ({ page, context, supabase, setEthBalance, setUsdcBalance, userId }, use) => {
+    log = debug(`test:send-accounts:${userId}:${test.info().parallelIndex}`)
     log('start onboarding')
 
     // @todo use webauthn authenticator and supabase API to create a send account
