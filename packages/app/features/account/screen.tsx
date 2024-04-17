@@ -274,27 +274,29 @@ const BottomButtonRow = () => {
   const media = useMedia()
 
   if (media.gtMd && (tags === undefined || tags.length === 0))
-    <Stack f={1} jc="center" $md={{ display: 'none' }}>
-      <Link
-        href={'/account/sendtag/checkout'}
-        theme="accent"
-        borderRadius={'$4'}
-        p={'$3.5'}
-        px="$6"
-        maw={301}
-        bg="$primary"
-      >
-        <XStack gap={'$1.5'} ai={'center'} jc="center">
-          <IconPlus col={'$black'} />
-          <Paragraph textTransform="uppercase" col={'$black'}>
-            SENDTAGS
-          </Paragraph>
-        </XStack>
-      </Link>
-    </Stack>
+    return (
+      <Stack f={1} jc="center" $md={{ display: 'none' }}>
+        <Link
+          href={'/account/sendtag/checkout'}
+          theme="accent"
+          borderRadius={'$4'}
+          p={'$3.5'}
+          px="$6"
+          maw={301}
+          bg="$primary"
+        >
+          <XStack gap={'$1.5'} ai={'center'} jc="center">
+            <IconPlus col={'$black'} />
+            <Paragraph textTransform="uppercase" col={'$black'}>
+              SENDTAGS
+            </Paragraph>
+          </XStack>
+        </Link>
+      </Stack>
+    )
 
   return (
-    <XStack gap={'$5'} f={1} $md={{ display: 'flex', jc: 'center' }}>
+    <XStack gap={'$5'} f={1} display="flex" jc="center" $gtMd={{ display: 'none' }}>
       <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
         Sendtags
       </BorderedLink>
