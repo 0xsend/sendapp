@@ -454,14 +454,14 @@ local_resource(
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
-        -p 3030:3030 \
+        -p 127.0.0.1:3030:3030 \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        -v ./etc/aa-bundler:/app/etc/aa-bundler \
+        -v ./apps/aabundler/etc:/app/etc/aabundler \
         -e "DEBUG={bundler_debug}" \
         -e "DEBUG_COLORS=true" \
         docker.io/0xbigboss/bundler:0.7.0 \
         --port 3030 \
-        --config /app/etc/aa-bundler/aa-bundler.config.json \
+        --config /app/etc/aabundler/aabundler.config.json \
         --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --network http://host.docker.internal:8546 \
         --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
