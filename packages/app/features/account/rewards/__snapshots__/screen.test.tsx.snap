@@ -337,7 +337,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    0 SEND
+                    &lt;0 SEND
                   </Text>
                 </View>
               </View>
@@ -610,7 +610,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       }
                       suppressHighlighting={true}
                     >
-                      1 SEND
+                      &lt;1 SEND
                     </Text>
                     <Text
                       selectable={true}

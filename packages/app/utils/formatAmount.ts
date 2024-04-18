@@ -92,8 +92,10 @@ export default function formatAmount(
   }
 
   const digits = amount.toString().split('.', 2)
+
   // eslint-disable-next-line prefer-const
   const [integers = 0, decimals = 0] = digits.map((s) => Number(s))
+
   const [integersLength = 0] = digits.map((s) => s.length)
 
   if ((digits[0] && Number.isNaN(integers)) || (digits[1] && Number.isNaN(decimals))) {
@@ -111,9 +113,16 @@ export default function formatAmount(
     return abbreviateNumber(flooredAmount, maxDecimals)
   }
 
-  return Number(floor(Number(amount), maxDecimals)).toLocaleString(undefined, {
-    useGrouping: true,
-    minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,
-    maximumFractionDigits: maxDecimals,
-  })
+  const countLeadingZeros = (digits[1] && (digits[1].match(/^0+/) || [''])[0].length) || 0
+
+  const lessThanMin = countLeadingZeros >= maxDecimals
+
+  return (
+    (lessThanMin ? '<' : '') +
+    Number(floor(Number(amount), maxDecimals)).toLocaleString(undefined, {
+      useGrouping: true,
+      minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,
+      maximumFractionDigits: maxDecimals,
+    })
+  )
 }
