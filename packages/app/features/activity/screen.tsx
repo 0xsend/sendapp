@@ -176,36 +176,41 @@ function SearchResults() {
 // TODO: Replace with dynamic list
 function Suggestions() {
   return (
-    <Container>
-      <YStack gap="$size.1" display="flex" $gtMd={{ display: 'none' }} width={'100%'}>
+    <YStack gap="$size.1" display="flex" $gtMd={{ display: 'none' }}>
+      <Container>
         <MobileSectionLabel>SUGGESTIONS</MobileSectionLabel>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {suggestions.map((user) => (
-            <XStack
-              key={user.username}
-              ai="center"
-              mr="$4"
-              borderColor="$decay"
-              borderWidth={1}
-              pr="$3.5"
-              gap="$3.5"
-              borderRadius={'$11'}
-              ml="$1.5"
-            >
-              <Avatar size="$4.5" br="$4" gap="$2" circular ml="$-1.5">
-                <Avatar.Image src={user.avatar} />
-                <Avatar.Fallback jc="center">
-                  <Spinner size="small" color="$send1" />
-                </Avatar.Fallback>
-              </Avatar>
-              <Paragraph color="$color12" fontFamily="$mono" fontSize="$2">
-                @{user.username}
-              </Paragraph>
-            </XStack>
-          ))}
-        </ScrollView>
-      </YStack>
-    </Container>
+      </Container>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ maxWidth: 768, marginHorizontal: 'auto', paddingLeft: '$6' }}
+      >
+        {suggestions.map((user) => (
+          <XStack
+            key={user.username}
+            ai="center"
+            mr="$4"
+            borderColor="$decay"
+            borderWidth={1}
+            pr="$3.5"
+            gap="$3.5"
+            borderRadius={'$11'}
+            ml="$1.5"
+          >
+            <Avatar size="$4.5" br="$4" gap="$2" circular ml="$-1.5">
+              <Avatar.Image src={user.avatar} />
+              <Avatar.Fallback jc="center">
+                <Spinner size="small" color="$send1" />
+              </Avatar.Fallback>
+            </Avatar>
+            <Paragraph color="$color12" fontFamily="$mono" fontSize="$2">
+              @{user.username}
+            </Paragraph>
+          </XStack>
+        ))}
+      </ScrollView>
+    </YStack>
   )
 }
 
