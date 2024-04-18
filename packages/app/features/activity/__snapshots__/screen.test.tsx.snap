@@ -593,21 +593,20 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
     <View
       style={
         {
-          "alignSelf": "center",
-          "flex": 1,
-          "flexDirection": "row",
-          "paddingLeft": 32,
-          "paddingRight": 32,
-          "width": "100%",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": 20,
         }
       }
     >
       <View
         style={
           {
-            "display": "flex",
-            "flexDirection": "column",
-            "gap": 20,
+            "alignSelf": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "paddingLeft": 32,
+            "paddingRight": 32,
             "width": "100%",
           }
         }
@@ -633,777 +632,785 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
         >
           SUGGESTIONS
         </Text>
-        <RCTScrollView
-          horizontal={true}
-          scrollEnabled={true}
-          showsHorizontalScrollIndicator={false}
-        >
-          <View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser1",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser1
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser2",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser2
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser3",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser3
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser4",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser4
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser5",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser5
-              </Text>
-            </View>
-          </View>
-        </RCTScrollView>
       </View>
+      <RCTScrollView
+        contentContainerStyle={
+          {
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "maxWidth": 768,
+            "paddingLeft": 32,
+          }
+        }
+        horizontal={true}
+        scrollEnabled={true}
+        showsHorizontalScrollIndicator={false}
+      >
+        <View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser1",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser1
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser2",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser2
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser3",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser3
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser4
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser5",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser5
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
     </View>
     <View
       style={
@@ -4164,21 +4171,20 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
     <View
       style={
         {
-          "alignSelf": "center",
-          "flex": 1,
-          "flexDirection": "row",
-          "paddingLeft": 32,
-          "paddingRight": 32,
-          "width": "100%",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": 20,
         }
       }
     >
       <View
         style={
           {
-            "display": "flex",
-            "flexDirection": "column",
-            "gap": 20,
+            "alignSelf": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "paddingLeft": 32,
+            "paddingRight": 32,
             "width": "100%",
           }
         }
@@ -4204,777 +4210,785 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         >
           SUGGESTIONS
         </Text>
-        <RCTScrollView
-          horizontal={true}
-          scrollEnabled={true}
-          showsHorizontalScrollIndicator={false}
-        >
-          <View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser1",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser1
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser2",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser2
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser3",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser3
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser4",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser4
-              </Text>
-            </View>
-            <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomColor": "#3E4A3C",
-                  "borderBottomLeftRadius": 42,
-                  "borderBottomRightRadius": 42,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
-                  "borderTopLeftRadius": 42,
-                  "borderTopRightRadius": 42,
-                  "borderTopWidth": 1,
-                  "flexDirection": "row",
-                  "gap": 16,
-                  "marginLeft": 4,
-                  "marginRight": 18,
-                  "paddingRight": 16,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "borderBottomLeftRadius": 100000,
-                    "borderBottomRightRadius": 100000,
-                    "borderTopLeftRadius": 100000,
-                    "borderTopRightRadius": 100000,
-                    "flexDirection": "column",
-                    "gap": 7,
-                    "height": 48,
-                    "justifyContent": "center",
-                    "marginLeft": -4,
-                    "maxHeight": 48,
-                    "maxWidth": 48,
-                    "minHeight": 48,
-                    "minWidth": 48,
-                    "overflow": "hidden",
-                    "paddingBottom": 0,
-                    "paddingLeft": 0,
-                    "paddingRight": 0,
-                    "paddingTop": 0,
-                    "position": "relative",
-                    "width": 48,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 1,
-                    }
-                  }
-                >
-                  <Image
-                    fullscreen={true}
-                    onError={[Function]}
-                    onLoad={[Function]}
-                    source={
-                      {
-                        "uri": "https://i.pravatar.cc/150?u=0xUser5",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 48,
-                        "width": 48,
-                      }
-                    }
-                  />
-                </View>
-                <View
-                  style={
-                    {
-                      "bottom": 0,
-                      "flexDirection": "column",
-                      "justifyContent": "center",
-                      "left": 0,
-                      "position": "absolute",
-                      "right": 0,
-                      "top": 0,
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      {
-                        "flexDirection": "column",
-                      }
-                    }
-                  >
-                    <ActivityIndicator
-                      color=""
-                      size="small"
-                    />
-                  </View>
-                </View>
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 100%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 14.399999999999999,
-                    "fontWeight": "400",
-                    "lineHeight": 19,
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                @
-                0xUser5
-              </Text>
-            </View>
-          </View>
-        </RCTScrollView>
       </View>
+      <RCTScrollView
+        contentContainerStyle={
+          {
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "maxWidth": 768,
+            "paddingLeft": 32,
+          }
+        }
+        horizontal={true}
+        scrollEnabled={true}
+        showsHorizontalScrollIndicator={false}
+      >
+        <View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser1",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser1
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser2",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser2
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser3",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser3
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser4",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser4
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomLeftRadius": 42,
+                "borderBottomRightRadius": 42,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#3E4A3C",
+                "borderLeftWidth": 1,
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "borderTopLeftRadius": 42,
+                "borderTopRightRadius": 42,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "gap": 16,
+                "marginLeft": 4,
+                "marginRight": 18,
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 100000,
+                  "borderBottomRightRadius": 100000,
+                  "borderTopLeftRadius": 100000,
+                  "borderTopRightRadius": 100000,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "marginLeft": -4,
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "paddingBottom": 0,
+                  "paddingLeft": 0,
+                  "paddingRight": 0,
+                  "paddingTop": 0,
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=0xUser5",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 14.399999999999999,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              @
+              0xUser5
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
     </View>
     <View
       style={
