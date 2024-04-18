@@ -140,7 +140,7 @@ export function TopNav({
               {header}
             </H2>
           )}
-          <XStack>{renderButton()}</XStack>
+          <XStack minWidth={'$4'}>{renderButton()}</XStack>
         </Container>
         <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
         {subheader && (
