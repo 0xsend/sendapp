@@ -27,7 +27,6 @@ import {
 } from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
 import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
-import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { DistributionClaimButton } from './components/DistributionClaimButton'
@@ -202,7 +201,9 @@ const DistributionRewardsSection = ({
             </Stack>
             <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
               <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
-              <ReferralsCard />
+              <ReferralsCard
+                referrals={distribution.distribution_verifications_summary[0].tag_referrals}
+              />
             </XStack>
           </YStack>
           <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
@@ -340,44 +341,30 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) 
   </Card>
 )
 
-const ReferralsCard = () => {
-  const { referralsCount, isLoading, error } = useUserReferralsCount()
-  if (error) throw error
-
-  return (
-    <Card
-      f={1}
-      bc="transparent"
-      borderWidth={1}
-      br={12}
-      borderColor={'$decay'}
-      $xs={{ p: '$2.5' }}
-      p="$4"
-      $gtLg={{ p: '$4' }}
-      jc="center"
-    >
-      <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-        <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
-          Referrals
-        </Label>
-        <Theme inverse>
-          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {(() => {
-              switch (true) {
-                case isLoading:
-                  return <Spinner color={'$color'} />
-                case referralsCount === undefined:
-                  return 'Fetch Error'
-                default:
-                  return referralsCount
-              }
-            })()}
-          </Paragraph>
-        </Theme>
-      </YStack>
-    </Card>
-  )
-}
+const ReferralsCard = ({ referrals }: { referrals: number | null }) => (
+  <Card
+    f={1}
+    bc="transparent"
+    borderWidth={1}
+    br={12}
+    borderColor={'$decay'}
+    $xs={{ p: '$2.5' }}
+    p="$4"
+    $gtLg={{ p: '$4' }}
+    jc="center"
+  >
+    <YStack gap="$2" $gtLg={{ gap: '$4' }}>
+      <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
+        Referrals
+      </Label>
+      <Theme inverse>
+        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
+          {referrals !== null ? referrals : '---'}
+        </Paragraph>
+      </Theme>
+    </YStack>
+  </Card>
+)
 
 const SendRewardsCard = ({
   distribution,
