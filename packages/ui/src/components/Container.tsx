@@ -3,7 +3,7 @@ import { XStack, type XStackProps } from 'tamagui'
 export const Container: React.FC<XStackProps> = (props: XStackProps) => {
   return (
     <XStack
-      px="$6"
+      px="$4"
       als="center"
       f={1}
       width={'100%'}
@@ -14,6 +14,7 @@ export const Container: React.FC<XStackProps> = (props: XStackProps) => {
       }}
       $gtMd={{
         maxWidth: 960,
+        px: '$6',
         ...(props.$gtMd ?? {}),
       }}
       $gtLg={{
