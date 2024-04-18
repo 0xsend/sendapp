@@ -20,6 +20,7 @@ import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 import { coins } from 'app/data/coins'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
+import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
 
 export enum ButtonOption {
@@ -60,6 +61,8 @@ export function TopNav({
   const { push } = useRouter()
   const media = useMedia()
   const toast = useToastController()
+  const selectedCoin = useCoinFromTokenParam()
+  const [, setTokenParam] = useToken()
 
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
@@ -69,12 +72,11 @@ export function TopNav({
     setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
   }
 
-  const [tokenParam, setTokenParam] = useToken()
-  const hasSubrouteParam = tokenParam !== undefined
+  const hasSelectedCoin = selectedCoin !== undefined
 
   const handleBack = () => {
     // always pop to the base path. e.g. /account/settings/edit-profile -> /account
-    if (hasSubrouteParam) {
+    if (hasSelectedCoin) {
       setTokenParam(undefined)
     }
     const newPath = parts.slice(0, 1).join('/')
@@ -86,8 +88,7 @@ export function TopNav({
 
   const isSubRoute = !noSubroute && parts.length > 1
 
-  const selectedCoin = coins.find((c) => c.token === tokenParam)
-  if (selectedCoin) {
+  if (hasSelectedCoin) {
     header = ''
     showLogo = false
   }
@@ -155,7 +156,7 @@ export function TopNav({
             jc="center"
             $gtLg={{ fd: 'row' }}
           >
-            {isSubRoute || hasSubrouteParam ? (
+            {isSubRoute || hasSelectedCoin ? (
               <Button
                 onPress={handleBack}
                 icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}
