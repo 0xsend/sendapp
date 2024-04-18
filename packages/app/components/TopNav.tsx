@@ -22,6 +22,7 @@ import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBotto
 export enum ButtonOption {
   QR = 'QR',
   SETTINGS = 'SETTINGS',
+  NONE = 'NONE',
 }
 
 interface TopNavProps {
@@ -91,6 +92,8 @@ export function TopNav({
             onPress={handleSettingsBottomSheet}
           />
         )
+      case ButtonOption.NONE:
+        return null
       default:
         if (__DEV__) throw new Error(`Unknown button option: ${button}`)
         return null
