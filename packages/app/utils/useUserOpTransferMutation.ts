@@ -1,85 +1,196 @@
-import { useMutation } from '@tanstack/react-query'
-import { assert } from './assert'
-import {
-  type Hex,
-  encodeFunctionData,
-  erc20Abi,
-  isAddress,
-  isHex,
-  size,
-  slice,
-  // maxUint256
-} from 'viem'
 import {
   baseMainnetBundlerClient,
   baseMainnetClient,
-  sendAccountAbi,
   entryPointAddress,
-  // tokenPaymasterAddress,
+  sendAccountAbi,
+  tokenPaymasterAbi,
+  tokenPaymasterAddress,
 } from '@my/wagmi'
-import { type UserOperation, getUserOperationHash } from 'permissionless'
-import { USEROP_VALID_UNTIL, USEROP_VERSION, signUserOp } from './userop'
+import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
+import {
+  getRequiredPrefund,
+  getUserOperationHash,
+  type GetUserOperationReceiptReturnType,
+  type UserOperation,
+} from 'permissionless'
+import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from 'viem'
+import { assert } from './assert'
+import { USEROP_VALID_UNTIL, USEROP_VERSION, entrypoint, signUserOp } from './userop'
+
+// default user op with preset gas values that work
+export const defaultUserOp: Pick<
+  UserOperation<'v0.7'>,
+  | 'callGasLimit'
+  | 'verificationGasLimit'
+  | 'preVerificationGas'
+  | 'maxFeePerGas'
+  | 'maxPriorityFeePerGas'
+  | 'paymasterVerificationGasLimit'
+  | 'paymasterPostOpGasLimit'
+> = {
+  callGasLimit: 100000n,
+  verificationGasLimit: 550000n,
+  preVerificationGas: 70000n,
+  maxFeePerGas: 10000000n,
+  maxPriorityFeePerGas: 10000000n,
+  paymasterVerificationGasLimit: 150000n,
+  paymasterPostOpGasLimit: 50000n,
+}
 
 export type UseUserOpTransferMutationArgs = {
-  sender: Hex
-  token?: Hex
-  amount: bigint
-  to: Hex
+  userOp: UserOperation<'v0.7'>
   validUntil?: number
-  initCode: Hex
-  nonce: bigint
 }
 
 /**
  * Given a Send Account, token, and amount, returns a mutation to send a user op ERC20 or native transfer.
  *
- * @note An undefined token value indicates the native currency.
- * @todo split out the userop generation into a separate hook
- *
- * @param sender The sender of the transfer.
- * @param token The token to transfer, or falsy value for the native currency.
- * @param amount The amount to transfer in the smallest unit of the token.
- * @param to The address to transfer to.
+ * @param userOp The user operation to send.
  * @param validUntil The valid until timestamp for the user op.
- * @param initCode The init code for the send account or 0x if account is already initialized.
- * @param nonce The nonce for the user op.
  */
 export function useUserOpTransferMutation() {
   return useMutation({
-    mutationFn: async ({
-      sender,
-      token,
-      amount,
-      to,
-      validUntil = USEROP_VALID_UNTIL,
-      initCode,
-      nonce,
-    }: UseUserOpTransferMutationArgs) => {
-      assert(isAddress(sender), 'Invalid send account address')
-      assert(isAddress(to), 'Invalid to address')
+    mutationFn: sendUserOpTransfer,
+  })
+}
+
+export async function sendUserOpTransfer({
+  userOp,
+  validUntil = USEROP_VALID_UNTIL,
+}: UseUserOpTransferMutationArgs): Promise<GetUserOperationReceiptReturnType> {
+  const chainId = baseMainnetClient.chain.id
+  const entryPoint = entryPointAddress[chainId]
+  const userOpHash = getUserOperationHash({
+    userOperation: userOp,
+    entryPoint,
+    chainId,
+  })
+
+  userOp.signature = await signUserOp({
+    userOpHash,
+    version: USEROP_VERSION,
+    validUntil,
+  })
+
+  const hash = await baseMainnetBundlerClient.sendUserOperation({
+    userOperation: userOp,
+  })
+  const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
+  assert(receipt.success === true, 'Failed to send userOp')
+  return receipt
+}
+
+export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'> }) {
+  return useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- manually build query key since bigint values are not supported
+    queryKey: ['userOpGasEstimate', ...Object.values(userOp ?? {}).map((v) => String(v))],
+    enabled: !!userOp,
+    queryFn: async () => {
+      assert(!!userOp, 'User op is required')
+      const feesPerGas = await baseMainnetClient.estimateFeesPerGas()
+
+      console.log('feesPerGas', {
+        maxFeePerGas: `${formatUnits(userOp.maxFeePerGas, 9)} gwei`,
+        maxPriorityFeePerGas: `${formatUnits(userOp.maxPriorityFeePerGas, 9)} gwei`,
+      })
+      console.log('feesPerGas [network]', {
+        maxFeePerGas: `${formatUnits(feesPerGas.maxFeePerGas ?? 0n, 9)} gwei`,
+        maxPriorityFeePerGas: `${formatUnits(feesPerGas.maxPriorityFeePerGas ?? 0n, 9)} gwei`,
+      })
+
+      const requiredPreFund = getRequiredPrefund({
+        userOperation: userOp,
+        entryPoint: entrypoint.address,
+      })
+      // calculate the required usdc balance
+      const [priceMarkup, , refundPostopCost, , baseFee] = await baseMainnetClient.readContract({
+        address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+        abi: tokenPaymasterAbi,
+        functionName: 'tokenPaymasterConfig',
+        args: [],
+      })
+      const cachedPrice = await baseMainnetClient.readContract({
+        address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+        abi: tokenPaymasterAbi,
+        functionName: 'cachedPrice',
+        args: [],
+      })
+      const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * userOp.maxFeePerGas
+      const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
+      const requiredUsdcBalance = await baseMainnetClient.readContract({
+        address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+        abi: tokenPaymasterAbi,
+        functionName: 'weiToToken',
+        args: [preChargeNative, cachedPriceWithMarkup],
+      })
+      console.log('usdc for gas', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
+      console.log(
+        'total + base fee',
+        requiredUsdcBalance + BigInt(baseFee),
+        formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
+      )
+      if ((feesPerGas.maxFeePerGas ?? 0n) > 0) {
+        const maxFeePerGas = feesPerGas.maxFeePerGas ?? 0n
+        const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * maxFeePerGas
+        const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
+        const requiredUsdcBalance = await baseMainnetClient.readContract({
+          address: tokenPaymasterAddress[baseMainnetClient.chain.id],
+          abi: tokenPaymasterAbi,
+          functionName: 'weiToToken',
+          args: [preChargeNative, cachedPriceWithMarkup],
+        })
+        console.log(
+          'usdc for gas [network]',
+          requiredUsdcBalance,
+          formatUnits(requiredUsdcBalance, 6)
+        )
+        console.log(
+          'total + base fee [network]',
+          requiredUsdcBalance + BigInt(baseFee),
+          formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
+        )
+      }
+
+      return {
+        userOp: {
+          maxFeePerGas: userOp.maxFeePerGas,
+          maxPriorityFeePerGas: userOp.maxPriorityFeePerGas,
+        },
+        networkGasEstimate: {
+          maxFeePerGas: feesPerGas.maxFeePerGas,
+          maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
+        },
+        preChargeNative,
+        cachedPriceWithMarkup,
+        requiredUsdcBalance,
+      }
+    },
+  })
+}
+
+export function useGenerateTransferUserOp({
+  sender,
+  to,
+  token,
+  amount,
+  nonce,
+}: {
+  sender?: Hex
+  to?: Hex
+  token?: Hex
+  amount?: bigint
+  nonce?: bigint
+}): UseQueryResult<UserOperation<'v0.7'>> {
+  return useQuery({
+    queryKey: ['generateTransferUserOp', sender, to, token, String(amount), String(nonce)],
+    enabled: !!sender && !!to && amount !== undefined && nonce !== undefined,
+    queryFn: () => {
+      assert(!!sender && isAddress(sender), 'Invalid send account address')
+      assert(!!to && isAddress(to), 'Invalid to address')
       assert(!token || isAddress(token), 'Invalid token address')
-      assert(isHex(initCode), 'Invalid init code')
       assert(typeof amount === 'bigint' && amount > 0n, 'Invalid amount')
       assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
 
-      if (nonce === 0n) {
-        assert(initCode.length > 2, 'Must provide init code for new account')
-      }
-
-      if (nonce > 0n) {
-        assert(initCode === '0x', 'Init code must be 0x for existing account')
-      }
-
-      // @todo implement gas estimation
-      // @todo implement paymaster and data
-      const chainId = baseMainnetClient.chain.id
-      const entryPoint = entryPointAddress[chainId]
-      // // @ts-expect-error paymaster only deployed on localnet
-      // const paymaster = tokenPaymasterAddress[chainId]
-      // const paymasterVerificationGasLimit = 20000n
-      // const paymasterPostOpGasLimit = 50000n
-
-      // GENERATE THE CALLDATA
       let callData: Hex | undefined
       if (!token) {
         callData = encodeFunctionData({
@@ -101,16 +212,6 @@ export function useUserOpTransferMutation() {
           functionName: 'executeBatch',
           args: [
             [
-              // approve Paymaster to spend token
-              // {
-              //   dest: token,
-              //   value: 0n,
-              //   data: encodeFunctionData({
-              //     abi: erc20Abi,
-              //     functionName: 'approve',
-              //     args: [paymaster, maxUint256],
-              //   }),
-              // },
               {
                 dest: token,
                 value: 0n,
@@ -125,101 +226,18 @@ export function useUserOpTransferMutation() {
         })
       }
 
+      const chainId = baseMainnetClient.chain.id
+      const paymaster = tokenPaymasterAddress[chainId]
       const userOp: UserOperation<'v0.7'> = {
+        ...defaultUserOp,
         sender,
         nonce,
-        factory: size(initCode) ? slice(initCode, 0, 20) : undefined,
-        factoryData: size(initCode) ? slice(initCode, 20) : undefined,
         callData,
-        callGasLimit: 300000n,
-        verificationGasLimit: 2000000n,
-        preVerificationGas: 3000000n,
-        maxFeePerGas: 1000000n,
-        maxPriorityFeePerGas: 1000000n,
-        paymaster: undefined,
-        // paymaster,
-        paymasterVerificationGasLimit: undefined,
-        // paymasterVerificationGasLimit,
-        paymasterPostOpGasLimit: undefined,
-        // paymasterPostOpGasLimit,
-        paymasterData: undefined,
-        // paymasterData: '0x',
+        paymaster,
+        paymasterData: '0x',
         signature: '0x',
       }
-
-      // console.log('userOp', userOp)
-
-      const userOpHash = getUserOperationHash({
-        userOperation: userOp,
-        entryPoint,
-        chainId,
-      })
-
-      userOp.signature = await signUserOp({
-        userOpHash,
-        version: USEROP_VERSION,
-        validUntil,
-      })
-
-      // const gasParameters = await baseMainnetBundlerClient.estimateUserOperationGas({
-      //   userOperation: userOp,
-      // })
-
-      // console.log('gasParameters', gasParameters)
-
-      // [simulateValidation](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L152)
-      // await baseMainnetClient
-      //   .simulateContract({
-      //     address: entryPoint,
-      //     functionName: 'simulateValidation',
-      //     abi: entryPointAbi,
-      //     args: [userOp],
-      //   })
-      //   .catch((e: ContractFunctionExecutionError) => {
-      //     const cause: ContractFunctionRevertedError = e.cause
-      //     if (cause.data?.errorName === 'ValidationResult') {
-      //       const data = cause.data
-      //       if ((data.args?.[0] as { sigFailed: boolean }).sigFailed) {
-      //         throw new Error('Signature failed')
-      //       }
-      //       // console.log('ValidationResult', data)
-      //       return data
-      //     }
-      //     throw e
-      //   })
-
-      // [simulateHandleOp](https://github.com/eth-infinitism/account-abstraction/blob/187613b0172c3a21cf3496e12cdfa24af04fb510/contracts/interfaces/IEntryPoint.sol#L203)
-      // await baseMainnetClient
-      //   .simulateContract({
-      //     address: entryPoint,
-      //     functionName: 'simulateHandleOp',
-      //     abi: entryPointAbi,
-      //     args: [
-      //       userOp,
-      //       '0x0000000000000000000000000000000000000000',
-      //       '0x', // target calldata
-      //     ],
-      //   })
-      //   .catch((e: ContractFunctionExecutionError) => {
-      //     const cause: ContractFunctionRevertedError = e.cause
-      //     if (cause.data?.errorName === 'ExecutionResult') {
-      //       const data = cause.data
-      //       if ((data.args?.[0] as { success: boolean }).success) {
-      //         throw new Error('Handle op failed')
-      //       }
-      //       // console.log('ExecutionResult', data)
-      //       // @todo use to estimate gas
-      //       return data
-      //     }
-      //     throw e
-      //   })
-
-      const hash = await baseMainnetBundlerClient.sendUserOperation({
-        userOperation: userOp,
-      })
-      const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
-      assert(receipt.success === true, 'Failed to send userOp')
-      return receipt
+      return userOp
     },
   })
 }

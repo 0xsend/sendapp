@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// @ts-expect-error - set global __DEV__ variable to handle app react native imports
+// @ts-expect-error set __DEV__ for code shared between react-native
 globalThis.__DEV__ = false
 
 // validate environment ensuring we aren't talking to prod or staging or something
@@ -50,7 +50,7 @@ export default defineConfig({
 
     /* Configure the video recording. */
     // video: {
-    //   size: { width: 1920, height: 1080 },
+    //   size: { width: 1366, height: 768 },
     //   mode: 'on',
     // },
   },

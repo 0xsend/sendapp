@@ -18,6 +18,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       {
         "flex": 1,
         "flexDirection": "column",
+        "gap": 18,
         "paddingBottom": 18,
         "paddingTop": 18,
         "width": "100%",
@@ -502,17 +503,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       </RNSVGSvgView>
     </View>
     <View
-      pointerEvents="none"
-      style={
-        {
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
-        }
-      }
-    />
-    <View
       animatedStyle={
         {
           "value": {
@@ -564,7 +554,9 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       style={
         {
           "flexDirection": "column",
+          "gap": 18,
           "marginBottom": 18,
+          "marginTop": 39,
           "opacity": 1,
           "transform": [
             {
@@ -577,7 +569,9 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
       <View
         style={
           {
+            "display": "flex",
             "flexDirection": "column",
+            "gap": 7,
           }
         }
       >
@@ -586,33 +580,24 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           selectable={true}
           style={
             {
-              "color": "hsla(191, 32%, 46%, 1)",
+              "color": "#86AE80",
               "fontFamily": "System",
-              "fontSize": 20,
+              "fontSize": 23,
               "fontWeight": "700",
-              "lineHeight": 24,
+              "lineHeight": 27,
               "marginBottom": 0,
               "marginLeft": 0,
               "marginRight": 0,
               "marginTop": 0,
+              "minWidth": 184,
+              "textAlign": "left",
               "textTransform": "none",
             }
           }
           suppressHighlighting={true}
         >
-          Suggested...
+          Suggestions
         </Text>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 7,
-              "minHeight": 7,
-              "minWidth": 7,
-              "width": 7,
-            }
-          }
-        />
         <RCTScrollView
           horizontal={true}
           scrollEnabled={true}
@@ -624,6 +609,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -638,6 +624,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -681,17 +668,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -719,22 +695,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -752,6 +717,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -766,6 +732,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -809,17 +776,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -847,22 +803,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -880,6 +825,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -894,6 +840,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -937,17 +884,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -975,22 +911,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1008,6 +933,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -1022,6 +948,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -1065,17 +992,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -1103,22 +1019,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1136,6 +1041,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -1150,6 +1056,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -1193,17 +1100,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -1231,22 +1127,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1264,6 +1149,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -1278,6 +1164,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -1321,17 +1208,6 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -1359,22 +1235,11 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -1391,984 +1256,1832 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
         </RCTScrollView>
       </View>
       <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <View
         style={
           {
             "flexDirection": "column",
+            "gap": 24,
             "marginBottom": 18,
           }
         }
       >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            accessibilityRole="header"
+            selectable={true}
+            style={
+              {
+                "color": "#86AE80",
+                "fontFamily": "System",
+                "fontSize": 23,
+                "fontWeight": "700",
+                "lineHeight": 27,
+                "marginBottom": 0,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "marginTop": 0,
+                "minWidth": 184,
+                "textAlign": "left",
+                "textTransform": "none",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Transactions
+          </Text>
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              accessibilityRole="header"
+              selectable={true}
+              style={
+                {
+                  "color": "#86AE80",
+                  "fontFamily": "System",
+                  "fontSize": 23,
+                  "fontWeight": "700",
+                  "lineHeight": 27,
+                  "marginBottom": 0,
+                  "marginLeft": 0,
+                  "marginRight": 0,
+                  "marginTop": 0,
+                  "minWidth": 184,
+                  "textAlign": "right",
+                  "textTransform": "none",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Date
+            </Text>
+            <Text
+              accessibilityRole="header"
+              selectable={true}
+              style={
+                {
+                  "color": "#86AE80",
+                  "fontFamily": "System",
+                  "fontSize": 23,
+                  "fontWeight": "700",
+                  "lineHeight": 27,
+                  "marginBottom": 0,
+                  "marginLeft": 0,
+                  "marginRight": 0,
+                  "marginTop": 0,
+                  "minWidth": 184,
+                  "textAlign": "right",
+                  "textTransform": "none",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Amount
+            </Text>
+          </View>
+        </View>
         <Text
           accessibilityRole="header"
           selectable={true}
           style={
             {
-              "color": "hsla(191, 32%, 46%, 1)",
+              "color": "hsl(0, 0%, 42.5%)",
               "fontFamily": "System",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "lineHeight": 24,
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
               "marginBottom": 0,
               "marginLeft": 0,
               "marginRight": 0,
-              "marginTop": 0,
-              "textTransform": "none",
+              "marginTop": 13,
             }
           }
           suppressHighlighting={true}
         >
-          Recent Activity
+          PENDING
         </Text>
         <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
-        <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=ethentree",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=ethentree",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                ethentree
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                ethentree
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              ethentree
+              1 min ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               200 USDT
-               ($
-              199.98
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            1 min ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=bigboss",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=bigboss",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                bigboss
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                bigboss
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              bigboss
+              2 mins ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               500 ETH
-               ($
-              1,250,000
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            2 mins ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=coincollector",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=coincollector",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                coincollector
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                coincollector
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              coincollector
+              10 mins ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               75 BTC
-               ($
-              2,850,000
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            10 mins ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=trademaster",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=trademaster",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                trademaster
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                trademaster
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              trademaster
+              1 hr ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               1,000 LTC
-               ($
-              160,000
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            1 hr ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=hodlqueen",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=hodlqueen",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                hodlqueen
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                hodlqueen
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              hodlqueen
+              1 day ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               10,000 XRP
-               ($
-              7,200
-              )
             </Text>
           </View>
+        </View>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsl(0, 0%, 42.5%)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 13,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          12 FEBRUARY 2024
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
           >
-            1 day ago
-          </Text>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=ethentree",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                ethentree
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                ethentree
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 min ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              200 USDT
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=bigboss",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                bigboss
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                bigboss
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              2 mins ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              500 ETH
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=coincollector",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                coincollector
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                coincollector
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              10 mins ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              75 BTC
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=trademaster",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                trademaster
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                trademaster
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 hr ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1,000 LTC
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=hodlqueen",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                hodlqueen
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                hodlqueen
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 day ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              10,000 XRP
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -2394,6 +3107,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       {
         "flex": 1,
         "flexDirection": "column",
+        "gap": 18,
         "paddingBottom": 18,
         "paddingTop": 18,
         "width": "100%",
@@ -2881,17 +3595,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       </RNSVGSvgView>
     </View>
     <View
-      pointerEvents="none"
-      style={
-        {
-          "height": 18,
-          "minHeight": 18,
-          "minWidth": 18,
-          "width": 18,
-        }
-      }
-    />
-    <View
       style={
         {
           "flexDirection": "column",
@@ -2930,6 +3633,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       style={
         {
           "flexDirection": "column",
+          "gap": 18,
           "marginBottom": 18,
           "opacity": 0,
           "transform": [
@@ -2963,17 +3667,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         Results
       </Text>
       <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <View
         data-href="/profile/test"
       >
         <View
@@ -2981,6 +3674,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
             }
           }
           testID="tag-search-test"
@@ -2994,6 +3688,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 "borderTopLeftRadius": 9,
                 "borderTopRightRadius": 9,
                 "flexDirection": "column",
+                "gap": 7,
                 "height": 44,
                 "justifyContent": "center",
                 "maxHeight": 44,
@@ -3036,17 +3731,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 }
               />
             </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
             <View
               style={
                 {
@@ -3140,20 +3824,10 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             </View>
           </View>
           <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
             style={
               {
                 "flexDirection": "column",
+                "gap": 2,
               }
             }
           >
@@ -3190,7 +3864,9 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       style={
         {
           "flexDirection": "column",
+          "gap": 18,
           "marginBottom": 18,
+          "marginTop": 39,
           "opacity": 1,
           "transform": [
             {
@@ -3203,7 +3879,9 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       <View
         style={
           {
+            "display": "flex",
             "flexDirection": "column",
+            "gap": 7,
           }
         }
       >
@@ -3212,33 +3890,24 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           selectable={true}
           style={
             {
-              "color": "hsla(191, 32%, 46%, 1)",
+              "color": "#86AE80",
               "fontFamily": "System",
-              "fontSize": 20,
+              "fontSize": 23,
               "fontWeight": "700",
-              "lineHeight": 24,
+              "lineHeight": 27,
               "marginBottom": 0,
               "marginLeft": 0,
               "marginRight": 0,
               "marginTop": 0,
+              "minWidth": 184,
+              "textAlign": "left",
               "textTransform": "none",
             }
           }
           suppressHighlighting={true}
         >
-          Suggested...
+          Suggestions
         </Text>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 7,
-              "minHeight": 7,
-              "minWidth": 7,
-              "width": 7,
-            }
-          }
-        />
         <RCTScrollView
           horizontal={true}
           scrollEnabled={true}
@@ -3250,6 +3919,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -3264,6 +3934,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -3307,17 +3978,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -3345,22 +4005,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -3378,6 +4027,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -3392,6 +4042,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -3435,17 +4086,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -3473,22 +4113,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -3506,6 +4135,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -3520,6 +4150,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -3563,17 +4194,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -3601,22 +4221,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -3634,6 +4243,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -3648,6 +4258,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -3691,17 +4302,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -3729,22 +4329,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -3762,6 +4351,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -3776,6 +4366,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -3819,17 +4410,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -3857,22 +4437,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -3890,6 +4459,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 {
                   "alignItems": "center",
                   "flexDirection": "row",
+                  "gap": 7,
                   "marginLeft": 18,
                   "marginRight": 18,
                 }
@@ -3904,6 +4474,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     "borderTopLeftRadius": 9,
                     "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
                     "height": 44,
                     "justifyContent": "center",
                     "maxHeight": 44,
@@ -3947,17 +4518,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   />
                 </View>
                 <View
-                  pointerEvents="none"
-                  style={
-                    {
-                      "height": 7,
-                      "minHeight": 7,
-                      "minWidth": 7,
-                      "width": 7,
-                    }
-                  }
-                />
-                <View
                   style={
                     {
                       "bottom": 0,
@@ -3985,22 +4545,11 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   </View>
                 </View>
               </View>
-              <View
-                pointerEvents="none"
-                style={
-                  {
-                    "height": 7,
-                    "minHeight": 7,
-                    "minWidth": 7,
-                    "width": 7,
-                  }
-                }
-              />
               <Text
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16.8,
                     "fontWeight": "400",
@@ -4017,984 +4566,1832 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         </RCTScrollView>
       </View>
       <View
-        pointerEvents="none"
-        style={
-          {
-            "height": 18,
-            "minHeight": 18,
-            "minWidth": 18,
-            "width": 18,
-          }
-        }
-      />
-      <View
         style={
           {
             "flexDirection": "column",
+            "gap": 24,
             "marginBottom": 18,
           }
         }
       >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            accessibilityRole="header"
+            selectable={true}
+            style={
+              {
+                "color": "#86AE80",
+                "fontFamily": "System",
+                "fontSize": 23,
+                "fontWeight": "700",
+                "lineHeight": 27,
+                "marginBottom": 0,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "marginTop": 0,
+                "minWidth": 184,
+                "textAlign": "left",
+                "textTransform": "none",
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Transactions
+          </Text>
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              accessibilityRole="header"
+              selectable={true}
+              style={
+                {
+                  "color": "#86AE80",
+                  "fontFamily": "System",
+                  "fontSize": 23,
+                  "fontWeight": "700",
+                  "lineHeight": 27,
+                  "marginBottom": 0,
+                  "marginLeft": 0,
+                  "marginRight": 0,
+                  "marginTop": 0,
+                  "minWidth": 184,
+                  "textAlign": "right",
+                  "textTransform": "none",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Date
+            </Text>
+            <Text
+              accessibilityRole="header"
+              selectable={true}
+              style={
+                {
+                  "color": "#86AE80",
+                  "fontFamily": "System",
+                  "fontSize": 23,
+                  "fontWeight": "700",
+                  "lineHeight": 27,
+                  "marginBottom": 0,
+                  "marginLeft": 0,
+                  "marginRight": 0,
+                  "marginTop": 0,
+                  "minWidth": 184,
+                  "textAlign": "right",
+                  "textTransform": "none",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Amount
+            </Text>
+          </View>
+        </View>
         <Text
           accessibilityRole="header"
           selectable={true}
           style={
             {
-              "color": "hsla(191, 32%, 46%, 1)",
+              "color": "hsl(0, 0%, 42.5%)",
               "fontFamily": "System",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "lineHeight": 24,
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
               "marginBottom": 0,
               "marginLeft": 0,
               "marginRight": 0,
-              "marginTop": 0,
-              "textTransform": "none",
+              "marginTop": 13,
             }
           }
           suppressHighlighting={true}
         >
-          Recent Activity
+          PENDING
         </Text>
         <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
-        <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=ethentree",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=ethentree",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                ethentree
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                ethentree
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              ethentree
+              1 min ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               200 USDT
-               ($
-              199.98
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            1 min ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=bigboss",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=bigboss",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                bigboss
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                bigboss
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              bigboss
+              2 mins ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               500 ETH
-               ($
-              1,250,000
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            2 mins ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=coincollector",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=coincollector",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                coincollector
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                coincollector
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              coincollector
+              10 mins ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               75 BTC
-               ($
-              2,850,000
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            10 mins ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=trademaster",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=trademaster",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                trademaster
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                trademaster
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              trademaster
+              1 hr ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               1,000 LTC
-               ($
-              160,000
-              )
             </Text>
           </View>
-          <View
-            pointerEvents="none"
-            style={
-              {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            1 hr ago
-          </Text>
         </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
         <View
           style={
             {
               "alignItems": "center",
               "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
             }
           }
         >
           <View
             style={
               {
-                "alignItems": "center",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "flexDirection": "column",
-                "height": 44,
-                "justifyContent": "center",
-                "maxHeight": 44,
-                "maxWidth": 44,
-                "minHeight": 44,
-                "minWidth": 44,
-                "overflow": "hidden",
-                "position": "relative",
-                "width": 44,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
           >
             <View
               style={
                 {
-                  "bottom": 0,
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
                   "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 1,
-                }
-              }
-            >
-              <Image
-                fullscreen={true}
-                onError={[Function]}
-                onLoad={[Function]}
-                source={
-                  {
-                    "uri": "https://i.pravatar.cc/150?u=hodlqueen",
-                  }
-                }
-                style={
-                  {
-                    "height": 44,
-                    "width": 44,
-                  }
-                }
-              />
-            </View>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 7,
-                  "minHeight": 7,
-                  "minWidth": 7,
-                  "width": 7,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "bottom": 0,
-                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
                   "justifyContent": "center",
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                  "zIndex": 0,
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
                 }
               }
             >
               <View
                 style={
                   {
+                    "bottom": 0,
                     "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
                   }
                 }
               >
-                <ActivityIndicator
-                  color=""
-                  size="small"
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=hodlqueen",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
                 />
               </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                hodlqueen
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                hodlqueen
+              </Text>
             </View>
           </View>
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
-              }
-            }
-          />
-          <View
-            style={
-              {
-                "flexDirection": "column",
+                "flexDirection": "row",
+                "gap": 18,
               }
             }
           >
             <Text
               style={
                 {
-                  "color": "hsla(112, 22%, 59%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              hodlqueen
+              1 day ago
             </Text>
-            <View
-              pointerEvents="none"
-              style={
-                {
-                  "height": 2,
-                  "minHeight": 2,
-                  "minWidth": 2,
-                  "width": 2,
-                }
-              }
-            />
             <Text
               style={
                 {
-                  "color": "hsla(191, 32%, 46%, 1)",
+                  "color": "hsla(112, 22%, 100%, 1)",
                   "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
                 }
               }
               suppressHighlighting={true}
             >
-              $
               10,000 XRP
-               ($
-              7,200
-              )
             </Text>
           </View>
+        </View>
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsl(0, 0%, 42.5%)",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 13,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          12 FEBRUARY 2024
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
           <View
-            pointerEvents="none"
             style={
               {
-                "height": 18,
-                "minHeight": 18,
-                "minWidth": 18,
-                "width": 18,
+                "flexDirection": "row",
+                "gap": 21,
               }
             }
-          />
-          <Text
-            style={
-              {
-                "color": "hsla(191, 32%, 46%, 1)",
-                "fontFamily": "System",
-              }
-            }
-            suppressHighlighting={true}
           >
-            1 day ago
-          </Text>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=ethentree",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                ethentree
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                ethentree
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 min ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              200 USDT
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=bigboss",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                bigboss
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                bigboss
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              2 mins ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              500 ETH
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=coincollector",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                coincollector
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                coincollector
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              10 mins ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              75 BTC
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=trademaster",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                trademaster
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                trademaster
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 hr ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1,000 LTC
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 21,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 44,
+                  "justifyContent": "center",
+                  "maxHeight": 44,
+                  "maxWidth": 44,
+                  "minHeight": 44,
+                  "minWidth": 44,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 44,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/150?u=hodlqueen",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 44,
+                      "width": 44,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <ActivityIndicator
+                    color=""
+                    size="small"
+                  />
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                  "gap": 4,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                hodlqueen
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#86AE80",
+                    "fontFamily": "System",
+                    "fontSize": 12,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                @
+                hodlqueen
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "display": "none",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 day ago
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              10,000 XRP
+            </Text>
+          </View>
         </View>
       </View>
     </View>

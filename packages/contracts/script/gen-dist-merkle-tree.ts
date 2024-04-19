@@ -7,11 +7,6 @@ import { config } from 'dotenv'
 
 const log = debug('contracts:script:gen-merkle-tree')
 
-const dotenvPath = join(__dirname, '..', '..', '..', '.env.local')
-config({ path: dotenvPath, override: true })
-
-log(`Loaded environment variables from ${dotenvPath}`)
-
 const NEXT_PUBLIC_SUPABASE_URL = String(process.env.NEXT_PUBLIC_SUPABASE_URL)
 if (!NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error(
@@ -71,8 +66,9 @@ async function genMerkleTree() {
 
   // save some debug data
   // write shares to local disk for debugging
+  const path = join(__dirname, '..', 'var', `${distributionId}-merkle.json`)
   Bun.write(
-    join(__dirname, '..', 'var', `${distributionId}-merkle.json`),
+    path,
     JSON.stringify(
       {
         distributionId,
@@ -86,6 +82,7 @@ async function genMerkleTree() {
       2
     )
   )
+  log(`Wrote ${path}`)
 }
 
 genMerkleTree()

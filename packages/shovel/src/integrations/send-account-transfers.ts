@@ -1,7 +1,7 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 // import { sendAccountFactorySenderFilterRef, sendAcctFactoryTable } from './send-account-deployed'
 import { sendTokenAddress, usdcAddress } from '@my/wagmi'
-import { sendAccountFactorySenderFilterRef } from './send-account-deployed'
+import { sendAccountFactorySenderFilterRef } from './send-account-created'
 
 export const transfersTable: Table = {
   name: 'send_account_transfers',
