@@ -32,6 +32,7 @@
     "experimentalDecorators": true,
     "useUnknownInCatchVariables": false,
     "preserveConstEnums": true,
+    "noUncheckedIndexedAccess": true,
     // DONT DO THIS so jsdoc will remain
     "removeComments": false,
     "strict": true,
