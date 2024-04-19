@@ -202,7 +202,7 @@ const DistributionRewardsSection = ({
             <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
               <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
               <ReferralsCard
-                referrals={distribution.distribution_verifications_summary[0].tag_referrals}
+                referrals={distribution.distribution_verifications_summary[0]?.tag_referrals ?? 0}
               />
             </XStack>
           </YStack>
