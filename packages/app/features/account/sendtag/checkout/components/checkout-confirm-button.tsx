@@ -94,6 +94,7 @@ export function ConfirmButton({
       submitTxToDb(event.transactionHash)
     }
   }, [receipts, publicClient, addresses, weiAmount, isLoadingReceipts, receiptHashes])
+
   useEffect(() => {
     if (block) {
       lookupSafeReceivedEvent()
@@ -114,7 +115,7 @@ export function ConfirmButton({
 
   const [attempts, setAttempts] = useState(0)
 
-  const { sendTransactionAsync } = useSendTransaction({
+  const { sendTransactionAsync, isPending: sendTransactionIsPending } = useSendTransaction({
     mutation: {
       onSuccess: setSentTx,
     },
@@ -140,7 +141,7 @@ export function ConfirmButton({
       ...tx,
     }).catch((err) => {
       console.error(err)
-      setError('Something went wrong')
+      setError(err.message.split('.').at(0))
     })
   }
 
@@ -315,11 +316,12 @@ export function ConfirmButton({
     )
   }
 
-  if (error) {
+  if (error && !(submitting || sendTransactionIsPending || txWaitLoading)) {
     return (
       <ConfirmButtonError
         buttonText={'Retry'}
         onPress={() => {
+          setError(undefined)
           switch (true) {
             case needsVerification || !savedAddress || connectedAddress !== savedAddress:
               handleVerify()
@@ -382,7 +384,7 @@ export function ConfirmButton({
         pointerEvents: 'none',
         opacity: 0.5,
       }}
-      pointerEvents={submitting || txWaitLoading ? 'none' : 'auto'}
+      pointerEvents={submitting || txWaitLoading || sendTransactionIsPending ? 'none' : 'auto'}
       space="$1.5"
       onPress={handleCheckoutTx}
       br={12}
@@ -390,8 +392,15 @@ export function ConfirmButton({
     >
       {(() => {
         switch (true) {
-          case !canAffordTags || estimateGasErr !== null:
+          case (!canAffordTags || estimateGasErr !== null) && (!txWaitLoading || !submitting):
             return <ButtonText>Insufficient funds</ButtonText>
+          case sendTransactionIsPending:
+            return (
+              <>
+                <Spinner color="$color11" />
+                <ButtonText p="$2">Requesting...</ButtonText>
+              </>
+            )
           case txWaitLoading:
             return (
               <>
