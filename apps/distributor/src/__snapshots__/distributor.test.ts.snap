@@ -1,0 +1,8 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Distributor Route should return a merkle root: distribution 4 merkle root 1`] = `
+{
+  "root": "0x0323baed48d30414af5f66d611d02e0c905bf97ca10b60942104a85b86cab876",
+  "total": 627736455,
+}
+`;
