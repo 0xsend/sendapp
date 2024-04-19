@@ -20,17 +20,19 @@ import {
 
 import React from 'react'
 
-import { type UseDistributionsResultData, useDistributions } from 'app/utils/distributions'
+import {
+  type UseDistributionsResultData,
+  useDistributions,
+  useSendMerkleDropTrancheActive,
+} from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
 import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
-import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { DistributionClaimButton } from './components/DistributionClaimButton'
-import { sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { type sendMerkleDropAddress, sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
-import { X } from '@tamagui/lucide-icons'
 import { useSendPrice } from 'app/utils/coin-gecko'
 
 export function RewardsScreen() {
@@ -76,9 +78,21 @@ const now = new Date()
 const DistributionRewardsSection = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
+  const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
+  const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
+  const {
+    data: isTrancheActive,
+    isLoading: isTrancheActiveLoading,
+    error: isTrancheActiveError,
+  } = useSendMerkleDropTrancheActive({
+    tranche: trancheId,
+    chainId: chainId,
+  })
+
   const isBeforeQualification = now < distribution.qualification_start
   const isDuringQualification =
     now >= distribution.qualification_start && now <= distribution.qualification_end
+  const isAfterQualification = now > distribution.qualification_end
   const isClaimable = now > distribution.qualification_end && now <= distribution.claim_end
 
   const timeRemaining = useTimeRemaining(
@@ -137,6 +151,24 @@ const DistributionRewardsSection = ({
                         )
                       case isDuringQualification:
                         return <DistributionRewardTimer timeRemaining={timeRemaining} />
+                      case isTrancheActiveLoading:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            Checking claimability...
+                          </Paragraph>
+                        )
+                      case !!isTrancheActiveError:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            Error checking claimability. Please try again later
+                          </Paragraph>
+                        )
+                      case isAfterQualification && !isTrancheActive:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            {`Qualification for Round ${distribution.number} is now closed and will be claimable soon.`}
+                          </Paragraph>
+                        )
                       case isClaimable:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
@@ -169,7 +201,9 @@ const DistributionRewardsSection = ({
             </Stack>
             <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
               <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
-              <ReferralsCard />
+              <ReferralsCard
+                referrals={distribution.distribution_verifications_summary[0].tag_referrals}
+              />
             </XStack>
           </YStack>
           <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
@@ -307,44 +341,30 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) 
   </Card>
 )
 
-const ReferralsCard = () => {
-  const { referralsCount, isLoading, error } = useUserReferralsCount()
-  if (error) throw error
-
-  return (
-    <Card
-      f={1}
-      bc="transparent"
-      borderWidth={1}
-      br={12}
-      borderColor={'$decay'}
-      $xs={{ p: '$2.5' }}
-      p="$4"
-      $gtLg={{ p: '$4' }}
-      jc="center"
-    >
-      <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-        <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
-          Referrals
-        </Label>
-        <Theme inverse>
-          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-            {(() => {
-              switch (true) {
-                case isLoading:
-                  return <Spinner color={'$color'} />
-                case referralsCount === undefined:
-                  return 'Fetch Error'
-                default:
-                  return referralsCount
-              }
-            })()}
-          </Paragraph>
-        </Theme>
-      </YStack>
-    </Card>
-  )
-}
+const ReferralsCard = ({ referrals }: { referrals: number | null }) => (
+  <Card
+    f={1}
+    bc="transparent"
+    borderWidth={1}
+    br={12}
+    borderColor={'$decay'}
+    $xs={{ p: '$2.5' }}
+    p="$4"
+    $gtLg={{ p: '$4' }}
+    jc="center"
+  >
+    <YStack gap="$2" $gtLg={{ gap: '$4' }}>
+      <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
+        Referrals
+      </Label>
+      <Theme inverse>
+        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
+          {referrals !== null ? referrals : '---'}
+        </Paragraph>
+      </Theme>
+    </YStack>
+  </Card>
+)
 
 const SendRewardsCard = ({
   distribution,
@@ -358,35 +378,38 @@ const SendRewardsCard = ({
     <Card
       f={1}
       mih={198}
-      $gtLg={{ f: 1 }}
+      p="$6"
+      $gtLg={{ f: 1, p: '$6' }}
       $gtMd={{ f: 2 }}
       $theme-dark={{ bc: '$darkest' }}
       $theme-light={{ bc: '$gray3Light' }}
       br={12}
       jc="center"
     >
-      <YStack w={'100%'} gap="$8" mx="auto" jc="center" ai="center">
+      <YStack gap="$4" mx="auto" jc="center" ai="center">
         <Stack gap="$6">
           <Label fontFamily={'$mono'} col="$olive" ta="left" fontSize={'$5'}>
             Rewards
           </Label>
-          <Theme inverse>
-            <Paragraph
-              fontFamily={'$mono'}
-              col="$background"
-              $gtXs={{ fontSize: '$10' }}
-              fontSize={'$9'}
-              fontWeight={'500'}
-              lh={40}
-            >
-              {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
-            </Paragraph>
-          </Theme>
-          {rewardValue && (
-            <Paragraph fontFamily={'$mono'} col="$color8" opacity={0.6}>
-              {`~$${rewardValue.toFixed(2)}`}
-            </Paragraph>
-          )}
+          <Stack>
+            <Theme inverse>
+              <Paragraph
+                fontFamily={'$mono'}
+                col="$background"
+                $gtXs={{ fontSize: '$10' }}
+                fontSize={'$9'}
+                fontWeight={'500'}
+                lh={40}
+              >
+                {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+              </Paragraph>
+            </Theme>
+            {rewardValue && (
+              <Paragraph fontFamily={'$mono'} col="$color8" opacity={0.6}>
+                {`${rewardValue.toFixed(2)} USD`}
+              </Paragraph>
+            )}
+          </Stack>
         </Stack>
         <DistributionClaimButton distribution={distribution} />
       </YStack>
