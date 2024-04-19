@@ -1,32 +1,27 @@
 import {
-  Button,
   Nav,
   Paragraph,
   ScrollView,
   Separator,
-  type SheetProps,
   SideBar,
   SideBarWrapper,
   XStack,
   YStack,
   type YStackProps,
   useMedia,
+  Avatar,
+  H4,
 } from '@my/ui'
 import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import {
-  IconAccount,
-  IconActivity,
-  IconHome,
-  IconSLogo,
-  IconSendLogo,
-  IconX,
-} from 'app/components/icons'
+import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
-import { useNav } from 'app/routers/params'
 import type { ReactElement } from 'react'
 import { NavSheet } from '../NavSheet'
+
+import { useUser } from 'app/utils/useUser'
+import { ReferralLink } from '../ReferralLink'
 
 const links = [
   {
@@ -75,21 +70,26 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
   )
 }
 
-const HomeBottomSheet = ({ open }: SheetProps) => {
-  const [nav, setNavParam] = useNav()
-
-  const onOpenChange = () => {
-    if (open) setNavParam('home', { webBehavior: 'replace' })
-    else setNavParam(undefined, { webBehavior: 'replace' })
-  }
+const HomeBottomSheet = () => {
+  const { profile } = useUser()
+  const avatarUrl = profile?.avatar_url
 
   return (
-    <NavSheet open={nav === 'home'} onOpenChange={onOpenChange}>
-      <Link href={'/'} marginTop={'$4'}>
-        <IconSendLogo size={'$2.5'} color={'$color12'} />
-      </Link>
-      <Nav display="flex" flex={2} height="100%" justifyContent={'center'}>
-        <ScrollView gap={'$4'} alignItems="stretch" jc="center" ml="$-5" height="100%">
+    <NavSheet navId="home">
+      <XStack gap="$4" ai="center">
+        <Avatar size="$4.5">
+          <Avatar.Image src={avatarUrl ?? ''} />
+          <Avatar.Fallback jc={'center'} delayMs={200}>
+            <IconAccount size="$4.5" color="$olive" />
+          </Avatar.Fallback>
+        </Avatar>
+        <YStack gap="$2">
+          <H4>{profile?.name ?? `#${profile?.send_id}`}</H4>
+          <ReferralLink p={0} />
+        </YStack>
+      </XStack>
+      <Nav display="flex" flex={2} height="100%">
+        <ScrollView gap={'$4'} alignItems="stretch" ml="$-5" height="100%">
           {links.map((link, idx) => (
             <YStack
               key={link.href}
@@ -113,22 +113,6 @@ const HomeBottomSheet = ({ open }: SheetProps) => {
           ))}
         </ScrollView>
       </Nav>
-
-      <XStack pos={'absolute'} top={'$7'} right={'$6'}>
-        <Button
-          size="$4"
-          transparent
-          chromeless
-          backgroundColor="transparent"
-          hoverStyle={{ backgroundColor: 'transparent' }}
-          pressStyle={{ backgroundColor: 'transparent' }}
-          focusStyle={{ backgroundColor: 'transparent' }}
-          circular
-          icon={<IconX size="$2" color="$color9" />}
-          onPress={onOpenChange}
-          theme="accent"
-        />
-      </XStack>
     </NavSheet>
   )
 }
