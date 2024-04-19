@@ -1,29 +1,14 @@
 import { cpus } from 'node:os'
 import type { Database, Tables } from '@my/supabase/database.types'
-import { config, readSendTokenBalanceOf, type sendTokenAddress } from '@my/wagmi'
-import { createClient } from '@supabase/supabase-js'
-import { selectAll } from 'app/utils/supabase/selectAll'
 import type { Logger } from 'pino'
-
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error(
-    'NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.'
-  )
-}
-if (!process.env.SUPABASE_SERVICE_ROLE) {
-  throw new Error(
-    'SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.'
-  )
-}
-
-/**
- * only meant to be used on the server side.
- */
-export const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE,
-  { auth: { persistSession: false } }
-)
+import {
+  createDistributionShares,
+  fetchAllHodlers,
+  fetchAllVerifications,
+  fetchDistribution,
+  supabaseAdmin,
+} from './supabase'
+import { fetchAllBalances } from './wagmi'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -48,11 +33,16 @@ export class DistributorWorker {
   private lastDistributionId: number | null = null
   private workerPromise: Promise<void>
 
-  constructor(log: Logger) {
+  constructor(log: Logger, start = true) {
     this.id = Math.random().toString(36).substring(7)
     this.log = log.child({ module: 'distributor', id: this.id })
-    this.running = true
-    this.workerPromise = this.worker()
+    if (start) {
+      this.running = true
+      this.workerPromise = this.worker()
+    } else {
+      this.running = false
+      this.workerPromise = Promise.resolve()
+    }
   }
 
   /**
@@ -121,17 +111,11 @@ export class DistributorWorker {
     const log = this.log.child({ distribution_id: distribution.id })
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
-    // fetch all verifications
     const {
       data: verifications,
       error: verificationsError,
       count,
-    } = await selectAll(
-      supabaseAdmin
-        .from('distribution_verifications')
-        .select('*', { count: 'exact' })
-        .eq('distribution_id', distribution.id)
-    )
+    } = await fetchAllVerifications(distribution.id)
 
     if (verificationsError) {
       throw verificationsError
@@ -174,17 +158,10 @@ export class DistributorWorker {
     log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
     log.debug({ verificationsByUserId })
 
-    const { data: hodlerAddresses, error: hodlerAddressesError } = await selectAll(
-      supabaseAdmin
-        .rpc(
-          'distribution_hodler_addresses',
-          {
-            distribution_id: distribution.id,
-          },
-          { count: 'exact' }
-        )
-        .select('*')
+    const { data: hodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
+      distribution.id
     )
+
     if (hodlerAddressesError) {
       throw hodlerAddressesError
     }
@@ -214,19 +191,9 @@ export class DistributorWorker {
     // lookup balances of all hodler addresses in qualification period
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
       return await Promise.all(
-        addresses.map(async ({ user_id, address }) => {
-          const balance = await readSendTokenBalanceOf(config, {
-            args: [address],
-            chainId: distribution.chain_id as keyof typeof sendTokenAddress,
-            blockNumber: distribution.snapshot_block_num
-              ? BigInt(distribution.snapshot_block_num)
-              : undefined,
-          })
-          return {
-            user_id,
-            address,
-            balance: balance.toString(),
-          }
+        fetchAllBalances({
+          addresses,
+          distribution,
         })
       )
     })
@@ -346,7 +313,8 @@ export class DistributorWorker {
         const hodlerPoolAmount = share.amount
         const bonusPoolAmount = calculatePercentageWithBips(hodlerPoolAmount, bonusBips)
         const fixedPoolAmount = fixedPoolAmountsByAddress[share.address] || 0n
-        totalAmount += hodlerPoolAmount + bonusPoolAmount + fixedPoolAmount
+        const amount = hodlerPoolAmount + bonusPoolAmount + fixedPoolAmount
+        totalAmount += amount
         totalHodlerPoolAmount += hodlerPoolAmount
         totalBonusPoolAmount += bonusPoolAmount
         totalFixedPoolAmount += fixedPoolAmount
@@ -360,7 +328,7 @@ export class DistributorWorker {
           {
             address: share.address,
             balance: balancesByAddress[share.address],
-            amount: hodlerPoolAmount + bonusPoolAmount,
+            amount: amount,
             bonusBips,
             hodlerPoolAmount,
             bonusPoolAmount,
@@ -368,25 +336,28 @@ export class DistributorWorker {
           },
           'Calculated share.'
         )
+
         // @ts-expect-error supabase-js does not support bigint
         return {
           address: share.address,
           distribution_id: distribution.id,
           user_id: userId,
-          amount: (hodlerPoolAmount + bonusPoolAmount).toString(),
+          amount: amount.toString(),
           bonus_pool_amount: bonusPoolAmount.toString(),
           fixed_pool_amount: fixedPoolAmount.toString(),
           hodler_pool_amount: hodlerPoolAmount.toString(),
         } as Tables<'distribution_shares'>
       })
-      .filter(Boolean)
+      .filter(Boolean) as Tables<'distribution_shares'>[]
 
     log.info(
       {
         totalAmount,
         totalHodlerPoolAmount,
+        hodlerPoolAvailableAmount,
         totalBonusPoolAmount,
         totalFixedPoolAmount,
+        fixedPoolAvailableAmount,
         maxBonusPoolBips,
         name: distribution.name,
         shares: shares.length,
@@ -395,10 +366,7 @@ export class DistributorWorker {
     )
     log.info(`Calculated ${shares.length} shares.`)
     log.debug({ shares })
-    const { error } = await supabaseAdmin.rpc('update_distribution_shares', {
-      distribution_id: distribution.id,
-      shares,
-    })
+    const { error } = await createDistributionShares(distribution.id, shares)
     if (error) {
       log.error({ error: error.message, code: error.code }, 'Error saving shares.')
       throw error
@@ -427,14 +395,7 @@ export class DistributorWorker {
   }
 
   public async calculateDistribution(id: string) {
-    const { data: distribution, error } = await supabaseAdmin
-      .from('distributions')
-      .select(
-        `*,
-        distribution_verification_values (*)`
-      )
-      .eq('id', id)
-      .single()
+    const { data: distribution, error } = await fetchDistribution(id)
     if (error) {
       this.log.error({ error: error.message, code: error.code }, 'Error fetching distribution.')
       throw error
