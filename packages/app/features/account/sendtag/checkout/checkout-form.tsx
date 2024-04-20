@@ -161,7 +161,7 @@ export const CheckoutForm = () => {
                     $theme-dark={{ col: '$olive' }}
                     $gtMd={{ f: 2 }}
                     f={1}
-                    maw="40%"
+                    maw="35%"
                     fontWeight={'bold'}
                     fontFamily={'$mono'}
                   >
@@ -170,7 +170,7 @@ export const CheckoutForm = () => {
                   <Paragraph
                     $theme-dark={{ col: '$olive' }}
                     f={1}
-                    maw="30%"
+                    maw="32%"
                     ta="center"
                     fontWeight={'400'}
                     fontFamily={'$mono'}
@@ -180,7 +180,7 @@ export const CheckoutForm = () => {
                   <Paragraph
                     $theme-dark={{ col: '$olive' }}
                     f={1}
-                    maw="30%"
+                    maw="33%"
                     ta="center"
                     fontWeight={'400'}
                     fontFamily={'$mono'}
@@ -204,7 +204,7 @@ export const CheckoutForm = () => {
                         fontWeight={'bold'}
                         col="$color12"
                         f={2}
-                        maw="40%"
+                        maw="35%"
                         fontFamily={'$mono'}
                         accessibilityLabel={`Pending Sendtag ${tag.name}`}
                         aria-label={`Pending Sendtag ${tag.name}`}
@@ -212,7 +212,7 @@ export const CheckoutForm = () => {
                       >
                         {tag.name}
                       </Paragraph>
-                      <Paragraph col="$color12" ta="center" f={1} maw="30%" fontFamily={'$mono'}>
+                      <Paragraph col="$color12" ta="center" f={1} maw="32%" fontFamily={'$mono'}>
                         <HoldingTime created={new Date(tag.created_at)} />
                       </Paragraph>
                       <XStack
@@ -220,7 +220,7 @@ export const CheckoutForm = () => {
                         $gtMd={{ gap: '$3' }}
                         gap="$2"
                         f={1}
-                        maw="30%"
+                        maw="33%"
                         jc="flex-end"
                       >
                         <Paragraph fontFamily={'$mono'} col="$color12">
@@ -346,7 +346,7 @@ function HoldingTime({ created }: { created: Date }) {
   const { minutes, seconds, diffInMs } = useTimeRemaining(expires)
   if (diffInMs <= 0) return 'Claimable'
 
-  return `${minutes} m ${seconds} s`
+  return `${minutes}m ${seconds}s`
 }
 
 function ConfirmTagPrice({ tag }: { tag: { name: string } }) {

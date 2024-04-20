@@ -18,10 +18,12 @@ import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'ap
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
+import { ReferralLink } from './ReferralLink'
 
 export enum ButtonOption {
   QR = 'QR',
   SETTINGS = 'SETTINGS',
+  REFERRAL = 'REFERRAL',
   NONE = 'NONE',
 }
 
@@ -29,6 +31,7 @@ interface TopNavProps {
   header: string
   subheader?: string
   showLogo?: boolean
+  showReferral?: boolean
   /**
    * Customize the button on the right side of the top nav.
    * @default ButtonOption.QR
@@ -45,6 +48,7 @@ export function TopNav({
   header,
   subheader,
   showLogo = false,
+  showReferral = false,
   button = ButtonOption.QR,
   noSubroute = false,
 }: TopNavProps) {
@@ -110,7 +114,11 @@ export function TopNav({
           fd="row"
           $lg={{ py: '$4' }}
         >
-          <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center">
+          <Stack
+            display={isSubRoute || media.lg ? 'flex' : 'none'}
+            jc="center"
+            $gtLg={{ fd: 'row' }}
+          >
             {isSubRoute ? (
               <Button
                 onPress={handleBack}
@@ -139,6 +147,11 @@ export function TopNav({
             >
               {header}
             </H2>
+          )}
+          {showReferral && media.gtLg && (
+            <XStack jc={'center'} ai={'center'} ml="auto">
+              <Paragraph>Referral Link</Paragraph> <ReferralLink />
+            </XStack>
           )}
           <XStack minWidth={'$4'}>{renderButton()}</XStack>
         </Container>

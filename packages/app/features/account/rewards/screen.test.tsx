@@ -16,6 +16,11 @@ jest.mock('app/utils/distributions', () => ({
             index: 1,
           },
         ],
+        distribution_verifications_summary: [
+          {
+            tag_referrals: 123,
+          },
+        ],
       },
     ],
   }),
@@ -35,9 +40,7 @@ jest.mock('app/utils/distributions', () => ({
     error: null,
   }),
 }))
-jest.mock('app/utils/useUserReferralsCount', () => ({
-  useUserReferralsCount: jest.fn().mockReturnValue({ referralsCount: 123, error: null }),
-}))
+
 jest.mock('app/utils/useChainAddresses', () => ({
   useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
 }))
