@@ -9,6 +9,7 @@ import {
   supabaseAdmin,
 } from './supabase'
 import { fetchAllBalances } from './wagmi'
+import { calculateWeights } from './weights'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -216,26 +217,25 @@ export class DistributorWorker {
     )
     log.debug({ balances })
 
+    // for debugging
+    const balancesByAddress: Record<string, bigint> = balances.reduce(
+      (acc, balance) => {
+        acc[balance.address] = BigInt(balance.balance)
+        return acc
+      },
+      {} as Record<string, bigint>
+    )
+
     // Calculate hodler pool share weights
-    const amount = BigInt(distribution.amount)
+    const distAmt = BigInt(distribution.amount)
     const hodlerPoolBips = BigInt(distribution.hodler_pool_bips)
     const fixedPoolBips = BigInt(distribution.fixed_pool_bips)
     const bonusPoolBips = BigInt(distribution.bonus_pool_bips)
-    const poolWeights: Record<string, bigint> = {}
-    const balancesByAddress: Record<string, bigint> = {}
-    for (const { address, balance } of balances) {
-      const weight = BigInt(balance)
-      if (poolWeights[address] === undefined) {
-        poolWeights[address] = 0n
-      }
-      poolWeights[address] += weight
-      balancesByAddress[address] = weight
-    }
-
-    // Calculate hodler pool share amounts
-    const totalWeight = Object.values(poolWeights).reduce((acc, weight) => acc + weight, 0n)
-    const hodlerPoolAvailableAmount = calculatePercentageWithBips(amount, hodlerPoolBips)
-    const weightPerSend = (totalWeight * 10000n) / hodlerPoolAvailableAmount
+    const hodlerPoolAvailableAmount = calculatePercentageWithBips(distAmt, hodlerPoolBips)
+    const { totalWeight, weightPerSend, poolWeights, weightedShares } = calculateWeights(
+      balances,
+      hodlerPoolAvailableAmount
+    )
 
     log.info(
       { totalWeight, hodlerPoolAvailableAmount, weightPerSend },
@@ -248,18 +248,7 @@ export class DistributorWorker {
       return
     }
 
-    const sharesObj: Record<string, { address: string; amount: bigint }> = {}
-    for (const [address, weight] of Object.entries(poolWeights)) {
-      const amount = (weight * 10000n) / weightPerSend
-      if (amount > 0n) {
-        sharesObj[address] = {
-          amount,
-          address,
-        }
-      }
-    }
-
-    const fixedPoolAvailableAmount = calculatePercentageWithBips(amount, fixedPoolBips)
+    const fixedPoolAvailableAmount = calculatePercentageWithBips(distAmt, fixedPoolBips)
     let fixedPoolAllocatedAmount = 0n
     const fixedPoolAmountsByAddress: Record<string, bigint> = {}
     const bonusPoolBipsByAddress: Record<string, bigint> = {}
@@ -292,7 +281,7 @@ export class DistributorWorker {
       }
     }
 
-    const hodlerShares = Object.values(sharesObj)
+    const hodlerShares = Object.values(weightedShares)
     let totalAmount = 0n
     let totalHodlerPoolAmount = 0n
     let totalBonusPoolAmount = 0n
@@ -366,6 +355,13 @@ export class DistributorWorker {
     )
     log.info(`Calculated ${shares.length} shares.`)
     log.debug({ shares })
+
+    // ensure share amounts do not exceed the total distribution amount, ideally this should be done in the database
+    const totalShareAmounts = shares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    if (totalShareAmounts > distAmt) {
+      throw new Error('Share amounts exceed total distribution amount')
+    }
+
     const { error } = await createDistributionShares(distribution.id, shares)
     if (error) {
       log.error({ error: error.message, code: error.code }, 'Error saving shares.')
