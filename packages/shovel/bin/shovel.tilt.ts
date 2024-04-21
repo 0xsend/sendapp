@@ -23,4 +23,4 @@ await $`docker run --rm \
     -v ${import.meta.dir}/../etc:/etc/shovel \
     --entrypoint /usr/local/bin/shovel \
     -w /usr/local/bin \
-    docker.io/indexsupply/shovel -l :80 -config /etc/shovel/config.json`
+    docker.io/indexsupply/shovel -l :80 -skip-migrate -config /etc/shovel/config.json`
