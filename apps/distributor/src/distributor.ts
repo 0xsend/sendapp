@@ -9,7 +9,7 @@ import {
   supabaseAdmin,
 } from './supabase'
 import { fetchAllBalances } from './wagmi'
-import { calculateWeights } from './weights'
+import { calculateWeights, calculatePercentageWithBips, PERC_DENOM } from './weights'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -19,12 +19,6 @@ const inBatches = <T>(array: T[], batchSize = Math.max(8, cpuCount - 1)) => {
   return Array.from({ length: Math.ceil(array.length / batchSize) }, (_, i) =>
     array.slice(i * batchSize, (i + 1) * batchSize)
   )
-}
-
-function calculatePercentageWithBips(value: bigint, bips: bigint) {
-  const bps = bips * 10000n
-  const percentage = value * (bps / 10000n)
-  return percentage / 10000n
 }
 
 export class DistributorWorker {
@@ -226,6 +220,20 @@ export class DistributorWorker {
       {} as Record<string, bigint>
     )
 
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'balances.json',
+        JSON.stringify(balances, (key, value) => {
+          if (typeof value === 'bigint') {
+            return value.toString()
+          }
+          return value
+        })
+      ).catch((e) => {
+        log.error(e, 'Error writing balances.json')
+      })
+    }
+
     // Calculate hodler pool share weights
     const distAmt = BigInt(distribution.amount)
     const hodlerPoolBips = BigInt(distribution.hodler_pool_bips)
@@ -252,7 +260,7 @@ export class DistributorWorker {
     let fixedPoolAllocatedAmount = 0n
     const fixedPoolAmountsByAddress: Record<string, bigint> = {}
     const bonusPoolBipsByAddress: Record<string, bigint> = {}
-    const maxBonusPoolBips = (bonusPoolBips * 10000n) / hodlerPoolBips // 3500*10000/6500 = 5384.615384615385% 1.53X
+    const maxBonusPoolBips = (bonusPoolBips * PERC_DENOM) / hodlerPoolBips // 3500*10000/6500 = 5384.615384615385% 1.53X
 
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]

@@ -18,13 +18,28 @@ type Weights = {
   weightedShares: Record<`0x${string}`, WeightedShare>
 }
 
+export enum Mode {
+  Linear = 'linear',
+  Logarithmic = 'logarithmic',
+  SquareRoot = 'square_root',
+  Exponential = 'exponential',
+}
+
+export const PERC_DENOM = 10000n
+
+export function calculatePercentageWithBips(value: bigint, bips: bigint) {
+  const bps = bips * PERC_DENOM
+  const percentage = value * (bps / PERC_DENOM)
+  return percentage / PERC_DENOM
+}
+
 /**
  * Given a list of balances and a distribution amount, calculate the distribution weights and share amounts.
  */
 export function calculateWeights(
   balances: readonly { address: `0x${string}`; balance: string }[],
   amount: bigint,
-  mode: 'linear' | 'logarithmic' | 'square_root' | 'exponential' = 'linear'
+  mode: Mode = Mode.Linear
 ): Weights {
   const poolWeights: Record<`0x${string}`, bigint> = {}
   const totalBalance = balances.reduce((acc, { balance }) => acc + BigInt(balance), 0n)
@@ -38,11 +53,11 @@ export function calculateWeights(
   }
 
   const totalWeight = Object.values(poolWeights).reduce((acc, weight) => acc + weight, 0n)
-  const weightPerSend = (totalWeight * 10000n) / amount
+  const weightPerSend = (totalWeight * PERC_DENOM) / amount
 
   const weightedShares: Record<string, WeightedShare> = {}
   for (const [address, weight] of Object.entries(poolWeights)) {
-    const amount = (weight * 10000n) / weightPerSend
+    const amount = (weight * PERC_DENOM) / weightPerSend
     if (amount > 0n) {
       weightedShares[address] = {
         amount,
@@ -58,26 +73,32 @@ function calculateWeightByMode(
   balance: bigint,
   totalBalance: bigint,
   numBalances: number,
-  mode: 'linear' | 'logarithmic' | 'square_root' | 'exponential'
+  mode: Mode
 ): bigint {
   switch (mode) {
-    case 'linear':
+    case Mode.Linear:
       return balance
-    case 'logarithmic':
+    case Mode.Logarithmic:
       return calculateLogarithmicWeight(balance, totalBalance)
-    case 'square_root':
+    case Mode.SquareRoot:
       return calculateSquareRootWeight(balance, totalBalance)
-    case 'exponential':
+    case Mode.Exponential:
       return calculateExponentialWeight(balance, totalBalance, numBalances)
+    default:
+      throw new Error(`Unknown weight mode: ${mode}`)
   }
 }
 
 function calculateLogarithmicWeight(balance: bigint, totalBalance: bigint): bigint {
-  return BigInt(Math.floor(10000 * Math.log(1 + Number(balance) / Number(totalBalance))))
+  return BigInt(
+    Math.floor(Number(PERC_DENOM) * Math.log(1 + Number(balance) / Number(totalBalance)))
+  )
 }
 
 function calculateSquareRootWeight(balance: bigint, totalBalance: bigint): bigint {
-  return BigInt(Math.floor(10000 * Math.sqrt(1 - Number(balance) / Number(totalBalance))))
+  return BigInt(
+    Math.floor(Number(PERC_DENOM) * Math.sqrt(1 - Number(balance) / Number(totalBalance)))
+  )
 }
 
 function calculateExponentialWeight(
@@ -86,5 +107,7 @@ function calculateExponentialWeight(
   numBalances: number
 ): bigint {
   const k = 0.005 * numBalances
-  return BigInt(Math.floor(10000 * Math.exp((-k * Number(balance)) / Number(totalBalance))))
+  return BigInt(
+    Math.floor(Number(PERC_DENOM) * Math.exp((-k * Number(balance)) / Number(totalBalance)))
+  )
 }
