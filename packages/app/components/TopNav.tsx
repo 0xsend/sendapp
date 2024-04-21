@@ -14,14 +14,7 @@ import {
 } from '@my/ui'
 import { useNav } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import {
-  IconArrowLeft,
-  IconCopy,
-  IconGear,
-  IconHamburger,
-  IconQr,
-  IconSendLogo,
-} from 'app/components/icons'
+import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
@@ -31,6 +24,7 @@ export enum ButtonOption {
   QR = 'QR',
   SETTINGS = 'SETTINGS',
   REFERRAL = 'REFERRAL',
+  NONE = 'NONE',
 }
 
 interface TopNavProps {
@@ -102,7 +96,8 @@ export function TopNav({
             onPress={handleSettingsBottomSheet}
           />
         )
-
+      case ButtonOption.NONE:
+        return null
       default:
         if (__DEV__) throw new Error(`Unknown button option: ${button}`)
         return null
@@ -158,7 +153,7 @@ export function TopNav({
               <Paragraph>Referral Link</Paragraph> <ReferralLink />
             </XStack>
           )}
-          <XStack>{renderButton()}</XStack>
+          <XStack minWidth={'$4'}>{renderButton()}</XStack>
         </Container>
         <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
         {subheader && (

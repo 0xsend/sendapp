@@ -15,9 +15,6 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP(async () => {
-  // disable for now
-  return { redirect: { destination: '/', permanent: false } }
-})
+export const getServerSideProps = userProtectedGetSSP()
 
 export default Page
