@@ -44,7 +44,7 @@ export default defineConfig({
   },
   transform: {
     auth: {
-      users({ row }) {
+      users: ({ row }) => {
         let phone: string
         if (row.phone !== null) {
           phone = `1${copycat.phoneNumber(row.phone.slice(1), {
@@ -69,37 +69,37 @@ export default defineConfig({
       },
     },
     storage: {
-      buckets({ row }) {
+      buckets: ({ row }) => {
         return {}
       },
-      objects({ row }) {
+      objects: ({ row }) => {
         return {}
       },
     },
 
     public: {
-      profiles({ row }) {
+      profiles: ({ row }) => {
         return {
           name: copycat.fullName(row.name),
           about: copycat.sentence(row.about),
           referral_code: copycat.scramble(row.referral_code),
         }
       },
-      send_account_transfers({ row }) {
+      send_account_transfers: ({ row }) => {
         return {}
       },
-      send_account_created({ row }) {
+      send_account_created: ({ row }) => {
         return {}
       },
-      send_token_transfers({ row }) {
+      send_token_transfers: ({ row }) => {
         return {}
       },
-      tags({ row }) {
+      tags: ({ row }) => {
         return {
-          name: tagName(row.name),
+          name: tagName(copycat.username(row.name)),
         }
       },
-      distribution_verifications({ row }) {
+      distribution_verifications: ({ row }) => {
         if (row.metadata === null) {
           return {}
         }
@@ -116,17 +116,17 @@ export default defineConfig({
           },
         }
       },
-      referrals({ row }) {
+      referrals: ({ row }) => {
         return {
           tag: tagName(row.tag),
         }
       },
-      tag_receipts({ row }) {
+      tag_receipts: ({ row }) => {
         return {
           tag_name: tagName(row.tag_name),
         }
       },
-      tag_reservations({ row }) {
+      tag_reservations: ({ row }) => {
         return {
           tag_name: tagName(row.tag_name),
         }
