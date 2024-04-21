@@ -364,6 +364,12 @@ export class DistributorWorker {
     log.info(`Calculated ${shares.length} shares.`)
     log.debug({ shares })
 
+    if (totalFixedPoolAmount > fixedPoolAvailableAmount) {
+      log.warn(
+        'Fixed pool amount is greater than available amount. This is not a problem, but it means the fixed pool is exhausted.'
+      )
+    }
+
     // ensure share amounts do not exceed the total distribution amount, ideally this should be done in the database
     const totalShareAmounts = shares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
     if (totalShareAmounts > distAmt) {

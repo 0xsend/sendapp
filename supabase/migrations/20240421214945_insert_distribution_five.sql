@@ -26,10 +26,10 @@ VALUES (
     'Fifth distributions of 300,000,000 SEND tokens to early hodlers',
     300000000,
     -- 300,000,000 SEND
-    6500,
-    3500,
+    9000,
     1000,
-    (select qualification_end from distributions where number = 4 limit 1),
+    500,
+    (select '2024-04-23T00:00:00Z'::timestamp with time zone),
     (
       select '2024-05-12T00:00:00Z'::timestamp with time zone - interval '1 second'
     ),
