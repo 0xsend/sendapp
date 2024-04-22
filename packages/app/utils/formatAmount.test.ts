@@ -99,4 +99,8 @@ describe('Additional scenarios', () => {
   it('should handle when num is less than default maxDecimals', () => {
     expect(formatAmount(0.0045)).toBe('<0.00')
   })
+
+  it('should handle when num is greater than and has no decimals', () => {
+    expect(formatAmount(123)).toBe('123')
+  })
 })
