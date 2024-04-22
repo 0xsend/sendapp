@@ -13,11 +13,11 @@ import {
   YStack,
   useMedia,
 } from '@my/ui'
-import { IconQRCode } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
+import { IconActivity, IconCaret } from 'app/components/icons'
 
 const activities = [
   {
@@ -72,15 +72,27 @@ export function ActivityScreen() {
     <TagSearchProvider>
       <YStack f={1} width={'100%'} pb="$4" gap="$6">
         <Container f={0}>
-          <XStack alignItems="center" width={'100%'} gap="$6">
+          <XStack alignItems="center" width={'100%'} gap="$size.1" $gtMd={{ gap: '$size.3.5' }}>
             <Search />
-            <IconQRCode />
+            <SortBy />
           </XStack>
         </Container>
 
         <ActivityBody />
       </YStack>
     </TagSearchProvider>
+  )
+}
+
+function SortBy() {
+  return (
+    <XStack ai="baseline" jc="center" gap="$2.5">
+      <IconActivity width={16} height={13} color={'$accent12Dark'} rotate="90deg" />
+      <Text color={'$accent12Dark'} mr="$1.5" fontWeight="700">
+        Sort by
+      </Text>
+      <IconCaret color="$accent12Dark" display="block" />
+    </XStack>
   )
 }
 
