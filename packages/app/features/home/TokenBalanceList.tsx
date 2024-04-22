@@ -14,7 +14,26 @@ import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
 
-const TokenDetails = ({
+export const TokenBalanceList = ({
+  coins,
+}: { coins: { label: string; token: `0x${string}` | undefined; icon: JSX.Element }[] }) => {
+  const { resolvedTheme } = useThemeSetting()
+  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+
+  return coins.map((coin, index) => (
+    <TokenBalanceItem
+      coin={coin}
+      key={coin.label}
+      jc={'space-between'}
+      ai={'center'}
+      py={'$3.5'}
+      borderColor={separatorColor}
+      borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
+    />
+  ))
+}
+
+const TokenBalanceItem = ({
   coin,
   ...props
 }: {
@@ -128,5 +147,3 @@ const ErrorTooltip = ({ Icon, children, ...props }: TooltipProps & { Icon?: JSX.
     </Tooltip>
   )
 }
-
-export default TokenDetails
