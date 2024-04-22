@@ -1,4 +1,12 @@
-import { Paragraph, Spinner, Tooltip, type TooltipProps, XStack, type XStackProps } from '@my/ui'
+import {
+  Paragraph,
+  Spinner,
+  Tooltip,
+  type TooltipProps,
+  XStack,
+  Link,
+  type LinkProps,
+} from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
@@ -9,8 +17,7 @@ import type { coins } from 'app/data/coins'
 import { useToken } from 'app/routers/params'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
-  const [, setTokenParam] = useToken()
-
+  const [tokenParam] = useToken()
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
@@ -22,7 +29,12 @@ export const TokenBalanceList = ({ coins }: { coins: coins }) => {
       ai={'center'}
       py={'$3.5'}
       borderColor={separatorColor}
-      onPress={() => setTokenParam(coin.token)}
+      disabled={tokenParam !== undefined && tokenParam !== coin.token}
+      disabledStyle={{ opacity: 0.5 }}
+      href={{
+        pathname: '/',
+        query: { token: coin.token },
+      }}
       borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
     />
   ))
@@ -33,7 +45,7 @@ const TokenBalanceItem = ({
   ...props
 }: {
   coin: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }
-} & XStackProps) => {
+} & Omit<LinkProps, 'children'>) => {
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
@@ -45,7 +57,7 @@ const TokenBalanceItem = ({
   })
 
   return (
-    <XStack {...props}>
+    <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
         {coin.icon}
         <Paragraph
@@ -60,7 +72,7 @@ const TokenBalanceItem = ({
       <XStack gap={'$3.5'} ai={'center'}>
         <TokenBalance balance={balance} />
       </XStack>
-    </XStack>
+    </Link>
   )
 }
 
