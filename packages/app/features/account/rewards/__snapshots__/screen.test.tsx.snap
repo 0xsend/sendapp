@@ -30,8 +30,8 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           "alignSelf": "center",
           "flex": 1,
           "flexDirection": "row",
-          "paddingLeft": 32,
-          "paddingRight": 32,
+          "paddingLeft": 18,
+          "paddingRight": 18,
           "width": "100%",
         }
       }
@@ -699,8 +699,8 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
         "alignSelf": "center",
         "flex": 1,
         "flexDirection": "row",
-        "paddingLeft": 32,
-        "paddingRight": 32,
+        "paddingLeft": 18,
+        "paddingRight": 18,
         "width": "100%",
       }
     }
