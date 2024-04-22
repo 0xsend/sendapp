@@ -7489,9 +7489,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@snaplet/sdk@npm:~0.89.4":
-  version: 0.89.4
-  resolution: "@snaplet/sdk@npm:0.89.4"
+"@snaplet/sdk@npm:~0.89.6":
+  version: 0.89.6
+  resolution: "@snaplet/sdk@npm:0.89.6"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -7539,20 +7539,20 @@ __metadata:
     word-wrap: "npm:1.2.3"
     zod: "npm:3.22.4"
     zod-validation-error: "npm:1.5.0"
-  checksum: 6dfa92e5f30107edc97f7f2365c4cc4c64431ae20de6959532a03c3d58bfdc18a6e7a2d1b8f7f7764f643dcd4c9e9661e67916f28ce9c1bece34dae1b06a1220
+  checksum: ac89adba0adc419d7f55843c488d251c8147f78536924ea0687a4e53b3525e910a05588c413841ebb604468491d9016e9853f89a8025330cb6085b9d52138c18
   languageName: node
   linkType: hard
 
 "@snaplet/seed@npm:^0.89.4":
-  version: 0.89.4
-  resolution: "@snaplet/seed@npm:0.89.4"
+  version: 0.89.6
+  resolution: "@snaplet/seed@npm:0.89.6"
   dependencies:
-    "@snaplet/sdk": "npm:~0.89.4"
+    "@snaplet/sdk": "npm:~0.89.6"
     "@types/node": "npm:20.10.4"
     pg: "npm:8.10.0"
   peerDependencies:
     "@snaplet/copycat": ">=4.1.0"
-  checksum: 44bd684d8b611eee80c89e4dc1a44382a85ac1f8ef5674f987f3ec6d919d89f949458d9ab30e64241cf167fe129548528484f8bb102ccdb465a64d2d1774c041
+  checksum: 9741e4621665b9ee054a35cb44abbf62a358fe41b01a123cc8b384485016775c2a0c2c4e69fa2382688217d8caa456406edb75169675824e8544ef6d0e629382
   languageName: node
   linkType: hard
 
@@ -28773,8 +28773,8 @@ __metadata:
   linkType: hard
 
 "snaplet@npm:^0.89.4":
-  version: 0.89.4
-  resolution: "snaplet@npm:0.89.4"
+  version: 0.89.6
+  resolution: "snaplet@npm:0.89.6"
   dependencies:
     "@babel/code-frame": "npm:7.22.13"
     "@babel/core": "npm:7.23.2"
@@ -28856,7 +28856,7 @@ __metadata:
     zod-validation-error: "npm:1.5.0"
   bin:
     snaplet: bin/snaplet.js
-  checksum: 6c4d627988e33239912e5318c9e197719c7a07b29d5490dabc9869ce09ff1fa2f1ae430ff9b578469c48ac8b91e7797dcba2fce36da08b900183366430533b3f
+  checksum: f567af2b8b1bf72629ee672402e04f1ab471bbcc6ce343768dcd99a86a841d76feb8861c14921a849f0512996545fbe10f42df41759f1250c920176128105e00
   languageName: node
   linkType: hard
 

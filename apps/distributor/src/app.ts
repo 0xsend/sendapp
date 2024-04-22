@@ -1,8 +1,9 @@
 import express, { type Request, type Response, Router } from 'express'
 import pino from 'pino'
-import { DistributorWorker, supabaseAdmin } from './distributor'
+import { DistributorWorker } from './distributor'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { selectAll } from 'app/utils/supabase/selectAll'
+import { supabaseAdmin } from './supabase'
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',

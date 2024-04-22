@@ -1,29 +1,15 @@
 import { cpus } from 'node:os'
 import type { Database, Tables } from '@my/supabase/database.types'
-import { config, readSendTokenBalanceOf, type sendTokenAddress } from '@my/wagmi'
-import { createClient } from '@supabase/supabase-js'
-import { selectAll } from 'app/utils/supabase/selectAll'
 import type { Logger } from 'pino'
-
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error(
-    'NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.'
-  )
-}
-if (!process.env.SUPABASE_SERVICE_ROLE) {
-  throw new Error(
-    'SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.'
-  )
-}
-
-/**
- * only meant to be used on the server side.
- */
-export const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE,
-  { auth: { persistSession: false } }
-)
+import {
+  createDistributionShares,
+  fetchAllHodlers,
+  fetchAllVerifications,
+  fetchDistribution,
+  supabaseAdmin,
+} from './supabase'
+import { fetchAllBalances } from './wagmi'
+import { calculateWeights, calculatePercentageWithBips, PERC_DENOM } from './weights'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -35,12 +21,6 @@ const inBatches = <T>(array: T[], batchSize = Math.max(8, cpuCount - 1)) => {
   )
 }
 
-function calculatePercentageWithBips(value: bigint, bips: bigint) {
-  const bps = bips * 10000n
-  const percentage = value * (bps / 10000n)
-  return percentage / 10000n
-}
-
 export class DistributorWorker {
   private log: Logger
   private running: boolean
@@ -48,11 +28,16 @@ export class DistributorWorker {
   private lastDistributionId: number | null = null
   private workerPromise: Promise<void>
 
-  constructor(log: Logger) {
+  constructor(log: Logger, start = true) {
     this.id = Math.random().toString(36).substring(7)
     this.log = log.child({ module: 'distributor', id: this.id })
-    this.running = true
-    this.workerPromise = this.worker()
+    if (start) {
+      this.running = true
+      this.workerPromise = this.worker()
+    } else {
+      this.running = false
+      this.workerPromise = Promise.resolve()
+    }
   }
 
   /**
@@ -121,17 +106,11 @@ export class DistributorWorker {
     const log = this.log.child({ distribution_id: distribution.id })
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
-    // fetch all verifications
     const {
       data: verifications,
       error: verificationsError,
       count,
-    } = await selectAll(
-      supabaseAdmin
-        .from('distribution_verifications')
-        .select('*', { count: 'exact' })
-        .eq('distribution_id', distribution.id)
-    )
+    } = await fetchAllVerifications(distribution.id)
 
     if (verificationsError) {
       throw verificationsError
@@ -174,17 +153,10 @@ export class DistributorWorker {
     log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
     log.debug({ verificationsByUserId })
 
-    const { data: hodlerAddresses, error: hodlerAddressesError } = await selectAll(
-      supabaseAdmin
-        .rpc(
-          'distribution_hodler_addresses',
-          {
-            distribution_id: distribution.id,
-          },
-          { count: 'exact' }
-        )
-        .select('*')
+    const { data: hodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
+      distribution.id
     )
+
     if (hodlerAddressesError) {
       throw hodlerAddressesError
     }
@@ -214,19 +186,9 @@ export class DistributorWorker {
     // lookup balances of all hodler addresses in qualification period
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
       return await Promise.all(
-        addresses.map(async ({ user_id, address }) => {
-          const balance = await readSendTokenBalanceOf(config, {
-            args: [address],
-            chainId: distribution.chain_id as keyof typeof sendTokenAddress,
-            blockNumber: distribution.snapshot_block_num
-              ? BigInt(distribution.snapshot_block_num)
-              : undefined,
-          })
-          return {
-            user_id,
-            address,
-            balance: balance.toString(),
-          }
+        fetchAllBalances({
+          addresses,
+          distribution,
         })
       )
     })
@@ -249,26 +211,39 @@ export class DistributorWorker {
     )
     log.debug({ balances })
 
+    // for debugging
+    const balancesByAddress: Record<string, bigint> = balances.reduce(
+      (acc, balance) => {
+        acc[balance.address] = BigInt(balance.balance)
+        return acc
+      },
+      {} as Record<string, bigint>
+    )
+
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'balances.json',
+        JSON.stringify(balances, (key, value) => {
+          if (typeof value === 'bigint') {
+            return value.toString()
+          }
+          return value
+        })
+      ).catch((e) => {
+        log.error(e, 'Error writing balances.json')
+      })
+    }
+
     // Calculate hodler pool share weights
-    const amount = BigInt(distribution.amount)
+    const distAmt = BigInt(distribution.amount)
     const hodlerPoolBips = BigInt(distribution.hodler_pool_bips)
     const fixedPoolBips = BigInt(distribution.fixed_pool_bips)
     const bonusPoolBips = BigInt(distribution.bonus_pool_bips)
-    const poolWeights: Record<string, bigint> = {}
-    const balancesByAddress: Record<string, bigint> = {}
-    for (const { address, balance } of balances) {
-      const weight = BigInt(balance)
-      if (poolWeights[address] === undefined) {
-        poolWeights[address] = 0n
-      }
-      poolWeights[address] += weight
-      balancesByAddress[address] = weight
-    }
-
-    // Calculate hodler pool share amounts
-    const totalWeight = Object.values(poolWeights).reduce((acc, weight) => acc + weight, 0n)
-    const hodlerPoolAvailableAmount = calculatePercentageWithBips(amount, hodlerPoolBips)
-    const weightPerSend = (totalWeight * 10000n) / hodlerPoolAvailableAmount
+    const hodlerPoolAvailableAmount = calculatePercentageWithBips(distAmt, hodlerPoolBips)
+    const { totalWeight, weightPerSend, poolWeights, weightedShares } = calculateWeights(
+      balances,
+      hodlerPoolAvailableAmount
+    )
 
     log.info(
       { totalWeight, hodlerPoolAvailableAmount, weightPerSend },
@@ -281,22 +256,11 @@ export class DistributorWorker {
       return
     }
 
-    const sharesObj: Record<string, { address: string; amount: bigint }> = {}
-    for (const [address, weight] of Object.entries(poolWeights)) {
-      const amount = (weight * 10000n) / weightPerSend
-      if (amount > 0n) {
-        sharesObj[address] = {
-          amount,
-          address,
-        }
-      }
-    }
-
-    const fixedPoolAvailableAmount = calculatePercentageWithBips(amount, fixedPoolBips)
+    const fixedPoolAvailableAmount = calculatePercentageWithBips(distAmt, fixedPoolBips)
     let fixedPoolAllocatedAmount = 0n
     const fixedPoolAmountsByAddress: Record<string, bigint> = {}
     const bonusPoolBipsByAddress: Record<string, bigint> = {}
-    const maxBonusPoolBips = (bonusPoolBips * 10000n) / hodlerPoolBips // 3500*10000/6500 = 5384.615384615385% 1.53X
+    const maxBonusPoolBips = (bonusPoolBips * PERC_DENOM) / hodlerPoolBips // 3500*10000/6500 = 5384.615384615385% 1.53X
 
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]
@@ -325,7 +289,7 @@ export class DistributorWorker {
       }
     }
 
-    const hodlerShares = Object.values(sharesObj)
+    const hodlerShares = Object.values(weightedShares)
     let totalAmount = 0n
     let totalHodlerPoolAmount = 0n
     let totalBonusPoolAmount = 0n
@@ -346,7 +310,8 @@ export class DistributorWorker {
         const hodlerPoolAmount = share.amount
         const bonusPoolAmount = calculatePercentageWithBips(hodlerPoolAmount, bonusBips)
         const fixedPoolAmount = fixedPoolAmountsByAddress[share.address] || 0n
-        totalAmount += hodlerPoolAmount + bonusPoolAmount + fixedPoolAmount
+        const amount = hodlerPoolAmount + bonusPoolAmount + fixedPoolAmount
+        totalAmount += amount
         totalHodlerPoolAmount += hodlerPoolAmount
         totalBonusPoolAmount += bonusPoolAmount
         totalFixedPoolAmount += fixedPoolAmount
@@ -360,7 +325,7 @@ export class DistributorWorker {
           {
             address: share.address,
             balance: balancesByAddress[share.address],
-            amount: hodlerPoolAmount + bonusPoolAmount,
+            amount: amount,
             bonusBips,
             hodlerPoolAmount,
             bonusPoolAmount,
@@ -368,25 +333,28 @@ export class DistributorWorker {
           },
           'Calculated share.'
         )
+
         // @ts-expect-error supabase-js does not support bigint
         return {
           address: share.address,
           distribution_id: distribution.id,
           user_id: userId,
-          amount: (hodlerPoolAmount + bonusPoolAmount).toString(),
+          amount: amount.toString(),
           bonus_pool_amount: bonusPoolAmount.toString(),
           fixed_pool_amount: fixedPoolAmount.toString(),
           hodler_pool_amount: hodlerPoolAmount.toString(),
         } as Tables<'distribution_shares'>
       })
-      .filter(Boolean)
+      .filter(Boolean) as Tables<'distribution_shares'>[]
 
     log.info(
       {
         totalAmount,
         totalHodlerPoolAmount,
+        hodlerPoolAvailableAmount,
         totalBonusPoolAmount,
         totalFixedPoolAmount,
+        fixedPoolAvailableAmount,
         maxBonusPoolBips,
         name: distribution.name,
         shares: shares.length,
@@ -395,10 +363,20 @@ export class DistributorWorker {
     )
     log.info(`Calculated ${shares.length} shares.`)
     log.debug({ shares })
-    const { error } = await supabaseAdmin.rpc('update_distribution_shares', {
-      distribution_id: distribution.id,
-      shares,
-    })
+
+    if (totalFixedPoolAmount > fixedPoolAvailableAmount) {
+      log.warn(
+        'Fixed pool amount is greater than available amount. This is not a problem, but it means the fixed pool is exhausted.'
+      )
+    }
+
+    // ensure share amounts do not exceed the total distribution amount, ideally this should be done in the database
+    const totalShareAmounts = shares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    if (totalShareAmounts > distAmt) {
+      throw new Error('Share amounts exceed total distribution amount')
+    }
+
+    const { error } = await createDistributionShares(distribution.id, shares)
     if (error) {
       log.error({ error: error.message, code: error.code }, 'Error saving shares.')
       throw error
@@ -427,14 +405,7 @@ export class DistributorWorker {
   }
 
   public async calculateDistribution(id: string) {
-    const { data: distribution, error } = await supabaseAdmin
-      .from('distributions')
-      .select(
-        `*,
-        distribution_verification_values (*)`
-      )
-      .eq('id', id)
-      .single()
+    const { data: distribution, error } = await fetchDistribution(id)
     if (error) {
       this.log.error({ error: error.message, code: error.code }, 'Error fetching distribution.')
       throw error

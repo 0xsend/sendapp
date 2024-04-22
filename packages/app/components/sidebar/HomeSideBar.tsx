@@ -14,7 +14,14 @@ import {
 } from '@my/ui'
 import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import { IconAccount, IconHome, IconSendLogo } from 'app/components/icons'
+import {
+  IconAccount,
+  // IconActivity,
+  IconHome,
+  // IconSLogo,
+  IconSendLogo,
+  IconX,
+} from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
