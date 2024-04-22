@@ -9,7 +9,7 @@ import pino from 'pino'
 import { DistributorWorker } from './distributor'
 import type { Tables } from '@my/supabase/database.types'
 
-describe.skip('Root Route', () => {
+describe('Root Route', () => {
   it('should return correct response for the root route', async () => {
     const res = await request(app).get('/')
 
@@ -18,7 +18,7 @@ describe.skip('Root Route', () => {
   })
 })
 
-describe.skip('Distributor Route', () => {
+describe('Distributor Route', () => {
   it('should reject unauthorized requests', async () => {
     const res = await request(app).post('/distributor')
 
@@ -70,7 +70,7 @@ describe.skip('Distributor Route', () => {
     })
   })
 
-  it.skip('should return a merkle root', async () => {
+  it('should return a merkle root', async () => {
     const res = await request(app)
       .post('/distributor/merkle')
       .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)

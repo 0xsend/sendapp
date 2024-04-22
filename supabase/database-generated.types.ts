@@ -324,6 +324,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "referrals_tag_fkey"
+            columns: ["tag"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["name"]
+          },
         ]
       }
       send_account_created: {
@@ -666,6 +673,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "receipts"
             referencedColumns: ["hash"]
+          },
+          {
+            foreignKeyName: "tag_receipts_tag_name_fkey"
+            columns: ["tag_name"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["name"]
           },
         ]
       }
