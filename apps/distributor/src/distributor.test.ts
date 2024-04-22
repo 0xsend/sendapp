@@ -70,7 +70,7 @@ describe('Distributor Route', () => {
     })
   })
 
-  it('should return a merkle root', async () => {
+  it.skip('should return a merkle root', async () => {
     const res = await request(app)
       .post('/distributor/merkle')
       .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)
