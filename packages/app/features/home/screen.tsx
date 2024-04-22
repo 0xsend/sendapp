@@ -3,6 +3,7 @@ import { IconDeposit } from 'app/components/icons'
 import { TokenBalanceList } from './TokenBalanceList'
 import { coins } from 'app/data/coins'
 import { TokenBalanceCard } from './TokenBalanceCard'
+import { createParam } from 'solito'
 
 export function HomeScreen() {
   const toast = useToastController()

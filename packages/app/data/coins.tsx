@@ -7,6 +7,6 @@ import {
 
 export const coins = [
   { label: 'USDC', token: usdcAddresses[baseMainnet.id], icon: <IconUSDC size={'$2.5'} /> },
-  { label: 'Ethereum', token: undefined, icon: <IconEthereum size={'$2.5'} /> },
+  { label: 'Ethereum', token: 'eth', icon: <IconEthereum size={'$2.5'} /> },
   { label: 'Send', token: sendAddresses[baseMainnet.id], icon: <IconSend size={'$2.5'} /> },
 ]
