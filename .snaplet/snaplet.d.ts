@@ -89,6 +89,7 @@ interface Table_public_distributions {
   qualification_start: string;
   qualification_end: string;
   claim_end: string;
+  snapshot_id: number | null;
   hodler_min_balance: number;
   created_at: string;
   updated_at: string;

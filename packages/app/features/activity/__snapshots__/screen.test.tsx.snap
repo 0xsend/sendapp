@@ -3901,7 +3901,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
     style={
       {
         "flexDirection": "column",
-        "gap": 18,
         "marginBottom": 18,
         "opacity": 0,
         "transform": [
@@ -3935,6 +3934,38 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       Results
     </Text>
     <View
+      pointerEvents="none"
+      style={
+        {
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "hsla(191, 32%, 46%, 1)",
+          "fontFamily": "System",
+          "fontSize": 20,
+          "fontWeight": "700",
+          "lineHeight": 24,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      tag_matches
+    </Text>
+    <View
       data-href="/profile/test"
     >
       <View
@@ -3942,7 +3973,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 18,
           }
         }
         testID="tag-search-test"
@@ -3956,7 +3986,6 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               "borderTopLeftRadius": 9,
               "borderTopRightRadius": 9,
               "flexDirection": "column",
-              "gap": 7,
               "height": 44,
               "justifyContent": "center",
               "maxHeight": 44,
@@ -3999,6 +4028,17 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               }
             />
           </View>
+          <View
+            pointerEvents="none"
+            style={
+              {
+                "height": 7,
+                "minHeight": 7,
+                "minWidth": 7,
+                "width": 7,
+              }
+            }
+          />
           <View
             style={
               {
@@ -4092,10 +4132,20 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           </View>
         </View>
         <View
+          pointerEvents="none"
+          style={
+            {
+              "height": 18,
+              "minHeight": 18,
+              "minWidth": 18,
+              "width": 18,
+            }
+          }
+        />
+        <View
           style={
             {
               "flexDirection": "column",
-              "gap": 2,
             }
           }
         >

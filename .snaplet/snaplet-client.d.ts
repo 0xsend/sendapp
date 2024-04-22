@@ -98,6 +98,7 @@ type Override = {
       qualification_start?: string;
       qualification_end?: string;
       claim_end?: string;
+      snapshot_id?: string;
       hodler_min_balance?: string;
       created_at?: string;
       updated_at?: string;
@@ -522,6 +523,7 @@ export interface Fingerprint {
     qualificationStart?: FingerprintDateField;
     qualificationEnd?: FingerprintDateField;
     claimEnd?: FingerprintDateField;
+    snapshotId?: FingerprintNumberField;
     hodlerMinBalance?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;

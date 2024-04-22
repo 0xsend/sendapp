@@ -31,8 +31,7 @@ select
 -- Verify that the tags are visible to the public
 select
   results_eq($$
-    select
-      count(*)::integer from tag_search('zzz') $$, $$
+  SELECT jsonb_array_length(tag_matches) from tag_search('zzz'); $$, $$
     values (4) $$, 'Tags should be visible to the public');
 select
   *

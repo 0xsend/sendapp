@@ -30,7 +30,7 @@ async function searchTags({ supabase, query }: SearchTagsArgs) {
   }
   abortController = new AbortController()
   const { data, error } = await supabase
-    .rpc('tag_search', { query })
+    .rpc('tag_search', { query, limit_val: 10 })
     .abortSignal(abortController.signal)
   return { data, error }
 }
@@ -68,8 +68,8 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
   const query = form.watch('query', '')
 
   useEffect(() => {
-    if (query.length >= 2) {
-      onSearch({ query })
+    if (query.length >= 1) {
+      onSearch({ query, limit_val: 10 })
     } else {
       setIsLoading(false)
       setError(null)

@@ -186,6 +186,7 @@ export type Database = {
           qualification_end: string
           qualification_start: string
           snapshot_block_num: number | null
+          snapshot_id: number | null
           updated_at: string
         }
         Insert: {
@@ -204,6 +205,7 @@ export type Database = {
           qualification_end: string
           qualification_start: string
           snapshot_block_num?: number | null
+          snapshot_id?: number | null
           updated_at?: string
         }
         Update: {
@@ -222,6 +224,7 @@ export type Database = {
           qualification_end?: string
           qualification_start?: string
           snapshot_block_num?: number | null
+          snapshot_id?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -916,15 +919,19 @@ export type Database = {
           address: string
           chain_id: number
           is_public: boolean
+          send_id: number
         }[]
       }
       tag_search: {
         Args: {
           query: string
+          limit_val?: number
+          offset_val?: number
         }
         Returns: {
-          avatar_url: string
-          tag_name: string
+          send_id_matches: Json
+          tag_matches: Json
+          phone_matches: Json
         }[]
       }
       update_distribution_shares: {

@@ -9,8 +9,15 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
       abortSignal: jest.fn().mockReturnValue({
         data: [
           {
-            tag_name: 'test',
-            avatar_url: 'https://avatars.githubusercontent.com/u/123',
+            send_id_matches: [],
+            tag_matches: [
+              {
+                send_id: 3665,
+                tag_name: 'test',
+                avatar_url: 'https://avatars.githubusercontent.com/u/123',
+              },
+            ],
+            phone_matches: [],
           },
         ],
         error: null,
