@@ -17,18 +17,8 @@ It seeds our database using two main methods:
 ```shell
 # Meant to be run from the root of the project, you may need to remove other migrations. 
 # This is just an example.
-rm -f ./supabase/migrations/20240107035807_users_can_have_only_one_send_account.sql
-rm -f ./supabase/migrations/20240101173854_create_webauthn_credentials.sql
-rm -f ./supabase/migrations/20240102033418_create_send_accounts.sql
-rm -f ./supabase/migrations/20240229220531_add_shovel.sql
-rm -f ./supabase/migrations/20240229220532_add_shovel_integrations.sql
-rm -f ./supabase/migrations/20240302022726_insert_distribution_four.sql
-rm -f ./supabase/migrations/20240302022727_update_distribution_hodler_function.sql
-rm -f ./supabase/migrations/20240113035231_users_referrals_count.sql
-rm -f ./supabase/migrations/20240116215010_create_tag_search_function.sql
-rm -f ./supabase/migrations/20240122020348_create_profile_lookup_function.sql
-rm -f ./supabase/migrations/20240129215957_update_tags_before_insert_or_update_func.sql
-rm -f ./supabase/migrations/20240329185908_add_profiles_send_id.sql
+rm -f supabase/migrations/20240421214944_drop_snapshot_id.sql
+rm -f supabase/migrations/20240421214945_insert_distribution_five.sql
 
 # now run the snapshot restore command
 bunx supabase db reset && \

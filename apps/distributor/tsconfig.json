@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["bun"]
   },
-  "include": ["./src", "../../globals.d.ts"]
+  "include": ["./src", "../../globals.d.ts", "bin"]
 }

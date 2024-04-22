@@ -234,5 +234,10 @@ describe('Distributor Worker', () => {
 
     // @ts-expect-error supabase-js does not support bigint
     expect(createDistributionShares.mock.calls[0]).toEqual([distribution.id, expectedShares])
+
+    // expected share amounts cannot exceed the total distribution amount
+    const totalDistributionAmount = BigInt(distribution.amount)
+    const totalShareAmounts = expectedShares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
+    expect(totalShareAmounts).toBeLessThanOrEqual(totalDistributionAmount)
   })
 })
