@@ -84,7 +84,7 @@ const HomeBottomSheet = () => {
   return (
     <NavSheet navId="home">
       <XStack gap="$4" ai="center">
-        <Avatar size="$4.5">
+        <Avatar size="$4.5" br={'$3'}>
           <Avatar.Image src={avatarUrl ?? ''} />
           <Avatar.Fallback jc={'center'} delayMs={200}>
             <IconAccount size="$4.5" color="$olive" />
