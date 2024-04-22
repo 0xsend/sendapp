@@ -1,4 +1,4 @@
-import { Paragraph, Spinner, Stack, Tooltip, TooltipGroup, XStack, YStack } from '@my/ui'
+import { Label, Paragraph, Spinner, Stack, Tooltip, TooltipGroup, XStack, YStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -22,15 +22,14 @@ export const TokenBalanceCard = () => {
               <Tooltip placement="bottom">
                 <Tooltip.Trigger>
                   <XStack ai="center" gap="$2.5">
-                    <Stack w={11} h={11} bc="$b" />
-                    <Paragraph
+                    <Label
                       fontSize={'$4'}
                       zIndex={1}
                       color={'$color05'}
                       textTransform={'uppercase'}
                     >
                       Total Balance
-                    </Paragraph>
+                    </Label>
                   </XStack>
                   <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
                     {totalBalance === undefined ? (

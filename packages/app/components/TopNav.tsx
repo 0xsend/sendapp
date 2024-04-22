@@ -11,12 +11,14 @@ import {
   Separator,
   useToastController,
   type ButtonProps,
+  ButtonText,
 } from '@my/ui'
-import { useNav } from 'app/routers/params'
+import { useNav, useToken } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
+import { coins } from 'app/data/coins'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
 import { ReferralLink } from './ReferralLink'
 
@@ -67,8 +69,14 @@ export function TopNav({
     setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
   }
 
+  const [tokenParam, setTokenParam] = useToken()
+  const hasSubrouteParam = tokenParam !== undefined
+
   const handleBack = () => {
     // always pop to the base path. e.g. /account/settings/edit-profile -> /account
+    if (hasSubrouteParam) {
+      setTokenParam(undefined)
+    }
     const newPath = parts.slice(0, 1).join('/')
     push(`/${newPath}`)
   }
@@ -78,9 +86,37 @@ export function TopNav({
 
   const isSubRoute = !noSubroute && parts.length > 1
 
+  const selectedCoin = coins.find((c) => c.token === tokenParam)
+  if (selectedCoin) {
+    header = ''
+    showLogo = false
+  }
+
   const renderButton = () => {
-    switch (button) {
-      case ButtonOption.QR:
+    switch (true) {
+      case selectedCoin !== undefined:
+        return (
+          <ButtonOg
+            disabled
+            $gtLg={{ display: 'none' }}
+            icon={selectedCoin.icon}
+            bc="transparent"
+            chromeless
+            jc={'center'}
+            ai={'center'}
+          >
+            <ButtonText
+              size={'$9'}
+              fontFamily={'$mono'}
+              col={'$color12'}
+              textTransform="uppercase"
+              fontWeight={'700'}
+            >
+              {selectedCoin.label}
+            </ButtonText>
+          </ButtonOg>
+        )
+      case button === ButtonOption.QR:
         return (
           <Button
             $gtLg={{ display: 'none' }}
@@ -88,7 +124,7 @@ export function TopNav({
             onPress={() => toast.show('Coming Soon')}
           />
         )
-      case ButtonOption.SETTINGS:
+      case button === ButtonOption.SETTINGS:
         return (
           <Button
             $gtLg={{ display: 'none' }}
@@ -119,7 +155,7 @@ export function TopNav({
             jc="center"
             $gtLg={{ fd: 'row' }}
           >
-            {isSubRoute ? (
+            {isSubRoute || hasSubrouteParam ? (
               <Button
                 onPress={handleBack}
                 icon={<IconArrowLeft size={'$2.5'} color={iconColor} />}

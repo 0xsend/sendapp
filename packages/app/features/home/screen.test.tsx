@@ -70,6 +70,10 @@ jest.mock('solito', () => ({
     .mockReturnValue({ useParam: jest.fn().mockReturnValue([undefined, jest.fn()]) }),
 }))
 
+jest.mock('app/routers/params', () => ({
+  useToken: jest.fn().mockReturnValue([undefined, jest.fn()]),
+}))
+
 // jest.mock('@vonovak/react-native-theme-control', () => ({
 //   useThemePreference: jest.fn().mockReturnValue('light'),
 //   setThemePreference: jest.fn(),

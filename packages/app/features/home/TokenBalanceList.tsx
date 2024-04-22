@@ -5,14 +5,11 @@ import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
-import { createParam } from 'solito'
+import type { coins } from 'app/data/coins'
+import { useToken } from 'app/routers/params'
 
-const { useParam } = createParam<{ token: `0x${string}` | 'eth' }>()
-
-export const TokenBalanceList = ({
-  coins,
-}: { coins: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }[] }) => {
-  const [, setToken] = useParam('token')
+export const TokenBalanceList = ({ coins }: { coins: coins }) => {
+  const [, setTokenParam] = useToken()
 
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
@@ -25,7 +22,7 @@ export const TokenBalanceList = ({
       ai={'center'}
       py={'$3.5'}
       borderColor={separatorColor}
-      onPress={() => setToken(coin.token)}
+      onPress={() => setTokenParam(coin.token)}
       borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
     />
   ))
@@ -99,7 +96,7 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
         </Paragraph>
 
         <XStack $lg={{ display: 'none' }}>
-          <IconArrowRight $group-hover={{ x: 5 }} color={iconColor} />
+          <IconArrowRight color={iconColor} />
         </XStack>
       </>
     )
