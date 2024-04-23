@@ -8,7 +8,18 @@ create or replace function public.tag_search(
         send_id_matches jsonb,
         tag_matches jsonb,
         phone_matches jsonb
-    ) language plpgsql immutable security definer as $function$ begin return query --
+    ) language plpgsql immutable security definer as $function$
+begin
+    if limit_val is not null
+    and (
+        limit_val <= 0
+        or limit_val > 100
+    ) then raise exception 'limit_val must be between 1 and 100';
+    end if;
+    if offset_val is not null
+    and offset_val < 0 then raise exception 'offset_val must be greater than or equal to 0';
+    end if;
+    return query --
   select
     COALESCE(
         (
