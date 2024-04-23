@@ -8,7 +8,8 @@ create or replace function public.profile_lookup(tag text)
     tag_name citext,
     address citext,
     chain_id integer,
-    is_public boolean)
+    is_public boolean,
+    send_id integer)
   language plpgsql
   immutable
   security definer
@@ -28,7 +29,8 @@ begin
     sa.chain_id as chain_id,
     case when current_setting('role')::text = 'service_role' then
       p.is_public
-    end as is_public
+    end as is_public,
+    p.send_id as send_id
   from
     profiles p
     join tags t on t.user_id = p.id

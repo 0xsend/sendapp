@@ -1,7 +1,7 @@
 -- Tag Search
 begin;
 select
-  plan(2);
+  plan(3);
 create extension "basejump-supabase_test_helpers";
 truncate tags cascade;
 -- Creating a test user
@@ -33,6 +33,12 @@ select
   results_eq($$
   SELECT jsonb_array_length(tag_matches) from tag_search('zzz'); $$, $$
     values (4) $$, 'Tags should be visible to the public');
+
+-- Verify you cant have a limit higher than 100
+select
+  throws_ok($$
+    select
+      count(*)::integer from tag_search('zzz', 101) $$, 'limit_val must be between 1 and 100');
 select
   *
 from
