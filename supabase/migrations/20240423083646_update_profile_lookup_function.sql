@@ -1,3 +1,4 @@
+drop function if exists public.profile_lookup(tag text);
 create or replace function public.profile_lookup(tag text)
   returns table(
     id uuid,
