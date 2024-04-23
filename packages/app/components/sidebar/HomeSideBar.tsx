@@ -14,7 +14,14 @@ import {
 } from '@my/ui'
 import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
+import {
+  IconAccount,
+  // IconActivity,
+  IconHome,
+  // IconSLogo,
+  IconSendLogo,
+  IconX,
+} from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -29,16 +36,16 @@ const links = [
     text: 'home',
     href: '/',
   },
-  {
-    icon: <IconSLogo size={'$1'} />,
-    text: 'send',
-    href: '/send',
-  },
-  {
-    icon: <IconActivity size={'$1'} />,
-    text: 'activity',
-    href: '/activity',
-  },
+  // {
+  //   icon: <IconSLogo size={'$1'} />,
+  //   text: 'send',
+  //   href: '/send',
+  // },
+  // {
+  //   icon: <IconActivity size={'$1'} />,
+  //   text: 'activity',
+  //   href: '/activity',
+  // },
   {
     icon: <IconAccount size={'$1'} />,
     text: 'account',
@@ -77,7 +84,7 @@ const HomeBottomSheet = () => {
   return (
     <NavSheet navId="home">
       <XStack gap="$4" ai="center">
-        <Avatar size="$4.5">
+        <Avatar size="$4.5" br={'$3'}>
           <Avatar.Image src={avatarUrl ?? ''} />
           <Avatar.Fallback jc={'center'} delayMs={200}>
             <IconAccount size="$4.5" color="$olive" />
