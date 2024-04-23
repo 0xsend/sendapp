@@ -113,9 +113,9 @@ export default function formatAmount(
     return abbreviateNumber(flooredAmount, maxDecimals)
   }
 
-  const countLeadingZeros = (digits[1] && (digits[1].match(/^0+/) || [''])[0].length) || 0
+  const countLeadingZeros = digits[1] && (digits[1].match(/^0+/) || [''])[0].length
 
-  const lessThanMin = countLeadingZeros >= maxDecimals
+  const lessThanMin = countLeadingZeros && countLeadingZeros >= maxDecimals
 
   return (
     (lessThanMin ? '<' : '') +
