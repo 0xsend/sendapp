@@ -31,7 +31,7 @@ select
 -- Verify that the tags are visible to the public
 select
   results_eq($$
-  SELECT jsonb_array_length(tag_matches) from tag_search('zzz'); $$, $$
+  SELECT array_length(tag_matches,1) from tag_search('zzz'); $$, $$
     values (4) $$, 'Tags should be visible to the public');
 
 -- Verify you cant have a limit higher than 100

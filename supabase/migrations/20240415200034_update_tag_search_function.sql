@@ -15,7 +15,18 @@ create or replace function public.tag_search(
                    send_id_matches public.tag_search_result[],
                    tag_matches public.tag_search_result[],
                    phone_matches public.tag_search_result[]
-               ) language plpgsql immutable security definer as $function$ begin return query
+               ) language plpgsql immutable security definer as $function$
+                begin
+                    if limit_val is not null
+                    and (
+                        limit_val <= 0
+                        or limit_val > 100
+                    ) then raise exception 'limit_val must be between 1 and 100';
+                    end if;
+                    if offset_val is not null
+                    and offset_val < 0 then raise exception 'offset_val must be greater than or equal to 0';
+                    end if;
+                return query --
     select
         (
             select array_agg(row(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
@@ -56,3 +67,4 @@ create or replace function public.tag_search(
 end;
 $function$;
 
+revoke all on function public.tag_search(q text, limit_val int, offset_val int) from anon;
