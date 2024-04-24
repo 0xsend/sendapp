@@ -1,5 +1,6 @@
 import type { Tables } from '@my/supabase/database.types'
-import { type baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
+import { useQuery } from '@tanstack/react-query'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { parseEther } from 'viem'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
@@ -34,46 +35,19 @@ export function tagLengthToWei(length: number) {
   }
 }
 
-export async function getSenderSafeReceivedEvents({
-  publicClient,
-  sender,
-}: {
-  publicClient: typeof baseMainnetClient
-  sender: `0x${string}`
-}) {
-  const fromBlock = {
-    [8453]: BigInt(12817000), // base mainnet send revenue contract creation block
-    [845337]: BigInt(12817000), // base mainnet fork send revenue contract creation block
-    [84532]: BigInt(7469197), // base sepolia send revenue contract creation block
-  }[publicClient.chain.id]
-  return await publicClient.getLogs({
-    event: {
-      type: 'event',
-      inputs: [
-        {
-          name: 'sender',
-          internalType: 'address',
-          type: 'address',
-          indexed: true,
-        },
-        {
-          name: 'value',
-          internalType: 'uint256',
-          type: 'uint256',
-          indexed: false,
-        },
-      ],
-      name: 'SafeReceived',
+export function useSenderSafeReceivedEvents() {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['senderSafeReceivedEvents'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('send_revenues_safe_receives').select('*')
+      if (error) {
+        throw error
+      }
+      return data
     },
-    address: sendRevenueSafeAddress[publicClient.chain.id],
-    args: {
-      sender,
-    },
-    strict: true,
-    fromBlock,
   })
 }
-
 export const hasFreeTag = (tagName: string, confirmedTags: Tables<'tags'>[]) => {
   // could be free if tag name is greater than 6 characters
   const hasFreeTag = tagName.length >= 6

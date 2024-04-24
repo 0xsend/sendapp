@@ -1,7 +1,7 @@
 -- 3. Tag Confirmation
 BEGIN;
 
-SELECT plan(10);
+SELECT plan(11);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -205,6 +205,27 @@ select isnt_empty(
     WHERE referrer_id = tests.get_supabase_uid('tag_creator') $test$,
       'Referral should be created'
   );
+
+-- duplicate receipt hash should not confirm tag
+select tests.authenticate_as('tag_creator_2');
+
+INSERT INTO tags(name, user_id)
+VALUES (
+    'tag_creator_2_4',
+    tests.get_supabase_uid('tag_creator_2')
+  );
+
+select tests.clear_authentication();
+
+select set_config('role', 'service_role', true);
+
+select throws_ok(
+    $$
+    SELECT confirm_tags('{tag_creator_2_4}', '0x1234567890123456789012345678901234567890123456789012345678901234', null);
+
+$$,
+'duplicate key value violates unique constraint "receipts_pkey"'
+);
 
 SELECT *
 FROM finish();
