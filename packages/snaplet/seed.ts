@@ -42,6 +42,7 @@ const pgClient = new PgClient({
 
   await seed.users([
     {
+      phone: '17777777777',
       profiles: [
         {
           name: 'Alice',
@@ -61,6 +62,7 @@ const pgClient = new PgClient({
       sendAccounts: [{}],
     },
     {
+      phone: '1234567890',
       profiles: [
         {
           name: 'Jane',
@@ -80,6 +82,7 @@ const pgClient = new PgClient({
       sendAccounts: [{}],
     },
     {
+      phone: '15555555555',
       profiles: [
         {
           name: 'John',

@@ -1,5 +1,5 @@
 {
-  "gasFactor": "1",
+  "gasFactor": "1.1",
   "minBalance": "1",
   "maxBundleGas": 5e6,
   "minStake": "1",

@@ -339,29 +339,3 @@ jobs:
             Vercel Unique URL: [${{ steps.vercel-deploy-preview.outputs.deployment-url }}](${{ steps.vercel-deploy-preview.outputs.deployment-url }})
             Vercel Preview URL: [${{ steps.public-hostname.outputs.public-hostname }}](https://${{ steps.public-hostname.outputs.public-hostname }}/)
             Last Commit: ${{ github.event.pull_request.head.sha }}
-
-  deploy-staging:
-    if: github.ref == 'refs/heads/dev'
-    needs: [cache-deps]
-    uses: ./.github/workflows/deploy-staging.yml
-    secrets:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      STAGING_SUPABASE_PROJECT_ID: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
-      STAGING_SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
-      CI_QA_NOTIFICATION_URL: ${{ secrets.CI_QA_NOTIFICATION_URL }}
-
-  deploy-production:
-    if: github.ref == 'refs/heads/main'
-    needs: [cache-deps]
-    uses: ./.github/workflows/deploy-production.yml
-    secrets:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      PRODUCTION_SUPABASE_PROJECT_ID: ${{ secrets.PRODUCTION_SUPABASE_PROJECT_ID }}
-      PRODUCTION_SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_SUPABASE_DB_PASSWORD }}
-      CI_QA_NOTIFICATION_URL: ${{ secrets.CI_QA_NOTIFICATION_URL }}

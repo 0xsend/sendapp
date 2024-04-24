@@ -64,6 +64,16 @@ jest.mock('@tamagui/tooltip', () => ({
   TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+jest.mock('solito', () => ({
+  createParam: jest
+    .fn()
+    .mockReturnValue({ useParam: jest.fn().mockReturnValue([undefined, jest.fn()]) }),
+}))
+
+jest.mock('app/routers/params', () => ({
+  useToken: jest.fn().mockReturnValue([undefined, jest.fn()]),
+}))
+
 jest.mock('app/utils/useChainAddresses', () => ({
   useChainAddresses: jest.fn().mockReturnValue({
     data: [

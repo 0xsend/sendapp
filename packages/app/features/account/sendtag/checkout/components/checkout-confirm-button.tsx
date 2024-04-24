@@ -13,7 +13,7 @@ import {
 
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { getPriceInWei, getSenderSafeReceivedEvents, verifyAddressMsg } from '../checkout-utils'
+import { getPriceInWei, useSenderSafeReceivedEvents, verifyAddressMsg } from '../checkout-utils'
 import {
   useAccount,
   useBalance,
@@ -35,6 +35,8 @@ import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { usePendingTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
+import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { checksumAddress } from 'viem'
 
 export function ConfirmButton({
   onConfirmed,
@@ -72,28 +74,48 @@ export function ConfirmButton({
   const { receipts, refetch: refetchReceipts, isLoading: isLoadingReceipts } = useReceipts()
   const receiptHashes = useMemo(() => receipts?.map((r) => r.hash) ?? [], [receipts])
   const [sentTx, setSentTx] = useState<`0x${string}`>()
+  const { data: sendRevenuesSafeReceives, error: sendRevenuesSafeReceivesError } =
+    useSenderSafeReceivedEvents()
 
   const { data: block } = useBlockNumber()
   const lookupSafeReceivedEvent = useCallback(async () => {
     if (!addresses || addresses.length === 0) return
-    const address = addresses[0].address
+    const address = addresses[0]?.address
+    if (!address) return
     if (isLoadingReceipts) return
     if (receipts === undefined) return
     if (!publicClient) return
 
-    const events = await getSenderSafeReceivedEvents({
-      publicClient: publicClient as typeof baseMainnetClient,
-      sender: address,
-    })
-    const event = events.filter(
-      (e) => e.args.value === weiAmount && !receiptHashes.includes(e.transactionHash)
-    )?.[0]
+    const event = sendRevenuesSafeReceives
+      ?.filter((e) => {
+        assert(!!e.tx_hash, 'tx_hash is required')
+        assert(e.tx_hash.startsWith('\\x'), 'Hex string must start with \\x')
+        assert(!!e.sender, 'sender is required')
+        assert(e.sender.startsWith('\\x'), 'Hex string must start with \\x')
+        const sender = pgBase16ToHex(e.sender as `\\x${string}`)
+        const hash = pgBase16ToHex(e.tx_hash as `\\x${string}`)
+        const isPurchase =
+          checksumAddress(sender) === checksumAddress(address) &&
+          e.v &&
+          BigInt(e.v) === weiAmount &&
+          !receiptHashes.includes(hash)
+        return isPurchase
+      })
+      .shift()
 
     // check it against the receipts
-    if (event?.transactionHash) {
-      submitTxToDb(event.transactionHash)
+    if (event?.tx_hash) {
+      submitTxToDb(pgBase16ToHex(event.tx_hash as `\\x${string}`))
     }
-  }, [receipts, publicClient, addresses, weiAmount, isLoadingReceipts, receiptHashes])
+  }, [
+    receipts,
+    publicClient,
+    addresses,
+    weiAmount,
+    isLoadingReceipts,
+    receiptHashes,
+    sendRevenuesSafeReceives,
+  ])
 
   useEffect(() => {
     if (block) {
@@ -220,20 +242,31 @@ export function ConfirmButton({
       .then((signature) => verify.mutateAsync({ address: connectedAddress, signature }))
       .then(() => updateAddresses())
       .then(({ data: addresses }) => {
-        setSavedAddress(addresses?.[0].address)
+        setSavedAddress(addresses?.[0]?.address)
       })
       .catch((e) => {
         if (e instanceof TRPCClientError) {
           setError(e.message)
         } else {
           console.error(e)
-          setError('Something went wrong')
+          setError(`Something went wrong: ${e.message ?? 'Unknown error'}`)
         }
       })
   }
 
   // @TODO: This is not native compatible
   //We will need to seperate this logic so that we can switch between web and native
+  if (sendRevenuesSafeReceivesError?.message) {
+    return (
+      <ConfirmButtonError>
+        <YStack gap="$2" ai="center">
+          <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
+            {sendRevenuesSafeReceivesError?.message}
+          </Paragraph>
+        </YStack>
+      </ConfirmButtonError>
+    )
+  }
   if (connectError?.message) {
     return (
       <ConfirmButtonError onPress={openConnectModal}>

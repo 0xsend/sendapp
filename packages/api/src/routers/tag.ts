@@ -1,14 +1,13 @@
 import { TRPCError } from '@trpc/server'
-import {
-  getPriceInWei,
-  getSenderSafeReceivedEvents,
-} from 'app/features/account/sendtag/checkout/checkout-utils'
+import { getPriceInWei } from 'app/features/account/sendtag/checkout/checkout-utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
 import { isAddressEqual } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
+import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
 
 const log = debug('api:routers:tag')
 
@@ -110,21 +109,20 @@ export const tagRouter = createTRPCRouter({
           })
         }
 
-        // validate transaction is payment for tags
-        const eventLogs = await getSenderSafeReceivedEvents({
-          publicClient: baseMainnetClient,
-          sender: receipt.from,
-        }).catch((error) => {
-          log('get events error', error)
+        const { data, error } = await supabase
+          .from('send_revenues_safe_receives')
+          .select('*')
+          .eq('tx_hash', hexToPgBase16(txHash as `0x${string}`))
+          .single()
+
+        if (error) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error.message,
           })
-        })
+        }
 
-        const eventLog = eventLogs.find((e) => e.transactionHash === txHash)
-
-        if (eventLog === undefined) {
+        if (data === null) {
           log('transaction is not a payment for tags', `txHash=${txHash}`)
           throw new TRPCError({
             code: 'BAD_REQUEST',
@@ -132,9 +130,19 @@ export const tagRouter = createTRPCRouter({
           })
         }
 
-        const { sender, value } = eventLog.args
+        const { sender: senderPgB16, v } = data
 
-        if (!value || value !== ethAmount) {
+        if (!senderPgB16 || !v) {
+          log('no sender or v found', `txHash=${txHash}`)
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'No sender or v found. Please try again.',
+          })
+        }
+
+        const sender = pgBase16ToHex(senderPgB16 as `\\x${string}`)
+
+        if (!v || BigInt(v) !== ethAmount) {
           log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`)
           throw new TRPCError({
             code: 'BAD_REQUEST',
