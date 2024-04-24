@@ -929,9 +929,9 @@ export type Database = {
           offset_val?: number
         }
         Returns: {
-          send_id_matches: Json
-          tag_matches: Json
-          phone_matches: Json
+          send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+          tag_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+          phone_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
         }[]
       }
       update_distribution_shares: {
@@ -952,7 +952,12 @@ export type Database = {
       verification_type: "tag_registration" | "tag_referral"
     }
     CompositeTypes: {
-      [_ in never]: never
+      tag_search_result: {
+        avatar_url: string
+        tag_name: string
+        send_id: number
+        phone: string
+      }
     }
   }
 }
