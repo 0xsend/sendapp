@@ -43,11 +43,12 @@ Here is a quick peek at the send stack. Quickly jump to any of the submodules by
 </code>
 </pre>
 
-<details padding="1rem 0">
+<details style="padding: 1rem 0">
 <summary style="font-size:20px;font-weight: bold;"><h2 style="display:inline;padding:0 1rem;">Thinking in Send</h2></summary>
 
 Here are some things to keep in mind about thee SEND philosophy when contributing
-  <ul>
+
+<ul>
      <li>
       Simplicity over complexity (K.I.S.S)
      </li>
@@ -93,6 +94,37 @@ See [yarn package manager](https://yarnpkg.com/). We are using Yarn 4 with works
 corepack enable
 ```
 
+<details style="padding: 0.5rem 0">
+<summary style="font-size:16px;font-weight: bold;"><h4 style="display:inline;padding:0 0.5rem;">Issues</h4></summary>
+
+If you are running a M1, M2 or M3 Mac this may cause some issues.
+
+###### Failing to install `better-sqlite3`
+
+If you get the following error:
+
+`error: libtool: file: Release/obj.target/sqlite3/gen/sqlite3/sqlite3.0 is not an object file (not allowed in a library)`
+
+See the following [issue](https://github.com/TryGhost/node-sqlite3/issues/1538)
+for instructions on how to solve it, essentially setting the following values
+solves the issue:
+
+```sh
+export LDFLAGS="-L/opt/homebrew/opt/sqlite/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/sqlite/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/sqlite/lib/pkgconfig"
+```
+
+Ensure these are added to `.env.local` in the following way, so they work in tilt:
+
+```
+LDFLAGS=-L/opt/homebrew/opt/sqlite/lib
+CPPFLAGS=-I/opt/homebrew/opt/sqlite/include
+PKG_CONFIG_PATH=/opt/homebrew/opt/sqlite/lib/pkgconfig
+```
+
+</details>
+
 #### [Turborepo](https://turbo.build/repo/docs/installing#install-globally)
 
 ```console
@@ -131,7 +163,7 @@ brew bundle
 </details>
 
 <details style="padding: 1rem 0">
-<summary style="font-size:20px;font-weight:bold;"><h2 style="display:inline;padding:0 1rem;">Your First Build<h2></summary>
+<summary style="font-size:20px;font-weight:bold;"><h2 style="display:inline;padding:0 1rem;">Your First Build</h2></summary>
 
 <h3 style="font-size:20px;font-weight:bold;">Build Steps</h3>
 
