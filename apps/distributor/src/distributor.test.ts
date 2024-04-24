@@ -205,7 +205,7 @@ describe('Distributor Worker', () => {
     }))
 
     const logger = pino({
-      level: 'debug',
+      level: 'silent',
     })
     const distributor = new DistributorWorker(logger, false)
     await distributor.calculateDistribution('4')
