@@ -8,17 +8,21 @@ create or replace function public.tag_search(
         send_id_matches jsonb,
         tag_matches jsonb,
         phone_matches jsonb
-    ) language plpgsql immutable security definer as $function$
-begin
+    ) language plpgsql immutable security definer as $function$ 
+    begin 
     if limit_val is not null
     and (
         limit_val <= 0
-        or limit_val > 100
-    ) then raise exception 'limit_val must be between 1 and 100';
+        or limit_val > 1000
+    ) then raise exception 'limit_val must be between 1 and 1000';
+
     end if;
+
     if offset_val is not null
     and offset_val < 0 then raise exception 'offset_val must be greater than or equal to 0';
+
     end if;
+    
     return query --
   select
     COALESCE(
@@ -69,7 +73,13 @@ begin
                         p.send_id
                     from profiles p
                         join tags t on t.user_id = p.id
-                    where t.name ILIKE '%' || query || '%'
+                        join send_accounts sa on sa.user_id = p.id
+                    where
+                        t.status = 'confirmed' :: tag_status
+                        and p.is_public = true
+                        and(
+                            t.name <<-> query < 0.9
+                            or t.name ilike '%' || query || '%')
                     order by (t.name <->query) asc
                     LIMIT limit_val OFFSET offset_val
                 ) sub
