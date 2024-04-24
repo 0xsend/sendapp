@@ -141,7 +141,7 @@ const TokenDetailsBalance = ({ balance }: { balance: UseBalanceReturnType }) => 
     if (balance.isError) {
       return <>---</>
     }
-    if (balance.isPending) {
+    if (balance.isFetching && balance.isPending) {
       return <Spinner size={'small'} />
     }
     if (balance?.data?.value === undefined) {

@@ -95,7 +95,7 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
         </>
       )
     }
-    if (balance.isPending) {
+    if (balance.isFetching && balance.isPending) {
       return <Spinner size={'small'} />
     }
     if (balance?.data?.value === undefined) {
