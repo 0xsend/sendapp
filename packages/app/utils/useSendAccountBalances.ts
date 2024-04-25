@@ -5,7 +5,7 @@ import {
   sendTokenAbi,
   usdcAbi,
 } from '@my/wagmi'
-import { useBalance, useReadContracts } from 'wagmi'
+import { useAccount, useBalance, useReadContracts } from 'wagmi'
 import { useTokenPrices } from './useTokenPrices'
 // import { useSendAccounts } from './send-accounts'
 import { useChainAddresses } from './useChainAddresses'
@@ -22,12 +22,15 @@ const sendBaseContract = {
   chainId: baseMainnet.id,
 } as const
 
-export const useSendAccountBalances = () => {
+export const useSendAccountBalances = ({
+  useConnectedWallet,
+}: { useConnectedWallet?: boolean } = {}) => {
   const { data: tokenPrices } = useTokenPrices()
   // const { data: sendAccounts } = useSendAccounts()
   // const sendAccount = sendAccounts?.[0]
   const { data: chainAddresses } = useChainAddresses()
-  const sendAccount = chainAddresses?.[0]
+  const { address: wagmiAddress } = useAccount()
+  const sendAccount = useConnectedWallet ? wagmiAddress : chainAddresses?.[0]?.address
 
   const { data: tokenBalances, isPending: isPendingTokenBalances } = useReadContracts({
     query: { enabled: !!sendAccount },
@@ -35,18 +38,18 @@ export const useSendAccountBalances = () => {
       {
         ...usdcBaseContract,
         functionName: 'balanceOf',
-        args: sendAccount?.address && [sendAccount?.address],
+        args: sendAccount && [sendAccount],
       },
       {
         ...sendBaseContract,
         functionName: 'balanceOf',
-        args: sendAccount?.address && [sendAccount?.address],
+        args: sendAccount && [sendAccount],
       },
     ],
   })
 
   const { data: ethBalanceOnBase, isPending: isPendingEthBalanceOnBase } = useBalance({
-    address: sendAccount?.address,
+    address: sendAccount,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })

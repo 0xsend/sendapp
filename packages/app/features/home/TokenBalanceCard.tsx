@@ -8,7 +8,7 @@ const USDollar = new Intl.NumberFormat('en-US', {
 })
 
 export const TokenBalanceCard = () => {
-  const { totalBalance } = useSendAccountBalances()
+  const { totalBalance } = useSendAccountBalances({ useConnectedWallet: true })
 
   return (
     <XStack w={'100%'} zIndex={4}>
