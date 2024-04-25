@@ -78,6 +78,15 @@ exports[`HomeScreen 1`] = `
                   }
                 }
               >
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#40FB50",
+                      "height": 11,
+                      "width": 11,
+                    }
+                  }
+                />
                 <Text
                   cancelable={true}
                   disabled={false}
