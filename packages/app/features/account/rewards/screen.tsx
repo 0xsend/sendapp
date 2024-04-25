@@ -7,6 +7,7 @@ import {
   H2,
   H3,
   Label,
+  Link,
   Paragraph,
   ScrollView,
   Spinner,
@@ -34,6 +35,8 @@ import { type sendMerkleDropAddress, sendTokenAddress, useReadSendTokenBalanceOf
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendPrice } from 'app/utils/coin-gecko'
+import { useConfirmedTags } from 'app/utils/tags'
+import { IconPlus } from 'app/components/icons'
 
 export function RewardsScreen() {
   const { data: distributions, isLoading } = useDistributions()
@@ -88,12 +91,15 @@ const DistributionRewardsSection = ({
     tranche: trancheId,
     chainId: chainId,
   })
+  const shareAmount = distribution.distribution_shares?.[0]?.amount
 
   const isBeforeQualification = now < distribution.qualification_start
   const isDuringQualification =
     now >= distribution.qualification_start && now <= distribution.qualification_end
   const isAfterQualification = now > distribution.qualification_end
   const isClaimable = now > distribution.qualification_end && now <= distribution.claim_end
+
+  const confirmedTags = useConfirmedTags()
 
   const timeRemaining = useTimeRemaining(
     isDuringQualification
@@ -107,7 +113,7 @@ const DistributionRewardsSection = ({
     <Container>
       <YStack
         f={1}
-        $lg={{ gap: '$2' }}
+        $lg={{ gap: '$5' }}
         $theme-dark={{ btc: '$gray7Dark' }}
         $theme-light={{ btc: '$gray4Light' }}
         $gtSm={{ pt: '$6', gap: '$8' }}
@@ -138,19 +144,33 @@ const DistributionRewardsSection = ({
               f={1}
               justifyContent="space-between"
             >
-              <YStack gap="$2" f={1} maw={312}>
-                {isDuringQualification && <Label fontFamily={'$mono'}>Closing in</Label>}
+              <YStack gap="$2" f={1} maw={312} jc="center">
                 <Theme inverse>
                   {(() => {
                     switch (true) {
                       case isBeforeQualification:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                            {`Qualification for Round ${distribution.number} has not started`}
+                            Round has not started
+                          </Paragraph>
+                        )
+                      case shareAmount === undefined ||
+                        shareAmount === 0 ||
+                        confirmedTags?.length === 0:
+                        return (
+                          <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
+                            Not eligible
                           </Paragraph>
                         )
                       case isDuringQualification:
-                        return <DistributionRewardTimer timeRemaining={timeRemaining} />
+                        return (
+                          <>
+                            <Theme inverse>
+                              <Label fontFamily={'$mono'}>Closing in</Label>
+                            </Theme>
+                            <DistributionRewardTimer timeRemaining={timeRemaining} />
+                          </>
+                        )
                       case isTrancheActiveLoading:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
@@ -166,19 +186,24 @@ const DistributionRewardsSection = ({
                       case isAfterQualification && !isTrancheActive:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                            {`Qualification for Round ${distribution.number} is now closed and will be claimable soon.`}
+                            Rewards will be available soon
                           </Paragraph>
                         )
+
                       case isClaimable:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                            {`Qualification for Round ${distribution.number} has closed and if you met the requirements, it should now be claimable.`}
+                            Claim Rewards
                           </Paragraph>
                         )
                       default:
                         return (
                           <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$5'}>
-                            {`Claims for Round ${distribution.number} have closed`}
+                            {`Expired ${now.toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}`}
                           </Paragraph>
                         )
                     }
@@ -194,22 +219,65 @@ const DistributionRewardsSection = ({
             </Stack>
           </XStack>
         </Stack>
-        <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
-          <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
-            <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-              <SendBalanceCard distribution={distribution} />
+        {confirmedTags?.length === 0 ? (
+          <YStack
+            w="100%"
+            jc={'space-around'}
+            ai="center"
+            f={1}
+            my="auto"
+            $theme-dark={{ bc: '$darkest' }}
+            $theme-light={{ bc: '$gray3Light' }}
+            $md={{ br: '$6' }}
+            p="$6"
+            br="$12"
+          >
+            <Paragraph
+              fontSize={'$6'}
+              $xs={{ fontSize: '$4' }}
+              fontWeight={'500'}
+              color={'$color12'}
+            >
+              Register a Sendtag to unlock rewards
+            </Paragraph>
+            <Stack jc="center" ai="center">
+              <Link
+                href={'/account/sendtag/checkout'}
+                theme="accent"
+                borderRadius={'$4'}
+                p={'$3.5'}
+                $xs={{ p: '$2.5', px: '$4' }}
+                px="$6"
+                maw={301}
+                bg="$primary"
+              >
+                <XStack gap={'$1.5'} ai={'center'} jc="center">
+                  <IconPlus col={'$black'} />
+                  <Paragraph textTransform="uppercase" col={'$black'}>
+                    SENDTAGS
+                  </Paragraph>
+                </XStack>
+              </Link>
             </Stack>
-            <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
-              <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
-              <ReferralsCard
-                referrals={distribution.distribution_verifications_summary[0]?.tag_referrals ?? 0}
-              />
-            </XStack>
           </YStack>
-          <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
-            <SendRewardsCard distribution={distribution} />
+        ) : (
+          <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
+            <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
+              <Stack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
+                <SendBalanceCard distribution={distribution} />
+              </Stack>
+              <XStack f={1} gap="$2" $gtSm={{ gap: '$4' }}>
+                <MinBalanceCard hodler_min_balance={distribution.hodler_min_balance} />
+                <ReferralsCard
+                  referrals={distribution.distribution_verifications_summary[0]?.tag_referrals ?? 0}
+                />
+              </XStack>
+            </YStack>
+            <Stack f={1} $gtLg={{ w: '50%', f: 1 }}>
+              <SendRewardsCard distribution={distribution} />
+            </Stack>
           </Stack>
-        </Stack>
+        )}
       </YStack>
     </Container>
   )
@@ -279,16 +347,8 @@ const SendBalanceCard = ({
       enabled: !!address,
     },
   })
-  if (snapshotBalanceError) throw snapshotBalanceError
 
-  const body = () => {
-    switch (true) {
-      case snapshotBalance === undefined:
-        return 'Error fetching SEND balance'
-      default:
-        return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
-    }
-  }
+  if (snapshotBalanceError) throw snapshotBalanceError
 
   return (
     <Card
@@ -303,13 +363,20 @@ const SendBalanceCard = ({
     >
       <YStack gap="$2" $gtLg={{ gap: '$4' }}>
         <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
-          Send Balance
+          Snapshot Send Balance
         </Label>
         {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
           <Spinner color={'$color'} />
         ) : (
           <Paragraph fontFamily={'$mono'} col="$color12" fontSize={'$7'} fontWeight={'500'}>
-            {body()}
+            {(() => {
+              switch (true) {
+                case snapshotBalance === undefined:
+                  return 'Error fetching SEND balance'
+                default:
+                  return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
+              }
+            })()}
           </Paragraph>
         )}
       </YStack>
