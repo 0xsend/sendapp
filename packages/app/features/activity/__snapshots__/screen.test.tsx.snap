@@ -18,8 +18,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
         "alignSelf": "center",
         "flex": 0,
         "flexDirection": "row",
-        "paddingLeft": 32,
-        "paddingRight": 32,
+        "paddingLeft": 18,
+        "paddingRight": 18,
         "width": "100%",
       }
     }
@@ -605,8 +605,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
             "alignSelf": "center",
             "flex": 1,
             "flexDirection": "row",
-            "paddingLeft": 32,
-            "paddingRight": 32,
+            "paddingLeft": 18,
+            "paddingRight": 18,
             "width": "100%",
           }
         }
@@ -1442,8 +1442,8 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           "alignSelf": "center",
           "flex": 1,
           "flexDirection": "row",
-          "paddingLeft": 32,
-          "paddingRight": 32,
+          "paddingLeft": 18,
+          "paddingRight": 18,
           "width": "100%",
         }
       }
@@ -3374,8 +3374,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         "alignSelf": "center",
         "flex": 0,
         "flexDirection": "row",
-        "paddingLeft": 32,
-        "paddingRight": 32,
+        "paddingLeft": 18,
+        "paddingRight": 18,
         "width": "100%",
       }
     }
@@ -4233,8 +4233,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
             "alignSelf": "center",
             "flex": 1,
             "flexDirection": "row",
-            "paddingLeft": 32,
-            "paddingRight": 32,
+            "paddingLeft": 18,
+            "paddingRight": 18,
             "width": "100%",
           }
         }
@@ -5070,8 +5070,8 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           "alignSelf": "center",
           "flex": 1,
           "flexDirection": "row",
-          "paddingLeft": 32,
-          "paddingRight": 32,
+          "paddingLeft": 18,
+          "paddingRight": 18,
           "width": "100%",
         }
       }

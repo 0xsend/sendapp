@@ -64,6 +64,16 @@ jest.mock('@tamagui/tooltip', () => ({
   TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+jest.mock('solito', () => ({
+  createParam: jest
+    .fn()
+    .mockReturnValue({ useParam: jest.fn().mockReturnValue([undefined, jest.fn()]) }),
+}))
+
+jest.mock('app/routers/params', () => ({
+  useToken: jest.fn().mockReturnValue([undefined, jest.fn()]),
+}))
+
 // jest.mock('@vonovak/react-native-theme-control', () => ({
 //   useThemePreference: jest.fn().mockReturnValue('light'),
 //   setThemePreference: jest.fn(),
