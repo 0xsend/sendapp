@@ -108,6 +108,7 @@ export const OnboardingForm = () => {
             fontFamily: '$mono',
             fontVariant: ['tabular-nums'],
             fontSize: 20,
+            fontWeight: '400',
             width: '100%',
             backgroundColor: 'transparent',
             outlineColor: 'transparent',

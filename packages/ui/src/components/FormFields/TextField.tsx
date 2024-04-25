@@ -85,21 +85,20 @@ export const TextField = (props: InputProps) => {
                 maxLength={maxLength}
                 borderWidth={0}
                 borderRadius={'$4'}
+                fontSize={'$5'}
+                fontStyle={field.value ? 'normal' : 'italic'}
+                fontWeight={field.value ? 'bold' : 'normal'}
                 $theme-dark={{
                   bc: '$charcoal',
                   color: '$gray12Dark',
                   // placeholderTextColor fails in test env for some reason
-                  ...(process.env.NODE_ENV !== 'test'
-                    ? { placeholderTextColor: '$gray10Dark' }
-                    : {}),
+                  ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
                 }}
                 $theme-light={{
-                  bc: '$gray3Light',
-                  color: '$gray12Light',
+                  bc: '$gray2Light',
+                  color: '$black',
                   // placeholderTextColor fails in test env for some reason
-                  ...(process.env.NODE_ENV !== 'test'
-                    ? { placeholderTextColor: '$gray10Light' }
-                    : {}),
+                  ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
                 }}
                 // @todo use the theme colors if we ever have the palette scales
                 // bc={'$color2'}
@@ -115,7 +114,6 @@ export const TextField = (props: InputProps) => {
                 placeholder={placeholder}
                 id={id}
                 focusStyle={{
-                  fontStyle: 'italic',
                   borderColor: '$color12',
                 }}
                 position="relative"
