@@ -227,6 +227,24 @@ type Override = {
       webauthn_credentials?: string;
     };
   }
+  send_account_signing_key_added?: {
+    name?: string;
+    fields?: {
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      account?: string;
+      key_slot?: string;
+      key?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
   send_account_transfers?: {
     name?: string;
     fields?: {
@@ -550,6 +568,15 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     account?: FingerprintRelationField;
     credential?: FingerprintRelationField;
+  }
+  sendAccountSigningKeyAddeds?: {
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    keySlot?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
   }
   sendAccountTransfers?: {
     id?: FingerprintNumberField;

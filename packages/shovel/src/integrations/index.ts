@@ -3,3 +3,4 @@ export { integration as sendAccountTransfersIntegration } from './send-account-t
 export { integration as sendAccountTransactionsIntegration } from './send-account-transactions'
 export { integration as sendTokenTransfersIntegration } from './send-token-transfers'
 export { integration as sendRevenuesSafeReceives } from './send-revenues-safe-receives'
+export { integration as sendAccountSigningKeyAdded } from './send-account-signing-key-added'
