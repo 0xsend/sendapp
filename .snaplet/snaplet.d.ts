@@ -631,7 +631,7 @@ interface Database {
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "uuid-ossp";
+  extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "pgtap" | "uuid-ossp";
   graphql: "pg_graphql";
   pgsodium: "pgsodium";
   pgtle: "pg_tle";
