@@ -19,16 +19,17 @@ import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { X } from '@tamagui/lucide-icons'
 import { TokenDetails } from './TokenDetails'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 export function HomeScreen() {
   const media = useMedia()
   const toast = useToastController()
-  const [tokenParam, setTokenParam] = useToken()
+  const [, setTokenParam] = useToken()
   const { address } = useAccount()
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
-  const selectedCoin = coins.find((c) => c.token === tokenParam)
+  const selectedCoin = useCoinFromTokenParam()
 
   return (
     <Container fd={'column'} $gtMd={{ pt: '$6' }}>
