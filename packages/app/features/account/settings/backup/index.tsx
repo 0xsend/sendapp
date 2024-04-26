@@ -1,8 +1,8 @@
-import { H1, H3, H4, H5, Link, Paragraph, Separator, YStack } from '@my/ui'
+import { Button, H1, H3, H4, H5, Link, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { IconNote } from 'app/components/icons'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useQuery } from '@tanstack/react-query'
-import type { Tables } from '@my/supabase/database.types'
+import { assert } from 'app/utils/assert'
+import { useSendAccounts } from 'app/utils/send-accounts'
+import { useLink } from 'solito/link'
 
 export const BackupScreen = () => {
   return (
@@ -12,7 +12,7 @@ export const BackupScreen = () => {
           Backup Send Account
         </H1>
         <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-          Backup your Send Account by adding more passkeys to your account. Passkeys are authorized
+          Backup your Send Account by add up to 20 passkeys to your account. Passkeys are authorized
           devices that can sign transactions for your account.
         </Paragraph>
       </YStack>
@@ -23,23 +23,23 @@ export const BackupScreen = () => {
 }
 
 const WebauthnCreds = () => {
-  const supabase = useSupabase()
-  const { data, error } = useQuery({
-    queryKey: ['webauthn_credentials'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('webauthn_credentials').select('*')
-      if (error) {
-        throw new Error(error.message)
-      }
-      return data
-    },
+  const addPasskeyLink = useLink({
+    href: '/account/settings/backup/add-passkey',
   })
+  const { data: sendAccts, error } = useSendAccounts()
 
   return (
     <YStack w={'100%'} gap={'$2'}>
-      <H3 size={'$6'} fontWeight={'300'} color={'$color05'}>
-        Passkeys
-      </H3>
+      <XStack w={'100%'} gap={'$2'} jc="space-between" ai="center">
+        <H3 size={'$6'} fontWeight={'300'} color={'$color05'}>
+          Passkeys
+        </H3>
+        <YStack>
+          <Button theme="accent" {...addPasskeyLink}>
+            Add Passkey
+          </Button>
+        </YStack>
+      </XStack>
       <YStack w={'100%'}>
         {error && (
           <YStack w={'100%'} gap={'$6'}>
@@ -48,7 +48,7 @@ const WebauthnCreds = () => {
             </Paragraph>
           </YStack>
         )}
-        {data && data.length === 0 && (
+        {sendAccts && sendAccts.length === 0 && (
           <YStack w={'100%'} gap={'$6'}>
             <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
               You have no Webauthn Credentials.
@@ -69,30 +69,48 @@ const WebauthnCreds = () => {
           </YStack>
         )}
       </YStack>
-      {data && data.length > 0 && (
-        <YStack w={'100%'} gap={'$6'}>
-          {data.map((cred) => (
-            <WebauthnCredential key={cred.id} {...{ cred }} />
-          ))}
+      {sendAccts && sendAccts.length > 0 && (
+        <YStack w={'100%'} gap={'$6'} pb={'$6'}>
+          {sendAccts.map((acct) =>
+            acct.send_account_credentials.map((cred, idx) => (
+              <>
+                <SendAccountCredentials key={`${acct.id}-${cred.key_slot}`} cred={cred} />
+                {idx !== acct.send_account_credentials.length - 1 && <Separator w={'100%'} />}
+              </>
+            ))
+          )}
         </YStack>
       )}
     </YStack>
   )
 }
 
-const WebauthnCredential = ({ cred }: { cred: Tables<'webauthn_credentials'> }) => {
+const SendAccountCredentials = ({
+  cred,
+}: {
+  cred: NonNullable<
+    ReturnType<typeof useSendAccounts>['data']
+  >[number]['send_account_credentials'][number]
+}) => {
+  const webauthnCred = cred.webauthn_credentials
+  assert(!!webauthnCred, 'webauthnCred not found')
   return (
     <YStack w={'100%'} gap={'$3'} mt={'$2'} mb={'$2'}>
       <H4 fontWeight={'300'} color={'$color05'}>
-        {cred.display_name}
+        {webauthnCred.display_name}
       </H4>
       <H5 fontWeight={'300'} color={'$color05'}>
         Created At
       </H5>
-      <Paragraph fontWeight={'300'} color={'$color05'}>
+      <Paragraph fontWeight={'300'} color={'$color05'} fontFamily={'$mono'}>
         {cred.created_at}
       </Paragraph>
-      <Separator w={'100%'} />
+      <H5 fontWeight={'300'} color={'$color05'}>
+        Key Slot
+      </H5>
+      <Paragraph fontWeight={'300'} color={'$color05'} fontFamily={'$mono'}>
+        {cred.key_slot}
+      </Paragraph>
     </YStack>
   )
 }

@@ -966,6 +966,27 @@ export type Database = {
           is_public: boolean
         }[]
       }
+      send_accounts_add_webauthn_credential: {
+        Args: {
+          send_account_id: string
+          webauthn_credential: unknown
+          key_slot: number
+        }
+        Returns: {
+          attestation_object: string
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string
+          user_id: string
+        }
+      }
       tag_search: {
         Args: {
           query: string

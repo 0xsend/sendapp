@@ -11,6 +11,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/pg": "^8",
     "app": "workspace:*",
+    "cbor": "^9.0.1",
     "debug": "^4.3.4",
     "dotenv-cli": "^7.3.0",
     "extract-zip": "^2.0.1",
