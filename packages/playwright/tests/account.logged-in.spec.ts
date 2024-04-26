@@ -2,7 +2,10 @@ import { assert } from 'app/utils/assert'
 import { expect, test } from './fixtures/send-accounts'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/account')
+  await page.goto('/')
+  await page.waitForURL('/')
+  await page.getByRole('link', { name: 'account' }).click()
+  await page.waitForURL('/account')
 })
 
 test('can visit account page', async ({ page, context, user: { profile } }) => {
@@ -42,4 +45,23 @@ test('can update profile', async ({ page, supabase }) => {
   expect(error).toBeFalsy()
   expect(user).toBeTruthy()
   expect(user?.name === 'LeO' && user.about === 'Sender' && user.is_public === true).toBeTruthy()
+})
+
+test('can backup account', async ({ page, supabase }) => {
+  await page.getByRole('link', { name: 'Settings' }).click()
+  await page.waitForURL('/account/settings/edit-profile')
+  await page.locator('[id="__next"]').getByRole('link', { name: 'Backup' }).click()
+  await expect(page).toHaveURL('/account/settings/backup')
+
+  const { data: cred, error } = await supabase
+    .from('webauthn_credentials')
+    .select('*')
+    .maybeSingle()
+  expect(error).toBeFalsy()
+  assert(!!cred, 'cred not found')
+
+  expect(cred).toBeTruthy()
+  expect(page.getByText(cred.display_name)).toBeVisible()
+  expect(page.getByText(cred.created_at)).toBeVisible()
+  // @todo add backup device with new webauthn credential
 })
