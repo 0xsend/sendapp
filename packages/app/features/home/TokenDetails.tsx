@@ -15,18 +15,19 @@ import type { coins } from 'app/data/coins'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { baseMainnet } from '@my/wagmi'
 // import { useSendAccounts } from 'app/utils/send-accounts'
-import { useAccount } from 'wagmi'
 
 import formatAmount from 'app/utils/formatAmount'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
+import { useChainAddresses } from 'app/utils/useChainAddresses'
 
 export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   const media = useMedia()
   // const { data: sendAccounts } = useSendAccounts()
   // const sendAccount = sendAccounts?.[0]
-  const sendAccount = useAccount()
+  const { data: addresses } = useChainAddresses()
+  const sendAccount = addresses?.[0]
   const balance = useBalance({
     address: sendAccount?.address,
     token: coin.token === 'eth' ? undefined : coin.token,
@@ -75,13 +76,10 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
 
 export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
-  console.log('tokenMarketData: ', tokenMarketData)
 
   const price = tokenMarketData?.at(0)?.current_price
-  console.log('price: ', price)
 
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
-  console.log('changePercent24h: ', changePercent24h)
 
   if (status === 'pending') return <Spinner size="small" />
   if (status === 'error' || price === undefined || changePercent24h === undefined)
