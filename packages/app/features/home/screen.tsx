@@ -32,7 +32,7 @@ export function HomeScreen() {
   const selectedCoin = useCoinFromTokenParam()
 
   return (
-    <Container fd={'column'} $gtMd={{ pt: '$6' }}>
+    <Container fd={'column'} $gtMd={{ pt: '$5' }}>
       {selectedCoin !== undefined && media.gtLg && (
         <Stack>
           <Button
