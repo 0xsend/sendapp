@@ -8,8 +8,11 @@ import {
   useMedia,
   useToastController,
   Stack,
+  Spinner,
+  Link,
+  H3,
 } from '@my/ui'
-import { IconDeposit } from 'app/components/icons'
+import { IconDeposit, IconPlus } from 'app/components/icons'
 import { TokenBalanceList } from './TokenBalanceList'
 import { coins } from 'app/data/coins'
 import { TokenBalanceCard } from './TokenBalanceCard'
@@ -18,6 +21,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { X } from '@tamagui/lucide-icons'
 import { TokenDetails } from './TokenDetails'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useChainAddresses } from 'app/utils/useChainAddresses'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -28,6 +32,7 @@ export function HomeScreen() {
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
   const selectedCoin = useCoinFromTokenParam()
+  const { data: sendAccount, isLoading: sendAccountLoading } = useChainAddresses()
 
   return (
     <Container fd={'column'} $gtMd={{ pt: '$5' }}>
@@ -60,13 +65,12 @@ export function HomeScreen() {
           />
         </Stack>
       )}
-      <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} f={1}>
-        {(selectedCoin === undefined || media.gtLg) && (
+      <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }}>
+        {media.gtLg || sendAccount?.length || selectedCoin === undefined ? (
           <YStack $gtLg={{ width: 360 }} width="100%" ai={'center'}>
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />
             </XStack>
-
             <Separator $gtLg={{ display: 'none' }} w={'100%'} borderColor={separatorColor} />
             <YStack w={'100%'} ai={'center'}>
               <XStack w={'100%'} ai={'center'} pt={'$7'}>
@@ -98,15 +102,89 @@ export function HomeScreen() {
                   </XStack>
                 </Button>
               </XStack>
-
-              <YStack width="100%" pt="$6" pb="$12">
-                <TokenBalanceList coins={coins} />
-              </YStack>
+              {!!sendAccount?.length && (
+                <YStack width="100%" pt="$6" pb="$12">
+                  <TokenBalanceList coins={coins} />
+                </YStack>
+              )}
             </YStack>
           </YStack>
+        ) : (
+          <></>
         )}
-        {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
+
+        {(() => {
+          switch (true) {
+            case sendAccountLoading:
+              return <Spinner size="large" />
+            case !sendAccount?.length:
+              return (
+                <YStack
+                  w="100%"
+                  ai="center"
+                  f={1}
+                  gap="$5"
+                  p="$6"
+                  $theme-dark={{ bc: '$darkest' }}
+                  $theme-light={{ bc: '$gray3Light' }}
+                  $lg={{ bc: 'transparent' }}
+                  $gtLg={{ br: '$6' }}
+                >
+                  <NoSendAccountMessage />
+                  <Stack jc="center" ai="center" $gtLg={{ mt: 'auto' }} $lg={{ m: 'auto' }}>
+                    <Link
+                      href={'/account/sendtag/checkout'}
+                      theme="accent"
+                      borderRadius={'$4'}
+                      p={'$3.5'}
+                      $xs={{ p: '$2.5', px: '$4' }}
+                      px="$6"
+                      bg="$primary"
+                    >
+                      <XStack gap={'$1.5'} ai={'center'} jc="center">
+                        <IconPlus col={'$black'} />
+                        <Paragraph textTransform="uppercase" col={'$black'}>
+                          SENDTAGS
+                        </Paragraph>
+                      </XStack>
+                    </Link>
+                  </Stack>
+                </YStack>
+              )
+            case selectedCoin !== undefined:
+              return <TokenDetails coin={selectedCoin} />
+            default:
+              return <> </>
+          }
+        })()}
       </XStack>
     </Container>
+  )
+}
+
+const NoSendAccountMessage = () => {
+  return (
+    <>
+      <H3 fontSize={'$9'} fontWeight={'700'} color={'$color12'} ta="center">
+        Register Your Sendtag Today!
+      </H3>
+
+      <YStack w="100%" gap="$3">
+        <Paragraph fontSize={'$6'} fontWeight={'700'} color={'$color12'} fontFamily={'$mono'}>
+          By registering a Sendtag, you can:
+        </Paragraph>
+        <YStack>
+          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+            1. Send and receive funds using your personalized identifier
+          </Paragraph>
+          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+            2. Earn Send It Rewards based on your token balance and referrals
+          </Paragraph>
+        </YStack>
+        <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
+          Join us in shaping the Future of Finance.
+        </Paragraph>
+      </YStack>
+    </>
   )
 }
