@@ -35,9 +35,7 @@ function setReferralCodeCookie(context: GetServerSidePropsContext) {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout
-    TopNav={<TopNav header="Home" button={ButtonOption.QR} showLogo={true} showReferral={true} />}
-  >
+  <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.QR} showLogo={true} />}>
     {children}
   </HomeLayout>
 )
