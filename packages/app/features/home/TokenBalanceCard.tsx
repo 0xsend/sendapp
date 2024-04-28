@@ -26,6 +26,7 @@ export const TokenBalanceCard = () => {
                     $theme-dark={{ col: '$gray5Light' }}
                     $theme-light={{ col: '$color12' }}
                     textTransform={'uppercase'}
+                    lineHeight={'$1'}
                   >
                     Total Balance
                   </Label>
