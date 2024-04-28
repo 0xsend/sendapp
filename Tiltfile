@@ -243,7 +243,7 @@ local_resource(
 
 if config.tilt_subcommand == "down":
     local("""
-    NONINTERACTIVE=1 ./bin/reset-supabase.ts
+    bun run ./bin/reset-supabase.ts
     docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
     docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
     docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
