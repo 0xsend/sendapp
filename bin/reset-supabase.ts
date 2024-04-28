@@ -26,8 +26,10 @@ if (!$.env.NONINTERACTIVE) {
 
 $.verbose = true
 
+await $`bunx supabase stop --no-backup`
+
 if (containers.length > 0) {
-  await $`docker kill ${containers}`
+  await $`docker kill -s SIGKILL ${containers}`
   await $`docker rm ${containers}`
 }
 
