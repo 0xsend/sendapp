@@ -9,13 +9,11 @@ import {
   useToastController,
   Stack,
 } from '@my/ui'
-import { IconDeposit, IconPlus } from 'app/components/icons'
+import { IconDeposit } from 'app/components/icons'
 import { TokenBalanceList } from './TokenBalanceList'
 import { coins } from 'app/data/coins'
 import { TokenBalanceCard } from './TokenBalanceCard'
-import { useAccount } from 'wagmi'
 import { useToken } from 'app/routers/params'
-import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { X } from '@tamagui/lucide-icons'
 import { TokenDetails } from './TokenDetails'
@@ -25,7 +23,7 @@ export function HomeScreen() {
   const media = useMedia()
   const toast = useToastController()
   const [, setTokenParam] = useToken()
-  const { address } = useAccount()
+
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
@@ -72,44 +70,33 @@ export function HomeScreen() {
             <Separator $gtLg={{ display: 'none' }} w={'100%'} borderColor={separatorColor} />
             <YStack w={'100%'} ai={'center'}>
               <XStack w={'100%'} ai={'center'} pt={'$7'}>
-                <OpenConnectModalWrapper
+                <Button
+                  px={'$3.5'}
                   h={'$6'}
                   width={'100%'}
+                  theme="accent"
+                  borderRadius={'$4'}
+                  onPress={() => {
+                    // @todo onramp / deposit
+                    toast.show('Coming Soon: Deposit')
+                  }}
                   disabled={selectedCoin !== undefined}
+                  disabledStyle={{ opacity: 0.5 }}
                 >
-                  <Button
-                    px={'$3.5'}
-                    h={'$6'}
-                    width={'100%'}
-                    theme="accent"
-                    borderRadius={'$4'}
-                    onPress={() => {
-                      // @todo onramp / deposit
-                      if (address === undefined) return
-                      toast.show('Coming Soon: Deposit')
-                    }}
-                    disabled={selectedCoin !== undefined}
-                    disabledStyle={{ opacity: 0.5 }}
-                  >
-                    <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                      <Paragraph
-                        // fontFamily={'$mono'}
-                        fontWeight={'500'}
-                        textTransform={'uppercase'}
-                        color={'$black'}
-                      >
-                        {address ? 'Deposit' : 'Connect Wallet'}
-                      </Paragraph>
-                      <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                        {address ? (
-                          <IconDeposit size={'$2.5'} color={'$black'} />
-                        ) : (
-                          <IconPlus size={'$2.5'} color={'$black'} />
-                        )}
-                      </XStack>
+                  <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+                    <Paragraph
+                      // fontFamily={'$mono'}
+                      fontWeight={'500'}
+                      textTransform={'uppercase'}
+                      color={'$black'}
+                    >
+                      Deposit
+                    </Paragraph>
+                    <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                      <IconDeposit size={'$2.5'} color={'$black'} />
                     </XStack>
-                  </Button>
-                </OpenConnectModalWrapper>
+                  </XStack>
+                </Button>
               </XStack>
 
               <YStack width="100%" pt="$6" pb="$12">
