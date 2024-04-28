@@ -471,11 +471,10 @@ exports[`OnboardingScreen 1`] = `
               <View
                 style={
                   {
+                    "bottom": 10,
                     "gap": 7,
                     "position": "absolute",
                     "right": 18,
-                    "top": "50%",
-                    "transform": "translateY(-50%)",
                   }
                 }
               />
