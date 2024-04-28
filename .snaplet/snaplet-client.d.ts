@@ -14,6 +14,17 @@ type Inflection = {
   oppositeBaseNameMap?: Record<string, string>;
 };
 type Override = {
+  auth_challenges?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      challenge?: string;
+      created_at?: string;
+      expires_at?: string;
+      users?: string;
+    };
+  }
   buckets?: {
     name?: string;
     fields?: {
@@ -385,6 +396,7 @@ type Override = {
       reauthentication_sent_at?: string;
       is_sso_user?: string;
       deleted_at?: string;
+      auth_challenges?: string;
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
@@ -437,6 +449,11 @@ interface FingerprintNumberField {
   }
 }
 export interface Fingerprint {
+  authChallenges?: {
+    createdAt?: FingerprintDateField;
+    expiresAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
@@ -630,6 +647,7 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    authChallenges?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;

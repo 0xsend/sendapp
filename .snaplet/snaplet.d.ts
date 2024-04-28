@@ -31,6 +31,13 @@ interface Table_auth_audit_log_entries {
   created_at: string | null;
   ip_address: string;
 }
+interface Table_public_auth_challenges {
+  id: string;
+  user_id: string;
+  challenge: string;
+  created_at: string;
+  expires_at: string;
+}
 interface Table_storage_buckets {
   id: string;
   name: string;
@@ -540,6 +547,7 @@ interface Schema_pgtle {
   feature_info: Table_pgtle_feature_info;
 }
 interface Schema_public {
+  auth_challenges: Table_public_auth_challenges;
   chain_addresses: Table_public_chain_addresses;
   distribution_shares: Table_public_distribution_shares;
   distribution_verification_values: Table_public_distribution_verification_values;
@@ -614,6 +622,14 @@ interface Extension {
   vault: "supabase_vault";
 }
 interface Tables_relationships {
+  "public.auth_challenges": {
+    parent: {
+       auth_challenges_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
   "storage.buckets": {
     parent: {
 
@@ -853,6 +869,7 @@ interface Tables_relationships {
        identities_user_id_fkey: "auth.identities";
        mfa_factors_user_id_fkey: "auth.mfa_factors";
        sessions_user_id_fkey: "auth.sessions";
+       auth_challenges_user_id_fkey: "public.auth_challenges";
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
