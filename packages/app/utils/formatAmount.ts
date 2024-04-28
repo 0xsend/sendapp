@@ -115,7 +115,7 @@ export default function formatAmount(
 
   const countLeadingZeros = digits[1] && (digits[1].match(/^0+/) || [''])[0].length
 
-  const lessThanMin = countLeadingZeros && countLeadingZeros >= maxDecimals
+  const lessThanMin = !integers && countLeadingZeros && countLeadingZeros >= maxDecimals
 
   return (
     (lessThanMin ? '<' : '') +

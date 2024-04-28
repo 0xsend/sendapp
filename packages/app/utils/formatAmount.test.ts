@@ -103,4 +103,8 @@ describe('Additional scenarios', () => {
   it('should handle when num is greater than and has no decimals', () => {
     expect(formatAmount(123)).toBe('123')
   })
+
+  it('should not show less than when number has integers', () => {
+    expect(formatAmount(5313.01, 4, 0)).toBe('5,313')
+  })
 })

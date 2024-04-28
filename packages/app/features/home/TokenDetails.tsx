@@ -75,13 +75,10 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
 
 export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   const { data: tokenMarketData, status } = useTokenMarketData(coin.coingeckoTokenId)
-  console.log('tokenMarketData: ', tokenMarketData)
 
   const price = tokenMarketData?.at(0)?.current_price
-  console.log('price: ', price)
 
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
-  console.log('changePercent24h: ', changePercent24h)
 
   if (status === 'pending') return <Spinner size="small" />
   if (status === 'error' || price === undefined || changePercent24h === undefined)
