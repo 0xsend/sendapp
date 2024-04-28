@@ -124,7 +124,7 @@ export const TextField = (props: InputProps) => {
             </Tooltip.Trigger>
           </Tooltip>
         </Shake>
-        <Stack position="absolute" right="$4" top="50%" transform="translateY(-50%)" gap="$2">
+        <Stack position="absolute" right="$4" bottom="$2.5" gap="$2">
           {(() => {
             switch (true) {
               case error !== undefined:

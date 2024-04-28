@@ -243,13 +243,12 @@ local_resource(
 
 if config.tilt_subcommand == "down":
     local("""
-    yarn supabase stop --no-backup
-    # can be removed once supabase stop --no-backup is fixed
-    docker volume ls --filter label=com.supabase.cli.project=send | awk 'NR>1 {print $2}' | xargs -I {} docker volume rm {}
+    NONINTERACTIVE=1 ./bin/reset-supabase.ts
     docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
     docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
-    which anvil || echo "anvil not installed"
-    pkill anvil || echo "anvil not running"
+    docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
+    docker ps -a | grep otterscan-base | awk '{{print $1}}' | xargs -r docker rm -f
+    pkill anvil || true
     """)
     local("yarn clean")
 
