@@ -76,7 +76,9 @@ jest.mock('app/utils/coin-gecko', () => ({
     .fn()
     .mockReturnValue({ data: { 'send-token': { usd: 1 } }, isSuccess: true, error: null }),
 }))
-
+jest.mock('app/utils/tags', () => ({
+  useConfirmedTags: jest.fn().mockReturnValue({ data: [{ name: 'tag1' }, { name: 'tag2' }] }),
+}))
 describe('EarnTokensScreen', () => {
   it('renders', () => {
     const tree = render(

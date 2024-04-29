@@ -83,7 +83,7 @@ const HomeBottomSheet = () => {
             <IconAccount size="$4.5" color="$olive" />
           </Avatar.Fallback>
         </Avatar>
-        <YStack gap="$2">
+        <YStack>
           <H4>{profile?.name ?? `#${profile?.send_id}`}</H4>
           <ReferralLink p={0} />
         </YStack>

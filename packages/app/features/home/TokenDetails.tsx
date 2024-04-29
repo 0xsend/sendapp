@@ -6,6 +6,7 @@ import {
   Separator,
   Spinner,
   Stack,
+  Tooltip,
   XStack,
   YStack,
   useMedia,
@@ -53,7 +54,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
         <Label fontSize={'$5'} fontWeight={'500'} color={'$color11'} textTransform={'uppercase'}>
           {`${coin.label} BALANCE`}
         </Label>
-        <TokenDetailsBalance balance={balance} />
+        <TokenDetailsBalance balance={balance} symbol={coin.symbol} />
       </YStack>
       <Stack w={'100%'} py={'$6'}>
         <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
@@ -78,7 +79,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
 
   if (status === 'pending') return <Spinner size="small" />
-  if (status === 'error' || !price || !changePercent24h)
+  if (status === 'error' || price === undefined || changePercent24h === undefined)
     return (
       <XStack gap="$2" ai="center" jc={'center'}>
         <Paragraph>Failed to load market data</Paragraph>
@@ -134,23 +135,50 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   )
 }
 
-const TokenDetailsBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
-  if (balance) {
-    if (balance.isError) {
-      return <>---</>
-    }
-    if (balance.isFetching && balance.isPending) {
-      return <Spinner size={'small'} />
-    }
-    if (balance?.data?.value === undefined) {
-      return <></>
-    }
-    return (
-      <BigHeading color={'$color12'}>
-        {formatAmount(
-          (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString()
-        )}
-      </BigHeading>
-    )
+const TokenDetailsBalance = ({
+  symbol,
+  balance,
+}: { symbol: string; balance: UseBalanceReturnType }) => {
+  if (balance?.isError) {
+    return <>---</>
   }
+  if (balance?.isFetching && balance?.isPending) {
+    return <Spinner size={'small'} />
+  }
+  if (balance?.data?.value === undefined) {
+    return <></>
+  }
+
+  const balanceWithDecimals = Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)
+  return (
+    <Tooltip placement="bottom">
+      <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
+        <BigHeading $platform-web={{ width: 'fit-content' }} color={'$color12'}>
+          {formatAmount(balanceWithDecimals.toString())}
+        </BigHeading>
+      </Tooltip.Trigger>
+      <Tooltip.Content
+        enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+        exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+        scale={1}
+        x={0}
+        y={0}
+        opacity={1}
+        animation={[
+          'quick',
+          {
+            opacity: {
+              overshootClamping: true,
+            },
+          },
+        ]}
+      >
+        <Tooltip.Arrow />
+
+        <Paragraph fontSize={'$6'} fontWeight={'500'}>
+          {`${balanceWithDecimals.toLocaleString()} ${symbol}`}
+        </Paragraph>
+      </Tooltip.Content>
+    </Tooltip>
+  )
 }

@@ -9,6 +9,10 @@ $.verbose = true
 
 await $`bunx supabase stop --no-backup`
 
+$.verbose = true
+
+await $`bunx supabase stop --no-backup`
+
 const containers = (await $`docker ps -a --format '{{.Names}}'`).stdout
   .split('\n')
   .filter((c) => c.match(/supabase/i))
