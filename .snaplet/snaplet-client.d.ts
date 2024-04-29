@@ -28,8 +28,6 @@ type Override = {
       allowed_mime_types?: string;
       owner_id?: string;
       objects?: string;
-      s3_multipart_uploads?: string;
-      s3_multipart_uploads_parts?: string;
     };
   }
   chain_addresses?: {
@@ -186,38 +184,6 @@ type Override = {
       profiles_referrals_referred_idToprofiles?: string;
       profiles_referrals_referrer_idToprofiles?: string;
       tags?: string;
-    };
-  }
-  s3_multipart_uploads?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      in_progress_size?: string;
-      upload_signature?: string;
-      bucket_id?: string;
-      key?: string;
-      version?: string;
-      owner_id?: string;
-      created_at?: string;
-      buckets?: string;
-      s3_multipart_uploads_parts?: string;
-    };
-  }
-  s3_multipart_uploads_parts?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      upload_id?: string;
-      size?: string;
-      part_number?: string;
-      bucket_id?: string;
-      key?: string;
-      etag?: string;
-      owner_id?: string;
-      version?: string;
-      created_at?: string;
-      buckets?: string;
-      s3_multipart_uploads?: string;
     };
   }
   auth_schema_migrations?: {
@@ -476,8 +442,6 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
-    s3MultipartUploads?: FingerprintRelationField;
-    s3MultipartUploadsParts?: FingerprintRelationField;
   }
   chainAddresses?: {
     createdAt?: FingerprintDateField;
@@ -567,19 +531,6 @@ export interface Fingerprint {
     referred?: FingerprintRelationField;
     referrer?: FingerprintRelationField;
     tagByTag?: FingerprintRelationField;
-  }
-  s3MultipartUploads?: {
-    inProgressSize?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    bucket?: FingerprintRelationField;
-    s3MultipartUploadsPartsByUploadId?: FingerprintRelationField;
-  }
-  s3MultipartUploadsParts?: {
-    size?: FingerprintNumberField;
-    partNumber?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    bucket?: FingerprintRelationField;
-    upload?: FingerprintRelationField;
   }
   authSchemaMigrations?: {
 
