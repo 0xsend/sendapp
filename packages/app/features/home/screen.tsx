@@ -5,7 +5,6 @@ import {
   Separator,
   XStack,
   YStack,
-  useMedia,
   useToastController,
   Stack,
   Spinner,
@@ -37,7 +36,7 @@ export function HomeScreen() {
 
   return (
     <Container fd={'column'} $gtMd={{ pt: '$5' }}>
-      <Stack display="none" $gtLg={{ display: hasSendAccount ? 'flex' : 'none' }}>
+      <Stack display="none" $gtLg={{ display: hasSendAccount && selectedCoin ? 'flex' : 'none' }}>
         <Button
           top={'$-8'}
           right={0}
@@ -67,7 +66,7 @@ export function HomeScreen() {
       <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }}>
         <YStack
           $gtLg={{ width: 360, display: 'flex' }}
-          display={hasSendAccount ? 'flex' : 'none'}
+          display={hasSendAccount && !selectedCoin ? 'flex' : 'none'}
           width="100%"
           ai={'center'}
         >
