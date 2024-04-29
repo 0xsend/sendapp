@@ -42,7 +42,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             "borderTopColor": "hsl(0, 0%, 24.3%)",
             "flex": 1,
             "flexDirection": "column",
-            "gap": 7,
+            "gap": 24,
           }
         }
       >
@@ -150,6 +150,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     "flex": 1,
                     "flexDirection": "column",
                     "gap": 7,
+                    "justifyContent": "center",
                     "maxWidth": 312,
                   }
                 }
@@ -167,7 +168,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  Claims for Round 1 have closed
+                  Expired Apr 28, 2024
                 </Text>
               </View>
               <View
@@ -322,7 +323,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     suppressHighlighting={true}
                     userSelect="none"
                   >
-                    Send Balance
+                    Snapshot Send Balance
                   </Text>
                   <Text
                     selectable={true}

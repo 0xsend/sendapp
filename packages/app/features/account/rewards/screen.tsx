@@ -18,9 +18,6 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-
-import React from 'react'
-
 import {
   type UseDistributionsResultData,
   useDistributions,
@@ -28,7 +25,6 @@ import {
 } from 'app/utils/distributions'
 import { useDistributionNumber } from 'app/routers/params'
 import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
-
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { DistributionClaimButton } from './components/DistributionClaimButton'
 import { type sendMerkleDropAddress, sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'

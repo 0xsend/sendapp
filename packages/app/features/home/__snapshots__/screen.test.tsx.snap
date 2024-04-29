@@ -109,7 +109,7 @@ exports[`HomeScreen 1`] = `
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "500",
-                      "lineHeight": 44,
+                      "lineHeight": 16,
                       "textTransform": "uppercase",
                       "zIndex": 1,
                     }
@@ -421,6 +421,7 @@ exports[`HomeScreen 1`] = `
         />
       </View>
     </View>
+     
   </View>
 </View>
 `;
