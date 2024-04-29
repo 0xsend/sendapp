@@ -6,6 +6,10 @@ import 'zx/globals'
  * This is useful for resetting the local development environment.
  */
 
+$.verbose = true
+
+await $`bunx supabase stop --no-backup`
+
 const containers = (await $`docker ps -a --format '{{.Names}}'`).stdout
   .split('\n')
   .filter((c) => c.match(/supabase/i))
@@ -15,18 +19,6 @@ const volumes = (await $`docker volume ls --format '{{.Name}}'`).stdout
   .filter((c) => c.match(/supabase/i))
 
 console.log(`Deleting supabase containers and volumes:\n${[...containers, ...volumes].join('\n')}`)
-
-if (!$.env.NONINTERACTIVE) {
-  const response = await question('Type "yes" to continue: ')
-  if (response !== 'yes') {
-    console.log('Exiting...')
-    process.exit(0)
-  }
-}
-
-$.verbose = true
-
-await $`bunx supabase stop --no-backup`
 
 if (containers.length > 0) {
   await $`docker kill -s SIGKILL ${containers}`
