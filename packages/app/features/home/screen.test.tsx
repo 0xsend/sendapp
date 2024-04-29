@@ -74,17 +74,6 @@ jest.mock('app/routers/params', () => ({
   useToken: jest.fn().mockReturnValue([undefined, jest.fn()]),
 }))
 
-jest.mock('app/utils/useChainAddresses', () => ({
-  useChainAddresses: jest.fn().mockReturnValue({
-    data: [
-      {
-        address: '0x123',
-        chainId: 1337,
-      },
-    ],
-  }),
-}))
-
 // jest.mock('@vonovak/react-native-theme-control', () => ({
 //   useThemePreference: jest.fn().mockReturnValue('light'),
 //   setThemePreference: jest.fn(),
