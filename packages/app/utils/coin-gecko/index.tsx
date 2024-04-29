@@ -28,11 +28,13 @@ export const MarketDataSchema = z
     atl: z.number(),
     atl_change_percentage: z.number(),
     atl_date: z.string(),
-    roi: z.object({
-      times: z.number(),
-      currency: z.string(),
-      percentage: z.number(),
-    }),
+    roi: z
+      .object({
+        times: z.number(),
+        currency: z.string(),
+        percentage: z.number(),
+      })
+      .nullable(),
   })
   .array()
 
@@ -76,6 +78,5 @@ export const useTokenMarketData = <T extends coins[number]['coingeckoTokenId']>(
       return MarketDataSchema.parse(data)
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchInterval: 1000 * 60 * 5, // 5 minutes
   })
 }

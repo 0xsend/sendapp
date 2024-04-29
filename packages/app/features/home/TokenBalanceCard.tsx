@@ -1,4 +1,4 @@
-import { Label, Paragraph, Spinner, Tooltip, TooltipGroup, XStack, YStack } from '@my/ui'
+import { Label, Paragraph, Spinner, Tooltip, TooltipGroup, XStack, YStack, Stack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
@@ -18,6 +18,7 @@ export const TokenBalanceCard = () => {
             <Tooltip placement="bottom">
               <Tooltip.Trigger>
                 <XStack ai="center" gap="$2.5">
+                  <Stack w={11} h={11} bc="$primary" $theme-light={{ bc: '$color12' }} />
                   <Label
                     fontSize={'$4'}
                     zIndex={1}
@@ -25,6 +26,7 @@ export const TokenBalanceCard = () => {
                     $theme-dark={{ col: '$gray5Light' }}
                     $theme-light={{ col: '$color12' }}
                     textTransform={'uppercase'}
+                    lineHeight={'$1'}
                   >
                     Total Balance
                   </Label>

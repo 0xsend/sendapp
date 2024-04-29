@@ -5,6 +5,9 @@ import 'zx/globals'
  * Deletes all docker containers and volumes matching the name "supabase".
  * This is useful for resetting the local development environment.
  */
+$.verbose = true
+
+await $`bunx supabase stop --no-backup`
 
 const containers = (await $`docker ps -a --format '{{.Names}}'`).stdout
   .split('\n')
@@ -16,18 +19,8 @@ const volumes = (await $`docker volume ls --format '{{.Name}}'`).stdout
 
 console.log(`Deleting supabase containers and volumes:\n${[...containers, ...volumes].join('\n')}`)
 
-if (!$.env.NONINTERACTIVE) {
-  const response = await question('Type "yes" to continue: ')
-  if (response !== 'yes') {
-    console.log('Exiting...')
-    process.exit(0)
-  }
-}
-
-$.verbose = true
-
 if (containers.length > 0) {
-  await $`docker kill ${containers}`
+  await $`docker kill -s SIGKILL ${containers}`
   await $`docker rm ${containers}`
 }
 

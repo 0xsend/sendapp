@@ -78,6 +78,15 @@ exports[`HomeScreen 1`] = `
                   }
                 }
               >
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#40FB50",
+                      "height": 11,
+                      "width": 11,
+                    }
+                  }
+                />
                 <Text
                   cancelable={true}
                   disabled={false}
@@ -100,7 +109,7 @@ exports[`HomeScreen 1`] = `
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "500",
-                      "lineHeight": 44,
+                      "lineHeight": 16,
                       "textTransform": "uppercase",
                       "zIndex": 1,
                     }
@@ -203,10 +212,14 @@ exports[`HomeScreen 1`] = `
           }
         >
           <View
+            accessibilityRole="button"
             cancelable={true}
             disabled={false}
-            focusable={true}
+            focusVisibleStyle={{}}
+            focusable={[Function]}
             minPressDuration={0}
+            onBlur={[Function]}
+            onFocus={[Function]}
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onPress={[Function]}
@@ -214,221 +227,318 @@ exports[`HomeScreen 1`] = `
             onPressOut={[Function]}
             style={
               {
+                "alignItems": "center",
+                "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 9,
+                "borderBottomRightRadius": 9,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 9,
+                "borderTopRightRadius": 9,
+                "borderTopWidth": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
                 "height": 64,
+                "justifyContent": "center",
+                "opacity": 1,
+                "paddingLeft": 16,
+                "paddingRight": 16,
                 "width": "100%",
               }
             }
           >
             <View
-              accessibilityRole="button"
-              cancelable={true}
-              disabled={false}
-              focusVisibleStyle={{}}
-              focusable={[Function]}
-              minPressDuration={0}
-              onBlur={[Function]}
-              onFocus={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onPress={[Function]}
-              onPressIn={[Function]}
-              onPressOut={[Function]}
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "hsla(125, 96%, 47%, 1)",
-                  "borderBottomColor": "transparent",
-                  "borderBottomLeftRadius": 9,
-                  "borderBottomRightRadius": 9,
-                  "borderBottomWidth": 1,
-                  "borderLeftColor": "transparent",
-                  "borderLeftWidth": 1,
-                  "borderRightColor": "transparent",
-                  "borderRightWidth": 1,
-                  "borderStyle": "solid",
-                  "borderTopColor": "transparent",
-                  "borderTopLeftRadius": 9,
-                  "borderTopRightRadius": 9,
-                  "borderTopWidth": 1,
                   "flexDirection": "row",
-                  "flexWrap": "nowrap",
-                  "height": 64,
-                  "justifyContent": "center",
-                  "opacity": 1,
-                  "paddingLeft": 16,
-                  "paddingRight": 16,
+                  "justifyContent": "space-between",
                   "width": "100%",
                 }
               }
             >
+              <Text
+                selectable={true}
+                style={
+                  {
+                    "color": "#122023",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "500",
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Deposit
+              </Text>
               <View
                 style={
                   {
                     "alignItems": "center",
                     "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "width": "100%",
+                    "justifyContent": "center",
+                    "zIndex": 2,
                   }
                 }
               >
-                <Text
-                  selectable={true}
+                <RNSVGSvgView
+                  align="xMidYMid"
+                  bbHeight="32"
+                  bbWidth="32"
+                  color="#122023"
+                  fill="none"
+                  focusable={false}
+                  height={32}
+                  meetOrSlice={0}
+                  minX={0}
+                  minY={0}
+                  strokeWidth="2"
                   style={
-                    {
-                      "color": "#122023",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "500",
-                      "lineHeight": 19,
-                      "textTransform": "uppercase",
-                    }
+                    [
+                      {
+                        "backgroundColor": "transparent",
+                        "borderWidth": 0,
+                      },
+                      {
+                        "color": "#122023",
+                      },
+                      {
+                        "flex": 0,
+                        "height": 32,
+                        "width": 32,
+                      },
+                    ]
                   }
-                  suppressHighlighting={true}
+                  tintColor="#122023"
+                  vbHeight={40}
+                  vbWidth={40}
+                  width={32}
                 >
-                  Deposit
-                </Text>
-                <View
-                  style={
-                    {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                      "zIndex": 2,
-                    }
-                  }
-                >
-                  <RNSVGSvgView
-                    align="xMidYMid"
-                    bbHeight="32"
-                    bbWidth="32"
-                    color="#122023"
-                    fill="none"
-                    focusable={false}
-                    height={32}
-                    meetOrSlice={0}
-                    minX={0}
-                    minY={0}
-                    strokeWidth="2"
-                    style={
+                  <RNSVGGroup
+                    fill={null}
+                    propList={
                       [
-                        {
-                          "backgroundColor": "transparent",
-                          "borderWidth": 0,
-                        },
-                        {
-                          "color": "#122023",
-                        },
-                        {
-                          "flex": 0,
-                          "height": 32,
-                          "width": 32,
-                        },
+                        "fill",
+                        "strokeWidth",
                       ]
                     }
-                    tintColor="#122023"
-                    vbHeight={40}
-                    vbWidth={40}
-                    width={32}
+                    strokeWidth="2"
                   >
-                    <RNSVGGroup
-                      fill={null}
+                    <RNSVGCircle
+                      cx="19.9999"
+                      cy="20"
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
                       propList={
                         [
-                          "fill",
+                          "stroke",
                           "strokeWidth",
+                          "strokeLinecap",
                         ]
                       }
+                      r="19"
+                      stroke={
+                        {
+                          "type": 2,
+                        }
+                      }
+                      strokeLinecap={1}
                       strokeWidth="2"
-                    >
-                      <RNSVGCircle
-                        cx="19.9999"
-                        cy="20"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
+                    />
+                    <RNSVGPath
+                      d="M19.9997 12.5L19.9997 27.5"
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
                         }
-                        propList={
-                          [
-                            "stroke",
-                            "strokeWidth",
-                            "strokeLinecap",
-                          ]
+                      }
+                      propList={
+                        [
+                          "stroke",
+                          "strokeWidth",
+                          "strokeLinecap",
+                        ]
+                      }
+                      stroke={
+                        {
+                          "type": 2,
                         }
-                        r="19"
-                        stroke={
-                          {
-                            "type": 2,
-                          }
+                      }
+                      strokeLinecap={1}
+                      strokeWidth="2"
+                    />
+                    <RNSVGPath
+                      d="M27.4997 20L12.4997 20"
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
                         }
-                        strokeLinecap={1}
-                        strokeWidth="2"
-                      />
-                      <RNSVGPath
-                        d="M19.9997 12.5L19.9997 27.5"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
+                      }
+                      propList={
+                        [
+                          "stroke",
+                          "strokeWidth",
+                          "strokeLinecap",
+                        ]
+                      }
+                      stroke={
+                        {
+                          "type": 2,
                         }
-                        propList={
-                          [
-                            "stroke",
-                            "strokeWidth",
-                            "strokeLinecap",
-                          ]
-                        }
-                        stroke={
-                          {
-                            "type": 2,
-                          }
-                        }
-                        strokeLinecap={1}
-                        strokeWidth="2"
-                      />
-                      <RNSVGPath
-                        d="M27.4997 20L12.4997 20"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
-                        }
-                        propList={
-                          [
-                            "stroke",
-                            "strokeWidth",
-                            "strokeLinecap",
-                          ]
-                        }
-                        stroke={
-                          {
-                            "type": 2,
-                          }
-                        }
-                        strokeLinecap={1}
-                        strokeWidth="2"
-                      />
-                    </RNSVGGroup>
-                  </RNSVGSvgView>
-                </View>
+                      }
+                      strokeLinecap={1}
+                      strokeWidth="2"
+                    />
+                  </RNSVGGroup>
+                </RNSVGSvgView>
               </View>
             </View>
           </View>
         </View>
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 24,
+          "paddingBottom": 32,
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "paddingTop": 32,
+          "width": "100%",
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(112, 22%, 100%, 1)",
+            "fontFamily": "System",
+            "fontSize": 30,
+            "fontWeight": "700",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textAlign": "center",
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Register Your Sendtag Today!
+      </Text>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 13,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          By registering a Sendtag, you can:
+        </Text>
         <View
           style={
             {
               "flexDirection": "column",
-              "paddingBottom": 88,
-              "paddingTop": 32,
-              "width": "100%",
             }
           }
-        />
+        >
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            1. Send and receive funds using your personalized identifier
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            2. Earn Send It Rewards based on your token balance and referrals
+          </Text>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Join us in shaping the Future of Finance.
+        </Text>
       </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "justifyContent": "center",
+            "marginBottom": "auto",
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "marginTop": "auto",
+          }
+        }
+      />
     </View>
   </View>
 </View>
