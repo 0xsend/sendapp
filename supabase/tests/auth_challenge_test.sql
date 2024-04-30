@@ -1,7 +1,7 @@
 -- Auth Challenge Creation Tests
 BEGIN;
 
-SELECT plan(9);
+SELECT plan(12);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -20,71 +20,81 @@ SELECT tests.authenticate_as('auth_user');
 
 -- Test inserting a value both authenticated and not from the table
 SELECT throws_ok(
-    $test$
+    $$
         INSERT INTO auth_challenges(user_id, challenge)
         VALUES(
-            tests.get_supabase_uid('auth_user') -> id
-            '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e',
-        )
-        WHERE user_id = tests.get_supabase_uid('auth_user') -> id;
+            tests.get_supabase_uid('auth_user'),
+            '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e'
+        );
     $$,
-    'new row violates insert policy for the RLS of this table',
+    'permission denied for table auth_challenges',
     'User should not be able to insert directly into any row or column.'
 );
 
 SELECT throws_ok(
-    $test$
+    $$
         INSERT INTO auth_challenges(user_id, challenge)
         VALUES(
-            tests.get_supabase_uid('auth_challenger') -> id
-            '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e',
-        )
-        WHERE user_id = tests.get_supabase_uid('auth_challenger') -> id;
+            tests.get_supabase_uid('auth_challenger'),
+            '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e'
+        );
     $$,
-    'new row violates insert policy for the RLS of this table',
+    'permission denied for table auth_challenges',
     'User should not be able to insert directly into any row or column.'
 );
 
 -- Test updating a value both authenticated and not from the table
 SELECT throws_ok(
-    $test$
-        UPDATE auth_challenges SET
-            user_id = tests.get_supabase_uid('auth_user') -> id,
-            challenge = '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a638e3', -- swapped last 2
-        WHERE user_id = tests.get_supabase_uid('auth_user') -> id;
     $$
-    'new row violates update policy for the RLS of this table',
+        UPDATE auth_challenges SET
+            user_id = tests.get_supabase_uid('auth_user'),
+            challenge = '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a638e3' -- swapped last 2
+        WHERE user_id = tests.get_supabase_uid('auth_user');
+    $$,
+    'permission denied for table auth_challenges',
     'User should not be able to update directly into any row or column.'
 );
 
 SELECT throws_ok(
-    $test$
-        UPDATE auth_challenges SET
-            user_id = tests.get_supabase_uid('auth_challenger') -> id,
-            challenge = '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a638e3', -- swapped last 2
-        WHERE user_id = tests.get_supabase_uid('auth_challenger') -> id;
     $$
-    'new row violates update policy for the RLS of this table',
+        UPDATE auth_challenges SET
+            user_id = tests.get_supabase_uid('auth_challenger'),
+            challenge = '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a638e3' -- swapped last 2
+        WHERE user_id = tests.get_supabase_uid('auth_challenger');
+    $$,
+    'permission denied for table auth_challenges',
     'User should not be able to update directly into any row or column.'
 );
 
 -- Test deleting a value both authenticated and not from the table
 SELECT throws_ok(
-    $test$
-        DELETE FROM auth_challenges
-        WHERE user_id = tests.get_supabase_uid('auth_user') -> id;
     $$
-    'new row violates delete policy for the RLS of this table',
+        DELETE FROM auth_challenges
+        WHERE user_id = tests.get_supabase_uid('auth_user');
+    $$,
+    'permission denied for table auth_challenges',
     'User should not be able to delete directly from any row or column.'
 );
 
 SELECT throws_ok(
-    $test$
-        DELETE FROM auth_challenges
-        WHERE user_id = tests.get_supabase_uid('auth_challenger') -> id;
     $$
-    'new row violates delete policy for the RLS of this table',
+        DELETE FROM auth_challenges
+        WHERE user_id = tests.get_supabase_uid('auth_challenger');
+    $$,
+    'permission denied for table auth_challenges',
     'User should not be able to delete directly from any row or column.'
+);
+
+-- Try executing upsert_auth_challenges
+SELECT throws_ok(
+    $$
+        SELECT "public"."upsert_auth_challenges"(
+            tests.get_supabase_uid('auth_user'),
+            '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e'
+        )::auth_challenges;
+    $$,
+    'permission denied for table auth_challenges',
+    'User should not be able to call upsert_auth_challenges directly.'
 );
 
 -- Servicle roll can bypass RLS rules fully and interact with the table
@@ -98,10 +108,10 @@ SELECT tests.clear_authentication();
 SET role to service_role;
 
 SELECT lives_ok(
-    $test$
+    $$
         INSERT INTO auth_challenges(user_id, challenge)
         VALUES (
-            tests.get_supabase_uid('auth_user') -> id
+            tests.get_supabase_uid('auth_user'),
             '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e'
         );
     $$,
@@ -110,31 +120,42 @@ SELECT lives_ok(
 
 -- Select a challenge as admin ( no errors)
 SELECT lives_ok(
-    $test$
+    $$
         SELECT (user_id, challenge) FROM auth_challenges
-        WHERE user_id = tests.get_supabase_uid('auth_user') -> id
+        WHERE user_id = tests.get_supabase_uid('auth_user');
     $$,
     'Selects a valid challenge'
 );
 
 -- Update a challenge as admin ( no errors)
 SELECT lives_ok(
-    $test$
+    $$
         UPDATE auth_challenges SET
-            user_id = tests.get_supabase_uid('auth_user') -> id,
-            challenge = '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e',
-        WHERE user_id = tests.get_supabase_uid('auth_user') -> id;
+            user_id = tests.get_supabase_uid('auth_user'),
+            challenge = '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e'
+        WHERE user_id = tests.get_supabase_uid('auth_user');
     $$,
     'Updates a valid challenge'
 );
 
 -- Update a challenge as admin ( no errors)
 SELECT lives_ok(
-    $test$
-        DELETE FROM auth_challenges(user_id, challenge)
-        WHERE user_id = tests.get_supabase_uid('auth_user') -> id;
+    $$
+        DELETE FROM auth_challenges
+        WHERE user_id = tests.get_supabase_uid('auth_user');
     $$,
     'Deletes a valid challenge'
+);
+
+-- Try executing upsert_auth_challenges
+SELECT lives_ok(
+    $$
+        SELECT "public"."upsert_auth_challenges"(
+            tests.get_supabase_uid('auth_user'),
+            '4bb9d0e3425f19f33db4b5e8b5f2a5c5326de94330bf9ea4750a3c8604a6383e'
+        )::auth_challenges;
+    $$,
+    'Upserts a valid challenge'
 );
 
 SELECT *

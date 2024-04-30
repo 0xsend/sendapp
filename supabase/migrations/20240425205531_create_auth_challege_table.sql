@@ -32,55 +32,9 @@ revoke all on "public"."users" from anon, authenticated, public;
 grant all on "public"."users" to service_role;
 
 
--- Secure the table with before triggers on insert, update and delete
+-- Secure the table granting all permissions to the service role
+revoke all on "public"."auth_challenges" from anon, authenticated, public;
 grant all on table "public"."auth_challenges" to service_role;
-
-create or replace function auth_challenges_func_before_insert()
-returns trigger security definer
-set search_path = public as
-$$
-    begin
-        if user.is_authenticated or !user.is_authenticated then
-            raise exception "new row violates insert policy for the RLS of this table";
-        end if;
-        return new;
-    end;
-$$ language plpgsql;
-
-create or replace function auth_challenges_func_before_update()
-returns trigger security definer
-set search_path = public as
-$$
-    begin
-        if user.is_authenticated or !user.is_authenticated then
-            raise exception "new row violates update policy for the RLS of this table";
-        end if;
-        return new;
-    end;
-$$ language plpgsql;
-
-create or replace function auth_challenges_func_before_delete()
-returns trigger security definer
-set search_path = public as
-$$
-    begin
-        if user.is_authenticated or !user.is_authenticated then
-            raise exception "new row violates delete policy for the RLS of this table";
-        end if;
-        return new;
-    end;
-$$ language plpgsql;
-
--- Assign the trigger function to the auth_challenges table to be invoked
--- before insert, update and delete
-create or replace trigger auth_challenges_trig_before_insert before insert
-on "public"."auth_challenges" for each row execute function auth_challenges_func_before_insert();
-
-create or replace trigger auth_challenges_trig_before_update before update
-on "public"."auth_challenges" for each row execute function auth_challenges_func_before_update();
-
-create or replace trigger auth_challenges_trig_before_select before delete
-on "public"."auth_challenges" for each row execute function auth_challenges_func_before_delete();
 
 -- Add the primary key using the auth_challenges table's random id column
 alter table "public"."auth_challenges" add constraint "auth_challenges_pkey"
@@ -103,25 +57,24 @@ unique using index "auth_challenges_user_id_idx";
 
 -- Create a function to update the table and add a challenge
 create or replace function upsert_auth_challenges(
-    user_id uuid,
+    userid uuid,
     challenge citext
 ) returns auth_challenges as $$
     declare _auth_id uuid;
             _created timestamptz;
             _expires timestamptz;
+            _old_auth auth_challenges;
+            _new_challenge auth_challenges;
     begin
-        -- Double check the user isn't already authenticated otherwise they
-        -- wouldn't need to do this challenge -> verifu flow
-        if auth.is_authenticated() then
-            throw new exception('User is already authenticated account recovery pointless', 400);
-        end
         -- Generate challenge auxiliary metadata for the new challenge.
         _created := current_timestamp;
         _expires := _created + interval '15 minute'; -- 15 minutes from creation
-        select * from "public"."auth_challenges" where "public"."auth_challenges"."user_id" = user_id
-        .single()
-        returning id into _auth_id;
-        if _auth_id is null then
+
+        select * into _old_auth from "public"."auth_challenges"
+        where "public"."auth_challenges"."user_id" = userid;
+
+        -- Check if we need to assign a new id to the challenge
+        if _old_auth."id" is null or _old_auth."expires_at" < _created then
             _auth_id := gen_random_uuid();
         end if;
 
@@ -129,18 +82,18 @@ create or replace function upsert_auth_challenges(
         insert into "public"."auth_challenges"
         -- insert all fields as `returning` for Insert only returns provided fields
         (id, user_id, challenge, created_at, expires_at)
-        values (_new_id, user_id, challenge, _created, _expires);
-        -- Use fully qualified column name to avoid name conflicts
-        where "public"."auth_challenges"."user_id" = user_id;
+        values (_auth_id, userid, challenge, _created, _expires)
         -- Perform an update if user_id already exist on in the database
-        on conflict ("public"."auth_challenges"."user_id") do update
+        on conflict (user_id) do update
             -- Set the relevant columns in the row
             set id = excluded.id,                 -- set the new id field to overwrite the old one
                 user_id = excluded.user_id,       -- set the new user_id
                 challenge = excluded.challenge,   -- set the new challenge
                 created_at = excluded.created_at, -- set the new created timestamp
-                expires_at = excluded.expires_at; -- set the new expiration timestamp
-        -- Return the entire row's values as a structured object not an arrah
-        returning.single();
+                expires_at = excluded.expires_at  -- set the new expiration timestamp
+        -- Return the entire row's values as a structured object not an array
+        returning * into _new_challenge;
+
+        return _new_challenge;
     end
 $$ language plpgsql; -- use the PostreSQL language for this function

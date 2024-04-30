@@ -42,7 +42,7 @@ $$ LANGUAGE sql;
 
 select tests.rls_enabled(
     'public',
-    ARRAY ['distribution_verifications_summary']
+    ARRAY ['distribution_verifications_summary', 'users']
   );
 
 SELECT *
