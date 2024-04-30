@@ -186,7 +186,6 @@ export type Database = {
           qualification_end: string
           qualification_start: string
           snapshot_block_num: number | null
-          snapshot_id: number | null
           updated_at: string
         }
         Insert: {
@@ -205,7 +204,6 @@ export type Database = {
           qualification_end: string
           qualification_start: string
           snapshot_block_num?: number | null
-          snapshot_id?: number | null
           updated_at?: string
         }
         Update: {
@@ -224,7 +222,6 @@ export type Database = {
           qualification_end?: string
           qualification_start?: string
           snapshot_block_num?: number | null
-          snapshot_id?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -907,7 +904,8 @@ export type Database = {
       }
       profile_lookup: {
         Args: {
-          tag: string
+          id_type: Database["public"]["Enums"]["id_type_enum"]
+          identifier: string
         }
         Returns: {
           id: string
@@ -917,16 +915,18 @@ export type Database = {
           referral_code: string
           tag_name: string
           address: string
+          phone: string
           chain_id: number
           is_public: boolean
           send_id: number
+          all_tags: string[]
         }[]
       }
       tag_search: {
         Args: {
           query: string
-          limit_val?: number
-          offset_val?: number
+          limit_val: number
+          offset_val: number
         }
         Returns: {
           send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
@@ -947,6 +947,12 @@ export type Database = {
       }
     }
     Enums: {
+      id_type_enum:
+        | "send_id"
+        | "tag_name"
+        | "referral_code"
+        | "address"
+        | "phone"
       key_type_enum: "ES256"
       tag_status: "pending" | "confirmed"
       verification_type: "tag_registration" | "tag_referral"

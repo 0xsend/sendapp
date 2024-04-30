@@ -3964,7 +3964,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
       tag_matches
     </Text>
     <View
-      data-href="/profile/test"
+      data-href="/profile/tag_name/test"
     >
       <View
         style={

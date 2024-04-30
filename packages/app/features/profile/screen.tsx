@@ -16,15 +16,17 @@ import { useState } from 'react'
 import { createParam } from 'solito'
 import { SendDialog } from './SendDialog'
 import { AvatarProfile } from './AvatarProfile'
-
-const { useParam } = createParam<{ tag: string }>()
+const { useParam } = createParam<{ id_type: string; identifier: string }>()
 
 export function ProfileScreen() {
   const { user } = useUser()
-  const [tag] = useParam('tag')
-  const { data: profile, isLoading, error } = useProfileLookup(tag)
+  const [id_type = 'tag_name'] = useParam('id_type')
+  const [identifier = ''] = useParam('identifier')
+  const { data: profile, isLoading, error } = useProfileLookup(id_type, identifier)
   const [showSendModal, setShowSendModal] = useState(false)
   const toast = useToastController()
+
+  const formatTags = (tags: string[]) => tags?.map((tag) => `@${tag}`).join(' ')
 
   return (
     <Container>
@@ -34,7 +36,7 @@ export function ProfileScreen() {
         {profile ? (
           <YStack width="100%" gap="$2">
             <AvatarProfile profile={profile} /> <H1 nativeID="profileName">{profile.name}</H1>
-            <H2 theme="alt1">@{tag}</H2>
+            <H2 theme="alt1">{formatTags(profile.all_tags)}</H2>
             <Paragraph mb="$4">{profile.about}</Paragraph>
             {profile && user?.id !== profile?.id ? (
               <XStack jc="space-around" gap="$6" maxWidth={600}>

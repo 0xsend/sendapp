@@ -133,6 +133,11 @@ function SearchResults() {
   if (!results || isLoading || error) {
     return null
   }
+  const idTypeMap = {
+    send_id_matches: 'send_id',
+    tag_matches: 'tag_name',
+    phone_matches: 'phone',
+  }
 
   return (
     <YStack
@@ -152,21 +157,22 @@ function SearchResults() {
         (!results.phone_matches || results.phone_matches?.length === 0) && (
           <Text>No results for {query}... 😢</Text>
         )}
-      {['send_id_matches', 'tag_matches', 'phone_matches'].map(
-        (key) =>
+      {['send_id_matches', 'tag_matches', 'phone_matches'].map((key) => {
+        const id_type = idTypeMap[key]
+        return (
           results[key] &&
           results[key].length > 0 && (
             <>
               <H4 theme={'alt2'}>{key}</H4>
               {results[key].map((result) => (
-                <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
-                  <XStack testID={`tag-search-${result.tag_name}`} ai="center" space="$4">
+                <Link key={result[id_type]} href={`/profile/${id_type}/${result[id_type]}`}>
+                  <XStack testID={`tag-search-${result[id_type]}`} ai="center" space="$4">
                     <Avatar size="$4" br="$4" space="$2">
                       <Avatar.Image src={result.avatar_url} />
                       <Avatar.Fallback>
                         <Avatar>
                           <Avatar.Image
-                            src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
+                            src={`https://ui-avatars.com/api.jpg?name=${result[id_type]}&size=256`}
                           />
                           <Avatar.Fallback>
                             <Paragraph>??</Paragraph>
@@ -175,14 +181,15 @@ function SearchResults() {
                       </Avatar.Fallback>
                     </Avatar>
                     <YStack space="$1">
-                      <Text>{result.tag_name}</Text>
+                      <Text>{result.tag_name ? result.tag_name : result[id_type]}</Text>
                     </YStack>
                   </XStack>
                 </Link>
               ))}
             </>
           )
-      )}
+        )
+      })}
     </YStack>
   )
 }

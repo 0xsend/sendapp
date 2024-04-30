@@ -2,7 +2,7 @@ import { ProfileScreen } from 'app/features/profile/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import type { NextPageWithLayout } from '../_app'
+import type { NextPageWithLayout } from '../../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
@@ -23,18 +23,20 @@ export const Page: NextPageWithLayout = () => {
 }
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
-export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
-  const { tag } = ctx.params ?? {}
+export const getServerSideProps = async (
+  ctx: GetServerSidePropsContext<{ id_type: string; identifier: string }>
+) => {
+  const { id_type, identifier } = ctx.params ?? {}
 
-  // ensure tag is valid before proceeding
-  const { success } = CheckoutTagSchema.safeParse({ name: tag })
-  if (!success) {
+  // ensure identifier is valid before proceeding
+  const { success } = CheckoutTagSchema.safeParse({ name: identifier })
+  if (!success || !id_type) {
     return {
       notFound: true,
     }
   }
-  assert(!!tag, 'Tag is required')
-  assert(typeof tag === 'string', 'Tag must be a string')
+  assert(!!identifier, 'Identifier is required')
+  assert(typeof identifier === 'string', 'Identifier must be a string')
 
   // log user activity
   console.log(
@@ -56,10 +58,12 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   // check if profile exists
-  const { data: profile, error } = await supabaseAdmin.rpc('profile_lookup', { tag }).maybeSingle()
+  const { data: profile, error } = await supabaseAdmin
+    .rpc('profile_lookup', { id_type: id_type, identifier: identifier })
+    .maybeSingle()
 
   if (error) {
-    console.error('Error fetching tag', error)
+    console.error('Error fetching identifier', error)
     throw error
   }
 
@@ -74,7 +78,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   return {
     props: {},
   }
-}) satisfies GetServerSideProps
+}
 
 Page.getLayout = (children) => (
   <HomeLayout TopNav={<TopNav header="Profile" noSubroute />}>{children}</HomeLayout>

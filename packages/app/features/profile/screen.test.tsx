@@ -16,6 +16,7 @@ const PROFILE = {
   tag_name: TAG_NAME,
   address: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
   chain_id: 845337,
+  all_tags: [TAG_NAME],
 }
 
 jest.mock('solito', () => ({
