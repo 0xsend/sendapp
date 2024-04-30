@@ -20,7 +20,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { X } from '@tamagui/lucide-icons'
 import { TokenDetails } from './TokenDetails'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
+import { useSendAccounts } from 'app/utils/send-accounts'
 
 export function HomeScreen() {
   const toast = useToastController()
@@ -30,7 +30,8 @@ export function HomeScreen() {
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
   const selectedCoin = useCoinFromTokenParam()
-  const { data: sendAccount, isLoading: sendAccountLoading } = useChainAddresses()
+  const { data: sendAccounts, isLoading: sendAccountLoading } = useSendAccounts()
+  const sendAccount = sendAccounts?.[0]
 
   const hasSendAccount = !(sendAccount === undefined || sendAccount.length === 0)
 
