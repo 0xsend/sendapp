@@ -1149,7 +1149,7 @@ export type Database = {
       }
       upsert_auth_challenges: {
         Args: {
-          user_id: string
+          userid: string
           challenge: string
         }
         Returns: {

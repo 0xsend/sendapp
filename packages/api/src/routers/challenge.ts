@@ -36,7 +36,7 @@ export const challengeRouter = createTRPCRouter({
           .select('*')
           .eq('phone', phoneNumber)
           .single()
-        const user_id: string = (data?.user_id as string) || ''
+        const user_id: string = (data?.id as string) || ''
         if (user_id === '') {
           log('challengeUser:user-not-found')
           throw new TRPCError({
@@ -48,7 +48,7 @@ export const challengeRouter = createTRPCRouter({
         // hex encoded hashed challenge message
         const { data: result } = await supabaseAdmin
           .rpc('upsert_auth_challenges', {
-            user_id: user_id,
+            userid: user_id,
             challenge: challengeUserMessage(user_id, phoneNumber),
           })
           .single()
