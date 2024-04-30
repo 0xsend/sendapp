@@ -16,6 +16,171 @@ exports[`HomeScreen 1`] = `
   <View
     style={
       {
+        "display": "none",
+      }
+    }
+  >
+    <View
+      accessibilityRole="button"
+      cancelable={true}
+      disabled={false}
+      focusVisibleStyle={{}}
+      focusable={[Function]}
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "borderBottomColor": "transparent",
+          "borderBottomLeftRadius": 100000,
+          "borderBottomRightRadius": 100000,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "transparent",
+          "borderLeftWidth": 1,
+          "borderRightColor": "transparent",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "transparent",
+          "borderTopLeftRadius": 100000,
+          "borderTopRightRadius": 100000,
+          "borderTopWidth": 1,
+          "display": "none",
+          "flexDirection": "row",
+          "flexWrap": "nowrap",
+          "height": 44,
+          "justifyContent": "center",
+          "maxHeight": 44,
+          "maxWidth": 44,
+          "minHeight": 44,
+          "minWidth": 44,
+          "paddingBottom": 0,
+          "paddingLeft": 0,
+          "paddingRight": 0,
+          "paddingTop": 0,
+          "position": "absolute",
+          "right": 0,
+          "shadowColor": "rgb(0,0,0)",
+          "shadowOffset": {
+            "height": 0,
+            "width": 0,
+          },
+          "shadowOpacity": 0,
+          "shadowRadius": 0,
+          "top": -46,
+          "width": 44,
+        }
+      }
+    >
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight="32"
+        bbWidth="32"
+        fill="none"
+        focusable={false}
+        height={32}
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        stroke="hsla(112, 22%, 59%, 1)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        style={
+          [
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+            },
+            {
+              "flex": 0,
+              "height": 32,
+              "width": 32,
+            },
+          ]
+        }
+        tintColor="hsla(112, 22%, 59%, 1)"
+        vbHeight={24}
+        vbWidth={24}
+        width={32}
+      >
+        <RNSVGGroup
+          fill={null}
+          propList={
+            [
+              "fill",
+              "stroke",
+              "strokeWidth",
+              "strokeLinecap",
+              "strokeLinejoin",
+            ]
+          }
+          stroke={
+            {
+              "payload": 4287016319,
+              "type": 0,
+            }
+          }
+          strokeLinecap={1}
+          strokeLinejoin={1}
+          strokeWidth="2"
+        >
+          <RNSVGPath
+            d="M18 6 6 18"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "stroke",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4287016319,
+                "type": 0,
+              }
+            }
+          />
+          <RNSVGPath
+            d="m6 6 12 12"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "stroke",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4287016319,
+                "type": 0,
+              }
+            }
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
+    </View>
+  </View>
+  <View
+    style={
+      {
         "flex": 1,
         "flexDirection": "row",
         "justifyContent": "space-between",
@@ -27,6 +192,7 @@ exports[`HomeScreen 1`] = `
       style={
         {
           "alignItems": "center",
+          "display": "flex",
           "flexDirection": "column",
           "width": "100%",
         }
@@ -476,6 +642,7 @@ exports[`HomeScreen 1`] = `
         <View
           style={
             {
+              "display": "flex",
               "flexDirection": "column",
             }
           }

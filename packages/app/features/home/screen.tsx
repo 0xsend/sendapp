@@ -5,7 +5,6 @@ import {
   Separator,
   XStack,
   YStack,
-  useMedia,
   useToastController,
   Stack,
   Spinner,
@@ -24,7 +23,6 @@ import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useSendAccounts } from 'app/utils/send-accounts'
 
 export function HomeScreen() {
-  const media = useMedia()
   const toast = useToastController()
   const [, setTokenParam] = useToken()
 
@@ -35,90 +33,89 @@ export function HomeScreen() {
   const { data: sendAccounts, isLoading: sendAccountLoading } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
 
+  const hasSendAccount = !(sendAccount === undefined || sendAccount.length === 0)
+
   return (
     <Container fd={'column'} $gtMd={{ pt: '$5' }}>
-      {selectedCoin !== undefined && media.gtLg && (
-        <Stack>
-          <Button
-            top={'$-8'}
-            right={0}
-            position="absolute"
-            bc="transparent"
-            chromeless
-            circular
-            jc={'center'}
-            ai={'center'}
-            $lg={{ display: 'none' }}
-            hoverStyle={{
-              backgroundColor: 'transparent',
-              borderColor: '$color11',
-            }}
-            pressStyle={{
-              backgroundColor: 'transparent',
-            }}
-            focusStyle={{
-              backgroundColor: 'transparent',
-            }}
-            icon={<X size={'$2.5'} color={'$color11'} />}
-            onPress={() => {
-              setTokenParam(undefined)
-            }}
-          />
-        </Stack>
-      )}
+      <Stack display="none" $gtLg={{ display: hasSendAccount && selectedCoin ? 'flex' : 'none' }}>
+        <Button
+          top={'$-8'}
+          right={0}
+          position="absolute"
+          bc="transparent"
+          chromeless
+          circular
+          jc={'center'}
+          ai={'center'}
+          $lg={{ display: 'none' }}
+          hoverStyle={{
+            backgroundColor: 'transparent',
+            borderColor: '$color11',
+          }}
+          pressStyle={{
+            backgroundColor: 'transparent',
+          }}
+          focusStyle={{
+            backgroundColor: 'transparent',
+          }}
+          icon={<X size={'$2.5'} color={'$color11'} />}
+          onPress={() => {
+            setTokenParam(undefined)
+          }}
+        />
+      </Stack>
       <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }}>
-        {media.gtLg || sendAccount?.length || selectedCoin === undefined ? (
-          <YStack $gtLg={{ width: 360 }} width="100%" ai={'center'}>
-            <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
-              <TokenBalanceCard />
-            </XStack>
-            <Separator $gtLg={{ display: 'none' }} w={'100%'} borderColor={separatorColor} />
-            <YStack w={'100%'} ai={'center'}>
-              <XStack w={'100%'} ai={'center'} pt={'$7'}>
-                <Button
-                  px={'$3.5'}
-                  h={'$6'}
-                  width={'100%'}
-                  theme="accent"
-                  borderRadius={'$4'}
-                  onPress={() => {
-                    // @todo onramp / deposit
-                    toast.show('Coming Soon: Deposit')
-                  }}
-                  disabled={selectedCoin !== undefined}
-                  disabledStyle={{ opacity: 0.5 }}
-                >
-                  <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                    <Paragraph
-                      // fontFamily={'$mono'}
-                      fontWeight={'500'}
-                      textTransform={'uppercase'}
-                      color={'$black'}
-                    >
-                      Deposit
-                    </Paragraph>
-                    <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                      <IconDeposit size={'$2.5'} color={'$black'} />
-                    </XStack>
+        <YStack
+          $gtLg={{ width: 360, display: 'flex' }}
+          display={hasSendAccount && !selectedCoin ? 'flex' : 'none'}
+          width="100%"
+          ai={'center'}
+        >
+          <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
+            <TokenBalanceCard />
+          </XStack>
+          <Separator $gtLg={{ display: 'none' }} w={'100%'} borderColor={separatorColor} />
+          <YStack w={'100%'} ai={'center'}>
+            <XStack w={'100%'} ai={'center'} pt={'$7'}>
+              <Button
+                px={'$3.5'}
+                h={'$6'}
+                width={'100%'}
+                theme="accent"
+                borderRadius={'$4'}
+                onPress={() => {
+                  // @todo onramp / deposit
+                  toast.show('Coming Soon: Deposit')
+                }}
+                disabled={selectedCoin !== undefined}
+                disabledStyle={{ opacity: 0.5 }}
+              >
+                <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+                  <Paragraph
+                    // fontFamily={'$mono'}
+                    fontWeight={'500'}
+                    textTransform={'uppercase'}
+                    color={'$black'}
+                  >
+                    Deposit
+                  </Paragraph>
+                  <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                    <IconDeposit size={'$2.5'} color={'$black'} />
                   </XStack>
-                </Button>
-              </XStack>
-              {!!sendAccount?.length && (
-                <YStack width="100%" pt="$6" pb="$12">
-                  <TokenBalanceList coins={coins} />
-                </YStack>
-              )}
+                </XStack>
+              </Button>
+            </XStack>
+            <YStack width="100%" pt="$6" pb="$12" display={hasSendAccount ? 'flex' : 'none'}>
+              <TokenBalanceList coins={coins} />
             </YStack>
           </YStack>
-        ) : (
-          <></>
-        )}
+        </YStack>
 
         {(() => {
           switch (true) {
             case sendAccountLoading:
               return <Spinner size="large" />
-            case !sendAccount?.length:
+            case !hasSendAccount:
               return (
                 <YStack
                   w="100%"
