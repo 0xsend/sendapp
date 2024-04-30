@@ -1,71 +1,90 @@
-drop type if exists public.tag_search_result cascade;
-create type public.tag_search_result as (
-                                            avatar_url text,
-                                            tag_name text,
-                                            send_id integer,
-                                            phone text
-                                        );
+DROP TYPE IF EXISTS public.tag_search_result CASCADE;
 
-drop function if exists public.tag_search(q text);
-create or replace function public.tag_search(
-    query text,
-    limit_val integer,
-    offset_val integer
-) returns table(
-                   send_id_matches public.tag_search_result[],
-                   tag_matches public.tag_search_result[],
-                   phone_matches public.tag_search_result[]
-               ) language plpgsql immutable security definer as $function$
-                begin
-                    if limit_val is null
-                    or (
-                        limit_val <= 0
-                        or limit_val > 100
-                    ) then raise exception 'limit_val must be between 1 and 100';
-                    end if;
-                    if offset_val is  null
-                    or offset_val < 0 then raise exception 'offset_val must be greater than or equal to 0';
-                    end if;
-                return query --
-    select
-        (
-            select array_agg(row(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-            from (
-                     select p.avatar_url, t.name as tag_name, p.send_id, null::text as phone
-                     from profiles p
-                              join tags t on t.user_id = p.id
-                     where query SIMILAR TO '\d+'
-                       and p.send_id::varchar ilike '%' || query || '%'
-                     order by p.send_id
-                     limit limit_val offset offset_val
-                 ) sub
-        ) as send_id_matches,
-        (
-            select array_agg(row(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-            from (
-                     select p.avatar_url, t.name as tag_name, p.send_id, null::text as phone
-                     from profiles p
-                              join tags t on t.user_id = p.id
-                     where t.name ILIKE '%' || query || '%'
-                     AND t.status = 'confirmed'
-                     order by (t.name <-> query)
-                     limit limit_val offset offset_val
-                 ) sub
-        ) as tag_matches,
-        (
-            select array_agg(row(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
-            from (
-                     select p.avatar_url, t.name as tag_name, p.send_id, u.phone
-                     from profiles p
-                              left join tags t on t.user_id = p.id
-                              join auth.users u on u.id = p.id
-                     where query ~ '^\d{6,}$'
-                       and u.phone like query || '%'
-                     order by u.phone
-                     limit limit_val offset offset_val
-                 ) sub
-        ) as phone_matches;
-end;
+CREATE TYPE public.tag_search_result AS (
+    avatar_url text,
+    tag_name text,
+    send_id integer,
+    phone text
+);
+
+DROP FUNCTION IF EXISTS public.tag_search(q text);
+
+CREATE OR REPLACE FUNCTION public.tag_search(query text, limit_val integer, offset_val integer)
+    RETURNS TABLE(
+        send_id_matches public.tag_search_result[],
+        tag_matches public.tag_search_result[],
+        phone_matches public.tag_search_result[])
+    LANGUAGE plpgsql
+    IMMUTABLE
+    SECURITY DEFINER
+    AS $function$
+BEGIN
+    IF limit_val IS NULL OR(limit_val <= 0 OR limit_val > 100) THEN
+        RAISE EXCEPTION 'limit_val must be between 1 and 100';
+    END IF;
+    IF offset_val IS NULL OR offset_val < 0 THEN
+        RAISE EXCEPTION 'offset_val must be greater than or equal to 0';
+    END IF;
+    RETURN query --
+    SELECT
+(
+            SELECT
+                array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+            FROM(
+                SELECT
+                    p.avatar_url,
+                    t.name AS tag_name,
+                    p.send_id,
+                    NULL::text AS phone
+                FROM
+                    profiles p
+                    JOIN tags t ON t.user_id = p.id
+                WHERE
+                    query SIMILAR TO '\d+'
+                    AND p.send_id::varchar ILIKE '%' || query || '%'
+                ORDER BY
+                    p.send_id
+                LIMIT limit_val offset offset_val) sub) AS send_id_matches,
+(
+        SELECT
+            array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+        FROM(
+            SELECT
+                p.avatar_url,
+                t.name AS tag_name,
+                p.send_id,
+                NULL::text AS phone
+            FROM
+                profiles p
+                JOIN tags t ON t.user_id = p.id
+            WHERE
+                t.status = 'confirmed'
+                AND(t.name <<-> query < 0.7
+                    OR t.name ILIKE '%' || query || '%')
+            ORDER BY
+(t.name <-> query)
+            LIMIT limit_val offset offset_val) sub) AS tag_matches,
+(
+        SELECT
+            array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone)::public.tag_search_result)
+        FROM(
+            SELECT
+                p.avatar_url,
+                t.name AS tag_name,
+                p.send_id,
+                u.phone
+            FROM
+                profiles p
+            LEFT JOIN tags t ON t.user_id = p.id
+            JOIN auth.users u ON u.id = p.id
+        WHERE
+            query ~ '^\d{6,}$'
+            AND u.phone LIKE query || '%'
+        ORDER BY
+            u.phone
+        LIMIT limit_val offset offset_val) sub) AS phone_matches;
+END;
 $function$;
 
-revoke all on function public.tag_search(q text, limit_val int, offset_val int) from anon;
+REVOKE ALL ON FUNCTION public.tag_search(q text, limit_val int, offset_val int) FROM anon;
+
