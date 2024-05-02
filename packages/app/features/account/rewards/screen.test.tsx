@@ -81,6 +81,8 @@ jest.mock('app/utils/tags', () => ({
 }))
 describe('EarnTokensScreen', () => {
   it('renders', () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
     const tree = render(
       <Wrapper>
         <RewardsScreen />
