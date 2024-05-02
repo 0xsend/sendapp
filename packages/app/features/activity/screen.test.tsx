@@ -53,7 +53,7 @@ test('ActivityScreen: search', async () => {
       <ActivityScreen />
     </TamaguiProvider>
   )
-  const searchInput = screen.getByPlaceholderText('Search')
+  const searchInput = screen.getByPlaceholderText('Name, $Sendtag, Phone, Email')
   await act(async () => {
     fireEvent.changeText(searchInput, 'test')
     jest.advanceTimersByTime(2000)

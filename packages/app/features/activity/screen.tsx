@@ -9,11 +9,11 @@ import {
   Separator,
   Spinner,
   Text,
+  View,
   XStack,
   YStack,
   useMedia,
 } from '@my/ui'
-import { IconQRCode } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { FormProvider } from 'react-hook-form'
@@ -71,12 +71,16 @@ export function ActivityScreen() {
   return (
     <TagSearchProvider>
       <YStack f={1} width={'100%'} pb="$4" gap="$6">
-        <Container f={0}>
-          <XStack alignItems="center" width={'100%'} gap="$6">
-            <Search />
-            <IconQRCode />
-          </XStack>
-        </Container>
+        <View>
+          <Container>
+            <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
+              <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
+                SEARCH BY
+              </H4>
+              <Search />
+            </YStack>
+          </Container>
+        </View>
 
         <ActivityBody />
       </YStack>
@@ -364,7 +368,7 @@ function Row({ activity }: { activity: (typeof activities)[number] }) {
           display="none"
           minWidth={'$14'}
           textAlign="right"
-          $gtMd={{ display: 'inline' }}
+          $gtMd={{ display: 'flex', jc: 'flex-end' }}
         >
           {activity.time}
         </Text>
@@ -396,7 +400,7 @@ function Search() {
         schema={SearchSchema}
         props={{
           query: {
-            placeholder: 'Search',
+            placeholder: 'Name, $Sendtag, Phone, Email',
           },
         }}
         formProps={{
