@@ -6,6 +6,7 @@ import {
   // sendAccountTransactionsIntegration,
   sendTokenTransfersIntegration,
   sendRevenuesSafeReceives,
+  sendAccountSigningKeyAdded,
 } from './integrations'
 
 // baseSrcBlockHeaders is to be used for integrations that require block headers
@@ -43,6 +44,10 @@ export const integrations: Integration[] = [
   },
   {
     ...sendRevenuesSafeReceives,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendAccountSigningKeyAdded,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
   // @todo split this into two integrations, one for Receive and one for UserOperationEvent

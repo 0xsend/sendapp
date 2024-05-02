@@ -6,7 +6,6 @@ import type {
   Table,
 } from '@indexsupply/shovel-config'
 import { sendAccountFactoryAddress } from '@my/wagmi'
-import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 
 export const sendAcctFactoryTable: Table = {
   name: 'send_account_created',

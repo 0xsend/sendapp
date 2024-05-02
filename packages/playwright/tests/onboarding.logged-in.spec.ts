@@ -11,6 +11,10 @@ import cbor from 'cbor'
 
 import { expect, test } from './fixtures/auth'
 import { OnboardingPage } from './fixtures/send-accounts'
+import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
+import { checksumAddress, withRetry } from 'viem'
+import { COSEECDHAtoXY } from 'app/utils/passkeys'
+import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
 
 test('can visit onboarding page', async ({ page, supabase, authSession, authenticator }) => {
   const onboardingPage = new OnboardingPage(page)
@@ -58,7 +62,41 @@ test('can visit onboarding page', async ({ page, supabase, authSession, authenti
   const cborAttObj = cbor.decodeAllSync(attestationObject)[0]
   assert(!!cborAttObj, 'Missing cbor attestation object')
   const { authData } = cborAttObj as Attestation
-  const { COSEPublicKey } = parseCredAuthData(authData)
-  assert(!!COSEPublicKey, 'Missing COSEPublicKey')
-  expect(webAuthnCred.public_key).toBe(`\\x${Buffer.from(COSEPublicKey).toString('hex')}`)
+  const { COSEPublicKey: COSEPublicKeyBytes } = parseCredAuthData(authData)
+  assert(!!COSEPublicKeyBytes, 'Missing COSEPublicKey')
+  const COSEPublicKey = Buffer.from(COSEPublicKeyBytes).toString('hex')
+  expect(webAuthnCred.public_key).toBe(`\\x${COSEPublicKey}`)
+
+  // retry until signing key is added to the account
+  const keyAdded = await withRetry(
+    async () => {
+      const { data: keyAdded, error: keyAddedErr } = await supabase
+        .from('send_account_signing_key_added')
+        .select('account, key_slot, key')
+        .order('block_num, tx_idx, log_idx, abi_idx')
+
+      if (keyAddedErr) {
+        throw keyAddedErr
+      }
+
+      if (keyAdded.length === 0) {
+        throw new Error('No key added')
+      }
+
+      return keyAdded
+    },
+    {
+      retryCount: 10,
+      delay: 500,
+    }
+  )
+
+  // signing key should be added to the account
+  expect(keyAdded.length).toBe(2)
+  const [x, y] = COSEECDHAtoXY(COSEPublicKeyBytes)
+  expect(keyAdded[0]?.key_slot).toBe(0)
+  expect(keyAdded[0]?.key).toBe(hexToPgBase16(x))
+  expect(keyAdded[1]?.key).toBe(hexToPgBase16(y))
+  const account = checksumAddress(pgBase16ToHex(keyAdded[0]?.account as `\\x${string}`))
+  expect(account).toBe(checksumAddress(sendAcct.address))
 })
