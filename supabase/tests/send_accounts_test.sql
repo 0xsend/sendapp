@@ -1,7 +1,7 @@
 BEGIN;
 
 -- Plan the number of tests to run
-SELECT plan(12);
+SELECT plan(15);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -23,18 +23,18 @@ SELECT gen_random_uuid() AS id,
   'test_credential_' || creds_count::text AS name,
   'Test Credential ' || creds_count::text AS display_name,
   decode(
-    '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
+    '00112233445566778899AABBCCDDEEF' || LPAD(creds_count::text, 3, '0'),
     'hex'
   ) AS raw_credential_id,
   auth.uid() AS user_id,
   decode(
-    '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
+    '00112233445566778899AABBCCDDEEF' || LPAD(creds_count::text, 3, '0'),
     'hex'
   ) AS public_key,
   'ES256'::key_type_enum AS key_type,
   0::bigint AS sign_count,
   decode(
-    '00112233445566778899AABBCCDDEEFF' || LPAD(creds_count::text, 2, '0'),
+    '00112233445566778899AABBCCDDEEF' || LPAD(creds_count::text, 3, '0'),
     'hex'
   ) AS attestation_object,
   now() AS created_at,
@@ -288,6 +288,69 @@ SELECT throws_ok(
       ) $$,
       'User can have at most 1 send account',
       'User can have at most 1 send account'
+  );
+
+-- Test send_accounts_add_webauthn_credential function
+SELECT isnt_empty(
+    $$
+    SELECT public.send_accounts_add_webauthn_credential(
+        (
+          SELECT id
+          FROM public.send_accounts
+          WHERE user_id = tests.get_supabase_uid('send_account_test_user')
+          LIMIT 1
+        ), tests.new_webauthn_credential(), 0
+      ) $$, 'Add webauthn credential to send account, first key slot'
+  );
+
+SELECT results_eq(
+    $$
+    SELECT count(*)::integer
+    FROM public.send_account_credentials
+    WHERE account_id = (
+        SELECT id
+        FROM public.send_accounts
+        WHERE user_id = tests.get_supabase_uid('send_account_test_user')
+        LIMIT 1
+      ) and key_slot = 0
+      $$,
+      $$VALUES (1) $$,
+      'Add webauthn credential to send account, check key slot 0'
+  );
+
+--  test users can replace an existing credential with the same key slot
+do $$
+declare
+  new_cred webauthn_credentials;
+begin
+  select * from tests.new_webauthn_credential() into new_cred;
+  select * from public.send_accounts_add_webauthn_credential(
+      (
+        select id
+        from public.send_accounts
+        where user_id = tests.get_supabase_uid('send_account_test_user')
+        limit 1
+      ), new_cred, 0
+    ) into new_cred;
+
+    EXECUTE format('SET SESSION "vars.new_cred_id" TO %L', new_cred.id);
+
+end;
+$$ language plpgsql;
+
+select results_eq(
+    $$
+    SELECT credential_id
+    FROM public.send_account_credentials
+    WHERE account_id = (
+        SELECT id
+        FROM public.send_accounts
+        WHERE user_id = tests.get_supabase_uid('send_account_test_user')
+        LIMIT 1
+      ) and key_slot = 0
+      $$,
+      $$select current_setting('vars.new_cred_id')::uuid$$,
+      'Replace webauthn credential on send account, key slot 0'
   );
 
 -- Complete the tests
