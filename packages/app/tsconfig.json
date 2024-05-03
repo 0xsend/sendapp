@@ -24,6 +24,7 @@
       "@my/ui/*": ["../ui/src/*"],
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/contracts/out/*": ["../contracts/out/*"],
+      "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"],
       "@my/*": ["../*"]
     }
   },

@@ -411,6 +411,54 @@ export type Database = {
           },
         ]
       }
+      send_account_signing_key_added: {
+        Row: {
+          abi_idx: number
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          ig_name: string
+          key: string
+          key_slot: number
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          ig_name: string
+          key: string
+          key_slot: number
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          account?: string
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          ig_name?: string
+          key?: string
+          key_slot?: number
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
       send_account_transfers: {
         Row: {
           abi_idx: number | null
@@ -921,6 +969,27 @@ export type Database = {
           send_id: number
           all_tags: string[]
         }[]
+      }
+      send_accounts_add_webauthn_credential: {
+        Args: {
+          send_account_id: string
+          webauthn_credential: unknown
+          key_slot: number
+        }
+        Returns: {
+          attestation_object: string
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string
+          user_id: string
+        }
       }
       tag_search: {
         Args: {
