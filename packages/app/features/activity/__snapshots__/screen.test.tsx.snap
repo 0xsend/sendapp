@@ -2836,7 +2836,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
         style={
           {
             "flexDirection": "column",
-            "gap": 7,
+            "gap": 16,
           }
         }
       >

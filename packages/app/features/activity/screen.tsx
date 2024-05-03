@@ -1,4 +1,5 @@
-import type { PropsWithChildren } from 'react'
+import { useState, type PropsWithChildren } from 'react'
+import type { Functions } from '@my/supabase/database.types'
 import {
   AnimatePresence,
   Avatar,
@@ -15,6 +16,7 @@ import {
   YStack,
   isWeb,
   useMedia,
+  ButtonText,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
@@ -132,8 +134,23 @@ function ActivityBody() {
   )
 }
 
+type SearchResultsType = Functions<'tag_search'>[number]
+type SearchResultsKeysType = keyof SearchResultsType
+type SearchResultCommonType = SearchResultsType[SearchResultsKeysType][number]
+
+const SEARCH_RESULTS_KEYS: SearchResultsKeysType[] = [
+  'phone_matches',
+  'tag_matches',
+  'send_id_matches',
+] as const
+
+const formatResultsKey = (str: string): string => {
+  return str.replace(/_matches/g, '').replace(/_/g, ' ')
+}
+
 function SearchResults() {
   const { form, results, isLoading, error } = useTagSearch()
+  const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
 
   const query = form.watch('query', '')
 
@@ -149,9 +166,11 @@ function SearchResults() {
     return null
   }
 
-  const noMatches = Object.values(results).every((value) => value === null)
+  const matchesCount = Object.values(results).filter(
+    (value) => Array.isArray(value) && value.length
+  ).length
 
-  if (noMatches) {
+  if (matchesCount === 0) {
     return (
       <Container>
         <Text mt="$4">No results for {query}... 😢</Text>
@@ -173,9 +192,31 @@ function SearchResults() {
           y: -10,
         }}
       >
-        {['phone_matches', 'tag_matches', 'send_id_matches'].map((key) =>
-          Array.isArray(results[key]) && results[key].length ? (
-            <YStack key={key} $gtLg={{ gap: '$3.5' }} gap="$2">
+        {matchesCount > 1 && (
+          <XStack gap="$size.0.75">
+            <SearchFilterButton
+              title="All"
+              active={!resultsFilter}
+              onPress={() => setResultsFilter(null)}
+            />
+            {SEARCH_RESULTS_KEYS.map((key) =>
+              Array.isArray(results[key]) && results[key].length ? (
+                <SearchFilterButton
+                  key={key}
+                  title={formatResultsKey(key)}
+                  active={resultsFilter === key}
+                  onPress={() => setResultsFilter(key as SearchResultsKeysType)}
+                />
+              ) : null
+            )}
+          </XStack>
+        )}
+
+        {SEARCH_RESULTS_KEYS.map((key) =>
+          Array.isArray(results[key]) &&
+          results[key].length &&
+          (!resultsFilter || resultsFilter === key) ? (
+            <YStack key={key} gap="$3.5">
               <H4
                 $theme-dark={{ color: '$lightGrayTextField' }}
                 $theme-light={{ color: '$darkGrayTextField' }}
@@ -184,11 +225,16 @@ function SearchResults() {
                 size={'$5'}
                 textTransform="uppercase"
               >
-                {key.replace(/_matches/g, '').replace(/_/g, ' ')}
+                {formatResultsKey(key)}
               </H4>
               <XStack gap="$5" flexWrap="wrap">
                 {results[key].map((item) => (
-                  <SearchResultRow key={item.send_id} keyField={key} item={item} query={query} />
+                  <SearchResultRow
+                    key={item.send_id}
+                    keyField={key as SearchResultsKeysType}
+                    item={item}
+                    query={query}
+                  />
                 ))}
               </XStack>
             </YStack>
@@ -229,7 +275,42 @@ function HighlightMatchingText({ text, highlight }: { text: string; highlight: s
   )
 }
 
-function SearchResultRow({ keyField, item, query }) {
+function SearchFilterButton({
+  title,
+  active,
+  onPress,
+}: { title: string; active: boolean; onPress: () => void }) {
+  return (
+    <Button
+      height="$size.1.5"
+      borderRadius="$2"
+      $theme-light={{ bc: active ? '$primary' : '$networkDarkEthereum' }}
+      $theme-dark={{ bc: active ? '$primary' : '$decay' }}
+      chromeless
+      onPress={onPress}
+    >
+      <ButtonText
+        fontSize={'$4'}
+        fontWeight={'500'}
+        $theme-light={{ color: active ? '$black' : '$metalTouch' }}
+        $theme-dark={{ color: active ? '$black' : '$white' }}
+        textTransform="capitalize"
+      >
+        {title}
+      </ButtonText>
+    </Button>
+  )
+}
+
+function SearchResultRow({
+  keyField,
+  item,
+  query,
+}: {
+  keyField: SearchResultsKeysType
+  item: SearchResultCommonType
+  query: string
+}) {
   const { resolvedTheme } = useThemeSetting()
   const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
 
@@ -273,7 +354,7 @@ function SearchResultRow({ keyField, item, query }) {
                   case 'send_id_matches':
                     return `#${item.send_id}`
                   default:
-                    return null
+                    return ''
                 }
               })()}
               highlight={query}
