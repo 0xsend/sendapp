@@ -20,12 +20,12 @@ export const challengeRouter = createTRPCRouter({
   challengeUser: publicProcedure
     .input(z.object({ phoneNumberInput: z.string() }))
     .mutation(async ({ input }) => {
-      // Check if tagNameInput is not empty
+      // Check the phone number was supplied
       const { phoneNumberInput } = input
       if (!phoneNumberInput) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'Send Tag name is required',
+          message: 'Phone number is required',
         })
       }
       const phoneNumber: string = formatPhoneNumber(phoneNumberInput)
