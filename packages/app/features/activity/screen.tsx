@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react'
 import {
   AnimatePresence,
   Avatar,
+  Button,
   Container,
   H4,
   Paragraph,
@@ -12,12 +13,15 @@ import {
   View,
   XStack,
   YStack,
+  isWeb,
   useMedia,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
+import { useThemeSetting } from '@tamagui/next-theme'
+import { IconX } from 'app/components/icons'
 
 const activities = [
   {
@@ -70,7 +74,7 @@ const suggestions = [
 export function ActivityScreen() {
   return (
     <TagSearchProvider>
-      <YStack f={1} width={'100%'} pb="$4" gap="$6">
+      <YStack f={1} width={'100%'} pb="$4">
         <View>
           <Container>
             <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
@@ -93,12 +97,6 @@ function ActivityBody() {
 
   return (
     <AnimatePresence>
-      {isLoading && (
-        <YStack key="loading" gap="$4" mb="$4">
-          <Spinner size="large" color="$send1" />
-        </YStack>
-      )}
-
       {error && (
         <YStack key="error" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
@@ -107,21 +105,25 @@ function ActivityBody() {
       )}
 
       <SearchResults />
+
       {results === null && !isLoading && !error && (
         <YStack
           key="suggestions"
           animation="quick"
           gap="$size.1.5"
           mb="$4"
-          mt="$size.0.5"
+          mt="$6"
           $gtSm={{ gap: '$size.2.5' }}
           exitStyle={{
             opacity: 0,
             y: 10,
           }}
         >
-          <Separator $gtMd={{ display: 'none' }} />
-          <Suggestions />
+          {/* 
+            <Separator $gtMd={{ display: 'none' }} />
+            <Suggestions />
+          */}
+
           <Separator $gtMd={{ display: 'none' }} />
           <RecentActivity />
         </YStack>
@@ -132,65 +134,165 @@ function ActivityBody() {
 
 function SearchResults() {
   const { form, results, isLoading, error } = useTagSearch()
+
   const query = form.watch('query', '')
 
-  if (!results || isLoading || error) {
+  if (isLoading) {
+    return (
+      <YStack key="loading" gap="$4" mt="$4">
+        <Spinner size="large" color="$olive" />
+      </YStack>
+    )
+  }
+
+  if (!results || error) {
     return null
   }
 
+  const noMatches = Object.values(results).every((value) => value === null)
+
+  if (noMatches) {
+    return (
+      <Container>
+        <Text mt="$4">No results for {query}... 😢</Text>
+      </Container>
+    )
+  }
+
   return (
-    <YStack
-      testID="searchResults"
-      animation="quick"
-      space="$4"
-      mb="$4"
-      enterStyle={{
-        opacity: 0,
-        y: -10,
-      }}
-    >
-      <H4 theme={'alt2'}>Results</H4>
-      {(!results.send_id_matches || results.send_id_matches.length === 0) &&
-        (!results.tag_matches || results.tag_matches.length === 0) &&
-        (!results.phone_matches || results.phone_matches?.length === 0) && (
-          <Text>No results for {query}... 😢</Text>
+    <Container>
+      <YStack
+        testID="searchResults"
+        key="searchResults"
+        animation="quick"
+        gap="$size.2.5"
+        mt="$size.3.5"
+        width="100%"
+        enterStyle={{
+          opacity: 0,
+          y: -10,
+        }}
+      >
+        {['phone_matches', 'tag_matches', 'send_id_matches'].map((key) =>
+          Array.isArray(results[key]) && results[key].length ? (
+            <YStack key={key} $gtLg={{ gap: '$3.5' }} gap="$2">
+              <H4
+                $theme-dark={{ color: '$lightGrayTextField' }}
+                $theme-light={{ color: '$darkGrayTextField' }}
+                fontFamily={'$mono'}
+                fontWeight={'500'}
+                size={'$5'}
+                textTransform="uppercase"
+              >
+                {key.replace(/_matches/g, '').replace(/_/g, ' ')}
+              </H4>
+              <XStack gap="$5" flexWrap="wrap">
+                {results[key].map((item) => (
+                  <SearchResultRow key={item.send_id} keyField={key} item={item} query={query} />
+                ))}
+              </XStack>
+            </YStack>
+          ) : null
         )}
-      {['send_id_matches', 'tag_matches', 'phone_matches'].map(
-        (key) =>
-          results[key] &&
-          results[key].length > 0 && (
-            <div key={key}>
-              {' '}
-              {/* Use a div with a key instead of a fragment */}
-              <H4 theme={'alt2'}>{key.replace('_', ' ')}</H4>
-              {results[key].map((result) => (
-                <Link key={result.send_id} href={`/profile/${result.send_id}`}>
-                  <XStack testID={`tag-search-${result.send_id}`} ai="center" space="$4">
-                    <Avatar size="$4" br="$4" space="$2">
-                      <Avatar.Image src={result.avatar_url} />
-                      <Avatar.Fallback>
-                        <Avatar>
-                          <Avatar.Image
-                            src={`https://ui-avatars.com/api.jpg?name=${result.send_id}&size=256`}
-                          />
-                          <Avatar.Fallback>
-                            <Paragraph>??</Paragraph>
-                          </Avatar.Fallback>
-                        </Avatar>
-                      </Avatar.Fallback>
-                    </Avatar>
-                    <YStack space="$1">
-                      <Text>{result.tag_name ? result.tag_name : result.send_id}</Text>
-                    </YStack>
-                  </XStack>
-                </Link>
-              ))}
-            </div>
-          )
-      )}
-    </YStack>
+      </YStack>
+    </Container>
   )
 }
+
+function HighlightMatchingText({ text, highlight }: { text: string; highlight: string }) {
+  const regex = new RegExp(`(${highlight})`, 'gi')
+  const parts = text.split(regex)
+
+  return (
+    <Text
+      fontWeight={'300'}
+      $theme-light={{ color: '$darkGrayTextField' }}
+      $theme-dark={{ color: '$lightGrayTextField' }}
+      fontSize="$7"
+      $gtSm={{ fontSize: '$5' }}
+    >
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <Text
+            key={i + part}
+            fontWeight="500"
+            $theme-light={{ color: '$black' }}
+            $theme-dark={{ color: '$white' }}
+          >
+            {part}
+          </Text>
+        ) : (
+          part
+        )
+      )}
+    </Text>
+  )
+}
+
+function SearchResultRow({ keyField, item, query }) {
+  const { resolvedTheme } = useThemeSetting()
+  const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
+
+  return (
+    <View
+      br="$5"
+      key={item.send_id}
+      width="100%"
+      $gtLg={{
+        width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
+        bc: rowBC,
+        p: '$1.5',
+      }}
+      $gtXl={{
+        width: isWeb ? 'calc((100% - 72px) / 4)' : '100%',
+      }}
+    >
+      <Link href={`/profile/${item.send_id}`}>
+        <XStack testID={`tag-search-${item.send_id}`} ai="center" gap="$4">
+          <Avatar size="$4.5" br="$3">
+            <Avatar.Image src={item.avatar_url} />
+            <Avatar.Fallback>
+              <Avatar size="$4.5" br="$3">
+                <Avatar.Image
+                  src={`https://ui-avatars.com/api.jpg?name=${item.tag_name}&size=256`}
+                />
+                <Avatar.Fallback>
+                  <Paragraph>??</Paragraph>
+                </Avatar.Fallback>
+              </Avatar>
+            </Avatar.Fallback>
+          </Avatar>
+          <YStack gap="$1">
+            <HighlightMatchingText
+              text={(() => {
+                switch (keyField) {
+                  case 'phone_matches':
+                    return item.phone
+                  case 'tag_matches':
+                    return item.tag_name
+                  case 'send_id_matches':
+                    return `#${item.send_id}`
+                  default:
+                    return null
+                }
+              })()}
+              highlight={query}
+            />
+            <Text
+              fontSize="$4"
+              ff={'$mono'}
+              $theme-light={{ color: '$darkGrayTextField' }}
+              $gtSm={{ fontSize: '$2' }}
+            >
+              {item.tag_name ? `@${item.tag_name}` : `#${item.send_id}`}
+            </Text>
+          </YStack>
+        </XStack>
+      </Link>
+    </View>
+  )
+}
+
 // TODO: Replace with dynamic list
 function Suggestions() {
   return (
@@ -382,31 +484,59 @@ function Row({ activity }: { activity: (typeof activities)[number] }) {
 
 function Search() {
   const { form } = useTagSearch()
+  const { resolvedTheme } = useThemeSetting()
+  const iconColor = resolvedTheme?.startsWith('dark') ? '$olive' : '$black'
+
   return (
-    <FormProvider {...form}>
-      <SchemaForm
-        form={form}
-        defaultValues={{ query: '' }}
-        onSubmit={() => {
-          // noop
+    <View position="relative">
+      <FormProvider {...form}>
+        <SchemaForm
+          form={form}
+          defaultValues={{ query: '' }}
+          onSubmit={() => {
+            // noop
+          }}
+          schema={SearchSchema}
+          props={{
+            query: {
+              placeholder: 'Name, $Sendtag, Phone',
+              pr: '$size.3.5',
+            },
+          }}
+          formProps={{
+            width: '100%',
+            f: 1,
+            als: 'center',
+            $gtSm: {
+              maxWidth: '100%',
+            },
+          }}
+        >
+          {({ query }) => query}
+        </SchemaForm>
+      </FormProvider>
+
+      <Button
+        position="absolute"
+        top="0"
+        right="0"
+        py={0}
+        px="$1.5"
+        br={0}
+        borderBottomRightRadius="$4"
+        borderTopRightRadius="$4"
+        bc="transparent"
+        hoverStyle={{
+          backgroundColor: 'transparent',
+          borderColor: '$transparent',
         }}
-        schema={SearchSchema}
-        props={{
-          query: {
-            placeholder: 'Name, $Sendtag, Phone, Email',
-          },
-        }}
-        formProps={{
-          width: '100%',
-          f: 1,
-          als: 'center',
-          $gtSm: {
-            maxWidth: '100%',
-          },
-        }}
+        pressStyle={{ backgroundColor: 'transparent' }}
+        focusStyle={{ backgroundColor: 'transparent' }}
+        onPress={() => form.setValue('query', '')}
+        aria-label="Clear input."
       >
-        {({ query }) => query}
-      </SchemaForm>
-    </FormProvider>
+        <IconX width="$size.1.5" height="$size.1.5" color={iconColor} />
+      </Button>
+    </View>
   )
 }

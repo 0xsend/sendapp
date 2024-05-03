@@ -53,7 +53,7 @@ test('ActivityScreen: search', async () => {
       <ActivityScreen />
     </TamaguiProvider>
   )
-  const searchInput = screen.getByPlaceholderText('Name, $Sendtag, Phone, Email')
+  const searchInput = screen.getByPlaceholderText('Name, $Sendtag, Phone')
   await act(async () => {
     fireEvent.changeText(searchInput, 'test')
     jest.advanceTimersByTime(2000)
@@ -63,6 +63,6 @@ test('ActivityScreen: search', async () => {
 
   expect(searchInput.props.value).toBe('test')
   const searchResults = await screen.findByTestId('tag-search-3665')
-  expect(searchResults).toHaveTextContent('??test')
+  expect(searchResults).toHaveTextContent('??test@test')
   expect(screen.toJSON()).toMatchSnapshot('ActivityScreen: search')
 })
