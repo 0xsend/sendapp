@@ -2,7 +2,7 @@ import { ProfileScreen } from 'app/features/profile/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import type { NextPageWithLayout } from '../../_app'
+import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
@@ -23,20 +23,18 @@ export const Page: NextPageWithLayout = () => {
 }
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
-export const getServerSideProps = async (
-  ctx: GetServerSidePropsContext<{ id_type: string; identifier: string }>
-) => {
-  const { id_type, identifier } = ctx.params ?? {}
+export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
+  const { sendid } = ctx.params ?? {}
 
   // ensure identifier is valid before proceeding
-  const { success } = CheckoutTagSchema.safeParse({ name: identifier })
-  if (!success || !id_type) {
+  const { success } = CheckoutTagSchema.safeParse({ name: sendid })
+  if (!success) {
     return {
       notFound: true,
     }
   }
-  assert(!!identifier, 'Identifier is required')
-  assert(typeof identifier === 'string', 'Identifier must be a string')
+  assert(!!sendid, 'sendid is required')
+  assert(typeof sendid === 'string', 'sendid must be a string')
 
   // log user activity
   console.log(
@@ -59,11 +57,11 @@ export const getServerSideProps = async (
 
   // check if profile exists
   const { data: profile, error } = await supabaseAdmin
-    .rpc('profile_lookup', { id_type: id_type, identifier: identifier })
+    .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid })
     .maybeSingle()
 
   if (error) {
-    console.error('Error fetching identifier', error)
+    console.error('Error fetching profile from sendid', error)
     throw error
   }
 
@@ -78,7 +76,7 @@ export const getServerSideProps = async (
   return {
     props: {},
   }
-}
+}) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
   <HomeLayout TopNav={<TopNav header="Profile" noSubroute />}>{children}</HomeLayout>

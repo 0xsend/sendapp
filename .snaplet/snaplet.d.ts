@@ -11,8 +11,8 @@ type Enum_pgsodium_key_status = 'default' | 'expired' | 'invalid' | 'valid';
 type Enum_pgsodium_key_type = 'aead-det' | 'aead-ietf' | 'auth' | 'generichash' | 'hmacsha256' | 'hmacsha512' | 'kdf' | 'secretbox' | 'secretstream' | 'shorthash' | 'stream_xchacha20';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'passcheck';
-type Enum_public_id_type_enum = 'address' | 'phone' | 'referral_code' | 'send_id' | 'tag_name';
 type Enum_public_key_type_enum = 'ES256';
+type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
 type Enum_public_verification_type = 'tag_referral' | 'tag_registration';
 interface Table_net_http_response {

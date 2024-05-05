@@ -24,17 +24,17 @@ test('logged in user needs onboarding before visiting profile', async ({ page, s
   assert(!!profile, 'profile not found')
   assert(!!profile.name, 'profile name not found')
   assert(!!profile.about, 'profile about not found')
-  await page.goto(`/profile/tag_name/${tag.name}`)
+  await page.goto(`${tag.name}`)
   expect(await page.title()).toBe('Send | Onboarding')
   await new OnboardingPage(page).completeOnboarding(expect)
 
   // @todo check that user is redirected back to profile page
-
-  await page.goto(`/profile/tag_name/${tag.name}`)
+  console.log('profile', profile)
+  await page.goto(`/profile/${profile.sendId}`)
 
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
 
   expect(await page.title()).toBe('Send | Profile')
-  await expect(page.getByRole('heading', { name: tag.name })).toBeVisible()
+  await expect(page.getByText(tag.name)).toBeVisible()
   await expect(profilePage.sendButton).toBeVisible()
 })

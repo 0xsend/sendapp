@@ -137,16 +137,10 @@ function SearchResults() {
   if (!results || isLoading || error) {
     return null
   }
-  const idTypeMap = {
-    send_id_matches: 'send_id',
-    tag_matches: 'tag_name',
-    phone_matches: 'phone',
-  }
 
   return (
     <YStack
       testID="searchResults"
-      key="searchResults"
       animation="quick"
       space="$4"
       mb="$4"
@@ -161,22 +155,23 @@ function SearchResults() {
         (!results.phone_matches || results.phone_matches?.length === 0) && (
           <Text>No results for {query}... 😢</Text>
         )}
-      {['send_id_matches', 'tag_matches', 'phone_matches'].map((key) => {
-        const id_type = idTypeMap[key]
-        return (
+      {['send_id_matches', 'tag_matches', 'phone_matches'].map(
+        (key) =>
           results[key] &&
           results[key].length > 0 && (
-            <>
-              <H4 theme={'alt2'}>{key}</H4>
+            <div key={key}>
+              {' '}
+              {/* Use a div with a key instead of a fragment */}
+              <H4 theme={'alt2'}>{key.replace('_', ' ')}</H4>
               {results[key].map((result) => (
-                <Link key={result[id_type]} href={`/profile/${id_type}/${result[id_type]}`}>
-                  <XStack testID={`tag-search-${result[id_type]}`} ai="center" space="$4">
+                <Link key={result.send_id} href={`/profile/${result.send_id}`}>
+                  <XStack testID={`tag-search-${result.send_id}`} ai="center" space="$4">
                     <Avatar size="$4" br="$4" space="$2">
                       <Avatar.Image src={result.avatar_url} />
                       <Avatar.Fallback>
                         <Avatar>
                           <Avatar.Image
-                            src={`https://ui-avatars.com/api.jpg?name=${result[id_type]}&size=256`}
+                            src={`https://ui-avatars.com/api.jpg?name=${result.send_id}&size=256`}
                           />
                           <Avatar.Fallback>
                             <Paragraph>??</Paragraph>
@@ -185,15 +180,14 @@ function SearchResults() {
                       </Avatar.Fallback>
                     </Avatar>
                     <YStack space="$1">
-                      <Text>{result.tag_name ? result.tag_name : result[id_type]}</Text>
+                      <Text>{result.tag_name ? result.tag_name : result.send_id}</Text>
                     </YStack>
                   </XStack>
                 </Link>
               ))}
-            </>
+            </div>
           )
-        )
-      })}
+      )}
     </YStack>
   )
 }
@@ -317,7 +311,6 @@ function MobileSectionLabel({ children }: PropsWithChildren) {
       fontFamily={'$mono'}
       fontWeight={'500'}
       size={'$5'}
-      display="inline"
       $gtMd={{ display: 'none' }}
     >
       {children}

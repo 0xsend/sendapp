@@ -78,13 +78,13 @@ export type Database = MergeDeep<
             avatar_url: string
             name: string
             about: string
-            referral_code: string
-            tag_name: string
+            refcode: string
+            tag: string
             address: string
             phone: string
             chain_id: number
             is_public: boolean
-            send_id: number
+            sendid: number
             all_tags: string[]
           }[]
         }

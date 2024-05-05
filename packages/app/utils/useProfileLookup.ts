@@ -5,24 +5,24 @@ import type { PostgrestError } from '@supabase/supabase-js'
 import { assert } from './assert'
 
 export function useProfileLookup(
-  id_type: Database['public']['Enums']['id_type_enum'],
+  lookup_type: Database['public']['Enums']['lookup_type_enum'],
   identifier: string
 ): UseQueryResult<Functions<'profile_lookup'>[number], PostgrestError> {
-  assert(!!id_type, 'id_type is required')
+  assert(!!lookup_type, 'lookup_type is required')
   assert(!!identifier, 'identifier is required')
 
   const supabase = useSupabase()
   return useQuery({
-    queryKey: ['profile', id_type, identifier],
+    queryKey: ['profile', lookup_type, identifier],
     queryFn: async () => {
       const { data, error } = await supabase
-        .rpc('profile_lookup', { id_type, identifier })
+        .rpc('profile_lookup', { lookup_type: lookup_type, identifier: identifier })
         .maybeSingle()
       if (error) {
         throw error
       }
       return data
     },
-    enabled: !!id_type && !!identifier,
+    enabled: !!lookup_type && !!identifier,
   })
 }

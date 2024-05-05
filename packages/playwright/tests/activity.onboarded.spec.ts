@@ -37,7 +37,7 @@ test('can search on activity page', async ({ page, context }) => {
           tag_matches: testTags.map((t) => ({
             avatar_url: null,
             tag_name: t,
-            send_id: 3665,
+            send_id: Math.floor(Math.random() * 10000),
             phone: null,
           })),
           phone_matches: null,

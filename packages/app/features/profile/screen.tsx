@@ -16,13 +16,12 @@ import { useState } from 'react'
 import { createParam } from 'solito'
 import { SendDialog } from './SendDialog'
 import { AvatarProfile } from './AvatarProfile'
-const { useParam } = createParam<{ id_type: string; identifier: string }>()
+const { useParam } = createParam<{ sendid: string }>()
 
 export function ProfileScreen() {
   const { user } = useUser()
-  const [id_type = 'tag_name'] = useParam('id_type')
-  const [identifier = ''] = useParam('identifier')
-  const { data: profile, isLoading, error } = useProfileLookup(id_type, identifier)
+  const [sendid] = useParam('sendid')
+  const { data: profile, isLoading, error } = useProfileLookup('sendid', sendid)
   const [showSendModal, setShowSendModal] = useState(false)
   const toast = useToastController()
 

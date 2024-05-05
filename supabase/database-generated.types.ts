@@ -952,7 +952,7 @@ export type Database = {
       }
       profile_lookup: {
         Args: {
-          id_type: Database["public"]["Enums"]["id_type_enum"]
+          lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
           identifier: string
         }
         Returns: {
@@ -960,13 +960,13 @@ export type Database = {
           avatar_url: string
           name: string
           about: string
-          referral_code: string
-          tag_name: string
+          refcode: string
+          tag: string
           address: string
           phone: string
           chain_id: number
           is_public: boolean
-          send_id: number
+          sendid: number
           all_tags: string[]
         }[]
       }
@@ -1016,13 +1016,8 @@ export type Database = {
       }
     }
     Enums: {
-      id_type_enum:
-        | "send_id"
-        | "tag_name"
-        | "referral_code"
-        | "address"
-        | "phone"
       key_type_enum: "ES256"
+      lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
       verification_type: "tag_registration" | "tag_referral"
     }
