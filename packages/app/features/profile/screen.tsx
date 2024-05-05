@@ -12,9 +12,8 @@ import {
 } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
-import { useState } from 'react'
+import { useRouter } from 'solito/router'
 import { createParam } from 'solito'
-import { SendDialog } from 'app/features/send/SendDialog'
 import { AvatarProfile } from './AvatarProfile'
 const { useParam } = createParam<{ sendid: string }>()
 interface ProfileScreenProps {
@@ -26,7 +25,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const [paramSendid] = useParam('sendid')
   const sendid = propSendid || paramSendid
   const { data: profile, isLoading, error } = useProfileLookup('sendid', sendid || '')
-  const [showSendModal, setShowSendModal] = useState(false)
+  const router = useRouter()
   const toast = useToastController()
 
   const formatTags = (tags: string[]) => tags?.map((tag) => `@${tag}`).join(' ')
@@ -48,7 +47,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   f={1}
                   width={'100%'}
                   onPress={() => {
-                    setShowSendModal(true)
+                    router.push({
+                      pathname: '/send',
+                      query: { recipient: profile.tag_name },
+                    })
                   }}
                   theme="accent"
                 >
@@ -66,7 +68,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 </Button>
               </XStack>
             ) : null}
-            <SendDialog profile={profile} open={showSendModal} onOpenChange={setShowSendModal} />
           </YStack>
         ) : null}
       </YStack>
