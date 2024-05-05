@@ -1,14 +1,17 @@
 import { Spinner } from '@my/ui'
-import { SendForm } from 'app/features/send/SendForm'
 import { useSendParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { SendAmountForm } from './SendAmountForm'
 
 export const SendScreen = () => {
-  const { recipient } = useSendParams()
-  const { data: profile, isLoading, error } = useProfileLookup(recipient)
+  const {
+    params: { recipient },
+  } = useSendParams()
+  const { data: profile, isLoading, error } = useProfileLookup('tag', recipient)
+
   if (isLoading) return <Spinner size="large" />
-  if (error) throw new Error(error.message)
+  if (error) return error.message
   if (!profile) return 'No profile found'
 
-  return <SendForm profile={profile} />
+  return <SendAmountForm />
 }
