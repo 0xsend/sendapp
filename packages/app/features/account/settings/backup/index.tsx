@@ -1,10 +1,15 @@
-import { Button, H1, H3, H4, H5, Link, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { Button, H1, H3, H4, H5, Link, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
+import { baseMainnetClient, useReadSendAccountGetActiveSigningKeys } from '@my/wagmi'
 import { IconNote } from 'app/components/icons'
 import { assert } from 'app/utils/assert'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { COSEECDHAtoXY } from 'app/utils/passkeys'
+import { pgBase16ToBytes } from 'app/utils/pgBase16ToBytes'
+import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useLink } from 'solito/link'
 
 export const BackupScreen = () => {
+  const { data: sendAcct, error, isLoading } = useSendAccount()
+  const hasSendAccount = !!sendAcct
   return (
     <YStack w={'100%'} als={'center'} gap={'$6'}>
       <YStack w={'100%'} gap={'$2'}>
@@ -17,16 +22,53 @@ export const BackupScreen = () => {
         </Paragraph>
       </YStack>
       <Separator w={'100%'} />
-      <WebauthnCreds />
+      {(() => {
+        switch (true) {
+          case error !== null:
+            return (
+              <YStack w={'100%'} gap={'$6'}>
+                <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                  {error.message}
+                </Paragraph>
+              </YStack>
+            )
+          case isLoading:
+            return <Spinner size="large" color="$color" />
+          case !hasSendAccount:
+            return (
+              <YStack w={'100%'} gap={'$6'}>
+                <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                  You have no Send Account.
+                </Paragraph>
+                <Link
+                  href="https://info.send.it/send/mission-vision-and-values"
+                  target="_blank"
+                  display="flex"
+                  alignItems="center"
+                  gap="2"
+                  color="$color12"
+                >
+                  <IconNote size="1.5" />
+                  <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                    Learn more about Send Accounts
+                  </Paragraph>
+                </Link>
+              </YStack>
+            )
+          default:
+            return <WebauthnCreds sendAcct={sendAcct} />
+        }
+      })()}
     </YStack>
   )
 }
 
-const WebauthnCreds = () => {
+const WebauthnCreds = ({
+  sendAcct,
+}: { sendAcct: NonNullable<ReturnType<typeof useSendAccount>['data']> }) => {
   const addPasskeyLink = useLink({
-    href: '/account/settings/backup/add-passkey',
+    href: '/account/settings/backup/create',
   })
-  const { data: sendAccts, error } = useSendAccounts()
 
   return (
     <YStack w={'100%'} gap={'$2'}>
@@ -40,59 +82,45 @@ const WebauthnCreds = () => {
           </Button>
         </YStack>
       </XStack>
-      <YStack w={'100%'}>
-        {error && (
-          <YStack w={'100%'} gap={'$6'}>
-            <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-              {error.message}
-            </Paragraph>
+      <YStack w={'100%'} gap={'$6'} pb={'$6'}>
+        {sendAcct.send_account_credentials.map((cred, idx) => (
+          <YStack key={`${sendAcct.id}-${cred.key_slot}`} w={'100%'} gap={'$2'}>
+            <SendAccountCredentials address={sendAcct.address} cred={cred} />
+            {idx !== sendAcct.send_account_credentials.length - 1 && <Separator w={'100%'} />}
           </YStack>
-        )}
-        {sendAccts && sendAccts.length === 0 && (
-          <YStack w={'100%'} gap={'$6'}>
-            <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-              You have no Webauthn Credentials.
-            </Paragraph>
-            <Link
-              href="https://info.send.it/send/mission-vision-and-values"
-              target="_blank"
-              display="flex"
-              alignItems="center"
-              gap="2"
-              color="$color12"
-            >
-              <IconNote size="1.5" />
-              <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-                Learn more about Webauthn
-              </Paragraph>
-            </Link>
-          </YStack>
-        )}
+        ))}
       </YStack>
-      {sendAccts && sendAccts.length > 0 && (
-        <YStack w={'100%'} gap={'$6'} pb={'$6'}>
-          {sendAccts.map((acct) =>
-            acct.send_account_credentials.map((cred, idx) => (
-              <>
-                <SendAccountCredentials key={`${acct.id}-${cred.key_slot}`} cred={cred} />
-                {idx !== acct.send_account_credentials.length - 1 && <Separator w={'100%'} />}
-              </>
-            ))
-          )}
-        </YStack>
-      )}
     </YStack>
   )
 }
 
 const SendAccountCredentials = ({
+  address,
   cred,
 }: {
-  cred: NonNullable<
-    ReturnType<typeof useSendAccounts>['data']
-  >[number]['send_account_credentials'][number]
+  address: `0x${string}`
+  cred: NonNullable<ReturnType<typeof useSendAccount>['data']>['send_account_credentials'][number]
 }) => {
   const webauthnCred = cred.webauthn_credentials
+  assert(!!webauthnCred, 'webauthnCred not found')
+  const {
+    data: activeSigningKeys,
+    isLoading: isLoadingActiveSigningKeys,
+    error: activeSigningKeysError,
+  } = useReadSendAccountGetActiveSigningKeys({
+    chainId: baseMainnetClient.chain.id,
+    address,
+    query: {
+      enabled: !!address,
+    },
+  })
+  const [x, y] = COSEECDHAtoXY(pgBase16ToBytes(webauthnCred.public_key as `\\x${string}`))
+  const activeIndex = activeSigningKeys?.[0].findIndex(([_x, _y]) => x === _x && y === _y) ?? -1
+  const isActive = activeIndex !== -1
+  const onchainSlot = activeSigningKeys?.[1][activeIndex]
+  const link = useLink({
+    href: `/account/settings/backup/confirm/${webauthnCred?.id}`,
+  })
   assert(!!webauthnCred, 'webauthnCred not found')
   return (
     <YStack w={'100%'} gap={'$3'} mt={'$2'} mb={'$2'}>
@@ -111,6 +139,39 @@ const SendAccountCredentials = ({
       <Paragraph fontWeight={'300'} color={'$color05'} fontFamily={'$mono'}>
         {cred.key_slot}
       </Paragraph>
+      {(() => {
+        switch (true) {
+          case isLoadingActiveSigningKeys:
+            return <Spinner size="small" />
+          case activeSigningKeysError !== null:
+            return (
+              <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+                {activeSigningKeysError?.message ??
+                  `Something went wrong: ${activeSigningKeysError}`}
+              </Paragraph>
+            )
+          case !isActive:
+            return (
+              <>
+                <Paragraph fontWeight={'300'} color={'$yellowVibrant'} fontFamily={'$mono'}>
+                  Passkey is not confirmed onchain. Finish confirming the passkey onchain.
+                </Paragraph>
+                <Button theme="warning" {...link}>
+                  Confirm
+                </Button>
+              </>
+            )
+          case onchainSlot !== cred.key_slot:
+            return (
+              <Paragraph fontWeight={'300'} color={'$yellowVibrant'} fontFamily={'$mono'}>
+                Onchain Slot: {onchainSlot} does not match Webauthn Slot: {cred.key_slot}. This
+                should never happen.
+              </Paragraph>
+            )
+          default:
+            return <></>
+        }
+      })()}
     </YStack>
   )
 }

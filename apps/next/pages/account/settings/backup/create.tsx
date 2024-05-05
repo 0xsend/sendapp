@@ -1,19 +1,18 @@
-import { HomeLayout } from 'app/features/home/layout.web'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { CreatePasskeyScreen } from 'app/features/account/settings/backup/create'
 import { SettingsLayout } from 'app/features/account/settings/layout.web'
-import { AddPasskeyScreen } from 'app/features/account/settings/backup/add-passkey'
+import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../../_app'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Add Passkey</title>
-        <meta name="description" content="Backup Send Account Add Passkey" key="desc" />
+        <title>Send | Create Passkey</title>
       </Head>
-      <AddPasskeyScreen />
+      <CreatePasskeyScreen />
     </>
   )
 }
