@@ -17,11 +17,15 @@ import { createParam } from 'solito'
 import { SendDialog } from './SendDialog'
 import { AvatarProfile } from './AvatarProfile'
 const { useParam } = createParam<{ sendid: string }>()
+interface ProfileScreenProps {
+  sendid?: string
+}
 
-export function ProfileScreen() {
+export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const { user } = useUser()
-  const [sendid] = useParam('sendid')
-  const { data: profile, isLoading, error } = useProfileLookup('sendid', sendid)
+  const [paramSendid] = useParam('sendid')
+  const sendid = propSendid || paramSendid
+  const { data: profile, isLoading, error } = useProfileLookup('sendid', sendid || '')
   const [showSendModal, setShowSendModal] = useState(false)
   const toast = useToastController()
 

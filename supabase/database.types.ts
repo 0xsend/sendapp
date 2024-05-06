@@ -74,25 +74,17 @@ export type Database = MergeDeep<
         }
         profile_lookup: {
           Returns: {
-            id: string
-            avatar_url: string
-            name: string
-            about: string
-            refcode: string
-            tag: string
-            address: string
-            phone: string
+            id: string | null
+            avatar_url: string | null
+            name: string | null
+            about: string | null
+            referral_code: string
+            tag_name: string
+            address: `0x${string}`
             chain_id: number
-            is_public: boolean
-            sendid: number
-            all_tags: string[]
-          }[]
-        }
-        tag_search: {
-          Returns: {
-            send_id_matches: Database['public']['CompositeTypes']['tag_search_result'][]
-            tag_matches: Database['public']['CompositeTypes']['tag_search_result'][]
-            phone_matches: Database['public']['CompositeTypes']['tag_search_result'][]
+            is_public: boolean | null
+            send_id: number
+            all_tags: string[] | []
           }[]
         }
       }

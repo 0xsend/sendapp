@@ -26,15 +26,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const { sendid } = ctx.params ?? {}
 
-  // ensure identifier is valid before proceeding
-  const { success } = CheckoutTagSchema.safeParse({ name: sendid })
-  if (!success) {
-    return {
-      notFound: true,
-    }
-  }
   assert(!!sendid, 'sendid is required')
-  assert(typeof sendid === 'string', 'sendid must be a string')
 
   // log user activity
   console.log(
@@ -57,7 +49,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   // check if profile exists
   const { data: profile, error } = await supabaseAdmin
-    .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid })
+    .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid.toString() })
     .maybeSingle()
 
   if (error) {

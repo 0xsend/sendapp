@@ -8,13 +8,12 @@ export function useProfileLookup(
   lookup_type: Database['public']['Enums']['lookup_type_enum'],
   identifier: string
 ): UseQueryResult<Functions<'profile_lookup'>[number], PostgrestError> {
-  assert(!!lookup_type, 'lookup_type is required')
-  assert(!!identifier, 'identifier is required')
-
   const supabase = useSupabase()
   return useQuery({
     queryKey: ['profile', lookup_type, identifier],
     queryFn: async () => {
+      assert(!!lookup_type, 'lookup_type is required')
+      assert(!!identifier, 'identifier is required')
       const { data, error } = await supabase
         .rpc('profile_lookup', { lookup_type: lookup_type, identifier: identifier })
         .maybeSingle()

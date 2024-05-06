@@ -11,13 +11,13 @@ import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
 
-export const Page: NextPageWithLayout = () => {
+export const Page: NextPageWithLayout = ({ sendid }) => {
   return (
     <>
       <Head>
         <title>Send | Profile</title>
       </Head>
-      <ProfileScreen />
+      <ProfileScreen sendid={sendid} />
     </>
   )
 }
@@ -36,7 +36,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   assert(!!tag, 'tag is required')
   assert(typeof tag === 'string', 'Identifier tag must be a string')
 
-  // log user activity
   console.log(
     `${ctx.req.url} - ${ctx.req.headers['user-agent']}${
       ctx.req.headers['x-forwarded-for'] ? ` - ${ctx.req.headers['x-forwarded-for']}` : ''
@@ -49,8 +48,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   } = await supabase.auth.getSession()
 
   if (session) {
-    // not anonymous user
-    // check if user is onboarded
+    // not anonymous user / check if user is onboarded
     const needsOnboarding = await userOnboarded(supabase, ctx)
     if (needsOnboarding) return needsOnboarding
   }
@@ -61,7 +59,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     .maybeSingle()
 
   if (error) {
-    console.error('Error fetching tag', error)
+    console.error('Error fetching profile from tag', error)
     throw error
   }
 
@@ -72,17 +70,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
       notFound: true,
     }
   }
-  if (profile?.sendid) {
-    return {
-      redirect: {
-        destination: `/profile/${profile.sendid}`,
-        permanent: false, // or true, depending on your needs
-      },
-    }
-  }
 
   return {
-    props: {},
+    props: {
+      sendid: profile.sendid,
+    },
   }
 }) satisfies GetServerSideProps
 
