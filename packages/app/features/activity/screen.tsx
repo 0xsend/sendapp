@@ -141,9 +141,8 @@ function SearchResults() {
   return (
     <YStack
       testID="searchResults"
-      key="searchResults"
       animation="quick"
-      gap="$4"
+      space="$4"
       mb="$4"
       enterStyle={{
         opacity: 0,
@@ -151,29 +150,44 @@ function SearchResults() {
       }}
     >
       <H4 theme={'alt2'}>Results</H4>
-      {results.length === 0 && <Text>No results for {query}... 😢</Text>}
-      {results.map((result) => (
-        <Link key={result.tag_name} href={`/profile/${result.tag_name}`}>
-          <XStack testID={`tag-search-${result.tag_name}`} ai="center" gap="$4">
-            <Avatar size="$4" br="$4" gap="$2">
-              <Avatar.Image src={result.avatar_url} />
-              <Avatar.Fallback>
-                <Avatar>
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api.jpg?name=${result.tag_name}&size=256`}
-                  />
-                  <Avatar.Fallback>
-                    <Paragraph>??</Paragraph>
-                  </Avatar.Fallback>
-                </Avatar>
-              </Avatar.Fallback>
-            </Avatar>
-            <YStack gap="$1">
-              <Text>{result.tag_name}</Text>
-            </YStack>
-          </XStack>
-        </Link>
-      ))}
+      {(!results.send_id_matches || results.send_id_matches.length === 0) &&
+        (!results.tag_matches || results.tag_matches.length === 0) &&
+        (!results.phone_matches || results.phone_matches?.length === 0) && (
+          <Text>No results for {query}... 😢</Text>
+        )}
+      {['send_id_matches', 'tag_matches', 'phone_matches'].map(
+        (key) =>
+          results[key] &&
+          results[key].length > 0 && (
+            <div key={key}>
+              {' '}
+              {/* Use a div with a key instead of a fragment */}
+              <H4 theme={'alt2'}>{key.replace('_', ' ')}</H4>
+              {results[key].map((result) => (
+                <Link key={result.send_id} href={`/profile/${result.send_id}`}>
+                  <XStack testID={`tag-search-${result.send_id}`} ai="center" space="$4">
+                    <Avatar size="$4" br="$4" space="$2">
+                      <Avatar.Image src={result.avatar_url} />
+                      <Avatar.Fallback>
+                        <Avatar>
+                          <Avatar.Image
+                            src={`https://ui-avatars.com/api.jpg?name=${result.send_id}&size=256`}
+                          />
+                          <Avatar.Fallback>
+                            <Paragraph>??</Paragraph>
+                          </Avatar.Fallback>
+                        </Avatar>
+                      </Avatar.Fallback>
+                    </Avatar>
+                    <YStack space="$1">
+                      <Text>{result.tag_name ? result.tag_name : result.send_id}</Text>
+                    </YStack>
+                  </XStack>
+                </Link>
+              ))}
+            </div>
+          )
+      )}
     </YStack>
   )
 }
@@ -188,7 +202,11 @@ function Suggestions() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ maxWidth: 768, marginHorizontal: 'auto', paddingLeft: '$6' }}
+        contentContainerStyle={{
+          maxWidth: 768,
+          marginHorizontal: 'auto',
+          paddingLeft: '$6',
+        }}
       >
         {suggestions.map((user) => (
           <XStack
@@ -293,7 +311,6 @@ function MobileSectionLabel({ children }: PropsWithChildren) {
       fontFamily={'$mono'}
       fontWeight={'500'}
       size={'$5'}
-      display="inline"
       $gtMd={{ display: 'none' }}
     >
       {children}
@@ -301,11 +318,7 @@ function MobileSectionLabel({ children }: PropsWithChildren) {
   )
 }
 
-function Row({
-  activity,
-}: {
-  activity: (typeof activities)[number]
-}) {
+function Row({ activity }: { activity: (typeof activities)[number] }) {
   const media = useMedia()
 
   return (

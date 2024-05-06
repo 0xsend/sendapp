@@ -14,8 +14,6 @@ import {
   useThemeName,
   Theme,
   H3,
-  ButtonText,
-  FontLanguage,
   Stack,
 } from '@my/ui'
 import {

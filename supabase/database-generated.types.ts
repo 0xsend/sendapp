@@ -952,18 +952,22 @@ export type Database = {
       }
       profile_lookup: {
         Args: {
-          tag: string
+          lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
+          identifier: string
         }
         Returns: {
           id: string
           avatar_url: string
           name: string
           about: string
-          referral_code: string
-          tag_name: string
+          refcode: string
+          tag: string
           address: string
+          phone: string
           chain_id: number
           is_public: boolean
+          sendid: number
+          all_tags: string[]
         }[]
       }
       send_accounts_add_webauthn_credential: {
@@ -990,10 +994,13 @@ export type Database = {
       tag_search: {
         Args: {
           query: string
+          limit_val: number
+          offset_val: number
         }
         Returns: {
-          avatar_url: string
-          tag_name: string
+          send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+          tag_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+          phone_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
         }[]
       }
       update_distribution_shares: {
@@ -1010,11 +1017,17 @@ export type Database = {
     }
     Enums: {
       key_type_enum: "ES256"
+      lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
       verification_type: "tag_registration" | "tag_referral"
     }
     CompositeTypes: {
-      [_ in never]: never
+      tag_search_result: {
+        avatar_url: string
+        tag_name: string
+        send_id: number
+        phone: string
+      }
     }
   }
 }

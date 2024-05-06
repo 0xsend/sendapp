@@ -24,17 +24,9 @@ export const Page: NextPageWithLayout = () => {
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
-  const { tag } = ctx.params ?? {}
+  const { sendid } = ctx.params ?? {}
 
-  // ensure tag is valid before proceeding
-  const { success } = CheckoutTagSchema.safeParse({ name: tag })
-  if (!success) {
-    return {
-      notFound: true,
-    }
-  }
-  assert(!!tag, 'Tag is required')
-  assert(typeof tag === 'string', 'Tag must be a string')
+  assert(!!sendid, 'sendid is required')
 
   // log user activity
   console.log(
@@ -56,10 +48,12 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   // check if profile exists
-  const { data: profile, error } = await supabaseAdmin.rpc('profile_lookup', { tag }).maybeSingle()
+  const { data: profile, error } = await supabaseAdmin
+    .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid.toString() })
+    .maybeSingle()
 
   if (error) {
-    console.error('Error fetching tag', error)
+    console.error('Error fetching profile from sendid', error)
     throw error
   }
 
