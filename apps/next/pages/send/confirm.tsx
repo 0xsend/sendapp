@@ -1,4 +1,4 @@
-import { SendConfirmScreen } from 'app/features/send/confirm'
+import { SendConfirmScreen } from 'app/features/send/confirm/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
