@@ -2,8 +2,8 @@ import { SendScreen } from 'app/features/send/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
-import { HomeLayout } from 'app/features/home/layout.web'
-import { TopNav } from 'app/components/TopNav'
+import { SendLayout } from 'app/features/send/layout.web'
+import { SendTopNav } from 'app/features/send/components/SendTopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -19,8 +19,6 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
-Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Enter Amount" />}>{children}</HomeLayout>
-)
+Page.getLayout = (children) => <SendLayout TopNav={<SendTopNav />}>{children}</SendLayout>
 
 export default Page
