@@ -9,7 +9,7 @@ jest.mock('app/utils/distributions', () => ({
       {
         number: 1,
         chain_id: 845337,
-        qualification_end: new Date(),
+        qualification_end: Date.UTC(2024, 6, 15),
         distribution_shares: [
           {
             amount: 1,
@@ -82,7 +82,7 @@ jest.mock('app/utils/tags', () => ({
 describe('EarnTokensScreen', () => {
   it('renders', () => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-01-01T00:00:00.000Z'))
+    jest.setSystemTime(Date.UTC(2024, 6, 12))
     const tree = render(
       <Wrapper>
         <RewardsScreen />
