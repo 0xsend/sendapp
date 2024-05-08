@@ -13,7 +13,8 @@
     "../api/src",
     "../wagmi/src",
     "jest.config.ts",
-    "jest.setup.ts"
+    "jest.setup.ts",
+    "jest.setup-after-env.ts"
   ],
   "compilerOptions": {
     "noEmit": true,

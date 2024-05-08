@@ -72,8 +72,6 @@ export function RewardsScreen() {
   )
 }
 
-const now = new Date()
-
 const DistributionRewardsSection = ({
   distribution,
 }: { distribution: UseDistributionsResultData[number] }) => {
@@ -89,6 +87,7 @@ const DistributionRewardsSection = ({
   })
   const shareAmount = distribution.distribution_shares?.[0]?.amount
 
+  const now = new Date()
   const isBeforeQualification = now < distribution.qualification_start
   const isDuringQualification =
     now >= distribution.qualification_start && now <= distribution.qualification_end
