@@ -1,14 +1,12 @@
-import type { Attestation } from '@0xsend/webauthn-authenticator/types'
-import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
 import { assert } from 'app/utils/assert'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
-import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
-import cbor from 'cbor'
-import { checksumAddress, withRetry } from 'viem'
 import { expect, test } from './fixtures/send-accounts'
+import { throwIf } from 'app/utils/throwIf'
+import { debug } from 'debug'
 
-test.beforeEach(async ({ page }) => {
+let log: debug.Debugger
+
+test.beforeEach(async ({ page, user: { user } }) => {
+  log = debug(`test:account:logged-in:${user.id}:${test.info().parallelIndex}`)
   await page.goto('/')
   await page.waitForURL('/')
   await page.getByRole('link', { name: 'account' }).click()
@@ -69,7 +67,7 @@ test('can backup account', async ({ page, supabase, authenticator, authSession }
   expect(page.getByText(cred.created_at)).toBeVisible()
 
   await page.getByRole('link', { name: 'Add Passkey' }).click()
-  await page.waitForURL('account/settings/backup/add-passkey')
+  await page.waitForURL('/account/settings/backup/create')
 
   const acctName = `test-${Math.floor(Math.random() * 1000000)}`
   await page.getByRole('textbox', { name: 'Passkey name' }).fill(acctName)
@@ -80,90 +78,29 @@ test('can backup account', async ({ page, supabase, authenticator, authSession }
   await request
   await response
 
-  // assert passkey was created
-  const credentials = authenticator.credentials
-  expect(Object.values(credentials).length).toBe(2)
-  const credential = Object.values(credentials)[1]
-  assert(!!credential, 'Missing credential')
-  expect(credential.attestations.length).toBe(1)
-
-  const attestation = credential.attestations[0]
-  assert(!!attestation, 'Missing credential attestation')
-
-  const { clientDataJSON, attestationObject } = attestation
-  assert(!!clientDataJSON && !!attestationObject, 'Missing clientDataJSON or attestationObject')
-
   // validate send account is created
-  const { data: sendAccts, error: sendAcctErr } = await supabase
+  const { data: sendAcct, error: sendAcctErr } = await supabase
     .from('send_accounts')
     .select('*, send_account_credentials(*), webauthn_credentials(*)')
-  if (sendAcctErr) {
-    throw sendAcctErr
-  }
-
-  const sendAcct = sendAccts[0]
-  assert(!!sendAcct, 'Missing send account')
-
-  expect(sendAcct.init_code).toMatch(/\\x[a-f0-9]+$/i)
-  expect(sendAcct.address).toMatch(/^0x[a-f0-9]{40}$/i)
-
-  // verify account credential is created
+    .order('created_at', { referencedTable: 'webauthn_credentials' })
+    .single()
+  throwIf(sendAcctErr)
+  assert(!!sendAcct, 'No send account found')
   const acctCred = sendAcct.send_account_credentials[1]
   assert(!!acctCred, 'Missing account credential')
-  expect(acctCred.key_slot).toBe(1)
-
-  // verify webauthn credential
   const webAuthnCred = sendAcct.webauthn_credentials[1]
   assert(!!webAuthnCred, 'Missing webauthn credential')
-  expect(webAuthnCred.display_name).toBe(acctName)
-  expect(webAuthnCred.name).toBe(`${authSession.decoded.sub}.1`) // key slot 1 == 2nd key added
-  expect(webAuthnCred.raw_credential_id).toBe(`\\x${credential.id.toString('hex')}`)
-  assert(!!attestation, 'Missing credential attestation')
-  expect(webAuthnCred.attestation_object).toBe(
-    `\\x${Buffer.from(attestationObject).toString('hex')}`
-  )
-  const cborAttObj = cbor.decodeAllSync(attestationObject)[0]
-  assert(!!cborAttObj, 'Missing cbor attestation object')
-  const { authData } = cborAttObj as Attestation
-  const { COSEPublicKey: COSEPublicKeyBytes } = parseCredAuthData(authData)
-  assert(!!COSEPublicKeyBytes, 'Missing COSEPublicKey')
-  const COSEPublicKey = Buffer.from(COSEPublicKeyBytes).toString('hex')
-  expect(webAuthnCred.public_key).toBe(`\\x${COSEPublicKey}`)
 
-  const xY = COSEECDHAtoXY(COSEPublicKeyBytes)
-  const x = hexToPgBase16(xY[0])
-  const y = hexToPgBase16(xY[1])
+  await page.waitForURL(`/account/settings/backup/confirm/${webAuthnCred.id}`)
+  const bundlerReq = page.waitForRequest('**/rpc')
+  const bundlerRes = page.waitForResponse('**/rpc')
+  const confirmBtn = page.getByRole('button', { name: 'Add Passkey as Signer' })
+  await confirmBtn.click()
+  await bundlerReq
+  await bundlerRes // wait for bundler response
+  await expect.soft(confirmBtn).toBeHidden() // page navigates after successful mutation
+  await expect(page.getByText('Something went wrong: Error:')).toBeHidden() // no error
+  await page.waitForURL('/account/settings/backup') // yay, we're back on the page
 
-  await page.getByRole('button', { name: 'Add Passkey as Signer' }).click()
-
-  // retry until signing key is added to the account
-  const keyAdded = await withRetry(
-    async () => {
-      const { data: keyAdded, error: keyAddedErr } = await supabase
-        .from('send_account_signing_key_added')
-        .select('account, key_slot, key')
-        .in('key', [x, y])
-        .order('block_num, tx_idx, log_idx, abi_idx')
-
-      if (keyAddedErr) {
-        throw keyAddedErr
-      }
-
-      if (keyAdded.length === 0) {
-        throw new Error('No key added')
-      }
-
-      return keyAdded
-    },
-    {
-      retryCount: 10,
-      delay: 500,
-    }
-  )
-
-  // signing key should be added to the account
-  expect(keyAdded.length).toBe(2)
-  expect(keyAdded[0]?.key_slot).toBe(1)
-  const account = checksumAddress(pgBase16ToHex(keyAdded[0]?.account as `\\x${string}`))
-  expect(account).toBe(checksumAddress(sendAcct.address))
+  await expect(supabase).toHaveValidWebAuthnCredentials(authenticator)
 })

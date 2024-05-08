@@ -1,3 +1,5 @@
+import './matchers'
+
 export {
   test,
   expect,
