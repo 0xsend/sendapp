@@ -4786,10 +4786,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@indexsupply/shovel-config@npm:^0.0.11":
-  version: 0.0.11
-  resolution: "@indexsupply/shovel-config@npm:0.0.11"
-  checksum: 839e5db2a1bbcf9d29887afb057c509b83eab582aedf69b28bd5dcaabe83ab68c7359ba6565ca301b580b951a60a20b3fbed20850b81130c47e1eb3c2697d2c8
+"@indexsupply/shovel-config@npm:^0.0.16":
+  version: 0.0.16
+  resolution: "@indexsupply/shovel-config@npm:0.0.16"
+  checksum: b152aa9ce3a7771d11f5e2c35a46fd55f0185c5f0dc449daa68a1856b467e7cfa02a92aa1caf3fd094537c1240e0c4681be1ce0a92d8ea3f170cbbfe5a2be936
   languageName: node
   linkType: hard
 
@@ -5677,6 +5677,7 @@ __metadata:
   dependencies:
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
+    "@supabase/supabase-js": "npm:2.41.1"
     "@tanstack/react-query": "npm:^5.18.1"
     "@trpc/client": "npm:11.0.0-next-beta.264"
     "@trpc/next": "npm:11.0.0-next-beta.264"
@@ -28465,7 +28466,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "shovel@workspace:packages/shovel"
   dependencies:
-    "@indexsupply/shovel-config": "npm:^0.0.11"
+    "@indexsupply/shovel-config": "npm:^0.0.16"
     "@my/wagmi": "workspace:*"
     "@types/bun": "npm:latest"
     permissionless: "npm:^0.1.14"
