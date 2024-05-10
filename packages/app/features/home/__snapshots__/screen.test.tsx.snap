@@ -194,6 +194,7 @@ exports[`HomeScreen 1`] = `
           "alignItems": "center",
           "display": "flex",
           "flexDirection": "column",
+          "justifyContent": "space-between",
           "width": "100%",
         }
       }
@@ -201,167 +202,16 @@ exports[`HomeScreen 1`] = `
       <View
         style={
           {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "width": "100%",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "flexDirection": "row",
-              "width": "100%",
-              "zIndex": 4,
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "flexDirection": "column",
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "flexDirection": "column",
-                  "gap": 18,
-                  "justifyContent": "center",
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "gap": 10,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "backgroundColor": "#40FB50",
-                      "height": 11,
-                      "width": 11,
-                    }
-                  }
-                />
-                <Text
-                  cancelable={true}
-                  disabled={false}
-                  focusable={true}
-                  id=":r0:"
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "backgroundColor": "transparent",
-                      "color": "hsl(0, 0%, 90.9%)",
-                      "display": "flex",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "500",
-                      "lineHeight": 16,
-                      "textTransform": "uppercase",
-                      "zIndex": 1,
-                    }
-                  }
-                  suppressHighlighting={true}
-                  userSelect="none"
-                >
-                  Total Balance
-                </Text>
-              </View>
-              <View
-                style={
-                  {
-                    "color": "white",
-                    "flexDirection": "row",
-                    "gap": 10,
-                    "marginTop": 13,
-                  }
-                }
-              >
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(112, 22%, 100%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 96,
-                      "fontWeight": "500",
-                      "lineHeight": 119,
-                      "zIndex": 1,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  0
-                </Text>
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(112, 22%, 100%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 21.599999999999998,
-                      "fontWeight": "500",
-                      "lineHeight": 19,
-                      "zIndex": 1,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  USD
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-      <View
-        style={
-          {
-            "borderBottomColor": "#E6E6E6",
-            "borderBottomWidth": 1,
-            "borderLeftColor": "#E6E6E6",
-            "borderLeftWidth": 0,
-            "borderRightColor": "#E6E6E6",
-            "borderRightWidth": 0,
-            "borderStyle": "solid",
-            "borderTopColor": "#E6E6E6",
-            "borderTopWidth": 0,
-            "flex": 1,
-            "flexShrink": 0,
-            "height": 0,
-            "maxHeight": 0,
-            "transform": [
-              {
-                "translateY": -0.5,
-              },
-            ],
-            "width": "100%",
-          }
-        }
-      />
-      <View
-        style={
-          {
-            "alignItems": "center",
-            "flexDirection": "column",
+            "borderBottomLeftRadius": 12,
+            "borderBottomRightRadius": 12,
+            "borderTopLeftRadius": 12,
+            "borderTopRightRadius": 12,
+            "gap": 74,
+            "justifyContent": "space-between",
+            "paddingBottom": 39,
+            "paddingLeft": 39,
+            "paddingRight": 39,
+            "paddingTop": 39,
             "width": "100%",
           }
         }
@@ -370,8 +220,142 @@ exports[`HomeScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "flex": 1,
               "flexDirection": "row",
-              "paddingTop": 39,
+              "justifyContent": "center",
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "row",
+                "width": "100%",
+                "zIndex": 4,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 18,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "gap": 10,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#40FB50",
+                        "height": 11,
+                        "width": 11,
+                      }
+                    }
+                  />
+                  <Text
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    id=":r0:"
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "transparent",
+                        "color": "hsl(0, 0%, 90.9%)",
+                        "display": "flex",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "500",
+                        "lineHeight": 16,
+                        "textTransform": "uppercase",
+                        "zIndex": 1,
+                      }
+                    }
+                    suppressHighlighting={true}
+                    userSelect="none"
+                  >
+                    Total Balance
+                  </Text>
+                </View>
+                <View
+                  style={
+                    {
+                      "color": "white",
+                      "flexDirection": "row",
+                      "gap": 10,
+                      "marginTop": 13,
+                    }
+                  }
+                >
+                  <Text
+                    selectable={true}
+                    style={
+                      {
+                        "color": "hsla(112, 22%, 100%, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 96,
+                        "fontWeight": "500",
+                        "lineHeight": 119,
+                        "zIndex": 1,
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    0
+                  </Text>
+                  <Text
+                    selectable={true}
+                    style={
+                      {
+                        "color": "hsla(112, 22%, 100%, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 21.599999999999998,
+                        "fontWeight": "500",
+                        "lineHeight": 19,
+                        "zIndex": 1,
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    USD
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "paddingTop": 18,
               "width": "100%",
             }
           }
@@ -409,7 +393,7 @@ exports[`HomeScreen 1`] = `
                 "borderTopWidth": 1,
                 "flexDirection": "row",
                 "flexWrap": "nowrap",
-                "height": 64,
+                "height": 48,
                 "justifyContent": "center",
                 "opacity": 1,
                 "paddingLeft": 16,
@@ -586,6 +570,41 @@ exports[`HomeScreen 1`] = `
             </View>
           </View>
         </View>
+      </View>
+      <View
+        style={
+          {
+            "borderBottomColor": "#E6E6E6",
+            "borderBottomWidth": 1,
+            "borderLeftColor": "#E6E6E6",
+            "borderLeftWidth": 0,
+            "borderRightColor": "#E6E6E6",
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopColor": "#E6E6E6",
+            "borderTopWidth": 0,
+            "flex": 1,
+            "flexShrink": 0,
+            "height": 0,
+            "maxHeight": 0,
+            "transform": [
+              {
+                "translateY": -0.5,
+              },
+            ],
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "column",
+            "width": "100%",
+          }
+        }
+      >
         <View
           style={
             {
