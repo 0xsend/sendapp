@@ -85,8 +85,8 @@ export const TextField = (props: InputProps) => {
                 maxLength={maxLength}
                 borderWidth={0}
                 borderRadius={'$4'}
+                bc="$color2"
                 $theme-dark={{
-                  bc: '$charcoal',
                   color: '$gray12Dark',
                   // placeholderTextColor fails in test env for some reason
                   ...(process.env.NODE_ENV !== 'test'
@@ -94,7 +94,6 @@ export const TextField = (props: InputProps) => {
                     : {}),
                 }}
                 $theme-light={{
-                  bc: '$gray3Light',
                   color: '$gray12Light',
                   // placeholderTextColor fails in test env for some reason
                   ...(process.env.NODE_ENV !== 'test'

@@ -208,7 +208,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "#081619",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomColor": "hsla(191, 32%, 32%, 1)",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
@@ -3567,7 +3567,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "#081619",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomColor": "hsla(191, 32%, 32%, 1)",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
