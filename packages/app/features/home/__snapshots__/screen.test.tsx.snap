@@ -229,9 +229,8 @@ exports[`HomeScreen 1`] = `
               style={
                 {
                   "flexDirection": "column",
-                  "gap": 32,
+                  "gap": 18,
                   "justifyContent": "center",
-                  "paddingBottom": 32,
                 }
               }
             >
@@ -302,9 +301,9 @@ exports[`HomeScreen 1`] = `
                     {
                       "color": "hsla(112, 22%, 100%, 1)",
                       "fontFamily": "System",
-                      "fontSize": 136.79999999999998,
+                      "fontSize": 96,
                       "fontWeight": "500",
-                      "lineHeight": 97,
+                      "lineHeight": 119,
                       "zIndex": 1,
                     }
                   }
@@ -484,8 +483,8 @@ exports[`HomeScreen 1`] = `
                     ]
                   }
                   tintColor="#122023"
-                  vbHeight={40}
-                  vbWidth={40}
+                  vbHeight={24}
+                  vbWidth={24}
                   width={32}
                 >
                   <RNSVGGroup
@@ -498,77 +497,89 @@ exports[`HomeScreen 1`] = `
                     }
                     strokeWidth="2"
                   >
-                    <RNSVGCircle
-                      cx="19.9999"
-                      cy="20"
+                     
+                    <RNSVGRect
                       fill={
                         {
                           "payload": 4278190080,
                           "type": 0,
                         }
                       }
+                      height="22"
                       propList={
                         [
                           "stroke",
                           "strokeWidth",
-                          "strokeLinecap",
                         ]
                       }
-                      r="19"
+                      rx="11"
                       stroke={
                         {
-                          "type": 2,
+                          "payload": 4279377955,
+                          "type": 0,
                         }
                       }
-                      strokeLinecap={1}
                       strokeWidth="2"
+                      width="22"
+                      x="1"
+                      y="1"
                     />
-                    <RNSVGPath
-                      d="M19.9997 12.5L19.9997 27.5"
+                    <RNSVGMask
                       fill={
                         {
                           "payload": 4278190080,
                           "type": 0,
                         }
                       }
-                      propList={
-                        [
-                          "stroke",
-                          "strokeWidth",
-                          "strokeLinecap",
-                        ]
-                      }
-                      stroke={
-                        {
-                          "type": 2,
+                      height="16"
+                      maskContentUnits={1}
+                      maskUnits={1}
+                      name="mask0_3996_6472"
+                      width="16"
+                      x="4"
+                      y="4"
+                    >
+                      <RNSVGRect
+                        fill={
+                          {
+                            "payload": 4292467161,
+                            "type": 0,
+                          }
                         }
-                      }
-                      strokeLinecap={1}
-                      strokeWidth="2"
-                    />
-                    <RNSVGPath
-                      d="M27.4997 20L12.4997 20"
+                        height="14.625"
+                        propList={
+                          [
+                            "fill",
+                          ]
+                        }
+                        width="14.625"
+                        x="4.5"
+                        y="4.5"
+                      />
+                    </RNSVGMask>
+                    <RNSVGGroup
                       fill={
                         {
                           "payload": 4278190080,
                           "type": 0,
                         }
                       }
-                      propList={
-                        [
-                          "stroke",
-                          "strokeWidth",
-                          "strokeLinecap",
-                        ]
-                      }
-                      stroke={
-                        {
-                          "type": 2,
+                      mask="mask0_3996_6472"
+                    >
+                      <RNSVGPath
+                        d="M11.3571 12.6429H6V11.3571H11.3571V6H12.6429V11.3571H18V12.6429H12.6429V18H11.3571V12.6429Z"
+                        fill={
+                          {
+                            "type": 2,
+                          }
                         }
-                      }
-                      strokeLinecap={1}
-                      strokeWidth="2"
-                    />
+                        propList={
+                          [
+                            "fill",
+                          ]
+                        }
+                      />
+                    </RNSVGGroup>
                   </RNSVGGroup>
                 </RNSVGSvgView>
               </View>

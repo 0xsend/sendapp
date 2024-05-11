@@ -100,7 +100,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(191, 32%, 99%, 1)",
+                    "color": "hsla(0, 0%, 99%, 1)",
                     "fontFamily": "System",
                     "fontSize": 54,
                     "fontWeight": "300",
@@ -159,7 +159,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "hsla(191, 32%, 99%, 1)",
+                      "color": "hsla(0, 0%, 99%, 1)",
                       "fontFamily": "System",
                       "fontSize": 19.2,
                       "fontWeight": "400",
@@ -168,7 +168,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  Expired Apr 29, 2024
+                  Expired May 10, 2024
                 </Text>
               </View>
               <View
@@ -213,7 +213,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "hsla(191, 32%, 99%, 1)",
+                      "color": "hsla(0, 0%, 99%, 1)",
                       "fontFamily": "System",
                       "fontSize": 16,
                       "fontWeight": "500",
@@ -422,7 +422,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "hsla(191, 32%, 15%, 1)",
+                        "color": "hsla(191, 32%, 10%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                         "fontWeight": "500",
@@ -505,7 +505,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "hsla(191, 32%, 15%, 1)",
+                        "color": "hsla(191, 32%, 10%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                         "fontWeight": "500",
@@ -602,7 +602,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       selectable={true}
                       style={
                         {
-                          "color": "hsla(191, 32%, 15%, 1)",
+                          "color": "hsla(191, 32%, 10%, 1)",
                           "fontFamily": "System",
                           "fontSize": 55.199999999999996,
                           "fontWeight": "500",

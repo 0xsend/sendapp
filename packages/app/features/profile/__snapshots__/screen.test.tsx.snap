@@ -376,7 +376,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "flex": 1,
@@ -396,7 +396,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
             "borderBottomLeftRadius": 0,
             "borderBottomRightRadius": 0,
             "borderBottomWidth": 0,

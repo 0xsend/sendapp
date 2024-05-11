@@ -122,8 +122,6 @@ export function HomeScreen() {
                   f={1}
                   gap="$5"
                   p="$6"
-                  $theme-dark={{ bc: '$darkest' }}
-                  $theme-light={{ bc: '$gray3Light' }}
                   $lg={{ bc: 'transparent' }}
                   $gtLg={{ br: '$6' }}
                 >

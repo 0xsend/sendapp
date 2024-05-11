@@ -101,6 +101,7 @@ export const CheckoutForm = () => {
             autoFocus: true,
             'aria-label': 'Sendtag name',
             placeholder: 'Enter Sendtag name',
+            bc: '$color2',
           },
         }}
         formProps={{

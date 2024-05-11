@@ -233,7 +233,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
     <View
       style={
         {
-          "backgroundColor": "hsla(191, 32%, 10%, 1)",
+          "backgroundColor": "hsla(191, 52%, 6%, 1)",
           "borderTopLeftRadius": 16,
           "borderTopRightRadius": 16,
           "flex": 1,
@@ -821,7 +821,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                   readOnly={false}
                   style={
                     {
-                      "backgroundColor": "#081619",
+                      "backgroundColor": "hsla(191, 32%, 10%, 1)",
                       "borderBottomColor": "hsla(191, 32%, 32%, 1)",
                       "borderBottomLeftRadius": 9,
                       "borderBottomRightRadius": 9,
@@ -951,7 +951,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                   style={
                     {
                       "alignItems": "center",
-                      "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                      "backgroundColor": "hsla(191, 52%, 6%, 1)",
                       "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                       "borderBottomLeftRadius": 16,
                       "borderBottomRightRadius": 16,
@@ -1253,7 +1253,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
               <View
                 style={
                   {
-                    "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                    "backgroundColor": "hsla(191, 52%, 6%, 1)",
                     "borderTopLeftRadius": 16,
                     "borderTopRightRadius": 16,
                     "flex": 1,
@@ -1327,7 +1327,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           style={
                             {
                               "alignItems": "center",
-                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "backgroundColor": "hsla(191, 52%, 6%, 1)",
                               "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                               "borderLeftColor": "hsla(191, 32%, 24%, 1)",
                               "borderRightColor": "hsla(191, 32%, 24%, 1)",
@@ -1492,7 +1492,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           style={
                             {
                               "alignItems": "center",
-                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "backgroundColor": "hsla(191, 52%, 6%, 1)",
                               "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                               "borderLeftColor": "hsla(191, 32%, 24%, 1)",
                               "borderRightColor": "hsla(191, 32%, 24%, 1)",
@@ -1571,7 +1571,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
                           style={
                             {
                               "alignItems": "center",
-                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "backgroundColor": "hsla(191, 52%, 6%, 1)",
                               "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                               "borderLeftColor": "hsla(191, 32%, 24%, 1)",
                               "borderRightColor": "hsla(191, 32%, 24%, 1)",
@@ -1618,7 +1618,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
               <View
                 style={
                   {
-                    "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                    "backgroundColor": "hsla(191, 52%, 6%, 1)",
                     "borderBottomLeftRadius": 0,
                     "borderBottomRightRadius": 0,
                     "borderBottomWidth": 0,
@@ -1651,7 +1651,7 @@ exports[`SendDialog it can send: SendForm 1`] = `
     <View
       style={
         {
-          "backgroundColor": "hsla(191, 32%, 10%, 1)",
+          "backgroundColor": "hsla(191, 52%, 6%, 1)",
           "borderBottomLeftRadius": 0,
           "borderBottomRightRadius": 0,
           "borderBottomWidth": 0,
@@ -1918,7 +1918,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
     <View
       style={
         {
-          "backgroundColor": "hsla(191, 32%, 10%, 1)",
+          "backgroundColor": "hsla(191, 52%, 6%, 1)",
           "borderTopLeftRadius": 16,
           "borderTopRightRadius": 16,
           "flex": 1,
@@ -2510,7 +2510,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                   readOnly={false}
                   style={
                     {
-                      "backgroundColor": "#081619",
+                      "backgroundColor": "hsla(0, 70%, 14%, 1)",
                       "borderBottomColor": "hsla(0, 70%, 32%, 1)",
                       "borderBottomLeftRadius": 9,
                       "borderBottomRightRadius": 9,
@@ -2759,7 +2759,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                   style={
                     {
                       "alignItems": "center",
-                      "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                      "backgroundColor": "hsla(191, 52%, 6%, 1)",
                       "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                       "borderBottomLeftRadius": 16,
                       "borderBottomRightRadius": 16,
@@ -3092,7 +3092,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
               <View
                 style={
                   {
-                    "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                    "backgroundColor": "hsla(191, 52%, 6%, 1)",
                     "borderTopLeftRadius": 16,
                     "borderTopRightRadius": 16,
                     "flex": 1,
@@ -3166,7 +3166,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           style={
                             {
                               "alignItems": "center",
-                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "backgroundColor": "hsla(191, 52%, 6%, 1)",
                               "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                               "borderLeftColor": "hsla(191, 32%, 24%, 1)",
                               "borderRightColor": "hsla(191, 32%, 24%, 1)",
@@ -3331,7 +3331,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           style={
                             {
                               "alignItems": "center",
-                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "backgroundColor": "hsla(191, 52%, 6%, 1)",
                               "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                               "borderLeftColor": "hsla(191, 32%, 24%, 1)",
                               "borderRightColor": "hsla(191, 32%, 24%, 1)",
@@ -3410,7 +3410,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
                           style={
                             {
                               "alignItems": "center",
-                              "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                              "backgroundColor": "hsla(191, 52%, 6%, 1)",
                               "borderBottomColor": "hsla(191, 32%, 24%, 1)",
                               "borderLeftColor": "hsla(191, 32%, 24%, 1)",
                               "borderRightColor": "hsla(191, 32%, 24%, 1)",
@@ -3457,7 +3457,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
               <View
                 style={
                   {
-                    "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                    "backgroundColor": "hsla(191, 52%, 6%, 1)",
                     "borderBottomLeftRadius": 0,
                     "borderBottomRightRadius": 0,
                     "borderBottomWidth": 0,
@@ -3490,7 +3490,7 @@ exports[`SendDialog it can send: SendForm Error 1`] = `
     <View
       style={
         {
-          "backgroundColor": "hsla(191, 32%, 10%, 1)",
+          "backgroundColor": "hsla(191, 52%, 6%, 1)",
           "borderBottomLeftRadius": 0,
           "borderBottomRightRadius": 0,
           "borderBottomWidth": 0,
