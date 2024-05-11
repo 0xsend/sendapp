@@ -189,13 +189,11 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       return userOp
     },
   })
-  const { error: gasEstimateError } = useUserOpGasEstimate({ userOp })
   const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
   const onSubmit = async () => {
     try {
       throwIf(sendAccountError)
       throwIf(nonceError)
-      throwIf(gasEstimateError)
       throwIf(gasFeesError)
       throwIf(userOpError)
       assert(!!userOp, 'User op is required')
