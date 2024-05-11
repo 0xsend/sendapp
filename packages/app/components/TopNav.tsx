@@ -53,7 +53,7 @@ export function TopNav({
   subheader,
   showLogo = false,
   showReferral = false,
-  button = ButtonOption.QR,
+  button,
   noSubroute = false,
 }: TopNavProps) {
   const [nav, setNavParam] = useNav()
@@ -91,6 +91,8 @@ export function TopNav({
 
   const renderButton = () => {
     switch (true) {
+      case button === undefined:
+        return <Button opacity={0} disabled />
       case selectedCoin !== undefined:
         return (
           <ButtonOg
