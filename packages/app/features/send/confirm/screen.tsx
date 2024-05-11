@@ -11,6 +11,7 @@ import {
   Avatar,
   Input,
   ButtonText,
+  ScrollView,
 } from '@my/ui'
 
 import { useSendAccounts } from 'app/utils/send-accounts'
@@ -20,7 +21,6 @@ import { assert } from 'app/utils/assert'
 import { baseMainnet } from '@my/wagmi'
 import { useBalance } from 'wagmi'
 import { useSendParams } from 'app/routers/params'
-import { useForm } from 'react-hook-form'
 import { formFields } from 'app/utils/SchemaForm'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -37,12 +37,6 @@ import { coins } from 'app/data/coins'
 import { IconAccount } from 'app/components/icons'
 
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
-
-const SendConfirmSchema = z.object({
-  amount: formFields.number,
-  token: formFields.select,
-  recipient: formFields.text,
-})
 
 export function SendConfirmScreen() {
   const {
@@ -66,7 +60,6 @@ export function SendConfirmScreen() {
 
 export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const toast = useToastController()
-  const form = useForm<z.infer<typeof SendConfirmSchema>>()
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
   const [sentUserOpTxHash, setSentUserOpTxHash] = useState<Hex>()
@@ -101,14 +94,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const {
     mutateAsync: sendUserOp,
     isPending: isTransferPending,
-    data: transferData,
-    status,
-    context,
     error: transferError,
   } = useUserOpTransferMutation()
-  console.log('status: ', status)
-  console.log('transferData: ', transferData)
-  console.log('context: ', context)
 
   const sentTxLink = useLink({
     href: `${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`,
@@ -141,11 +128,9 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
       assert(receipt.success, 'Failed to send user op')
       setSentUserOpTxHash(receipt.receipt.transactionHash)
       toast.show(`Sent user op ${receipt.receipt.transactionHash}!`)
-      balanceRefetch()
+      router.replace({ pathname: '/', query: { token: tokenParam } })
     } catch (e) {
       console.error(e)
-      toast.show('Failed to send user op')
-      form.setError('amount', { type: 'custom', message: `${e}` })
     }
   }
 
@@ -192,7 +177,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
               ai="center"
               gap="$3"
               bc="$metalTouch"
-              p="$3"
+              p="$2"
               br="$3"
               $theme-light={{ bc: '$gray3Light' }}
               f={1}
@@ -326,7 +311,22 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
             }
           })()}
         </Button>
+        {transferError && (
+          <ErrorMessage error={`Error sending user op. ${transferError.message}`} />
+        )}
       </Stack>
     </Container>
+  )
+}
+
+function ErrorMessage({ error }: { error?: string }) {
+  if (!error) return null
+
+  return (
+    <ScrollView pos="absolute" $gtLg={{ top: '$-12' }} top="$-10" height="$4">
+      <Paragraph size="$1" w="$20" col={'$red500'} ta="center">
+        {error.split('.').at(0)}
+      </Paragraph>
+    </ScrollView>
   )
 }
