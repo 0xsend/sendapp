@@ -1,4 +1,4 @@
-import { Button, Paragraph, Spinner, SubmitButton, XStack, YStack, Stack } from '@my/ui'
+import { Button, Paragraph, Spinner, SubmitButton, XStack, YStack, Stack, Container } from '@my/ui'
 import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -124,7 +124,7 @@ export function SendAmountForm() {
           amount: Number(amountParam || '0'),
         }}
         renderAfter={({ submit }) => (
-          <XStack $gtLg={{ pos: 'absolute', bottom: '$5', right: '$5' }} jc="center" ai="flex-end">
+          <XStack $gtLg={{ ai: 'flex-end', ml: 'auto' }} jc="center">
             <SubmitButton
               theme="accent"
               onPress={submit}
@@ -139,7 +139,7 @@ export function SendAmountForm() {
         )}
       >
         {({ amount, token }) => (
-          <YStack gap="$5" $gtSm={{ maw: 500 }} mx="auto" f={1}>
+          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto" f={1}>
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack

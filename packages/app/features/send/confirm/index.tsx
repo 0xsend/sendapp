@@ -6,11 +6,12 @@ import {
   XStack,
   YStack,
   Stack,
+  SubmitButton,
   Button,
+  Link,
   Label,
   Avatar,
   Input,
-  ButtonText,
 } from '@my/ui'
 
 import { useSendAccounts } from 'app/utils/send-accounts'
@@ -20,8 +21,8 @@ import { assert } from 'app/utils/assert'
 import { baseMainnet } from '@my/wagmi'
 import { useBalance } from 'wagmi'
 import { useSendParams } from 'app/routers/params'
-import { useForm } from 'react-hook-form'
-import { formFields } from 'app/utils/SchemaForm'
+import { useForm, FormProvider } from 'react-hook-form'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
@@ -77,7 +78,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const router = useRouter()
   const {
     data: balance,
-    isLoading: balanceIsLoading,
+    isPending: balanceIsPending,
     error: balanceError,
     refetch: balanceRefetch,
   } = useBalance({
@@ -98,17 +99,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   })
 
   const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    data: transferData,
-    status,
-    context,
-    error: transferError,
-  } = useUserOpTransferMutation()
-  console.log('status: ', status)
-  console.log('transferData: ', transferData)
-  console.log('context: ', context)
+  const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
 
   const sentTxLink = useLink({
     href: `${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`,
@@ -149,35 +140,16 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     }
   }
 
-  if (balanceIsLoading) return <Spinner size="large" />
-
   return (
-    <Container
-      $gtLg={{ jc: 'flex-start', ai: 'flex-start' }}
-      flexDirection="column"
-      jc="center"
-      ai="center"
-      f={1}
-      pb="$5"
-    >
-      <YStack gap="$10" width="100%" f={1} maw={784}>
+    <Container $gtLg={{ jc: 'flex-start' }} jc="center" f={1} pb="$5">
+      <YStack gap="$5" width="100%" f={1}>
         <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }}>
             <XStack jc="space-between" ai="center" gap="$3">
-              <Label
-                fontWeight="500"
-                fontSize={'$5'}
-                textTransform="uppercase"
-                $theme-dark={{ col: '$gray8Light' }}
-              >
-                TO
+              <Label fontWeight="500" fontSize={'$5'}>
+                To
               </Label>
-              <Button
-                bc="transparent"
-                chromeless
-                hoverStyle={{ bc: 'transparent' }}
-                pressStyle={{ bc: 'transparent' }}
-                focusStyle={{ bc: 'transparent' }}
+              <Paragraph
                 onPress={() =>
                   router.push({
                     pathname: '/send',
@@ -185,8 +157,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   })
                 }
               >
-                <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-              </Button>
+                edit
+              </Paragraph>
             </XStack>
             <XStack
               ai="center"
@@ -212,7 +184,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   fontSize="$4"
                   fontWeight="400"
                   lineHeight="$1"
-                  color="$color11"
+                  color="$color12"
                 >
                   @{profile?.tag_name}
                 </Paragraph>
@@ -222,20 +194,10 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
 
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }}>
             <XStack jc="space-between" ai="center" gap="$3">
-              <Label
-                fontWeight="500"
-                fontSize={'$5'}
-                textTransform="uppercase"
-                $theme-dark={{ col: '$gray8Light' }}
-              >
-                AMOUNT
+              <Label fontWeight="500" fontSize={'$5'}>
+                Amount
               </Label>
-              <Button
-                bc="transparent"
-                chromeless
-                hoverStyle={{ bc: 'transparent' }}
-                pressStyle={{ bc: 'transparent' }}
-                focusStyle={{ bc: 'transparent' }}
+              <Paragraph
                 onPress={() =>
                   router.push({
                     pathname: '/send',
@@ -243,8 +205,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   })
                 }
               >
-                <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-              </Button>
+                edit
+              </Paragraph>
             </XStack>
             <XStack
               ai="center"
@@ -255,7 +217,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
               $theme-light={{ bc: '$gray3Light' }}
               f={1}
             >
-              <Paragraph fontSize="$9" fontWeight="600" color="$color12">
+              <Paragraph fontSize="$5" fontWeight="500" color="$color12">
                 {amountParam}
               </Paragraph>
               {coins.find((coin) => coin.token === tokenParam)?.icon}
@@ -264,17 +226,11 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
         </Stack>
         {/*  TODO add this back when backend is ready
         <YStack gap="$5" f={1}>
-          <Label
-            fontWeight="500"
-            fontSize={'$5'}
-            textTransform="uppercase"
-            $theme-dark={{ col: '$gray8Light' }}
-          >
+          <Label fontWeight="500" fontSize={'$5'} textTransform="uppercase">
             ADD A NOTE
           </Label>
           <Input
             placeholder="(Optional)"
-            placeholderTextColor="$color12"
             value={note}
             onChangeText={(text) => setParams({ note: text }, { webBehavior: 'replace' })}
             fontSize={20}
@@ -297,36 +253,19 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
             fontFamily="$mono"
           />
         </YStack> */}
+        <Stack w="100%" jc="flex-end" ai="center" $gtLg={{ ai: 'flex-end' }} mt="auto">
+          <Button
+            theme="accent"
+            onPress={onSubmit}
+            px="$15"
+            br={12}
+            disabledStyle={{ opacity: 0.5 }}
+            disabled={!canSubmit}
+          >
+            <Button.Text>/SEND</Button.Text>
+          </Button>
+        </Stack>
       </YStack>
-      <Stack jc="flex-end" ai="center" $gtLg={{ ai: 'flex-end', ml: 'auto' }} mt="auto">
-        <Button
-          theme="accent"
-          onPress={onSubmit}
-          px="$15"
-          br={12}
-          disabledStyle={{ opacity: 0.5 }}
-          disabled={!canSubmit}
-          gap={4}
-        >
-          {(() => {
-            switch (true) {
-              case isTransferPending:
-                return (
-                  <>
-                    <Button.Icon>
-                      <Spinner size="small" color="$color" />
-                    </Button.Icon>
-                    <Button.Text>Sending...</Button.Text>
-                  </>
-                )
-              case sentUserOpTxHash !== undefined:
-                return null
-              default:
-                return <Button.Text>/SEND</Button.Text>
-            }
-          })()}
-        </Button>
-      </Stack>
     </Container>
   )
 }
