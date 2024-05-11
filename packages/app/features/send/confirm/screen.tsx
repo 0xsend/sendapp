@@ -166,7 +166,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                 onPress={() =>
                   router.push({
                     pathname: '/send',
-                    query: { recipient, sendToken: tokenParam, amount: amountParam },
+                    query: { sendToken: tokenParam, amount: amountParam },
                   })
                 }
               >
