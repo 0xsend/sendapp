@@ -11,7 +11,7 @@ import {
   useMedia,
 } from '@my/ui'
 import { IconClose } from 'app/components/icons'
-import { AvatarProfile } from './AvatarProfile'
+import { AvatarProfile } from '../profile/AvatarProfile'
 import type { useProfileLookup } from 'app/utils/useProfileLookup'
 import { Provider } from 'app/provider'
 import { SendForm } from './SendForm'

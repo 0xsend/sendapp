@@ -14,7 +14,7 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 import { useState } from 'react'
 import { createParam } from 'solito'
-import { SendDialog } from './SendDialog'
+import { SendDialog } from 'app/features/send/SendDialog'
 import { AvatarProfile } from './AvatarProfile'
 const { useParam } = createParam<{ sendid: string }>()
 interface ProfileScreenProps {
