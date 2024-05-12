@@ -81,7 +81,6 @@ export async function verifySignature(
 }
 
 export const USEROP_VERSION = 1
-export const USEROP_VALID_UNTIL = 0
 export const USEROP_KEY_SLOT = 0
 export const USEROP_SALT = 0n
 
@@ -122,8 +121,8 @@ export function getSendAccountCreateArgs(publicKey: [Hex, Hex]): readonly [
 export function generateChallenge({
   userOpHash,
   version = USEROP_VERSION,
-  validUntil = USEROP_VALID_UNTIL,
-}: { userOpHash: Hex; version?: number; validUntil?: number }): {
+  validUntil,
+}: { userOpHash: Hex; version?: number; validUntil }): {
   challenge: Hex
   versionBytes: Uint8Array
   validUntilBytes: Uint8Array
@@ -192,9 +191,14 @@ export async function signUserOp({
   validUntil,
 }: {
   userOpHash: Hex
-  version: number
-  validUntil: number
+  version?: number
+  validUntil?: number
 }) {
+  version = version ?? USEROP_VERSION
+  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 60) / 1000) // default 60 seconds
+  assert(version === USEROP_VERSION, 'version must be 1')
+  assert(typeof validUntil === 'number', 'validUntil must be a number')
+  assert(validUntil > Math.floor(Date.now() / 1000), 'validUntil must be in the future')
   const { challenge, versionBytes, validUntilBytes } = generateChallenge({
     userOpHash,
     version,
