@@ -15,7 +15,7 @@ import {
 } from 'permissionless'
 import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from 'viem'
 import { assert } from './assert'
-import { USEROP_VALID_UNTIL, USEROP_VERSION, entrypoint, signUserOp } from './userop'
+import { entrypoint, signUserOp } from './userop'
 
 // default user op with preset gas values that work
 export const defaultUserOp: Pick<
@@ -40,6 +40,7 @@ export const defaultUserOp: Pick<
 export type UseUserOpTransferMutationArgs = {
   userOp: UserOperation<'v0.7'>
   validUntil?: number
+  version?: number
 }
 
 /**
@@ -56,7 +57,8 @@ export function useUserOpTransferMutation() {
 
 export async function sendUserOpTransfer({
   userOp,
-  validUntil = USEROP_VALID_UNTIL,
+  version,
+  validUntil,
 }: UseUserOpTransferMutationArgs): Promise<GetUserOperationReceiptReturnType> {
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
@@ -68,7 +70,7 @@ export async function sendUserOpTransfer({
 
   userOp.signature = await signUserOp({
     userOpHash,
-    version: USEROP_VERSION,
+    version,
     validUntil,
   })
 
