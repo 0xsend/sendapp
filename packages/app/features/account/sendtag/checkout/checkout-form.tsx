@@ -9,28 +9,26 @@ import {
   Theme,
   XStack,
   YStack,
-  useToastController,
   useMedia,
+  useToastController,
 } from '@my/ui'
 
 import { X } from '@tamagui/lucide-icons'
+import { IconPlus } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
 import { formatEther } from 'viem'
 import type { z } from 'zod'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 import { getPriceInWei, maxNumSendTags, tagLengthToWei } from './checkout-utils'
-import { IconPlus } from 'app/components/icons'
-import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import { ConfirmButton } from './components/checkout-confirm-button'
-import { useRouter } from 'solito/router'
 
 export const CheckoutForm = () => {
   const user = useUser()
