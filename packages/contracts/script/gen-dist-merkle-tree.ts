@@ -3,7 +3,6 @@ import type { Database } from '@my/supabase/database.types'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { createClient } from '@supabase/supabase-js'
 import debug from 'debug'
-import { config } from 'dotenv'
 
 const log = debug('contracts:script:gen-merkle-tree')
 
@@ -67,7 +66,7 @@ async function genMerkleTree() {
   // save some debug data
   // write shares to local disk for debugging
   const path = join(__dirname, '..', 'var', `${distributionId}-merkle.json`)
-  Bun.write(
+  await Bun.write(
     path,
     JSON.stringify(
       {
