@@ -39,6 +39,7 @@ import {
   useWaitForTransactionReceipt,
 } from 'wagmi'
 import { getPriceInWei, useSenderSafeReceivedEvents } from '../checkout-utils'
+import { throwIf } from 'app/utils/throwIf'
 
 export function ConfirmButton({
   onConfirmed,
@@ -124,16 +125,8 @@ export function ConfirmButton({
   const [confirmed, setConfirmed] = useState(false)
 
   const [attempts, setAttempts] = useState(0)
-  const {
-    data: nonce,
-    error: nonceError,
-    isLoading: isLoadingNonce,
-  } = useAccountNonce({ sender: sendAccount?.address })
-  const {
-    data: feesPerGas,
-    error: gasFeesError,
-    isLoading: isLoadingGasFees,
-  } = useEstimateFeesPerGas({
+  const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
+  const { data: feesPerGas, error: gasFeesError } = useEstimateFeesPerGas({
     chainId: baseMainnetClient.chain.id,
   })
   const { maxFeePerGas, maxPriorityFeePerGas } = feesPerGas ?? {}
@@ -151,6 +144,8 @@ export function ConfirmButton({
       String(maxFeePerGas),
       String(maxPriorityFeePerGas),
       String(weiAmount),
+      nonceError,
+      gasFeesError,
     ],
     enabled:
       !!sendAccount &&
@@ -162,6 +157,8 @@ export function ConfirmButton({
       assert(nonce !== undefined, 'No nonce found')
       assert(maxFeePerGas !== undefined, 'No max fee per gas found')
       assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
+      throwIf(nonceError)
+      throwIf(gasFeesError)
       const callData = encodeFunctionData({
         abi: sendAccountAbi,
         functionName: 'executeBatch',
@@ -203,6 +200,7 @@ export function ConfirmButton({
 
   async function handleCheckoutTx() {
     try {
+      throwIf(userOpError)
       assert(!!userOp, 'User op is required')
       await sendUserOp({ userOp })
     } catch (e) {
@@ -339,7 +337,11 @@ export function ConfirmButton({
         pointerEvents: 'none',
         opacity: 0.5,
       }}
-      pointerEvents={submitting || txWaitLoading || sendTransactionIsPending ? 'none' : 'auto'}
+      pointerEvents={
+        submitting || txWaitLoading || sendTransactionIsPending || userOpError || isLoadingUserOp
+          ? 'none'
+          : 'auto'
+      }
       gap="$1.5"
       onPress={handleCheckoutTx}
       br={12}
