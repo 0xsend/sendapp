@@ -121,13 +121,7 @@ function TagItem({ tag }: { tag?: Tables<'tags'> }) {
     )
 
   return (
-    <ListItem
-      h={54}
-      br={12}
-      w="fit-content"
-      $theme-dark={{ bc: '$darkest' }}
-      $theme-light={{ bc: '$gray4Light' }}
-    >
+    <ListItem h={54} br={12} w="fit-content" bc="$color2">
       <H3 fontSize={32} fontWeight={'500'} fontFamily={'$mono'} $theme-dark={{ col: '$primary' }}>
         {tag.name}
       </H3>
