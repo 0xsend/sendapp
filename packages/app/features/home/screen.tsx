@@ -35,7 +35,7 @@ export function HomeScreen() {
   const hasSendAccount = !(sendAccount === undefined || sendAccount.length === 0)
 
   return (
-    <Container fd={'column'} $gtMd={{ pt: '$5' }}>
+    <Container fd={'column'}>
       <Stack display="none" $gtLg={{ display: hasSendAccount && selectedCoin ? 'flex' : 'none' }}>
         <Button
           top={'$-8'}
