@@ -265,7 +265,7 @@ export const CheckoutForm = () => {
           return (
             <YStack mb="-$8" width="100%">
               {!has5Tags && (
-                <Label $gtMd={{ py: '$4' }}>
+                <Label $gtMd={{ pb: '$4' }}>
                   {hasPendingTags ? 'ADD ANOTHER SENDTAG' : 'CREATE A NEW SENDTAG'}
                 </Label>
               )}
