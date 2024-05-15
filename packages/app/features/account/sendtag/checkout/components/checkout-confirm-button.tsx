@@ -204,7 +204,7 @@ export function ConfirmButton({
       assert(!!userOp, 'User op is required')
       await sendUserOp({ userOp })
     } catch (e) {
-      setError(e.message)
+      setError(e.message.split('.').at(0))
     }
   }
 
