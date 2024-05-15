@@ -122,7 +122,7 @@ export function generateChallenge({
   userOpHash,
   version = USEROP_VERSION,
   validUntil,
-}: { userOpHash: Hex; version?: number; validUntil }): {
+}: { userOpHash: Hex; version?: number; validUntil: number }): {
   challenge: Hex
   versionBytes: Uint8Array
   validUntilBytes: Uint8Array
@@ -195,10 +195,13 @@ export async function signUserOp({
   validUntil?: number
 }) {
   version = version ?? USEROP_VERSION
-  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 60) / 1000) // default 60 seconds
+  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 60) / 1000) // default 60 seconds (1 minute
   assert(version === USEROP_VERSION, 'version must be 1')
   assert(typeof validUntil === 'number', 'validUntil must be a number')
-  assert(validUntil > Math.floor(Date.now() / 1000), 'validUntil must be in the future')
+  assert(
+    validUntil === 0 || validUntil > Math.floor(Date.now() / 1000), // 0 means valid forever
+    'validUntil must be in the future'
+  )
   const { challenge, versionBytes, validUntilBytes } = generateChallenge({
     userOpHash,
     version,

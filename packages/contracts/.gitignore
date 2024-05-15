@@ -8,5 +8,6 @@ out/
 /broadcast/CreateSendDistributionTranche.s.sol/
 /broadcast/CreateSendSnapshot.s.sol/
 /broadcast/DeployTestnetSendToken.s.sol/
+/broadcast/UpdateTokenPaymasterCachedPrice.s.sol/
 /broadcast/**/run-*.json
 !/broadcast/**/run-latest.json
