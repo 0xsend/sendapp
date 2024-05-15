@@ -14,8 +14,6 @@ import {
   useThemeName,
   Theme,
   H3,
-  ButtonText,
-  FontLanguage,
   Stack,
 } from '@my/ui'
 import {
@@ -110,68 +108,66 @@ export function AccountScreen() {
 
   return (
     <>
-      <Container>
-        <YStack w={'100%'} ai={'center'} gap={'$6'} pb="$6">
-          <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
-            <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
-              <Avatar $gtMd={{ size: 133.5 }} size={'$10'} borderRadius={'$3'}>
-                <Avatar.Image
-                  $gtMd={{ w: 133.5, h: 133.5 }}
-                  w={'$10'}
-                  h="$10"
-                  accessibilityLabel=""
-                  src={avatar_url ?? ''}
-                />
-                <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
-                  <IconAccount size="$6" color="$olive" />
-                </Avatar.Fallback>
-              </Avatar>
-              <YStack gap={'$2'} $md={{ ai: 'center' }}>
-                <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
-                  {name ? name : '---'}
+      <YStack w={'100%'} ai={'center'} gap={'$6'} py="$6">
+        <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
+          <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
+            <Avatar $gtMd={{ size: 133.5 }} size={'$10'} borderRadius={'$3'}>
+              <Avatar.Image
+                $gtMd={{ w: 133.5, h: 133.5 }}
+                w={'$10'}
+                h="$10"
+                accessibilityLabel=""
+                src={avatar_url ?? ''}
+              />
+              <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
+                <IconAccount size="$6" color="$olive" />
+              </Avatar.Fallback>
+            </Avatar>
+            <YStack gap={'$2'} $md={{ ai: 'center' }}>
+              <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
+                {name ? name : '---'}
+              </Paragraph>
+              {tags?.[0] ? (
+                <Paragraph fontFamily={'$mono'} opacity={0.6}>
+                  @{tags[0].name}
                 </Paragraph>
-                {tags?.[0] ? (
-                  <Paragraph fontFamily={'$mono'} opacity={0.6}>
-                    @{tags[0].name}
-                  </Paragraph>
-                ) : null}
-              </YStack>
-            </XStack>
-            <XStack gap={'$5'} $md={{ display: 'none' }}>
-              <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-                Sendtags
-              </BorderedLink>
-              <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-                Rewards
-              </BorderedLink>
-              <BorderedLink
-                href="/account/settings/edit-profile"
-                Icon={IconGear}
-                // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
-                {...(media.lg
-                  ? {
-                      onPress: (e) => {
-                        if (media.lg) {
-                          e.preventDefault()
-                          setNavParam('settings', { webBehavior: 'replace' })
-                        }
-                      },
-                    }
-                  : {})}
-              >
-                Settings
-              </BorderedLink>
-            </XStack>
+              ) : null}
+            </YStack>
           </XStack>
-          <Separator w={'100%'} />
-          <ProfileFacts facts={facts} />
-          <Separator w={'100%'} />
-          <YStack w="100%" gap="$5" f={1}>
-            {tags?.length === 0 ? <NoTagsMessage /> : null}
-            <BottomButtonRow />
-          </YStack>
+          <XStack gap={'$5'} $md={{ display: 'none' }}>
+            <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
+              Sendtags
+            </BorderedLink>
+            <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
+              Rewards
+            </BorderedLink>
+            <BorderedLink
+              href="/account/settings/edit-profile"
+              Icon={IconGear}
+              // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
+              {...(media.lg
+                ? {
+                    onPress: (e) => {
+                      if (media.lg) {
+                        e.preventDefault()
+                        setNavParam('settings', { webBehavior: 'replace' })
+                      }
+                    },
+                  }
+                : {})}
+            >
+              Settings
+            </BorderedLink>
+          </XStack>
+        </XStack>
+        <Separator w={'100%'} />
+        <ProfileFacts facts={facts} />
+        <Separator w={'100%'} />
+        <YStack w="100%" gap="$5" f={1}>
+          {tags?.length === 0 ? <NoTagsMessage /> : null}
+          <BottomButtonRow />
         </YStack>
-      </Container>
+      </YStack>
     </>
   )
 }
