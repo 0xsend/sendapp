@@ -131,17 +131,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
   if (media.gtLg)
     return (
       <SideBarWrapper
-        sidebar={
-          <HomeSideBar
-            bc="$color2"
-            width={234}
-            minWidth={234}
-            btlr={0}
-            bblr={0}
-            pt={80}
-            jc="flex-start"
-          />
-        }
+        sidebar={<HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />}
       >
         {children}
       </SideBarWrapper>
