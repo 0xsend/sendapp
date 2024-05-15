@@ -239,11 +239,10 @@ export function ConfirmButton({
             return
           }
 
-          setError(err.message)
           return
         }
         console.error(err)
-        setError('Something went wrong')
+        setError(err?.message?.split('.').at(0) ?? 'Something went wrong')
       })
       .finally(() => {
         setSubmitting(false)
@@ -256,7 +255,7 @@ export function ConfirmButton({
 
   useEffect(() => {
     if (txWaitError) {
-      setError(txWaitError.message)
+      setError(txWaitError.message.split('.').at(0))
     }
   }, [txWaitError])
 
