@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const Referral = (props: IconProps) => {
+const Referral = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -23,5 +23,5 @@ const Referral = (props: IconProps) => {
     </Svg>
   )
 }
-const IconReferral = memo(themed(Referral))
+const IconReferral = memo<IconProps>(themed(Referral))
 export { IconReferral }

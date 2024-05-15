@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Circle, G, Mask, Path, Rect, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const Deposit = (props: IconProps) => {
+const Deposit = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -28,5 +28,5 @@ const Deposit = (props: IconProps) => {
     </Svg>
   )
 }
-const IconDeposit = memo(themed(Deposit))
+const IconDeposit = memo<IconProps>(themed(Deposit))
 export { IconDeposit }

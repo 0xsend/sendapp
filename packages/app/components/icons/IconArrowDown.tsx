@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const ArrowDown = (props: IconProps) => {
+const ArrowDown = (props) => {
   const { size, color, ...rest } = props
 
   return (
@@ -37,5 +37,5 @@ const ArrowDown = (props: IconProps) => {
     </Svg>
   )
 }
-const IconArrowDown = memo(themed(ArrowDown))
+const IconArrowDown = memo<IconProps>(themed(ArrowDown))
 export { IconArrowDown }

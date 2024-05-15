@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui'
 
-const Download = (props: IconProps) => {
+const Download = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -24,5 +24,5 @@ const Download = (props: IconProps) => {
     </Svg>
   )
 }
-const IconDownlod = memo(themed(Download))
+const IconDownlod = memo<IconProps>(themed(Download))
 export { IconDownlod }

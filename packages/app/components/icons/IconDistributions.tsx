@@ -4,7 +4,7 @@ import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const Distributions = (props: IconProps) => {
+const Distributions = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -63,5 +63,5 @@ const Distributions = (props: IconProps) => {
     </Svg>
   )
 }
-const IconDistributions = memo(themed(Distributions))
+const IconDistributions = memo<IconProps>(themed(Distributions))
 export { IconDistributions }

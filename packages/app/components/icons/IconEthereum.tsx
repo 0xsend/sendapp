@@ -3,7 +3,7 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
 
-const Ethereum = (props: IconProps) => {
+const Ethereum = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -39,5 +39,5 @@ const Ethereum = (props: IconProps) => {
     </Svg>
   )
 }
-const IconEthereum = memo(themed(Ethereum))
+const IconEthereum = memo<IconProps>(themed(Ethereum))
 export { IconEthereum }
