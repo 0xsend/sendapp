@@ -195,7 +195,7 @@ export async function signUserOp({
   validUntil?: number
 }) {
   version = version ?? USEROP_VERSION
-  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 60) / 1000) // default 60 seconds (1 minute
+  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 120) / 1000) // default 120 seconds (2 minutes)
   assert(version === USEROP_VERSION, 'version must be 1')
   assert(typeof validUntil === 'number', 'validUntil must be a number')
   assert(
