@@ -29,11 +29,20 @@ export const BackupScreen = () => {
   return (
     <YStack w={'100%'} als={'center'} gap={'$size.3.5'}>
       <YStack w={'100%'} gap={'$size.2'}>
-        <H1 size={'$8'} fontWeight={'300'} color={'$lightGrayTextField'}>
+        <H1
+          size={'$8'}
+          fontWeight={'300'}
+          $theme-dark={{ color: '$lightGrayTextField' }}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           Add Passkey as Signer
         </H1>
 
-        <Paragraph size={'$5'} color={'$lightGrayTextField'}>
+        <Paragraph
+          size={'$5'}
+          $theme-dark={{ color: '$lightGrayTextField' }}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
           Backup your Send Account by add up to 20 passkeys to your account. Passkeys are authorized
           devices that can sign transactions for your account.
         </Paragraph>
@@ -44,7 +53,7 @@ export const BackupScreen = () => {
           case error !== null:
             return (
               <YStack w={'100%'} gap={'$6'}>
-                <Separator w={'100%'} borderColor={'$decay'} />
+                <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   {error.message}
                 </Paragraph>
@@ -55,7 +64,7 @@ export const BackupScreen = () => {
           case !hasSendAccount:
             return (
               <YStack w={'100%'} gap={'$6'}>
-                <Separator w={'100%'} borderColor={'$decay'} />
+                <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   You have no Send Account.
                 </Paragraph>
@@ -99,7 +108,7 @@ const WebauthnCreds = ({
         </YStack>
       </XStack>
 
-      <Separator w={'100%'} borderColor="$decay" />
+      <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
 
       <XStack gap="$5" flexWrap="wrap" ai="flex-start">
         {sendAcct.send_account_credentials.map((cred) => (
@@ -148,9 +157,8 @@ const SendAccountCredentials = ({
       w={'100%'}
       gap={'$size.1.5'}
       p={'$size.1.5'}
-      $theme-dark={{
-        backgroundColor: '$darkest',
-      }}
+      $theme-dark={{ backgroundColor: '$darkest' }}
+      $theme-light={{ backgroundColor: '$gray2Light' }}
       borderRadius={'$5'}
       $gtLg={{
         width: isWeb ? 'calc((100% - 24px) / 2)' : '100%',
@@ -269,10 +277,21 @@ const CardTextBlock = ({
 }: { label: string; text: string; warningText?: boolean }) => {
   return (
     <YStack gap={'$size.0.5'}>
-      <H5 size={'$5'} color={'$lightGrayTextField'} fontWeight={'400'}>
+      <H5
+        size={'$5'}
+        $theme-dark={{ color: '$lightGrayTextField' }}
+        $theme-light={{ color: '$darkGrayTextField' }}
+        fontWeight={'400'}
+      >
         {label}
       </H5>
-      <Paragraph fontWeight={'300'} color={warningText ? '$error' : '$white'} fontFamily={'$mono'}>
+      <Paragraph
+        fontWeight={'300'}
+        size={'$5'}
+        $theme-dark={{ color: warningText ? '$error' : '$white' }}
+        $theme-light={{ color: warningText ? '$error' : '$black' }}
+        fontFamily={'$mono'}
+      >
         {text}
       </Paragraph>
     </YStack>
@@ -292,22 +311,41 @@ const RemovePasskeyConfirmation = ({
 
   return (
     <YStack gap={'$size.3.5'}>
-      <Text fontWeight={'400'} fontSize={'$5'} color={'$white'} fontFamily={'$mono'}>
+      <Text
+        fontWeight={'400'}
+        fontSize={'$5'}
+        $theme-dark={{ color: '$white' }}
+        $theme-light={{ color: '$black' }}
+        fontFamily={'$mono'}
+      >
         Removing &quot;{name}&quot; as a signer on your Send account.{' '}
-        <Text fontWeight={'400'} fontSize={'$5'} color={'$warning'} fontFamily={'$mono'}>
+        <Text
+          fontWeight={'400'}
+          fontSize={'$5'}
+          $theme-dark={{ color: '$warning' }}
+          $theme-light={{ color: '$yellow300' }}
+          fontFamily={'$mono'}
+        >
           This cannot be undone.
         </Text>
       </Text>
 
       <YStack gap={'$size.1.5'}>
-        <Text fontWeight={'400'} fontSize={'$5'} color={'$white'} fontFamily={'$mono'}>
+        <Text
+          fontWeight={'400'}
+          fontSize={'$5'}
+          $theme-dark={{ color: '$white' }}
+          $theme-light={{ color: '$black' }}
+          fontFamily={'$mono'}
+        >
           Please enter &quot;{name}&quot; below
         </Text>
 
         <Input
           boc={'transparent'}
           borderRadius={'$4'}
-          color={'$white'}
+          $theme-dark={{ color: '$white' }}
+          $theme-light={{ color: '$black' }}
           ff={'$mono'}
           autoFocus
           onChangeText={setInputVal}
