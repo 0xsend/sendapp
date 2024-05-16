@@ -77,7 +77,7 @@ export function AccountScreen() {
     { label: 'Send ID', value: send_id },
     { label: 'Sendtags', value: sendTags },
     {
-      label: 'Referral Code',
+      label: 'Referral Link',
       value: (
         <TooltipSimple label={canShare ? 'Share' : 'Copy'}>
           <Button
