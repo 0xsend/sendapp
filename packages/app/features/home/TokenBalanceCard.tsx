@@ -1,5 +1,15 @@
-import { Label, Paragraph, Spinner, Tooltip, TooltipGroup, XStack, YStack, Stack } from '@my/ui'
-import { formatAmount } from 'app/utils/formatAmount'
+import {
+  Label,
+  Paragraph,
+  Spinner,
+  Tooltip,
+  TooltipGroup,
+  XStack,
+  YStack,
+  Stack,
+  BigHeading,
+} from '@my/ui'
+import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 const USDollar = new Intl.NumberFormat('en-US', {
@@ -9,6 +19,8 @@ const USDollar = new Intl.NumberFormat('en-US', {
 
 export const TokenBalanceCard = () => {
   const { totalBalance } = useSendAccountBalances()
+
+  const formattedBalance = formatAmount(totalBalance, 9, 0)
 
   return (
     <XStack w={'100%'} zIndex={4}>
@@ -35,16 +47,28 @@ export const TokenBalanceCard = () => {
                   {totalBalance === undefined ? (
                     <Spinner size={'large'} />
                   ) : (
-                    <Paragraph
-                      color={'$color12'}
-                      fontFamily={'$mono'}
+                    <BigHeading
+                      $platform-web={{ width: 'fit-content' }}
+                      $sm={{
+                        fontSize: (() => {
+                          switch (true) {
+                            case formattedBalance.length > 8:
+                              return '$11'
+                            case formattedBalance.length > 5:
+                              return '$12'
+                            default:
+                              return 96
+                          }
+                        })(),
+                      }}
                       fontSize={96}
                       lineHeight={'$15'}
                       fontWeight={'500'}
+                      color={'$color12'}
                       zIndex={1}
                     >
-                      {formatAmount(totalBalance, 4, 0)}
-                    </Paragraph>
+                      {formattedBalance}
+                    </BigHeading>
                   )}
                   <Paragraph color={'$color12'} fontSize={'$6'} fontWeight={'500'} zIndex={1}>
                     {'USD'}

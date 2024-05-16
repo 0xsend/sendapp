@@ -16,7 +16,7 @@ import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { baseMainnet } from '@my/wagmi'
 // import { useSendAccounts } from 'app/utils/send-accounts'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
-import { formatAmount } from 'app/utils/formatAmount'
+import formatAmount from 'app/utils/formatAmount'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
@@ -95,6 +95,8 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
       </XStack>
     )
 
+  const formatPrice = (price: number) => price.toString().slice(0, 7)
+
   const formatPriceChange = (change: number) => {
     const fixedChange = change.toFixed(2)
     if (change > 0)
@@ -134,7 +136,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
         $theme-dark={{ color: '$gray8Light' }}
         color={'$color12'}
       >
-        {`1 ${coin.symbol} = ${formatAmount(price, 9, 6)} USD`}
+        {`1 ${coin.symbol} = ${formatPrice(price)} USD`}
       </Paragraph>
       <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
         {formatPriceChange(changePercent24h)}
@@ -161,8 +163,12 @@ const TokenDetailsBalance = ({
   return (
     <Tooltip placement="bottom">
       <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
-        <BigHeading $platform-web={{ width: 'fit-content' }} color={'$color12'}>
-          {formatAmount(balanceWithDecimals.toString(), 9, 5)}
+        <BigHeading
+          $platform-web={{ width: 'fit-content' }}
+          $sm={{ fontSize: balanceWithDecimals.toString().length > 8 ? '$10' : 64 }}
+          color={'$color12'}
+        >
+          {formatAmount(balanceWithDecimals.toString(), 10, 5)}
         </BigHeading>
       </Tooltip.Trigger>
       <Tooltip.Content

@@ -10,7 +10,7 @@ import {
 import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
-import { formatAmount } from 'app/utils/formatAmount'
+import formatAmount from 'app/utils/formatAmount'
 // import { useSendAccounts } from 'app/utils/send-accounts'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
@@ -106,7 +106,9 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
       <>
         <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
           {formatAmount(
-            (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString()
+            (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString(),
+            10,
+            5
           )}
         </Paragraph>
 

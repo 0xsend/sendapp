@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 
-import { formatAmount } from './formatAmount' // Adjust the import path
+import formatAmount from './formatAmount' // Adjust the import path
 
 describe('abbreviateNumber', () => {
   it('should handle negatives', () => {
@@ -75,9 +75,9 @@ describe('maxDecimals handling', () => {
     expect(formatAmount(123.45678, 5, 2)).toBe('123.45') // input has 5 decimals, but only 2 are expected in output
   })
 
-  // it('should format to maxDecimals even if input has fewer decimals', () => {
-  //   expect(formatAmount(123.4, 5, 2)).toBe('123.40') // input has 1 decimal, but 2 are expected in output
-  // })
+  it('should format to maxDecimals even if input has fewer decimals', () => {
+    expect(formatAmount(123.4, 5, 2)).toBe('123.40') // input has 1 decimal, but 2 are expected in output
+  })
 })
 describe('Additional scenarios', () => {
   it('should handle larger numbers with given maxIntegers and maxDecimals', () => {

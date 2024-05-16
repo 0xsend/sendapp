@@ -69,7 +69,7 @@ function abbreviateNumber(
   return (!sign ? '-' : '') + rounded + suffix
 }
 
-export function formatAmount(
+export default function formatAmount(
   amount: number | string | undefined,
   maxIntegers = 4,
   maxDecimals = 2
@@ -125,20 +125,4 @@ export function formatAmount(
       maximumFractionDigits: maxDecimals,
     })
   )
-}
-
-export function removeTrailingZeros(amount: string, removeZerosAfterIndex: number) {
-  const [integers, decimals] = amount.split('.')
-  if (decimals === undefined || decimals.length === 0) {
-    return amount
-  }
-
-  const [keepZeros, removeZeros] = [
-    decimals.substring(0, removeZerosAfterIndex),
-    decimals.substring(removeZerosAfterIndex),
-  ]
-
-  const removedZeros = removeZeros.replace(/0+$/, '').length
-
-  return `${integers}.${keepZeros}${removedZeros}`
 }

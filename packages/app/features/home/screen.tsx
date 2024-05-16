@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   Paragraph,
   Separator,
   XStack,
