@@ -36,20 +36,26 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
 
   return (
     <YStack f={1}>
-      {media.gtLg && coin.label !== 'USDC' && (
-        <XStack w={'100%'} ai={'center'} jc={'space-between'} $gtLg={{ mt: '$9' }} mt={'$6'}>
-          <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
-          <Stack
-            bw={1}
-            br={'$2'}
+      {media.gtLg && (
+        <XStack w={'100%'} ai={'center'} jc={'space-between'} $gtLg={{ mt: '$4.5' }} mt={'$6'}>
+          <Separator
             $theme-dark={{ boc: '$decay' }}
             $theme-light={{ boc: '$gray4Light' }}
-            p={'$1.5'}
-            jc="center"
-            miw="$18"
-          >
-            <TokenDetailsMarketData coin={coin} />
-          </Stack>
+            my={coin.label === 'USDC' ? '$3.5' : '$0'}
+          />
+          {coin.label !== 'USDC' && (
+            <Stack
+              bw={1}
+              br={'$2'}
+              $theme-dark={{ boc: '$decay' }}
+              $theme-light={{ boc: '$gray4Light' }}
+              p={'$1.5'}
+              jc="center"
+              miw="$18"
+            >
+              <TokenDetailsMarketData coin={coin} />
+            </Stack>
+          )}
         </XStack>
       )}
       <YStack pt="$4">
@@ -88,6 +94,10 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
         <IconError size="$1.75" color={'$redVibrant'} />
       </XStack>
     )
+
+  // Coingecko API returns a formatted price already. For now, we just want to make sure it doesn't have more than 8 digits
+  // so the text doesn't get cut off.
+  const formatPrice = (price: number) => price.toString().slice(0, 7)
 
   const formatPriceChange = (change: number) => {
     const fixedChange = change.toFixed(2)
@@ -128,7 +138,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
         $theme-dark={{ color: '$gray8Light' }}
         color={'$color12'}
       >
-        {`1 ${coin.symbol} = ${price} USD`}
+        {`1 ${coin.symbol} = ${formatPrice(price)} USD`}
       </Paragraph>
       <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
         {formatPriceChange(changePercent24h)}
@@ -155,8 +165,12 @@ const TokenDetailsBalance = ({
   return (
     <Tooltip placement="bottom">
       <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
-        <BigHeading $platform-web={{ width: 'fit-content' }} color={'$color12'}>
-          {formatAmount(balanceWithDecimals.toString())}
+        <BigHeading
+          $platform-web={{ width: 'fit-content' }}
+          $sm={{ fontSize: balanceWithDecimals.toString().length > 8 ? '$10' : 64 }}
+          color={'$color12'}
+        >
+          {formatAmount(balanceWithDecimals.toString(), 10, 5)}
         </BigHeading>
       </Tooltip.Trigger>
       <Tooltip.Content

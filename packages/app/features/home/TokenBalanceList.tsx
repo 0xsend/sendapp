@@ -106,7 +106,9 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
       <>
         <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
           {formatAmount(
-            (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString()
+            (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString(),
+            10,
+            5
           )}
         </Paragraph>
 

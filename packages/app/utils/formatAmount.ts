@@ -113,12 +113,12 @@ export default function formatAmount(
     return abbreviateNumber(flooredAmount, maxDecimals)
   }
 
-  const countLeadingZeros = digits[1] && (digits[1].match(/^0+/) || [''])[0].length
+  const countLeadingZeros = digits[1] && digits[1].length - digits[1].replace(/^0+/, '').length
 
   const lessThanMin = !integers && countLeadingZeros && countLeadingZeros >= maxDecimals
 
   return (
-    (lessThanMin ? '<' : '') +
+    (lessThanMin ? '>' : '') +
     Number(floor(Number(amount), maxDecimals)).toLocaleString(undefined, {
       useGrouping: true,
       minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,

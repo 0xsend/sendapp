@@ -309,14 +309,20 @@ exports[`HomeScreen 1`] = `
                   }
                 >
                   <Text
+                    accessibilityRole="header"
                     selectable={true}
                     style={
                       {
                         "color": "hsla(112, 22%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 96,
-                        "fontWeight": "500",
-                        "lineHeight": 119,
+                        "fontWeight": "700",
+                        "lineHeight": 118,
+                        "marginBottom": 0,
+                        "marginLeft": 0,
+                        "marginRight": 0,
+                        "marginTop": 0,
+                        "textTransform": "none",
                         "zIndex": 1,
                       }
                     }
