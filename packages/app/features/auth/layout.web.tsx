@@ -1,4 +1,4 @@
-import { Container, YStack, LinearGradient, useMedia, Stack } from '@my/ui'
+import { Container, YStack, LinearGradient, useMedia, Stack, isWeb } from '@my/ui'
 import { AuthSideBarWrapper } from 'app/components/sidebar/AuthSideBar'
 import { useMemo, useState } from 'react'
 import { AuthCarouselContext } from './AuthCarouselContext'
@@ -36,14 +36,36 @@ export function AuthLayout({
       >
         <AuthSideBarWrapper>
           {carouselImage && !isMobileOnboarding && (
-            <>
-              <Stack bc="$black" pos="absolute" top={0} left={0} right={0} bottom={0} />
+            <Stack
+              pos="absolute"
+              top={0}
+              left={0}
+              right={0}
+              bottom={0}
+              height={isWeb ? '100vh' : '100%'}
+            >
+              <Stack
+                bc="$black"
+                pos="absolute"
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                height={isWeb ? '100vh' : '100%'}
+              />
               <AnimationLayout
                 currentKey={carouselImage.base64 || 'none'}
                 direction={1}
                 fullscreen={true}
               >
-                <>
+                <Stack
+                  pos="absolute"
+                  top={0}
+                  left={0}
+                  right={0}
+                  bottom={0}
+                  height={isWeb ? '100vh' : '100%'}
+                >
                   <SolitoImage
                     placeholder="blur"
                     blurDataURL={carouselImage.base64}
@@ -62,12 +84,12 @@ export function AuthLayout({
                       media.gtMd ? ['transparent', 'black'] : ['$black', 'transparent', '$black']
                     }
                   />
-                </>
+                </Stack>
               </AnimationLayout>
-            </>
+            </Stack>
           )}
 
-          <Container height={'100%'} $sm={{ px: '$4' }}>
+          <Container height={isWeb ? 'calc(100vh - (100vh - 100%))' : '100%'} $sm={{ px: '$4' }}>
             <YStack h={'100%'} f={1}>
               {children}
             </YStack>
