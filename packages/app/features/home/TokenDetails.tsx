@@ -16,7 +16,7 @@ import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { baseMainnet } from '@my/wagmi'
 // import { useSendAccounts } from 'app/utils/send-accounts'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
-import formatAmount from 'app/utils/formatAmount'
+import { formatAmount } from 'app/utils/formatAmount'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
@@ -36,20 +36,26 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
 
   return (
     <YStack f={1}>
-      {media.gtLg && coin.label !== 'USDC' && (
-        <XStack w={'100%'} ai={'center'} jc={'space-between'} $gtLg={{ mt: '$9' }} mt={'$6'}>
-          <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
-          <Stack
-            bw={1}
-            br={'$2'}
+      {media.gtLg && (
+        <XStack w={'100%'} ai={'center'} jc={'space-between'} $gtLg={{ mt: '$4.5' }} mt={'$6'}>
+          <Separator
             $theme-dark={{ boc: '$decay' }}
             $theme-light={{ boc: '$gray4Light' }}
-            p={'$1.5'}
-            jc="center"
-            miw="$18"
-          >
-            <TokenDetailsMarketData coin={coin} />
-          </Stack>
+            my={coin.label === 'USDC' ? '$3.5' : '$0'}
+          />
+          {coin.label !== 'USDC' && (
+            <Stack
+              bw={1}
+              br={'$2'}
+              $theme-dark={{ boc: '$decay' }}
+              $theme-light={{ boc: '$gray4Light' }}
+              p={'$1.5'}
+              jc="center"
+              miw="$18"
+            >
+              <TokenDetailsMarketData coin={coin} />
+            </Stack>
+          )}
         </XStack>
       )}
       <YStack pt="$4">
@@ -128,7 +134,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
         $theme-dark={{ color: '$gray8Light' }}
         color={'$color12'}
       >
-        {`1 ${coin.symbol} = ${price} USD`}
+        {`1 ${coin.symbol} = ${formatAmount(price, 9, 6)} USD`}
       </Paragraph>
       <XStack gap={'$1.5'} ai="center" jc={'space-around'}>
         {formatPriceChange(changePercent24h)}
@@ -156,7 +162,7 @@ const TokenDetailsBalance = ({
     <Tooltip placement="bottom">
       <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
         <BigHeading $platform-web={{ width: 'fit-content' }} color={'$color12'}>
-          {formatAmount(balanceWithDecimals.toString())}
+          {formatAmount(balanceWithDecimals.toString(), 9, 5)}
         </BigHeading>
       </Tooltip.Trigger>
       <Tooltip.Content

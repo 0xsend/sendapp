@@ -1,5 +1,5 @@
 import { Label, Paragraph, Spinner, Tooltip, TooltipGroup, XStack, YStack, Stack } from '@my/ui'
-import formatAmount from 'app/utils/formatAmount'
+import { formatAmount } from 'app/utils/formatAmount'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 const USDollar = new Intl.NumberFormat('en-US', {

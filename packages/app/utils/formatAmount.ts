@@ -69,7 +69,7 @@ function abbreviateNumber(
   return (!sign ? '-' : '') + rounded + suffix
 }
 
-export default function formatAmount(
+export function formatAmount(
   amount: number | string | undefined,
   maxIntegers = 4,
   maxDecimals = 2
@@ -113,16 +113,32 @@ export default function formatAmount(
     return abbreviateNumber(flooredAmount, maxDecimals)
   }
 
-  const countLeadingZeros = digits[1] && (digits[1].match(/^0+/) || [''])[0].length
+  const countLeadingZeros = digits[1] && digits[1].length - digits[1].replace(/^0+/, '').length
 
   const lessThanMin = !integers && countLeadingZeros && countLeadingZeros >= maxDecimals
 
   return (
-    (lessThanMin ? '<' : '') +
+    (lessThanMin ? '>' : '') +
     Number(floor(Number(amount), maxDecimals)).toLocaleString(undefined, {
       useGrouping: true,
       minimumFractionDigits: (decimals || 0) < maxDecimals ? decimals : maxDecimals,
       maximumFractionDigits: maxDecimals,
     })
   )
+}
+
+export function removeTrailingZeros(amount: string, removeZerosAfterIndex: number) {
+  const [integers, decimals] = amount.split('.')
+  if (decimals === undefined || decimals.length === 0) {
+    return amount
+  }
+
+  const [keepZeros, removeZeros] = [
+    decimals.substring(0, removeZerosAfterIndex),
+    decimals.substring(removeZerosAfterIndex),
+  ]
+
+  const removedZeros = removeZeros.replace(/0+$/, '').length
+
+  return `${integers}.${keepZeros}${removedZeros}`
 }

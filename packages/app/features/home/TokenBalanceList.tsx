@@ -10,7 +10,7 @@ import {
 import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
-import formatAmount from 'app/utils/formatAmount'
+import { formatAmount } from 'app/utils/formatAmount'
 // import { useSendAccounts } from 'app/utils/send-accounts'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'

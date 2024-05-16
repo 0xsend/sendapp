@@ -6,7 +6,7 @@ import { useSendAccounts } from 'app/utils/send-accounts'
 import { formatUnits, parseUnits } from 'viem'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { useBalance } from 'wagmi'
-import formatAmount from 'app/utils/formatAmount'
+import { formatAmount } from 'app/utils/formatAmount'
 
 import { coins } from 'app/data/coins'
 import { useSendParams } from 'app/routers/params'
