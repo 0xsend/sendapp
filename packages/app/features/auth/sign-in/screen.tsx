@@ -1,4 +1,4 @@
-import { Stack, YStack, Button, ButtonText, XStack, useMedia, Theme } from '@my/ui'
+import { Stack, YStack, Button, ButtonText, XStack, useMedia, Theme, isWeb } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useContext, useEffect, useState } from 'react'
 import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
@@ -20,7 +20,7 @@ export const SignInScreen = () => {
     )
 
   return (
-    <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
+    <YStack w="100%" h={isWeb ? 'calc(100vh - (100vh - 100%))' : '100%'} jc="flex-start" pt="$7">
       <SignInScreensMobile />
     </YStack>
   )
@@ -57,7 +57,7 @@ const SignInScreensMobile = () => {
   }
 
   return (
-    <>
+    <Stack h="100%">
       <Stack>
         {screens[signInProgress] === 'form' ? (
           <Theme inverse={true}>
@@ -78,7 +78,7 @@ const SignInScreensMobile = () => {
           </>
         )}
       </YStack>
-    </>
+    </Stack>
   )
 }
 
