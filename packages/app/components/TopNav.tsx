@@ -139,7 +139,7 @@ export function TopNav({
   }
 
   return (
-    <Header w="100%" pb="$6">
+    <Header w="100%">
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
@@ -205,13 +205,12 @@ export function TopNav({
       )}
       <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
-        <Container pos="relative">
+        <Container pos="relative" mt={'$4'}>
           <View
             position="absolute"
             $lg={{ right: '$6' }}
             $md={{ right: 0 }}
             right={0}
-            top={0}
             bottom={0}
             justifyContent="center"
           >

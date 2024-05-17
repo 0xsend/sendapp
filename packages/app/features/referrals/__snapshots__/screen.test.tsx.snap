@@ -111,7 +111,7 @@ exports[`ReferralScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderTopLeftRadius": 16,
@@ -180,7 +180,7 @@ exports[`ReferralScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderTopLeftRadius": 16,
@@ -249,7 +249,7 @@ exports[`ReferralScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderTopLeftRadius": 16,
@@ -318,7 +318,7 @@ exports[`ReferralScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 15%, 1)",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderTopLeftRadius": 16,
@@ -462,7 +462,7 @@ exports[`ReferralScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
             "borderBottomLeftRadius": 22,
             "borderBottomRightRadius": 22,
             "borderTopLeftRadius": 22,

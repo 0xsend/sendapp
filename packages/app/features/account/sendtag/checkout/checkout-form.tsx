@@ -85,6 +85,7 @@ export const CheckoutForm = () => {
             autoFocus: true,
             'aria-label': 'Sendtag name',
             placeholder: 'Enter Sendtag name',
+            bc: '$color2',
           },
         }}
         formProps={{
@@ -248,7 +249,7 @@ export const CheckoutForm = () => {
           return (
             <YStack mb="-$8" width="100%">
               {!has5Tags && (
-                <Label $gtMd={{ py: '$4' }}>
+                <Label $gtMd={{ pb: '$4' }}>
                   {hasPendingTags ? 'ADD ANOTHER SENDTAG' : 'CREATE A NEW SENDTAG'}
                 </Label>
               )}

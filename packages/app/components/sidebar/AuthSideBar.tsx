@@ -31,7 +31,7 @@ export const AuthSideBarWrapper = ({ children }: { children?: React.ReactNode })
     return (
       <SideBarWrapper
         overflow="hidden"
-        sidebar={<AuthSideBar bc={'$background'} h={'92%'} ml={'$7'} my={'auto'} />}
+        sidebar={<AuthSideBar bc={'$background'} h={'92%'} ml={'$7'} my={'auto'} br={'$8'} />}
       >
         {children}
       </SideBarWrapper>

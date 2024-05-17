@@ -26,7 +26,7 @@ import { ReferralLink } from '../ReferralLink'
 const links = [
   {
     icon: <IconHome size={'$1.75'} />,
-    text: 'home',
+    text: 'Home',
     href: '/',
   },
   {
@@ -41,13 +41,13 @@ const links = [
   },
   {
     icon: <IconAccount size={'$1'} />,
-    text: 'account',
+    text: 'Account',
     href: '/account',
   },
   __DEV__ || baseMainnet.id === 84532
     ? {
         icon: <Paragraph px="$1">🔒</Paragraph>,
-        text: 'secret shop',
+        text: 'Secret shop',
         href: '/secret-shop',
       }
     : undefined,
@@ -56,11 +56,11 @@ const links = [
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
     <SideBar {...props}>
-      <Nav display="flex" flex={1}>
-        <Link href={'/'} display="flex" pl={'$4.5'}>
+      <Nav display="flex" w="100%" pl={'$7'}>
+        <Link href={'/'} display="flex">
           <IconSendLogo size={'$2.5'} color={'$color12'} />
         </Link>
-        <YStack gap={'$4'} pt={'$10'} alignItems="stretch" w={'100%'} f={1}>
+        <YStack gap={'$3.5'} pt={'$10'}>
           {links.map((link) => (
             <SideBarNavLink key={link.href} {...link} />
           ))}
@@ -97,6 +97,7 @@ const HomeBottomSheet = () => {
               alignItems="stretch"
               justifyContent="center"
               f={1}
+              pl={'$5'}
               h={'$7'}
             >
               <SideBarNavLink key={link.href} {...link} />
@@ -123,18 +124,7 @@ export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode })
   if (media.gtLg)
     return (
       <SideBarWrapper
-        sidebar={
-          <HomeSideBar
-            $theme-dark={{ backgroundColor: '$charcoal' }}
-            $theme-light={{ backgroundColor: '$gray3Light' }}
-            width={208}
-            minWidth={208}
-            btlr={0}
-            bblr={0}
-            pt={80}
-            jc="flex-start"
-          />
-        }
+        sidebar={<HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />}
       >
         {children}
       </SideBarWrapper>

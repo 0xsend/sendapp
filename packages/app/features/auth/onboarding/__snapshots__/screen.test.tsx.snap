@@ -17,7 +17,7 @@ exports[`OnboardingScreen 1`] = `
       align="xMidYMid"
       bbHeight="28"
       bbWidth="77"
-      color="hsla(191, 32%, 99%, 1)"
+      color="hsla(0, 0%, 99%, 1)"
       focusable={false}
       height={28}
       meetOrSlice={0}
@@ -31,7 +31,7 @@ exports[`OnboardingScreen 1`] = `
             "borderWidth": 0,
           },
           {
-            "color": "hsla(191, 32%, 99%, 1)",
+            "color": "hsla(0, 0%, 99%, 1)",
           },
           {
             "flex": 0,
@@ -40,7 +40,7 @@ exports[`OnboardingScreen 1`] = `
           },
         ]
       }
-      tintColor="hsla(191, 32%, 99%, 1)"
+      tintColor="hsla(0, 0%, 99%, 1)"
       vbHeight={48}
       vbWidth={132}
       width={77}
@@ -203,7 +203,7 @@ exports[`OnboardingScreen 1`] = `
           selectable={true}
           style={
             {
-              "color": "hsla(191, 32%, 99%, 1)",
+              "color": "hsla(0, 0%, 99%, 1)",
               "fontFamily": "System",
               "fontSize": 64,
               "fontWeight": "700",
@@ -252,7 +252,7 @@ exports[`OnboardingScreen 1`] = `
             selectable={true}
             style={
               {
-                "color": "hsla(191, 32%, 99%, 1)",
+                "color": "hsla(0, 0%, 99%, 1)",
                 "fontFamily": "System",
                 "fontSize": 13.2,
                 "fontWeight": "500",

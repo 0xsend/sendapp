@@ -221,11 +221,10 @@ const DistributionRewardsSection = ({
             ai="center"
             f={1}
             my="auto"
-            $theme-dark={{ bc: '$darkest' }}
-            $theme-light={{ bc: '$gray3Light' }}
+            bc="$color2"
             $md={{ br: '$6' }}
             p="$6"
-            br="$12"
+            br="$6"
           >
             <Paragraph
               fontSize={'$6'}

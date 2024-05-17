@@ -1,4 +1,4 @@
-import { YStack, ScrollView } from '@my/ui'
+import { YStack, ScrollView, Container } from '@my/ui'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 
 export function HomeLayout({
@@ -14,7 +14,7 @@ export function HomeLayout({
         <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
           {TopNav}
         </YStack>
-        {children}
+        <Container $gtLg={{ pt: '$5' }}>{children}</Container>
       </ScrollView>
     </HomeSideBarWrapper>
   )

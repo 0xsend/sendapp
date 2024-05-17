@@ -11,7 +11,6 @@ export const SideBar = ({ children, ...props }: YStackProps) => {
       ai={props.ai ?? props.alignItems ?? 'center'}
       mih={props.mih ?? props.minHeight ?? 524}
       miw={props.miw ?? props.minWidth ?? 395}
-      br={props.br ?? props.borderRadius ?? '$8'}
       {...props}
     >
       {children}
