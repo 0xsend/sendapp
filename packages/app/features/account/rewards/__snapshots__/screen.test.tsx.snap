@@ -168,7 +168,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  Expired May 10, 2024
+                  Expired Jul 12, 2024
                 </Text>
               </View>
               <View
@@ -227,7 +227,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  CLOSED
+                  OPEN
                 </Text>
               </View>
             </View>
@@ -631,62 +631,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     </Text>
                   </View>
                 </View>
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(191, 32%, 46%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 13.2,
-                      "fontWeight": "300",
-                      "lineHeight": 16,
-                      "marginLeft": "auto",
-                      "marginRight": "auto",
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  Already claimed
-                  <Text
-                    selectable={true}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 59%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 13.2,
-                        "fontWeight": "300",
-                        "lineHeight": 16,
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    <Text
-                      accessibilityLabel="View Claim on Etherscan"
-                      accessibilityRole="link"
-                      cancelable={true}
-                      disabled={false}
-                      focusable={true}
-                      minPressDuration={0}
-                      onMouseEnter={[Function]}
-                      onMouseLeave={[Function]}
-                      onPress={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      style={
-                        {
-                          "color": "hsla(112, 22%, 59%, 1)",
-                          "fontFamily": "System",
-                          "fontSize": 16.8,
-                          "fontWeight": "400",
-                          "lineHeight": 19,
-                        }
-                      }
-                      suppressHighlighting={true}
-                    >
-                      0x123
-                    </Text>
-                  </Text>
-                </Text>
               </View>
             </View>
           </View>

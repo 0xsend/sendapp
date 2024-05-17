@@ -19,7 +19,7 @@ test('anon user can visit public profile', async ({ page, seed }) => {
   assert(!!profile, 'profile not found')
   assert(!!profile.name, 'profile name not found')
   assert(!!profile.about, 'profile about not found')
-  await page.goto(`/profile/${tag.name}`)
+  await page.goto(`${tag.name}`)
   const title = await page.title()
   expect(title).toBe('Send | Profile')
   await expect(page.getByRole('heading', { name: tag.name })).toBeVisible()
@@ -32,7 +32,7 @@ test('anon user cannot visit private profile', async ({ page, seed }) => {
   const plan = await seed.users([{ ...userOnboarded, profiles: [{ isPublic: false }] }])
   const tag = plan.tags[0]
   assert(!!tag, 'tag not found')
-  await page.goto(`/profile/${tag.name}`)
+  await page.goto(`${tag.name}`)
   const title = await page.title()
   expect(title).toBe('404 | Send')
   await expect(page.getByRole('heading', { name: 'Not found.' })).toBeVisible()

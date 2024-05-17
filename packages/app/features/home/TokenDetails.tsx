@@ -20,7 +20,6 @@ import formatAmount from 'app/utils/formatAmount'
 import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
 
 export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   const media = useMedia()

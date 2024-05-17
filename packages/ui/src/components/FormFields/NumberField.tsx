@@ -4,7 +4,7 @@ import { Fieldset, Input, type InputProps, Label, Theme, useThemeName } from 'ta
 import { FieldError } from '../FieldError'
 import { Shake } from '../Shake'
 
-export const NumberField = (props: Pick<InputProps, 'size' | 'autoFocus'>) => {
+export const NumberField = (props: InputProps) => {
   const {
     field,
     error,
@@ -28,6 +28,7 @@ export const NumberField = (props: Pick<InputProps, 'size' | 'autoFocus'>) => {
             disabled={disabled}
             placeholderTextColor="$color10"
             keyboardType="number-pad"
+            inputMode="numeric"
             value={field.value?.toString() || '0'}
             onChangeText={(text) => {
               const num = Number(text)

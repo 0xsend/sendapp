@@ -15,5 +15,9 @@
   ],
   "theme_color": "#122023",
   "background_color": "#122023",
-  "display": "standalone"
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/",
+  "description": "Send app, instant payments, future cash.",
+  "categories": ["payments", "financial"]
 }

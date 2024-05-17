@@ -2,10 +2,15 @@ import { faker } from '@faker-js/faker'
 import type { Page } from '@playwright/test'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
-import { expect, test } from './fixtures/checkout'
-import { devices } from '@playwright/test'
+import { expect, test as checkoutTest } from './fixtures/checkout'
+import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
+import { devices, mergeTests } from '@playwright/test'
+import { userOnboarded } from '@my/snaplet/models'
+import { assert } from 'app/utils/assert'
 
-let log: debug.Debugger | undefined
+let log: debug.Debugger
+
+const test = mergeTests(checkoutTest, snapletTest)
 
 const debugAuthSession = async (page: Page) => {
   const { decoded } = await getAuthSessionFromContext(page.context())
@@ -72,6 +77,32 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
 
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
   await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
+})
+
+test('can refer a tag', async ({ seed, checkoutPage, supabase, pg }) => {
+  const plan = await seed.users([userOnboarded])
+  const profile = plan.profiles[0]
+  assert(!!profile, 'profile not found')
+  await checkoutPage.page.goto(`/?referral=${profile.referralCode}`)
+  await checkoutPage.goto()
+  const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
+  await checkoutPage.addPendingTag(tagName)
+  await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
+  await checkoutPage.confirmTags(expect)
+  await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeHidden()
+
+  const { data: tags, error } = await supabase.from('tags').select('*').eq('name', tagName)
+  expect(error).toBeFalsy()
+  expect(tags).toHaveLength(1)
+
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+  await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
+
+  const { rows } = await pg.query(
+    'select count(*) as count from referrals where referrer_id = $1',
+    [profile.id]
+  )
+  expect(rows[0]?.count).toBe('1')
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {

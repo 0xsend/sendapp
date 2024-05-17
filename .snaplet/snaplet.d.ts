@@ -12,6 +12,7 @@ type Enum_pgsodium_key_type = 'aead-det' | 'aead-ietf' | 'auth' | 'generichash' 
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
+type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
 type Enum_public_verification_type = 'tag_referral' | 'tag_registration';
 interface Table_net_http_response {
@@ -332,6 +333,21 @@ interface Table_public_send_account_credentials {
   key_slot: number;
   created_at: string | null;
 }
+interface Table_public_send_account_signing_key_added {
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  account: string;
+  key_slot: number;
+  key: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+}
 interface Table_public_send_account_transfers {
   id: number;
   chain_id: number | null;
@@ -572,6 +588,7 @@ interface Schema_public {
   referrals: Table_public_referrals;
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
+  send_account_signing_key_added: Table_public_send_account_signing_key_added;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;

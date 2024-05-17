@@ -456,6 +456,7 @@ exports[`OnboardingScreen 1`] = `
                       "color": "hsla(112, 22%, 59%, 1)",
                       "fontFamily": "System",
                       "fontSize": 20,
+                      "fontStyle": "normal",
                       "fontWeight": "400",
                       "height": 44,
                       "minWidth": 0,
@@ -471,11 +472,10 @@ exports[`OnboardingScreen 1`] = `
               <View
                 style={
                   {
+                    "bottom": 10,
                     "gap": 7,
                     "position": "absolute",
                     "right": 18,
-                    "top": "50%",
-                    "transform": "translateY(-50%)",
                   }
                 }
               />

@@ -28,6 +28,7 @@ select is(
       from pg_class pc
         join pg_namespace pn on pn.oid = pc.relnamespace
         and pn.nspname = rls_enabled.testing_schema
+        and pc.relkind = 'r'
         and pc.relname not in (
           select unnest(rls_enabled.exclude_tables)
         )

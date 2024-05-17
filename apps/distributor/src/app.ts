@@ -106,7 +106,7 @@ distributorRouter.post('/', checkAuthorization, async (req, res) => {
     logger.error(err, 'Error while calculating distribution')
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'An unexpected error occurred.',
+      message: err?.message?.split('.').at(0) || 'An unexpected error occurred.',
     })
     return
   }

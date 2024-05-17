@@ -15,7 +15,6 @@ import { useSendAccounts } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import type { coins } from 'app/data/coins'
 import { useToken } from 'app/routers/params'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
   const [tokenParam] = useToken()

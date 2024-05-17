@@ -67,6 +67,7 @@ export const SignInForm = () => {
               fontFamily: '$mono',
               fontVariant: ['tabular-nums'],
               fontSize: '$7',
+              fontWeight: '400',
               borderWidth: 0,
               borderBottomWidth: 2,
               borderRadius: '$0',

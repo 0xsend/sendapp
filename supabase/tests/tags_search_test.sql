@@ -1,7 +1,7 @@
 -- Tag Search
 begin;
 select
-  plan(2);
+  plan(3);
 create extension "basejump-supabase_test_helpers";
 truncate tags cascade;
 -- Creating a test user
@@ -23,7 +23,7 @@ select
 select
   throws_ok($$
     select
-      count(*)::integer from tag_search('zzz') $$, 'permission denied for function tag_search');
+      count(*)::integer from tag_search('zzz',1,0) $$, 'permission denied for function tag_search');
 select
   tests.create_supabase_user('tag_searcher');
 select
@@ -31,9 +31,14 @@ select
 -- Verify that the tags are visible to the public
 select
   results_eq($$
+  SELECT array_length(tag_matches,1) from tag_search('zzz',1,0); $$, $$
+    values (1) $$, 'Tags should be visible to the public');
+
+-- Verify you cant have a limit higher than 100
+select
+  throws_ok($$
     select
-      count(*)::integer from tag_search('zzz') $$, $$
-    values (4) $$, 'Tags should be visible to the public');
+      count(*)::integer from tag_search('zzz',101,0) $$, 'limit_val must be between 1 and 100');
 select
   *
 from
