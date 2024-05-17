@@ -52,10 +52,37 @@ export const useToken = () => {
   return [token, setTokenParam] as const
 }
 
-export const useTokenParams = () => {
+export const useTokenDetailsParams = () => {
   const [token] = useTokenParam('token')
 
   return {
     token,
   }
 }
+
+const { useParam: useSendParam, useParams: useSendParams } = createParam<{
+  recipient: string
+  amount: string
+  sendToken: `0x${string}` | 'eth'
+  note?: string
+}>()
+
+export const useRecipient = () => {
+  const [recipient, setRecipientParam] = useSendParam('recipient')
+
+  return [recipient, setRecipientParam] as const
+}
+
+export const useAmount = () => {
+  const [amount, setAmountParam] = useSendParam('amount')
+
+  return [amount, setAmountParam] as const
+}
+
+export const useNote = () => {
+  const [note, setNoteParam] = useSendParam('note')
+
+  return [note, setNoteParam] as const
+}
+
+export { useSendParams }

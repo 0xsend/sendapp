@@ -41,3 +41,20 @@ The bundler is configured via a JSON file or command line arguments. Below is an
   "beneficiary": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 }
 ```
+
+### Developer mode
+
+You can run the bundler in developer mode by running the following commands from the root of the bundler repo.
+
+```bash
+cd $FULLPATH/eth-infinitism-bundler/packages/utils/
+yarn run tsc
+
+cd $FULLPATH/eth-infinitism-bundler/packages/bundler/
+
+DEBUG="aa.*" yarn run ts-node ./src/exec.ts \
+
+--port 3030 \
+
+--config $FULLPATH/etc/aabundler-nodocker.config.json
+```

@@ -1,13 +1,13 @@
 import type { Page } from '@playwright/test'
-import { test as base } from '../auth'
-import { OnboardingPage } from './page'
-import { testBaseClient } from '../viem/base'
 import { assert } from 'app/utils/assert'
-import { parseEther, zeroAddress } from 'viem'
-import { debug } from 'debug'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { usdcAddress } from '../viem'
 import type { testClient } from 'app/utils/userop'
+import { debug } from 'debug'
+import { parseEther, zeroAddress } from 'viem'
+import { test as base } from '../auth'
+import { usdcAddress } from '../viem'
+import { testBaseClient } from '../viem/base'
+import { OnboardingPage } from './page'
 
 let log: debug.Debugger
 

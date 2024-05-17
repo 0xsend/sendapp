@@ -31,7 +31,18 @@ test('can search on activity page', async ({ page, context }) => {
   await context.route(`${SUPABASE_URL}/rest/v1/rpc/tag_search*`, async (route) => {
     expect(route.request().postDataJSON().query).toBe('test')
     await route.fulfill({
-      body: JSON.stringify(testTags.map((t) => ({ avatar_url: null, tag_name: t }))),
+      body: JSON.stringify([
+        {
+          send_id_matches: null,
+          tag_matches: testTags.map((t) => ({
+            avatar_url: null,
+            tag_name: t,
+            send_id: Math.floor(Math.random() * 10000),
+            phone: null,
+          })),
+          phone_matches: null,
+        },
+      ]),
       headers: { 'content-type': 'application/json; charset=utf-8' },
       status: 200,
     })
@@ -39,11 +50,11 @@ test('can search on activity page', async ({ page, context }) => {
 
   await expect(activityHeading(page)).toBeVisible()
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
-  await page.getByRole('textbox', { name: 'Search' }).fill('test')
-  await expect(page.getByRole('textbox', { name: 'Search' })).toHaveValue('test')
+  await page.getByRole('textbox', { name: 'Name, $Sendtag, Phone' }).fill('test')
+  await expect(page.getByRole('textbox', { name: 'Name, $Sendtag, Phone' })).toHaveValue('test')
   await isLoading.waitFor({ state: 'detached' })
-  await expect(page.getByRole('heading', { name: 'Results' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'TAG' })).toBeVisible()
   for (const tag of testTags) {
-    await expect(page.getByText(tag)).toBeVisible()
+    await expect(page.getByRole('link', { name: `${tag} @${tag}` })).toBeVisible()
   }
 })

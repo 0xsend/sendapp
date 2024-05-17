@@ -9,8 +9,15 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
       abortSignal: jest.fn().mockReturnValue({
         data: [
           {
-            tag_name: 'test',
-            avatar_url: 'https://avatars.githubusercontent.com/u/123',
+            send_id_matches: [],
+            tag_matches: [
+              {
+                send_id: 3665,
+                tag_name: 'test',
+                avatar_url: 'https://avatars.githubusercontent.com/u/123',
+              },
+            ],
+            phone_matches: [],
           },
         ],
         error: null,
@@ -46,16 +53,16 @@ test('ActivityScreen: search', async () => {
       <ActivityScreen />
     </TamaguiProvider>
   )
-  const searchInput = screen.getByPlaceholderText('Search')
+  const searchInput = screen.getByPlaceholderText('Name, $Sendtag, Phone')
   await act(async () => {
     fireEvent.changeText(searchInput, 'test')
     jest.advanceTimersByTime(2000)
     jest.runAllTimers()
-    await waitFor(() => screen.findByTestId('tag-search-test'))
+    await waitFor(() => screen.findByTestId('tag-search-3665'))
   })
 
   expect(searchInput.props.value).toBe('test')
-  const searchResults = await screen.findByTestId('tag-search-test')
-  expect(searchResults).toHaveTextContent('??test')
+  const searchResults = await screen.findByTestId('tag-search-3665')
+  expect(searchResults).toHaveTextContent('??test@test')
   expect(screen.toJSON()).toMatchSnapshot('ActivityScreen: search')
 })

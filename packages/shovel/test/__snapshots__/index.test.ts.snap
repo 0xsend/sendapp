@@ -358,6 +358,97 @@ exports[`shovel config 1`] = `
         "name": "send_revenues_safe_receives",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "column": "account",
+            "integration": "send_account_created",
+          },
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "account",
+            "indexed": true,
+            "name": "account",
+            "type": "address",
+          },
+          {
+            "column": "key_slot",
+            "indexed": false,
+            "name": "keySlot",
+            "type": "uint8",
+          },
+          {
+            "column": "key",
+            "indexed": false,
+            "name": "key",
+            "type": "bytes32[2]",
+          },
+        ],
+        "name": "SigningKeyAdded",
+        "type": "event",
+      },
+      "name": "send_account_signing_key_added",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "account",
+            "type": "bytea",
+          },
+          {
+            "name": "key_slot",
+            "type": "smallint",
+          },
+          {
+            "name": "key",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_account_signing_key_added",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [

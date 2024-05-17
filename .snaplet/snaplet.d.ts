@@ -12,6 +12,7 @@ type Enum_pgsodium_key_type = 'aead-det' | 'aead-ietf' | 'auth' | 'generichash' 
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
+type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
 type Enum_public_verification_type = 'tag_referral' | 'tag_registration';
 interface Table_net_http_response {
@@ -252,28 +253,6 @@ interface Table_auth_refresh_tokens {
   parent: string | null;
   session_id: string | null;
 }
-interface Table_storage_s_3_multipart_uploads {
-  id: string;
-  in_progress_size: number;
-  upload_signature: string;
-  bucket_id: string;
-  key: string;
-  version: string;
-  owner_id: string | null;
-  created_at: string;
-}
-interface Table_storage_s_3_multipart_uploads_parts {
-  id: string;
-  upload_id: string;
-  size: number;
-  part_number: number;
-  bucket_id: string;
-  key: string;
-  etag: string;
-  owner_id: string | null;
-  version: string;
-  created_at: string;
-}
 interface Table_auth_saml_providers {
   id: string;
   sso_provider_id: string;
@@ -331,6 +310,21 @@ interface Table_public_send_account_credentials {
   credential_id: string;
   key_slot: number;
   created_at: string | null;
+}
+interface Table_public_send_account_signing_key_added {
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  account: string;
+  key_slot: number;
+  key: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
 }
 interface Table_public_send_account_transfers {
   id: number;
@@ -572,6 +566,7 @@ interface Schema_public {
   referrals: Table_public_referrals;
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
+  send_account_signing_key_added: Table_public_send_account_signing_key_added;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;
@@ -596,8 +591,6 @@ interface Schema_storage {
   buckets: Table_storage_buckets;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
-  s3_multipart_uploads: Table_storage_s_3_multipart_uploads;
-  s3_multipart_uploads_parts: Table_storage_s_3_multipart_uploads_parts;
 }
 interface Schema_supabase_functions {
   hooks: Table_supabase_functions_hooks;
@@ -644,8 +637,6 @@ interface Tables_relationships {
     };
     children: {
        objects_bucketId_fkey: "storage.objects";
-       s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
-       s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
   };
   "public.chain_addresses": {
@@ -779,23 +770,6 @@ interface Tables_relationships {
   "auth.refresh_tokens": {
     parent: {
        refresh_tokens_session_id_fkey: "auth.sessions";
-    };
-    children: {
-
-    };
-  };
-  "storage.s3_multipart_uploads": {
-    parent: {
-       s3_multipart_uploads_bucket_id_fkey: "storage.buckets";
-    };
-    children: {
-       s3_multipart_uploads_parts_upload_id_fkey: "storage.s3_multipart_uploads_parts";
-    };
-  };
-  "storage.s3_multipart_uploads_parts": {
-    parent: {
-       s3_multipart_uploads_parts_bucket_id_fkey: "storage.buckets";
-       s3_multipart_uploads_parts_upload_id_fkey: "storage.s3_multipart_uploads";
     };
     children: {
 

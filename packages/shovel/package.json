@@ -8,12 +8,12 @@
     "shovel:tilt": "bun run ./bin/shovel.tilt.ts"
   },
   "devDependencies": {
-    "@indexsupply/shovel-config": "^0.0.11",
+    "@indexsupply/shovel-config": "^0.0.16",
     "@my/wagmi": "workspace:*",
     "@types/bun": "latest",
     "permissionless": "^0.1.14",
     "viem": "^2.8.10",
-    "zx": "^7.2.3"
+    "zx": "^8.0.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

@@ -411,6 +411,54 @@ export type Database = {
           },
         ]
       }
+      send_account_signing_key_added: {
+        Row: {
+          abi_idx: number
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          ig_name: string
+          key: string
+          key_slot: number
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          ig_name: string
+          key: string
+          key_slot: number
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          account?: string
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          ig_name?: string
+          key?: string
+          key_slot?: number
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
       send_account_transfers: {
         Row: {
           abi_idx: number | null
@@ -904,27 +952,55 @@ export type Database = {
       }
       profile_lookup: {
         Args: {
-          tag: string
+          lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
+          identifier: string
         }
         Returns: {
           id: string
           avatar_url: string
           name: string
           about: string
-          referral_code: string
-          tag_name: string
+          refcode: string
+          tag: string
           address: string
+          phone: string
           chain_id: number
           is_public: boolean
+          sendid: number
+          all_tags: string[]
         }[]
+      }
+      send_accounts_add_webauthn_credential: {
+        Args: {
+          send_account_id: string
+          webauthn_credential: unknown
+          key_slot: number
+        }
+        Returns: {
+          attestation_object: string
+          created_at: string
+          deleted_at: string | null
+          display_name: string
+          id: string
+          key_type: Database["public"]["Enums"]["key_type_enum"]
+          name: string
+          public_key: string
+          raw_credential_id: string
+          sign_count: number
+          updated_at: string
+          user_id: string
+        }
       }
       tag_search: {
         Args: {
           query: string
+          limit_val: number
+          offset_val: number
         }
         Returns: {
-          avatar_url: string
-          tag_name: string
+          send_id_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+          tag_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
+          phone_matches: Database["public"]["CompositeTypes"]["tag_search_result"][]
         }[]
       }
       update_distribution_shares: {
@@ -941,11 +1017,17 @@ export type Database = {
     }
     Enums: {
       key_type_enum: "ES256"
+      lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
       verification_type: "tag_registration" | "tag_referral"
     }
     CompositeTypes: {
-      [_ in never]: never
+      tag_search_result: {
+        avatar_url: string
+        tag_name: string
+        send_id: number
+        phone: string
+      }
     }
   }
 }

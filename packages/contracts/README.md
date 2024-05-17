@@ -121,6 +121,17 @@ forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
   --keystores ~/.foundry/keystores/send_deployer
 ```
 
+#### Updating Token Paymaster Cached Price
+
+```shell
+PAYMASTER=0x7e84448C1c94978f480D1895E6566C31c32fb136 \
+forge script ./script/UpdateTokenPaymasterCachedPrice.s.sol:UpdateTokenPaymasterCachedPriceScript \
+  -vvv \
+  --rpc-url base-sepolia \
+  --sender 0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f \
+  --keystores ~/.foundry/keystores/send_core_dev
+```
+
 #### Creating a Distribution Tranche
 
 ```shell

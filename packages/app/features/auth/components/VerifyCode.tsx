@@ -68,6 +68,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             color: '$color12',
             fontFamily: '$mono',
             fontVariant: ['tabular-nums'],
+            fontWeight: '400',
             fontSize: '$7',
             $sm: {
               w: '60%',
