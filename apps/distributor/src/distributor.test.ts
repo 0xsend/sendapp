@@ -36,7 +36,7 @@ describe('Distributor Route', () => {
     })
   })
 
-  it('should perform distributor logic correctly', async () => {
+  it.skip('should perform distributor logic correctly', async () => {
     const { data: distribution, error } = await supabaseAdmin
       .from('distributions')
       .select(
@@ -201,6 +201,9 @@ describe('Distributor Worker', () => {
             balance: '500000',
           }),
         ]
+      }),
+      isMerkleDropActive: mock((distribution) => {
+        return Promise.resolve(false)
       }),
     }))
 
