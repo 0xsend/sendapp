@@ -303,7 +303,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Referral Code
+        Referral Link
       </Text>
     </View>
     <View
@@ -587,7 +587,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Referral Code
+        Referral Link
       </Text>
       <Text
         selectable={true}
