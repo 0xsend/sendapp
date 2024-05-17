@@ -179,8 +179,7 @@ const SendAccountCredentials = ({
       w={'100%'}
       gap={'$size.1.5'}
       p={'$size.1.5'}
-      $theme-dark={{ backgroundColor: '$darkest' }}
-      $theme-light={{ backgroundColor: '$gray2Light' }}
+      bc={'$color2'}
       borderRadius={'$5'}
       $gtLg={{
         width: isWeb ? 'calc((100% - 24px) / 2)' : '100%',
