@@ -35,7 +35,7 @@ export function HomeScreen() {
   const hasSendAccount = !(sendAccount === undefined || sendAccount.length === 0)
 
   return (
-    <Container fd={'column'}>
+    <YStack f={1}>
       <Stack display="none" $gtLg={{ display: hasSendAccount && selectedCoin ? 'flex' : 'none' }}>
         <Button
           top={'$-8'}
@@ -71,7 +71,15 @@ export function HomeScreen() {
           ai={'center'}
           jc="space-between"
         >
-          <Stack $gtLg={{ bc: '$color2' }} p="$7" w={'100%'} jc="space-between" br={12} gap="$11">
+          <Stack
+            $gtLg={{ bc: '$color2', p: 36 }}
+            py={'$9'}
+            px={'$2'}
+            w={'100%'}
+            jc="space-between"
+            br={12}
+            gap="$6"
+          >
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />
             </XStack>
@@ -107,7 +115,7 @@ export function HomeScreen() {
           </Stack>
           <Separator $gtLg={{ display: 'none' }} w={'100%'} borderColor={separatorColor} />
           <YStack w={'100%'} ai={'center'}>
-            <YStack width="100%" pt="$6" pb="$12" display={hasSendAccount ? 'flex' : 'none'}>
+            <YStack width="100%" $gtLg={{ pt: '$3' }} display={hasSendAccount ? 'flex' : 'none'}>
               <TokenBalanceList coins={coins} />
             </YStack>
           </YStack>
@@ -156,7 +164,7 @@ export function HomeScreen() {
           }
         })()}
       </XStack>
-    </Container>
+    </YStack>
   )
 }
 
