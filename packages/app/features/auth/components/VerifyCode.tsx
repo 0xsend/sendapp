@@ -131,7 +131,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
               fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
-              Enter the code we sent you on your phone.
+              Enter verification code
             </H3>
             <YStack gap="$4">
               <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
