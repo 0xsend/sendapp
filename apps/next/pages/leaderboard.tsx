@@ -16,7 +16,10 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP()
+export const getServerSideProps = userProtectedGetSSP(async () => {
+  // disable for now
+  return { redirect: { destination: '/', permanent: false } }
+})
 
 Page.getLayout = (children) => (
   <HomeLayout TopNav={<TopNav header="Leaderboard" />}>{children}</HomeLayout>
