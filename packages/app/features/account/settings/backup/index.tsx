@@ -1,4 +1,4 @@
-import { Button, H1, H3, H4, H5, Link, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
+import { Button, H1, H4, H5, Link, Paragraph, Separator, Spinner, XStack, YStack } from '@my/ui'
 import { baseMainnetClient, useReadSendAccountGetActiveSigningKeys } from '@my/wagmi'
 import { IconNote } from 'app/components/icons'
 import { assert } from 'app/utils/assert'
@@ -11,22 +11,24 @@ export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
   const hasSendAccount = !!sendAcct
   return (
-    <YStack w={'100%'} als={'center'} gap={'$6'}>
-      <YStack w={'100%'} gap={'$2'}>
-        <H1 size={'$8'} fontWeight={'300'} color={'$color05'}>
-          Backup Send Account
+    <YStack w={'100%'} als={'center'} gap={'$size.3.5'}>
+      <YStack w={'100%'} gap={'$size.2'}>
+        <H1 size={'$8'} fontWeight={'300'} color={'$lightGrayTextField'}>
+          Add Passkey as Signer
         </H1>
-        <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+
+        <Paragraph size={'$5'} color={'$lightGrayTextField'}>
           Backup your Send Account by add up to 20 passkeys to your account. Passkeys are authorized
           devices that can sign transactions for your account.
         </Paragraph>
       </YStack>
-      <Separator w={'100%'} />
+
       {(() => {
         switch (true) {
           case error !== null:
             return (
               <YStack w={'100%'} gap={'$6'}>
+                <Separator w={'100%'} borderColor={'$decay'} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   {error.message}
                 </Paragraph>
@@ -37,6 +39,7 @@ export const BackupScreen = () => {
           case !hasSendAccount:
             return (
               <YStack w={'100%'} gap={'$6'}>
+                <Separator w={'100%'} borderColor={'$decay'} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
                   You have no Send Account.
                 </Paragraph>
@@ -71,17 +74,17 @@ const WebauthnCreds = ({
   })
 
   return (
-    <YStack w={'100%'} gap={'$2'}>
+    <YStack w={'100%'} gap={'$size.3'}>
       <XStack w={'100%'} gap={'$2'} jc="space-between" ai="center">
-        <H3 size={'$6'} fontWeight={'300'} color={'$color05'}>
-          Passkeys
-        </H3>
         <YStack>
           <Button theme="accent" {...addPasskeyLink}>
             Add Passkey
           </Button>
         </YStack>
       </XStack>
+
+      <Separator w={'100%'} borderColor="$decay" />
+
       <YStack w={'100%'} gap={'$6'} pb={'$6'}>
         {sendAcct.send_account_credentials.map((cred, idx) => (
           <YStack key={`${sendAcct.id}-${cred.key_slot}`} w={'100%'} gap={'$2'}>
