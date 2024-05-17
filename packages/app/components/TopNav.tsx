@@ -200,7 +200,7 @@ export function TopNav({
           >
             {subheader}
           </Paragraph>
-          <Separator w={'100%'} borderColor="$jet" />
+          <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
       <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
