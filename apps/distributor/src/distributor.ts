@@ -8,7 +8,7 @@ import {
   fetchDistribution,
   supabaseAdmin,
 } from './supabase'
-import { fetchAllBalances } from './wagmi'
+import { fetchAllBalances, isMerkleDropActive } from './wagmi'
 import { calculateWeights, calculatePercentageWithBips, PERC_DENOM } from './weights'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -19,6 +19,13 @@ const inBatches = <T>(array: T[], batchSize = Math.max(8, cpuCount - 1)) => {
   return Array.from({ length: Math.ceil(array.length / batchSize) }, (_, i) =>
     array.slice(i * batchSize, (i + 1) * batchSize)
   )
+}
+
+const jsonBigint = (key, value) => {
+  if (typeof value === 'bigint') {
+    return value.toString()
+  }
+  return value
 }
 
 export class DistributorWorker {
@@ -104,6 +111,12 @@ export class DistributorWorker {
     }
   ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
+
+    // verify tranche is not created when in production
+    if (await isMerkleDropActive(distribution)) {
+      throw new Error('Tranche is active. Cannot calculate distribution shares.')
+    }
+
     log.info({ distribution_id: distribution.id }, 'Calculating distribution shares.')
 
     const {
@@ -126,7 +139,15 @@ export class DistributorWorker {
     }
 
     log.info(`Found ${verifications.length} verifications.`)
-    log.debug({ verifications })
+    // log.debug({ verifications })
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'dist/verifications.json',
+        JSON.stringify(verifications, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing verifications.json')
+      })
+    }
 
     const verificationValues = distribution.distribution_verification_values.reduce(
       (acc, verification) => {
@@ -151,7 +172,15 @@ export class DistributorWorker {
     )
 
     log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
-    log.debug({ verificationsByUserId })
+    // log.debug({ verificationsByUserId })
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'dist/verificationsByUserId.json',
+        JSON.stringify(verificationsByUserId, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing verificationsByUserId.json')
+      })
+    }
 
     const { data: hodlerAddresses, error: hodlerAddressesError } = await fetchAllHodlers(
       distribution.id
@@ -181,7 +210,15 @@ export class DistributorWorker {
     )
 
     log.info(`Found ${hodlerAddresses.length} addresses.`)
-    log.debug({ hodlerAddresses })
+    // log.debug({ hodlerAddresses })
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write(
+        'dist/hodlerAddresses.json',
+        JSON.stringify(hodlerAddresses, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing hodlerAddresses.json')
+      })
+    }
 
     // lookup balances of all hodler addresses in qualification period
     const batches = inBatches(hodlerAddresses).flatMap(async (addresses) => {
@@ -193,42 +230,28 @@ export class DistributorWorker {
       )
     })
 
-    let balances: { user_id: string; address: `0x${string}`; balance: string }[] = []
+    let minBalanceAddresses: { user_id: string; address: `0x${string}`; balance: string }[] = []
     for await (const batch of batches) {
-      balances = balances.concat(...batch)
+      minBalanceAddresses = minBalanceAddresses.concat(...batch)
     }
 
-    log.info(`Found ${balances.length} balances.`)
-    log.debug({ balances })
+    log.info(`Found ${minBalanceAddresses.length} balances.`)
+    // log.debug({ balances })
 
     // Filter out hodler with not enough send token balance
-    balances = balances.filter(
+    minBalanceAddresses = minBalanceAddresses.filter(
       ({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance)
     )
 
     log.info(
-      `Found ${balances.length} balances after filtering hodler_min_balance of ${distribution.hodler_min_balance}`
+      `Found ${minBalanceAddresses.length} balances after filtering hodler_min_balance of ${distribution.hodler_min_balance}`
     )
-    log.debug({ balances })
-
-    // for debugging
-    const balancesByAddress: Record<string, bigint> = balances.reduce(
-      (acc, balance) => {
-        acc[balance.address] = BigInt(balance.balance)
-        return acc
-      },
-      {} as Record<string, bigint>
-    )
+    // log.debug({ balances })
 
     if (log.isLevelEnabled('debug')) {
       await Bun.write(
-        'balances.json',
-        JSON.stringify(balances, (key, value) => {
-          if (typeof value === 'bigint') {
-            return value.toString()
-          }
-          return value
-        })
+        'dist/balances.json',
+        JSON.stringify(minBalanceAddresses, jsonBigint, 2)
       ).catch((e) => {
         log.error(e, 'Error writing balances.json')
       })
@@ -240,8 +263,15 @@ export class DistributorWorker {
     const fixedPoolBips = BigInt(distribution.fixed_pool_bips)
     const bonusPoolBips = BigInt(distribution.bonus_pool_bips)
     const hodlerPoolAvailableAmount = calculatePercentageWithBips(distAmt, hodlerPoolBips)
+    const minBalanceByAddress: Record<string, bigint> = minBalanceAddresses.reduce(
+      (acc, balance) => {
+        acc[balance.address] = BigInt(balance.balance)
+        return acc
+      },
+      {} as Record<string, bigint>
+    )
     const { totalWeight, weightPerSend, poolWeights, weightedShares } = calculateWeights(
-      balances,
+      minBalanceAddresses,
       hodlerPoolAvailableAmount
     )
 
@@ -249,7 +279,14 @@ export class DistributorWorker {
       { totalWeight, hodlerPoolAvailableAmount, weightPerSend },
       `Calculated ${Object.keys(poolWeights).length} weights.`
     )
-    log.debug({ poolWeights })
+    // log.debug({ poolWeights })
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write('dist/poolWeights.json', JSON.stringify(poolWeights, jsonBigint, 2)).catch(
+        (e) => {
+          log.error(e, 'Error writing poolWeights.json')
+        }
+      )
+    }
 
     if (totalWeight === 0n) {
       log.warn('Total weight is 0. Skipping distribution.')
@@ -265,10 +302,12 @@ export class DistributorWorker {
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]
       if (!hodler || !hodler.address) {
-        log.debug({ userId }, 'Hodler not found for user Skipping verification.')
         continue
       }
       const { address } = hodler
+      if (!minBalanceByAddress[address]) {
+        continue
+      }
       for (const verification of verifications) {
         const { fixedValue, bipsValue } = verificationValues[verification.type]
         if (fixedValue && fixedPoolAllocatedAmount + fixedValue <= fixedPoolAvailableAmount) {
@@ -301,8 +340,26 @@ export class DistributorWorker {
       },
       'Calculated fixed & bonus pool amounts.'
     )
-    log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
-
+    // log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write('dist/hodlerShares.json', JSON.stringify(hodlerShares, jsonBigint, 2)).catch(
+        (e) => {
+          log.error(e, 'Error writing hodlerShares.json')
+        }
+      )
+      await Bun.write(
+        'dist/fixedPoolAmountsByAddress.json',
+        JSON.stringify(fixedPoolAmountsByAddress, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing fixedPoolAmountsByAddress.json')
+      })
+      await Bun.write(
+        'dist/bonusPoolBipsByAddress.json',
+        JSON.stringify(bonusPoolBipsByAddress, jsonBigint, 2)
+      ).catch((e) => {
+        log.error(e, 'Error writing bonusPoolBipsByAddress.json')
+      })
+    }
     const shares = hodlerShares
       .map((share) => {
         const userId = hodlerUserIdByAddress[share.address]
@@ -321,18 +378,18 @@ export class DistributorWorker {
           return null
         }
 
-        log.debug(
-          {
-            address: share.address,
-            balance: balancesByAddress[share.address],
-            amount: amount,
-            bonusBips,
-            hodlerPoolAmount,
-            bonusPoolAmount,
-            fixedPoolAmount,
-          },
-          'Calculated share.'
-        )
+        // log.debug(
+        //   {
+        //     address: share.address,
+        //     balance: balancesByAddress[share.address],
+        //     amount: amount,
+        //     bonusBips,
+        //     hodlerPoolAmount,
+        //     bonusPoolAmount,
+        //     fixedPoolAmount,
+        //   },
+        //   'Calculated share.'
+        // )
 
         // @ts-expect-error supabase-js does not support bigint
         return {
@@ -354,6 +411,7 @@ export class DistributorWorker {
         hodlerPoolAvailableAmount,
         totalBonusPoolAmount,
         totalFixedPoolAmount,
+        fixedPoolAllocatedAmount,
         fixedPoolAvailableAmount,
         maxBonusPoolBips,
         name: distribution.name,
@@ -362,7 +420,12 @@ export class DistributorWorker {
       'Distribution totals'
     )
     log.info(`Calculated ${shares.length} shares.`)
-    log.debug({ shares })
+    // log.debug({ shares })
+    if (log.isLevelEnabled('debug')) {
+      await Bun.write('dist/shares.json', JSON.stringify(shares, jsonBigint, 2)).catch((e) => {
+        log.error(e, 'Error writing shares.json')
+      })
+    }
 
     if (totalFixedPoolAmount > fixedPoolAvailableAmount) {
       log.warn(
