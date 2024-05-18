@@ -72,7 +72,6 @@ export function HomeScreen() {
           display={hasSendAccount && !selectedCoin ? 'flex' : 'none'}
           width="100%"
           ai={'center'}
-          jc="space-between"
         >
           <Stack
             $gtLg={{ bc: '$color2', p: 36 }}
