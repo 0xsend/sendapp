@@ -1,25 +1,22 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-// import { sendAccountFactorySenderFilterRef, sendAcctFactoryTable } from './send-account-deployed'
-import { sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { sendAccountFactorySenderFilterRef } from './send-account-created'
 
-export const transfersTable: Table = {
-  name: 'send_account_transfers',
+export const table: Table = {
+  name: 'send_account_signing_key_removed',
   columns: [
     { name: 'chain_id', type: 'numeric' },
     { name: 'log_addr', type: 'bytea' },
     { name: 'block_time', type: 'numeric' },
     { name: 'tx_hash', type: 'bytea' },
-    { name: 'f', type: 'bytea' },
-    { name: 't', type: 'bytea' },
-    { name: 'v', type: 'numeric' },
+    { name: 'account', type: 'bytea' },
+    { name: 'key_slot', type: 'smallint' },
+    { name: 'key', type: 'bytea' },
   ] as Column[],
 } as const
 
 export const integration: Omit<Integration, 'sources'> = {
-  name: 'send_account_transfers',
+  name: 'send_account_signing_key_removed',
   enabled: true,
-  table: transfersTable,
   block: [
     {
       name: 'chain_id',
@@ -36,35 +33,24 @@ export const integration: Omit<Integration, 'sources'> = {
     {
       name: 'log_addr',
       column: 'log_addr',
+      filter_op: 'contains',
+      filter_ref: sendAccountFactorySenderFilterRef,
     },
   ] as BlockData[],
   event: {
     type: 'event',
-    name: 'Transfer',
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        name: 'from',
+        name: 'account',
         type: 'address',
-        column: 'f',
-        filter_op: 'contains',
-        filter_ref: sendAccountFactorySenderFilterRef,
-      },
-      {
         indexed: true,
-        name: 'to',
-        type: 'address',
-        column: 't',
-        filter_op: 'contains',
-        filter_ref: sendAccountFactorySenderFilterRef,
+        column: 'account',
       },
-      {
-        indexed: false,
-        name: 'value',
-        type: 'uint256',
-        column: 'v',
-      },
+      { name: 'keySlot', type: 'uint8', indexed: false, column: 'key_slot' },
+      { name: 'key', type: 'bytes32[2]', indexed: false, column: 'key' },
     ],
+    name: 'SigningKeyRemoved',
   },
+  table: table,
 } as const

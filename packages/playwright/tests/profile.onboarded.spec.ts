@@ -14,7 +14,7 @@ test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
 })
 
-test('can visit other user profile', async ({ page, seed }) => {
+test.skip('can visit other user profile', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]

@@ -237,8 +237,6 @@ export const sendAccountRouter = createTRPCRouter({
           key_slot: keySlot,
         })
 
-        log('create_send_account', 'done', '@todo add hash')
-
         if (error) {
           console.error('create_send_account error', error)
           throw new TRPCError({

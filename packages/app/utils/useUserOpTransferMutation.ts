@@ -13,7 +13,14 @@ import {
   type GetUserOperationReceiptReturnType,
   type UserOperation,
 } from 'permissionless'
-import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from 'viem'
+import {
+  encodeFunctionData,
+  erc20Abi,
+  isAddress,
+  type Hex,
+  formatUnits,
+  type CallExecutionError,
+} from 'viem'
 import { assert } from './assert'
 import { entrypoint, signUserOp } from './userop'
 
@@ -67,6 +74,20 @@ export async function sendUserOpTransfer({
     entryPoint,
     chainId,
   })
+
+  // simulate
+  await baseMainnetClient
+    .call({
+      account: entryPointAddress[baseMainnetClient.chain.id],
+      to: userOp.sender,
+      data: userOp.callData,
+    })
+    .catch((e) => {
+      const error = e as CallExecutionError
+      console.error('Failed to simulate userop', e)
+      if (error.shortMessage) throw error.shortMessage
+      throw e
+    })
 
   userOp.signature = await signUserOp({
     userOpHash,

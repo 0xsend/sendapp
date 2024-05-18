@@ -459,6 +459,54 @@ export type Database = {
         }
         Relationships: []
       }
+      send_account_signing_key_removed: {
+        Row: {
+          abi_idx: number | null
+          account: string | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ig_name: string | null
+          key: string | null
+          key_slot: number | null
+          log_addr: string | null
+          log_idx: number | null
+          src_name: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          account?: string | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          key?: string | null
+          key_slot?: number | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          account?: string | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          key?: string | null
+          key_slot?: number | null
+          log_addr?: string | null
+          log_idx?: number | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
       send_account_transfers: {
         Row: {
           abi_idx: number | null

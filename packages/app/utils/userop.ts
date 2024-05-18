@@ -217,9 +217,11 @@ export async function signUserOp({
   return bytesToHex(signature)
 }
 
+const useAccountNonceQueryKey = 'accountNonce'
+
 export function useAccountNonce({ sender }): UseQueryResult<bigint, Error> {
   return useQuery({
-    queryKey: ['accountNonce', sender],
+    queryKey: [useAccountNonceQueryKey, sender],
     queryFn: async () => {
       const nonce = await getAccountNonce(baseMainnetClient, {
         sender,
@@ -229,3 +231,5 @@ export function useAccountNonce({ sender }): UseQueryResult<bigint, Error> {
     },
   })
 }
+
+useAccountNonce.queryKey = useAccountNonceQueryKey

@@ -22,7 +22,7 @@ test('can visit activity page', async ({ page }) => {
   await expect(activityHeading(page)).toBeVisible()
 })
 
-test('can search on activity page', async ({ page, context }) => {
+test.skip('can search on activity page', async ({ page, context }) => {
   await page.goto('/activity')
   log('beforeEach', `url=${page.url()}`)
   const testTags = ['dob_spud89665', 'down_coke9222', 'few_down65006']

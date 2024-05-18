@@ -326,6 +326,21 @@ interface Table_public_send_account_signing_key_added {
   log_idx: number;
   abi_idx: number;
 }
+interface Table_public_send_account_signing_key_removed {
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  account: string | null;
+  key_slot: number | null;
+  key: string | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  tx_idx: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
 interface Table_public_send_account_transfers {
   id: number;
   chain_id: number | null;
@@ -567,6 +582,7 @@ interface Schema_public {
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
   send_account_signing_key_added: Table_public_send_account_signing_key_added;
+  send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;
