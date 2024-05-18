@@ -144,7 +144,7 @@ export function TopNav({
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        $lg={{ py: '$6' }}
+        $lg={{ pt: '$8', pb: '$2' }}
       >
         <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
           {isSubRoute || hasSelectedCoin ? (
