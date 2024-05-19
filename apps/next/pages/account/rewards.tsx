@@ -23,6 +23,12 @@ const subheader =
 
 Page.getLayout = (children) => (
   <HomeLayout
+    $platform-web={{
+      h: '100vh',
+      contentContainerStyle: {
+        h: '100vh',
+      },
+    }}
     TopNav={
       <TopNav header="Send It Rewards" subheader={subheader} button={ButtonOption.SETTINGS} />
     }
