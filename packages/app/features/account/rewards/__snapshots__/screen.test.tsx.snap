@@ -8,8 +8,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
       "flexDirection": "column",
       "gap": 32,
       "justifyContent": "space-between",
-      "paddingBottom": 7,
-      "paddingTop": 24,
+      "paddingBottom": 24,
     }
   }
 >
@@ -19,7 +18,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
         "flex": 2,
         "flexDirection": "column",
         "gap": 18,
-        "minHeight": "40%",
         "overflow": "hidden",
       }
     }
@@ -30,6 +28,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           "flex": 1,
           "flexDirection": "column",
           "gap": 24,
+          "paddingTop": 32,
         }
       }
     >
@@ -155,7 +154,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
                 suppressHighlighting={true}
               >
-                Expired May 17, 2024
+                Expired Jul 12, 2024
               </Text>
             </View>
             <View
@@ -214,7 +213,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
                 suppressHighlighting={true}
               >
-                CLOSED
+                OPEN
               </Text>
             </View>
           </View>
@@ -618,686 +617,639 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   </Text>
                 </View>
               </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(191, 32%, 46%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 13.2,
-                    "fontWeight": "300",
-                    "lineHeight": 16,
-                    "marginLeft": "auto",
-                    "marginRight": "auto",
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                Already claimed
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(112, 22%, 59%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 13.2,
-                      "fontWeight": "300",
-                      "lineHeight": 16,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  <Text
-                    accessibilityLabel="View Claim on Etherscan"
-                    accessibilityRole="link"
-                    cancelable={true}
-                    disabled={false}
-                    focusable={true}
-                    minPressDuration={0}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    onPress={[Function]}
-                    onPressIn={[Function]}
-                    onPressOut={[Function]}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 59%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    0x123
-                  </Text>
-                </Text>
-              </Text>
             </View>
           </View>
         </View>
       </View>
     </View>
   </View>
-  <RCTScrollView
-    scrollEnabled={true}
-    showsHorizontalScrollIndicator={false}
-    showsVerticalScrollIndicator={false}
+  <View
     style={
       {
-        "overflow": "scroll",
+        "marginBottom": "auto",
+        "marginTop": "auto",
       }
     }
   >
-    <View>
-      <View
-        style={
-          {
-            "flexDirection": "row",
-            "gap": 7,
-            "justifyContent": "space-between",
-            "marginLeft": "auto",
-            "marginRight": "auto",
-            "maxWidth": 1072,
-            "paddingBottom": 7,
-            "paddingTop": 7,
-            "width": "100%",
-          }
+    <RCTScrollView
+      scrollEnabled={true}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      style={
+        {
+          "marginBottom": "auto",
+          "marginTop": "auto",
+          "overflow": "scroll",
         }
-      >
+      }
+    >
+      <View>
         <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
-            }
-          }
-          pointerEvents="none"
           style={
             {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
               "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
+              "gap": 7,
+              "justifyContent": "space-between",
+              "marginLeft": "auto",
+              "marginRight": "auto",
+              "maxWidth": 1072,
+              "width": "100%",
             }
           }
         >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
-            style={
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "borderColor": "$background",
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
-          >
-            # 1
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
-            }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 2
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 1
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 3
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 2
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 4
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 3
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 5
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 4
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 6
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 5
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 7
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 6
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 8
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 7
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 9
-          </Text>
-        </View>
-        <View
-          accessibilityRole="button"
-          focusVisibleStyle={
-            {
-              "borderColor": "$background",
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 8
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
             }
-          }
-          pointerEvents="none"
-          style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#081619",
-              "borderBottomColor": "transparent",
-              "borderBottomLeftRadius": 6,
-              "borderBottomRightRadius": 6,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "transparent",
-              "borderLeftWidth": 1,
-              "borderRightColor": "transparent",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "transparent",
-              "borderTopLeftRadius": 6,
-              "borderTopRightRadius": 6,
-              "borderTopWidth": 1,
-              "flex": 1,
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-              "height": 28,
-              "justifyContent": "center",
-              "maxWidth": 84,
-              "minWidth": 74,
-              "opacity": 0.4,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-            }
-          }
-        >
-          <Text
-            lineBreakMode="clip"
-            numberOfLines={1}
+            pointerEvents="none"
             style={
               {
-                "color": "#86AE80",
-                "flexGrow": 0,
-                "flexShrink": 1,
-                "fontFamily": "System",
-                "fontSize": 13.2,
-                "fontWeight": "300",
-                "lineHeight": 16,
-                "textAlign": "center",
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
               }
             }
-            suppressHighlighting={true}
-            userSelect="none"
           >
-            # 10
-          </Text>
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 9
+            </Text>
+          </View>
+          <View
+            accessibilityRole="button"
+            focusVisibleStyle={
+              {
+                "borderColor": "$background",
+              }
+            }
+            pointerEvents="none"
+            style={
+              {
+                "alignItems": "center",
+                "backgroundColor": "#081619",
+                "borderBottomColor": "transparent",
+                "borderBottomLeftRadius": 6,
+                "borderBottomRightRadius": 6,
+                "borderBottomWidth": 1,
+                "borderLeftColor": "transparent",
+                "borderLeftWidth": 1,
+                "borderRightColor": "transparent",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "transparent",
+                "borderTopLeftRadius": 6,
+                "borderTopRightRadius": 6,
+                "borderTopWidth": 1,
+                "flex": 1,
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
+                "height": 28,
+                "justifyContent": "center",
+                "maxWidth": 84,
+                "minWidth": 74,
+                "opacity": 0.4,
+                "paddingLeft": 18,
+                "paddingRight": 18,
+              }
+            }
+          >
+            <Text
+              lineBreakMode="clip"
+              numberOfLines={1}
+              style={
+                {
+                  "color": "#86AE80",
+                  "flexGrow": 0,
+                  "flexShrink": 1,
+                  "fontFamily": "System",
+                  "fontSize": 13.2,
+                  "fontWeight": "300",
+                  "lineHeight": 16,
+                  "textAlign": "center",
+                }
+              }
+              suppressHighlighting={true}
+              userSelect="none"
+            >
+              # 10
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
-  </RCTScrollView>
+    </RCTScrollView>
+  </View>
 </View>
 `;

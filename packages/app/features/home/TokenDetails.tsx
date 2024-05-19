@@ -52,7 +52,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
           </Stack>
         </XStack>
       )}
-      <YStack>
+      <YStack pt="$4">
         <Label fontSize={'$5'} fontWeight={'500'} color={'$color11'} textTransform={'uppercase'}>
           {`${coin.label} BALANCE`}
         </Label>

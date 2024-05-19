@@ -144,7 +144,7 @@ export function TopNav({
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        $lg={{ pt: '$8', pb: '$2' }}
+        $lg={{ pt: '$6', pb: '$3' }}
       >
         <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
           {isSubRoute || hasSelectedCoin ? (
@@ -203,15 +203,16 @@ export function TopNav({
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
-      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
+      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} mt="$4" />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
-        <Container pos="relative" mt={'$4'}>
+        <Container pos="relative">
           <View
             position="absolute"
             $lg={{ right: '$6' }}
             $md={{ right: 0 }}
             right={0}
             bottom={0}
+            top={0}
             justifyContent="center"
           >
             <View
