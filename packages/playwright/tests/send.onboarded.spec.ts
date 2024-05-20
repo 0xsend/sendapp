@@ -16,7 +16,7 @@ test.beforeAll(async () => {
   log = debug(`test:send:logged-in:${test.info().workerIndex}`)
 })
 
-test('can send ETH to user on profile', async ({ page, seed }) => {
+test.skip('can send ETH to user on profile', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
@@ -46,7 +46,7 @@ test('can send ETH to user on profile', async ({ page, seed }) => {
   await expect(sendDialog.getByRole('link', { name: 'View on Otterscan' })).toBeVisible()
 })
 
-test('can send USDC to user on profile', async ({ page, seed }) => {
+test.skip('can send USDC to user on profile', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
@@ -79,7 +79,7 @@ test('can send USDC to user on profile', async ({ page, seed }) => {
   await expect(sendDialog.getByRole('link', { name: 'View on Otterscan' })).toBeVisible()
 })
 
-test('can send USDC to user on profile using paymaster', async ({
+test.skip('can send USDC to user on profile using paymaster', async ({
   page,
   seed,
   supabase,

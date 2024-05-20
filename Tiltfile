@@ -490,8 +490,8 @@ local_resource(
     ],
     serve_cmd = "yarn run shovel:tilt",
     serve_dir = "packages/shovel",
-    trigger_mode = TRIGGER_MODE_MANUAL,
     deps = [
+        "packages/shovel/bin/shovel.tilt.ts",
         "packages/shovel/etc/config.json",
     ],
 )
@@ -657,6 +657,7 @@ local_resource(
         "snaplet:generate",
         "next:web",
         "supabase",
+        "shovel",
     ],
 )
 

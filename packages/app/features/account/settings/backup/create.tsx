@@ -108,9 +108,14 @@ const CreatePasskeyForm = ({
       assert(!!webauthnCred, 'Failed to save passkey')
       onPasskeySaved(webauthnCred)
     } catch (e) {
+      console.error(e)
+      const message =
+        e.details?.toString().split('.').at(0) ??
+        e.mesage?.split('.').at(0) ??
+        e.toString().split('.').at(0)
       form.setError('accountName', {
         type: 'custom',
-        message: e.mesage ?? `Something went wrong: ${e}`,
+        message,
       })
     }
   }

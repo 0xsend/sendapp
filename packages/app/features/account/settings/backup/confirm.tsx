@@ -17,11 +17,7 @@ import { pgBase16ToBytes } from 'app/utils/pgBase16ToBytes'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import {
-  defaultUserOp,
-  useUserOpGasEstimate,
-  useUserOpTransferMutation,
-} from 'app/utils/useUserOpTransferMutation'
+import { defaultUserOp, useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -203,9 +199,14 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       toast.show(`Sent user op ${transactionHash}!`)
       router.replace('/account/settings/backup')
     } catch (e) {
+      console.error(e)
+      const message =
+        e.details?.toString().split('.').at(0) ??
+        e.mesage?.split('.').at(0) ??
+        e.toString().split('.').at(0)
       form.setError('root', {
         type: 'custom',
-        message: e.mesage ?? `Something went wrong: ${e}`,
+        message,
       })
     }
   }

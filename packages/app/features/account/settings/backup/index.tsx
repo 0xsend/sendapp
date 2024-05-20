@@ -1,27 +1,45 @@
-import { useState } from 'react'
 import {
   Button,
   H1,
   H4,
   H5,
-  Input,
   Link,
   Paragraph,
   Separator,
   Spinner,
+  SubmitButton,
   Text,
   XStack,
   YStack,
   isWeb,
+  useToastController,
 } from '@my/ui'
-import { baseMainnetClient, useReadSendAccountGetActiveSigningKeys } from '@my/wagmi'
+import {
+  baseMainnetClient,
+  sendAccountAbi,
+  tokenPaymasterAddress,
+  usdcAddress,
+  useReadSendAccountGetActiveSigningKeys,
+} from '@my/wagmi'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { IconDots, IconNote, IconX } from 'app/components/icons'
+import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { formatTimeDate } from 'app/utils/formatTimeDate'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { pgBase16ToBytes } from 'app/utils/pgBase16ToBytes'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { throwIf } from 'app/utils/throwIf'
+import { defaultUserOp, useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
+import { useAccountNonce } from 'app/utils/userop'
+import type { UserOperation } from 'permissionless'
+import { useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { useLink } from 'solito/link'
+import { encodeFunctionData } from 'viem'
+import { useBalance, useEstimateFeesPerGas } from 'wagmi'
+import { z } from 'zod'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
@@ -123,12 +141,16 @@ const WebauthnCreds = ({
   )
 }
 
+type SendAccountCredential = NonNullable<
+  ReturnType<typeof useSendAccount>['data']
+>['send_account_credentials'][number]
+
 const SendAccountCredentials = ({
   address,
   cred,
 }: {
   address: `0x${string}`
-  cred: NonNullable<ReturnType<typeof useSendAccount>['data']>['send_account_credentials'][number]
+  cred: SendAccountCredential
 }) => {
   const [cardStatus, setCardStatus] = useState<'default' | 'settings' | 'remove'>('default')
   const webauthnCred = cred.webauthn_credentials
@@ -203,11 +225,9 @@ const SendAccountCredentials = ({
           case 'remove':
             return (
               <RemovePasskeyConfirmation
-                name={webauthnCred.display_name}
+                isActiveOnchain={isActive}
+                cred={cred}
                 onCancel={() => setCardStatus('default')}
-                onRemove={() => {
-                  throw new Error('`onRemove` has not been implemented')
-                }}
               />
             )
           default:
@@ -298,84 +318,257 @@ const CardTextBlock = ({
   )
 }
 
+const RemovePasskeySchema = z.object({
+  name: z.string(),
+})
+
+type RemovePasskeySchema = z.infer<typeof RemovePasskeySchema>
+
 const RemovePasskeyConfirmation = ({
-  name,
+  cred,
   onCancel,
-  onRemove,
+  isActiveOnchain,
 }: {
-  name: string
+  cred: SendAccountCredential
   onCancel: () => void
-  onRemove: () => void
+  /**
+   * Whether the credential is onchain and an active key slot
+   */
+  isActiveOnchain: boolean
 }) => {
-  const [inputVal, setInputVal] = useState('')
+  const supabase = useSupabase()
+  const { key_slot: keySlot } = cred
+  const webauthnCred = cred.webauthn_credentials
+  assert(!!webauthnCred, 'No webauthn credential found') // should be impossible
+  const { display_name: displayName } = webauthnCred
+  const {
+    data: sendAccount,
+    error: sendAccountError,
+    isLoading: isLoadingSendAccount,
+  } = useSendAccount()
+  const {
+    data: usdcBal,
+    error: usdcBalError,
+    isLoading: isLoadingUsdcBal,
+  } = useBalance({
+    address: sendAccount?.address,
+    token: usdcAddress[baseMainnetClient.chain.id],
+  })
+  const form = useForm<RemovePasskeySchema>()
+  const {
+    data: nonce,
+    error: nonceError,
+    isLoading: isLoadingNonce,
+  } = useAccountNonce({ sender: sendAccount?.address })
+  const {
+    data: feesPerGas,
+    error: gasFeesError,
+    isLoading: isLoadingGasFees,
+  } = useEstimateFeesPerGas({
+    chainId: baseMainnetClient.chain.id,
+  })
+  const { maxFeePerGas, maxPriorityFeePerGas } = feesPerGas ?? {}
+  const {
+    data: userOp,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+  } = useQuery({
+    queryKey: [
+      'removeSigningKey',
+      sendAccount?.address,
+      String(nonce),
+      sendAccount,
+      keySlot,
+      String(maxFeePerGas),
+      String(maxPriorityFeePerGas),
+    ],
+    enabled:
+      !!sendAccount &&
+      !!webauthnCred &&
+      nonce !== undefined &&
+      keySlot !== undefined &&
+      maxFeePerGas !== undefined &&
+      maxPriorityFeePerGas !== undefined,
+    queryFn: async () => {
+      assert(!!sendAccount, 'No send account found')
+      assert(keySlot !== undefined, 'No key slot found')
+      assert(nonce !== undefined, 'No nonce found')
+      assert(maxFeePerGas !== undefined, 'No max fee per gas found')
+      assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
+      const callData = encodeFunctionData({
+        abi: sendAccountAbi,
+        functionName: 'executeBatch',
+        args: [
+          [
+            {
+              dest: sendAccount?.address,
+              value: 0n,
+              data: encodeFunctionData({
+                abi: sendAccountAbi,
+                functionName: 'removeSigningKey',
+                args: [keySlot],
+              }),
+            },
+          ],
+        ],
+      })
+
+      const chainId = baseMainnetClient.chain.id
+      const paymaster = tokenPaymasterAddress[chainId]
+      const userOp: UserOperation<'v0.7'> = {
+        ...defaultUserOp,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        sender: sendAccount?.address,
+        nonce,
+        callData,
+        paymaster,
+        paymasterData: '0x',
+        signature: '0x',
+      }
+      return userOp
+    },
+  })
+  const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
+  const queryClient = useQueryClient()
+  const onSubmit = async () => {
+    try {
+      if (isActiveOnchain) {
+        throwIf(sendAccountError)
+        throwIf(nonceError)
+        throwIf(gasFeesError)
+        throwIf(userOpError)
+        throwIf(usdcBalError)
+        assert((usdcBal?.value ?? 0n) > 0n, 'No USDC balance to pay for gas fees')
+        assert(!!userOp, 'User op is required')
+
+        await sendUserOp({ userOp })
+      }
+
+      const { error } = await supabase
+        .from('webauthn_credentials')
+        .delete()
+        .eq('id', webauthnCred.id)
+
+      throwIf(error)
+
+      await queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
+      await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+    } catch (e) {
+      console.error(e)
+      const message =
+        e.details?.toString().split('.').at(0) ??
+        e.mesage?.split('.').at(0) ??
+        e.toString().split('.').at(0)
+      form.setError('root', {
+        type: 'custom',
+        message,
+      })
+    }
+  }
+
+  const isLoading =
+    isLoadingNonce ||
+    isLoadingGasFees ||
+    isLoadingSendAccount ||
+    isLoadingUserOp ||
+    isLoadingUsdcBal
+  const inputVal = form.watch('name', '')
 
   return (
-    <YStack gap={'$size.3.5'}>
-      <Text
-        fontWeight={'400'}
-        fontSize={'$5'}
-        $theme-dark={{ color: '$white' }}
-        $theme-light={{ color: '$black' }}
-        fontFamily={'$mono'}
+    <FormProvider {...form}>
+      <SchemaForm
+        form={form}
+        formProps={{
+          $gtLg: {
+            als: 'flex-start',
+          },
+          $gtMd: {
+            maxWidth: '100%',
+          },
+          px: '$0',
+        }}
+        props={{
+          name: {
+            boc: 'transparent',
+            borderRadius: '$4',
+            color: '$color11',
+            ff: '$mono',
+            autoFocus: true,
+          },
+        }}
+        schema={RemovePasskeySchema}
+        onSubmit={onSubmit}
+        renderAfter={({ submit }) => (
+          <XStack gap="$size.1" jc="space-between" w={'100%'} pt={'$size.0.9'}>
+            <Button
+              borderColor={'$primary'}
+              color={'$primary'}
+              variant="outlined"
+              flex={1}
+              hoverStyle={{ borderColor: '$primary' }}
+              onPress={onCancel}
+            >
+              CANCEL
+            </Button>
+            <SubmitButton
+              testID={'RemovePasskeyButton'}
+              theme={'error'}
+              color={'$error'}
+              variant="outlined"
+              flex={1}
+              hoverStyle={{ borderColor: '$error' }}
+              disabledStyle={{ opacity: 0.5 }}
+              onPress={submit}
+              {...(isLoading || displayName !== inputVal ? { disabled: true } : {})}
+            >
+              REMOVE
+            </SubmitButton>
+          </XStack>
+        )}
       >
-        Removing &quot;{name}&quot; as a signer on your Send account.{' '}
-        <Text
-          fontWeight={'400'}
-          fontSize={'$5'}
-          $theme-dark={{ color: '$warning' }}
-          $theme-light={{ color: '$yellow300' }}
-          fontFamily={'$mono'}
-        >
-          This cannot be undone.
-        </Text>
-      </Text>
+        {({ name: nameCheck }) => (
+          <YStack gap={'$size.3.5'}>
+            <Text fontWeight={'400'} fontSize={'$5'} color="$color12" fontFamily={'$mono'}>
+              Removing &quot;{displayName}&quot; as a signer on your Send account.{' '}
+              <Text
+                fontWeight={'400'}
+                fontSize={'$5'}
+                $theme-dark={{ color: '$warning' }}
+                $theme-light={{ color: '$yellow300' }}
+                fontFamily={'$mono'}
+              >
+                This cannot be undone.
+              </Text>
+            </Text>
 
-      <YStack gap={'$size.1.5'}>
-        <Text
-          fontWeight={'400'}
-          fontSize={'$5'}
-          $theme-dark={{ color: '$white' }}
-          $theme-light={{ color: '$black' }}
-          fontFamily={'$mono'}
-        >
-          Please enter &quot;{name}&quot; below
-        </Text>
+            <YStack gap={'$size.1.5'}>
+              <Text
+                fontWeight={'400'}
+                fontSize={'$5'}
+                $theme-dark={{ color: '$white' }}
+                $theme-light={{ color: '$black' }}
+                fontFamily={'$mono'}
+              >
+                Please enter &quot;{displayName}&quot; below
+              </Text>
 
-        <Input
-          boc={'transparent'}
-          borderRadius={'$4'}
-          $theme-dark={{ color: '$white' }}
-          $theme-light={{ color: '$black' }}
-          ff={'$mono'}
-          autoFocus
-          onChangeText={setInputVal}
-        />
-
-        <XStack gap="$size.1" jc="space-between" w={'100%'} pt={'$size.0.9'}>
-          <Button
-            borderColor={'$primary'}
-            color={'$primary'}
-            variant="outlined"
-            flex={1}
-            hoverStyle={{ borderColor: '$primary' }}
-            onPress={onCancel}
-          >
-            CANCEL
-          </Button>
-          <Button
-            borderColor={'$error'}
-            color={'$error'}
-            variant="outlined"
-            flex={1}
-            hoverStyle={{ borderColor: '$error' }}
-            onPress={onRemove}
-            disabledStyle={{ opacity: 0.5 }}
-            disabled={name !== inputVal}
-          >
-            REMOVE
-          </Button>
-        </XStack>
-      </YStack>
-    </YStack>
+              {nameCheck}
+              {form.formState.errors?.root?.message ? (
+                <Paragraph
+                  testID="RemovePasskeyError"
+                  size={'$6'}
+                  fontWeight={'300'}
+                  $theme-dark={{ color: '$warning' }}
+                  $theme-light={{ color: '$yellow300' }}
+                >
+                  {form.formState.errors?.root?.message}
+                </Paragraph>
+              ) : null}
+            </YStack>
+          </YStack>
+        )}
+      </SchemaForm>
+    </FormProvider>
   )
 }

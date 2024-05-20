@@ -2,9 +2,19 @@
 
 import 'zx/globals'
 
+$.verbose = true
+
+/**
+ * This script is used to start the shovel container for local development.
+ * It is not intended to be used in production.
+ *
+ * SHOVEL_DEBUG=1 - Enables debug mode, which prints verbose logs to the console.
+ * SHOVEL_MIGRATE=1 - Enables migration mode, which tells shovel to create the database and run migrations. Useful for adding new integrations.
+ */
+
 await $`docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f || true`
 
-await $`docker pull docker.io/indexsupply/shovel:latest || true`
+await $`docker pull docker.io/indexsupply/shovel:1.6 || true`
 
 const blockNumber =
   await $`cast rpc --rpc-url http://127.0.0.1:8546 eth_blockNumber | jq -r . | cast to-dec`
@@ -23,4 +33,8 @@ await $`docker run --rm \
     -v ${import.meta.dir}/../etc:/etc/shovel \
     --entrypoint /usr/local/bin/shovel \
     -w /usr/local/bin \
-    docker.io/indexsupply/shovel -l :80 -skip-migrate -config /etc/shovel/config.json`
+    docker.io/indexsupply/shovel:1.6 \
+      -l :80 \
+      ${$.env.SHOVEL_DEBUG === '1' ? '-v' : ''} \
+      ${$.env.SHOVEL_MIGRATE === '1' ? '' : '-skip-migrate'} \
+      -config /etc/shovel/config.json`

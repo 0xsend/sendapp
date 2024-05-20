@@ -156,13 +156,13 @@ DELETE FROM public.webauthn_credentials
 WHERE user_id = tests.get_supabase_uid('webauthn_user')
   AND name = 'test_credential';
 
-SELECT isnt_empty(
+SELECT is_empty(
     $$
     SELECT *
     FROM public.webauthn_credentials
     WHERE user_id = tests.get_supabase_uid('webauthn_user')
       AND name = 'test_credential' $$,
-      'Credential should not have been deleted'
+      'Credential should have been deleted'
   );
 
 -- Complete the tests

@@ -39,7 +39,6 @@ import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import {
-  USEROP_VALID_UNTIL,
   USEROP_VERSION,
   entrypoint,
   generateChallenge,
@@ -193,11 +192,11 @@ async function createAccountAndVerifySignature() {
   const { userOp, userOpHash } = await generateUserOp([key1, key2])
 
   const bVersion = numberToBytes(USEROP_VERSION, { size: 1 })
-  const bValidUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
+  const bValidUntil = numberToBytes(0, { size: 6 })
   const { challenge } = generateChallenge({
     userOpHash,
     version: USEROP_VERSION,
-    validUntil: USEROP_VALID_UNTIL,
+    validUntil: 0,
   })
   const { keySlot, encodedSig: sig } = await signer(challenge)
   const bKeySlot = numberToBytes(keySlot, { size: 1 })

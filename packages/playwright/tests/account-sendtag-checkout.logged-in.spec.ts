@@ -85,24 +85,30 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, pg }) => {
   assert(!!profile, 'profile not found')
   await checkoutPage.page.goto(`/?referral=${profile.referralCode}`)
   await checkoutPage.goto()
-  const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
-  await checkoutPage.addPendingTag(tagName)
-  await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
+  const tagsCount = Math.floor(Math.random() * 5) + 1
+  const tagsToRegister: string[] = []
+  for (let i = 0; i < tagsCount; i++) {
+    const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
+    tagsToRegister.push(tagName)
+    await checkoutPage.addPendingTag(tagName)
+    await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
+  }
   await checkoutPage.confirmTags(expect)
-  await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeHidden()
-
-  const { data: tags, error } = await supabase.from('tags').select('*').eq('name', tagName)
+  const { data: tags, error } = await supabase.from('tags').select('*').in('name', tagsToRegister)
   expect(error).toBeFalsy()
-  expect(tags).toHaveLength(1)
+  expect(tags).toHaveLength(tagsCount)
 
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
-  await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
+
+  for (const tag of tagsToRegister) {
+    await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
+  }
 
   const { rows } = await pg.query(
     'select count(*) as count from referrals where referrer_id = $1',
     [profile.id]
   )
-  expect(rows[0]?.count).toBe('1')
+  expect(rows[0]?.count).toBe(tagsCount.toString())
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
