@@ -100,7 +100,8 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests
-    runs-on: self-hosted
+    # runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
