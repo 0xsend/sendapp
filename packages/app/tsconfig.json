@@ -1,4 +1,5 @@
 {
+  // "noErrorTruncation": true,
   "extends": "../../tsconfig.base",
   "include": [
     "features",

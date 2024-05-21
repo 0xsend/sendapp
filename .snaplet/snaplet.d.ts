@@ -25,6 +25,15 @@ interface Table_net_http_response {
   error_msg: string | null;
   created: string;
 }
+interface Table_public_activity {
+  id: number;
+  event_name: string;
+  event_id: string;
+  from_user_id: string | null;
+  to_user_id: string | null;
+  data: Json | null;
+  created_at: string;
+}
 interface Table_auth_audit_log_entries {
   instance_id: string | null;
   id: string;
@@ -293,17 +302,18 @@ interface Table_vault_secrets {
   updated_at: string;
 }
 interface Table_public_send_account_created {
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
   user_op_hash: string | null;
-  tx_hash: string | null;
-  account: string | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
+  tx_hash: string;
+  account: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  id: number;
 }
 interface Table_public_send_account_credentials {
   account_id: string;
@@ -325,39 +335,39 @@ interface Table_public_send_account_signing_key_added {
   tx_idx: number;
   log_idx: number;
   abi_idx: number;
+  id: number;
 }
 interface Table_public_send_account_signing_key_removed {
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  account: string | null;
-  key_slot: number | null;
-  key: string | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  account: string;
+  key_slot: number;
+  key: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+  id: number;
 }
 interface Table_public_send_account_transfers {
   id: number;
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  f: string | null;
-  t: string | null;
-  v: number | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
-  f_tags: Json | null;
-  t_tags: Json | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  f: string;
+  t: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
 }
 interface Table_public_send_accounts {
   id: string;
@@ -375,34 +385,35 @@ interface Table_public_send_liquidity_pools {
   chain_id: number;
 }
 interface Table_public_send_revenues_safe_receives {
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  sender: string | null;
-  v: number | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  sender: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+  id: number;
 }
 interface Table_public_send_token_transfers {
   id: number;
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  f: string | null;
-  t: string | null;
-  v: number | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  f: string;
+  t: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
 }
 interface Table_auth_sessions {
   id: string;
@@ -562,6 +573,7 @@ interface Schema_pgtle {
   feature_info: Table_pgtle_feature_info;
 }
 interface Schema_public {
+  activity: Table_public_activity;
   chain_addresses: Table_public_chain_addresses;
   distribution_shares: Table_public_distribution_shares;
   distribution_verification_values: Table_public_distribution_verification_values;

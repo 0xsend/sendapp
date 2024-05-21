@@ -14,6 +14,18 @@ type Inflection = {
   oppositeBaseNameMap?: Record<string, string>;
 };
 type Override = {
+  activity?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      event_name?: string;
+      event_id?: string;
+      from_user_id?: string;
+      to_user_id?: string;
+      data?: string;
+      created_at?: string;
+    };
+  }
   buckets?: {
     name?: string;
     fields?: {
@@ -214,6 +226,8 @@ type Override = {
       block_num?: string;
       tx_idx?: string;
       log_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_account_credentials?: {
@@ -243,6 +257,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_account_signing_key_removed?: {
@@ -261,6 +277,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_account_transfers?: {
@@ -280,8 +298,7 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
-      f_tags?: string;
-      t_tags?: string;
+      event_id?: string;
     };
   }
   send_accounts?: {
@@ -322,6 +339,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_token_transfers?: {
@@ -341,6 +360,7 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      event_id?: string;
     };
   }
   tag_receipts?: {
@@ -461,6 +481,11 @@ interface FingerprintNumberField {
   }
 }
 export interface Fingerprint {
+  activities?: {
+    id?: FingerprintNumberField;
+    data?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
@@ -568,6 +593,7 @@ export interface Fingerprint {
     blockNum?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendAccountCredentials?: {
     keySlot?: FingerprintNumberField;
@@ -583,6 +609,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendAccountSigningKeyRemoveds?: {
     chainId?: FingerprintNumberField;
@@ -592,6 +619,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendAccountTransfers?: {
     id?: FingerprintNumberField;
@@ -602,8 +630,6 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
-    fTags?: FingerprintJsonField;
-    tTags?: FingerprintJsonField;
   }
   sendAccounts?: {
     chainId?: FingerprintNumberField;
@@ -625,6 +651,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendTokenTransfers?: {
     id?: FingerprintNumberField;

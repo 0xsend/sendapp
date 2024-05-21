@@ -1,4 +1,4 @@
-import type { MergeDeep } from 'type-fest'
+import type { Merge, MergeDeep } from 'type-fest'
 import type { Database as DatabaseGenerated } from './database-generated.types'
 export type { Json } from './database-generated.types'
 import type { PostgrestError } from '@supabase/supabase-js'
@@ -86,6 +86,20 @@ export type Database = MergeDeep<
             send_id: number
             all_tags: string[] | []
           }[]
+        }
+      }
+      Views: {
+        activity_feed: {
+          Row: {
+            from_user: Merge<
+              DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
+              { tags: string[] }
+            > | null
+            to_user: Merge<
+              DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
+              { tags: string[] }
+            > | null
+          }
         }
       }
     }

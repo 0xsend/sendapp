@@ -1,5 +1,5 @@
 import { useState, type PropsWithChildren } from 'react'
-import type { Functions } from '@my/supabase/database.types'
+import type { Database, Functions, Views } from '@my/supabase/database.types'
 import {
   AnimatePresence,
   Avatar,
@@ -24,44 +24,9 @@ import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconX } from 'app/components/icons'
-
-const activities = [
-  {
-    username: 'ethentree',
-    amount: '200 USDT',
-    value: '199.98',
-    time: '1 min ago',
-    avatar: 'https://i.pravatar.cc/150?u=ethentree',
-  },
-  {
-    username: 'bigboss',
-    amount: '500 ETH',
-    value: '1,250,000',
-    time: '2 mins ago',
-    avatar: 'https://i.pravatar.cc/150?u=bigboss',
-  },
-  {
-    username: 'coincollector',
-    amount: '75 BTC',
-    value: '2,850,000',
-    time: '10 mins ago',
-    avatar: 'https://i.pravatar.cc/150?u=coincollector',
-  },
-  {
-    username: 'trademaster',
-    amount: '1,000 LTC',
-    value: '160,000',
-    time: '1 hr ago',
-    avatar: 'https://i.pravatar.cc/150?u=trademaster',
-  },
-  {
-    username: 'hodlqueen',
-    amount: '10,000 XRP',
-    value: '7,200',
-    time: '1 day ago',
-    avatar: 'https://i.pravatar.cc/150?u=hodlqueen',
-  },
-]
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useQuery } from '@tanstack/react-query'
+import { assert } from 'app/utils/assert'
 
 const suggestions = [
   { username: '0xUser', avatar: 'https://i.pravatar.cc/150?u=0xUser' },
@@ -375,6 +340,8 @@ function SearchResultRow({
 }
 
 // TODO: Replace with dynamic list
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function Suggestions() {
   return (
     <YStack gap="$size.1" display="flex" $gtMd={{ display: 'none' }}>
@@ -419,8 +386,30 @@ function Suggestions() {
   )
 }
 
-// TODO: Replace with dynamic list
 function RecentActivity() {
+  const supabase = useSupabase()
+  const {
+    data: activities,
+    isLoading: isLoadingActivities,
+    error: activitiesError,
+  } = useQuery({
+    queryKey: ['activity_feed'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('activity_feed')
+        .select('*')
+        .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
+        .order('created_at', { ascending: false })
+        .limit(10)
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    },
+  })
+
   return (
     <Container>
       <YStack gap="$5" mb="$4" width={'100%'}>
@@ -432,21 +421,38 @@ function RecentActivity() {
           </XStack>
         </XStack>
 
-        {/* @TODO: Update with real values/filtering */}
-        <RowLabel>PENDING</RowLabel>
-
         <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
+        {(() => {
+          switch (true) {
+            case isLoadingActivities:
+              return <Spinner size="small" />
+            case activitiesError !== null:
+              return (
+                <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+                  {activitiesError?.message ?? `Something went wrong: ${activitiesError}`}
+                </Paragraph>
+              )
+            case activities?.length === 0:
+              return (
+                <>
+                  <RowLabel>No activities</RowLabel>
+                </>
+              )
+            default:
+              return (
+                <>
+                  <RowLabel>{activities?.[0]?.created_at}</RowLabel>
 
-        {activities.map((activity) => (
-          <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
-        ))}
-
-        <RowLabel>12 FEBRUARY 2024</RowLabel>
-
-        {activities.map((activity) => (
-          // @TODO: Replace key with unique id
-          <Row activity={activity} key={`${activity.username} - ${activity.time}`} />
-        ))}
+                  {activities?.map((activity) => (
+                    <Row
+                      activity={activity}
+                      key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                    />
+                  ))}
+                </>
+              )
+          }
+        })()}
       </YStack>
     </Container>
   )
@@ -501,12 +507,15 @@ function MobileSectionLabel({ children }: PropsWithChildren) {
   )
 }
 
-function Row({ activity }: { activity: (typeof activities)[number] }) {
+function Row({ activity }: { activity: Views<'activity_feed'> }) {
   const media = useMedia()
+  const { from_user, to_user, event_name, created_at, data } = activity
+  const user = to_user ? to_user : from_user
+
+  assert(!!user, 'User is required')
 
   return (
     <XStack
-      key={activity.time}
       ai="center"
       jc="space-between"
       gap="$4"
@@ -517,15 +526,21 @@ function Row({ activity }: { activity: (typeof activities)[number] }) {
     >
       <XStack gap="$4.5">
         <Avatar size="$4.5" br="$4" gap="$2">
-          <Avatar.Image src={activity.avatar} />
-          <Avatar.Fallback jc="center">
-            <Spinner size="small" color="$send1" />
+          <Avatar.Image src={user.avatar_url} />
+          <Avatar.Fallback jc="center" bc="$color3">
+            <Avatar size="$4.5" br="$4">
+              <Avatar.Image
+                src={`https://ui-avatars.com/api.jpg?name=${
+                  user.name ?? user.tags?.[0] ?? user.send_id
+                }&size=256`}
+              />
+            </Avatar>
           </Avatar.Fallback>
         </Avatar>
 
         <YStack gap="$1.5">
           <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
-            {activity.username}
+            {event_name}
           </Text>
           <Text
             theme="alt2"
@@ -533,21 +548,32 @@ function Row({ activity }: { activity: (typeof activities)[number] }) {
             fontFamily={'$mono'}
             fontSize="$4"
             $gtMd={{ fontSize: '$2' }}
+            maxWidth={'100%'}
+            overflow={'hidden'}
           >
-            @{activity.username}
+            {(() => {
+              if (user.tags?.[0]) {
+                return `@${user.tags[0]}`
+              }
+
+              return `#${user.send_id}`
+            })()}
+            {JSON.stringify(data, null, 2)}
           </Text>
         </YStack>
       </XStack>
       <XStack gap="$4">
-        <Text
-          color="$color12"
-          display="none"
-          minWidth={'$14'}
-          textAlign="right"
-          $gtMd={{ display: 'flex', jc: 'flex-end' }}
-        >
-          {activity.time}
-        </Text>
+        {created_at ? (
+          <Text
+            color="$color12"
+            display="none"
+            minWidth={'$14'}
+            textAlign="right"
+            $gtMd={{ display: 'flex', jc: 'flex-end' }}
+          >
+            {new Date(created_at).toLocaleString()}
+          </Text>
+        ) : null}
         <Text
           color="$color12"
           textAlign="right"
@@ -556,7 +582,8 @@ function Row({ activity }: { activity: (typeof activities)[number] }) {
           fontFamily={media.md ? '$mono' : '$body'}
           $gtMd={{ fontSize: '$5', minWidth: '$14' }}
         >
-          {activity.amount}
+          {/* {activity.amount} */}
+          123
         </Text>
       </XStack>
     </XStack>

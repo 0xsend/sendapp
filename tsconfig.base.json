@@ -33,6 +33,7 @@
     "useUnknownInCatchVariables": false,
     "preserveConstEnums": true,
     "noUncheckedIndexedAccess": true,
+    "strictNullChecks": true,
     // DONT DO THIS so jsdoc will remain
     "removeComments": false,
     "strict": true,

@@ -54,17 +54,29 @@ VALUES(
 insert into public.send_token_transfers ("f",
                                        "t",
                                        "v",
+                                       ig_name,
+                                       src_name,
                                        block_num,
                                        block_time,
                                        tx_idx,
-                                       log_idx)
+                                       log_idx,
+                                       chain_id,
+                                       log_addr,
+                                       tx_hash,
+                                       abi_idx)
 values ((select address from send_liquidity_pools limit 1),
         decode(:hodler_address, 'hex'),
         1000000,
+        'send_token_transfers',
+        'send_token_transfers',
         18181005,
         extract(epoch from '2023-01-21 01:32:59.000000 +00:00'::timestamp),
         1,
-        158);
+        158,
+        8453,
+        '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+        '\x1234',
+        0);
 
 insert into chain_addresses (address, user_id)
 values (concat('0x', :hodler_address),
@@ -90,17 +102,29 @@ select results_eq($$SELECT
 insert into public.send_token_transfers ("f",
                                        "t",
                                        "v",
+                                       ig_name,
+                                       src_name,
                                        block_num,
                                        block_time,
                                        tx_idx,
-                                       log_idx)
+                                       log_idx,
+                                       chain_id,
+                                       log_addr,
+                                       tx_hash,
+                                       abi_idx)
 values (decode(:hodler_address, 'hex'),
         (select address from send_liquidity_pools limit 1),
         64509,
+        'send_token_transfers',
+        'send_token_transfers',
         18180534,
         extract(epoch from '2023-01-20 23:58:35.000000 +00:00'::timestamp),
         1,
-        182);
+        182,
+        8453,
+        '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+        '\x1234',
+        0);
 
 select is_empty($$SELECT *
         FROM distribution_hodler_addresses((select id from distributions where number = 123)) $$,
