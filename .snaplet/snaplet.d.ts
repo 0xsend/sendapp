@@ -356,6 +356,8 @@ interface Table_public_send_account_transfers {
   tx_idx: number | null;
   log_idx: number | null;
   abi_idx: number | null;
+  f_tags: Json | null;
+  t_tags: Json | null;
 }
 interface Table_public_send_accounts {
   id: string;

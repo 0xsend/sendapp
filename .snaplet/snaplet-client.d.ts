@@ -280,6 +280,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      f_tags?: string;
+      t_tags?: string;
     };
   }
   send_accounts?: {
@@ -600,6 +602,8 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    fTags?: FingerprintJsonField;
+    tTags?: FingerprintJsonField;
   }
   sendAccounts?: {
     chainId?: FingerprintNumberField;

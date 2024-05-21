@@ -514,12 +514,14 @@ export type Database = {
           block_time: number | null
           chain_id: number | null
           f: string | null
+          f_tags: Json | null
           id: number
           ig_name: string | null
           log_addr: string | null
           log_idx: number | null
           src_name: string | null
           t: string | null
+          t_tags: Json | null
           tx_hash: string | null
           tx_idx: number | null
           v: number | null
@@ -530,12 +532,14 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           f?: string | null
+          f_tags?: Json | null
           id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
           src_name?: string | null
           t?: string | null
+          t_tags?: Json | null
           tx_hash?: string | null
           tx_idx?: number | null
           v?: number | null
@@ -546,12 +550,14 @@ export type Database = {
           block_time?: number | null
           chain_id?: number | null
           f?: string | null
+          f_tags?: Json | null
           id?: number
           ig_name?: string | null
           log_addr?: string | null
           log_idx?: number | null
           src_name?: string | null
           t?: string | null
+          t_tags?: Json | null
           tx_hash?: string | null
           tx_idx?: number | null
           v?: number | null
@@ -868,6 +874,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      send_account_activity: {
+        Row: {
+          block_num: number | null
+          block_time: number | null
+          log_idx: number | null
+          logdata: Json | null
+          table: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {
