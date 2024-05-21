@@ -713,42 +713,6 @@ export type Database = {
         }
         Relationships: []
       }
-      send_transfer_logs: {
-        Row: {
-          block_hash: string
-          block_number: number
-          block_timestamp: string
-          created_at: string | null
-          from: string
-          log_index: number
-          to: string
-          tx_hash: string
-          value: number
-        }
-        Insert: {
-          block_hash: string
-          block_number: number
-          block_timestamp: string
-          created_at?: string | null
-          from: string
-          log_index: number
-          to: string
-          tx_hash: string
-          value: number
-        }
-        Update: {
-          block_hash?: string
-          block_number?: number
-          block_timestamp?: string
-          created_at?: string | null
-          from?: string
-          log_index?: number
-          to?: string
-          tx_hash?: string
-          value?: number
-        }
-        Relationships: []
-      }
       tag_receipts: {
         Row: {
           hash: string
@@ -991,12 +955,6 @@ export type Database = {
       generate_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
-      }
-      insert_send_transfer_logs: {
-        Args: {
-          _send_transfer_logs: unknown[]
-        }
-        Returns: undefined
       }
       profile_lookup: {
         Args: {

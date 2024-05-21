@@ -341,20 +341,6 @@ type Override = {
       abi_idx?: string;
     };
   }
-  send_transfer_logs?: {
-    name?: string;
-    fields?: {
-      from?: string;
-      to?: string;
-      value?: string;
-      block_number?: string;
-      block_timestamp?: string;
-      block_hash?: string;
-      tx_hash?: string;
-      log_index?: string;
-      created_at?: string;
-    };
-  }
   tag_receipts?: {
     name?: string;
     fields?: {
@@ -645,13 +631,6 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
-  }
-  sendTransferLogs?: {
-    value?: FingerprintNumberField;
-    blockNumber?: FingerprintNumberField;
-    blockTimestamp?: FingerprintDateField;
-    logIndex?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
   }
   tagReceipts?: {
     ha?: FingerprintRelationField;

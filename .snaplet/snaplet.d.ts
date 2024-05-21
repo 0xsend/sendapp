@@ -402,17 +402,6 @@ interface Table_public_send_token_transfers {
   log_idx: number | null;
   abi_idx: number | null;
 }
-interface Table_public_send_transfer_logs {
-  from: string;
-  to: string;
-  value: number;
-  block_number: number;
-  block_timestamp: string;
-  block_hash: string;
-  tx_hash: string;
-  log_index: number;
-  created_at: string | null;
-}
 interface Table_auth_sessions {
   id: string;
   user_id: string;
@@ -588,7 +577,6 @@ interface Schema_public {
   send_liquidity_pools: Table_public_send_liquidity_pools;
   send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_token_transfers: Table_public_send_token_transfers;
-  send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
   tags: Table_public_tags;
