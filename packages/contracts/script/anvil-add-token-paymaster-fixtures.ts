@@ -31,3 +31,15 @@ void (async function main() {
 
   console.log(chalk.green('Done!'))
 })()
+
+/**
+ * For some reason, token paymaster stops working once it needs to update the cached price. This script is a workaround to fix that.
+
+PAYMASTER=0x85f874D9da566bc66AeC5bD62293de963bab88B0 \
+forge script ./script/UpdateTokenPaymasterCachedPrice.s.sol:UpdateTokenPaymasterCachedPriceScript \
+   -vvvv \
+ --fork-url base-local \
+ --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+ --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+ --broadcast
+ */
