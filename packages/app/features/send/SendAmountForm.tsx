@@ -1,54 +1,37 @@
-import { Button, Paragraph, Spinner, SubmitButton, XStack, YStack, Stack, Container } from '@my/ui'
+import { Button, Paragraph, Spinner, SubmitButton, XStack, YStack, Stack } from '@my/ui'
 import { z } from 'zod'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { formatUnits, parseUnits } from 'viem'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { useBalance } from 'wagmi'
 import formatAmount from 'app/utils/formatAmount'
+import { useSendScreenParams } from 'app/routers/params'
 
-import { coins } from 'app/data/coins'
-import { useSendParams } from 'app/routers/params'
 import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
+import { coins, type coin } from 'app/data/coins'
 
 // @todo add currency field
 const SendAmountSchema = z.object({
-  amount: formFields.number,
-  token: formFields.select,
+  amount: formFields.text,
+  token: formFields.coin,
 })
 
 export function SendAmountForm() {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
   const router = useRouter()
 
-  const { setParams } = useSendParams()
-  const {
-    params: { amount: amountParam, sendToken: tokenParam, recipient: recipientParam },
-  } = useSendParams()
+  const [sendParams, setSendParams] = useSendScreenParams()
 
   const token = form.watch('token')
-
-  useEffect(() => {
-    const subscription = form.watch(({ amount, token }) => {
-      setParams(
-        {
-          amount: amount?.toString(),
-          sendToken: token as `0x${string}` | 'eth',
-        },
-        { webBehavior: 'replace' }
-      )
-    })
-    return () => subscription.unsubscribe()
-  }, [form, setParams])
 
   // need balance to check if user has enough to send
   const {
     data: balance,
-    isPending: balanceIsPending,
+    isLoading: balanceIsLoading,
     error: balanceError,
     refetch: balanceRefetch,
   } = useBalance({
@@ -58,22 +41,44 @@ export function SendAmountForm() {
     chainId: baseMainnet.id,
   })
 
+  useEffect(() => {
+    const subscription = form.watch(({ amount, token }) => {
+      setSendParams(
+        {
+          ...sendParams,
+          amount: amount,
+          sendToken: token as `0x${string}` | 'eth',
+        },
+        { webBehavior: 'replace' }
+      )
+    })
+    return () => subscription.unsubscribe()
+  }, [form, setSendParams, sendParams])
+
+  const sendToken = sendParams.sendToken ?? usdcAddress[baseMainnet.id]
+  const selectedCoin = coins.find((c) => c.token === sendToken) ?? (coins[0] as coin)
+  const parsedAmount = parseUnits(sendParams.amount ?? '0', selectedCoin.decimals)
+
+  const canSubmit =
+    !balanceIsLoading &&
+    balance?.value !== undefined &&
+    sendParams.amount !== undefined &&
+    balance?.value > parsedAmount &&
+    parsedAmount > BigInt(0)
+
   async function onSubmit() {
     if (!canSubmit) return
-    const sendToken = (tokenParam || usdcAddress[baseMainnet.id]) as `0x${string}` | 'eth'
+
+    const amount = formatUnits(parsedAmount, selectedCoin.decimals)
     router.push({
       pathname: '/send/confirm',
       query: {
-        recipient: recipientParam,
-        amount: amountParam,
+        recipient: sendParams.recipient,
+        amount: amount,
         sendToken: sendToken,
       },
     })
   }
-
-  const parsedAmount = parseUnits((amountParam ?? '0').toString(), balance?.decimals ?? 0)
-
-  const canSubmit = balance?.value ?? BigInt(0) >= parsedAmount
 
   return (
     <FormProvider {...form}>
@@ -82,9 +87,6 @@ export function SendAmountForm() {
         schema={SendAmountSchema}
         onSubmit={onSubmit}
         props={{
-          token: {
-            options: coins.map((coin) => ({ name: coin.symbol, value: coin.token })),
-          },
           amount: {
             h: '$11',
             br: '$8',
@@ -111,20 +113,23 @@ export function SendAmountForm() {
               outlineColor: 'transparent',
             },
             fontFamily: '$mono',
+            keyboardType: balance?.decimals ? 'decimal-pad' : 'numeric',
+            onChangeText: (text) => {
+              form.setValue('amount', text.replace(/[^0-9.]/g, ''))
+            },
           },
         }}
         formProps={{
           testID: 'SendForm',
           $gtSm: { maxWidth: '100%' },
-          jc: 'flex-start',
-          f: 1,
+          jc: 'space-between',
         }}
         defaultValues={{
-          token: tokenParam || coins.find((coin) => coin.label === 'USDC')?.token,
-          amount: Number(amountParam || '0'),
+          token: sendParams.sendToken || usdcAddress[baseMainnet.id],
+          amount: sendParams.amount,
         }}
         renderAfter={({ submit }) => (
-          <XStack $gtLg={{ ai: 'flex-end', ml: 'auto' }} jc="center">
+          <XStack $gtLg={{ ai: 'flex-end', ml: 'auto' }} jc="center" mt="auto">
             <SubmitButton
               theme="accent"
               onPress={submit}
@@ -139,7 +144,7 @@ export function SendAmountForm() {
         )}
       >
         {({ amount, token }) => (
-          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto" f={1}>
+          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack
@@ -154,7 +159,7 @@ export function SendAmountForm() {
               >
                 {(() => {
                   switch (true) {
-                    case balanceIsPending:
+                    case balanceIsLoading:
                       return <Spinner size="small" />
                     case !balance || balanceError !== null:
                       return (

@@ -6,12 +6,9 @@ import {
   XStack,
   YStack,
   Stack,
-  SubmitButton,
   Button,
-  Link,
   Label,
   Avatar,
-  Input,
 } from '@my/ui'
 
 import { useSendAccounts } from 'app/utils/send-accounts'
@@ -21,8 +18,8 @@ import { assert } from 'app/utils/assert'
 import { baseMainnet } from '@my/wagmi'
 import { useBalance } from 'wagmi'
 import { useSendParams } from 'app/routers/params'
-import { useForm, FormProvider } from 'react-hook-form'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { useForm } from 'react-hook-form'
+import { formFields } from 'app/utils/SchemaForm'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
