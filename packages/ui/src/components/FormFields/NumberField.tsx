@@ -30,6 +30,7 @@ export const NumberField = (props: InputProps) => {
             keyboardType="number-pad"
             inputMode="numeric"
             value={field.value?.toString() || '0'}
+            bc={'$color2'}
             onChangeText={(text) => {
               const num = Number(text)
               if (Number.isNaN(num)) {
