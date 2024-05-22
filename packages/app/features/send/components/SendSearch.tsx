@@ -260,7 +260,7 @@ export function Search() {
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$olive' : '$black'
   return (
-    <View position="relative">
+    <View position="relative" testID="sendSearchContainer">
       <FormProvider {...form}>
         <SchemaForm
           form={form}
