@@ -60,6 +60,7 @@ const pgClient = new PgClient({
         },
       ],
       sendAccounts: [{}],
+      chainAddresses: [{}],
     },
     {
       phone: '1234567890',
@@ -80,6 +81,7 @@ const pgClient = new PgClient({
         },
       ],
       sendAccounts: [{}],
+      chainAddresses: [{}],
     },
     {
       phone: '15555555555',
@@ -100,6 +102,7 @@ const pgClient = new PgClient({
         },
       ],
       sendAccounts: [{}],
+      chainAddresses: [{}],
     },
     ...Array(100).fill(userOnboarded),
   ])

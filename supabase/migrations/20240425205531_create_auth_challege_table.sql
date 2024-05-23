@@ -63,30 +63,22 @@ create or replace function upsert_auth_challenges(
     declare _auth_id uuid;
             _created timestamptz;
             _expires timestamptz;
-            _old_auth auth_challenges;
             _new_challenge auth_challenges;
     begin
         -- Generate challenge auxiliary metadata for the new challenge.
         _created := current_timestamp;
         _expires := _created + interval '15 minute'; -- 15 minutes from creation
-
-        select * into _old_auth from "public"."auth_challenges"
-        where "public"."auth_challenges"."user_id" = userid;
-
-        -- Check if we need to assign a new id to the challenge
-        if _old_auth."id" is null or _old_auth."expires_at" < _created then
-            _auth_id := gen_random_uuid();
-        end if;
+        _auth_id := gen_random_uuid();
 
         -- Upsert the record, insert first and fall back to update on conflict
-        insert into "public"."auth_challenges"
+        INSERT INTO "public"."auth_challenges"
         -- insert all fields as `returning` for Insert only returns provided fields
-        (id, user_id, challenge, created_at, expires_at)
-        values (_auth_id, userid, challenge, _created, _expires)
+        (user_id, challenge, created_at, expires_at)
+        VALUES (userid, challenge, _created, _expires)
         -- Perform an update if user_id already exist on in the database
-        on conflict (user_id) do update
+        ON conflict (user_id) do UPDATE
             -- Set the relevant columns in the row
-            set id = excluded.id,                 -- set the new id field to overwrite the old one
+            set id = _auth_id,
                 user_id = excluded.user_id,       -- set the new user_id
                 challenge = excluded.challenge,   -- set the new challenge
                 created_at = excluded.created_at, -- set the new created timestamp

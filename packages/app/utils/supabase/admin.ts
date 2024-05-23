@@ -14,6 +14,9 @@ if (!process.env.SUPABASE_SERVICE_ROLE) {
 
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
+// @note see how Supabase does it here: https://github.com/supabase/supabase-js/blob/f6bf008d8017ae013450ecd3fa806acad735bacc/src/SupabaseClient.ts#L95
+export const SUPABASE_SUBDOMAIN = new URL(SUPABASE_URL).hostname.split('.')[0]
+
 const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE
 
 /**

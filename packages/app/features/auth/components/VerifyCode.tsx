@@ -1,5 +1,6 @@
 import {
   BigHeading,
+  Button,
   ButtonText,
   FormWrapper,
   H3,
@@ -11,7 +12,6 @@ import {
 import type { MobileOtpType } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -22,10 +22,11 @@ const ConfirmSchema = z.object({
 export type VerifyCodeProps = {
   phone: string
   onSuccess: () => void
+  onRecover?: () => void
   type?: MobileOtpType
 }
 
-export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) => {
+export const VerifyCode = ({ phone, onSuccess, onRecover, type = 'sms' }: VerifyCodeProps) => {
   const supabase = useSupabase()
   const form = useForm<z.infer<typeof ConfirmSchema>>()
   async function confirmCode({ token }: z.infer<typeof ConfirmSchema>) {
@@ -96,10 +97,12 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           <XStack
             f={1}
             mt={'0'}
-            jc={'flex-end'}
+            jc={'space-between'}
             $sm={{ jc: 'center', height: '100%' }}
             ai={'flex-start'}
           >
+            {/* TODO: style button */}
+            <Button onPress={onRecover}>Recover account</Button>
             <SubmitButton
               onPress={() => submit()}
               br="$3"

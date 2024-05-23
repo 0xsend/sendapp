@@ -6,13 +6,13 @@ import { distributionRouter } from './distribution'
 import { tagRouter } from './tag'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
-import { challengeRouter } from './challenge'
+import { accountRecoveryRouter } from './account-recovery/router'
 
 export const appRouter = createTRPCRouter({
   chainAddress: chainAddressRouter,
   tag: tagRouter,
   auth: authRouter,
-  challenge: challengeRouter,
+  challenge: accountRecoveryRouter,
   distribution: distributionRouter,
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,

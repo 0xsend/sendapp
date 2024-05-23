@@ -5,7 +5,7 @@ import { test as webauthnTest } from '../webauthn'
 import type { Database, Tables } from '@my/supabase/database.types'
 import { type Session, type SupabaseClient, type User, createClient } from '@supabase/supabase-js'
 import { countries } from 'app/utils/country'
-import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
+import { SUPABASE_URL, SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
@@ -60,9 +60,8 @@ const authTest = base.extend<{
     const { access_token, refresh_token } = session
 
     // @note see how Supabase does it here: https://github.com/supabase/supabase-js/blob/f6bf008d8017ae013450ecd3fa806acad735bacc/src/SupabaseClient.ts#L95
-    const subdomain = new URL(SUPABASE_URL).hostname.split('.')[0]
-    assert(!!subdomain, 'subdomain not found')
-    const name = `sb-${subdomain}-auth-token`
+    assert(!!SUPABASE_SUBDOMAIN, 'subdomain not found')
+    const name = `sb-${SUPABASE_SUBDOMAIN}-auth-token`
     const domain = new URL(config.use.baseURL).hostname
     assert(!!domain, 'domain not found')
 

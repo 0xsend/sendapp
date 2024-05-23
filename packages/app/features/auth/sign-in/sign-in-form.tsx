@@ -5,12 +5,15 @@ import { api } from 'app/utils/api'
 import { useRouter } from 'solito/router'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { z } from 'zod'
+import { useState } from 'react'
+import AccountRecoveryScreen from 'app/features/auth/account-recovery/screen'
 
 const SignInSchema = z.object({
   countrycode: formFields.countrycode,
   phone: formFields.text.min(1).max(20),
 })
 export const SignInForm = () => {
+  const [showRecoveryForm, setShowRecoveryForm] = useState<boolean>(false)
   const form = useForm<z.infer<typeof SignInSchema>>()
   const signInWithOtp = api.auth.signInWithOtp.useMutation()
 
@@ -37,12 +40,22 @@ export const SignInForm = () => {
   return (
     <FormProvider {...form}>
       {form.formState.isSubmitSuccessful ? (
-        <VerifyCode
-          phone={`${form.getValues().countrycode}${form.getValues().phone}`}
-          onSuccess={() => {
-            router.push('/')
-          }}
-        />
+        showRecoveryForm ? (
+          <AccountRecoveryScreen
+            phoneNumber={`${form.getValues().countrycode}${form.getValues().phone}`}
+            onClose={() => setShowRecoveryForm(false)}
+          />
+        ) : (
+          <VerifyCode
+            phone={`${form.getValues().countrycode}${form.getValues().phone}`}
+            onSuccess={() => {
+              router.push('/')
+            }}
+            onRecover={() => {
+              setShowRecoveryForm(true)
+            }}
+          />
+        )
       ) : (
         <SchemaForm
           flex={1}
