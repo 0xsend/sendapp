@@ -88,13 +88,13 @@ export const TextField = (props: InputProps) => {
                 fontSize={'$5'}
                 fontStyle={field.value ? 'normal' : 'italic'}
                 fontWeight={field.value ? 'bold' : 'normal'}
+                bc={'$color2'}
                 $theme-dark={{
                   color: '$gray12Dark',
                   // placeholderTextColor fails in test env for some reason
                   ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
                 }}
                 $theme-light={{
-                  bc: '$gray2Light',
                   color: '$black',
                   // placeholderTextColor fails in test env for some reason
                   ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
