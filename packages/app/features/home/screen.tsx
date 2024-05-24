@@ -13,14 +13,14 @@ import {
 } from '@my/ui'
 import { IconDeposit, IconPlus } from 'app/components/icons'
 import { TokenBalanceList } from './TokenBalanceList'
-import { coins } from 'app/data/coins'
+import { coins } from 'app/utils/coin'
 import { TokenBalanceCard } from './TokenBalanceCard'
 import { useToken } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { X } from '@tamagui/lucide-icons'
 import { TokenDetails } from './TokenDetails'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 export function HomeScreen() {
   const toast = useToastController()
@@ -30,10 +30,9 @@ export function HomeScreen() {
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
   const selectedCoin = useCoinFromTokenParam()
-  const { data: sendAccounts, isLoading: sendAccountLoading } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
 
-  const hasSendAccount = !(sendAccount === undefined || sendAccount.length === 0)
+  const hasSendAccount = !!sendAccount
 
   return (
     <YStack f={1}>
