@@ -8,6 +8,15 @@ import { radius } from './themes/token-radius'
 import { size } from './themes/token-size'
 import { space } from './themes/token-space'
 import { zIndex } from './themes/token-z-index'
+import { setupDev } from '@tamagui/core'
+
+setupDev({
+  // can just be true as well for defaulting to key: Alt + delay: 800
+  visualizer: {
+    key: 'Alt',
+    delay: 800,
+  },
+})
 
 import * as themes from './themes/theme-generated'
 import { color } from './themes/token-colors'

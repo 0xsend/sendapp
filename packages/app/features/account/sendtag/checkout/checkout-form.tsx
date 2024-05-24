@@ -2,6 +2,7 @@ import {
   AnimatePresence,
   Avatar,
   Button,
+  ButtonIcon,
   ButtonText,
   Fade,
   Input,
@@ -90,7 +91,7 @@ export const CheckoutForm = () => {
             autoFocus: true,
             'aria-label': 'Sendtag name',
             placeholder: 'Enter Sendtag name',
-            bc: '$color2',
+
             fieldsetProps: {
               f: 1,
             },
@@ -116,9 +117,7 @@ export const CheckoutForm = () => {
                   br={12}
                   icon={<IconPlus />}
                 >
-                  <ButtonText fontFamily={'$mono'} col={'$color12'}>
-                    ADD TAG
-                  </ButtonText>
+                  <ButtonText fontFamily={'$mono'}>ADD TAG</ButtonText>
                 </SubmitButton>
                 {media.gtMd ? (
                   <SendTagPricingTooltip name={form.watch('name', '')} />
@@ -227,6 +226,7 @@ export const CheckoutForm = () => {
                           p="$0"
                           hoverStyle={{
                             bg: 'transparent',
+                            boc: '$backgroundTransparent',
                           }}
                           onPress={() => {
                             supabase
@@ -243,7 +243,11 @@ export const CheckoutForm = () => {
                               .then(() => user?.updateProfile())
                           }}
                         >
-                          <X color="$red500" size={16} />
+                          <Theme name="red">
+                            <ButtonIcon>
+                              <X color={'$color8'} size={16} />
+                            </ButtonIcon>
+                          </Theme>
                         </Button>
                       </XStack>
                     </XStack>
@@ -270,7 +274,7 @@ export const CheckoutForm = () => {
       <ReferredBy />
 
       {hasPendingTags && (
-        <Theme name="accent">
+        <Theme name="green">
           <AnimatePresence>
             <XStack w="100%">
               <Stack
@@ -376,7 +380,7 @@ function ReferredBy() {
             />
             {profile && (
               <Fade>
-                <Check color="$accent10Dark" size="1" position="absolute" right="$3" top="$3" />
+                <Check color="$green10Dark" size="1" position="absolute" right="$3" top="$3" />
               </Fade>
             )}
           </XStack>

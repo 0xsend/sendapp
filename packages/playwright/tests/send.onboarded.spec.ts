@@ -99,7 +99,7 @@ for (const token of tokens) {
       await page.locator('[id="__next"]').getByRole('button', { name: 'Send' }).click()
 
       // fill search input
-      const searchInput = page.getByPlaceholder('$Sendtag, Phone, Send ID')
+      const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID')
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 

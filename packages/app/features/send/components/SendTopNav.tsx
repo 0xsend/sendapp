@@ -85,7 +85,7 @@ function Button(props: ButtonProps) {
       focusStyle={{
         backgroundColor: 'transparent',
       }}
-      theme="accent"
+      theme="green"
       {...props}
     />
   )

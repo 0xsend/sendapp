@@ -1,4 +1,8 @@
+import { combineMasks, type ThemeDefinitions } from '@tamagui/create-theme'
 import { maskOptions } from './templates'
+import type { masks } from './masks'
+
+type Masks = typeof masks
 
 const overlayThemes = {
   light: {
@@ -33,17 +37,25 @@ export const componentThemeDefinitions = {
       ...maskOptions.component,
     },
   ],
-
   Card: {
     mask: 'soften',
     ...maskOptions.component,
   },
-
-  Button: {
-    mask: 'soften2',
-    ...maskOptions.button,
-  },
-
+  Button: [
+    {
+      parent: 'dark_green',
+      mask: 'inverseSoften3',
+      ...maskOptions.button,
+      override: {
+        color: 0,
+      },
+    },
+    {
+      parent: '',
+      mask: 'soften',
+      ...maskOptions.button,
+    },
+  ],
   Checkbox: {
     mask: 'soften2',
     ...maskOptions.component,
@@ -57,11 +69,10 @@ export const componentThemeDefinitions = {
   SwitchThumb: {
     mask: 'inverseStrengthen2',
     ...maskOptions.component,
-    debug: true,
   },
 
   TooltipContent: {
-    mask: 'soften2',
+    mask: 'strengthen',
     ...maskOptions.component,
   },
 
@@ -99,28 +110,17 @@ export const componentThemeDefinitions = {
     mask: 'inverse',
     ...maskOptions.component,
   },
-
   ProgressIndicator: {
     mask: 'inverse',
     ...maskOptions.component,
   },
-
   SheetOverlay: overlayThemeDefinitions,
   DialogOverlay: overlayThemeDefinitions,
   ModalOverlay: overlayThemeDefinitions,
-
-  Input: [
-    {
-      parent: 'light',
-      mask: 'strengthenButSoftenBorder',
-      ...maskOptions.component,
-    },
-    {
-      parent: 'dark',
-      mask: 'softenBorder',
-      ...maskOptions.component,
-    },
-  ],
+  Input: {
+    mask: 'soften',
+    ...maskOptions.component,
+  },
 
   TextArea: [
     {
@@ -134,16 +134,9 @@ export const componentThemeDefinitions = {
       ...maskOptions.component,
     },
   ],
-  SideBar: [
-    {
-      parent: 'light',
-      mask: 'strengthen',
-      ...maskOptions.component,
-    },
-    {
-      parent: 'dark',
-      mask: 'identity',
-      ...maskOptions.component,
-    },
-  ],
-}
+  Separator: { mask: 'soften3', ...maskOptions.component },
+  Surface: {
+    mask: 'soften',
+    ...maskOptions.component,
+  },
+} satisfies ThemeDefinitions<keyof Masks>

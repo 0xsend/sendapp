@@ -278,7 +278,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
           />
         </YStack> */}
         <Button
-          theme="accent"
+          theme="green"
           onPress={onSubmit}
           br={12}
           disabledStyle={{ opacity: 0.5 }}

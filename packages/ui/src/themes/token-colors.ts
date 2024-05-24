@@ -2,13 +2,8 @@ import type { Variable } from '@tamagui/web'
 import {
   blue,
   blueDark,
-  brandColors,
-  gold,
-  goldDark,
   gray,
   grayDark,
-  green,
-  greenDark,
   orange,
   orangeDark,
   pink,
@@ -17,44 +12,36 @@ import {
   purpleDark,
   red,
   redDark,
-  accent,
   yellow,
   yellowDark,
-} from './colors'
+  gold,
+  goldDark,
+} from '@tamagui/colors'
 
-export {
-  darkColor,
-  darkPalette,
-  darkTransparent,
-  lightColor,
-  lightPalette,
-  lightTransparent,
-} from './colors'
+import { brandColors, greenPalette } from './colors'
 
 export const colorTokens = {
   light: {
     blue: blue,
     gray: gray,
-    green: green,
+    green: greenPalette.light,
     orange: orange,
     pink: pink,
     purple: purple,
     red: red,
     yellow: yellow,
     gold: gold,
-    accent: accent,
   },
   dark: {
     blue: blueDark,
     gray: grayDark,
-    green: greenDark,
+    green: greenPalette.dark,
     orange: orangeDark,
     pink: pinkDark,
     purple: purpleDark,
     red: redDark,
     yellow: yellowDark,
     gold: goldDark,
-    accent: accent,
   },
 }
 
@@ -68,7 +55,6 @@ export const darkColors = {
   ...colorTokens.dark.red,
   ...colorTokens.dark.yellow,
   ...colorTokens.dark.gold,
-  ...colorTokens.dark.accent,
 }
 
 export const lightColors = {
@@ -81,7 +67,6 @@ export const lightColors = {
   ...colorTokens.light.red,
   ...colorTokens.light.yellow,
   ...colorTokens.light.gold,
-  ...colorTokens.dark.accent,
 }
 
 export const color = {

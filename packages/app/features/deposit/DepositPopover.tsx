@@ -1,18 +1,20 @@
 import {
   Button,
-  Paragraph,
   XStack,
   YStack,
   Adapt,
   Popover,
   type PopoverProps,
   useMedia,
+  ButtonText,
+  Theme,
 } from '@my/ui'
 import { IconClose, IconDeposit } from 'app/components/icons'
 import { DepositWelcome } from './screen'
 
 export function DepositPopover(props: PopoverProps) {
   const media = useMedia()
+
   return (
     <Popover
       size="$5"
@@ -23,16 +25,18 @@ export function DepositPopover(props: PopoverProps) {
       offset={{ mainAxis: 0, crossAxis: 0, alignmentAxis: 0 }}
     >
       <Popover.Trigger asChild>
-        <Button px={'$3.5'} h={'$4.5'} width={'100%'} theme="accent" borderRadius={'$4'}>
-          <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-            <Paragraph fontWeight={'500'} textTransform={'uppercase'} color={'$black'}>
-              Deposit
-            </Paragraph>
-            <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-              <IconDeposit size={'$2.5'} color={'$black'} />
+        <Theme name="green">
+          <Button px={'$3.5'} h={'$4.5'} width={'100%'} borderRadius={'$4'}>
+            <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+              <ButtonText fontWeight={'500'} textTransform={'uppercase'}>
+                Deposit
+              </ButtonText>
+              <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                <IconDeposit size={'$2.5'} />
+              </XStack>
             </XStack>
-          </XStack>
-        </Button>
+          </Button>
+        </Theme>
       </Popover.Trigger>
 
       <Adapt when="sm" platform="touch">

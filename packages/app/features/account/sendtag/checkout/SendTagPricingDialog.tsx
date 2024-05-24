@@ -204,7 +204,7 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
         {isOpen && (
           <Separator
             w={68}
-            theme="accent"
+            theme="green"
             boc={'$color10'}
             borderStyle="dashed"
             pos={'absolute'}

@@ -130,7 +130,7 @@ export default function AccountRecovery(props: Props) {
         {!error && challengeData && showRecoveryOptions()}
       </Stack>
 
-      <Button w={'100%'} theme="accent" onPress={props.onClose}>
+      <Button w={'100%'} theme="green" onPress={props.onClose}>
         <ButtonText>RETURN</ButtonText>
       </Button>
     </YStack>

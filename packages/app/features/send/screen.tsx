@@ -59,7 +59,7 @@ function SendSearchBody() {
         </YStack>
       )}
       {error && (
-        <YStack key="error" gap="$4" mb="$4">
+        <YStack key="red" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
           <Text>{error.message}</Text>
         </YStack>

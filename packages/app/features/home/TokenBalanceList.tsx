@@ -6,6 +6,8 @@ import {
   XStack,
   Link,
   type LinkProps,
+  Separator,
+  Theme,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
@@ -19,25 +21,24 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
   const [{ token: tokenParam }] = useRootScreenParams()
-  const { resolvedTheme } = useThemeSetting()
-  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
   return coins.map((coin, index) => (
-    <TokenBalanceItem
-      coin={coin}
-      key={coin.label}
-      jc={'space-between'}
-      ai={'center'}
-      py={'$3.5'}
-      borderColor={separatorColor}
-      disabled={tokenParam !== undefined && tokenParam !== coin.token}
-      disabledStyle={{ opacity: 0.5 }}
-      href={{
-        pathname: '/',
-        query: { token: coin.token },
-      }}
-      borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
-    />
+    <>
+      <TokenBalanceItem
+        coin={coin}
+        key={coin.label}
+        jc={'space-between'}
+        ai={'center'}
+        py={'$3.5'}
+        disabled={tokenParam !== undefined && tokenParam !== coin.token}
+        disabledStyle={{ opacity: 0.5 }}
+        href={{
+          pathname: '/',
+          query: { token: coin.token },
+        }}
+      />
+      {index !== coins.length - 1 && <Separator />}
+    </>
   ))
 }
 
@@ -77,9 +78,6 @@ const TokenBalanceItem = ({
 }
 
 const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
-
   if (balance) {
     if (balance.isError) {
       return (
@@ -100,8 +98,8 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
       return <></>
     }
     return (
-      <>
-        <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
+      <Theme name="green">
+        <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'}>
           {formatAmount(
             (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString(),
             10,
@@ -109,10 +107,10 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
           )}
         </Paragraph>
 
-        <XStack $lg={{ display: 'none' }}>
-          <IconArrowRight color={iconColor} />
+        <XStack $lg={{ display: 'none' }} theme="green">
+          <IconArrowRight col={'$background'} />
         </XStack>
-      </>
+      </Theme>
     )
   }
 }

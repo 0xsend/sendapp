@@ -1,8 +1,11 @@
-import { YStack, type YStackProps } from 'tamagui'
+import { Nav, styled, type YStackProps } from 'tamagui'
+
+const StyledSideBar = styled(Nav, { name: 'Surface' })
 
 export const SideBar = ({ children, ...props }: YStackProps) => {
   return (
-    <YStack
+    <StyledSideBar
+      bc={props.bc ?? props.backgroundColor ?? '$background'}
       h={props.h ?? props.height ?? '100%'}
       width={props.w ?? props.width ?? '20%'}
       py={props.py ?? props.paddingVertical ?? '$6'}
@@ -14,6 +17,6 @@ export const SideBar = ({ children, ...props }: YStackProps) => {
       {...props}
     >
       {children}
-    </YStack>
+    </StyledSideBar>
   )
 }

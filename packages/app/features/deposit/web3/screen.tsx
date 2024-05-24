@@ -411,7 +411,7 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
     return (
       <Wrapper>
         <Stack width="100%" f={1} jc="center">
-          <Spinner size="small" color="$accent10Dark" />
+          <Spinner size="small" color="$green10Dark" />
         </Stack>
       </Wrapper>
     )

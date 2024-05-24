@@ -144,7 +144,7 @@ export function SendAmountForm({ profile }: { profile: Functions<'profile_lookup
         renderAfter={({ submit }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
             <SubmitButton
-              theme="accent"
+              theme="green"
               onPress={submit}
               px="$15"
               br={12}

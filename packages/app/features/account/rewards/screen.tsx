@@ -36,7 +36,6 @@ import { IconPlus } from 'app/components/icons'
 
 export function RewardsScreen() {
   const { data: distributions, isLoading } = useDistributions()
-
   const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
 
   const [queryParams] = useRewardsScreenParams()
@@ -56,7 +55,7 @@ export function RewardsScreen() {
     )
 
   return (
-    <YStack f={1} gap="$6" pb="$5" jc="space-between">
+    <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between" h="95%">
       {selectedDistribution ? (
         <>
           <YStack gap="$4" f={2} overflow={'hidden'}>
@@ -209,13 +208,12 @@ const DistributionRewardsSection = ({
         </XStack>
       </Stack>
       {confirmedTags?.length === 0 ? (
-        <YStack
+        <Card
           w="100%"
           jc={'space-around'}
           ai="center"
           f={1}
           my="auto"
-          bc="$color2"
           $md={{ br: '$6' }}
           p="$6"
           br="$6"
@@ -226,7 +224,7 @@ const DistributionRewardsSection = ({
           <Stack jc="center" ai="center">
             <Link
               href={'/account/sendtag/checkout'}
-              theme="accent"
+              theme="green"
               borderRadius={'$4'}
               p={'$3.5'}
               $xs={{ p: '$2.5', px: '$4' }}
@@ -242,7 +240,7 @@ const DistributionRewardsSection = ({
               </XStack>
             </Link>
           </Stack>
-        </YStack>
+        </Card>
       ) : (
         <Stack fd="column" $gtLg={{ fd: 'row', mah: 248 }} gap="$2" f={1} my="auto">
           <YStack $gtLg={{ w: '50%' }} gap="$2" $gtSm={{ gap: '$4' }}>
@@ -334,32 +332,33 @@ const SendBalanceCard = ({
 
   return (
     <Card
-      bc="transparent"
-      borderWidth={1}
+      bw={1}
       br={12}
-      borderColor={'$decay'}
+      theme="ghost_dim"
       p="$4"
       $xs={{ p: '$2.5' }}
       $gtLg={{ p: '$4' }}
       jc="center"
     >
       <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-        <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
+        <Label fontFamily={'$mono'} fontSize={'$5'} color="$color9">
           Snapshot Send Balance
         </Label>
         {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
           <Spinner color={'$color'} />
         ) : (
-          <Paragraph fontFamily={'$mono'} col="$color12" fontSize={'$7'} fontWeight={'500'}>
-            {(() => {
-              switch (true) {
-                case snapshotBalance === undefined:
-                  return 'Error fetching SEND balance'
-                default:
-                  return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
-              }
-            })()}
-          </Paragraph>
+          <Theme reset>
+            <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
+              {(() => {
+                switch (true) {
+                  case snapshotBalance === undefined:
+                    return 'Error fetching SEND balance'
+                  default:
+                    return `${formatAmount(snapshotBalance.toString(), 9, 0)} SEND`
+                }
+              })()}
+            </Paragraph>
+          </Theme>
         )}
       </YStack>
     </Card>
@@ -368,24 +367,21 @@ const SendBalanceCard = ({
 const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) => (
   <Card
     f={2}
-    bc="transparent"
-    borderWidth={1}
+    theme="ghost_dim"
+    bw={1}
     br={12}
-    borderColor={'$decay'}
     $xs={{ p: '$2.5' }}
     p="$4"
     $gtLg={{ p: '$4' }}
     jc="center"
   >
     <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-      <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
+      <Label fontFamily={'$mono'} fontSize={'$5'} color="$color9">
         Min Balance required
       </Label>
-      <Theme inverse>
-        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-          {hodler_min_balance ? `${formatAmount(hodler_min_balance, 9, 0)} SEND` : '?'}
-        </Paragraph>
-      </Theme>
+      <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
+        {hodler_min_balance ? `${formatAmount(hodler_min_balance, 9, 0)} SEND` : '?'}
+      </Paragraph>
     </YStack>
   </Card>
 )
@@ -393,24 +389,22 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) 
 const ReferralsCard = ({ referrals }: { referrals: number | null }) => (
   <Card
     f={1}
-    bc="transparent"
     borderWidth={1}
     br={12}
-    borderColor={'$decay'}
+    theme="ghost_dim"
     $xs={{ p: '$2.5' }}
     p="$4"
     $gtLg={{ p: '$4' }}
     jc="center"
   >
     <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-      <Label fontFamily={'$mono'} col="$olive" fontSize={'$5'}>
+      <Label fontFamily={'$mono'} fontSize={'$5'} col={'$color9'}>
         Referrals
       </Label>
-      <Theme inverse>
-        <Paragraph fontFamily={'$mono'} col="$background" fontSize={'$7'} fontWeight={'500'}>
-          {referrals !== null ? referrals : '---'}
-        </Paragraph>
-      </Theme>
+
+      <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} col={'$color12'}>
+        {referrals !== null ? referrals : '---'}
+      </Paragraph>
     </YStack>
   </Card>
 )
@@ -424,16 +418,7 @@ const SendRewardsCard = ({
   const rewardValue = pricePerSend && shareAmount ? shareAmount * pricePerSend : undefined
 
   return (
-    <Card
-      f={1}
-      mih={198}
-      p="$6"
-      $gtLg={{ f: 1, p: '$6' }}
-      $gtMd={{ f: 2 }}
-      bc="$color2"
-      br={12}
-      jc="center"
-    >
+    <Card f={1} mih={198} p="$6" $gtLg={{ f: 1, p: '$6' }} $gtMd={{ f: 2 }} br={12} jc="center">
       <YStack gap="$4" mx="auto" jc="center" ai="center">
         <Stack gap="$6">
           <Label fontFamily={'$mono'} col="$olive" ta="left" fontSize={'$5'}>
@@ -504,30 +489,32 @@ const DistributionRewardsList = ({
         overflow="scroll"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
+        pb="$4"
       >
         <XStack w="100%" gap="$2" jc={'space-between'} maw={1072} mx="auto">
           {allDistributions?.map((distribution, i) => {
             return distribution?.id === undefined ? (
-              <Button
+              <Card
                 key={distribution.number}
-                bc={'$darkest'}
                 f={1}
                 maw={84}
                 miw="$7"
                 h="$2"
                 br={6}
                 disabled
-                opacity={0.4}
+                jc="center"
+                opacity={0.5}
               >
-                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$olive">
+                <Paragraph size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$color9">
                   {`# ${i + 1}`}
-                </ButtonText>
-              </Button>
+                </Paragraph>
+              </Card>
             ) : queryParams.distribution === distribution?.number ||
               (queryParams.distribution === undefined &&
                 distribution?.number === distributions?.length) ? (
               <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
                 <View
+                  theme="green_alt1"
                   position="absolute"
                   top={-5}
                   left={0}
@@ -537,17 +524,17 @@ const DistributionRewardsList = ({
                   h={0}
                   borderLeftColor={'transparent'}
                   borderRightColor={'transparent'}
-                  borderBottomColor={'$accent12Dark'}
+                  borderBottomColor={'$background'}
                   borderBottomWidth={8}
                   borderLeftWidth={8}
                   borderRightWidth={8}
                 />
 
                 <Button
+                  theme="green"
                   onPress={() =>
                     setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
                   }
-                  bc={'$accent12Dark'}
                   br={6}
                   h="$2"
                   disabled
@@ -567,11 +554,11 @@ const DistributionRewardsList = ({
               <Button
                 key={distribution.number}
                 f={1}
-                bc={'$decay'}
                 maw={84}
                 miw="$7"
                 h="$2"
                 br={6}
+                theme="green_alt2"
                 onPress={() =>
                   setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
                 }
