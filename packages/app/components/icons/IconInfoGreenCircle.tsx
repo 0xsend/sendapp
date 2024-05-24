@@ -4,7 +4,7 @@ import { Svg, Circle as _Circle, Path } from 'react-native-svg'
 import { themed } from '@tamagui/helpers-icon'
 import type { ColorTokens } from '@my/ui'
 
-const Icon = (props: IconProps) => {
+const Icon = (props) => {
   const { color = 'black', size = 24, ...otherProps } = props
   return (
     <Svg

@@ -3,7 +3,7 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { G, Path, Svg } from 'react-native-svg'
 
-const QRCode = (props: IconProps) => {
+const QRCode = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -81,5 +81,5 @@ const QRCode = (props: IconProps) => {
     </Svg>
   )
 }
-const IconQRCode = memo(themed(QRCode))
+const IconQRCode = memo<IconProps>(themed(QRCode))
 export { IconQRCode }
