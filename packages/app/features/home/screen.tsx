@@ -13,7 +13,7 @@ import {
 } from '@my/ui'
 import { IconDeposit, IconPlus } from 'app/components/icons'
 import { TokenBalanceList } from './TokenBalanceList'
-import { coins } from 'app/utils/coin'
+import { coins } from 'app/data/coins'
 import { TokenBalanceCard } from './TokenBalanceCard'
 import { useToken } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
