@@ -123,7 +123,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   return (
     <XStack gap="$2" ai="center" jc={'space-around'}>
       <Paragraph
-        fontSize="$4"
+        fontSize={14}
         fontWeight="500"
         $theme-dark={{ color: '$gray8Light' }}
         color={'$color12'}

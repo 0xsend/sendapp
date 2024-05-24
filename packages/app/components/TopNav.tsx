@@ -24,6 +24,7 @@ import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBotto
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
+import { usePwa } from 'app/utils/usePwa'
 
 export enum ButtonOption {
   QR = 'QR',
@@ -64,6 +65,7 @@ export function TopNav({
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
   const [, setTokenParam] = useToken()
+  const isPwa = usePwa()
 
   const handleHomeBottomSheet = () => {
     setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
@@ -144,7 +146,7 @@ export function TopNav({
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        $lg={{ pt: '$6', pb: '$3' }}
+        $lg={{ pt: isPwa ? '$0' : '$5', pb: '$5' }}
       >
         <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
           {isSubRoute || hasSelectedCoin ? (
@@ -203,7 +205,7 @@ export function TopNav({
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
-      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} mt="$4" />
+      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
         <Container pos="relative">
           <View
@@ -220,7 +222,8 @@ export function TopNav({
               br={'$2'}
               $theme-dark={{ boc: '$decay' }}
               $theme-light={{ boc: '$gray4Light' }}
-              p={'$2'}
+              py={'$1.5'}
+              px={'$2'}
               miw="$18"
               bc="$background"
             >
