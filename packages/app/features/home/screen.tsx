@@ -66,7 +66,6 @@ export function HomeScreen() {
         >
           <Card
             $gtLg={{ p: 36 }}
-            $lg={{ bc: 'transparent' }}
             py={'$9'}
             px={'$2'}
             w={'100%'}

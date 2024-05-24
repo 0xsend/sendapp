@@ -54,6 +54,23 @@ export const { templates, maskOptions } = (() => {
       borderColorFocus: 4,
       borderColorPress: 4,
     },
+    accent: {
+      ...template,
+      background: 6,
+      backgroundHover: 7,
+      backgroundPress: 0,
+      backgroundFocus: 1,
+      backgroundStrong: 7,
+      borderColor: 6,
+      borderColorHover: 7,
+      borderColorFocus: 0,
+      borderColorPress: 6,
+      color: -0,
+      colorHover: -4,
+      colorFocus: -2,
+      colorPress: -3,
+      colorTransparent: 'transparent',
+    },
   }
 
   const shadows = {

@@ -11,6 +11,7 @@ import {
   YStack,
   useMedia,
   type YStackProps,
+  Theme,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
 import {
