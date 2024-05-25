@@ -15,21 +15,19 @@ select a.created_at                       as created_at,
                        case when a.from_user_id = from_p.id then from_p.name end,
                        case when a.from_user_id = from_p.id then from_p.avatar_url end,
                        case when a.from_user_id = from_p.id then from_p.send_id end,
-                       case when a.from_user_id = from_p.id then array_remove(array_agg(from_t.name::text), null) end
+                       case when a.from_user_id = from_p.id then (select name from tags where user_id = from_p.id and status = 'confirmed') end
                )::activity_feed_user end) as from_user,
        (case when a.to_user_id = to_p.id then (case when a.to_user_id = ( select auth.uid() ) then a.to_user_id end,
                                                case when a.to_user_id = to_p.id then to_p.name end,
                                                case when a.to_user_id = to_p.id then to_p.avatar_url end,
                                                case when a.to_user_id = to_p.id then to_p.send_id end,
                                                case when a.to_user_id = to_p.id
-                                                        then array_remove(array_agg(to_t.name::text), null) end
+                                                        then (select name from tags where user_id = to_.id and status = 'confirmed') end
            )::activity_feed_user end)     as to_user,
        a.data                             as data
 from activity a
          left join profiles from_p on a.from_user_id = from_p.id
-         left join tags from_t on from_p.id = from_t.user_id
          left join profiles to_p on a.to_user_id = to_p.id
-         left join tags to_t on to_p.id = to_t.user_id
 where a.from_user_id = ( select auth.uid() )
    or a.to_user_id = ( select auth.uid() )
 group by a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url,

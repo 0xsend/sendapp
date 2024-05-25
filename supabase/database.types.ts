@@ -91,6 +91,8 @@ export type Database = MergeDeep<
       Views: {
         activity_feed: {
           Row: {
+            created_at: string
+            event_name: string
             from_user: Merge<
               DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
               { tags: string[] }

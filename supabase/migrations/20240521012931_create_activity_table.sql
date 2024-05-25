@@ -12,12 +12,5 @@ create index activity_from_user_id_event_name_idx on activity using btree (from_
 create index activity_to_user_id_event_name_idx on activity using btree (to_user_id, created_at, event_name);
 create unique index activity_event_name_event_id_idx on activity using btree (event_name, event_id);
 
--- below is probably not needed since we will use `activity_feed` function
+-- use `activity_feed` function to get activity feed
 alter table activity enable row level security;
-
-create policy "users can see their own activity" on activity for select to authenticated using (
-    (select auth.uid() as uid) in (
-                                   from_user_id,
-                                   to_user_id
-        )
-    );

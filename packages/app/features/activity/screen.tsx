@@ -393,7 +393,7 @@ function RecentActivity() {
     isLoading: isLoadingActivities,
     error: activitiesError,
   } = useQuery({
-    queryKey: ['activity_feed'],
+    queryKey: ['recent_activity_feed'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('activity_feed')
@@ -527,12 +527,12 @@ function Row({ activity }: { activity: Views<'activity_feed'> }) {
       <XStack gap="$4.5">
         <Avatar size="$4.5" br="$4" gap="$2">
           <Avatar.Image src={user.avatar_url} />
-          <Avatar.Fallback jc="center" bc="$color3">
+          <Avatar.Fallback jc="center" bc="$olive">
             <Avatar size="$4.5" br="$4">
               <Avatar.Image
-                src={`https://ui-avatars.com/api.jpg?name=${
+                src={`https://ui-avatars.com/api/?name=${
                   user.name ?? user.tags?.[0] ?? user.send_id
-                }&size=256`}
+                }&size=256&format=png&background=86ad7f`}
               />
             </Avatar>
           </Avatar.Fallback>
@@ -540,7 +540,19 @@ function Row({ activity }: { activity: Views<'activity_feed'> }) {
 
         <YStack gap="$1.5">
           <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
-            {event_name}
+            {(() => {
+              switch (true) {
+                case event_name === 'send_account_transfers':
+                  return 'Transfer'
+                case event_name === 'send_token_transfers':
+                  return 'Transfer'
+                default:
+                  return event_name
+                    .split('_')
+                    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                    .join(' ')
+              }
+            })()}
           </Text>
           <Text
             theme="alt2"

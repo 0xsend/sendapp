@@ -14,6 +14,7 @@ void (async function main() {
   $.env.UNISWAP_ROUTER = '0x2626664c2603336E57B271c5C0b26F421741e481' // Uniswap V3 SwapRouter
   $.env.TOKEN_ORACLE = '0x7e860098F58bBFC8648a4311b374B1D669a2bc6B' // USDC/USD
   $.env.NATIVE_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' // ETH/USD
+  $.env.CACHE_TIME_TO_LIVE = '2592000' // 30 days
 
   console.log(chalk.blue('Deploying TokenPaymaster contract...'))
   await $`forge script ./script/DeployTokenPaymaster.s.sol:DeployTokenPaymasterScript \

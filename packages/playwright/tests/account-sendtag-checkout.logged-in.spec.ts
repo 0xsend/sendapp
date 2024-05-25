@@ -14,7 +14,7 @@ const test = mergeTests(checkoutTest, snapletTest)
 
 const debugAuthSession = async (page: Page) => {
   const { decoded } = await getAuthSessionFromContext(page.context())
-  log?.('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
+  log('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
 const pricingText = [
@@ -77,6 +77,14 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
 
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
   await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
+
+  const { data, error: activityError } = await supabase
+    .from('activity_feed')
+    .select('*')
+    .eq('event_name', 'tag_receipts')
+  expect(activityError).toBeFalsy()
+  expect(data).toHaveLength(1)
+  expect((data?.[0]?.data as { tags: string[] })?.tags).toEqual([tagName])
 })
 
 test('can refer a tag', async ({ seed, checkoutPage, supabase, pg }) => {
@@ -104,8 +112,11 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, pg }) => {
     await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
   }
 
+  // use admin query to get the referrer id
   const { rows } = await pg.query(
-    'select count(*) as count from referrals where referrer_id = $1',
+    `--sql
+  select count(*) as count from referrals where referrer_id = $1
+`,
     [profile.id]
   )
   expect(rows[0]?.count).toBe(tagsCount.toString())
@@ -121,7 +132,7 @@ test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) =
     receipt_hash: '0x',
     referral_code_input: '',
   })
-  log?.('cannot confirm a tag without paying', data, error)
+  log('cannot confirm a tag without paying', data, error)
   expect(error).toBeTruthy()
   expect(error?.code).toBe('42501')
   expect(error?.message).toBe('permission denied for function confirm_tags')
