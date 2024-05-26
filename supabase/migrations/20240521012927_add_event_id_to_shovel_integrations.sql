@@ -78,9 +78,9 @@ alter table send_account_signing_key_removed
   alter column log_idx set not null,
   alter column abi_idx set not null;
 
-alter table send_account_created  add column event_id text GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
-alter table send_account_transfers add column event_id  text GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
-alter table send_token_transfers add column event_id  text GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
-alter table send_revenues_safe_receives add column event_id  text GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
-alter table send_account_signing_key_added add column event_id  text GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
-alter table send_account_signing_key_removed add column event_id  text GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
+alter table send_account_created  add column event_id text not null GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
+alter table send_account_transfers add column event_id  text not null GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
+alter table send_token_transfers add column event_id  text not null GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
+alter table send_revenues_safe_receives add column event_id  text not null GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
+alter table send_account_signing_key_added add column event_id  text not null GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;
+alter table send_account_signing_key_removed add column event_id  text not null GENERATED ALWAYS AS (ig_name || '/' || src_name || '/' || block_num::text || '/' || tx_idx::text || '/' || log_idx::text) stored;

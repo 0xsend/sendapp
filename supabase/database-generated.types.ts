@@ -384,7 +384,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id: string | null
+          event_id: string
           id: number
           ig_name: string
           log_addr: string
@@ -399,7 +399,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name: string
           log_addr: string
@@ -414,7 +414,7 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name?: string
           log_addr?: string
@@ -469,7 +469,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id: string | null
+          event_id: string
           id: number
           ig_name: string
           key: string
@@ -486,7 +486,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name: string
           key: string
@@ -503,7 +503,7 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name?: string
           key?: string
@@ -523,7 +523,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id: string | null
+          event_id: string
           id: number
           ig_name: string
           key: string
@@ -540,7 +540,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name: string
           key: string
@@ -557,7 +557,7 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name?: string
           key?: string
@@ -576,7 +576,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id: string | null
+          event_id: string
           f: string
           id: number
           ig_name: string
@@ -593,7 +593,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id?: string | null
+          event_id?: string
           f: string
           id?: number
           ig_name: string
@@ -610,7 +610,7 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
-          event_id?: string | null
+          event_id?: string
           f?: string
           id?: number
           ig_name?: string
@@ -689,7 +689,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id: string | null
+          event_id: string
           id: number
           ig_name: string
           log_addr: string
@@ -705,7 +705,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name: string
           log_addr: string
@@ -721,7 +721,7 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
-          event_id?: string | null
+          event_id?: string
           id?: number
           ig_name?: string
           log_addr?: string
@@ -740,7 +740,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id: string | null
+          event_id: string
           f: string
           id: number
           ig_name: string
@@ -757,7 +757,7 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
-          event_id?: string | null
+          event_id?: string
           f: string
           id?: number
           ig_name: string
@@ -774,7 +774,7 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
-          event_id?: string | null
+          event_id?: string
           f?: string
           id?: number
           ig_name?: string
