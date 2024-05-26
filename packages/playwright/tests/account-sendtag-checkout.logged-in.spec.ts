@@ -87,11 +87,18 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
   expect((data?.[0]?.data as { tags: string[] })?.tags).toEqual([tagName])
 })
 
-test('can refer a tag', async ({ seed, checkoutPage, supabase, pg }) => {
+test('can refer a tag', async ({
+  seed,
+  checkoutPage,
+  supabase,
+  pg,
+  user: { profile: myProfile },
+}) => {
   const plan = await seed.users([userOnboarded])
-  const profile = plan.profiles[0]
-  assert(!!profile, 'profile not found')
-  await checkoutPage.page.goto(`/?referral=${profile.referralCode}`)
+  const referrer = plan.profiles[0]
+  const referrerTags = plan.tags.map((t) => t.name)
+  assert(!!referrer, 'profile not found')
+  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
   await checkoutPage.goto()
   const tagsCount = Math.floor(Math.random() * 5) + 1
   const tagsToRegister: string[] = []
@@ -111,15 +118,19 @@ test('can refer a tag', async ({ seed, checkoutPage, supabase, pg }) => {
   for (const tag of tagsToRegister) {
     await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
   }
-
-  // use admin query to get the referrer id
-  const { rows } = await pg.query(
-    `--sql
-  select count(*) as count from referrals where referrer_id = $1
-`,
-    [profile.id]
-  )
-  expect(rows[0]?.count).toBe(tagsCount.toString())
+  // user should have received a referral activity
+  const { data, error: activityError } = await supabase
+    .from('activity_feed')
+    .select('*')
+    .eq('event_name', 'referrals')
+    .single()
+  expect(activityError).toBeFalsy()
+  assert(!!data, 'data not found')
+  expect((data.data as { tags: string[] })?.tags).toEqual(tagsToRegister)
+  expect(data.from_user?.send_id).toEqual(referrer.sendId)
+  expect(data.from_user?.tags).toEqual(referrerTags)
+  expect(data.to_user?.id).toEqual(myProfile.id)
+  expect(data.to_user?.send_id).toEqual(myProfile.send_id)
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
