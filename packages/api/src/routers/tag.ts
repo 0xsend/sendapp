@@ -5,8 +5,7 @@ import debug from 'debug'
 import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import type { PostgrestError } from '@supabase/supabase-js'
 
 const log = debug('api:routers:tag')
@@ -80,7 +79,7 @@ export const tagRouter = createTRPCRouter({
             const { data, error } = await supabase
               .from('send_revenues_safe_receives')
               .select('*')
-              .eq('tx_hash', hexToPgBase16(txHash as `0x${string}`))
+              .eq('tx_hash', hexToBytea(txHash as `0x${string}`))
               .single()
 
             if (error) {

@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { pgBase16ToBytes } from 'app/utils/pgBase16ToBytes'
+import { byteaToBytes } from 'app/utils/byteaToBytes'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -150,7 +150,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       assert(nonce !== undefined, 'No nonce found')
       assert(maxFeePerGas !== undefined, 'No max fee per gas found')
       assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
-      const xY = COSEECDHAtoXY(pgBase16ToBytes(webauthnCred.public_key as `\\x${string}`))
+      const xY = COSEECDHAtoXY(byteaToBytes(webauthnCred.public_key as `\\x${string}`))
       const callData = encodeFunctionData({
         abi: sendAccountAbi,
         functionName: 'executeBatch',
