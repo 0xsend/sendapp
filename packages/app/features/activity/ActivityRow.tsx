@@ -2,6 +2,7 @@ import { Avatar, Text, XStack, YStack, useMedia } from '@my/ui'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import type { Activity } from 'app/utils/zod/activity'
+import { formatUnits } from 'viem'
 
 export function Row({ activity }: { activity: Activity }) {
   const media = useMedia()
@@ -92,17 +93,11 @@ export function Row({ activity }: { activity: Activity }) {
           {(() => {
             switch (true) {
               case event_name === 'send_account_transfers': {
-                const tfr = data as unknown as {
-                  f: `\\x${string}`
-                  t: `\\x${string}`
-                  v: string
-                  log_addr: `\\x${string}`
-                  tx_hash: `\\x${string}`
+                if (data.coin) {
+                  const amount = formatUnits(data.v, data.coin.decimals)
+                  return `${amount} ${data.coin.symbol}`
                 }
-                // @todo lookup token info
-                // tfr.log_addr
-                // @todo if no from/to user, lookup address or show unknown sender/receiver
-                return formatAmount(`${tfr.v}`, 5, 0)
+                return formatAmount(`${data.v}`, 5, 0)
               }
               case event_name === 'tag_receipts': {
                 const tr = data as unknown as { tags: string[]; value: string }

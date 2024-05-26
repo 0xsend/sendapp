@@ -1364,7 +1364,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   focusVisibleStyle={{}}
                   focusable={true}
-                  id=":r0:"
+                  id=":r6:"
                   name="query"
                   onBlur={[Function]}
                   onChangeText={[Function]}

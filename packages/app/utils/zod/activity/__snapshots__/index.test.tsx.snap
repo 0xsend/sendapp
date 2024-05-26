@@ -5,6 +5,14 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
   {
     "created_at": 2024-05-26T13:38:25.000Z,
     "data": {
+      "coin": {
+        "coingeckoTokenId": "usd-coin",
+        "decimals": 6,
+        "icon": "USDC",
+        "label": "USDC",
+        "symbol": "USDC",
+        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      },
       "f": "0x760e2928c3aa3af87897be52eb4833d42bbb27cf",
       "log_addr": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
       "t": "0xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1",

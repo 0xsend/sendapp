@@ -27,6 +27,7 @@ describe('EventArraySchema', () => {
     expect(transfer.data.tx_hash).toBe(
       '0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4'
     )
+    expect(transfer.data.coin?.label).toBe('USDC')
     const receipt = result.data[1] as TagReceiptsEvent
     assert(!!receipt)
     expect(receipt.event_name).toBe('tag_receipts')
