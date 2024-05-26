@@ -24,6 +24,8 @@ type Override = {
       to_user_id?: string;
       data?: string;
       created_at?: string;
+      users_activity_from_user_idTousers?: string;
+      users_activity_to_user_idTousers?: string;
     };
   }
   buckets?: {
@@ -429,6 +431,8 @@ type Override = {
       reauthentication_sent_at?: string;
       is_sso_user?: string;
       deleted_at?: string;
+      activity_activity_from_user_idTousers?: string;
+      activity_activity_to_user_idTousers?: string;
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
@@ -485,6 +489,8 @@ export interface Fingerprint {
     id?: FingerprintNumberField;
     data?: FingerprintJsonField;
     createdAt?: FingerprintDateField;
+    fromUser?: FingerprintRelationField;
+    toUser?: FingerprintRelationField;
   }
   buckets?: {
     createdAt?: FingerprintDateField;
@@ -694,6 +700,8 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    activitiesByFromUserId?: FingerprintRelationField;
+    activitiesByToUserId?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;

@@ -15,14 +15,14 @@ select a.created_at                       as created_at,
                        case when a.from_user_id = from_p.id then from_p.name end,
                        case when a.from_user_id = from_p.id then from_p.avatar_url end,
                        case when a.from_user_id = from_p.id then from_p.send_id end,
-                       case when a.from_user_id = from_p.id then (select name from tags where user_id = from_p.id and status = 'confirmed') end
+                       case when a.from_user_id = from_p.id then (select array_agg(name) from tags where user_id = from_p.id and status = 'confirmed') end
                )::activity_feed_user end) as from_user,
        (case when a.to_user_id = to_p.id then (case when a.to_user_id = ( select auth.uid() ) then a.to_user_id end,
                                                case when a.to_user_id = to_p.id then to_p.name end,
                                                case when a.to_user_id = to_p.id then to_p.avatar_url end,
                                                case when a.to_user_id = to_p.id then to_p.send_id end,
                                                case when a.to_user_id = to_p.id
-                                                        then (select name from tags where user_id = to_.id and status = 'confirmed') end
+                                                        then (select array_agg(name) from tags where user_id = to_p.id and status = 'confirmed') end
            )::activity_feed_user end)     as to_user,
        a.data                             as data
 from activity a

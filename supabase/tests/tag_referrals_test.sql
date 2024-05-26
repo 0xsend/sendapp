@@ -1,7 +1,7 @@
 -- Tag referrals test
 BEGIN;
 
-SELECT plan(5);
+SELECT plan(7);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -56,6 +56,42 @@ select isnt_empty(
       and referred_id = tests.get_supabase_uid('tag_referred') $test$,
       'Referral should be created'
   );
+
+-- Verify user can see referral activity
+SELECT tests.authenticate_as('tag_referrer');
+
+SELECT results_eq(
+   $$
+   SELECT data->>'tags', (from_user).tags, (to_user).tags
+   FROM activity_feed
+   WHERE event_name = 'referrals'
+   $$,
+   $$
+   VALUES ('["zzz1"]',
+        null::text[],
+        '{"zzz1"}'::text[]) $$,
+   'verify referral activity was created'
+);
+
+-- admin deleting referral should delete activity
+select tests.clear_authentication();
+
+select set_config('role', 'service_role', true);
+
+DELETE FROM referrals
+WHERE referrer_id = tests.get_supabase_uid('tag_referrer')
+  and referred_id = tests.get_supabase_uid('tag_referred');
+
+SELECT results_eq(
+   $$
+   SELECT COUNT(*)::integer
+   FROM activity
+   WHERE event_name = 'referrals' and event_id = sha256(decode(replace(tests.get_supabase_uid('tag_referred')::text, '-', ''), 'hex'))::text
+   $$,
+   $$
+   VALUES (0) $$,
+   'verify referral activity was deleted'
+);
 
 -- Verify invalid referral code still confirms tags
 SELECT tests.authenticate_as('tag_referred');

@@ -649,6 +649,15 @@ interface Extension {
   vault: "supabase_vault";
 }
 interface Tables_relationships {
+  "public.activity": {
+    parent: {
+       activity_from_user_id_fkey: "auth.users";
+       activity_to_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
   "storage.buckets": {
     parent: {
 
@@ -888,6 +897,8 @@ interface Tables_relationships {
        identities_user_id_fkey: "auth.identities";
        mfa_factors_user_id_fkey: "auth.mfa_factors";
        sessions_user_id_fkey: "auth.sessions";
+       activity_from_user_id_fkey: "public.activity";
+       activity_to_user_id_fkey: "public.activity";
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";

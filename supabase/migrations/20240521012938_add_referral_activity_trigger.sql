@@ -24,3 +24,20 @@ create trigger referrals_insert_activity_trigger
     after insert on referrals
     referencing new table as NEW_TABLE
     for each statement execute function referrals_insert_activity_trigger();
+
+create or replace function referrals_delete_activity_trigger() returns trigger
+    language plpgsql
+    security definer as
+$$
+begin
+    delete from activity
+    where event_name = 'referrals'
+      and event_id in (select sha256(decode(replace(OLD_TABLE.referred_id::text, '-', ''), 'hex'))::text from OLD_TABLE);
+    return NULL;
+end;
+$$;
+
+create trigger referrals_delete_activity_trigger
+    after delete on referrals
+    referencing old table as OLD_TABLE
+    for each statement execute function referrals_delete_activity_trigger();
