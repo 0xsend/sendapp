@@ -2,15 +2,8 @@ import { TRPCError } from '@trpc/server'
 import debug from 'debug'
 import { SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
-import {
-  VerifyChallengeRequestSchema,
-  GetChallengeRequestSchema,
-} from '@my/api/src/routers/account-recovery/schemas'
-import {
-  type ChallengeResponse,
-  type VerifyChallengeResponse,
-  RecoveryOptions,
-} from '@my/api/src/routers/account-recovery/types'
+import { z } from 'zod'
+import { type ChallengeResponse, RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import {
   getChallenge,
   getChainAddress,
@@ -22,6 +15,28 @@ import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
 import { verifyMessage } from 'viem'
 
 const logger = debug('api:routers:account-recovery')
+
+const GetChallengeRequestSchema = z.object({
+  recoveryType: z.nativeEnum(RecoveryOptions),
+  identifier: z.string(),
+})
+
+export const GetChallengeResponseSchema = z.object({
+  id: z.string(),
+  challenge: z.string(),
+  created_at: z.string(),
+  expires_at: z.string(),
+})
+
+const VerifyChallengeRequestSchema = z.object({
+  recoveryType: z.nativeEnum(RecoveryOptions),
+  identifier: z.string(),
+  signature: z.string(),
+})
+
+export const VerifyChallengeResponseSchema = z.object({
+  jwt: z.string(),
+})
 
 export const accountRecoveryRouter = createTRPCRouter({
   getChallenge: publicProcedure.input(GetChallengeRequestSchema).mutation(async ({ input }) => {

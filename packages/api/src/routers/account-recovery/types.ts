@@ -1,13 +1,7 @@
 import type { z } from 'zod'
-import type {
-  GetChallengeResponseSchema,
-  RecoveryEligibilityResponseSchema,
-  VerifyChallengeResponseSchema,
-} from '@my/api/src/routers/account-recovery/schemas'
+import type { GetChallengeResponseSchema } from '@my/api/src/routers/account-recovery/router'
 
-export type RecoveryEligibilityResponse = z.infer<typeof RecoveryEligibilityResponseSchema>
 export type ChallengeResponse = z.infer<typeof GetChallengeResponseSchema>
-export type VerifyChallengeResponse = z.infer<typeof VerifyChallengeResponseSchema>
 
 export type ErrorWithMessage = {
   message: string
