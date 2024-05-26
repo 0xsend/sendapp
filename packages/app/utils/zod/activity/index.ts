@@ -7,4 +7,6 @@ export const EventSchema = z.discriminatedUnion('event_name', [
   TagReceiptsEventSchema,
 ])
 
+export type Activity = z.infer<typeof EventSchema>
+
 export const EventArraySchema = z.array(EventSchema)

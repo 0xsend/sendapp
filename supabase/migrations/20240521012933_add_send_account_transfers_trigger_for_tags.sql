@@ -11,7 +11,8 @@ begin
     select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
     select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
 
-    _data := json_build_object('log_addr', NEW.log_addr, 'f', NEW.f, 't', NEW.t, 'v', NEW.v, 'tx_hash', NEW.tx_hash);
+    -- cast v to text to avoid losing precision when converting to json when sending to clients
+    _data := json_build_object('log_addr', NEW.log_addr, 'f', NEW.f, 't', NEW.t, 'v', NEW.v::text, 'tx_hash', NEW.tx_hash);
 
     insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
     values ('send_account_transfers',

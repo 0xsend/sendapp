@@ -1,5 +1,5 @@
 import { useState, type PropsWithChildren } from 'react'
-import type { Database, Functions, Views } from '@my/supabase/database.types'
+import type { Functions } from '@my/supabase/database.types'
 import {
   AnimatePresence,
   Avatar,
@@ -15,8 +15,8 @@ import {
   XStack,
   YStack,
   isWeb,
-  useMedia,
   ButtonText,
+  Stack,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { SearchSchema, TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
@@ -24,9 +24,7 @@ import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconX } from 'app/components/icons'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useQuery } from '@tanstack/react-query'
-import { assert } from 'app/utils/assert'
+import { RecentActivity } from './RecentActivity'
 
 const suggestions = [
   { username: '0xUser', avatar: 'https://i.pravatar.cc/150?u=0xUser' },
@@ -386,79 +384,24 @@ function Suggestions() {
   )
 }
 
-function RecentActivity() {
-  const supabase = useSupabase()
-  const {
-    data: activities,
-    isLoading: isLoadingActivities,
-    error: activitiesError,
-  } = useQuery({
-    queryKey: ['recent_activity_feed'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('activity_feed')
-        .select('*')
-        .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
-        .order('created_at', { ascending: false })
-        .limit(10)
-
-      if (error) {
-        throw error
-      }
-
-      return data
-    },
-  })
-
+export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
-    <Container>
-      <YStack gap="$5" mb="$4" width={'100%'}>
-        <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
-          <TableLabel>Transactions</TableLabel>
-          <XStack gap="$4">
-            <TableLabel textAlign="right">Date</TableLabel>
-            <TableLabel textAlign="right">Amount</TableLabel>
-          </XStack>
-        </XStack>
-
-        <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
-        {(() => {
-          switch (true) {
-            case isLoadingActivities:
-              return <Spinner size="small" />
-            case activitiesError !== null:
-              return (
-                <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-                  {activitiesError?.message ?? `Something went wrong: ${activitiesError}`}
-                </Paragraph>
-              )
-            case activities?.length === 0:
-              return (
-                <>
-                  <RowLabel>No activities</RowLabel>
-                </>
-              )
-            default:
-              return (
-                <>
-                  <RowLabel>{activities?.[0]?.created_at}</RowLabel>
-
-                  {activities?.map((activity) => (
-                    <Row
-                      activity={activity}
-                      key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                    />
-                  ))}
-                </>
-              )
-          }
-        })()}
-      </YStack>
-    </Container>
+    <AnimatePresence>
+      <Stack
+        key="enter"
+        animateOnly={['transform', 'opacity']}
+        animation="200ms"
+        enterStyle={{ opacity: 0, scale: 0.9 }}
+        exitStyle={{ opacity: 0, scale: 0.95 }}
+        opacity={1}
+      >
+        {children}
+      </Stack>
+    </AnimatePresence>
   )
 }
 
-function TableLabel({
+export function TableLabel({
   textAlign = 'left',
   children,
 }: { textAlign?: 'left' | 'right' } & PropsWithChildren) {
@@ -476,7 +419,7 @@ function TableLabel({
   )
 }
 
-function RowLabel({ children }: PropsWithChildren) {
+export function RowLabel({ children }: PropsWithChildren) {
   return (
     <H4
       // @TODO: Update with theme color variable
@@ -493,7 +436,7 @@ function RowLabel({ children }: PropsWithChildren) {
   )
 }
 
-function MobileSectionLabel({ children }: PropsWithChildren) {
+export function MobileSectionLabel({ children }: PropsWithChildren) {
   return (
     <H4
       color="$olive"
@@ -504,101 +447,6 @@ function MobileSectionLabel({ children }: PropsWithChildren) {
     >
       {children}
     </H4>
-  )
-}
-
-function Row({ activity }: { activity: Views<'activity_feed'> }) {
-  const media = useMedia()
-  const { from_user, to_user, event_name, created_at, data } = activity
-  const user = to_user ? to_user : from_user
-
-  assert(!!user, 'User is required')
-
-  return (
-    <XStack
-      ai="center"
-      jc="space-between"
-      gap="$4"
-      borderBottomWidth={1}
-      pb="$5"
-      borderBottomColor={'$decay'}
-      $gtMd={{ borderBottomWidth: 0, pb: '0' }}
-    >
-      <XStack gap="$4.5">
-        <Avatar size="$4.5" br="$4" gap="$2">
-          <Avatar.Image src={user.avatar_url} />
-          <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$4.5" br="$4">
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${
-                  user.name ?? user.tags?.[0] ?? user.send_id
-                }&size=256&format=png&background=86ad7f`}
-              />
-            </Avatar>
-          </Avatar.Fallback>
-        </Avatar>
-
-        <YStack gap="$1.5">
-          <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
-            {(() => {
-              switch (true) {
-                case event_name === 'send_account_transfers':
-                  return 'Transfer'
-                case event_name === 'send_token_transfers':
-                  return 'Transfer'
-                default:
-                  return event_name
-                    .split('_')
-                    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-                    .join(' ')
-              }
-            })()}
-          </Text>
-          <Text
-            theme="alt2"
-            color="$olive"
-            fontFamily={'$mono'}
-            fontSize="$4"
-            $gtMd={{ fontSize: '$2' }}
-            maxWidth={'100%'}
-            overflow={'hidden'}
-          >
-            {(() => {
-              if (user.tags?.[0]) {
-                return `@${user.tags[0]}`
-              }
-
-              return `#${user.send_id}`
-            })()}
-            {JSON.stringify(data, null, 2)}
-          </Text>
-        </YStack>
-      </XStack>
-      <XStack gap="$4">
-        {created_at ? (
-          <Text
-            color="$color12"
-            display="none"
-            minWidth={'$14'}
-            textAlign="right"
-            $gtMd={{ display: 'flex', jc: 'flex-end' }}
-          >
-            {new Date(created_at).toLocaleString()}
-          </Text>
-        ) : null}
-        <Text
-          color="$color12"
-          textAlign="right"
-          fontSize="$7"
-          // @NOTE: font families don't change in `$gtMd` breakpoint
-          fontFamily={media.md ? '$mono' : '$body'}
-          $gtMd={{ fontSize: '$5', minWidth: '$14' }}
-        >
-          {/* {activity.amount} */}
-          123
-        </Text>
-      </XStack>
-    </XStack>
   )
 }
 

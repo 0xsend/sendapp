@@ -627,73 +627,213 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          1716346092
+          5/26/2024
         </Text>
         <View
+          animatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          collapsable={false}
+          forwardedRef={[Function]}
           style={
             {
-              "alignItems": "center",
-              "borderBottomColor": "#3E4A3C",
-              "borderBottomWidth": 1,
-              "borderStyle": "solid",
-              "flexDirection": "row",
-              "gap": 18,
-              "justifyContent": "space-between",
-              "paddingBottom": 24,
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
             }
           }
         >
           <View
             style={
               {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomWidth": 1,
+                "borderStyle": "solid",
                 "flexDirection": "row",
-                "gap": 21,
+                "gap": 18,
+                "justifyContent": "space-between",
+                "paddingBottom": 24,
               }
             }
           >
             <View
               style={
                 {
-                  "alignItems": "center",
-                  "borderBottomLeftRadius": 9,
-                  "borderBottomRightRadius": 9,
-                  "borderTopLeftRadius": 9,
-                  "borderTopRightRadius": 9,
-                  "flexDirection": "column",
-                  "gap": 7,
-                  "height": 48,
-                  "justifyContent": "center",
-                  "maxHeight": 48,
-                  "maxWidth": 48,
-                  "minHeight": 48,
-                  "minWidth": 48,
-                  "overflow": "hidden",
-                  "position": "relative",
-                  "width": 48,
+                  "flexDirection": "row",
+                  "gap": 21,
                 }
               }
             >
               <View
                 style={
                   {
-                    "backgroundColor": "hsla(191, 32%, 19%, 1)",
-                    "bottom": 0,
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
                     "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                    "zIndex": 0,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
                   }
                 }
-              />
+              >
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
+                    }
+                  }
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "flexDirection": "column",
+                        "height": 48,
+                        "justifyContent": "center",
+                        "maxHeight": 48,
+                        "maxWidth": 48,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "overflow": "hidden",
+                        "position": "relative",
+                        "width": 48,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "bottom": 0,
+                          "flexDirection": "column",
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                          "zIndex": 1,
+                        }
+                      }
+                    >
+                      <Image
+                        fullscreen={true}
+                        onError={[Function]}
+                        onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
+                          }
+                        }
+                        style={
+                          {
+                            "height": 48,
+                            "width": 48,
+                          }
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 4,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Received
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  @asdf
+                </Text>
+              </View>
             </View>
             <View
               style={
                 {
-                  "flexDirection": "column",
-                  "gap": 4,
+                  "flexDirection": "row",
+                  "gap": 18,
                 }
               }
             >
@@ -701,70 +841,296 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 style={
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
+                    "display": "none",
                     "fontFamily": "System",
-                    "fontSize": 24,
+                    "minWidth": 184,
+                    "textAlign": "right",
                   }
                 }
                 suppressHighlighting={true}
               >
-                send_account_created
+                5/26/2024, 1:38:25 PM
               </Text>
               <Text
                 style={
                   {
-                    "color": "#86AE80",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
-                    "maxWidth": "100%",
-                    "overflow": "hidden",
+                    "fontSize": 24,
+                    "textAlign": "right",
                   }
                 }
                 suppressHighlighting={true}
               >
-                {
-  "send_id": 123,
-  "avatar_url": "https://avatars.githubusercontent.com/u/123"
-}
+                19,032
               </Text>
             </View>
           </View>
+        </View>
+        <View
+          animatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          collapsable={false}
+          forwardedRef={[Function]}
+          style={
+            {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            }
+          }
+        >
           <View
             style={
               {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomWidth": 1,
+                "borderStyle": "solid",
                 "flexDirection": "row",
                 "gap": 18,
+                "justifyContent": "space-between",
+                "paddingBottom": 24,
               }
             }
           >
-            <Text
+            <View
               style={
                 {
-                  "color": "hsla(112, 22%, 100%, 1)",
-                  "display": "none",
-                  "fontFamily": "System",
-                  "minWidth": 184,
-                  "textAlign": "right",
+                  "flexDirection": "row",
+                  "gap": 21,
                 }
               }
-              suppressHighlighting={true}
             >
-              1716346092
-            </Text>
-            <Text
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
+                    }
+                  }
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "flexDirection": "column",
+                        "height": 48,
+                        "justifyContent": "center",
+                        "maxHeight": 48,
+                        "maxWidth": 48,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "overflow": "hidden",
+                        "position": "relative",
+                        "width": 48,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "bottom": 0,
+                          "flexDirection": "column",
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                          "zIndex": 1,
+                        }
+                      }
+                    >
+                      <Image
+                        fullscreen={true}
+                        onError={[Function]}
+                        onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
+                          }
+                        }
+                        style={
+                          {
+                            "height": 48,
+                            "width": 48,
+                          }
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 4,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Tag Receipts
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  @asdf
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "hsla(112, 22%, 100%, 1)",
-                  "fontFamily": "System",
-                  "fontSize": 24,
-                  "textAlign": "right",
+                  "flexDirection": "row",
+                  "gap": 18,
                 }
               }
-              suppressHighlighting={true}
             >
-              123
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "display": "none",
+                    "fontFamily": "System",
+                    "minWidth": 184,
+                    "textAlign": "right",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                5/26/2024, 1:36:07 PM
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                    "fontSize": 24,
+                    "textAlign": "right",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                20P
+              </Text>
+            </View>
           </View>
         </View>
+        <View
+          animatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          collapsable={false}
+          forwardedRef={[Function]}
+          style={
+            {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            }
+          }
+        />
       </View>
     </View>
   </View>
@@ -998,7 +1364,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                   }
                   focusVisibleStyle={{}}
                   focusable={true}
-                  id=":r3:"
+                  id=":r0:"
                   name="query"
                   onBlur={[Function]}
                   onChangeText={[Function]}
@@ -1672,73 +2038,213 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           }
           suppressHighlighting={true}
         >
-          1716346092
+          5/26/2024
         </Text>
         <View
+          animatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          collapsable={false}
+          forwardedRef={[Function]}
           style={
             {
-              "alignItems": "center",
-              "borderBottomColor": "#3E4A3C",
-              "borderBottomWidth": 1,
-              "borderStyle": "solid",
-              "flexDirection": "row",
-              "gap": 18,
-              "justifyContent": "space-between",
-              "paddingBottom": 24,
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
             }
           }
         >
           <View
             style={
               {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomWidth": 1,
+                "borderStyle": "solid",
                 "flexDirection": "row",
-                "gap": 21,
+                "gap": 18,
+                "justifyContent": "space-between",
+                "paddingBottom": 24,
               }
             }
           >
             <View
               style={
                 {
-                  "alignItems": "center",
-                  "borderBottomLeftRadius": 9,
-                  "borderBottomRightRadius": 9,
-                  "borderTopLeftRadius": 9,
-                  "borderTopRightRadius": 9,
-                  "flexDirection": "column",
-                  "gap": 7,
-                  "height": 48,
-                  "justifyContent": "center",
-                  "maxHeight": 48,
-                  "maxWidth": 48,
-                  "minHeight": 48,
-                  "minWidth": 48,
-                  "overflow": "hidden",
-                  "position": "relative",
-                  "width": 48,
+                  "flexDirection": "row",
+                  "gap": 21,
                 }
               }
             >
               <View
                 style={
                   {
-                    "backgroundColor": "hsla(191, 32%, 19%, 1)",
-                    "bottom": 0,
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
                     "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
                     "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                    "zIndex": 0,
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
                   }
                 }
-              />
+              >
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
+                    }
+                  }
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "flexDirection": "column",
+                        "height": 48,
+                        "justifyContent": "center",
+                        "maxHeight": 48,
+                        "maxWidth": 48,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "overflow": "hidden",
+                        "position": "relative",
+                        "width": 48,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "bottom": 0,
+                          "flexDirection": "column",
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                          "zIndex": 1,
+                        }
+                      }
+                    >
+                      <Image
+                        fullscreen={true}
+                        onError={[Function]}
+                        onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
+                          }
+                        }
+                        style={
+                          {
+                            "height": 48,
+                            "width": 48,
+                          }
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 4,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Received
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  @asdf
+                </Text>
+              </View>
             </View>
             <View
               style={
                 {
-                  "flexDirection": "column",
-                  "gap": 4,
+                  "flexDirection": "row",
+                  "gap": 18,
                 }
               }
             >
@@ -1746,70 +2252,296 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 style={
                   {
                     "color": "hsla(112, 22%, 100%, 1)",
+                    "display": "none",
                     "fontFamily": "System",
-                    "fontSize": 24,
+                    "minWidth": 184,
+                    "textAlign": "right",
                   }
                 }
                 suppressHighlighting={true}
               >
-                send_account_created
+                5/26/2024, 1:38:25 PM
               </Text>
               <Text
                 style={
                   {
-                    "color": "#86AE80",
+                    "color": "hsla(112, 22%, 100%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 16.8,
-                    "maxWidth": "100%",
-                    "overflow": "hidden",
+                    "fontSize": 24,
+                    "textAlign": "right",
                   }
                 }
                 suppressHighlighting={true}
               >
-                {
-  "send_id": 123,
-  "avatar_url": "https://avatars.githubusercontent.com/u/123"
-}
+                19,032
               </Text>
             </View>
           </View>
+        </View>
+        <View
+          animatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          collapsable={false}
+          forwardedRef={[Function]}
+          style={
+            {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            }
+          }
+        >
           <View
             style={
               {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomWidth": 1,
+                "borderStyle": "solid",
                 "flexDirection": "row",
                 "gap": 18,
+                "justifyContent": "space-between",
+                "paddingBottom": 24,
               }
             }
           >
-            <Text
+            <View
               style={
                 {
-                  "color": "hsla(112, 22%, 100%, 1)",
-                  "display": "none",
-                  "fontFamily": "System",
-                  "minWidth": 184,
-                  "textAlign": "right",
+                  "flexDirection": "row",
+                  "gap": 21,
                 }
               }
-              suppressHighlighting={true}
             >
-              1716346092
-            </Text>
-            <Text
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
+                    }
+                  }
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "flexDirection": "column",
+                        "height": 48,
+                        "justifyContent": "center",
+                        "maxHeight": 48,
+                        "maxWidth": 48,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "overflow": "hidden",
+                        "position": "relative",
+                        "width": 48,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "bottom": 0,
+                          "flexDirection": "column",
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                          "zIndex": 1,
+                        }
+                      }
+                    >
+                      <Image
+                        fullscreen={true}
+                        onError={[Function]}
+                        onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
+                          }
+                        }
+                        style={
+                          {
+                            "height": 48,
+                            "width": 48,
+                          }
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 4,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Tag Receipts
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  @asdf
+                </Text>
+              </View>
+            </View>
+            <View
               style={
                 {
-                  "color": "hsla(112, 22%, 100%, 1)",
-                  "fontFamily": "System",
-                  "fontSize": 24,
-                  "textAlign": "right",
+                  "flexDirection": "row",
+                  "gap": 18,
                 }
               }
-              suppressHighlighting={true}
             >
-              123
-            </Text>
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "display": "none",
+                    "fontFamily": "System",
+                    "minWidth": 184,
+                    "textAlign": "right",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                5/26/2024, 1:36:07 PM
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "hsla(112, 22%, 100%, 1)",
+                    "fontFamily": "System",
+                    "fontSize": 24,
+                    "textAlign": "right",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                20P
+              </Text>
+            </View>
           </View>
         </View>
+        <View
+          animatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          collapsable={false}
+          forwardedRef={[Function]}
+          style={
+            {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            }
+          }
+        />
       </View>
     </View>
   </View>

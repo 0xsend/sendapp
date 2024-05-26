@@ -12,6 +12,7 @@ export const BaseEventSchema = z.object({
         received: typeof v,
         message: `${v} is not a valid date`,
       })
+      return z.NEVER
     }
   }),
   event_name: z.string(),

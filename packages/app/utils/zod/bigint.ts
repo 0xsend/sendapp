@@ -13,5 +13,6 @@ export const decimalStrToBigInt = z.union([z.string(), z.number()]).transform((v
       received: typeof v,
       message: `${v} is not a valid bigint`,
     })
+    return z.NEVER
   }
 })

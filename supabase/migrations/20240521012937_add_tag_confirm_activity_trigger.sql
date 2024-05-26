@@ -10,7 +10,7 @@ begin
         NEW_TABLE.hash,
         t.user_id,
         null,
-        json_build_object('tx_hash', srsr.tx_hash, 'tags', array_agg(t.name), 'value', srsr.v),
+        json_build_object('tx_hash', srsr.tx_hash, 'tags', array_agg(t.name), 'value', srsr.v::text), -- cast v to text to avoid losing precision when converting to json when sending to clients
         current_timestamp
     from NEW_TABLE
          join tags t on t.name = NEW_TABLE.tag_name
