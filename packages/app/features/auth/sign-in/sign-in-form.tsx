@@ -6,7 +6,7 @@ import { useRouter } from 'solito/router'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { z } from 'zod'
 import { useState } from 'react'
-import AccountRecoveryScreen from 'app/features/auth/account-recovery/screen'
+import AccountRecovery from 'app/features/auth/account-recovery/account-recovery'
 
 const SignInSchema = z.object({
   countrycode: formFields.countrycode,
@@ -47,7 +47,7 @@ export const SignInForm = () => {
           }}
         />
       ) : showRecoveryForm ? (
-        <AccountRecoveryScreen onClose={() => setShowRecoveryForm(false)} />
+        <AccountRecovery onClose={() => setShowRecoveryForm(false)} />
       ) : (
         <SchemaForm
           flex={1}

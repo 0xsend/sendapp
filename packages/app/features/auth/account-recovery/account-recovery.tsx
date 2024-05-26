@@ -20,7 +20,7 @@ export enum SignState {
   FAILED = 2,
 }
 
-export default function AccountRecoveryScreen(props: Props) {
+export default function AccountRecovery(props: Props) {
   const [error, setError] = useState<ErrorWithMessage>()
   // TODO: implement loading state
   const [signState, setSignState] = useState<SignState>(SignState.NOT_COMPLETE)
