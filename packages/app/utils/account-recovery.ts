@@ -18,7 +18,7 @@ export const getPasskey = async (publicKey: string) => {
 }
 
 export const getChallenge = async (userId: string) => {
-  return await supabaseAdmin.from('auth_challenges').select('*').eq('user_id', userId).single()
+  return await supabaseAdmin.from('challenges').select('*').eq('user_id', userId).single()
 }
 
 export const isChallengeExpired = async (
@@ -26,14 +26,13 @@ export const isChallengeExpired = async (
   logger?: Debugger
 ): Promise<boolean> => {
   const { data, error } = await supabaseAdmin
-    .from('auth_challenges')
+    .from('challenges')
     .select('*')
     .eq('id', challengeId)
     .gt('expires_at', 'now()')
     .limit(1)
 
   if (error) {
-    console.log('here', error)
     logger?.(`isChallengeExpired:${error?.message}`)
     throw error
   }
@@ -49,8 +48,8 @@ export const isChallengeExpired = async (
  *
  * @returns {string} - challenge hex string
  */
-export function generateChallenge(): string {
-  const buffer = new Uint8Array(32)
+export function generateChallenge(): Uint8Array {
+  const buffer = new Uint8Array(64)
   crypto.getRandomValues(buffer)
-  return Array.from(buffer, (byte) => byte.toString(16).padStart(2, '0')).join('')
+  return buffer
 }

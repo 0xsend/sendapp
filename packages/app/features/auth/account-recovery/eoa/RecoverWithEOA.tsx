@@ -4,7 +4,6 @@ import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
 import { Button, ButtonText } from '@my/ui'
 import { Provider } from 'app/provider'
 import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
-import { SignState } from 'app/features/auth/account-recovery/account-recovery'
 import { type ChallengeResponse, RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 
 interface Props {

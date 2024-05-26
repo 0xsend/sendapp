@@ -3,7 +3,11 @@ import debug from 'debug'
 import { SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
 import { z } from 'zod'
-import { type ChallengeResponse, RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
+import {
+  type ChallengeResponse,
+  type VerifyChallengeResponse,
+  RecoveryOptions,
+} from '@my/api/src/routers/account-recovery/types'
 import {
   getChallenge,
   getChainAddress,
@@ -45,8 +49,8 @@ export const accountRecoveryRouter = createTRPCRouter({
     const userId = await getUserIdByIdentifier(recoveryType, identifier)
 
     const { data: challengeData, error: challengeError } = await supabaseAdmin
-      .rpc('upsert_auth_challenges', {
-        userid: userId,
+      .rpc('upsert_challenges', {
+        user_id: userId,
         challenge: generateChallenge(),
       })
       .single()
@@ -66,6 +70,8 @@ export const accountRecoveryRouter = createTRPCRouter({
     .input(VerifyChallengeRequestSchema)
     .mutation(async ({ input, ctx }): Promise<VerifyChallengeResponse> => {
       const { recoveryType, identifier, signature } = input
+
+      // TODO: base64 decode signature
 
       if (!recoveryType || !identifier || !signature) {
         throw new TRPCError({
@@ -132,7 +138,7 @@ export const accountRecoveryRouter = createTRPCRouter({
       const jwt = mintAuthenticatedJWTToken(userId)
       const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
 
-      ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}`)
+      ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/`)
       return {
         jwt,
       }

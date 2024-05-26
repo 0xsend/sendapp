@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
 import type { SignMessageErrorType } from '@wagmi/core'
 import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
