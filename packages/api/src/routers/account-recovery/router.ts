@@ -3,157 +3,64 @@ import debug from 'debug'
 import { SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
 import {
-  PhoneNumberSchema,
   VerifyChallengeRequestSchema,
-  RecoveryEligibilityResponseSchema,
+  GetChallengeRequestSchema,
 } from '@my/api/src/routers/account-recovery/schemas'
 import {
   type ChallengeResponse,
   type VerifyChallengeResponse,
-  type RecoveryEligibilityResponse,
   RecoveryOptions,
 } from '@my/api/src/routers/account-recovery/types'
 import {
   getChallenge,
+  getChainAddress,
+  getPasskey,
   isChallengeExpired,
-  challengeUserMessage,
-} from 'app/utils/account-recovery/challenge'
+  generateChallenge,
+} from 'app/utils/account-recovery'
 import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
 import { verifyMessage } from 'viem'
 
 const logger = debug('api:routers:account-recovery')
 
 export const accountRecoveryRouter = createTRPCRouter({
-  // Checks user's eligibility for account recovery
-  // Users can only recover their account if they have an associated EOA (legacy) / webauthn keys.
-  getRecoveryEligibility: publicProcedure
-    .input(PhoneNumberSchema)
-    .query(async ({ input }): Promise<RecoveryEligibilityResponse> => {
-      if (!input.phoneNumberInput) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: formatErr('Phone number required'),
-        })
-      }
+  getChallenge: publicProcedure.input(GetChallengeRequestSchema).mutation(async ({ input }) => {
+    const { recoveryType, identifier } = input
 
-      // Retrieve user from phone number
-      const { data: userData, error: getUserError } = await getUserByPhoneNumber(
-        input.phoneNumberInput
-      )
+    const userId = await getUserIdByIdentifier(recoveryType, identifier)
 
-      if (!userData || getUserError) {
-        logger('getRecoveryEligibility:user-not-found')
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: formatErr(`User with phone number (${input.phoneNumberInput}) not found`),
-        })
-      }
-
-      const { data: chainAddress } = await supabaseAdmin
-        .from('chain_addresses')
-        .select('*')
-        .eq('user_id', userData.id as string)
-      const { data: webauthnCredentials } = await supabaseAdmin
-        .from('webauthn_credentials')
-        .select('*')
-        .eq('user_id', userData.id as string)
-
-      const recoveryOptions: RecoveryOptions[] = []
-      if (chainAddress || webauthnCredentials) {
-        if (chainAddress) {
-          recoveryOptions.push(RecoveryOptions.EOA)
-        }
-        if (webauthnCredentials) {
-          recoveryOptions.push(RecoveryOptions.WEBAUTHN)
-        }
-        return RecoveryEligibilityResponseSchema.parse({
-          eligible: true,
-          recoveryOptions: recoveryOptions,
-        })
-      }
-      return RecoveryEligibilityResponseSchema.parse({
-        eligible: false,
-        recoveryOptions,
-        error: formatErr('No linked chain address / webauthn credentials'),
-      })
-    }),
-  getChallenge: publicProcedure.input(PhoneNumberSchema).mutation(async ({ input }) => {
-    // Check the phone number was supplied
-    const { phoneNumberInput } = input
-    if (!phoneNumberInput) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: formatChallengeErr('Phone number required'),
-        cause: 'Phone number not provided',
-      })
-    }
-    // Retrieve the corresponding user_id to the tag name
-    const { data: userData, error: userDataError } = await getUserByPhoneNumber(phoneNumberInput)
-
-    if (userDataError || !userData?.id) {
-      logger('getChallenge:user-not-found')
-      const errorMsg = `Could not find user with phone number: [${phoneNumberInput}]`
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: formatChallengeErr(errorMsg),
-        cause: `${errorMsg}. ${userDataError?.message}`,
-      })
-    }
-
-    // Call the create_challenge function with the user_id and the
-    // hex encoded hashed challenge message
-    const { data: challengeData, error: challengeCreationError } = await supabaseAdmin
+    const { data: challengeData, error: challengeError } = await supabaseAdmin
       .rpc('upsert_auth_challenges', {
-        userid: userData.id,
-        challenge: challengeUserMessage(userData.id, phoneNumberInput),
+        userid: userId,
+        challenge: generateChallenge(),
       })
       .single()
 
-    // If the result is null throw an error
-    if (challengeCreationError) {
-      logger('getChallenge:cant-create-challenge')
+    if (challengeError || !challengeData) {
+      logger('getChallenge:cant-upsert-challenge')
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: formatChallengeErr('Internal server error'),
-        cause: challengeCreationError.message,
+        message: formatErr('Cannot retrieve challenge: Internal server error'),
+        cause: challengeError.message,
       })
     }
 
-    // Return the JSON result object
     return challengeData as ChallengeResponse
   }),
   verifyChallenge: publicProcedure
     .input(VerifyChallengeRequestSchema)
     .mutation(async ({ input, ctx }): Promise<VerifyChallengeResponse> => {
-      const { address, signature } = input
-      if (!address || !signature) {
-        logger('verifyChallenge:bad-request-address-signature-required')
+      const { recoveryType, identifier, signature } = input
+
+      if (!recoveryType || !identifier || !signature) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: formatVerifyErr(
-            `${
-              !address && !signature ? 'Address and Signature' : !address ? 'Address' : 'Signature'
-            } Required`
-          ),
-          cause: 'Address or signature not provided.',
+          message: 'Recovery type, identifier and signature required',
         })
       }
 
-      const { data: userData, error: getUserIdError } = await supabaseAdmin
-        .from('chain_addresses')
-        .select('*')
-        .eq('address', address)
-        .single()
-
-      if (getUserIdError || !userData?.user_id) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: formatVerifyErr('Unrecognised chain address'),
-          cause: `Could not find associated user to chain address: [${getUserIdError?.message}]`,
-        })
-      }
-
-      const userId = userData.user_id
+      // Identify user from identifier
+      const userId = await getUserIdByIdentifier(recoveryType, identifier)
 
       // Retrieve challenge for user
       const { data: challengeData, error: getChallengeError } = await getChallenge(userId)
@@ -161,7 +68,7 @@ export const accountRecoveryRouter = createTRPCRouter({
         logger('verifyChallenge:invalid-user-or-challenge')
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: formatVerifyErr('Could not retrieve challenge'),
+          message: formatErr('Could not retrieve challenge'),
           cause: getChallengeError.message,
         })
       }
@@ -173,7 +80,7 @@ export const accountRecoveryRouter = createTRPCRouter({
             logger?.('verifyChallenge:challenge-not-found-or-expired')
             throw new TRPCError({
               code: 'NOT_FOUND',
-              message: formatVerifyErr('Challenge expired'),
+              message: formatErr('Challenge expired'),
               cause: 'Challenge expired',
             })
           }
@@ -182,24 +89,25 @@ export const accountRecoveryRouter = createTRPCRouter({
           logger?.('verifyChallenge:challenge-not-found-or-expired')
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
-            message: formatVerifyErr(error),
+            message: formatErr(error),
             cause: 'Internal server error',
           })
         })
 
       // Verify signature with user's chain address
-      const challengeVerified = await verifyMessage({
-        address: address as `0x${string}`,
-        message: challengeData.challenge,
-        signature: signature as `0x${string}`,
-      })
+      const challengeVerified = await verifyChallenge(
+        recoveryType,
+        identifier,
+        signature,
+        challengeData
+      )
 
       // Handle unauthorized requests
       if (!challengeVerified) {
         logger('verifyChallenge:challenge_failed_verification')
         throw new TRPCError({
           code: 'UNAUTHORIZED',
-          message: formatVerifyErr(
+          message: formatErr(
             'Unauthorized. Ensure that you are signing with the address you signed up with'
           ),
           cause: 'Signature failed verification',
@@ -209,26 +117,105 @@ export const accountRecoveryRouter = createTRPCRouter({
       const jwt = mintAuthenticatedJWTToken(userId)
       const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
 
-      // TODO: what is the right form here?
       ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}`)
-      // supabaseAdmin.auth.getUser(jwt).then((res) => console.log(res.data)).catch((err) => console.log(err))
       return {
         jwt,
       }
     }),
 })
 
-// TODO: isolate logic, move to seperate file
-const getUserByPhoneNumber = async (phoneNumber: string) => {
-  return await supabaseAdmin.from('users').select('*').eq('phone', phoneNumber).single()
+const getUserIdByIdentifier = async (
+  recoveryType: RecoveryOptions,
+  identifier: string
+): Promise<string> => {
+  if (!recoveryType || !identifier) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Recovery type and identifier required',
+    })
+  }
+
+  let userId = ''
+  if (recoveryType === RecoveryOptions.EOA) {
+    userId = await getUserIdByChainAddress(identifier)
+  } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
+    userId = await getUserIdByPasskey(identifier)
+  }
+  if (userId) {
+    return userId
+  }
+  throw new TRPCError({
+    code: 'BAD_REQUEST',
+    message: formatErr('Unrecognized recovery type'),
+    cause: `Unrecognized recovery type: [${recoveryType}]`,
+  })
 }
 
-const formatChallengeErr = (reason: string): string => {
-  return `Unable to retrieve challenge. ${formatErr(reason)}`
+const verifyChallenge = async (
+  recoveryType: RecoveryOptions,
+  identifier: string,
+  signature: string,
+  challenge: ChallengeResponse
+): Promise<boolean> => {
+  let verified = false
+  if (recoveryType === RecoveryOptions.EOA) {
+    verified = await verifyMessage({
+      address: identifier as `0x${string}`,
+      message: challenge.challenge,
+      signature: signature as `0x${string}`,
+    })
+  } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
+    // TODO: implement
+    throw new Error('Not implemented')
+  } else {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: formatErr('Unrecognized recovery type'),
+      cause: `Cannot verify challenge: Unrecognized recovery type: [${recoveryType}]`,
+    })
+  }
+  return verified
 }
 
-const formatVerifyErr = (reason: string): string => {
-  return `Unable to verify account. ${formatErr(reason)}`
+const getUserIdByChainAddress = async (chainAddress: string): Promise<string> => {
+  if (!chainAddress) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: formatErr('Chain address required'),
+      cause: 'Chain address not provided',
+    })
+  }
+  const { data: chainAddressData, error: chainAddressError } = await getChainAddress(chainAddress)
+
+  if (chainAddressError || !chainAddressData.user_id) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: formatErr('User not found: Unrecognised chain address'),
+      cause: `Could not find associated user to chain address: [${chainAddress}] Error: [${chainAddressError?.message}]`,
+    })
+  }
+  return chainAddressData.user_id
+}
+
+const getUserIdByPasskey = async (publicKey: string): Promise<string> => {
+  if (!publicKey) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: formatErr('WebAuthn public key required'),
+      cause: 'WebAuthn public key not provided',
+    })
+  }
+
+  const { data: passkeyData, error: passkeyError } = await getPasskey(publicKey)
+  if (passkeyError || !passkeyData.user_id) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: formatErr('User not found: Unrecognised passkey credentials'),
+      cause: `Could not find associated user to webauthn pubkey: [${publicKey}] Error: [${passkeyError?.message}]`,
+    })
+  }
+
+  return passkeyData.user_id
 }
 
 const formatErr = (reason: string): string => {

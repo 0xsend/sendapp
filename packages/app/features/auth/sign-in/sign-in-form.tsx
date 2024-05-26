@@ -1,4 +1,4 @@
-import { ButtonText, BigHeading, Paragraph, SubmitButton, XStack, YStack, H3 } from '@my/ui'
+import { ButtonText, BigHeading, Paragraph, SubmitButton, XStack, YStack, H3, Anchor } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { api } from 'app/utils/api'
@@ -40,22 +40,14 @@ export const SignInForm = () => {
   return (
     <FormProvider {...form}>
       {form.formState.isSubmitSuccessful ? (
-        showRecoveryForm ? (
-          <AccountRecoveryScreen
-            phoneNumber={`${form.getValues().countrycode}${form.getValues().phone}`}
-            onClose={() => setShowRecoveryForm(false)}
-          />
-        ) : (
-          <VerifyCode
-            phone={`${form.getValues().countrycode}${form.getValues().phone}`}
-            onSuccess={() => {
-              router.push('/')
-            }}
-            onRecover={() => {
-              setShowRecoveryForm(true)
-            }}
-          />
-        )
+        <VerifyCode
+          phone={`${form.getValues().countrycode}${form.getValues().phone}`}
+          onSuccess={() => {
+            router.push('/')
+          }}
+        />
+      ) : showRecoveryForm ? (
+        <AccountRecoveryScreen onClose={() => setShowRecoveryForm(false)} />
       ) : (
         <SchemaForm
           flex={1}
@@ -98,10 +90,20 @@ export const SignInForm = () => {
             <XStack
               f={1}
               mt={'0'}
-              jc={'flex-end'}
+              jc={'space-between'}
               $sm={{ jc: 'center', height: '100%' }}
               ai={'flex-start'}
             >
+              <Anchor
+                href=""
+                onPress={(e) => {
+                  e.preventDefault()
+                  setShowRecoveryForm(true)
+                }}
+                fontSize="$3"
+              >
+                Forgot your phone number?
+              </Anchor>
               <SubmitButton
                 onPress={() => submit()}
                 br="$3"

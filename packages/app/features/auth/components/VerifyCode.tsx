@@ -1,4 +1,5 @@
 import {
+  Anchor,
   BigHeading,
   Button,
   ButtonText,
@@ -22,11 +23,10 @@ const ConfirmSchema = z.object({
 export type VerifyCodeProps = {
   phone: string
   onSuccess: () => void
-  onRecover?: () => void
   type?: MobileOtpType
 }
 
-export const VerifyCode = ({ phone, onSuccess, onRecover, type = 'sms' }: VerifyCodeProps) => {
+export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) => {
   const supabase = useSupabase()
   const form = useForm<z.infer<typeof ConfirmSchema>>()
   async function confirmCode({ token }: z.infer<typeof ConfirmSchema>) {
@@ -99,10 +99,8 @@ export const VerifyCode = ({ phone, onSuccess, onRecover, type = 'sms' }: Verify
             mt={'0'}
             jc={'space-between'}
             $sm={{ jc: 'center', height: '100%' }}
-            ai={'flex-start'}
+            ai={'center'}
           >
-            {/* TODO: style button */}
-            <Button onPress={onRecover}>Recover account</Button>
             <SubmitButton
               onPress={() => submit()}
               br="$3"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
 import type { SignMessageErrorType } from '@wagmi/core'
 import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
@@ -6,18 +6,14 @@ import { Stack, XStack, YStack, Text, Button, ButtonText } from '@my/ui'
 import type { ChallengeResponse } from '@my/api/src/routers/account-recovery/types'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { api } from 'app/utils/api'
-import { Spinner } from '@my/ui'
 import { IconError, IconRefresh } from 'app/components/icons'
-import { useThemeSetting } from 'app/provider/theme'
-import { IconArrowLeft } from 'app/components/icons'
 import { useRouter } from 'solito/router'
+import type { ErrorWithMessage } from '@my/api/src/routers/account-recovery/types'
 
 interface Props {
-  phoneNumber: string
   onClose?: () => void
 }
 
-// TODO: move recovery/ dir into signin / auth folder, this is part of sign-in flow
 export enum SignState {
   NOT_COMPLETE = 0,
   IN_PROGRESS = 1,
@@ -25,116 +21,81 @@ export enum SignState {
 }
 
 export default function AccountRecoveryScreen(props: Props) {
-  const [challenge, setChallenge] = useState<ChallengeResponse>()
+  const [error, setError] = useState<ErrorWithMessage>()
+  // TODO: implement loading state
   const [signState, setSignState] = useState<SignState>(SignState.NOT_COMPLETE)
 
-  const { data, isLoading, isSuccess, error } = api.challenge.getRecoveryEligibility.useQuery(
-    {
-      phoneNumberInput: props.phoneNumber,
-    },
-    {
-      retry: false,
-    }
-  )
   const challengeMutation = api.challenge.getChallenge.useMutation({ retry: false })
   const verifyChallengeMutation = api.challenge.verifyChallenge.useMutation({ retry: false })
   const router = useRouter()
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
 
-  useEffect(() => {
-    if (data?.recoveryOptions) {
-      // Retrieve challenge if there are recovery options
-      challengeMutation
-        .mutateAsync({ phoneNumberInput: props.phoneNumber })
-        .then((challengeResponse) => {
-          setChallenge(challengeResponse as ChallengeResponse)
-        })
-        .catch((error) => {
-          // TODO: handle TRPClientErrors
-          throw error
-        })
+  const getChallenge = async (
+    recoveryType: RecoveryOptions,
+    identifier?: string | `0x${string}`
+  ) => {
+    if (!identifier) {
+      setError({
+        message: 'Unable to identify user. Please try again.',
+      })
     } else {
-      // Unable to determine account recovery ilegibility
-      handleIneligible(error)
+      return challengeMutation
+        .mutateAsync({ recoveryType, identifier })
+        .then((challengeResponse) => {
+          return challengeResponse as ChallengeResponse
+        })
+        .catch((err) => {
+          setError(err)
+        })
     }
-  }, [props.phoneNumber, data?.recoveryOptions, challengeMutation, error])
+  }
 
-  const handleIneligible = useCallback((error) => {
-    // Process account recovery if eligible for recovery
-    // TODO: show options
-    console.log(error)
-  }, [])
+  const onSignSuccess = (
+    data: SignMessageData,
+    variables: SignMessageVariables,
+    context: unknown
+  ) => {
+    const { account } = variables
+    const address = account as string
 
-  const onSignSuccess = useCallback(
-    (data: SignMessageData, variables: SignMessageVariables, context: unknown) => {
-      if (challenge) {
-        const { account } = variables
-        const address = account as `0x${string}`
-        verifyChallengeMutation
-          .mutateAsync({ signature: data, address })
-          .then((jwt) => {
-            // JWT is set via Set-Cookie header
-            router.push('/')
-          })
-          .catch((err) => {
-            // TODO: handle errors
-            throw err
-          })
-      } else {
-        // TODO: handle no challenge
-      }
-    },
-    [challenge, router, verifyChallengeMutation]
-  )
+    verifyChallengeMutation
+      .mutateAsync({ recoveryType: RecoveryOptions.EOA, signature: data, identifier: address })
+      .then(() => {
+        // JWT is set via Set-Cookie header
+        router.push('/')
+      })
+      .catch((err) => {
+        setError(err)
+      })
+  }
 
-  const onSignError = useCallback(
-    (error: SignMessageErrorType, variables: SignMessageVariables, context: unknown) => {
-      // TODO: handle failed error
+  const onSignError = (
+    error: SignMessageErrorType,
+    variables: SignMessageVariables,
+    context: unknown
+  ) => {
+    setError({
+      message: 'Failed to sign challenge. Please try again.',
+    })
+  }
 
-      // TODO: should reset state
-      // e.g. for EOAs, allow user to reconnect wallet
-      // e.g. for webauthn, reset
-      console.log(error)
-    },
-    []
-  )
-
-  const showRecoveryOptions = useMemo(() => {
+  const showRecoveryOptions = () => {
     return (
-      challenge && (
-        <XStack width="100%" gap="$2" alignItems="center" justifyContent="center">
-          {data?.recoveryOptions.includes(RecoveryOptions.EOA) && (
-            <RecoverWithEOA
-              challenge={challenge}
-              signState={signState}
-              onSignSuccess={onSignSuccess}
-              onSignError={onSignError}
-            />
-          )}
+      <XStack width="100%" gap="$2" alignItems="center" justifyContent="center">
+        <RecoverWithEOA
+          getChallenge={getChallenge}
+          signState={signState}
+          onSignSuccess={onSignSuccess}
+          onSignError={onSignError}
+        />
 
-          {data?.recoveryOptions.includes(RecoveryOptions.WEBAUTHN) && (
-            <Button flexBasis={0} flexGrow={1}>
-              <ButtonText>Webauthn</ButtonText>
-            </Button>
-          )}
-        </XStack>
-      )
+        <Button width="50%">
+          <ButtonText>PASSKEY</ButtonText>
+        </Button>
+      </XStack>
     )
-  }, [data?.recoveryOptions, challenge, onSignSuccess, onSignError, signState])
+  }
 
-  const showError = useMemo(() => {
-    return (
-      <>
-        <Text fontWeight="bold" textAlign="center">
-          Unable to recover account
-        </Text>
-        {error?.message && <Text textAlign="center">{error.message}</Text>}
-      </>
-    )
-  }, [error])
-
-  const showHeading = useMemo(() => {
+  const showHeading = () => {
     return (
       <>
         {/* Icon */}
@@ -147,26 +108,17 @@ export default function AccountRecoveryScreen(props: Props) {
 
         {/* Description */}
         <Text textAlign="center">
-          {error?.message ? (
-            error.message
-          ) : data?.recoveryOptions ? (
-            `Recover with the ${getRecoveryOptionsStr(
-              data?.recoveryOptions
-            )} credentials linked to your account.`
-          ) : (
-            <Spinner size="small" color="$color11" />
-          )}
+          {error?.message || `Recover with the ${getRecoveryOptionsStr()} linked to your account.`}
         </Text>
       </>
     )
-  }, [error, data])
+  }
 
   return (
     <YStack mt={'0'} w={'100%'} h={'100%'} jc={'space-between'}>
       <Stack flex={1} jc={'center'} alignItems="center" gap="$2">
-        {isLoading && <Spinner size="large" color="$color11" />}
-        {showHeading}
-        {isSuccess && data?.recoveryOptions && showRecoveryOptions}
+        {showHeading()}
+        {!error && showRecoveryOptions()}
       </Stack>
 
       <Button
@@ -176,18 +128,16 @@ export default function AccountRecoveryScreen(props: Props) {
         pressStyle={{ backgroundColor: '$primary' }}
         focusStyle={{ backgroundColor: '$primary' }}
         onPress={props.onClose}
-        icon={<IconArrowLeft size={'$1'} color={iconColor} />}
       >
-        <ButtonText>Return</ButtonText>
+        <ButtonText>RETURN</ButtonText>
       </Button>
     </YStack>
   )
 }
 
-const getRecoveryOptionsStr = (recoveryOptions?: RecoveryOptions[]): string => {
-  if (!recoveryOptions) {
-    return ''
-  }
+const getRecoveryOptionsStr = (): string => {
+  const recoveryOptions = Object.values(RecoveryOptions)
+
   if (recoveryOptions.length <= 2) {
     return recoveryOptions.join(' or ')
   }

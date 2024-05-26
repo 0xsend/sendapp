@@ -3,7 +3,12 @@ import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 
 export const PhoneNumberSchema = z.object({ phoneNumberInput: z.string() })
 
-export const ChallengeResponseSchema = z.object({
+export const GetChallengeRequestSchema = z.object({
+  recoveryType: z.nativeEnum(RecoveryOptions),
+  identifier: z.string(),
+})
+
+export const GetChallengeResponseSchema = z.object({
   id: z.string(),
   challenge: z.string(),
   created_at: z.string(),
@@ -11,7 +16,8 @@ export const ChallengeResponseSchema = z.object({
 })
 
 export const VerifyChallengeRequestSchema = z.object({
-  address: z.string(),
+  recoveryType: z.nativeEnum(RecoveryOptions),
+  identifier: z.string(),
   signature: z.string(),
 })
 
