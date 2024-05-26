@@ -862,7 +862,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 }
                 suppressHighlighting={true}
               >
-                19,032
+                0.019032 USDC
               </Text>
             </View>
           </View>
@@ -2273,7 +2273,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 }
                 suppressHighlighting={true}
               >
-                19,032
+                0.019032 USDC
               </Text>
             </View>
           </View>
