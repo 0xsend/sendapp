@@ -4,6 +4,7 @@ import { EventArraySchema } from '.'
 import type { SendAccountTransfersEvent } from './SendAccountTransfersEventSchema'
 import type { TagReceiptsEvent } from './TagReceiptsEventSchema'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/useActivityFeed'
+import type { ReferralsEvent } from './ReferralsEventSchema'
 
 describe('EventArraySchema', () => {
   it('should parse a valid event array', () => {
@@ -39,5 +40,12 @@ describe('EventArraySchema', () => {
     expect(receipt.data.tx_hash).toBe(
       '0x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c'
     )
+    const referral = result.data[2] as ReferralsEvent
+    assert(!!referral)
+    expect(referral.event_name).toBe('referrals')
+    expect(referral.created_at).toBeInstanceOf(Date)
+    expect(referral.from_user).not.toBeNull()
+    expect(referral.to_user).not.toBeNull()
+    expect(referral.data.tags).toEqual(['disconnect_whorl7351'])
   })
 })
