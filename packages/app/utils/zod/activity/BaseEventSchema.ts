@@ -18,5 +18,5 @@ export const BaseEventSchema = z.object({
   event_name: z.string(),
   from_user: UserSchema.nullable(),
   to_user: UserSchema.nullable(),
-  data: z.object({}).nullable(),
+  data: z.any().nullable(),
 })

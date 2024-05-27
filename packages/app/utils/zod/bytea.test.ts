@@ -25,7 +25,7 @@ describe('pgEthAddr', () => {
 describe('pgToHexEthAddress', () => {
   it('should return a valid eth address', () => {
     expect(byteaToHexEthAddress.parse('\\xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1')).toEqual(
-      '0xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1'
+      '0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1'
     )
   })
   it('should return an error for an invalid eth address', () => {

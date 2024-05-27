@@ -15,6 +15,14 @@ describe('TagReceiptsDataSchema', () => {
           tags: ['hurl_handholding2408'],
           value: 10000000000000000n,
           tx_hash: '0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4',
+          coin: {
+            coingeckoTokenId: 'ethereum',
+            decimals: 18,
+            icon: 'ETH',
+            label: 'Ethereum',
+            symbol: 'ETH',
+            token: 'eth',
+          },
         },
       },
     ]

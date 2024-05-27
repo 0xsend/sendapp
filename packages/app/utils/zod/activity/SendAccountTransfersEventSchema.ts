@@ -46,3 +46,7 @@ export const SendAccountTransfersEventSchema = BaseEventSchema.extend({
 })
 
 export type SendAccountTransfersEvent = z.infer<typeof SendAccountTransfersEventSchema>
+
+export const isSendAccountTransfersEvent = (event: {
+  event_name: string
+}): event is SendAccountTransfersEvent => event.event_name === 'send_account_transfers'

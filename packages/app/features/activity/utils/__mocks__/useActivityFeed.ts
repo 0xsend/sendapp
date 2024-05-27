@@ -37,6 +37,27 @@ export const MockActivityFeed = [
       tx_hash: '\\x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c',
     },
   },
+  {
+    created_at: '2024-05-26T19:41:05.370062+00:00',
+    event_name: 'referrals',
+    from_user: {
+      id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+      name: null,
+      avatar_url: null,
+      send_id: 65244,
+      tags: ['asdf', 'teq', 'yuw'],
+    },
+    to_user: {
+      id: null,
+      name: 'Mr. Dan Conn',
+      avatar_url: 'https://i.pravatar.cc/500?u=Hortense Ratke',
+      send_id: 12530,
+      tags: ['disconnect_whorl7351'],
+    },
+    data: {
+      tags: ['disconnect_whorl7351'],
+    },
+  },
 ] as const
 
 export const useActivityFeed = jest.fn().mockReturnValue({

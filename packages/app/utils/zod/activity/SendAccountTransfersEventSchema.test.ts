@@ -13,11 +13,11 @@ describe('TransferDataSchema', () => {
           log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
         },
         expected: {
-          f: '0x760e2928c3aa3af87897be52eb4833d42bbb27cf',
-          t: '0xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1',
+          f: '0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf',
+          t: '0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1',
           v: 1965443n,
           tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
-          log_addr: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          log_addr: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
           coin: {
             coingeckoTokenId: 'usd-coin',
             decimals: 6,
@@ -37,11 +37,11 @@ describe('TransferDataSchema', () => {
           log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
         },
         expected: {
-          f: '0x760e2928c3aa3af87897be52eb4833d42bbb27cf',
-          t: '0xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1',
+          f: '0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf',
+          t: '0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1',
           v: 0n,
           tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
-          log_addr: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          log_addr: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
           coin: {
             coingeckoTokenId: 'usd-coin',
             decimals: 6,
