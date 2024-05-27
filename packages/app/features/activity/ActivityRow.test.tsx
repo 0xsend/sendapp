@@ -49,10 +49,10 @@ describe('ActivityRow', () => {
     // expect(getByText('Alice')).toBeOnTheScreen() // should we show the user's name?
     expect(getByText('Sent')).toBeOnTheScreen()
     expect(getByText('0.019032 USDC')).toBeOnTheScreen()
-    expect(getByText('@alice')).toBeOnTheScreen() // shows senders first tag
+    expect(getByText('@alice')).toBeOnTheScreen() // shows receivers first tag
   })
 
-  it('should render send account transfers event when sent and sender is a send app user', () => {
+  it('should render send account transfers event when received and sender is a send app user', () => {
     const activity = EventSchema.parse(MockActivityFeed[0])
     activity.from_user = alice
     activity.to_user = bigboss
