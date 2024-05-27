@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
 import type { SignMessageErrorType } from '@wagmi/core'
 import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
@@ -9,6 +9,7 @@ import { api } from 'app/utils/api'
 import { IconError, IconRefresh } from 'app/components/icons'
 import { useRouter } from 'solito/router'
 import type { ErrorWithMessage } from '@my/api/src/routers/account-recovery/types'
+import RecoverWithPasskey from 'app/features/auth/account-recovery/webauthn/RecoverWithWebauthn'
 
 interface Props {
   onClose?: () => void
@@ -24,32 +25,27 @@ export default function AccountRecovery(props: Props) {
   const [error, setError] = useState<ErrorWithMessage>()
   // TODO: implement loading state
   const [signState, setSignState] = useState<SignState>(SignState.NOT_COMPLETE)
-
+  const [challengeData, setChallengeData] = useState<ChallengeResponse>()
   const challengeMutation = api.challenge.getChallenge.useMutation({ retry: false })
   const verifyChallengeMutation = api.challenge.verifyChallenge.useMutation({ retry: false })
   const router = useRouter()
 
-  const getChallenge = async (
-    recoveryType: RecoveryOptions,
-    identifier?: string | `0x${string}`
-  ) => {
-    if (!identifier) {
-      setError({
-        message: 'Unable to identify user. Please try again.',
+  const loadChallenge = (): void => {
+    challengeMutation
+      .mutateAsync()
+      .then((challengeResponse) => {
+        setChallengeData(challengeResponse as ChallengeResponse)
       })
-    } else {
-      return challengeMutation
-        .mutateAsync({ recoveryType, identifier })
-        .then((challengeResponse) => {
-          return challengeResponse as ChallengeResponse
-        })
-        .catch((err) => {
-          setError(err)
-        })
-    }
+      .catch((err) => {
+        setError(err)
+      })
   }
 
-  const onSignSuccess = (
+  useEffect(() => {
+    loadChallenge()
+  }, [loadChallenge])
+
+  const onSignSuccess = async (
     data: SignMessageData,
     variables: SignMessageVariables,
     context: unknown
@@ -57,8 +53,13 @@ export default function AccountRecovery(props: Props) {
     const { account } = variables
     const address = account as string
 
-    verifyChallengeMutation
-      .mutateAsync({ recoveryType: RecoveryOptions.EOA, signature: data, identifier: address })
+    await verifyChallengeMutation
+      .mutateAsync({
+        recoveryType: RecoveryOptions.EOA,
+        signature: data,
+        identifier: address,
+        challengeId: challengeData.id,
+      })
       .then(() => {
         // JWT is set via Set-Cookie header
         router.push('/')
@@ -82,15 +83,13 @@ export default function AccountRecovery(props: Props) {
     return (
       <XStack width="100%" gap="$2" alignItems="center" justifyContent="center">
         <RecoverWithEOA
-          getChallenge={getChallenge}
+          challengeData={challengeData}
           signState={signState}
           onSignSuccess={onSignSuccess}
           onSignError={onSignError}
         />
 
-        <Button width="50%">
-          <ButtonText>PASSKEY</ButtonText>
-        </Button>
+        <RecoverWithPasskey challengeData={challengeData} />
       </XStack>
     )
   }
@@ -118,7 +117,7 @@ export default function AccountRecovery(props: Props) {
     <YStack mt={'0'} w={'100%'} h={'100%'} jc={'space-between'}>
       <Stack flex={1} jc={'center'} alignItems="center" gap="$2">
         {showHeading()}
-        {!error && showRecoveryOptions()}
+        {!error && challengeData && showRecoveryOptions()}
       </Stack>
 
       <Button

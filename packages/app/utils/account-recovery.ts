@@ -17,8 +17,33 @@ export const getPasskey = async (publicKey: string) => {
     .single()
 }
 
-export const getChallenge = async (userId: string) => {
-  return await supabaseAdmin.from('challenges').select('*').eq('user_id', userId).single()
+/**
+ * Attempts to insert a challenge. Upon failing to generate a challenge (in the case of duplicate challenges), this function will retry a maximum of `maxRetries` times.
+ *
+ *
+ * @param {int} [maxRetries=3] Maximum number of retries
+ * @returns Challenge
+ */
+export const tryInsertChallenge = async (maxRetries: int = 3) => {
+  if (maxRetries === 0) {
+    return
+  }
+  const result = await supabaseAdmin
+    .rpc('insert_challenge', {
+      challenge: generateChallenge(),
+    })
+    .single()
+
+  const { data, error } = result
+  if (!data || error) {
+    return await tryInsertChallenge(maxRetries - 1)
+  }
+
+  return result
+}
+
+export const getChallengeById = async (challengeId: number) => {
+  return await supabaseAdmin.from('challenges').select('*').eq('id', challengeId).single()
 }
 
 export const isChallengeExpired = async (
@@ -47,8 +72,9 @@ export const isChallengeExpired = async (
  * Generates a 64-byte randomly generated challenge (hex)
  *
  * @returns {string} - challenge hex string
+ * @see {tryInsertChallenge} - avoid using `generateChallenge` directly. use `tryGenerateChallenge` instead.
  */
-export function generateChallenge(): Uint8Array {
+function generateChallenge(): Uint8Array {
   const buffer = new Uint8Array(64)
   crypto.getRandomValues(buffer)
   return buffer

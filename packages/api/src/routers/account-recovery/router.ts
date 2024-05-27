@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import debug from 'debug'
-import { SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
+import { SUPABASE_SUBDOMAIN } from 'app/utils/supabase/admin'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
 import { z } from 'zod'
 import {
@@ -9,24 +9,19 @@ import {
   RecoveryOptions,
 } from '@my/api/src/routers/account-recovery/types'
 import {
-  getChallenge,
+  getChallengeById,
   getChainAddress,
   getPasskey,
   isChallengeExpired,
-  generateChallenge,
+  tryInsertChallenge,
 } from 'app/utils/account-recovery'
 import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
 import { verifyMessage } from 'viem'
 
 const logger = debug('api:routers:account-recovery')
 
-const GetChallengeRequestSchema = z.object({
-  recoveryType: z.nativeEnum(RecoveryOptions),
-  identifier: z.string(),
-})
-
 export const GetChallengeResponseSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   challenge: z.string(),
   created_at: z.string(),
   expires_at: z.string(),
@@ -35,6 +30,7 @@ export const GetChallengeResponseSchema = z.object({
 const VerifyChallengeRequestSchema = z.object({
   recoveryType: z.nativeEnum(RecoveryOptions),
   identifier: z.string(),
+  challengeId: z.number(),
   signature: z.string(),
 })
 
@@ -43,24 +39,15 @@ export const VerifyChallengeResponseSchema = z.object({
 })
 
 export const accountRecoveryRouter = createTRPCRouter({
-  getChallenge: publicProcedure.input(GetChallengeRequestSchema).mutation(async ({ input }) => {
-    const { recoveryType, identifier } = input
-
-    const userId = await getUserIdByIdentifier(recoveryType, identifier)
-
-    const { data: challengeData, error: challengeError } = await supabaseAdmin
-      .rpc('upsert_challenges', {
-        user_id: userId,
-        challenge: generateChallenge(),
-      })
-      .single()
+  getChallenge: publicProcedure.mutation(async () => {
+    const { data: challengeData, error: challengeError } = await tryInsertChallenge()
 
     if (challengeError || !challengeData) {
       logger('getChallenge:cant-upsert-challenge')
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: formatErr('Cannot retrieve challenge: Internal server error'),
-        cause: challengeError.message,
+        message: formatErr('Cannot generate challenge: Internal server error'),
+        cause: challengeError?.message,
       })
     }
 
@@ -69,33 +56,21 @@ export const accountRecoveryRouter = createTRPCRouter({
   verifyChallenge: publicProcedure
     .input(VerifyChallengeRequestSchema)
     .mutation(async ({ input, ctx }): Promise<VerifyChallengeResponse> => {
-      const { recoveryType, identifier, signature } = input
+      const { recoveryType, identifier, signature, challengeId } = input
 
-      // TODO: base64 decode signature
-
-      if (!recoveryType || !identifier || !signature) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Recovery type, identifier and signature required',
-        })
-      }
-
-      // Identify user from identifier
-      const userId = await getUserIdByIdentifier(recoveryType, identifier)
-
-      // Retrieve challenge for user
-      const { data: challengeData, error: getChallengeError } = await getChallenge(userId)
+      const { data: challengeData, error: getChallengeError } = await getChallengeById(challengeId)
+      console.log(challengeData, getChallengeError, challengeId)
       if (getChallengeError || !challengeData) {
         logger('verifyChallenge:invalid-user-or-challenge')
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: formatErr('Could not retrieve challenge'),
-          cause: getChallengeError.message,
+          message: formatErr('Cannot retrieve challenge for verification'),
+          cause: getChallengeError?.message,
         })
       }
 
       // Validate challenge isn't expired
-      isChallengeExpired(challengeData.id, logger)
+      await isChallengeExpired(challengeData.id, logger)
         .then((expired) => {
           if (expired) {
             logger?.('verifyChallenge:challenge-not-found-or-expired')
@@ -135,6 +110,8 @@ export const accountRecoveryRouter = createTRPCRouter({
         })
       }
 
+      // Identify user from identifier
+      const userId = await getUserIdByIdentifier(recoveryType, identifier)
       const jwt = mintAuthenticatedJWTToken(userId)
       const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
 

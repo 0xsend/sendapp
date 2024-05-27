@@ -7,10 +7,7 @@ import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import { type ChallengeResponse, RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 
 interface Props {
-  getChallenge: (
-    recoveryType: RecoveryOptions,
-    identifier?: `0x${string}` | string
-  ) => Promise<ChallengeResponse>
+  challengeData: ChallengeResponse
   // https://wagmi.sh/react/api/hooks/useSignMessage#onsuccess
   onSignSuccess: (data: SignMessageData, variables: SignMessageVariables, context: unknown) => void
   // https://wagmi.sh/react/api/hooks/useSignMessage#onerror
@@ -26,11 +23,10 @@ export default function RecoverWithEOA(props: Props) {
   const { address } = useAccount()
 
   const onPress = async () => {
-    const challengeData = await props.getChallenge(RecoveryOptions.EOA, address)
-    if (challengeData?.challenge) {
+    if (props.challengeData.challenge) {
       signMessage(
         {
-          message: challengeData.challenge,
+          message: props.challengeData.challenge,
           account: address,
         },
         {
