@@ -33,7 +33,7 @@ export function RecentActivity() {
           case activitiesError !== null:
             return (
               <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-                {activitiesError?.message ?? `Something went wrong: ${activitiesError}`}
+                {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
               </Paragraph>
             )
           case pages?.length === 0:
