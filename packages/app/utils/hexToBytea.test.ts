@@ -1,8 +1,8 @@
 import { describe, it } from '@jest/globals'
 import { hexToBytea } from './hexToBytea'
 
-describe('test hexToPgBase16', () => {
-  it('test hexToPgBase16', () => {
+describe('test hexToBytea', () => {
+  it('test hexToBytea', () => {
     // Testing edge cases
     expect(hexToBytea('0x')).toBe('\\x') // empty string
     expect(hexToBytea('0x12')).toBe('\\x12') // single character

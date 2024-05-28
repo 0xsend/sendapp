@@ -3,7 +3,7 @@ import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
 import type { Database } from '@my/supabase/database-generated.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { assert } from 'app/utils/assert'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { withRetry, checksumAddress } from 'viem'
@@ -78,8 +78,8 @@ expect.extend({
         `\\x${COSEPublicKey}`
       )
       const [xHex, yHex] = COSEECDHAtoXY(COSEPublicKeyBytes)
-      const xPgB16 = hexToPgBase16(xHex)
-      const yPgB16 = hexToPgBase16(yHex)
+      const xPgB16 = hexToBytea(xHex)
+      const yPgB16 = hexToBytea(yHex)
 
       // retry until signing key is added to the account
       const keyAdded = await withRetry(

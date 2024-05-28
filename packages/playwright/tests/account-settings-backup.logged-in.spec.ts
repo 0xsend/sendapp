@@ -7,7 +7,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@my/supabase/database.types'
 import type { Authenticator } from '@0xsend/webauthn-authenticator'
 import { withRetry } from 'viem'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
+import { hexToBytea } from 'app/utils/hexToBytea'
 
 let log: debug.Debugger
 
@@ -107,7 +107,7 @@ test('can remove a signer', async ({ page, supabase, authenticator }) => {
       const { data: keyRemoved, error: keyRemovedErr } = await supabase
         .from('send_account_signing_key_removed')
         .select('account, key_slot')
-        .eq('account', hexToPgBase16(sendAcct.address))
+        .eq('account', hexToBytea(sendAcct.address))
         .order('block_num, tx_idx, log_idx, abi_idx')
 
       if (keyRemovedErr) {
