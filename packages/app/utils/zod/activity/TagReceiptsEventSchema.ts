@@ -4,6 +4,7 @@ import { decimalStrToBigInt } from '../bigint'
 import { BaseEventSchema } from './BaseEventSchema'
 import { CoinSchema, coins } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
+import { Events } from './events'
 
 const eth = coins.find((c) => c.symbol === 'ETH')
 assert(!!eth, 'ETH coin not found')
@@ -28,7 +29,7 @@ export const TagReceiptsDataSchema = z.object({
 })
 
 export const TagReceiptsEventSchema = BaseEventSchema.extend({
-  event_name: z.literal('tag_receipts'),
+  event_name: z.literal(Events.TagReceipts),
   data: TagReceiptsDataSchema,
 })
 
@@ -36,4 +37,4 @@ export type TagReceiptsEvent = z.infer<typeof TagReceiptsEventSchema>
 
 export const isTagReceiptsEvent = (event: {
   event_name: string
-}): event is TagReceiptsEvent => event.event_name === 'tag_receipts'
+}): event is TagReceiptsEvent => event.event_name === Events.TagReceipts

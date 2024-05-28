@@ -4,11 +4,11 @@ import { byteaToHexEthAddress, byteaToHexTxHash } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
 import { CoinSchema, coins } from 'app/data/coins'
 import { isAddressEqual } from 'viem'
+import { Events } from './events'
 
 /**
  * ERC-20 token transfer event data
  */
-
 export const TransferDataSchema = z
   .object({
     /**
@@ -41,7 +41,7 @@ export const TransferDataSchema = z
   }))
 
 export const SendAccountTransfersEventSchema = BaseEventSchema.extend({
-  event_name: z.literal('send_account_transfers'),
+  event_name: z.literal(Events.SendAccountTransfers),
   data: TransferDataSchema,
 })
 
@@ -49,4 +49,4 @@ export type SendAccountTransfersEvent = z.infer<typeof SendAccountTransfersEvent
 
 export const isSendAccountTransfersEvent = (event: {
   event_name: string
-}): event is SendAccountTransfersEvent => event.event_name === 'send_account_transfers'
+}): event is SendAccountTransfersEvent => event.event_name === Events.SendAccountTransfers

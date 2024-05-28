@@ -1,11 +1,16 @@
 import { z } from 'zod'
-import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
-import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 import { BaseEventSchema } from './BaseEventSchema'
 import { ReferralsEventSchema } from './ReferralsEventSchema'
+import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
+import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 
-export { isSendAccountTransfersEvent } from './SendAccountTransfersEventSchema'
-export { isTagReceiptsEvent } from './TagReceiptsEventSchema'
+export { ReferralsEventSchema, isReferralsEvent } from './ReferralsEventSchema'
+export {
+  SendAccountTransfersEventSchema,
+  isSendAccountTransfersEvent,
+} from './SendAccountTransfersEventSchema'
+export { TagReceiptsEventSchema, isTagReceiptsEvent } from './TagReceiptsEventSchema'
+export { Events } from './events'
 
 export const EventSchema = z
   .discriminatedUnion('event_name', [
