@@ -24,6 +24,7 @@ import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBotto
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
+import { IconCoin } from './icons/IconCoin'
 
 export enum ButtonOption {
   QR = 'QR',
@@ -98,7 +99,7 @@ export function TopNav({
           <ButtonOg
             disabled
             $gtLg={{ display: 'none' }}
-            icon={selectedCoin.icon}
+            icon={<IconCoin coin={selectedCoin} />}
             bc="transparent"
             chromeless
             jc={'flex-end'}
