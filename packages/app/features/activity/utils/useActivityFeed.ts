@@ -19,7 +19,12 @@ export function useActivityFeed({ pageSize = 10 }: { pageSize?: number } = {}) {
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)
-    return EventArraySchema.parse(data)
+    const result = EventArraySchema.safeParse(data)
+    if (result.success) {
+      return result.data
+    }
+    console.error('Error parsing activity feed', result.error)
+    return result.error.issues.map((issue) => issue.message).join(', ')
   }
 
   return useInfiniteQuery({

@@ -20,5 +20,5 @@ export const UserSchema = z.object({
   /**
    * Confirmed sendtags
    */
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).nullable().default([]),
 })

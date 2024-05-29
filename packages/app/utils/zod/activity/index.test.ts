@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 import { assert } from 'app/utils/assert'
-import { EventArraySchema } from '.'
+import { EventArraySchema, type BaseEvent } from '.'
 import type { SendAccountTransfersEvent } from './SendAccountTransfersEventSchema'
 import type { TagReceiptsEvent } from './TagReceiptsEventSchema'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/useActivityFeed'
@@ -14,8 +14,8 @@ describe('EventArraySchema', () => {
     }
     assert(result.success === true)
     expect(result.data).toMatchSnapshot()
-    expect(result.data).toHaveLength(3)
-    assert(result.data.length === 3)
+    expect(result.data).toHaveLength(5)
+    assert(result.data.length === 5)
     const transfer = result.data[0] as SendAccountTransfersEvent
     assert(!!transfer)
     expect(transfer.event_name).toBe('send_account_transfers')
@@ -47,5 +47,29 @@ describe('EventArraySchema', () => {
     expect(referral.from_user).not.toBeNull()
     expect(referral.to_user).not.toBeNull()
     expect(referral.data.tags).toEqual(['disconnect_whorl7351'])
+    const keyAdded = result.data[3] as BaseEvent
+    assert(!!keyAdded)
+    expect(keyAdded.event_name).toBe('send_account_signing_key_added')
+    expect(keyAdded.created_at).toBeInstanceOf(Date)
+    expect(keyAdded.from_user).not.toBeNull()
+    expect(keyAdded.to_user).toBeNull()
+    expect(keyAdded.data.account).toBe('\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1')
+    expect(keyAdded.data.key_slot).toBe(0)
+    expect(keyAdded.data.key).toEqual([
+      '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
+      '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
+    ])
+    const keyRemoved = result.data[4] as BaseEvent
+    assert(!!keyRemoved)
+    expect(keyRemoved.event_name).toBe('send_account_signing_key_removed')
+    expect(keyRemoved.created_at).toBeInstanceOf(Date)
+    expect(keyRemoved.from_user).not.toBeNull()
+    expect(keyRemoved.to_user).toBeNull()
+    expect(keyRemoved.data.account).toBe('\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1')
+    expect(keyRemoved.data.key_slot).toBe(0)
+    expect(keyRemoved.data.key).toEqual([
+      '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
+      '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
+    ])
   })
 })

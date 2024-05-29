@@ -1517,6 +1517,671 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           </View>
         </View>
       </View>
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsl(0, 0%, 42.5%)",
+            "display": "none",
+            "fontFamily": "System",
+            "fontSize": 19.2,
+            "fontWeight": "400",
+            "lineHeight": 21,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 13,
+          }
+        }
+        suppressHighlighting={true}
+      >
+        5/29/2024
+      </Text>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 1,
+              "transform": [
+                {
+                  "scale": 1,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Send Account Signing Key Added
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                />
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "display": "none",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  •
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  5/29/2024, 1:34:26 PM
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "justifyContent": "flex-end",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              5/29/2024, 1:34:26 PM
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 24,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 1,
+              "transform": [
+                {
+                  "scale": 1,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Send Account Signing Key Removed
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                />
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "display": "none",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  •
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  5/29/2024, 1:34:26 PM
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "justifyContent": "flex-end",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              5/29/2024, 1:34:26 PM
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 24,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+            </Text>
+          </View>
+        </View>
+      </View>
       <View
         animatedStyle={
           {
@@ -1763,7 +2428,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 }
                 focusVisibleStyle={{}}
                 focusable={true}
-                id=":r7:"
+                id=":r9:"
                 name="query"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -3322,6 +3987,671 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
               suppressHighlighting={true}
             >
               1 Referrals
+            </Text>
+          </View>
+        </View>
+      </View>
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsl(0, 0%, 42.5%)",
+            "display": "none",
+            "fontFamily": "System",
+            "fontSize": 19.2,
+            "fontWeight": "400",
+            "lineHeight": 21,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 13,
+          }
+        }
+        suppressHighlighting={true}
+      >
+        5/29/2024
+      </Text>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 1,
+              "transform": [
+                {
+                  "scale": 1,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Send Account Signing Key Added
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                />
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "display": "none",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  •
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  5/29/2024, 1:34:26 PM
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "justifyContent": "flex-end",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              5/29/2024, 1:34:26 PM
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 24,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 1,
+              "transform": [
+                {
+                  "scale": 1,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Send Account Signing Key Removed
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                />
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "display": "none",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  •
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  5/29/2024, 1:34:26 PM
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "row",
+                "gap": 18,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "justifyContent": "flex-end",
+                  "minWidth": 184,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              5/29/2024, 1:34:26 PM
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 24,
+                  "textAlign": "right",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              {
+  "key": [
+    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
+  ],
+  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+  "key_slot": 0,
+  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
+}
             </Text>
           </View>
         </View>

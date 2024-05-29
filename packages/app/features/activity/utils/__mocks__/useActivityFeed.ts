@@ -58,6 +58,50 @@ export const MockActivityFeed = [
       tags: ['disconnect_whorl7351'],
     },
   },
+  {
+    created_at: '2024-05-29T13:34:26+00:00',
+    event_name: 'send_account_signing_key_added',
+    from_user: {
+      id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+      name: null,
+      avatar_url: null,
+      send_id: 55617,
+      tags: null,
+    },
+    to_user: null,
+    data: {
+      key: [
+        '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
+        '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
+      ],
+      account: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+      tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
+      key_slot: 0,
+      log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+    },
+  },
+  {
+    created_at: '2024-05-29T13:34:26+00:00',
+    event_name: 'send_account_signing_key_removed',
+    from_user: {
+      id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+      name: null,
+      avatar_url: null,
+      send_id: 55617,
+      tags: null,
+    },
+    to_user: null,
+    data: {
+      key: [
+        '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
+        '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
+      ],
+      account: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+      tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
+      key_slot: 0,
+      log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+    },
+  },
 ] as const
 
 export const useActivityFeed = jest.fn().mockReturnValue({

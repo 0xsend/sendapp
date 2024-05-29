@@ -20,3 +20,5 @@ export const BaseEventSchema = z.object({
   to_user: UserSchema.nullable(),
   data: z.any().nullable(),
 })
+
+export type BaseEvent = z.infer<typeof BaseEventSchema>
