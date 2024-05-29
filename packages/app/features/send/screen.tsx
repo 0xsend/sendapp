@@ -1,10 +1,9 @@
-import { AnimatePresence, Container, H4, Separator, Spinner, Text, YStack } from '@my/ui'
+import { AnimatePresence, Container, H4, Spinner, Text, YStack } from '@my/ui'
 import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { SendAmountForm } from './SendAmountForm'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from 'app/components/SearchBar'
-import { RecentActivity } from '../activity/RecentActivity'
 
 export const SendScreen = () => {
   const [{ recipient }] = useSendScreenParams()
@@ -32,40 +31,22 @@ export const SendScreen = () => {
 }
 
 function SendSearchBody() {
-  const [queryParams] = useSendScreenParams()
-  const { isLoading, results, error } = useTagSearch()
+  const { isLoading, error } = useTagSearch()
 
   return (
     <AnimatePresence>
+      {isLoading && (
+        <YStack key="loading" gap="$4" mb="$4">
+          <Spinner size="large" color="$send1" />
+        </YStack>
+      )}
       {error && (
         <YStack key="error" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
           <Text>{error.message}</Text>
         </YStack>
       )}
-      <Search.Results to="/send" queryParams={queryParams} />
-      {results === null && !isLoading && !error && (
-        <YStack
-          key="suggestions"
-          animation="quick"
-          gap="$size.1.5"
-          mb="$4"
-          mt="$6"
-          $gtSm={{ gap: '$size.2.5' }}
-          exitStyle={{
-            opacity: 0,
-            y: 10,
-          }}
-        >
-          {/*
-            <Separator $gtMd={{ display: 'none' }} />
-            <Suggestions />
-          */}
-
-          <Separator $gtMd={{ display: 'none' }} />
-          <RecentActivity />
-        </YStack>
-      )}
+      <Search.Results />
     </AnimatePresence>
   )
 }

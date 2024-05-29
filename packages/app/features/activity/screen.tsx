@@ -9,7 +9,6 @@ import {
   Separator,
   Spinner,
   Text,
-  View,
   XStack,
   YStack,
   Stack,
@@ -32,13 +31,9 @@ export function ActivityScreen() {
   return (
     <TagSearchProvider>
       <YStack f={1} width={'100%'} pb="$4">
-        <View>
-          <Container>
-            <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-              <Search />
-            </YStack>
-          </Container>
-        </View>
+        <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
+          <Search />
+        </YStack>
 
         <ActivityBody />
       </YStack>
@@ -58,7 +53,7 @@ function ActivityBody() {
         </YStack>
       )}
 
-      <Search.Results to="/profile" />
+      <Search.Results />
 
       {results === null && !isLoading && !error && (
         <YStack

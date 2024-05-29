@@ -2,7 +2,6 @@ import {
   Avatar,
   Button,
   ButtonText,
-  Container,
   H4,
   Paragraph,
   Spinner,
@@ -52,75 +51,69 @@ function SearchResults() {
     (value) => Array.isArray(value) && value.length
   ).length
   if (matchesCount === 0) {
-    return (
-      <Container>
-        <Text mt="$4">No results for {query}... 😢</Text>
-      </Container>
-    )
+    return <Text mt="$4">No results for {query}... 😢</Text>
   }
   return (
-    <Container>
-      <YStack
-        testID="searchResults"
-        key="searchResults"
-        animation="quick"
-        gap="$size.2.5"
-        mt="$size.3.5"
-        width="100%"
-        enterStyle={{
-          opacity: 0,
-          y: -10,
-        }}
-      >
-        {matchesCount > 1 && (
-          <XStack gap="$size.0.75">
-            <SearchFilterButton
-              title="All"
-              active={!resultsFilter}
-              onPress={() => setResultsFilter(null)}
-            />
-            {SEARCH_RESULTS_KEYS.map((key) =>
-              Array.isArray(results[key]) && results[key].length ? (
-                <SearchFilterButton
-                  key={key}
-                  title={formatResultsKey(key)}
-                  active={resultsFilter === key}
-                  onPress={() => setResultsFilter(key as SearchResultsKeysType)}
+    <YStack
+      testID="searchResults"
+      key="searchResults"
+      animation="quick"
+      gap="$size.2.5"
+      mt="$size.3.5"
+      width="100%"
+      enterStyle={{
+        opacity: 0,
+        y: -10,
+      }}
+    >
+      {matchesCount > 1 && (
+        <XStack gap="$size.0.75">
+          <SearchFilterButton
+            title="All"
+            active={!resultsFilter}
+            onPress={() => setResultsFilter(null)}
+          />
+          {SEARCH_RESULTS_KEYS.map((key) =>
+            Array.isArray(results[key]) && results[key].length ? (
+              <SearchFilterButton
+                key={key}
+                title={formatResultsKey(key)}
+                active={resultsFilter === key}
+                onPress={() => setResultsFilter(key as SearchResultsKeysType)}
+              />
+            ) : null
+          )}
+        </XStack>
+      )}
+      {SEARCH_RESULTS_KEYS.map((key) =>
+        Array.isArray(results[key]) &&
+        results[key].length &&
+        (!resultsFilter || resultsFilter === key) ? (
+          <YStack key={key} gap="$3.5">
+            <H4
+              $theme-dark={{ color: '$lightGrayTextField' }}
+              $theme-light={{ color: '$darkGrayTextField' }}
+              fontFamily={'$mono'}
+              fontWeight={'500'}
+              size={'$5'}
+              textTransform="uppercase"
+            >
+              {formatResultsKey(key)}
+            </H4>
+            <XStack gap="$5" flexWrap="wrap">
+              {results[key].map((item: SearchResultCommonType) => (
+                <SearchResultRow
+                  key={item.send_id}
+                  keyField={key as SearchResultsKeysType}
+                  item={item}
+                  query={query}
                 />
-              ) : null
-            )}
-          </XStack>
-        )}
-        {SEARCH_RESULTS_KEYS.map((key) =>
-          Array.isArray(results[key]) &&
-          results[key].length &&
-          (!resultsFilter || resultsFilter === key) ? (
-            <YStack key={key} gap="$3.5">
-              <H4
-                $theme-dark={{ color: '$lightGrayTextField' }}
-                $theme-light={{ color: '$darkGrayTextField' }}
-                fontFamily={'$mono'}
-                fontWeight={'500'}
-                size={'$5'}
-                textTransform="uppercase"
-              >
-                {formatResultsKey(key)}
-              </H4>
-              <XStack gap="$5" flexWrap="wrap">
-                {results[key].map((item: SearchResultCommonType) => (
-                  <SearchResultRow
-                    key={item.send_id}
-                    keyField={key as SearchResultsKeysType}
-                    item={item}
-                    query={query}
-                  />
-                ))}
-              </XStack>
-            </YStack>
-          ) : null
-        )}
-      </YStack>
-    </Container>
+              ))}
+            </XStack>
+          </YStack>
+        ) : null
+      )}
+    </YStack>
   )
 }
 
