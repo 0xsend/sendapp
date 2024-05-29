@@ -5,6 +5,10 @@ import { ActivityScreen } from './screen'
 
 jest.mock('app/features/activity/utils/useActivityFeed')
 
+jest.mock('expo-router', () => ({
+  usePathname: jest.fn(),
+}))
+
 jest.mock('app/utils/supabase/useSupabase', () => ({
   useSupabase: jest.fn().mockReturnValue({
     rpc: jest.fn().mockReturnValue({
@@ -55,7 +59,7 @@ test('ActivityScreen: search', async () => {
       <ActivityScreen />
     </TamaguiProvider>
   )
-  const searchInput = screen.getByPlaceholderText('Name, $Sendtag, Phone')
+  const searchInput = screen.getByPlaceholderText('$Sendtag, Phone, Send ID')
   await act(async () => {
     fireEvent.changeText(searchInput, 'test')
     jest.advanceTimersByTime(2000)

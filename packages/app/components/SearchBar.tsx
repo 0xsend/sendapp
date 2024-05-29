@@ -20,11 +20,11 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { IconX } from 'app/components/icons'
 import { useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
-import { useSendScreenParams } from 'app/routers/params'
+import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
-type SearchResultCommonType = SearchResultsType[SearchResultsKeysType][number]
+export type SearchResultCommonType = SearchResultsType[SearchResultsKeysType][number]
 const SEARCH_RESULTS_KEYS: SearchResultsKeysType[] = [
   'phone_matches',
   'tag_matches',
@@ -33,7 +33,8 @@ const SEARCH_RESULTS_KEYS: SearchResultsKeysType[] = [
 const formatResultsKey = (str: string): string => {
   return str.replace(/_matches/g, '').replace(/_/g, ' ')
 }
-export function SearchResults() {
+
+function SearchResults() {
   const { form, results, isLoading, error } = useTagSearch()
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   const query = form.watch('query', '')
@@ -106,7 +107,7 @@ export function SearchResults() {
                 {formatResultsKey(key)}
               </H4>
               <XStack gap="$5" flexWrap="wrap">
-                {results[key].map((item) => (
+                {results[key].map((item: SearchResultCommonType) => (
                   <SearchResultRow
                     key={item.send_id}
                     keyField={key as SearchResultsKeysType}
@@ -122,6 +123,7 @@ export function SearchResults() {
     </Container>
   )
 }
+
 function HighlightMatchingText({ text, highlight }: { text: string; highlight: string }) {
   const regex = new RegExp(`(${highlight})`, 'gi')
   const parts = text.split(regex)
@@ -187,9 +189,10 @@ function SearchResultRow({
   item: SearchResultCommonType
   query: string
 }) {
-  const [params] = useSendScreenParams()
+  const href = useSearchResultHref(item)
   const { resolvedTheme } = useThemeSetting()
   const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
+
   return (
     <View
       br="$5"
@@ -204,12 +207,7 @@ function SearchResultRow({
         width: isWeb ? 'calc((100% - 72px) / 4)' : '100%',
       }}
     >
-      <Link
-        href={`/send?${new URLSearchParams({
-          ...JSON.parse(JSON.stringify(params)), //JSON makes sure we don't pass undefined values
-          recipient: item.tag_name,
-        }).toString()}`}
-      >
+      <Link href={href}>
         <XStack testID={`tag-search-${item.send_id}`} ai="center" gap="$4">
           <Avatar size="$4.5" br="$3">
             <Avatar.Image src={item.avatar_url} />
@@ -255,59 +253,67 @@ function SearchResultRow({
   )
 }
 
-export function Search() {
+function Search() {
   const { form } = useTagSearch()
   const { resolvedTheme } = useThemeSetting()
   const iconColor = resolvedTheme?.startsWith('dark') ? '$olive' : '$black'
   return (
-    <View position="relative" testID="sendSearchContainer">
-      <FormProvider {...form}>
-        <SchemaForm
-          form={form}
-          defaultValues={{ query: '' }}
-          onSubmit={() => {
-            // noop
+    <>
+      <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
+        SEARCH BY
+      </H4>
+      <View position="relative" testID="sendSearchContainer">
+        <FormProvider {...form}>
+          <SchemaForm
+            form={form}
+            defaultValues={{ query: '' }}
+            onSubmit={() => {
+              // noop
+            }}
+            schema={SearchSchema}
+            props={{
+              query: {
+                placeholder: '$Sendtag, Phone, Send ID',
+                pr: '$size.3.5',
+              },
+            }}
+            formProps={{
+              width: '100%',
+              f: 1,
+              als: 'center',
+              $gtSm: {
+                maxWidth: '100%',
+              },
+            }}
+          >
+            {({ query }) => query}
+          </SchemaForm>
+        </FormProvider>
+        <Button
+          position="absolute"
+          top="0"
+          right="0"
+          py={0}
+          px="$1.5"
+          br={0}
+          borderBottomRightRadius="$4"
+          borderTopRightRadius="$4"
+          bc="transparent"
+          hoverStyle={{
+            backgroundColor: 'transparent',
+            borderColor: '$transparent',
           }}
-          schema={SearchSchema}
-          props={{
-            query: {
-              placeholder: '$Sendtag, Phone, Send ID',
-              pr: '$size.3.5',
-            },
-          }}
-          formProps={{
-            width: '100%',
-            f: 1,
-            als: 'center',
-            $gtSm: {
-              maxWidth: '100%',
-            },
-          }}
+          pressStyle={{ backgroundColor: 'transparent' }}
+          focusStyle={{ backgroundColor: 'transparent' }}
+          onPress={() => form.setValue('query', '')}
+          aria-label="Clear input."
         >
-          {({ query }) => query}
-        </SchemaForm>
-      </FormProvider>
-      <Button
-        position="absolute"
-        top="0"
-        right="0"
-        py={0}
-        px="$1.5"
-        br={0}
-        borderBottomRightRadius="$4"
-        borderTopRightRadius="$4"
-        bc="transparent"
-        hoverStyle={{
-          backgroundColor: 'transparent',
-          borderColor: '$transparent',
-        }}
-        pressStyle={{ backgroundColor: 'transparent' }}
-        focusStyle={{ backgroundColor: 'transparent' }}
-        onPress={() => form.setValue('query', '')}
-        aria-label="Clear input."
-      >
-        <IconX width="$size.1.5" height="$size.1.5" color={iconColor} />
-      </Button>
-    </View>
+          <IconX width="$size.1.5" height="$size.1.5" color={iconColor} />
+        </Button>
+      </View>
+    </>
   )
 }
+
+Search.Results = SearchResults
+export default Search
