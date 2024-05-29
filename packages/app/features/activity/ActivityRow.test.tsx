@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals'
 import { render } from '@testing-library/react-native'
 import { ActivityRow } from './ActivityRow'
-import { MockActivityFeed } from './utils/__mocks__/useActivityFeed'
+import { MockActivityFeed } from './utils/__mocks__/mock-activity-feed'
 import { EventSchema } from 'app/utils/zod/activity'
 import { TamaguiProvider } from '@tamagui/web'
 import { config } from '@my/ui'

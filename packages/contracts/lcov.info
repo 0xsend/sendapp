@@ -784,6 +784,8 @@ BRH:0
 end_of_record
 TN:
 SF:src/SendVerifier.sol
+FN:13,SendVerifierProxy.
+FNDA:2,SendVerifierProxy.
 FN:30,SendVerifier.
 FNDA:2,SendVerifier.
 DA:31,2
@@ -811,8 +813,6 @@ DA:59,12
 DA:61,10
 DA:61,10
 DA:61,10
-FN:13,SendVerifierProxy.
-FNDA:2,SendVerifierProxy.
 FNF:7
 FNH:7
 LF:6

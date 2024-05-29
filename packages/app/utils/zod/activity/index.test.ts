@@ -3,7 +3,7 @@ import { assert } from 'app/utils/assert'
 import { EventArraySchema, type BaseEvent } from '.'
 import type { SendAccountTransfersEvent } from './SendAccountTransfersEventSchema'
 import type { TagReceiptsEvent } from './TagReceiptsEventSchema'
-import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/useActivityFeed'
+import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import type { ReferralsEvent } from './ReferralsEventSchema'
 
 describe('EventArraySchema', () => {

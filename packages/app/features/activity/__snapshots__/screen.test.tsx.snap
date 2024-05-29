@@ -473,6 +473,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
           "width": "100%",
         }
       }
+      testID="RecentActivity"
     >
       <View
         style={
@@ -1751,18 +1752,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                   }
                   suppressHighlighting={true}
-                >
-                  {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-                </Text>
+                />
               </View>
               <View
                 style={
@@ -1845,18 +1835,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-            >
-              {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-            </Text>
+            />
           </View>
         </View>
       </View>
@@ -2073,18 +2052,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                     }
                   }
                   suppressHighlighting={true}
-                >
-                  {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-                </Text>
+                />
               </View>
               <View
                 style={
@@ -2167,18 +2135,7 @@ exports[`ActivityScreen: ActivityScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-            >
-              {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-            </Text>
+            />
           </View>
         </View>
       </View>
@@ -2947,6 +2904,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
           "width": "100%",
         }
       }
+      testID="RecentActivity"
     >
       <View
         style={
@@ -4225,18 +4183,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                   }
                   suppressHighlighting={true}
-                >
-                  {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-                </Text>
+                />
               </View>
               <View
                 style={
@@ -4319,18 +4266,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 }
               }
               suppressHighlighting={true}
-            >
-              {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-            </Text>
+            />
           </View>
         </View>
       </View>
@@ -4547,18 +4483,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                     }
                   }
                   suppressHighlighting={true}
-                >
-                  {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-                </Text>
+                />
               </View>
               <View
                 style={
@@ -4641,18 +4566,7 @@ exports[`ActivityScreen: search: ActivityScreen: search 1`] = `
                 }
               }
               suppressHighlighting={true}
-            >
-              {
-  "key": [
-    "\\\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
-    "\\\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43"
-  ],
-  "account": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
-  "tx_hash": "\\\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
-  "key_slot": 0,
-  "log_addr": "\\\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1"
-}
-            </Text>
+            />
           </View>
         </View>
       </View>
