@@ -100,7 +100,7 @@ export function ActivityRow({ activity }: { activity: Activity }) {
         return `${data.tags.length} Referrals`
       }
       default:
-        return JSON.stringify(activity.data, null, 2)
+        if (__DEV__) console.log('unknown activity', activity)
     }
   })()
   const date = new Date(created_at).toLocaleString()

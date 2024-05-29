@@ -1,0 +1,1 @@
+http://127.0.0.1:54321/rest/v1/activity_feed?select=*&or=%28from_user.not.is.null%2C+to_user.not.is.null%29&order=created_at.desc&offset=0&limit=10

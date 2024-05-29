@@ -16,7 +16,7 @@ export function RecentActivity() {
   } = useActivityFeed()
   const { pages } = data ?? {}
   return (
-    <YStack gap="$5" mb="$4" width={'100%'}>
+    <YStack gap="$5" mb="$4" width={'100%'} testID={'RecentActivity'}>
       <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
         <TableLabel>Transactions</TableLabel>
         <XStack gap="$4">

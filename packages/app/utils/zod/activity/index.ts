@@ -19,8 +19,9 @@ export const EventSchema = z
     TagReceiptsEventSchema,
     ReferralsEventSchema,
   ])
-  // @ts-expect-error not sure WTF is going on with zod here
+  .or(BaseEventSchema)
   .catch((ctx) => {
+    // this is only required since the discrimnated union hard errors when a non-matching event is passed
     // if an unknown event is found, we should return a generic event
     if (ctx.error.name === 'ZodError') {
       const { issues } = ctx.error

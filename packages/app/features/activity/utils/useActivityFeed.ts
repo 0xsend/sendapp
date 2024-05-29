@@ -1,15 +1,28 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import type { Tables } from '@my/supabase/database-generated.types'
+import type { Views } from '@my/supabase/database.types'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import {
+  useInfiniteQuery,
+  type InfiniteData,
+  type UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { EventArraySchema } from 'app/utils/zod/activity'
+import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
+import type { ZodError } from 'zod'
 
 /**
  * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
  * @param pageSize - number of items to fetch per page
  */
-export function useActivityFeed({ pageSize = 10 }: { pageSize?: number } = {}) {
+export function useActivityFeed({
+  pageSize = 10,
+}: { pageSize?: number } = {}): UseInfiniteQueryResult<
+  InfiniteData<Activity[]>,
+  PostgrestError | ZodError
+> {
   const supabase = useSupabase()
-  async function fetchActivityFeed({ pageParam }: { pageParam: number }) {
+  async function fetchActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     const { data, error } = await supabase
@@ -19,12 +32,7 @@ export function useActivityFeed({ pageSize = 10 }: { pageSize?: number } = {}) {
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)
-    const result = EventArraySchema.safeParse(data)
-    if (result.success) {
-      return result.data
-    }
-    console.error('Error parsing activity feed', result.error)
-    return result.error.issues.map((issue) => issue.message).join(', ')
+    return EventArraySchema.parse(data)
   }
 
   return useInfiniteQuery({
