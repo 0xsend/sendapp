@@ -18,7 +18,6 @@ describe('TagReceiptsDataSchema', () => {
           coin: {
             coingeckoTokenId: 'ethereum',
             decimals: 18,
-            icon: 'ETH',
             label: 'Ethereum',
             symbol: 'ETH',
             token: 'eth',

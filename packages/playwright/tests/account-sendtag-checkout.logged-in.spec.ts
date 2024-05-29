@@ -1,12 +1,13 @@
 import { faker } from '@faker-js/faker'
-import type { Page } from '@playwright/test'
-import debug from 'debug'
-import { getAuthSessionFromContext } from './fixtures/auth'
-import { expect, test as checkoutTest } from './fixtures/checkout'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { devices, mergeTests } from '@playwright/test'
 import { userOnboarded } from '@my/snaplet/models'
+import type { Page } from '@playwright/test'
+import { devices, mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'
+import debug from 'debug'
+import { parseEther } from 'viem'
+import { getAuthSessionFromContext } from './fixtures/auth'
+import { test as checkoutTest, expect } from './fixtures/checkout'
 
 let log: debug.Debugger
 
@@ -63,7 +64,7 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
   expect(checkoutPage.page.getByText('Only English alphabet, numbers, and underscore')).toBeTruthy()
 })
 
-test('can confirm a tag', async ({ checkoutPage, supabase }) => {
+test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myProfile } }) => {
   // test.setTimeout(60_000) // 60 seconds
   const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
   await checkoutPage.addPendingTag(tagName)
@@ -85,6 +86,19 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
   expect(activityError).toBeFalsy()
   expect(data).toHaveLength(1)
   expect((data?.[0]?.data as { tags: string[] })?.tags).toEqual([tagName])
+
+  const receiptEvent = {
+    event_name: 'tag_receipts',
+    from_user: {
+      id: myProfile.id,
+      send_id: myProfile.send_id,
+    },
+    data: {
+      tags: [tagName],
+      value: parseEther('0.002').toString(),
+    },
+  }
+  await expect(supabase).toHaveEventInActivityFeed(receiptEvent)
 })
 
 test('can refer a tag', async ({
@@ -118,19 +132,21 @@ test('can refer a tag', async ({
   for (const tag of tagsToRegister) {
     await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
   }
-  // user should have received a referral activity
-  const { data, error: activityError } = await supabase
-    .from('activity_feed')
-    .select('*')
-    .eq('event_name', 'referrals')
-    .single()
-  expect(activityError).toBeFalsy()
-  assert(!!data, 'data not found')
-  expect((data.data as { tags: string[] })?.tags).toEqual(tagsToRegister)
-  expect(data.from_user?.send_id).toEqual(referrer.sendId)
-  expect(data.from_user?.tags).toEqual(referrerTags)
-  expect(data.to_user?.id).toEqual(myProfile.id)
-  expect(data.to_user?.send_id).toEqual(myProfile.send_id)
+
+  await expect(supabase).toHaveEventInActivityFeed({
+    event_name: 'referrals',
+    from_user: {
+      send_id: referrer.sendId,
+      tags: referrerTags,
+    },
+    to_user: {
+      id: myProfile.id,
+      send_id: myProfile.send_id,
+    },
+    data: {
+      tags: tagsToRegister,
+    },
+  })
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
