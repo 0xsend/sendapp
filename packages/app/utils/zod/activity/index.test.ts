@@ -25,6 +25,9 @@ describe('EventArraySchema', () => {
     expect(transfer.data.f).toBe('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')
     expect(transfer.data.t).toBe('0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1')
     expect(transfer.data.v).toBe(19032n)
+    expect(transfer.data.block_num).toBe(15164540n)
+    expect(transfer.data.tx_idx).toBe(0n)
+    expect(transfer.data.log_idx).toBe(2n)
     expect(transfer.data.tx_hash).toBe(
       '0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4'
     )

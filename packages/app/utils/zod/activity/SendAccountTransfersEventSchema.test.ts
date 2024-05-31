@@ -11,6 +11,9 @@ describe('TransferDataSchema', () => {
           v: 1965443,
           tx_hash: '\\xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
           log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          block_num: '15164540',
+          tx_idx: '0',
+          log_idx: '2',
         },
         expected: {
           f: '0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf',
@@ -18,6 +21,9 @@ describe('TransferDataSchema', () => {
           v: 1965443n,
           tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
           log_addr: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          block_num: 15164540n,
+          tx_idx: 0n,
+          log_idx: 2n,
           coin: {
             coingeckoTokenId: 'usd-coin',
             decimals: 6,
@@ -34,6 +40,9 @@ describe('TransferDataSchema', () => {
           v: 0,
           tx_hash: '\\xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
           log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          block_num: '15164540',
+          tx_idx: '0',
+          log_idx: '2',
         },
         expected: {
           f: '0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf',
@@ -41,6 +50,9 @@ describe('TransferDataSchema', () => {
           v: 0n,
           tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
           log_addr: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+          block_num: 15164540n,
+          tx_idx: 0n,
+          log_idx: 2n,
           coin: {
             coingeckoTokenId: 'usd-coin',
             decimals: 6,
@@ -68,6 +80,9 @@ describe('TransferDataSchema', () => {
         v: '5528761',
         tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
         log_addr: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        block_num: '15164540',
+        tx_idx: '0',
+        log_idx: '2',
       },
       {
         f: '0xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1',
@@ -75,6 +90,9 @@ describe('TransferDataSchema', () => {
         // v: 5528761,
         tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
         log_addr: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        block_num: '15164540',
+        tx_idx: '0',
+        log_idx: '2',
       },
       {
         f: '0xbf65ee06b43b9ca718216241f0b9f81b5ff30cc1',
@@ -82,6 +100,9 @@ describe('TransferDataSchema', () => {
         v: 0,
         tx_hash: '0xc283f8867727a615fd61c58a97b03afb76004c809bf53248f2130eb9a09ea952',
         log_addr: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        block_num: '15164540',
+        tx_idx: '0',
+        log_idx: '2',
       },
       {},
     ]

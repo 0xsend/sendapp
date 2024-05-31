@@ -23,6 +23,8 @@ expect.extend({
     assert(!!activityFeed, 'activity feed not found')
     expect(error).toBeFalsy()
 
+    // console.log('activityFeed', activityFeed)
+
     for (const event of activityFeed) {
       if (event.event_name === activity.event_name) {
         expect(event.data).toMatchObject(activity.data)

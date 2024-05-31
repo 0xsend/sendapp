@@ -17,6 +17,9 @@ export const MockActivityFeed = [
       v: 19032,
       tx_hash: '\\xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4',
       log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+      block_num: '15164540',
+      tx_idx: '0',
+      log_idx: '2',
     },
   },
   {

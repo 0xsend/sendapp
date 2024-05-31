@@ -5,33 +5,25 @@ import { BaseEventSchema } from './BaseEventSchema'
 import { CoinSchema, coins } from 'app/data/coins'
 import { isAddressEqual } from 'viem'
 import { Events } from './events'
+import { OnchainEventDataSchema } from './OnchainDataSchema'
 
 /**
  * ERC-20 token transfer event data
  */
-export const TransferDataSchema = z
-  .object({
-    /**
-     * The address of the sender
-     */
-    f: byteaToHexEthAddress,
-    /**
-     * The address of the receiver
-     */
-    t: byteaToHexEthAddress,
-    /**
-     * The value of the transaction
-     */
-    v: decimalStrToBigInt,
-    /**
-     * The transaction hash that included this event
-     */
-    tx_hash: byteaToHexTxHash,
-    /**
-     * The token address that logged the event
-     */
-    log_addr: byteaToHexEthAddress,
-  })
+export const TransferDataSchema = OnchainEventDataSchema.extend({
+  /**
+   * The address of the sender
+   */
+  f: byteaToHexEthAddress,
+  /**
+   * The address of the receiver
+   */
+  t: byteaToHexEthAddress,
+  /**
+   * The value of the transaction
+   */
+  v: decimalStrToBigInt,
+})
   .extend({
     coin: CoinSchema.optional(),
   })

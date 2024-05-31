@@ -5,6 +5,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
   {
     "created_at": 2024-05-26T13:38:25.000Z,
     "data": {
+      "block_num": 15164540n,
       "coin": {
         "coingeckoTokenId": "usd-coin",
         "decimals": 6,
@@ -14,8 +15,10 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       },
       "f": "0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf",
       "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "log_idx": 2n,
       "t": "0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1",
       "tx_hash": "0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4",
+      "tx_idx": 0n,
       "v": 19032n,
     },
     "event_name": "send_account_transfers",
