@@ -25,6 +25,9 @@ SELECT results_eq(
             (data->>'t')::citext as t,
             (data->>'v') as v,
             (data->>'tx_hash')::citext as tx_hash,
+            (data->>'block_num')::text as block_num,
+            (data->>'tx_idx')::text as tx_idx,
+            (data->>'log_idx')::text as log_idx,
             created_at,
             from_user_id,
             to_user_id
@@ -39,6 +42,9 @@ SELECT results_eq(
             '\xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA'::citext,
             100::text,
             '\x1234'::citext,
+            '1'::text,
+            '0'::text,
+            '0'::text,
             timestamptz '2013-07-01 12:00:00',
             tests.get_supabase_uid('test_user_from'),
             tests.get_supabase_uid('test_user_to'))

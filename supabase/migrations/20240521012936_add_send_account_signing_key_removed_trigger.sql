@@ -8,8 +8,17 @@ declare
 begin
     select user_id from send_accounts where address = concat('0x', encode(NEW.account, 'hex'))::citext into _f_user_id;
 
-    select json_build_object('log_addr', NEW.log_addr, 'account', NEW.account, 'key_slot', NEW.key_slot, 'key',
-                             json_agg(key order by abi_idx), 'tx_hash', NEW.tx_hash)
+    select json_build_object(
+        'log_addr', 
+        NEW.log_addr, 
+        'account', NEW.account, 
+        'key_slot', NEW.key_slot, 
+        'key', json_agg(key order by abi_idx), 
+        'tx_hash', NEW.tx_hash,
+        'block_num', NEW.block_num::text,
+        'tx_idx', NEW.tx_idx::text,
+        'log_idx', NEW.log_idx::text
+    )
     from send_account_signing_key_removed
     where src_name = NEW.src_name
       and ig_name = NEW.ig_name

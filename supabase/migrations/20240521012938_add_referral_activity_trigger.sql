@@ -9,7 +9,7 @@ begin
     insert into activity (event_name, event_id, from_user_id, to_user_id, data, created_at)
     select
         'referrals',
-        sha256(decode(replace(NEW_TABLE.referred_id::text, '-', ''), 'hex'))::text,
+        referred_id,
         NEW_TABLE.referrer_id,
         NEW_TABLE.referred_id,
         json_build_object('tags', array_agg(NEW_TABLE.tag)),

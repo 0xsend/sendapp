@@ -10,20 +10,20 @@ create type activity_feed_user as
 create or replace view activity_feed with (security_barrier) as
 select a.created_at                       as created_at,
        a.event_name                       as event_name,
-       (case when a.from_user_id = from_p.id
-                 then (case when a.from_user_id = ( select auth.uid() ) then a.from_user_id end,
-                       case when a.from_user_id = from_p.id then from_p.name end,
-                       case when a.from_user_id = from_p.id then from_p.avatar_url end,
-                       case when a.from_user_id = from_p.id then from_p.send_id end,
-                       case when a.from_user_id = from_p.id then (select array_agg(name) from tags where user_id = from_p.id and status = 'confirmed') end
-               )::activity_feed_user end) as from_user,
-       (case when a.to_user_id = to_p.id then (case when a.to_user_id = ( select auth.uid() ) then a.to_user_id end,
-                                               case when a.to_user_id = to_p.id then to_p.name end,
-                                               case when a.to_user_id = to_p.id then to_p.avatar_url end,
-                                               case when a.to_user_id = to_p.id then to_p.send_id end,
-                                               case when a.to_user_id = to_p.id
-                                                        then (select array_agg(name) from tags where user_id = to_p.id and status = 'confirmed') end
-           )::activity_feed_user end)     as to_user,
+       case when a.from_user_id = from_p.id
+                 then ((select auth.uid() ),
+                        from_p.name,
+                        from_p.avatar_url,
+                        from_p.send_id,
+                        (select array_agg(name) from tags where user_id = from_p.id and status = 'confirmed')
+               )::activity_feed_user end as from_user,
+       case when a.to_user_id = to_p.id 
+                then (( select auth.uid() ),
+                        to_p.name,
+                        to_p.avatar_url,
+                        to_p.send_id,
+                        (select array_agg(name) from tags where user_id = to_p.id and status = 'confirmed')
+           )::activity_feed_user end     as to_user,
        a.data                             as data
 from activity a
          left join profiles from_p on a.from_user_id = from_p.id
