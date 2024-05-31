@@ -80,6 +80,9 @@ export const MockActivityFeed = [
       tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
       key_slot: 0,
       log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+      block_num: '15164541',
+      tx_idx: '0',
+      log_idx: '2',
     },
   },
   {
@@ -102,6 +105,9 @@ export const MockActivityFeed = [
       tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
       key_slot: 0,
       log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+      block_num: '15164542',
+      tx_idx: '0',
+      log_idx: '2',
     },
   },
 ] as const
