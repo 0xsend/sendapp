@@ -13,6 +13,11 @@ import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import { coins, type coin } from 'app/data/coins'
 
+const removeDuplicateInString = (text: string, substring: string) => {
+  const [first, ...after] = text.split(substring)
+  return first + (after.length ? `${substring}${after.join('')}` : '')
+}
+
 // @todo add currency field
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -68,6 +73,7 @@ export function SendAmountForm() {
 
   async function onSubmit() {
     if (!canSubmit) return
+    const sendToken = sendParams.sendToken || usdcAddress[baseMainnet.id]
 
     const amount = formatUnits(parsedAmount, selectedCoin.decimals)
     router.push({
@@ -115,7 +121,8 @@ export function SendAmountForm() {
             fontFamily: '$mono',
             keyboardType: balance?.decimals ? 'decimal-pad' : 'numeric',
             onChangeText: (text) => {
-              form.setValue('amount', text.replace(/[^0-9.]/g, ''))
+              const formattedText = removeDuplicateInString(text, '.').replace(/[^0-9.]/g, '') //remove duplicate "." then filter out any letters
+              form.setValue('amount', formattedText)
             },
           },
         }}
