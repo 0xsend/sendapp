@@ -14,7 +14,7 @@ test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
 })
 
-test.skip('can visit other user profile', async ({ page, seed }) => {
+test('can visit other user profile', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
@@ -26,7 +26,7 @@ test.skip('can visit other user profile', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
   await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
-  await expect(page.getByTestId('sendDialogContainer')).toBeVisible()
+  await expect(page.getByTestId('sendSearchContainer')).toBeVisible()
 })
 
 test('can visit my own profile', async ({
