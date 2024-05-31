@@ -47,9 +47,9 @@ test('can visit activity page', async ({ context, page }) => {
   await expect(page.getByText('Send Account Signing Key Removed')).toBeVisible()
 
   expect(page.getByTestId('RecentActivity')).toBeVisible()
-  expect(await page.getByTestId('RecentActivity').screenshot()).toMatchSnapshot(
-    'recent-activity.png'
-  )
+  await expect(page.getByTestId('RecentActivity')).toHaveScreenshot('recent-activity.png', {
+    timeout: 5_000,
+  })
 })
 
 test.skip('can search on activity page', async ({ page, context }) => {

@@ -27,6 +27,7 @@ export default defineConfig({
   // globalTimeout: 30 * 60_000, // 30 minutes
 
   testDir: './tests',
+  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
