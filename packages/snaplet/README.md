@@ -14,12 +14,18 @@ It seeds our database using two main methods:
 
 **⚠️ When restoring from snapshot** migrations are not run and can make your local database inconsistent with the production database or even fail to restore some data. To mitigate this, remove any migrations that are not in production yet. See below for how to remove migrations to overcome this.
 
-```shell
-# Meant to be run from the root of the project, you may need to remove other migrations. 
-# This is just an example.
-rm -f supabase/migrations/20240421214944_drop_snapshot_id.sql
-rm -f supabase/migrations/20240421214945_insert_distribution_five.sql
+### Removing migrations
 
+This step is required in case the snapshots and migrations conflict since the snapshots are created from the production database without your feature branch's migrations. To remove migrations that are not in production yet, run the following command:
+
+```shell
+# when you are ready to remove the migrations
+git diff --name-only --diff-filter=A origin/main..HEAD -- supabase/migrations  | xargs rm
+```
+
+### Restore
+
+```shell
 # now run the snapshot restore command
 bunx supabase db reset && \
 bunx snaplet snapshot restore --no-reset --latest && \
