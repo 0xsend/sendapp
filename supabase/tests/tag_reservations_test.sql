@@ -124,6 +124,6 @@ SELECT isnt_empty(
     'Tag should be confirmed'
 );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

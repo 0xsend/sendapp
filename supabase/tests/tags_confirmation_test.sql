@@ -287,6 +287,6 @@ $$,
 'duplicate key value violates unique constraint "receipts_pkey"'
 );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

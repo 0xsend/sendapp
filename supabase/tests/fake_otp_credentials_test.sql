@@ -50,6 +50,6 @@ SELECT results_eq(
     'Service role should be able to fake OTP credentials for a user'
 );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

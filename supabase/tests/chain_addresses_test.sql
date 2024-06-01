@@ -143,6 +143,6 @@ SELECT is_empty(
     'User should not be able to read other user addresses'
 );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

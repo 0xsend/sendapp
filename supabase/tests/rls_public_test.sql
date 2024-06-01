@@ -48,6 +48,6 @@ SELECT tests.rls_enabled(
     ARRAY['distribution_verifications_summary']
 );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

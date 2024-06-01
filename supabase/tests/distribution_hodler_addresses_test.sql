@@ -169,6 +169,6 @@ select throws_ok(
 );
 
 
-select finish();
+SELECT finish();
 
 rollback;

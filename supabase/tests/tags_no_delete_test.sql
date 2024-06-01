@@ -38,6 +38,6 @@ SELECT results_eq(
         'User should not be able to delete a tag'
     );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

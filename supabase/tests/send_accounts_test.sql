@@ -354,6 +354,6 @@ SELECT results_eq(
 );
 
 -- Complete the tests
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

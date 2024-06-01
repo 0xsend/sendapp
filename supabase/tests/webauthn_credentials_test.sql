@@ -168,6 +168,6 @@ SELECT is_empty(
 );
 
 -- Complete the tests
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

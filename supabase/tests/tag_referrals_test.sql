@@ -169,6 +169,6 @@ SELECT is_empty(
     'Referral should not be created'
 );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

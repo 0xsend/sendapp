@@ -143,6 +143,6 @@ SELECT results_eq(
     'Pending tag more than 30 minutes old is claimable by any user'
   );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;

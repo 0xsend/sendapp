@@ -518,6 +518,6 @@ SELECT results_eq(
             'Verification for user referral should be inserted'
     );
 
-SELECT FINISH();
+SELECT finish();
 
 ROLLBACK;
