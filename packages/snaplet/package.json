@@ -3,15 +3,20 @@
   "private": true,
   "main": "src/index.ts",
   "type": "module",
-  "packageManager": "yarn@4.0.2",
+  "scripts": {
+    "seed": "DRY=0 bunx tsx ./bin/seed.ts",
+    "restore": "bun run ./bin/snaplet.ts --restore"
+  },
   "devDependencies": {
     "@snaplet/copycat": "^5.0.0",
     "@snaplet/seed": "^0.89.4",
     "@types/pg": "^8",
-    "snaplet": "^0.89.4"
+    "snaplet": "^0.89.4",
+    "zx": "^8.1.2"
   },
   "dependencies": {
     "pg": "^8.11.3",
     "viem": "^2.8.10"
-  }
+  },
+  "packageManager": "yarn@4.0.2"
 }

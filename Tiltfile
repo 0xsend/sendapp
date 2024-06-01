@@ -284,7 +284,7 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "yarn snaplet:seed",
+        "yarn snaplet seed",
     ],
     icon_name = "compost",
     location = location.NAV,
@@ -297,12 +297,12 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "yarn snaplet:snapshot:restore",
+        "yarn snaplet restore",
     ],
     icon_name = "settings_backup_restore",
     location = location.NAV,
     resource = "supabase",
-    text = "snaplet snapshot restore",
+    text = "snaplet restore",
 )
 
 local_resource(

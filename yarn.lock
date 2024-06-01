@@ -5703,7 +5703,7 @@ __metadata:
     "@uniswap/v3-periphery": "npm:^1.4.4"
     debug: "npm:^4.3.4"
     solhint: "npm:^3.6.2"
-    zx: "npm:^8.0.2"
+    zx: "npm:^8.1.2"
   languageName: unknown
   linkType: soft
 
@@ -5744,6 +5744,7 @@ __metadata:
     pg: "npm:^8.11.3"
     snaplet: "npm:^0.89.4"
     viem: "npm:^2.8.10"
+    zx: "npm:^8.1.2"
   languageName: unknown
   linkType: soft
 
@@ -10235,12 +10236,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:>=20.12.5":
-  version: 20.12.7
-  resolution: "@types/node@npm:20.12.7"
+"@types/node@npm:>=20.12.12":
+  version: 20.13.0
+  resolution: "@types/node@npm:20.13.0"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: b4a28a3b593a9bdca5650880b6a9acef46911d58cf7cfa57268f048e9a7157a7c3196421b96cea576850ddb732e3b54bc982c8eb5e1e5ef0635d4424c2fce801
+  checksum: 82f0e999078fa5e251de002c755d18f63c47ff09c192fdd1381ca91774327563ad778244ab51f52304a9432b5ba678c1328585ef5e92ffdc5eed8e950a6ad1b9
   languageName: node
   linkType: hard
 
@@ -28248,7 +28249,7 @@ __metadata:
     pierre: "npm:^2.0.0-alpha.8"
     turbo: "npm:^1.10.3"
     typescript: "npm:^5.3.3"
-    zx: "npm:^8.0.2"
+    zx: "npm:^8.1.2"
   languageName: unknown
   linkType: soft
 
@@ -28471,7 +28472,7 @@ __metadata:
     "@types/bun": "npm:latest"
     permissionless: "npm:^0.1.14"
     viem: "npm:^2.8.10"
-    zx: "npm:^8.0.2"
+    zx: "npm:^8.1.2"
   peerDependencies:
     typescript: ^5.0.0
   languageName: unknown
@@ -32622,12 +32623,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zx@npm:^8.0.2":
-  version: 8.0.2
-  resolution: "zx@npm:8.0.2"
+"zx@npm:^8.1.2":
+  version: 8.1.2
+  resolution: "zx@npm:8.1.2"
   dependencies:
     "@types/fs-extra": "npm:^11.0.4"
-    "@types/node": "npm:>=20.12.5"
+    "@types/node": "npm:>=20.12.12"
   dependenciesMeta:
     "@types/fs-extra":
       optional: true
@@ -32635,6 +32636,6 @@ __metadata:
       optional: true
   bin:
     zx: build/cli.js
-  checksum: 189e83f6f4ce9ca13a41db522bbe8314bdc416653edc542f496659ddc91faac5f51f0512a03e991c36f00e936b94e25d1da0e6658b6ba600f9738837fe596382
+  checksum: 6e965bf651759ea778ad8b8ad56dfc7c072fc546563abc2f189de1be305994c82d3f228ed99aa9b4992d839f119158f2ddc0d7e00dc87a216ffc16ed87d57813
   languageName: node
   linkType: hard

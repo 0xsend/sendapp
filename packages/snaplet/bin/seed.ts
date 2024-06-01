@@ -5,10 +5,10 @@
 // More on this in our docs: https://docs.snaplet.dev/core-concepts/seed#inside-the-snapletseed-workflow
 import { copycat, faker } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
-import { models } from './src'
+import { models } from '../src'
 import * as pg from 'pg'
-import { pravatar } from './src/utils'
-import { userOnboarded } from './src/models'
+import { pravatar } from '../src/utils'
+import { userOnboarded } from '../src/models'
 
 // @ts-expect-error typescript is confused
 const { Client: PgClient } = pg.default as unknown as typeof pg
