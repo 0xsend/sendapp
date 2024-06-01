@@ -7,7 +7,7 @@ create type activity_feed_user as
     tags       text[]
 );
 
-create or replace view activity_feed with (security_barrier) as
+create or replace view activity_feed with (security_barrier=on) as
 select a.created_at                       as created_at,
        a.event_name                       as event_name,
        case when a.from_user_id = from_p.id
