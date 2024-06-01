@@ -1,6 +1,6 @@
 create or replace function send_account_transfers_trigger_insert_activity() returns trigger
-    language plpgsql
-    security definer as
+language plpgsql
+security definer as
 $$
 declare
     _f_user_id uuid;
@@ -41,14 +41,14 @@ end;
 $$;
 
 create trigger send_account_transfers_trigger_insert_activity
-    after insert
-    on send_account_transfers
-    for each row
+after insert
+on send_account_transfers
+for each row
 execute function send_account_transfers_trigger_insert_activity();
 
 create or replace function send_account_transfers_trigger_delete_activity() returns trigger
-    language plpgsql
-    security definer as
+language plpgsql
+security definer as
 $$
 begin
     delete 
@@ -60,7 +60,7 @@ end;
 $$;
 
 create trigger send_account_transfers_trigger_delete_activity
-    after delete
-    on send_account_transfers
-    for each row
+after delete
+on send_account_transfers
+for each row
 execute function send_account_transfers_trigger_delete_activity();

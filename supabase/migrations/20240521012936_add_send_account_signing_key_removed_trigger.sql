@@ -1,6 +1,8 @@
-create or replace function send_account_signing_key_removed_trigger_insert_activity() returns trigger
-    language plpgsql
-    security definer as
+create or replace function
+send_account_signing_key_removed_trigger_insert_activity()
+returns trigger
+language plpgsql
+security definer as
 $$
 declare
     _f_user_id uuid;
@@ -45,14 +47,16 @@ end;
 $$;
 
 create trigger send_account_signing_key_removed_trigger_insert_activity
-    after insert
-    on send_account_signing_key_removed
-    for each row
+after insert
+on send_account_signing_key_removed
+for each row
 execute function send_account_signing_key_removed_trigger_insert_activity();
 
-create or replace function send_account_signing_key_removed_trigger_delete_activity() returns trigger
-    language plpgsql
-    security definer as
+create or replace function
+send_account_signing_key_removed_trigger_delete_activity()
+returns trigger
+language plpgsql
+security definer as
 $$
 begin
     delete from activity where event_id = OLD.event_id and event_name = 'send_account_signing_key_removed';
@@ -61,7 +65,7 @@ end;
 $$;
 
 create trigger send_account_signing_key_removed_trigger_delete_activity
-    after delete
-    on send_account_signing_key_removed
-    for each row
+after delete
+on send_account_signing_key_removed
+for each row
 execute function send_account_signing_key_removed_trigger_delete_activity();

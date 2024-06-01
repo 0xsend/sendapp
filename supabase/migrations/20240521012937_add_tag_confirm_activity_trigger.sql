@@ -1,6 +1,6 @@
 create or replace function tag_receipts_insert_activity_trigger() returns trigger
-    language plpgsql
-    security definer as
+language plpgsql
+security definer as
 $$
 begin
     delete from activity where event_name = 'tag_receipts' and event_id in (select hash from NEW_TABLE);
@@ -22,6 +22,6 @@ end;
 $$;
 
 create trigger tag_receipts_insert_activity_trigger
-    after insert on tag_receipts
-    referencing new table as NEW_TABLE
-    for each statement execute function tag_receipts_insert_activity_trigger();
+after insert on tag_receipts
+referencing new table as new_table
+for each statement execute function tag_receipts_insert_activity_trigger();
