@@ -11,7 +11,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import type { coins, coin } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
@@ -47,8 +47,7 @@ const TokenBalanceItem = ({
 }: {
   coin: coin
 } & Omit<LinkProps, 'children'>) => {
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
 
   const balance = useBalance({
     address: sendAccount?.address,
