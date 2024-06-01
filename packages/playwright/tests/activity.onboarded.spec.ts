@@ -40,11 +40,15 @@ test('can visit activity page', async ({ context, page }) => {
   await expect(page.getByText('0.02 ETH').nth(1)).toBeVisible()
 
   await expect(page.getByText('Referral', { exact: true })).toBeVisible()
-  await expect(page.getByText('@disconnect_whorl7351')).toBeVisible()
+  await expect(page.getByText('@disconnect_whorl7351').nth(1)).toBeVisible()
   await expect(page.getByText('1 Referrals').nth(1)).toBeVisible()
 
   await expect(page.getByText('Send Account Signing Key Added')).toBeVisible()
   await expect(page.getByText('Send Account Signing Key Removed')).toBeVisible()
+
+  await expect(page.getByText('Sent')).toBeVisible()
+  await expect(page.getByText('0.077777 USDC').nth(1)).toBeVisible()
+  await expect(page.getByText('dan').nth(1)).toBeVisible()
 
   expect(page.getByTestId('RecentActivity')).toBeVisible()
   await expect(page.getByTestId('RecentActivity')).toHaveScreenshot('recent-activity.png', {

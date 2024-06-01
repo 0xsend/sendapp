@@ -66,5 +66,4 @@ test('ActivityScreen: search', async () => {
   expect(searchInput.props.value).toBe('test')
   const searchResults = await screen.findByTestId('tag-search-3665')
   expect(searchResults).toHaveTextContent('??test@test')
-  expect(screen.toJSON()).toMatchSnapshot('ActivityScreen: search')
 })

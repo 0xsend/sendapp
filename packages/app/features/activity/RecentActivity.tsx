@@ -3,18 +3,13 @@ import { useActivityFeed } from './utils/useActivityFeed'
 import { TableLabel, MobileSectionLabel, RowLabel, AnimateEnter } from './screen'
 import { ActivityRow } from './ActivityRow'
 import { Fragment } from 'react'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import type { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query'
+import type { ZodError } from 'zod'
+import type { Activity } from 'app/utils/zod/activity'
 
 export function RecentActivity() {
-  const {
-    data,
-    isLoading: isLoadingActivities,
-    error: activitiesError,
-    isFetching: isFetchingActivities,
-    isFetchingNextPage: isFetchingNextPageActivities,
-    fetchNextPage,
-    hasNextPage,
-  } = useActivityFeed()
-  const { pages } = data ?? {}
+  const result = useActivityFeed()
   return (
     <YStack gap="$5" mb="$4" width={'100%'} testID={'RecentActivity'}>
       <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
@@ -24,8 +19,28 @@ export function RecentActivity() {
           <TableLabel textAlign="right">Amount</TableLabel>
         </XStack>
       </XStack>
-
       <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
+      <ActivityFeed {...result} />
+    </YStack>
+  )
+}
+
+function ActivityFeed(
+  activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
+) {
+  const {
+    data,
+    isLoading: isLoadingActivities,
+    error: activitiesError,
+    isFetching: isFetchingActivities,
+    isFetchingNextPage: isFetchingNextPageActivities,
+    fetchNextPage,
+    hasNextPage,
+  } = activityFeedQuery
+  const { pages } = data ?? {}
+  return (
+    <YStack gap="$5">
+      {/* <> */}
       {(() => {
         switch (true) {
           case isLoadingActivities:
