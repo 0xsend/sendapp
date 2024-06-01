@@ -2,16 +2,18 @@ import 'zx/globals'
 import * as pg from 'pg'
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ['help', 'restore', 'seed', 'verbose'],
+  boolean: ['help', 'restore', 'seed', 'verbose', 'onboard-users'],
 })
 
 if (argv.help) {
   console.log(`
-    Usage: snaplet <command> [options]
+    Usage: snaplet [options]
 
-    Commands:
-      seed      Seed the database with default data
-      restore   Restore the database from a snapshot
+    Options:
+      --seed      Seed the database with default data
+      --restore   Restore the database from a snapshot
+      --onboard-users  Onboard users with send accounts by copying from chain_addresses into send_accounts
+
   `)
   process.exit(0)
 }
@@ -70,6 +72,10 @@ if (argv.restore) {
     console.log(chalk.red('Error migrating database:'), e)
     process.exit(1)
   })
+  process.exit(0)
+}
+
+if (argv.onboardUsers) {
   // @ts-expect-error typescript is confused
   const { Client: PgClient } = pg.default as unknown as typeof pg
 
