@@ -95,8 +95,8 @@ SELECT lives_ok(
         1,
         '\\x00112233445566778899AABBCCDDEEFF'
       ) $$,
-      'Insert a valid send account'
-  );
+    'Insert a valid send account'
+);
 
 -- Test check constraint for address format
 SELECT throws_ok(
@@ -113,9 +113,9 @@ SELECT throws_ok(
         1,
         '\\x00112233445566778899AABBCCDDEEFF'
       ) $$,
-      'new row for relation "send_accounts" violates check constraint "chain_addresses_address_check"',
-      'Insert should fail due to invalid address format'
-  );
+    'new row for relation "send_accounts" violates check constraint "chain_addresses_address_check"',
+    'Insert should fail due to invalid address format'
+);
 
 -- Test uniqueness of address and chain_id
 SELECT throws_ok(
@@ -132,9 +132,9 @@ SELECT throws_ok(
         1,
         '\\x00112233445566778899AABBCCDDEEFF'
       ) $$,
-      'duplicate key value violates unique constraint "send_accounts_address_key"',
-      'Insert should fail due to duplicate address and chain_id'
-  );
+    'duplicate key value violates unique constraint "send_accounts_address_key"',
+    'Insert should fail due to duplicate address and chain_id'
+);
 
 -- Test inserting a valid send account credential
 SELECT lives_ok(
@@ -152,7 +152,7 @@ SELECT lives_ok(
           LIMIT 1
         ), tests.insert_webauthn_credential(), 1
       ) $$, 'Insert a valid send account credential'
-  );
+);
 
 -- Test key slot check constraint for valid range
 SELECT throws_ok(
@@ -170,7 +170,7 @@ SELECT throws_ok(
           LIMIT 1
         ), tests.insert_webauthn_credential(), -1
       ) $$, 'new row for relation "send_account_credentials" violates check constraint "account_credentials_key_slot_check"', 'Insert should fail due to invalid key slot'
-  );
+);
 
 -- Test unique constraint for account_id and key_slot
 SELECT throws_ok(
@@ -188,7 +188,7 @@ SELECT throws_ok(
           LIMIT 1
         ), tests.insert_webauthn_credential(), 1
       ) $$, 'duplicate key value violates unique constraint "send_account_credentials_account_id_key_slot_key"', 'Insert should fail due to duplicate account_id and key_slot'
-  );
+);
 
 -- Test RLS: Inserting as another user should fail
 SELECT tests.create_supabase_user('another_send_account_test_user');
@@ -207,9 +207,9 @@ SELECT throws_ok(
         '0x9876543210FEDCBA9876543210FEDCBA98765432',
         2
       ) $$,
-      'new row violates row-level security policy for table "send_accounts"',
-      'Insert should fail due to RLS policy violation'
-  );
+    'new row violates row-level security policy for table "send_accounts"',
+    'Insert should fail due to RLS policy violation'
+);
 
 -- Test update operations
 SELECT tests.authenticate_as('send_account_test_user');
@@ -219,8 +219,8 @@ SELECT lives_ok(
     UPDATE public.send_accounts
     SET address = '0x9876543210FEDCBA9876543210FEDCBA98765432'
     WHERE user_id = tests.get_supabase_uid('send_account_test_user') $$,
-      'Update send account address'
-  );
+    'Update send account address'
+);
 
 -- Test deletion of account credentials
 SELECT lives_ok(
@@ -233,8 +233,8 @@ SELECT lives_ok(
         LIMIT 1
       )
       AND key_slot = 1 $$,
-      'Delete send account credential'
-  );
+    'Delete send account credential'
+);
 
 -- Test insertion of account credentials with non-existent account
 SELECT throws_ok(
@@ -250,9 +250,9 @@ SELECT throws_ok(
         tests.insert_webauthn_credential(),
         1
       ) $$,
-      'new row violates row-level security policy for table "send_account_credentials"',
-      'Insert should fail due to non-existent account'
-  );
+    'new row violates row-level security policy for table "send_account_credentials"',
+    'Insert should fail due to non-existent account'
+);
 
 -- Test function create_send_account(send_account, webauthn_credential, key_slot)
 SELECT isnt_empty(
@@ -265,7 +265,7 @@ SELECT isnt_empty(
           LIMIT 1
         ), tests.new_webauthn_credential(), 1
       ) $$, 'Create send account with credential'
-  );
+);
 
 -- Test users can only create 1 send account
 SELECT throws_ok(
@@ -286,9 +286,9 @@ SELECT throws_ok(
         tests.new_webauthn_credential(),
         0
       ) $$,
-      'User can have at most 1 send account',
-      'User can have at most 1 send account'
-  );
+    'User can have at most 1 send account',
+    'User can have at most 1 send account'
+);
 
 -- Test send_accounts_add_webauthn_credential function
 SELECT isnt_empty(
@@ -301,7 +301,7 @@ SELECT isnt_empty(
           LIMIT 1
         ), tests.new_webauthn_credential(), 0
       ) $$, 'Add webauthn credential to send account, first key slot'
-  );
+);
 
 SELECT results_eq(
     $$
@@ -314,12 +314,12 @@ SELECT results_eq(
         LIMIT 1
       ) and key_slot = 0
       $$,
-      $$VALUES (1) $$,
-      'Add webauthn credential to send account, check key slot 0'
-  );
+    $$VALUES (1) $$,
+    'Add webauthn credential to send account, check key slot 0'
+);
 
 --  test users can replace an existing credential with the same key slot
-do $$
+DO $$
 declare
   new_cred webauthn_credentials;
 begin
@@ -336,9 +336,9 @@ begin
     EXECUTE format('SET SESSION "vars.new_cred_id" TO %L', new_cred.id);
 
 end;
-$$ language plpgsql;
+$$ LANGUAGE plpgsql;
 
-select results_eq(
+SELECT results_eq(
     $$
     SELECT credential_id
     FROM public.send_account_credentials
@@ -349,12 +349,11 @@ select results_eq(
         LIMIT 1
       ) and key_slot = 0
       $$,
-      $$select current_setting('vars.new_cred_id')::uuid$$,
-      'Replace webauthn credential on send account, key slot 0'
-  );
+    $$select current_setting('vars.new_cred_id')::uuid$$,
+    'Replace webauthn credential on send account, key slot 0'
+);
 
 -- Complete the tests
-SELECT *
-FROM finish();
+SELECT FINISH();
 
 ROLLBACK;

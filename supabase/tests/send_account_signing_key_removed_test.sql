@@ -2,13 +2,18 @@ BEGIN;
 SELECT plan(3);
 
 -- Create the necessary extensions
-CREATE EXTENSION "basejump-supabase_test_helpers";
+CREATE EXTENSION "basejump-supabase_test_helpers"; -- noqa: RF05
 
 -- Create a test user and authenticate as the user
 SELECT tests.create_supabase_user('bob');
 
 INSERT INTO send_accounts (user_id, address, chain_id, init_code)
-VALUES (tests.get_supabase_uid('bob'), '0xB0B0000000000000000000000000000000000000', 1, '\\x00112233445566778899AABBCCDDEEFF');
+VALUES (
+    tests.get_supabase_uid('bob'),
+    '0xB0B0000000000000000000000000000000000000',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'
+);
 
 -- Insert a test row into send_account_signing_key_removed table
 INSERT INTO send_account_signing_key_removed (
@@ -29,7 +34,7 @@ INSERT INTO send_account_signing_key_removed (
 VALUES (
     1,
     '\xB0B0000000000000000000000000000000000000',
-    floor(EXTRACT(EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    floor(extract(EPOCH FROM timestamptz '2013-07-01 12:00:00')),
     '\x1234',
     '\xB0B0000000000000000000000000000000000000',
     0,
@@ -43,8 +48,8 @@ VALUES (
 ), (
     1,
     '\xB0B0000000000000000000000000000000000000',
-    floor(EXTRACT(EPOCH FROM timestamptz '2013-07-01 12:00:00')),
-    '\x1234',    
+    floor(extract(EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
     '\xB0B0000000000000000000000000000000000000',
     0,
     '\x01',
@@ -58,7 +63,7 @@ VALUES (
 
 -- Test if the trigger function populated the additional columns correctly
 SELECT results_eq(
-               $$
+    $$
         select (data->>'account')::citext as account,
         (data->>'key_slot') as key_slot,
         data->'key' as key,
@@ -73,11 +78,11 @@ SELECT results_eq(
                 jsonb_build_array('\x00', '\x01'),
         '2013-07-01 12:00:00'::timestamptz, tests.get_supabase_uid('bob'), NULL::uuid)
     $$,
-               'Test if the trigger function populated the additional columns correctly'
-       );
+    'Test if the trigger function populated the additional columns correctly'
+);
 
 DELETE FROM send_account_signing_key_removed
-WHERE id in (
+WHERE id IN (
     SELECT id
     FROM send_account_signing_key_removed
     WHERE account = '\xB0B0000000000000000000000000000000000000'::bytea

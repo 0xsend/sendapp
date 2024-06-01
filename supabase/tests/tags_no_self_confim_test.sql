@@ -53,7 +53,6 @@ SELECT throws_ok(
       'User should not be able to confirm their own tag'
   );
 
-SELECT *
-FROM finish();
+SELECT FINISH();
 
 ROLLBACK;

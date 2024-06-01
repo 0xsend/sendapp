@@ -64,7 +64,6 @@ $$,
 'Service role should be able to change the name of a confirmed tag'
 );
 
-SELECT *
-FROM finish();
+SELECT FINISH();
 
 ROLLBACK;
