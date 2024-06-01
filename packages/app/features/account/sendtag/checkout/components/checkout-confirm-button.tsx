@@ -21,7 +21,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { byteaToHex } from 'app/utils/byteaToHex'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
 import { useReceipts } from 'app/utils/useReceipts'
@@ -81,8 +81,8 @@ export function ConfirmButton({
         assert(e.tx_hash.startsWith('\\x'), 'Hex string must start with \\x')
         assert(!!e.sender, 'sender is required')
         assert(e.sender.startsWith('\\x'), 'Hex string must start with \\x')
-        const sender = pgBase16ToHex(e.sender as `\\x${string}`)
-        const hash = pgBase16ToHex(e.tx_hash as `\\x${string}`)
+        const sender = byteaToHex(e.sender as `\\x${string}`)
+        const hash = byteaToHex(e.tx_hash as `\\x${string}`)
         const isPurchase =
           checksumAddress(sender) === checksumAddress(address) &&
           e.v &&
@@ -94,7 +94,7 @@ export function ConfirmButton({
 
     // check it against the receipts
     if (event?.tx_hash) {
-      submitTxToDb(pgBase16ToHex(event.tx_hash as `\\x${string}`))
+      submitTxToDb(byteaToHex(event.tx_hash as `\\x${string}`))
     }
   }, [
     receipts,

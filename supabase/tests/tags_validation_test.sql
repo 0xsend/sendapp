@@ -53,7 +53,6 @@ SELECT throws_ok(
 FROM UNNEST(
     ARRAY ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '{', '}', '[', ']', '|', '\', ':', ';', '"', '\\', '<', '>', ',', '.', '?', '/', '`', '~']) F(invalid_char);
 
-SELECT *
-FROM finish();
+SELECT finish();
 
 ROLLBACK;

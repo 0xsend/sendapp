@@ -5753,7 +5753,7 @@ __metadata:
   dependencies:
     dotenv-cli: "npm:^7.3.0"
     supabase: "npm:1.145.4"
-    type-fest: "npm:^4.3.1"
+    type-fest: "npm:^4.18.3"
   languageName: unknown
   linkType: soft
 
@@ -30629,10 +30629,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^4.3.1":
-  version: 4.7.1
-  resolution: "type-fest@npm:4.7.1"
-  checksum: ef21f317738080d71d8603a65bd7136e1e0246980b407e9fe6b4c35cc239b712dd737b06c391e7cde8213d8a733449930b6cc5a3417324b90dddeb84fa167629
+"type-fest@npm:^4.18.3":
+  version: 4.18.3
+  resolution: "type-fest@npm:4.18.3"
+  checksum: eb750920d0ef3639177f581edd6489d972c5c5827abb602a9c9662889aad148a7d558257e36c563f1beb81a2e417faec52ecec9799b28531d8335856f91e6dff
   languageName: node
   linkType: hard
 

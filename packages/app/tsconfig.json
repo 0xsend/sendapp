@@ -1,4 +1,5 @@
 {
+  // "noErrorTruncation": true,
   "extends": "../../tsconfig.base",
   "include": [
     "features",
@@ -14,7 +15,9 @@
     "../wagmi/src",
     "jest.config.ts",
     "jest.setup.ts",
-    "jest.setup-after-env.ts"
+    "jest.setup-after-env.ts",
+    "__mocks__",
+    "tamagui.config.ts"
   ],
   "compilerOptions": {
     "noEmit": true,

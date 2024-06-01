@@ -1,5 +1,5 @@
 import { type UseQueryResult, useQuery } from '@tanstack/react-query'
-import type { SendAccountQuery } from './send-accounts/useSendAccounts'
+import type { useSendAccount } from './send-accounts/useSendAccounts'
 import { useBytecode } from 'wagmi'
 import { assert } from './assert'
 import { isHex } from 'viem'
@@ -11,7 +11,7 @@ import { baseMainnet } from '@my/wagmi/chains'
 export function useSendAccountInitCode({
   sendAccount,
 }: {
-  sendAccount?: SendAccountQuery
+  sendAccount?: ReturnType<typeof useSendAccount>['data']
 }): UseQueryResult<`0x${string}`> {
   const {
     data: byteCode,

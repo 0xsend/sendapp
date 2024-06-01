@@ -34,8 +34,8 @@ SELECT lives_ok(
         0,
         decode('00112233445566778899AABBCCDDEEFF', 'hex')
       ) $$,
-      'Insert a valid webauthn credential'
-  );
+    'Insert a valid webauthn credential'
+);
 
 -- Test updating a credential
 SELECT lives_ok(
@@ -44,8 +44,8 @@ SELECT lives_ok(
     SET sign_count = 1
     WHERE user_id = tests.get_supabase_uid('webauthn_user')
       AND name = 'test_credential' $$,
-      'Update a valid webauthn credential'
-  );
+    'Update a valid webauthn credential'
+);
 
 SELECT throws_ok(
     $$
@@ -53,20 +53,21 @@ SELECT throws_ok(
     SET user_id = tests.get_supabase_uid('webauthn_user_another_user')
     WHERE user_id = tests.get_supabase_uid('webauthn_user')
       AND name = 'test_credential' $$,
-      'new row violates row-level security policy for table "webauthn_credentials"',
-      'Update should fail due to RLS policy violation'
-  );
+    'new row violates row-level security policy for table "webauthn_credentials"',
+    'Update should fail due to RLS policy violation'
+);
 
-select is(
+SELECT is(
     tests.get_supabase_uid('webauthn_user'),
     (
-      SELECT user_id
-      FROM public.webauthn_credentials
-      WHERE user_id = tests.get_supabase_uid('webauthn_user')
-        AND name = 'test_credential'
+        SELECT user_id
+        FROM public.webauthn_credentials
+        WHERE
+            user_id = tests.get_supabase_uid('webauthn_user')
+            AND name = 'test_credential'
     ),
     'Credential should have been deleted'
-  );
+);
 
 -- Test check constraint for sign_count
 SELECT throws_ok(
@@ -89,9 +90,9 @@ SELECT throws_ok(
         -1,
         decode('FEDCBA98765432100123456789ABCDEF', 'hex')
       ) $$,
-      'new row for relation "webauthn_credentials" violates check constraint "webauthn_credentials_sign_count_check"',
-      'Insert should fail due to negative sign_count'
-  );
+    'new row for relation "webauthn_credentials" violates check constraint "webauthn_credentials_sign_count_check"',
+    'Insert should fail due to negative sign_count'
+);
 
 -- Test uniqueness of raw_credential_id
 SELECT throws_ok(
@@ -114,9 +115,9 @@ SELECT throws_ok(
         0,
         decode('FFEEAABB44556677889900CCDDEE1122', 'hex')
       ) $$,
-      'duplicate key value violates unique constraint "webauthn_credentials_raw_credential_id"',
-      'Insert should fail due to duplicate raw_credential_id'
-  );
+    'duplicate key value violates unique constraint "webauthn_credentials_raw_credential_id"',
+    'Insert should fail due to duplicate raw_credential_id'
+);
 
 -- Test row level security policies (insert, select, update, delete)
 -- Test inserting as another user
@@ -145,16 +146,17 @@ SELECT throws_ok(
         0,
         decode('11223344556677889900AABBCCDDEEFF', 'hex')
       ) $$,
-      'new row violates row-level security policy for table "webauthn_credentials"',
-      'Insert should fail due to RLS policy violation'
-  );
+    'new row violates row-level security policy for table "webauthn_credentials"',
+    'Insert should fail due to RLS policy violation'
+);
 
 -- Test deleting is not allowed
 SELECT tests.authenticate_as('webauthn_user');
 
 DELETE FROM public.webauthn_credentials
-WHERE user_id = tests.get_supabase_uid('webauthn_user')
-  AND name = 'test_credential';
+WHERE
+    user_id = tests.get_supabase_uid('webauthn_user')
+    AND name = 'test_credential';
 
 SELECT is_empty(
     $$
@@ -162,11 +164,10 @@ SELECT is_empty(
     FROM public.webauthn_credentials
     WHERE user_id = tests.get_supabase_uid('webauthn_user')
       AND name = 'test_credential' $$,
-      'Credential should have been deleted'
-  );
+    'Credential should have been deleted'
+);
 
 -- Complete the tests
-SELECT *
-FROM finish();
+SELECT finish();
 
 ROLLBACK;

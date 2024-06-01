@@ -13,8 +13,9 @@ import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
-import type { coins } from 'app/data/coins'
+import type { coin, coins } from 'app/data/coins'
 import { useToken } from 'app/routers/params'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
   const [tokenParam] = useToken()
@@ -44,7 +45,7 @@ const TokenBalanceItem = ({
   coin,
   ...props
 }: {
-  coin: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }
+  coin: coin
 } & Omit<LinkProps, 'children'>) => {
   const { data: sendAccounts } = useSendAccounts()
   const sendAccount = sendAccounts?.[0]
@@ -59,7 +60,7 @@ const TokenBalanceItem = ({
   return (
     <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
-        {coin.icon}
+        <IconCoin coin={coin} />
         <Paragraph
           fontSize={'$5'}
           fontWeight={'500'}

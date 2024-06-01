@@ -36,6 +36,7 @@ import { useLink } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { coins } from 'app/data/coins'
 import { IconAccount } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
@@ -220,7 +221,13 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
               <Paragraph fontSize="$5" fontWeight="500" color="$color12">
                 {amountParam}
               </Paragraph>
-              {coins.find((coin) => coin.token === tokenParam)?.icon}
+              {(() => {
+                const coin = coins.find((coin) => coin.token === tokenParam)
+                if (coin) {
+                  return <IconCoin coin={coin} />
+                }
+                return null
+              })()}
             </XStack>
           </YStack>
         </Stack>

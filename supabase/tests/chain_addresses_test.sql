@@ -19,18 +19,18 @@ SELECT throws_ok(
         '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
         tests.get_supabase_uid('address_owner')
       ) $$,
-      'new row violates row-level security policy for table "chain_addresses"',
-      'User should not be able to insert a chain address'
-  );
+    'new row violates row-level security policy for table "chain_addresses"',
+    'User should not be able to insert a chain address'
+);
 
 -- Test adding a chain address
-set role to postgres;
+SET role TO postgres;
 
-INSERT INTO chain_addresses(address, user_id)
+INSERT INTO chain_addresses (address, user_id)
 VALUES (
     '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
     tests.get_supabase_uid('address_owner')
-  );
+);
 
 -- Test cannot add more than one address per user
 SELECT throws_ok(
@@ -40,9 +40,9 @@ SELECT throws_ok(
         '0x5355c409fa3D0901292231Ddb953C949C2211D96',
         tests.get_supabase_uid('address_owner')
       ) $$,
-      'User can have at most 1 address',
-      'User should not be able to add more than one address'
-  );
+    'User can have at most 1 address',
+    'User should not be able to add more than one address'
+);
 
 -- Test viewing a chain address
 SELECT tests.authenticate_as('address_owner');
@@ -51,22 +51,22 @@ SELECT results_eq(
     $$SELECT address
     FROM chain_addresses
     WHERE address = '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f' $$,
-      $$VALUES (
+    $$VALUES (
         '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f'::citext
       ) $$,
-      'User should be able to add a chain address'
-  );
+    'User should be able to add a chain address'
+);
 
 -- Test case insensitivity
 SELECT results_eq(
     $$SELECT address
     FROM chain_addresses
     WHERE address = '0xfb00d9cda6dad99994849d7c66fa2631f280f64f' $$,
-      $$VALUES (
+    $$VALUES (
         '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f'::citext
       ) $$,
-      'Address should be case-insensitive'
-  );
+    'Address should be case-insensitive'
+);
 
 -- Test updating a chain address
 UPDATE chain_addresses
@@ -77,11 +77,11 @@ SELECT results_eq(
     $$SELECT address
     FROM chain_addresses
     WHERE address = '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f' $$,
-      $$VALUES (
+    $$VALUES (
         '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f'::citext
       ) $$,
-      'User should not be able to update a chain address'
-  );
+    'User should not be able to update a chain address'
+);
 
 -- Test deleting a chain address
 DELETE FROM chain_addresses
@@ -91,10 +91,10 @@ SELECT isnt_empty(
     $$SELECT address
     FROM chain_addresses
     WHERE address = '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f' $$,
-      'User should not be able to delete a chain address'
-  );
+    'User should not be able to delete a chain address'
+);
 
-set role to service_role;
+SET role TO service_role;
 
 DELETE FROM chain_addresses
 WHERE address = '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f';
@@ -103,10 +103,10 @@ SELECT is_empty(
     $$SELECT address
     FROM chain_addresses
     WHERE address = '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f' $$,
-      'Admin should be able to delete a chain address'
-  );
+    'Admin should be able to delete a chain address'
+);
 
-set role to postgres;
+SET role TO postgres;
 
 -- Test adding an invalid address
 SELECT throws_ok(
@@ -115,9 +115,9 @@ SELECT throws_ok(
         'InvalidAddress',
         tests.get_supabase_uid('address_owner')
       ) $$,
-      'new row for relation "chain_addresses" violates check constraint "chain_addresses_address_check"',
-      'Should not be able to insert an invalid address'
-  );
+    'new row for relation "chain_addresses" violates check constraint "chain_addresses_address_check"',
+    'Should not be able to insert an invalid address'
+);
 
 -- Test adding a duplicate address
 SELECT throws_ok(
@@ -130,9 +130,9 @@ SELECT throws_ok(
         '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
         tests.get_supabase_uid('address_owner')
       ) $$,
-      'duplicate key value violates unique constraint "chain_addresses_pkey"',
-      'Should not be able to insert a duplicate address'
-  );
+    'duplicate key value violates unique constraint "chain_addresses_pkey"',
+    'Should not be able to insert a duplicate address'
+);
 
 -- Test cannot read other user addresses
 SELECT tests.authenticate_as('address_reader');
@@ -140,10 +140,9 @@ SELECT tests.authenticate_as('address_reader');
 SELECT is_empty(
     $$SELECT address
     FROM chain_addresses $$,
-      'User should not be able to read other user addresses'
-  );
+    'User should not be able to read other user addresses'
+);
 
-SELECT *
-FROM finish();
+SELECT finish();
 
 ROLLBACK;

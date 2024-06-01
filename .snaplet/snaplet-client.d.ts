@@ -14,6 +14,20 @@ type Inflection = {
   oppositeBaseNameMap?: Record<string, string>;
 };
 type Override = {
+  activity?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      event_name?: string;
+      event_id?: string;
+      from_user_id?: string;
+      to_user_id?: string;
+      data?: string;
+      created_at?: string;
+      users_activity_from_user_idTousers?: string;
+      users_activity_to_user_idTousers?: string;
+    };
+  }
   buckets?: {
     name?: string;
     fields?: {
@@ -214,6 +228,8 @@ type Override = {
       block_num?: string;
       tx_idx?: string;
       log_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_account_credentials?: {
@@ -243,6 +259,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_account_signing_key_removed?: {
@@ -261,6 +279,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_account_transfers?: {
@@ -280,6 +300,7 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      event_id?: string;
     };
   }
   send_accounts?: {
@@ -320,6 +341,8 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      id?: string;
+      event_id?: string;
     };
   }
   send_token_transfers?: {
@@ -339,20 +362,7 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
-    };
-  }
-  send_transfer_logs?: {
-    name?: string;
-    fields?: {
-      from?: string;
-      to?: string;
-      value?: string;
-      block_number?: string;
-      block_timestamp?: string;
-      block_hash?: string;
-      tx_hash?: string;
-      log_index?: string;
-      created_at?: string;
+      event_id?: string;
     };
   }
   tag_receipts?: {
@@ -421,6 +431,8 @@ type Override = {
       reauthentication_sent_at?: string;
       is_sso_user?: string;
       deleted_at?: string;
+      activity_activity_from_user_idTousers?: string;
+      activity_activity_to_user_idTousers?: string;
       chain_addresses?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
@@ -473,6 +485,13 @@ interface FingerprintNumberField {
   }
 }
 export interface Fingerprint {
+  activities?: {
+    id?: FingerprintNumberField;
+    data?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    fromUser?: FingerprintRelationField;
+    toUser?: FingerprintRelationField;
+  }
   buckets?: {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
@@ -580,6 +599,7 @@ export interface Fingerprint {
     blockNum?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendAccountCredentials?: {
     keySlot?: FingerprintNumberField;
@@ -595,6 +615,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendAccountSigningKeyRemoveds?: {
     chainId?: FingerprintNumberField;
@@ -604,6 +625,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendAccountTransfers?: {
     id?: FingerprintNumberField;
@@ -635,6 +657,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    id?: FingerprintNumberField;
   }
   sendTokenTransfers?: {
     id?: FingerprintNumberField;
@@ -645,13 +668,6 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
-  }
-  sendTransferLogs?: {
-    value?: FingerprintNumberField;
-    blockNumber?: FingerprintNumberField;
-    blockTimestamp?: FingerprintDateField;
-    logIndex?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
   }
   tagReceipts?: {
     ha?: FingerprintRelationField;
@@ -684,6 +700,8 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    activitiesByFromUserId?: FingerprintRelationField;
+    activitiesByToUserId?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;

@@ -27,7 +27,7 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { formatTimeDate } from 'app/utils/formatTimeDate'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { pgBase16ToBytes } from 'app/utils/pgBase16ToBytes'
+import { byteaToBytes } from 'app/utils/byteaToBytes'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -166,7 +166,7 @@ const SendAccountCredentials = ({
       enabled: !!address,
     },
   })
-  const [x, y] = COSEECDHAtoXY(pgBase16ToBytes(webauthnCred.public_key as `\\x${string}`))
+  const [x, y] = COSEECDHAtoXY(byteaToBytes(webauthnCred.public_key as `\\x${string}`))
   const activeIndex = activeSigningKeys?.[0].findIndex(([_x, _y]) => x === _x && y === _y) ?? -1
   const isActive = activeIndex !== -1
   const onchainSlot = activeSigningKeys?.[1][activeIndex]

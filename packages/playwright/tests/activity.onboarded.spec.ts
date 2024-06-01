@@ -6,6 +6,7 @@ import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import { expect, test } from './fixtures/send-accounts'
 import debug from 'debug'
 import type { Page } from '@playwright/test'
+import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 
 let log: debug.Debugger
 
@@ -16,10 +17,39 @@ test.beforeEach(() => {
 const activityHeading = (page: Page) =>
   page.getByRole('heading', { name: 'Activity', exact: true }).and(page.getByText('Activity'))
 
-test('can visit activity page', async ({ page }) => {
+test('can visit activity page', async ({ context, page }) => {
+  const req = context.route(`${SUPABASE_URL}/rest/v1/activity_feed*`, async (route) => {
+    expect(route.request().url()).toMatchSnapshot('activity-feed-url.txt')
+    await route.fulfill({
+      body: JSON.stringify(MockActivityFeed),
+      headers: { 'content-type': 'application/json; charset=utf-8' },
+      status: 200,
+    })
+  })
   await page.goto('/activity')
+  await req
   log('beforeEach', `url=${page.url()}`)
   await expect(activityHeading(page)).toBeVisible()
+
+  await expect(page.getByText('Received')).toBeVisible()
+  await expect(page.getByText('0.019032 USDC').nth(1)).toBeVisible()
+  await expect(page.getByText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')).toBeVisible()
+
+  await expect(page.getByText('Sendtag Registered')).toBeVisible()
+  await expect(page.getByText('@yuw')).toBeVisible()
+  await expect(page.getByText('0.02 ETH').nth(1)).toBeVisible()
+
+  await expect(page.getByText('Referral', { exact: true })).toBeVisible()
+  await expect(page.getByText('@disconnect_whorl7351')).toBeVisible()
+  await expect(page.getByText('1 Referrals').nth(1)).toBeVisible()
+
+  await expect(page.getByText('Send Account Signing Key Added')).toBeVisible()
+  await expect(page.getByText('Send Account Signing Key Removed')).toBeVisible()
+
+  expect(page.getByTestId('RecentActivity')).toBeVisible()
+  await expect(page.getByTestId('RecentActivity')).toHaveScreenshot('recent-activity.png', {
+    timeout: 5_000,
+  })
 })
 
 test('can search on activity page', async ({ page, context }) => {

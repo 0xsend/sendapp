@@ -1,13 +1,15 @@
-import { assert } from 'app/utils/assert'
-import { expect, test } from './fixtures/send-accounts'
-import { throwIf } from 'app/utils/throwIf'
-import { debug } from 'debug'
+import type { Authenticator } from '@0xsend/webauthn-authenticator'
+import type { Database, Tables } from '@my/supabase/database.types'
 import type { Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@my/supabase/database.types'
-import type { Authenticator } from '@0xsend/webauthn-authenticator'
+import { assert } from 'app/utils/assert'
+import { byteaToBytes } from 'app/utils/byteaToBytes'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { COSEECDHAtoXY } from 'app/utils/passkeys'
+import { throwIf } from 'app/utils/throwIf'
+import { debug } from 'debug'
 import { withRetry } from 'viem'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
+import { expect, test } from './fixtures/send-accounts'
 
 let log: debug.Debugger
 
@@ -28,7 +30,13 @@ const backupAccountTest = async ({
   page,
   supabase,
   authenticator,
-}: { page: Page; supabase: SupabaseClient<Database>; authenticator: Authenticator }) => {
+  profile,
+}: {
+  page: Page
+  supabase: SupabaseClient<Database>
+  authenticator: Authenticator
+  profile: Tables<'profiles'>
+}) => {
   const { data: cred, error } = await supabase.from('webauthn_credentials').select('*').single()
   expect(error).toBeFalsy()
   assert(!!cred, 'cred not found')
@@ -74,15 +82,37 @@ const backupAccountTest = async ({
 
   await expect(supabase).toHaveValidWebAuthnCredentials(authenticator)
 
+  const [xHex, yHex] = COSEECDHAtoXY(byteaToBytes(webAuthnCred.public_key))
+  const xPgB16 = hexToBytea(xHex)
+  const yPgB16 = hexToBytea(yHex)
+
+  await expect(supabase).toHaveEventInActivityFeed({
+    event_name: 'send_account_signing_key_added',
+    from_user: {
+      id: profile.id,
+      send_id: profile.send_id,
+    },
+    data: {
+      account: hexToBytea(sendAcct.address).toLowerCase(),
+      key_slot: acctCred.key_slot,
+      key: [xPgB16, yPgB16],
+    },
+  })
+
   return { sendAcct, webAuthnCred }
 }
 
-test('can backup account', async ({ page, supabase, authenticator }) => {
-  await backupAccountTest({ page, supabase, authenticator })
+test('can backup account', async ({ page, supabase, authenticator, user: { profile } }) => {
+  await backupAccountTest({ page, supabase, authenticator, profile })
 })
 
-test('can remove a signer', async ({ page, supabase, authenticator }) => {
-  const { sendAcct, webAuthnCred } = await backupAccountTest({ page, supabase, authenticator })
+test('can remove a signer', async ({ page, supabase, authenticator, user: { profile } }) => {
+  const { sendAcct, webAuthnCred } = await backupAccountTest({
+    page,
+    supabase,
+    authenticator,
+    profile,
+  })
   await page
     .locator('div')
     .filter({ hasText: new RegExp(`^${webAuthnCred.display_name}$`) })
@@ -102,21 +132,19 @@ test('can remove a signer', async ({ page, supabase, authenticator }) => {
   await expect(page.getByTestId('RemovePasskeyError')).toBeHidden() // no err
 
   // retry until signing key is removed from the account
-  await withRetry(
+  const keyRemoved = await withRetry(
     async () => {
       const { data: keyRemoved, error: keyRemovedErr } = await supabase
         .from('send_account_signing_key_removed')
-        .select('account, key_slot')
-        .eq('account', hexToPgBase16(sendAcct.address))
+        .select('account, key_slot, key')
+        .eq('account', hexToBytea(sendAcct.address))
         .order('block_num, tx_idx, log_idx, abi_idx')
 
       if (keyRemovedErr) {
         throw keyRemovedErr
       }
 
-      if (keyRemoved.length === 0) {
-        throw new Error('No key removed')
-      }
+      if (keyRemoved.length === 0) throw new Error('No key removed')
 
       return keyRemoved
     },
@@ -125,6 +153,20 @@ test('can remove a signer', async ({ page, supabase, authenticator }) => {
       delay: 500,
     }
   )
+
+  await expect(supabase).toHaveEventInActivityFeed({
+    event_name: 'send_account_signing_key_removed',
+    from_user: {
+      id: profile.id,
+      send_id: profile.send_id,
+    },
+    // biome-ignore lint/suspicious/noExplicitAny: need to define the event schema
+    data: keyRemoved.reduce((acc: Record<string, any>, keyRemoved) => {
+      const { account, key_slot, key } = keyRemoved
+      acc.key = acc.key || []
+      return { account, key_slot, key: [...acc.key, key] }
+    }, {}),
+  })
 
   await expect(page.getByText(webAuthnCred.display_name)).toBeHidden()
 })

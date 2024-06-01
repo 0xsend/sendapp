@@ -3,6 +3,8 @@ import { TamaguiProvider, View as MockView, config } from '@my/ui'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
 
+jest.mock('app/features/activity/utils/useActivityFeed')
+
 jest.mock('app/utils/supabase/useSupabase', () => ({
   useSupabase: jest.fn().mockReturnValue({
     rpc: jest.fn().mockReturnValue({

@@ -2,7 +2,6 @@ import type { ColorTokens } from '@my/ui/types'
 import { themed } from '@tamagui/helpers-icon'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { useThemeSetting } from '@tamagui/next-theme'
-import * as React from 'react'
 import { memo } from 'react'
 import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 
