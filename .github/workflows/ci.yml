@@ -194,6 +194,13 @@ jobs:
           name: playwright-report
           path: packages/playwright/playwright-report/
           retention-days: 30
+      - name: Playwright Test Results
+        uses: actions/upload-artifact@v4
+        if: always() && steps.playwright.outcome == 'failure'
+        with:
+          name: playwright-test-results
+          path: packages/playwright/test-results/
+          retention-days: 30
 
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow

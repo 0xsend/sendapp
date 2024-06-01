@@ -4,7 +4,7 @@ import { ReferralsEventSchema } from './ReferralsEventSchema'
 import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
 import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
 
-export { BaseEvent } from './BaseEventSchema'
+export type { BaseEvent } from './BaseEventSchema'
 export { ReferralsEventSchema, isReferralsEvent } from './ReferralsEventSchema'
 export {
   SendAccountTransfersEventSchema,
