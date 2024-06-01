@@ -13,7 +13,7 @@
     "@types/bun": "latest",
     "permissionless": "^0.1.14",
     "viem": "^2.8.10",
-    "zx": "^8.0.2"
+    "zx": "^8.1.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
