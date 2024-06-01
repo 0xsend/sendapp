@@ -3,6 +3,9 @@ import type { Database as DatabaseGenerated } from './database-generated.types'
 export type { Json } from './database-generated.types'
 import type { PostgrestError } from '@supabase/supabase-js'
 
+/**
+ * @see https://www.postgresql.org/docs/16/functions-binarystring.html#ENCODE-FORMAT-HEX
+ **/
 export type PgBytea = `\\x${string}`
 
 export type Database = MergeDeep<
