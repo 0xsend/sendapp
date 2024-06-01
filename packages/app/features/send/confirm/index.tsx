@@ -221,13 +221,13 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
               <Paragraph fontSize="$5" fontWeight="500" color="$color12">
                 {amountParam}
               </Paragraph>
-              {() => {
+              {(() => {
                 const coin = coins.find((coin) => coin.token === tokenParam)
                 if (coin) {
                   return <IconCoin coin={coin} />
                 }
                 return null
-              }}
+              })()}
             </XStack>
           </YStack>
         </Stack>
