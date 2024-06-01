@@ -48,7 +48,9 @@ alter table "public"."send_transfer_logs" drop constraint "send_transfer_logs_to
 
 alter table "public"."send_transfer_logs" drop constraint "send_transfer_logs_tx_hash_check";
 
-drop function if exists "public"."insert_send_transfer_logs"(_send_transfer_logs send_transfer_logs[]);
+drop function if exists "public"."insert_send_transfer_logs" (
+    _send_transfer_logs send_transfer_logs []
+);
 
 alter table "public"."send_transfer_logs" drop constraint "send_transfer_logs_pkey";
 
@@ -63,5 +65,3 @@ drop index if exists "public"."send_transfer_logs_pkey";
 drop index if exists "public"."send_transfer_logs_to_idx";
 
 drop table "public"."send_transfer_logs";
-
-
