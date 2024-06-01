@@ -1,5 +1,3 @@
-import type { Tables } from '@my/supabase/database-generated.types'
-import type { Views } from '@my/supabase/database.types'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
   useInfiniteQuery,
