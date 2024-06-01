@@ -1,30 +1,39 @@
 import {
   BigHeading,
+  Button,
   H1,
   Label,
   Paragraph,
   Separator,
   Spinner,
   Stack,
+  Text,
   Tooltip,
   XStack,
   YStack,
   useMedia,
 } from '@my/ui'
-import type { coins } from 'app/data/coins'
-import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { baseMainnet } from '@my/wagmi'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import type { coins } from 'app/data/coins'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useBalance, type UseBalanceReturnType } from 'wagmi'
 
-import formatAmount from 'app/utils/formatAmount'
-import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
+import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import { assert } from 'app/utils/assert'
+import { useTokenMarketData } from 'app/utils/coin-gecko'
+import formatAmount from 'app/utils/formatAmount'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import type { SendAccountTransfersEvent } from 'app/utils/zod/activity'
+import { Fragment } from 'react'
+import { ActivityAvatar } from '../activity/ActivityAvatar'
+import { AnimateEnter, RowLabel } from '../activity/screen'
+import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 
 export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   const media = useMedia()
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
   const balance = useBalance({
     address: sendAccount?.address,
     token: coin.token === 'eth' ? undefined : coin.token,
@@ -60,12 +69,12 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
         <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
       </Stack>
       <YStack>
-        <Label fontSize="$7" fontWeight="500" color={'$color11'} textTransform={'uppercase'}>
-          HISTORY
-        </Label>
-        <H1 fontSize="$9" fontWeight="700" color={'$color12'}>
-          Coming Soon
-        </H1>
+        {(() => {
+          if (coin.token === 'eth') {
+            return <TokenDetailsHistoryComingSoon />
+          }
+          return <TokenDetailsHistory coin={coin} />
+        })()}
       </YStack>
     </YStack>
   )
@@ -180,5 +189,197 @@ const TokenDetailsBalance = ({
         </Paragraph>
       </Tooltip.Content>
     </Tooltip>
+  )
+}
+
+const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
+  assert(coin.token !== 'eth', 'ETH token does not have a history')
+  const result = useTokenActivityFeed({
+    pageSize: 10,
+    address: hexToBytea(coin.token),
+  })
+  const {
+    data,
+    isLoading: isLoadingActivities,
+    error: activitiesError,
+    isFetching: isFetchingActivities,
+    isFetchingNextPage: isFetchingNextPageActivities,
+    fetchNextPage,
+    hasNextPage,
+  } = result
+  const { pages } = data ?? {}
+  return (
+    <YStack gap="$5">
+      {(() => {
+        switch (true) {
+          case isLoadingActivities:
+            return <Spinner size="small" />
+          case activitiesError !== null:
+            return (
+              <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
+                {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+              </Paragraph>
+            )
+          case pages?.length === 0:
+            return (
+              <>
+                <RowLabel>No activities</RowLabel>
+              </>
+            )
+          default: {
+            let lastDate: string | undefined
+            return pages?.map((activities) => {
+              return activities?.map((activity) => {
+                const date = activity.created_at.toLocaleDateString()
+                const isNewDate = !lastDate || date !== lastDate
+                if (isNewDate) {
+                  lastDate = date
+                }
+                return (
+                  <Fragment
+                    key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                  >
+                    {isNewDate ? <RowLabel>{lastDate}</RowLabel> : null}
+                    <AnimateEnter>
+                      <TokenActivityRow activity={activity} />
+                    </AnimateEnter>
+                  </Fragment>
+                )
+              })
+            })
+          }
+        }
+      })()}
+      <AnimateEnter>
+        {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
+          <>
+            {isFetchingNextPageActivities && <Spinner size="small" />}
+            {hasNextPage && (
+              <Button
+                onPress={() => {
+                  fetchNextPage()
+                }}
+                disabled={isFetchingNextPageActivities || isFetchingActivities}
+                color="$color"
+                width={200}
+                mx="auto"
+              >
+                Load More
+              </Button>
+            )}
+          </>
+        ) : null}
+      </AnimateEnter>
+    </YStack>
+  )
+}
+
+function TokenActivityRow({ activity }: { activity: SendAccountTransfersEvent }) {
+  const media = useMedia()
+  const { created_at } = activity
+  const amount = amountFromActivity(activity)
+  const date = new Date(created_at).toLocaleString()
+  const eventName = eventNameFromActivity(activity)
+  const subtext = subtextFromActivity(activity)
+
+  return (
+    <XStack
+      width={'100%'}
+      ai="center"
+      jc="space-between"
+      gap="$4"
+      borderBottomWidth={1}
+      pb="$5"
+      borderBottomColor={'$decay'}
+      $gtMd={{ borderBottomWidth: 0, pb: '0' }}
+    >
+      <XStack gap="$4.5" width={'100%'} f={1}>
+        <ActivityAvatar activity={activity} />
+        <YStack gap="$1.5" width={'100%'} f={1} overflow="hidden">
+          <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
+            <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
+              {eventName}
+            </Text>
+            <Text
+              color="$color12"
+              fontSize="$7"
+              //  $gtMd={{ display: 'none', fontSize: '$5' }}
+            >
+              {amount}
+            </Text>
+          </XStack>
+          <Stack
+            gap="$1.5"
+            fd="column"
+            $gtSm={{ fd: 'row' }}
+            alignItems="flex-start"
+            justifyContent="space-between"
+            width="100%"
+            overflow="hidden"
+            f={1}
+          >
+            <Text
+              theme="alt2"
+              color="$olive"
+              fontFamily={'$mono'}
+              // $gtMd={{ fontSize: '$2' }}
+              maxWidth={'100%'}
+              overflow={'hidden'}
+            >
+              {subtext}
+            </Text>
+            {/* <Text
+              display="none"
+              // @NOTE: font families don't change in `$gtMd` breakpoint
+              fontFamily={media.md ? '$mono' : '$body'}
+              $gtSm={{ display: 'flex' }}
+              // $gtMd={{ display: 'none' }}
+            >
+              •
+            </Text> */}
+            <Text
+            // $gtMd={{ display: 'none' }}
+            >
+              {date}
+            </Text>
+          </Stack>
+        </YStack>
+      </XStack>
+      <XStack
+        gap="$4"
+        display="none"
+        // $gtMd={{ display: 'flex' }}
+      >
+        <Text color="$color12" minWidth={'$14'} textAlign="right" jc={'flex-end'}>
+          {date}
+        </Text>
+        <Text
+          color="$color12"
+          textAlign="right"
+          fontSize="$7"
+          // @NOTE: font families don't change in `$gtMd` breakpoint
+          fontFamily={media.md ? '$mono' : '$body'}
+          $gtMd={{
+            fontSize: '$5',
+            //  minWidth: '$14'
+          }}
+        >
+          {amount}
+        </Text>
+      </XStack>
+    </XStack>
+  )
+}
+
+const TokenDetailsHistoryComingSoon = () => {
+  return (
+    <>
+      <Label fontSize="$7" fontWeight="500" color={'$color11'} textTransform={'uppercase'}>
+        HISTORY
+      </Label>
+      <H1 fontSize="$9" fontWeight="700" color={'$color12'}>
+        Coming Soon
+      </H1>
+    </>
   )
 }
