@@ -14,7 +14,7 @@ import {
   ButtonText,
   View,
 } from '@my/ui'
-import { useNav, useToken } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
@@ -57,21 +57,26 @@ export function TopNav({
   button,
   noSubroute = false,
 }: TopNavProps) {
-  const [nav, setNavParam] = useNav()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
   const { push } = useRouter()
   const media = useMedia()
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
-  const [, setTokenParam] = useToken()
 
   const handleHomeBottomSheet = () => {
-    setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'home' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const handleSettingsBottomSheet = () => {
-    setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'settings' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const hasSelectedCoin = selectedCoin !== undefined
@@ -79,7 +84,7 @@ export function TopNav({
   const handleBack = () => {
     // always pop to the base path. e.g. /account/settings/edit-profile -> /account
     if (hasSelectedCoin) {
-      setTokenParam(undefined)
+      setRootParams({ ...queryParams, token: undefined })
     }
     const newPath = parts.slice(0, 1).join('/')
     push(`/${newPath}`)

@@ -28,7 +28,7 @@ import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
-import { useNav } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 import type React from 'react'
 import { type ElementType, useEffect, useState } from 'react'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -45,7 +45,7 @@ export function AccountScreen() {
   const sendTags = useConfirmedTags()?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
   const refCode = profile?.referral_code ?? ''
   const referralHref = getReferralHref(refCode)
-  const [, setNavParam] = useNav()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const [canShare, setCanShare] = useState(false)
 
   useEffect(() => {
@@ -150,7 +150,10 @@ export function AccountScreen() {
                     onPress: (e) => {
                       if (media.lg) {
                         e.preventDefault()
-                        setNavParam('settings', { webBehavior: 'replace' })
+                        setRootParams(
+                          { ...queryParams, nav: 'settings' },
+                          { webBehavior: 'replace' }
+                        )
                       }
                     },
                   }

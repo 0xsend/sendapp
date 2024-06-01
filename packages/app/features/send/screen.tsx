@@ -1,15 +1,13 @@
 import { AnimatePresence, Container, H4, Spinner, Text, YStack } from '@my/ui'
-import { useSendParams } from 'app/routers/params'
+import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { SendAmountForm } from './SendAmountForm'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { Search, SearchResults } from 'app/features/send/components/SendSearch'
 
 export const SendScreen = () => {
-  const {
-    params: { recipient },
-  } = useSendParams()
-  const { data: profile, isLoading, error } = useProfileLookup('tag', recipient)
+  const [{ recipient }] = useSendScreenParams()
+  const { data: profile, isLoading, error } = useProfileLookup('tag', recipient ?? '')
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
   if (!profile)

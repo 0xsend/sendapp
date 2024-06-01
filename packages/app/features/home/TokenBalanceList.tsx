@@ -13,12 +13,12 @@ import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
-import type { coin, coins } from 'app/data/coins'
-import { useToken } from 'app/routers/params'
+import type { coins, coin } from 'app/data/coins'
+import { useRootScreenParams } from 'app/routers/params'
 import { IconCoin } from 'app/components/icons/IconCoin'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
-  const [tokenParam] = useToken()
+  const [{ token: tokenParam }] = useRootScreenParams()
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
