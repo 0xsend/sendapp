@@ -25,19 +25,19 @@ describe('test amountFromActivity', () => {
 
 describe('test eventNameFromActivity', () => {
   it('should return the received when transfer and to user ID is present', () => {
-    const activity = MockActivityFeed[0]
+    const activity = mockReceivedTransfer
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
   })
   it('should return the sent when transfer and from user ID is present', () => {
-    const activity = MockActivityFeed[1]
+    const activity = mockSentTransfer
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sent')
   })
   it('should return the sendtag registered when tag receipts event', () => {
-    const activity = MockActivityFeed[2]
+    const activity = mockTagReceipt
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sendtag Registered')
   })
   it('should return the referral when referrals event', () => {
-    const activity = MockActivityFeed[3]
+    const activity = mockReferral
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Referral')
   })
   it('should return I Am Rick James when unknown event name equals i_am_rick_james', () => {
@@ -65,7 +65,7 @@ describe('test subtextFromActivity', () => {
     )
   })
   it('should return the referrals when referrals event', () => {
-    const activity = MockActivityFeed[3]
+    const activity = mockReferral
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('@disconnect_whorl7351')
   })
 })

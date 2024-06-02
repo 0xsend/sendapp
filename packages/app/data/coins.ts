@@ -15,26 +15,26 @@ export const CoinSchema = z.object({
 export type coin = z.infer<typeof CoinSchema>
 export type coins = coin[]
 
-export const coins: coins = [
-  {
-    label: 'USDC',
-    symbol: 'USDC',
-    token: usdcAddresses[baseMainnet.id],
-    decimals: 6,
-    coingeckoTokenId: 'usd-coin',
-  },
-  {
-    label: 'Ethereum',
-    symbol: 'ETH',
-    token: 'eth',
-    decimals: 18,
-    coingeckoTokenId: 'ethereum',
-  },
-  {
-    label: 'Send',
-    symbol: 'SEND',
-    token: sendAddresses[baseMainnet.id],
-    decimals: 0,
-    coingeckoTokenId: 'send-token',
-  },
-] as const
+export const usdcCoin: coin = {
+  label: 'USDC',
+  symbol: 'USDC',
+  token: usdcAddresses[baseMainnet.id],
+  decimals: 6,
+  coingeckoTokenId: 'usd-coin',
+}
+
+export const ethCoin: coin = {
+  label: 'Ethereum',
+  symbol: 'ETH',
+  token: 'eth',
+  decimals: 18,
+  coingeckoTokenId: 'ethereum',
+}
+export const sendCoin: coin = {
+  label: 'Send',
+  symbol: 'SEND',
+  token: sendAddresses[baseMainnet.id],
+  decimals: 0,
+  coingeckoTokenId: 'send-token',
+}
+export const coins: coins = [usdcCoin, ethCoin, sendCoin] as const

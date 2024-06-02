@@ -1,0 +1,955 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TokenDetails 1`] = `
+<View
+  style={
+    {
+      "flex": 1,
+      "flexDirection": "column",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+      }
+    }
+  >
+    <Text
+      cancelable={true}
+      disabled={false}
+      focusable={true}
+      id=":r0:"
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "color": "hsla(112, 22%, 59%, 1)",
+          "display": "flex",
+          "fontFamily": "System",
+          "fontSize": 19.2,
+          "fontWeight": "500",
+          "lineHeight": 44,
+          "textTransform": "uppercase",
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      USDC BALANCE
+    </Text>
+    <Text
+      accessibilityRole="header"
+      selectable={true}
+      style={
+        {
+          "color": "hsla(112, 22%, 100%, 1)",
+          "fontFamily": "System",
+          "fontSize": 64,
+          "fontWeight": "700",
+          "lineHeight": 57,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      0
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "paddingBottom": 32,
+        "paddingTop": 32,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "borderBottomColor": "#3E4A3C",
+          "borderBottomWidth": 1,
+          "borderLeftColor": "#3E4A3C",
+          "borderLeftWidth": 0,
+          "borderRightColor": "#3E4A3C",
+          "borderRightWidth": 0,
+          "borderStyle": "solid",
+          "borderTopColor": "#3E4A3C",
+          "borderTopWidth": 0,
+          "flex": 1,
+          "flexShrink": 0,
+          "height": 0,
+          "maxHeight": 0,
+          "transform": [
+            {
+              "translateY": -0.5,
+            },
+          ],
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "column",
+          "gap": 24,
+        }
+      }
+      testID="TokenDetailsHistory"
+    >
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsl(0, 0%, 42.5%)",
+            "display": "none",
+            "fontFamily": "System",
+            "fontSize": 19.2,
+            "fontWeight": "400",
+            "lineHeight": 21,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 13,
+          }
+        }
+        suppressHighlighting={true}
+      >
+        6/2/2024
+      </Text>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://ui-avatars.com/api/?name=0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a&size=256&format=png&background=86ad7f",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "overflow": "hidden",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Sent
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  10 USDC
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "overflow": "hidden",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  6/2/2024, 2:22:06 AM
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://ui-avatars.com/api/?name=0xa71CE00000000000000000000000000000000000&size=256&format=png&background=86ad7f",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=0xa71CE00000000000000000000000000000000000&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "overflow": "hidden",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Received
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  20 USDC
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "overflow": "hidden",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  0xa71CE00000000000000000000000000000000000
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  6/2/2024, 2:22:02 AM
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "borderBottomColor": "#3E4A3C",
+              "borderBottomWidth": 1,
+              "borderStyle": "solid",
+              "flexDirection": "row",
+              "gap": 18,
+              "justifyContent": "space-between",
+              "paddingBottom": 24,
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 21,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "height": 48,
+                  "justifyContent": "center",
+                  "maxHeight": 48,
+                  "maxWidth": 48,
+                  "minHeight": 48,
+                  "minWidth": 48,
+                  "overflow": "hidden",
+                  "position": "relative",
+                  "width": 48,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 1,
+                  }
+                }
+              >
+                <Image
+                  fullscreen={true}
+                  onError={[Function]}
+                  onLoad={[Function]}
+                  source={
+                    {
+                      "uri": "https://i.pravatar.cc/500?u=alice",
+                    }
+                  }
+                  style={
+                    {
+                      "height": 48,
+                      "width": 48,
+                    }
+                  }
+                />
+              </View>
+              <View
+                style={
+                  {
+                    "backgroundColor": "#86AE80",
+                    "bottom": 0,
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "left": 0,
+                    "position": "absolute",
+                    "right": 0,
+                    "top": 0,
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 9,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 4,
+                  "overflow": "hidden",
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Received
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 100%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  30 USDC
+                </Text>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "flex-start",
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "justifyContent": "space-between",
+                    "overflow": "hidden",
+                    "width": "100%",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    {
+                      "color": "#86AE80",
+                      "fontFamily": "System",
+                      "maxWidth": "100%",
+                      "overflow": "hidden",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  @alice
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  6/2/2024, 2:21:44 AM
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        animatedStyle={
+          {
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            },
+          }
+        }
+        collapsable={false}
+        forwardedRef={[Function]}
+        style={
+          {
+            "opacity": 0,
+            "transform": [
+              {
+                "scale": 0.9,
+              },
+            ],
+          }
+        }
+      />
+    </View>
+  </View>
+</View>
+`;

@@ -14,7 +14,9 @@ import {
 } from 'app/utils/zod/activity'
 import { z, type ZodError } from 'zod'
 
-const SendAccountTransfersEvenArrayySchema = z.array(SendAccountTransfersEventSchema)
+const SendAccountTransfersEvenArraySchema = z.array(SendAccountTransfersEventSchema)
+
+type SendAccountTransfersEventArray = z.infer<typeof SendAccountTransfersEvenArraySchema>
 
 /**
  * Infinite query to fetch ERC-20 token activity feed.
@@ -26,13 +28,16 @@ const SendAccountTransfersEvenArrayySchema = z.array(SendAccountTransfersEventSc
 export function useTokenActivityFeed(params: {
   pageSize?: number
   address: PgBytea
-}): UseInfiniteQueryResult<InfiniteData<SendAccountTransfersEvent[]>, PostgrestError | ZodError> {
+}): UseInfiniteQueryResult<
+  InfiniteData<SendAccountTransfersEventArray>,
+  PostgrestError | ZodError
+> {
   const { pageSize = 10, address } = params
   const supabase = useSupabase()
 
   async function fetchTokenActivityFeed({
     pageParam,
-  }: { pageParam: number }): Promise<SendAccountTransfersEvent[]> {
+  }: { pageParam: number }): Promise<SendAccountTransfersEventArray> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     const { data, error } = await supabase
@@ -44,7 +49,7 @@ export function useTokenActivityFeed(params: {
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)
-    return SendAccountTransfersEvenArrayySchema.parse(data)
+    return SendAccountTransfersEvenArraySchema.parse(data)
   }
 
   return useInfiniteQuery({
