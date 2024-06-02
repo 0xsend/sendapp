@@ -156,7 +156,7 @@ test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) =
   await checkoutPage.page.pause()
   const { data, error } = await supabase.rpc('confirm_tags', {
     tag_names: [tagName],
-    receipt_hash: '0x',
+    event_id: '',
     referral_code_input: '',
   })
   log('cannot confirm a tag without paying', data, error)

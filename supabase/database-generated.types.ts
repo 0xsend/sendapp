@@ -312,17 +312,23 @@ export type Database = {
       receipts: {
         Row: {
           created_at: string | null
-          hash: string
+          event_id: string | null
+          hash: string | null
+          id: number
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          hash: string
+          event_id?: string | null
+          hash?: string | null
+          id?: number
           user_id: string
         }
         Update: {
           created_at?: string | null
-          hash?: string
+          event_id?: string | null
+          hash?: string | null
+          id?: number
           user_id?: string
         }
         Relationships: [
@@ -790,25 +796,27 @@ export type Database = {
       }
       tag_receipts: {
         Row: {
-          hash: string
+          created_at: string | null
+          event_id: string | null
+          hash: string | null
+          id: number
           tag_name: string
         }
         Insert: {
-          hash: string
+          created_at?: string | null
+          event_id?: string | null
+          hash?: string | null
+          id?: number
           tag_name: string
         }
         Update: {
-          hash?: string
+          created_at?: string | null
+          event_id?: string | null
+          hash?: string | null
+          id?: number
           tag_name?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "tag_receipts_hash_fkey"
-            columns: ["hash"]
-            isOneToOne: false
-            referencedRelation: "receipts"
-            referencedColumns: ["hash"]
-          },
           {
             foreignKeyName: "tag_receipts_tag_name_fkey"
             columns: ["tag_name"]
@@ -1012,7 +1020,7 @@ export type Database = {
       confirm_tags: {
         Args: {
           tag_names: string[]
-          receipt_hash: string
+          event_id: string
           referral_code_input: string
         }
         Returns: undefined

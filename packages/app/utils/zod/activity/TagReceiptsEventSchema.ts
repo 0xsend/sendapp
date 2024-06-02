@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { byteaToHexTxHash } from '../bytea'
 import { decimalStrToBigInt } from '../bigint'
 import { BaseEventSchema } from './BaseEventSchema'
 import { CoinSchema, coins } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { Events } from './events'
+import { OnchainEventDataSchema } from './OnchainDataSchema'
 
 const eth = coins.find((c) => c.symbol === 'ETH')
 assert(!!eth, 'ETH coin not found')
@@ -12,7 +12,7 @@ assert(!!eth, 'ETH coin not found')
 /**
  * Tag receipt event data
  */
-export const TagReceiptsDataSchema = z.object({
+export const TagReceiptsDataSchema = OnchainEventDataSchema.extend({
   /**
    * The sendtags that were confirmed in this transaction
    */
@@ -21,10 +21,6 @@ export const TagReceiptsDataSchema = z.object({
    * The value in ETH of the transaction
    */
   value: decimalStrToBigInt,
-  /**
-   * The transaction hash that included this event
-   */
-  tx_hash: byteaToHexTxHash,
   coin: CoinSchema.default(eth),
 })
 
