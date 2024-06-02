@@ -146,7 +146,7 @@ export function generateChallenge({
  * struct for the SendVerifier contract.
  */
 export async function signChallenge(challenge: Hex) {
-  assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
+  // assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
   const challengeBytes = hexToBytes(challenge)
   const challengeB64 = Buffer.from(challengeBytes).toString('base64')
   const sign = await signWithPasskey({

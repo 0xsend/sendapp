@@ -1,6 +1,11 @@
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import type { Debugger } from 'debug'
 
+/**
+ * Retrieve a chainAddress row from the `chain_addresses` table
+ * @param {string} chainAddress - chainAddress to retrieve
+ * @returns chainAddress row
+ */
 export const getChainAddress = async (chainAddress: string) => {
   return await supabaseAdmin
     .from('chain_addresses')
@@ -9,45 +14,47 @@ export const getChainAddress = async (chainAddress: string) => {
     .single()
 }
 
-export const getPasskey = async (publicKey: string) => {
+/**
+ * Retrieves a passkey row from the `webauthn_credentials` table by its name `passkeyName` in the format <userId>.<keySlot>
+ * @param {string} passkeyName - passkey name, in the format <userId>.<keySlot>
+ * @returns passkey row
+ */
+export const getPasskey = async (passkeyName: string) => {
   return await supabaseAdmin
     .from('webauthn_credentials')
     .select('*')
-    .eq('public_key', publicKey)
+    .eq('name', passkeyName)
     .single()
 }
 
 /**
- * Attempts to insert a challenge. Upon failing to generate a challenge (in the case of duplicate challenges), this function will retry a maximum of `maxRetries` times.
- *
- *
- * @param {int} [maxRetries=3] Maximum number of retries
- * @returns Challenge
+ * Inserts a challenge into the `challenges` table and returns the row
  */
-export const tryInsertChallenge = async (maxRetries: int = 3) => {
-  if (maxRetries === 0) {
-    return
-  }
-  const result = await supabaseAdmin
+export const insertChallenge = async () => {
+  return await supabaseAdmin
     .rpc('insert_challenge', {
       challenge: generateChallenge(),
     })
     .single()
-
-  const { data, error } = result
-  if (!data || error) {
-    return await tryInsertChallenge(maxRetries - 1)
-  }
-
-  return result
 }
 
+/**
+ * Retrieves a challenge from the `challenges` table, from the challenge id.
+ * @param {number} challengeId
+ * @returns challenge row
+ */
 export const getChallengeById = async (challengeId: number) => {
   return await supabaseAdmin.from('challenges').select('*').eq('id', challengeId).single()
 }
 
+/**
+ * Determines whether a challenge is expired
+ * @param {number} challengeId - challenge id in `challenges` table
+ * @param {Debugger} logger - logger
+ * @returns {boolean} - whether the challenge is expired
+ */
 export const isChallengeExpired = async (
-  challengeId: string,
+  challengeId: number,
   logger?: Debugger
 ): Promise<boolean> => {
   const { data, error } = await supabaseAdmin
@@ -72,7 +79,8 @@ export const isChallengeExpired = async (
  * Generates a 64-byte randomly generated challenge (hex)
  *
  * @returns {string} - challenge hex string
- * @see {tryInsertChallenge} - avoid using `generateChallenge` directly. use `tryGenerateChallenge` instead.
+ * @see {insertChallenge} - avoid using `generateChallenge` directly. use `tryGenerateChallenge` instead.
+ * @returns {Uint8Array} - 64-byte challenge
  */
 function generateChallenge(): Uint8Array {
   const buffer = new Uint8Array(64)

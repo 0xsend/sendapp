@@ -1,26 +1,40 @@
 import { useAccount, useSignMessage } from 'wagmi'
-import type { SignMessageErrorType } from '@wagmi/core'
 import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
 import { Button, ButtonText } from '@my/ui'
 import { Provider } from 'app/provider'
 import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
-import { type ChallengeResponse, RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
+import {
+  type ChallengeResponse,
+  type VerifyChallengeRequest,
+  RecoveryOptions,
+} from '@my/api/src/routers/account-recovery/types'
+import type { SignState } from 'app/features/auth/account-recovery/account-recovery'
 
 interface Props {
   challengeData: ChallengeResponse
-  // https://wagmi.sh/react/api/hooks/useSignMessage#onsuccess
-  onSignSuccess: (data: SignMessageData, variables: SignMessageVariables, context: unknown) => void
-  // https://wagmi.sh/react/api/hooks/useSignMessage#onerror
-  onSignError: (
-    error: SignMessageErrorType,
-    variables: SignMessageVariables,
-    context: unknown
-  ) => void
+  signState: SignState
+
+  onSignSuccess: (args: VerifyChallengeRequest) => Promise<void>
+  onSignError: () => void
 }
 
 export default function RecoverWithEOA(props: Props) {
   const { signMessage } = useSignMessage()
   const { address } = useAccount()
+
+  // https://wagmi.sh/react/api/hooks/useSignMessage#onsuccess
+  const onSuccess = async (
+    data: SignMessageData,
+    variables: SignMessageVariables,
+    context: unknown
+  ) => {
+    await props.onSignSuccess({
+      recoveryType: RecoveryOptions.EOA,
+      signature: data,
+      identifier: variables.account as string,
+      challengeId: props.challengeData.id,
+    })
+  }
 
   const onPress = async () => {
     if (props.challengeData.challenge) {
@@ -30,7 +44,7 @@ export default function RecoverWithEOA(props: Props) {
           account: address,
         },
         {
-          onSuccess: props.onSignSuccess,
+          onSuccess: onSuccess,
           onError: props.onSignError,
         }
       )
@@ -40,12 +54,9 @@ export default function RecoverWithEOA(props: Props) {
   return (
     <Provider>
       <OpenConnectModalWrapper>
-        {address && (
-          // TODO: front-end devs: remove hardcoded width
-          <Button onPress={onPress} width={'$12'}>
-            <ButtonText>EOA</ButtonText>
-          </Button>
-        )}
+        <Button onPress={onPress} width={'$12'}>
+          <ButtonText>EOA</ButtonText>
+        </Button>
       </OpenConnectModalWrapper>
     </Provider>
   )

@@ -13,10 +13,13 @@ import {
   getChainAddress,
   getPasskey,
   isChallengeExpired,
-  tryInsertChallenge,
+  insertChallenge,
 } from 'app/utils/account-recovery'
 import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
-import { verifyMessage } from 'viem'
+import { verifyMessage, hexToBytes } from 'viem'
+import { verifySignature } from 'app/utils/userop'
+import { COSEECDHAtoXY } from 'app/utils/passkeys'
+import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
 
 const logger = debug('api:routers:account-recovery')
 
@@ -27,20 +30,20 @@ export const GetChallengeResponseSchema = z.object({
   expires_at: z.string(),
 })
 
-const VerifyChallengeRequestSchema = z.object({
+export const ValidateSignatureRequestSchema = z.object({
   recoveryType: z.nativeEnum(RecoveryOptions),
   identifier: z.string(),
   challengeId: z.number(),
   signature: z.string(),
 })
 
-export const VerifyChallengeResponseSchema = z.object({
+export const ValidateSignatureResponseSchema = z.object({
   jwt: z.string(),
 })
 
 export const accountRecoveryRouter = createTRPCRouter({
   getChallenge: publicProcedure.mutation(async () => {
-    const { data: challengeData, error: challengeError } = await tryInsertChallenge()
+    const { data: challengeData, error: challengeError } = await insertChallenge()
 
     if (challengeError || !challengeData) {
       logger('getChallenge:cant-upsert-challenge')
@@ -53,27 +56,27 @@ export const accountRecoveryRouter = createTRPCRouter({
 
     return challengeData as ChallengeResponse
   }),
-  verifyChallenge: publicProcedure
-    .input(VerifyChallengeRequestSchema)
+  validateSignature: publicProcedure
+    .input(ValidateSignatureRequestSchema)
     .mutation(async ({ input, ctx }): Promise<VerifyChallengeResponse> => {
       const { recoveryType, identifier, signature, challengeId } = input
 
       const { data: challengeData, error: getChallengeError } = await getChallengeById(challengeId)
-      console.log(challengeData, getChallengeError, challengeId)
+
       if (getChallengeError || !challengeData) {
         logger('verifyChallenge:invalid-user-or-challenge')
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: formatErr('Cannot retrieve challenge for verification'),
+          message: formatErr('Challenge not found'),
           cause: getChallengeError?.message,
         })
       }
 
-      // Validate challenge isn't expired
+      // validate challenge isn't expired
       await isChallengeExpired(challengeData.id, logger)
         .then((expired) => {
           if (expired) {
-            logger?.('verifyChallenge:challenge-not-found-or-expired')
+            logger('verifyChallenge:challenge-not-found-or-expired')
             throw new TRPCError({
               code: 'NOT_FOUND',
               message: formatErr('Challenge expired'),
@@ -82,7 +85,7 @@ export const accountRecoveryRouter = createTRPCRouter({
           }
         })
         .catch((error) => {
-          logger?.('verifyChallenge:challenge-not-found-or-expired')
+          logger('verifyChallenge:challenge-not-found-or-expired')
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: formatErr(error),
@@ -90,31 +93,32 @@ export const accountRecoveryRouter = createTRPCRouter({
           })
         })
 
-      // Verify signature with user's chain address
-      const challengeVerified = await verifyChallenge(
+      // verify signature with user's identifier
+      const signatureVerified = await verifyRecoverySignature(
         recoveryType,
         identifier,
-        signature,
+        signature as `0x${string}`,
         challengeData
       )
 
-      // Handle unauthorized requests
-      if (!challengeVerified) {
-        logger('verifyChallenge:challenge_failed_verification')
+      // handle unauthorized requests
+      if (!signatureVerified) {
+        logger('api:accountRecoveryRouter:verifyChallenge:signature-failed-verification')
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: formatErr(
-            'Unauthorized. Ensure that you are signing with the address you signed up with'
+            `Unauthorized. Ensure that you are signing with the ${recoveryType} you signed up with`
           ),
           cause: 'Signature failed verification',
         })
       }
 
-      // Identify user from identifier
+      // identify user from identifier
       const userId = await getUserIdByIdentifier(recoveryType, identifier)
       const jwt = mintAuthenticatedJWTToken(userId)
       const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
 
+      logger('api:accountRecoveryRouter:signature-verified')
       ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/`)
       return {
         jwt,
@@ -137,7 +141,12 @@ const getUserIdByIdentifier = async (
   if (recoveryType === RecoveryOptions.EOA) {
     userId = await getUserIdByChainAddress(identifier)
   } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
-    userId = await getUserIdByPasskey(identifier)
+    userId = await getUserIdByPasskeyName(identifier)
+  } else {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Unrecognized recovery type: [${recoveryType}]`,
+    })
   }
   if (userId) {
     return userId
@@ -149,22 +158,38 @@ const getUserIdByIdentifier = async (
   })
 }
 
-const verifyChallenge = async (
+const verifyRecoverySignature = async (
   recoveryType: RecoveryOptions,
   identifier: string,
-  signature: string,
-  challenge: ChallengeResponse
+  signature: `0x${string}`,
+  challengeData: ChallengeResponse
 ): Promise<boolean> => {
   let verified = false
   if (recoveryType === RecoveryOptions.EOA) {
     verified = await verifyMessage({
       address: identifier as `0x${string}`,
-      message: challenge.challenge,
-      signature: signature as `0x${string}`,
+      message: challengeData.challenge,
+      signature: signature,
     })
   } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
-    // TODO: implement
-    throw new Error('Not implemented')
+    const { data: passkeyData, error: passkeyError } = await getPasskey(identifier)
+    if (!passkeyData || passkeyError) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: formatErr('Unrecognised passkey'),
+      })
+    }
+
+    const pubkey = COSEECDHAtoXY(hexToBytes(pgBase16ToHex(passkeyData.public_key)))
+
+    // SendVerifier.sol expects hex value (`0x<hex>`) rather than hex string (`/x<hex>`)
+    // challengeData.challenge = `0x${challengeData.challenge.slice(2)}`
+
+    verified = await verifySignature(
+      pgBase16ToHex(challengeData.challenge as `\\x${string}`),
+      signature,
+      pubkey
+    )
   } else {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -175,6 +200,12 @@ const verifyChallenge = async (
   return verified
 }
 
+/**
+ * Get user ID via chain address (`chain_addresses` table lookup)
+ *
+ * @param {string} chainAddress - chain address linked to user's account
+ * @returns  {Promise<string>} - user id
+ */
 const getUserIdByChainAddress = async (chainAddress: string): Promise<string> => {
   if (!chainAddress) {
     throw new TRPCError({
@@ -195,27 +226,40 @@ const getUserIdByChainAddress = async (chainAddress: string): Promise<string> =>
   return chainAddressData.user_id
 }
 
-const getUserIdByPasskey = async (publicKey: string): Promise<string> => {
-  if (!publicKey) {
+/**
+ * Get user ID via passkey name
+ *
+ * Passkey names are in the format <userId>.<keySlot>
+ *
+ * @param {string} passkeyName - passkey name in the format <userId>.<keySlot>
+ * @returns  {Promise<string>} - user id
+ */
+const getUserIdByPasskeyName = async (passkeyName: string): Promise<string> => {
+  if (!passkeyName) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
-      message: formatErr('WebAuthn public key required'),
-      cause: 'WebAuthn public key not provided',
+      message: formatErr('Passkey name required'),
+      cause: 'Passkey name not provided',
     })
   }
 
-  const { data: passkeyData, error: passkeyError } = await getPasskey(publicKey)
+  const { data: passkeyData, error: passkeyError } = await getPasskey(passkeyName)
   if (passkeyError || !passkeyData.user_id) {
     throw new TRPCError({
       code: 'NOT_FOUND',
       message: formatErr('User not found: Unrecognised passkey credentials'),
-      cause: `Could not find associated user to webauthn pubkey: [${publicKey}] Error: [${passkeyError?.message}]`,
+      cause: `Could not find associated user to passkey name: [${passkeyName}] Error: [${passkeyError?.message}]`,
     })
   }
 
   return passkeyData.user_id
 }
-
+/**
+ * User readable error helper
+ *
+ * @param {string} reason - error reason
+ * @returns  {string}
+ */
 const formatErr = (reason: string): string => {
   return `${reason}. Please try again.`
 }

@@ -5,7 +5,7 @@ const jwtSecret = process.env.SUPABASE_JWT_SECRET as Secret
 
 export const mintAuthenticatedJWTToken = (sub: string): string => {
   const options = {
-    expiresIn: '1h',
+    expiresIn: '7d',
   }
 
   return mintJWTToken('authenticated', 'authenticated', sub, options)

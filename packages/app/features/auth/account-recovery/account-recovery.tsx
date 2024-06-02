@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
-import type { SignMessageErrorType } from '@wagmi/core'
-import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
 import { Stack, XStack, YStack, Text, Button, ButtonText } from '@my/ui'
-import type { ChallengeResponse } from '@my/api/src/routers/account-recovery/types'
+import type {
+  ChallengeResponse,
+  VerifyChallengeRequest,
+  ErrorWithMessage,
+} from '@my/api/src/routers/account-recovery/types'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { api } from 'app/utils/api'
 import { IconError, IconRefresh } from 'app/components/icons'
 import { useRouter } from 'solito/router'
-import type { ErrorWithMessage } from '@my/api/src/routers/account-recovery/types'
-import RecoverWithPasskey from 'app/features/auth/account-recovery/webauthn/RecoverWithWebauthn'
+import RecoverWithPasskey from 'app/features/auth/account-recovery/passkey/RecoverWithPasskey'
 
 interface Props {
   onClose?: () => void
@@ -23,57 +24,47 @@ export enum SignState {
 
 export default function AccountRecovery(props: Props) {
   const [error, setError] = useState<ErrorWithMessage>()
-  // TODO: implement loading state
+  // TODO: frontend: implement signing loading state
   const [signState, setSignState] = useState<SignState>(SignState.NOT_COMPLETE)
   const [challengeData, setChallengeData] = useState<ChallengeResponse>()
-  const challengeMutation = api.challenge.getChallenge.useMutation({ retry: false })
-  const verifyChallengeMutation = api.challenge.verifyChallenge.useMutation({ retry: false })
+  const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
+    retry: false,
+  })
+  const { mutateAsync: validateSignatureMutateAsync } = api.challenge.validateSignature.useMutation(
+    { retry: false }
+  )
   const router = useRouter()
 
-  const loadChallenge = (): void => {
-    challengeMutation
-      .mutateAsync()
-      .then((challengeResponse) => {
-        setChallengeData(challengeResponse as ChallengeResponse)
-      })
-      .catch((err) => {
-        setError(err)
-      })
-  }
-
   useEffect(() => {
+    const loadChallenge = async () => {
+      await getChallengeMutateAsync()
+        .then((challengeResponse) => {
+          setChallengeData(challengeResponse as ChallengeResponse)
+        })
+        .catch((err) => {
+          setError(err)
+        })
+    }
     loadChallenge()
-  }, [loadChallenge])
+  }, [getChallengeMutateAsync])
 
-  const onSignSuccess = async (
-    data: SignMessageData,
-    variables: SignMessageVariables,
-    context: unknown
-  ) => {
-    const { account } = variables
-    const address = account as string
+  const onSignSuccess = useCallback(
+    async (verifyChallengeRequest: VerifyChallengeRequest) => {
+      await validateSignatureMutateAsync({
+        ...verifyChallengeRequest,
+      })
+        .then(() => {
+          // JWT is set via Set-Cookie header
+          router.push('/')
+        })
+        .catch((err) => {
+          setError(err)
+        })
+    },
+    [validateSignatureMutateAsync, router]
+  )
 
-    await verifyChallengeMutation
-      .mutateAsync({
-        recoveryType: RecoveryOptions.EOA,
-        signature: data,
-        identifier: address,
-        challengeId: challengeData.id,
-      })
-      .then(() => {
-        // JWT is set via Set-Cookie header
-        router.push('/')
-      })
-      .catch((err) => {
-        setError(err)
-      })
-  }
-
-  const onSignError = (
-    error: SignMessageErrorType,
-    variables: SignMessageVariables,
-    context: unknown
-  ) => {
+  const onSignError = () => {
     setError({
       message: 'Failed to sign challenge. Please try again.',
     })
@@ -81,16 +72,22 @@ export default function AccountRecovery(props: Props) {
 
   const showRecoveryOptions = () => {
     return (
-      <XStack width="100%" gap="$2" alignItems="center" justifyContent="center">
-        <RecoverWithEOA
-          challengeData={challengeData}
-          signState={signState}
-          onSignSuccess={onSignSuccess}
-          onSignError={onSignError}
-        />
+      challengeData && (
+        <XStack width="100%" gap="$2" alignItems="center" justifyContent="center">
+          <RecoverWithEOA
+            challengeData={challengeData}
+            signState={signState}
+            onSignSuccess={onSignSuccess}
+            onSignError={onSignError}
+          />
 
-        <RecoverWithPasskey challengeData={challengeData} />
-      </XStack>
+          <RecoverWithPasskey
+            onSignSuccess={onSignSuccess}
+            onSignError={onSignError}
+            challengeData={challengeData}
+          />
+        </XStack>
+      )
     )
   }
 
