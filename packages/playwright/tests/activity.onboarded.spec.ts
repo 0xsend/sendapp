@@ -29,28 +29,28 @@ test('can visit activity page', async ({ context, page }) => {
   await page.goto('/activity')
   await req
   log('beforeEach', `url=${page.url()}`)
-  await expect(activityHeading(page)).toBeVisible()
+  await expect.soft(activityHeading(page)).toBeVisible()
 
-  await expect(page.getByText('Received')).toBeVisible()
-  await expect(page.getByText('0.019032 USDC').nth(1)).toBeVisible()
-  await expect(page.getByText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')).toBeVisible()
+  await expect.soft(page.getByText('Received')).toBeVisible()
+  await expect.soft(page.getByText('0.019032 USDC').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')).toBeVisible()
 
-  await expect(page.getByText('Sendtag Registered')).toBeVisible()
-  await expect(page.getByText('@yuw')).toBeVisible()
-  await expect(page.getByText('0.02 ETH').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('Sendtag Registered')).toBeVisible()
+  await expect.soft(page.getByText('@yuw')).toBeVisible()
+  await expect.soft(page.getByText('0.02 ETH').nth(1)).toBeVisible()
 
-  await expect(page.getByText('Referral', { exact: true })).toBeVisible()
-  await expect(page.getByText('@disconnect_whorl7351').nth(1)).toBeVisible()
-  await expect(page.getByText('1 Referrals').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('Referral', { exact: true })).toBeVisible()
+  await expect.soft(page.getByText('@disconnect_whorl7351')).toBeVisible()
+  await expect.soft(page.getByText('1 Referrals').nth(1)).toBeVisible()
 
-  await expect(page.getByText('Send Account Signing Key Added')).toBeVisible()
-  await expect(page.getByText('Send Account Signing Key Removed')).toBeVisible()
+  await expect.soft(page.getByText('Send Account Signing Key Added')).toBeVisible()
+  await expect.soft(page.getByText('Send Account Signing Key Removed')).toBeVisible()
 
-  await expect(page.getByText('Sent')).toBeVisible()
-  await expect(page.getByText('0.077777 USDC').nth(1)).toBeVisible()
-  await expect(page.getByText('dan').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('Sent')).toBeVisible()
+  await expect.soft(page.getByText('0.077777 USDC').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('dan')).toBeVisible()
 
-  expect(page.getByTestId('RecentActivity')).toBeVisible()
+  await expect.soft(page.getByTestId('RecentActivity')).toBeVisible()
   await expect(page.getByTestId('RecentActivity')).toHaveScreenshot('recent-activity.png', {
     timeout: 5_000,
   })
