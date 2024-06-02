@@ -20,7 +20,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { IconX } from 'app/components/icons'
 import { useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
-import { useSendParams } from 'app/routers/params'
+import { useSendScreenParams } from 'app/routers/params'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -187,7 +187,7 @@ function SearchResultRow({
   item: SearchResultCommonType
   query: string
 }) {
-  const { params } = useSendParams()
+  const [params] = useSendScreenParams()
   const { resolvedTheme } = useThemeSetting()
   const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
   return (
@@ -206,7 +206,7 @@ function SearchResultRow({
     >
       <Link
         href={`/send?${new URLSearchParams({
-          ...params,
+          ...JSON.parse(JSON.stringify(params)), //JSON makes sure we don't pass undefined values
           recipient: item.tag_name,
         }).toString()}`}
       >

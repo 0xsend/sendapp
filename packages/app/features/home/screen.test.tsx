@@ -59,6 +59,23 @@ jest.mock('app/utils/useSendAccountBalances', () => ({
   }),
 }))
 
+jest.mock('app/utils/send-accounts', () => ({
+  useSendAccounts: jest.fn().mockReturnValue({
+    data: [
+      {
+        address: '0x123',
+        init_code: '0x123',
+      },
+    ],
+  }),
+  useSendAccount: jest.fn().mockReturnValue({
+    account: {
+      address: '0x123',
+      init_code: '0x123',
+    },
+  }),
+}))
+
 jest.mock('@tamagui/tooltip', () => ({
   ...jest.requireActual('@tamagui/tooltip'),
   TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -71,7 +88,7 @@ jest.mock('solito', () => ({
 }))
 
 jest.mock('app/routers/params', () => ({
-  useToken: jest.fn().mockReturnValue([undefined, jest.fn()]),
+  useRootScreenParams: jest.fn().mockReturnValue([{ nav: 'home', token: undefined }, jest.fn()]),
 }))
 
 // jest.mock('@vonovak/react-native-theme-control', () => ({

@@ -1,12 +1,17 @@
 import { Sheet, type SheetProps, isWeb, Button, Stack, Separator } from '@my/ui'
 import { IconX } from './icons'
-import { useNav, type Nav } from 'app/routers/params'
+import { type RootParams, useRootScreenParams } from 'app/routers/params'
 
-export function NavSheet({ children, open, navId, ...props }: SheetProps & { navId: Nav['nav'] }) {
-  const [nav, setNavParam] = useNav()
+export function NavSheet({
+  children,
+  open,
+  navId,
+  ...props
+}: SheetProps & { navId: RootParams['nav'] }) {
+  const [queryParams, setRootParams] = useRootScreenParams()
   const onOpenChange = () => {
-    if (open) setNavParam(navId, { webBehavior: 'replace' })
-    else setNavParam(undefined, { webBehavior: 'replace' })
+    if (open) setRootParams({ ...queryParams, nav: navId }, { webBehavior: 'replace' })
+    else setRootParams({ ...queryParams, nav: undefined }, { webBehavior: 'replace' })
   }
   return (
     <Sheet
@@ -15,7 +20,7 @@ export function NavSheet({ children, open, navId, ...props }: SheetProps & { nav
       animation={'quick'}
       dismissOnSnapToBottom
       snapPointsMode="fit"
-      open={nav === navId}
+      open={queryParams.nav === navId}
       onOpenChange={onOpenChange}
       {...props}
     >

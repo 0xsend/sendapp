@@ -1,88 +1,109 @@
 import { createParam } from 'solito'
 
-export type Nav = { nav?: 'home' | 'settings' }
+export type RootParams = { nav?: 'home' | 'settings'; token?: string }
 
-const { useParam: useNavParam } = createParam<Nav>()
+const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
 
-export const useNav = () => {
-  const [nav, setNavParam] = useNavParam('nav')
+const useNav = () => {
+  const [nav, setNavParam] = useRootParam('nav')
 
   return [nav, setNavParam] as const
 }
 
-export const useNavParams = () => {
-  const [nav] = useNavParam('nav')
-
-  return {
-    nav,
-  }
-}
-
-type Distribution = { distribution: number }
-
-const { useParam: useDistributionNumberParam } = createParam<Distribution>()
-
-export const useDistributionNumber = () => {
-  const [distributionNumber, setDistributionNumberParam] = useDistributionNumberParam(
-    'distribution',
-    {
-      initial: undefined,
-      parse: (value) => Number(value),
-    }
-  )
-
-  return [distributionNumber, setDistributionNumberParam] as const
-}
-
-export const useDistributionNumberParams = () => {
-  const [distributionNumber] = useDistributionNumberParam('distribution', {
-    initial: undefined,
-    parse: (value) => Number(value),
-  })
-  return {
-    distributionNumber,
-  }
-}
-
-const { useParam: useTokenParam } = createParam<{ token: `0x${string}` | 'eth' }>()
-
-export const useToken = () => {
-  const [token, setTokenParam] = useTokenParam('token')
+const useToken = () => {
+  const [token, setTokenParam] = useRootParam('token')
 
   return [token, setTokenParam] as const
 }
 
-export const useTokenDetailsParams = () => {
-  const [token] = useTokenParam('token')
+export const useRootScreenParams = () => {
+  const { setParams } = useRootParams()
+  const [nav] = useNav()
+  const [token] = useToken()
 
-  return {
-    token,
-  }
+  return [
+    {
+      nav,
+      token,
+    },
+    setParams,
+  ] as const
 }
 
-const { useParam: useSendParam, useParams: useSendParams } = createParam<{
-  recipient: string
-  amount: string
-  sendToken: `0x${string}` | 'eth'
-  note?: string
-}>()
+export type DistributionScreenParams = { distribution?: number }
 
-export const useRecipient = () => {
+const { useParam: useDistributionParam, useParams: useDistributionParams } =
+  createParam<DistributionScreenParams>()
+
+const useDistribution = () => {
+  const [distribution, setDistributionParam] = useDistributionParam('distribution', {
+    initial: undefined,
+    parse: (value) => Number(value),
+  })
+
+  return [distribution, setDistributionParam] as const
+}
+
+export const useDistributionScreenParams = () => {
+  const { setParams } = useDistributionParams()
+  const [distributionNumber] = useDistribution()
+  return [
+    {
+      distributionNumber,
+    },
+    setParams,
+  ] as const
+}
+
+export type SendScreenParams = {
+  recipient?: string
+  amount?: string
+  sendToken?: `0x${string}` | 'eth'
+  note?: string
+}
+
+const { useParam: useSendParam, useParams: useSendParams } = createParam<SendScreenParams>()
+
+const useRecipient = () => {
   const [recipient, setRecipientParam] = useSendParam('recipient')
 
   return [recipient, setRecipientParam] as const
 }
 
-export const useAmount = () => {
+const useAmount = () => {
   const [amount, setAmountParam] = useSendParam('amount')
 
   return [amount, setAmountParam] as const
 }
 
-export const useNote = () => {
+const useSendToken = () => {
+  const [sendToken, setSendTokenParam] = useSendParam('sendToken')
+
+  return [sendToken, setSendTokenParam] as const
+}
+
+const useNote = () => {
   const [note, setNoteParam] = useSendParam('note')
 
   return [note, setNoteParam] as const
 }
 
-export { useSendParams }
+export const useSendScreenParams = () => {
+  const { setParams } = useSendParams()
+  const [recipient] = useRecipient()
+  const [amount] = useAmount()
+  const [sendToken] = useSendToken()
+  const [note] = useNote()
+
+  return [
+    {
+      recipient,
+      amount,
+      sendToken,
+      note,
+    },
+    setParams,
+  ] as const
+}
+
+export type ProfileScreenParams = undefined

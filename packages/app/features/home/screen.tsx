@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   Paragraph,
   Separator,
   XStack,
@@ -15,7 +14,7 @@ import { IconDeposit, IconPlus } from 'app/components/icons'
 import { TokenBalanceList } from './TokenBalanceList'
 import { coins } from 'app/data/coins'
 import { TokenBalanceCard } from './TokenBalanceCard'
-import { useToken } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { X } from '@tamagui/lucide-icons'
 import { TokenDetails } from './TokenDetails'
@@ -24,7 +23,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 
 export function HomeScreen() {
   const toast = useToastController()
-  const [, setTokenParam] = useToken()
+  const [queryParams, setParams] = useRootScreenParams()
 
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
@@ -59,7 +58,7 @@ export function HomeScreen() {
           }}
           icon={<X size={'$2.5'} color={'$color11'} />}
           onPress={() => {
-            setTokenParam(undefined)
+            setParams({ ...queryParams, token: undefined })
           }}
         />
       </Stack>

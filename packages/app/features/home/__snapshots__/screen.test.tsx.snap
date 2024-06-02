@@ -188,7 +188,7 @@ exports[`HomeScreen 1`] = `
       style={
         {
           "alignItems": "center",
-          "display": "flex",
+          "display": "none",
           "flexDirection": "column",
           "justifyContent": "space-between",
           "width": "100%",
@@ -604,7 +604,7 @@ exports[`HomeScreen 1`] = `
         <View
           style={
             {
-              "display": "flex",
+              "display": "none",
               "flexDirection": "column",
               "width": "100%",
             }
@@ -612,7 +612,135 @@ exports[`HomeScreen 1`] = `
         />
       </View>
     </View>
-     
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "transparent",
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 24,
+          "paddingBottom": 32,
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "paddingTop": 32,
+          "width": "100%",
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(112, 22%, 100%, 1)",
+            "fontFamily": "System",
+            "fontSize": 30,
+            "fontWeight": "700",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textAlign": "center",
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Register Your Sendtag Today!
+      </Text>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 13,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          By registering a Sendtag, you can:
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "column",
+            }
+          }
+        >
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            1. Send and receive funds using your personalized identifier
+          </Text>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            2. Earn Send It Rewards based on your token balance and referrals
+          </Text>
+        </View>
+        <Text
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Join us in shaping the Future of Finance.
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "justifyContent": "center",
+            "marginBottom": "auto",
+            "marginLeft": "auto",
+            "marginRight": "auto",
+            "marginTop": "auto",
+          }
+        }
+      />
+    </View>
   </View>
 </View>
 `;
