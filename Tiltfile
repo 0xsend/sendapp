@@ -756,6 +756,7 @@ local_resource(
     "contracts:cov",
     "yarn contracts test:cov -vvv",
     allow_parallel = True,
+    auto_init = False,
     labels = labels,
     resource_deps = [
         "yarn:install",

@@ -78,6 +78,7 @@ export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
                 color="$color"
                 width={200}
                 mx="auto"
+                mb="$6"
               >
                 Load More
               </Button>

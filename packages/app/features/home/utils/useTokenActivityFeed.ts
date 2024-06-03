@@ -7,11 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import {
-  Events,
-  SendAccountTransfersEventSchema,
-  type SendAccountTransfersEvent,
-} from 'app/utils/zod/activity'
+import { Events, SendAccountTransfersEventSchema } from 'app/utils/zod/activity'
 import { z, type ZodError } from 'zod'
 
 const SendAccountTransfersEvenArraySchema = z.array(SendAccountTransfersEventSchema)
