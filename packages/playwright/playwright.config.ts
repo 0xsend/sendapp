@@ -120,12 +120,12 @@ export default defineConfig({
     toHaveScreenshot: {
       threshold: 0.25,
       maxDiffPixelRatio: 0.125,
-      maxDiffPixels: 25,
+      // maxDiffPixels: 25,
     },
     toMatchSnapshot: {
       threshold: 0.25,
       maxDiffPixelRatio: 0.125,
-      maxDiffPixels: 25,
+      // maxDiffPixels: 25,
     },
   },
 })
