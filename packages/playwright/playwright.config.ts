@@ -27,7 +27,6 @@ export default defineConfig({
   // globalTimeout: 30 * 60_000, // 30 minutes
 
   testDir: './tests',
-  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -116,16 +115,21 @@ export default defineConfig({
    * - `maxDiffPixels`: The maximum number of pixels that can differ while still passing the test. By default, this option is disabled.
    * - `maxDiffPixelRatio`: The maximum percentage of pixels that can differ while still passing the test. Values are a percentage from 0 to 1, but this control is disabled by default.
    */
-  expect: {
-    toHaveScreenshot: {
-      threshold: 0.25,
-      maxDiffPixelRatio: 0.125,
-      // maxDiffPixels: 25,
-    },
-    toMatchSnapshot: {
-      threshold: 0.25,
-      maxDiffPixelRatio: 0.125,
-      // maxDiffPixels: 25,
-    },
-  },
+
+  // need to handle differences on various platforms and give developers ability to update snapshots cross platform easily
+  // add docker image with snapshot capabiltities
+
+  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
+  // expect: {
+  //   toHaveScreenshot: {
+  //     threshold: 0.25,
+  //     maxDiffPixelRatio: 0.125,
+  //     // maxDiffPixels: 25,
+  //   },
+  //   toMatchSnapshot: {
+  //     threshold: 0.25,
+  //     maxDiffPixelRatio: 0.125,
+  //     // maxDiffPixels: 25,
+  //   },
+  // },
 })

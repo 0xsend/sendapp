@@ -51,9 +51,12 @@ test('can visit activity page', async ({ context, page }) => {
   await expect.soft(page.getByText('dan')).toBeVisible()
 
   await expect.soft(page.getByTestId('RecentActivity')).toBeVisible()
-  await expect(page.getByTestId('RecentActivity')).toHaveScreenshot('recent-activity.png', {
-    timeout: 5_000,
-  })
+  expect(await page.getByTestId('RecentActivity').textContent()).toMatchSnapshot(
+    'recent-activity.txt'
+  )
+  // await expect(page.getByTestId('RecentActivity')).toHaveScreenshot('recent-activity.png', {
+  //   timeout: 5_000,
+  // })
 })
 
 test('can search on activity page', async ({ page, context }) => {
