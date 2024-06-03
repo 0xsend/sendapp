@@ -312,21 +312,21 @@ export type Database = {
       receipts: {
         Row: {
           created_at: string | null
-          event_id: string | null
+          event_id: string
           hash: string | null
           id: number
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          event_id?: string | null
+          event_id: string
           hash?: string | null
           id?: number
           user_id: string
         }
         Update: {
           created_at?: string | null
-          event_id?: string | null
+          event_id?: string
           hash?: string | null
           id?: number
           user_id?: string

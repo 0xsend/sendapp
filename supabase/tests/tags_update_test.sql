@@ -102,7 +102,7 @@ SELECT throws_ok(
 
 $$,
     'update or delete on table "tags" violates foreign key constraint "tag_receipts_tag_name_fkey" on table "tag_receipts"',
-    'Service role should be able to change the name of a confirmed tag'
+    'Service role should not be able to change the name of a confirmed tag'
 );
 
 SELECT finish();

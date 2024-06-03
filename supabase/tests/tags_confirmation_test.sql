@@ -25,7 +25,6 @@ $$;
 -- Creating a test user
 SELECT tests.create_supabase_user('bob');
 SELECT tests.create_supabase_user('alice');
-SELECT tests.create_supabase_user('chole');
 SELECT tests.create_supabase_user('hacker');
 
 SELECT set_config('role', 'service_role', true);
@@ -201,13 +200,10 @@ VALUES (
     tests.get_supabase_uid('alice')
 );
 
-
-
 -- Confirm tags with the service role
 SELECT tests.clear_authentication();
 
 SELECT set_config('role', 'service_role', true);
-
 
 -- raise notice 'found alice event_id: %', _event_id;
 
@@ -286,7 +282,6 @@ SELECT results_eq(
 );
 
 -- duplicate receipt hash should not confirm tag
-SELECT tests.authenticate_as('hacker');
 
 INSERT INTO tags (name, user_id)
 VALUES (

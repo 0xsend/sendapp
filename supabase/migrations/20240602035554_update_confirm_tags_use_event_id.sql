@@ -24,6 +24,12 @@ alter table receipts alter column "hash" drop not null;
 alter table receipts add column id serial primary key;
 alter table receipts add column event_id text;
 
+-- set event_id to hash if it's null
+update receipts set event_id = hash where event_id is null;
+
+-- now make event_id non-nullable
+alter table receipts alter column event_id set not null;
+
 -- event can only be used once
 create unique index receipts_event_id_idx on receipts using btree (event_id);
 
