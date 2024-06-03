@@ -1,33 +1,18 @@
-import { Button, Paragraph, Spinner, XStack, YStack } from '@my/ui'
-import { useActivityFeed } from './utils/useActivityFeed'
-import { TableLabel, MobileSectionLabel, RowLabel, AnimateEnter } from './screen'
-import { ActivityRow } from './ActivityRow'
+import { Button, Paragraph, Spinner, YStack } from '@my/ui'
+import type { coins } from 'app/data/coins'
+import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { Fragment } from 'react'
-import type { PostgrestError } from '@supabase/postgrest-js'
-import type { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query'
-import type { ZodError } from 'zod'
-import type { Activity } from 'app/utils/zod/activity'
+import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
+import { RowLabel, AnimateEnter } from './TokenDetails'
+import { TokenActivityRow } from './TokenActivityRow'
 
-export function RecentActivity() {
-  const result = useActivityFeed()
-  return (
-    <YStack gap="$5" mb="$4" width={'100%'} testID={'RecentActivity'}>
-      <XStack ai="center" jc="space-between" display="none" $gtMd={{ display: 'flex' }}>
-        <TableLabel>Transactions</TableLabel>
-        <XStack gap="$4">
-          <TableLabel textAlign="right">Date</TableLabel>
-          <TableLabel textAlign="right">Amount</TableLabel>
-        </XStack>
-      </XStack>
-      <MobileSectionLabel>ACTIVITIES</MobileSectionLabel>
-      <ActivityFeed {...result} />
-    </YStack>
-  )
-}
-
-function ActivityFeed(
-  activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
-) {
+export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
+  assert(coin.token !== 'eth', 'ETH token does not have a history')
+  const result = useTokenActivityFeed({
+    pageSize: 10,
+    address: hexToBytea(coin.token),
+  })
   const {
     data,
     isLoading: isLoadingActivities,
@@ -36,11 +21,10 @@ function ActivityFeed(
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
     hasNextPage,
-  } = activityFeedQuery
+  } = result
   const { pages } = data ?? {}
   return (
-    <YStack gap="$5">
-      {/* <> */}
+    <YStack gap="$5" testID="TokenDetailsHistory">
       {(() => {
         switch (true) {
           case isLoadingActivities:
@@ -72,7 +56,7 @@ function ActivityFeed(
                   >
                     {isNewDate ? <RowLabel>{lastDate}</RowLabel> : null}
                     <AnimateEnter>
-                      <ActivityRow activity={activity} />
+                      <TokenActivityRow activity={activity} />
                     </AnimateEnter>
                   </Fragment>
                 )
@@ -94,6 +78,7 @@ function ActivityFeed(
                 color="$color"
                 width={200}
                 mx="auto"
+                mb="$6"
               >
                 Load More
               </Button>

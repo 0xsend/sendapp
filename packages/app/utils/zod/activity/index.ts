@@ -9,6 +9,7 @@ export { ReferralsEventSchema, isReferralsEvent } from './ReferralsEventSchema'
 export {
   SendAccountTransfersEventSchema,
   isSendAccountTransfersEvent,
+  type SendAccountTransfersEvent,
 } from './SendAccountTransfersEventSchema'
 export { TagReceiptsEventSchema, isTagReceiptsEvent } from './TagReceiptsEventSchema'
 export { Events } from './events'

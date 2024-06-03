@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { decimalStrToBigInt } from '../bigint'
-import { byteaToHexEthAddress, byteaToHexTxHash } from '../bytea'
+import { byteaToHexEthAddress } from '../bytea'
 import { BaseEventSchema } from './BaseEventSchema'
 import { CoinSchema, coins } from 'app/data/coins'
 import { isAddressEqual } from 'viem'

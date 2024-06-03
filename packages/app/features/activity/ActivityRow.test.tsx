@@ -1,10 +1,14 @@
 import { describe, expect, it } from '@jest/globals'
-import { render } from '@testing-library/react-native'
-import { ActivityRow } from './ActivityRow'
-import { MockActivityFeed } from './utils/__mocks__/mock-activity-feed'
-import { EventSchema } from 'app/utils/zod/activity'
-import { TamaguiProvider } from '@tamagui/web'
 import { config } from '@my/ui'
+import { TamaguiProvider } from '@tamagui/web'
+import { render } from '@testing-library/react-native'
+import { EventSchema } from 'app/utils/zod/activity'
+import { ActivityRow } from './ActivityRow'
+import {
+  mockReceivedTransfer,
+  mockReferral,
+  mockTagReceipt,
+} from './utils/__mocks__/mock-activity-feed'
 
 const bigboss = {
   // user has id so it's the authenticated user
@@ -26,7 +30,7 @@ const alice = {
 
 describe('ActivityRow', () => {
   it('should render send account transfers event when received and sender is not a send app user', () => {
-    const activity = EventSchema.parse(MockActivityFeed[0])
+    const activity = EventSchema.parse(mockReceivedTransfer)
     const { getByText } = render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityRow activity={activity} />
@@ -38,7 +42,7 @@ describe('ActivityRow', () => {
   })
 
   it('should render send account transfers event when sent and receiver is a send app user', () => {
-    const activity = EventSchema.parse(MockActivityFeed[0])
+    const activity = EventSchema.parse(mockReceivedTransfer)
     activity.from_user = bigboss
     activity.to_user = alice
     const { getByText } = render(
@@ -53,7 +57,7 @@ describe('ActivityRow', () => {
   })
 
   it('should render send account transfers event when received and sender is a send app user', () => {
-    const activity = EventSchema.parse(MockActivityFeed[0])
+    const activity = EventSchema.parse(mockReceivedTransfer)
     activity.from_user = alice
     activity.to_user = bigboss
     const { getByText } = render(
@@ -67,7 +71,7 @@ describe('ActivityRow', () => {
   })
 
   it('should render tag receipts event', () => {
-    const activity = EventSchema.parse(MockActivityFeed[1])
+    const activity = EventSchema.parse(mockTagReceipt)
     const { getByText } = render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityRow activity={activity} />
@@ -79,7 +83,7 @@ describe('ActivityRow', () => {
   })
 
   it('should render referrals event', () => {
-    const activity = EventSchema.parse(MockActivityFeed[2])
+    const activity = EventSchema.parse(mockReferral)
     const { getByText } = render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityRow activity={activity} />

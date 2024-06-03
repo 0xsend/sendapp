@@ -83,10 +83,7 @@ jest.mock('app/routers/params', () => ({
   useRootScreenParams: jest.fn().mockReturnValue([{ nav: 'home', token: undefined }, jest.fn()]),
 }))
 
-// jest.mock('@vonovak/react-native-theme-control', () => ({
-//   useThemePreference: jest.fn().mockReturnValue('light'),
-//   setThemePreference: jest.fn(),
-// }))
+jest.mock('app/features/home/utils/useTokenActivityFeed')
 
 test('HomeScreen', () => {
   const tree = render(

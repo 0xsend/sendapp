@@ -1,6 +1,8 @@
 import {
+  AnimatePresence,
   BigHeading,
   H1,
+  H4,
   Label,
   Paragraph,
   Separator,
@@ -11,20 +13,37 @@ import {
   YStack,
   useMedia,
 } from '@my/ui'
-import type { coins } from 'app/data/coins'
-import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { baseMainnet } from '@my/wagmi'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import type { coins } from 'app/data/coins'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useBalance, type UseBalanceReturnType } from 'wagmi'
 
-import formatAmount from 'app/utils/formatAmount'
-import { useTokenMarketData } from 'app/utils/coin-gecko'
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
+import { useTokenMarketData } from 'app/utils/coin-gecko'
+import formatAmount from 'app/utils/formatAmount'
+import type { PropsWithChildren } from 'react'
+import { TokenDetailsHistory } from './TokenDetailsHistory'
 
+export function AnimateEnter({ children }: { children: React.ReactNode }) {
+  return (
+    <AnimatePresence>
+      <Stack
+        key="enter"
+        animateOnly={['transform', 'opacity']}
+        animation="200ms"
+        enterStyle={{ opacity: 0, scale: 0.9 }}
+        exitStyle={{ opacity: 0, scale: 0.95 }}
+        opacity={1}
+      >
+        {children}
+      </Stack>
+    </AnimatePresence>
+  )
+}
 export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   const media = useMedia()
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
   const balance = useBalance({
     address: sendAccount?.address,
     token: coin.token === 'eth' ? undefined : coin.token,
@@ -60,12 +79,12 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
         <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
       </Stack>
       <YStack>
-        <Label fontSize="$7" fontWeight="500" color={'$color11'} textTransform={'uppercase'}>
-          HISTORY
-        </Label>
-        <H1 fontSize="$9" fontWeight="700" color={'$color12'}>
-          Coming Soon
-        </H1>
+        {(() => {
+          if (coin.token === 'eth') {
+            return <TokenDetailsHistoryComingSoon />
+          }
+          return <TokenDetailsHistory coin={coin} />
+        })()}
       </YStack>
     </YStack>
   )
@@ -180,5 +199,35 @@ const TokenDetailsBalance = ({
         </Paragraph>
       </Tooltip.Content>
     </Tooltip>
+  )
+}
+
+const TokenDetailsHistoryComingSoon = () => {
+  return (
+    <>
+      <Label fontSize="$7" fontWeight="500" color={'$color11'} textTransform={'uppercase'}>
+        HISTORY
+      </Label>
+      <H1 fontSize="$9" fontWeight="700" color={'$color12'}>
+        Coming Soon
+      </H1>
+    </>
+  )
+}
+
+export function RowLabel({ children }: PropsWithChildren) {
+  return (
+    <H4
+      // @TODO: Update with theme color variable
+      color="hsl(0, 0%, 42.5%)"
+      fontFamily={'$mono'}
+      fontWeight={'500'}
+      size={'$5'}
+      mt="$3"
+      display="none"
+      $gtMd={{ display: 'inline' }}
+    >
+      {children}
+    </H4>
   )
 }

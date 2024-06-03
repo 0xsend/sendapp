@@ -1,3 +1,4 @@
+import type { PgBytea } from '@my/supabase/database.types'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
   useInfiniteQuery,
@@ -6,35 +7,49 @@ import {
 } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
-import type { ZodError } from 'zod'
+import { Events, SendAccountTransfersEventSchema } from 'app/utils/zod/activity'
+import { z, type ZodError } from 'zod'
+
+const SendAccountTransfersEvenArraySchema = z.array(SendAccountTransfersEventSchema)
+
+type SendAccountTransfersEventArray = z.infer<typeof SendAccountTransfersEvenArraySchema>
 
 /**
- * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
+ * Infinite query to fetch ERC-20 token activity feed.
+ *
+ * @note does not support ETH transfers. Need to add another shovel integration to handle ETH receives, and another one for ETH sends
+ *
  * @param pageSize - number of items to fetch per page
  */
-export function useActivityFeed({
-  pageSize = 10,
-}: { pageSize?: number } = {}): UseInfiniteQueryResult<
-  InfiniteData<Activity[]>,
+export function useTokenActivityFeed(params: {
+  pageSize?: number
+  address: PgBytea
+}): UseInfiniteQueryResult<
+  InfiniteData<SendAccountTransfersEventArray>,
   PostgrestError | ZodError
 > {
+  const { pageSize = 10, address } = params
   const supabase = useSupabase()
-  async function fetchActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
+
+  async function fetchTokenActivityFeed({
+    pageParam,
+  }: { pageParam: number }): Promise<SendAccountTransfersEventArray> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     const { data, error } = await supabase
       .from('activity_feed')
       .select('*')
+      .eq('event_name', Events.SendAccountTransfers)
+      .eq('data->>log_addr', address)
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)
-    return EventArraySchema.parse(data)
+    return SendAccountTransfersEvenArraySchema.parse(data)
   }
 
   return useInfiniteQuery({
-    queryKey: ['activity_feed'],
+    queryKey: ['token_activity_feed', address],
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage !== null && lastPage.length < pageSize) return undefined
@@ -46,6 +61,6 @@ export function useActivityFeed({
       }
       return firstPageParam - 1
     },
-    queryFn: fetchActivityFeed,
+    queryFn: fetchTokenActivityFeed,
   })
 }

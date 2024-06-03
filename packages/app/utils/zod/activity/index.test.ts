@@ -14,8 +14,8 @@ describe('EventArraySchema', () => {
     }
     assert(result.success === true)
     expect(result.data).toMatchSnapshot()
-    expect(result.data).toHaveLength(5)
-    assert(result.data.length === 5)
+    expect(result.data).toHaveLength(6)
+    assert(result.data.length === 6)
     const transfer = result.data[0] as SendAccountTransfersEvent
     assert(!!transfer)
     expect(transfer.event_name).toBe('send_account_transfers')
