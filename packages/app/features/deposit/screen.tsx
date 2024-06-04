@@ -14,7 +14,18 @@ import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { IconEthereum } from 'app/components/icons'
 import { IconCoinbaseOnramp } from 'app/components/icons/IconCoinbaseOnramp'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { usePathname } from 'app/utils/usePathname'
+import { createParam } from 'solito'
 import { useAccount } from 'wagmi'
+import { z } from 'zod'
+
+const DepositSchema = z.object({
+  d: z.string().regex(/^0x[a-fA-F0-9]{40}$/i, 'Invalid token'),
+})
+
+type DepositSchema = z.infer<typeof DepositSchema>
+
+const { useParams } = createParam<DepositSchema>()
 
 /**
  * Deposit screen shows the various options for depositing funds.
@@ -23,8 +34,18 @@ import { useAccount } from 'wagmi'
  * - ???
  */
 export function DepositScreen() {
+  const pathname = usePathname()
+  const params = useParams()
+
+  console.log('pathname', pathname)
+  console.log('params', params)
+
+  return <DepositWelcome />
+}
+
+function DepositWelcome(props: YStackProps) {
   return (
-    <YStack $gtSm={{ minWidth: 500 }} mx="auto" width={'100%'} mt="auto">
+    <YStack $gtSm={{ minWidth: 500 }} mx="auto" width={'100%'} mt="auto" {...props}>
       <YStack w={'100%'} gap={'$4'}>
         <YStack gap="$2">
           <H3 size={'$8'} fontWeight={'300'} color={'$color05'}>
@@ -143,7 +164,7 @@ function DepositButton({ children, ...props }: ButtonProps) {
     <Button
       chromeless
       f={1}
-      bc={'$color2'}
+      bc={'$color3'}
       height={'$8'}
       width="100%"
       $gtMd={{
