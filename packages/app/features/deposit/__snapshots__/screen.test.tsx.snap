@@ -1,0 +1,405 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DepositScreen renders the deposit screen 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "column",
+      "marginLeft": "auto",
+      "marginRight": "auto",
+      "marginTop": "auto",
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 18,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "column",
+          "gap": 7,
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(0, 0%, 100%, 0.5)",
+            "fontFamily": "System",
+            "fontSize": 23,
+            "fontWeight": "300",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Deposit funds
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "gap": 18,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        accessibilityRole="button"
+        cancelable={true}
+        disabled={false}
+        focusVisibleStyle={{}}
+        focusable={[Function]}
+        minPressDuration={0}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "transparent",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderBottomWidth": 1,
+            "borderLeftColor": "transparent",
+            "borderLeftWidth": 1,
+            "borderRightColor": "transparent",
+            "borderRightWidth": 1,
+            "borderStyle": "solid",
+            "borderTopColor": "transparent",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "borderTopWidth": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 84,
+            "justifyContent": "center",
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "shadowColor": "rgb(0,0,0)",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          lineBreakMode="clip"
+          numberOfLines={1}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flexGrow": 0,
+              "flexShrink": 1,
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+          userSelect="none"
+        >
+          Web3 Wallet
+        </Text>
+      </View>
+      <View
+        accessibilityRole="button"
+        cancelable={true}
+        disabled={false}
+        focusVisibleStyle={{}}
+        focusable={[Function]}
+        minPressDuration={0}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "transparent",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderBottomWidth": 1,
+            "borderLeftColor": "transparent",
+            "borderLeftWidth": 1,
+            "borderRightColor": "transparent",
+            "borderRightWidth": 1,
+            "borderStyle": "solid",
+            "borderTopColor": "transparent",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "borderTopWidth": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 84,
+            "justifyContent": "center",
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "shadowColor": "rgb(0,0,0)",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          lineBreakMode="clip"
+          numberOfLines={1}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flexGrow": 0,
+              "flexShrink": 1,
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+          userSelect="none"
+        >
+          Coinbase Pay
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`DepositScreen renders the deposit screen with connect when wallet is not connected 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "column",
+      "marginLeft": "auto",
+      "marginRight": "auto",
+      "marginTop": "auto",
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 18,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "flexDirection": "column",
+          "gap": 7,
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        selectable={true}
+        style={
+          {
+            "color": "hsla(0, 0%, 100%, 0.5)",
+            "fontFamily": "System",
+            "fontSize": 23,
+            "fontWeight": "300",
+            "lineHeight": 27,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Deposit funds
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "gap": 18,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        accessibilityRole="button"
+        cancelable={true}
+        disabled={false}
+        focusVisibleStyle={{}}
+        focusable={[Function]}
+        minPressDuration={0}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "transparent",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderBottomWidth": 1,
+            "borderLeftColor": "transparent",
+            "borderLeftWidth": 1,
+            "borderRightColor": "transparent",
+            "borderRightWidth": 1,
+            "borderStyle": "solid",
+            "borderTopColor": "transparent",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "borderTopWidth": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 84,
+            "justifyContent": "center",
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "shadowColor": "rgb(0,0,0)",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          lineBreakMode="clip"
+          numberOfLines={1}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flexGrow": 0,
+              "flexShrink": 1,
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+          userSelect="none"
+        >
+          Connect to Deposit
+        </Text>
+      </View>
+      <View
+        accessibilityRole="button"
+        cancelable={true}
+        disabled={false}
+        focusVisibleStyle={{}}
+        focusable={[Function]}
+        minPressDuration={0}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "hsla(191, 32%, 10%, 1)",
+            "borderBottomColor": "transparent",
+            "borderBottomLeftRadius": 16,
+            "borderBottomRightRadius": 16,
+            "borderBottomWidth": 1,
+            "borderLeftColor": "transparent",
+            "borderLeftWidth": 1,
+            "borderRightColor": "transparent",
+            "borderRightWidth": 1,
+            "borderStyle": "solid",
+            "borderTopColor": "transparent",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "borderTopWidth": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 84,
+            "justifyContent": "center",
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "shadowColor": "rgb(0,0,0)",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          lineBreakMode="clip"
+          numberOfLines={1}
+          style={
+            {
+              "color": "hsla(112, 22%, 59%, 1)",
+              "flexGrow": 0,
+              "flexShrink": 1,
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+          userSelect="none"
+        >
+          Coinbase Pay
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
