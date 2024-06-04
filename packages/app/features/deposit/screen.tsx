@@ -1,15 +1,18 @@
 import {
   AnimatePresence,
   Button,
-  ButtonText,
   H3,
-  Paragraph,
+  H4,
   Stack,
   YStack,
   useToastController,
   type ButtonProps,
+  type HeadingProps,
+  type YStackProps,
 } from '@my/ui'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { IconEthereum } from 'app/components/icons'
+import { IconCoinbaseOnramp } from 'app/components/icons/IconCoinbaseOnramp'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useAccount } from 'wagmi'
 
@@ -47,34 +50,43 @@ function DespositWeb3Wallet() {
 
   if (!isConnected) {
     return (
-      <DepositButton onPress={() => openConnectModal?.()}>
-        <ButtonText>Connect to Deposit</ButtonText>
-      </DepositButton>
+      <DepositStackButton>
+        <DepositButton
+          icon={<IconEthereum size={'$2.5'} color={'$color12'} />}
+          onPress={() => openConnectModal?.()}
+        />
+        <DepositStackSubheader>Connect to Deposit</DepositStackSubheader>
+      </DepositStackButton>
     )
   }
   return (
-    <DepositButton
-      onPress={() => {
-        console.log('Deposit to', sendAccount?.address, 'from', address)
-        // show screen to send to send account
-      }}
-    >
-      <ButtonText>Web3 Wallet</ButtonText>
-    </DepositButton>
+    <DepositStackButton>
+      <DepositButton
+        icon={<IconEthereum size={'$2.5'} color={'$color12'} />}
+        onPress={() => {
+          console.log('Deposit to', sendAccount?.address, 'from', address)
+          // show screen to send to send account
+        }}
+      />
+      <DepositStackSubheader>Web3 Wallet</DepositStackSubheader>
+    </DepositStackButton>
   )
 }
 
 function DespositCoinbasePay() {
   const toast = useToastController()
   return (
-    <DepositButton
-      onPress={() => {
-        console.log('Coinbase Pay')
-        toast.show('Coming Soon')
-      }}
-    >
-      <ButtonText>Coinbase Pay</ButtonText>
-    </DepositButton>
+    <DepositStackButton disabled disabledStyle={{ opacity: 0.5 }}>
+      <DepositButton
+        icon={<IconCoinbaseOnramp size={'$2.5'} color={'$color12'} />}
+        onPress={() => {
+          console.log('Coinbase Pay')
+          toast.show('Coming Soon')
+        }}
+      />
+      {/* <DepositStackSubheader>Coinbase Pay</DepositStackSubheader> */}
+      <DepositStackSubheader>Coming Soon</DepositStackSubheader>
+    </DepositStackButton>
   )
 }
 
@@ -97,6 +109,35 @@ function AnimateEnter({ children }: { children: React.ReactNode }) {
   )
 }
 
+function DepositStackButton({ children, ...props }: YStackProps) {
+  return (
+    <YStack
+      gap={'$4'}
+      jc="center"
+      ai="center"
+      f={1}
+      width="100%"
+      $md={{
+        width: '100%',
+      }}
+      $gtMd={{
+        height: '$12',
+      }}
+      {...props}
+    >
+      {children}
+    </YStack>
+  )
+}
+
+function DepositStackSubheader({ children, ...props }: HeadingProps) {
+  return (
+    <H4 size={'$4'} fontWeight={'300'} color={'$color05'} ta="center" {...props}>
+      {children}
+    </H4>
+  )
+}
+
 function DepositButton({ children, ...props }: ButtonProps) {
   return (
     <Button
@@ -105,14 +146,7 @@ function DepositButton({ children, ...props }: ButtonProps) {
       bc={'$color2'}
       height={'$8'}
       width="100%"
-      // minWidth={'$14'}
-      $sm={
-        {
-          // minWidth: '$20',
-        }
-      }
       $gtMd={{
-        // width: '50%',
         height: '$12',
       }}
       {...props}
