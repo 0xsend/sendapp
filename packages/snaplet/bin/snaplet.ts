@@ -34,21 +34,30 @@ if (argv.restore) {
       process.exit(1)
     })
     .then((r) => r.stdout.trim())
-  console.log('Project root:', prjRoot)
   console.log(chalk.blue('Restoring database from snapshot'))
   // remove any migrations that are not in production yet
-  const migs =
-    await $`git diff --name-only --diff-filter=A origin/main..HEAD -- ${prjRoot}/supabase/migrations`
-      .catch((e) => {
-        console.log(chalk.red('Error getting migrations:'), e)
-        process.exit(1)
-      })
-      .then((r) =>
-        r.stdout
-          .trim()
-          .split('\n')
-          .map((s) => `${prjRoot}/${s}`)
+  const migs = await $`git diff --exit-code -- ${prjRoot}/supabase/migrations` // ensure we don't have any uncommitted migrations
+    .catch((e) => {
+      console.log(
+        chalk.red('Refusing to restore database from snapshot with uncommitted migrations:')
       )
+      console.log(e.stdout)
+      process.exit(1)
+    })
+    .then(
+      () =>
+        $`git diff --name-only --diff-filter=A origin/main..HEAD -- ${prjRoot}/supabase/migrations`
+    )
+    .catch((e) => {
+      console.log(chalk.red('Error getting migrations:'), e)
+      process.exit(1)
+    })
+    .then((r) =>
+      r.stdout
+        .trim()
+        .split('\n')
+        .map((s) => `${prjRoot}/${s}`)
+    )
   await $`rm -f ${migs}`.catch((e) => {
     console.log(chalk.red('Error removing migrations:'), e)
     process.exit(1)

@@ -184,8 +184,9 @@ type Override = {
       hash?: string;
       created_at?: string;
       user_id?: string;
+      id?: string;
+      event_id?: string;
       users?: string;
-      tag_receipts?: string;
     };
   }
   referrals?: {
@@ -370,7 +371,9 @@ type Override = {
     fields?: {
       tag_name?: string;
       hash?: string;
-      receipts?: string;
+      event_id?: string;
+      id?: string;
+      created_at?: string;
       tags?: string;
     };
   }
@@ -578,8 +581,8 @@ export interface Fingerprint {
   }
   receipts?: {
     createdAt?: FingerprintDateField;
+    id?: FingerprintNumberField;
     user?: FingerprintRelationField;
-    tagReceipts?: FingerprintRelationField;
   }
   referrals?: {
     id?: FingerprintNumberField;
@@ -670,7 +673,8 @@ export interface Fingerprint {
     abiIdx?: FingerprintNumberField;
   }
   tagReceipts?: {
-    ha?: FingerprintRelationField;
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
     tag?: FingerprintRelationField;
   }
   tagReservations?: {

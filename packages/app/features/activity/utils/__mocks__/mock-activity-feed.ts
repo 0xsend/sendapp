@@ -65,6 +65,10 @@ export const mockTagReceipt = {
   data: {
     tags: ['yuw'],
     value: 20000000000000000,
+    log_addr: '\\x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+    block_num: 15164541,
+    tx_idx: 0,
+    log_idx: 2,
     tx_hash: '\\x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c',
   },
 }

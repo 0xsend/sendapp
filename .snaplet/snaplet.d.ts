@@ -241,9 +241,11 @@ interface Table_public_profiles {
   send_id: number;
 }
 interface Table_public_receipts {
-  hash: string;
+  hash: string | null;
   created_at: string | null;
   user_id: string;
+  id: number;
+  event_id: string | null;
 }
 interface Table_public_referrals {
   referrer_id: string;
@@ -448,7 +450,10 @@ interface Table_auth_sso_providers {
 }
 interface Table_public_tag_receipts {
   tag_name: string;
-  hash: string;
+  hash: string | null;
+  event_id: string | null;
+  id: number;
+  created_at: string | null;
 }
 interface Table_public_tag_reservations {
   tag_name: string;
@@ -781,7 +786,7 @@ interface Tables_relationships {
        receipts_user_id_fkey: "auth.users";
     };
     children: {
-       tag_receipts_hash_fkey: "public.tag_receipts";
+
     };
   };
   "public.referrals": {
@@ -873,7 +878,6 @@ interface Tables_relationships {
   };
   "public.tag_receipts": {
     parent: {
-       tag_receipts_hash_fkey: "public.receipts";
        tag_receipts_tag_name_fkey: "public.tags";
     };
     children: {

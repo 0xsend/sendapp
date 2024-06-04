@@ -794,7 +794,6 @@ local_resource(
         "webauthn-authenticator:test",
         "supabase:test",
         "contracts:test",
-        "contracts:cov",
         "distributor:test",
     ],
 )
