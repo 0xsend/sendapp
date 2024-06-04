@@ -245,7 +245,7 @@ interface Table_public_receipts {
   created_at: string | null;
   user_id: string;
   id: number;
-  event_id: string | null;
+  event_id: string;
 }
 interface Table_public_referrals {
   referrer_id: string;
