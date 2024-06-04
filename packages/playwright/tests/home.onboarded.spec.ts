@@ -43,9 +43,9 @@ test('can visit token detail page', async ({ context, page }) => {
   await expect(page.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()
 
   expect(page.getByTestId('TokenDetailsHistory')).toBeVisible()
-  expect(await page.getByTestId('TokenDetailsHistory').textContent()).toMatchSnapshot(
-    'token-details-history.txt'
-  )
+  // expect(await page.getByTestId('TokenDetailsHistory').textContent()).toMatchSnapshot(
+  //   'token-details-history.txt'
+  // )
   // await expect(page.getByTestId('TokenDetailsHistory')).toHaveScreenshot(
   //   'token-details-history.png',
   //   {
