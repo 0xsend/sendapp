@@ -3,7 +3,7 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { SendAmountForm } from './SendAmountForm'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
-import { Search, SearchResults } from 'app/features/send/components/SendSearch'
+import Search from 'app/components/SearchBar'
 
 export const SendScreen = () => {
   const [{ recipient }] = useSendScreenParams()
@@ -16,9 +16,6 @@ export const SendScreen = () => {
         <Container>
           <YStack f={1} width={'100%'} pb="$4" gap="$6">
             <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-              <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
-                SEARCH BY
-              </H4>
               <Search />
             </YStack>
             <SendSearchBody />
@@ -35,6 +32,7 @@ export const SendScreen = () => {
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
+
   return (
     <AnimatePresence>
       {isLoading && (
@@ -48,7 +46,7 @@ function SendSearchBody() {
           <Text>{error.message}</Text>
         </YStack>
       )}
-      <SearchResults />
+      <Search.Results />
     </AnimatePresence>
   )
 }

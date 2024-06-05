@@ -1,9 +1,16 @@
-import { expect, test } from '@jest/globals'
+import { expect } from '@jest/globals'
 import { TamaguiProvider, View as MockView, config } from '@my/ui'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
+import { useSearchResultHref } from 'app/utils/useSearchResultHref'
+
+jest.mock('app/utils/useSearchResultHref')
 
 jest.mock('app/features/activity/utils/useActivityFeed')
+
+jest.mock('expo-router', () => ({
+  usePathname: jest.fn(),
+}))
 
 jest.mock('app/utils/supabase/useSupabase', () => ({
   useSupabase: jest.fn().mockReturnValue({
@@ -34,36 +41,45 @@ jest.mock('solito/link', () => ({
   ),
 }))
 
-test('ActivityScreen', async () => {
-  jest.useFakeTimers()
-  render(
-    <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <ActivityScreen />
-    </TamaguiProvider>
-  )
-  await act(async () => {
-    jest.advanceTimersByTime(2000)
-    jest.runAllTimers()
-  })
-  expect(screen.toJSON()).toMatchSnapshot('ActivityScreen')
-})
-
-test('ActivityScreen: search', async () => {
-  jest.useFakeTimers()
-  render(
-    <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <ActivityScreen />
-    </TamaguiProvider>
-  )
-  const searchInput = screen.getByPlaceholderText('Name, $Sendtag, Phone')
-  await act(async () => {
-    fireEvent.changeText(searchInput, 'test')
-    jest.advanceTimersByTime(2000)
-    jest.runAllTimers()
-    await waitFor(() => screen.findByTestId('tag-search-3665'))
+describe('ActivityScreen', () => {
+  beforeEach(() => {
+    // @ts-expect-error mock
+    useSearchResultHref.mockImplementation((item) => {
+      return `/profile/${item.send_id}`
+    })
   })
 
-  expect(searchInput.props.value).toBe('test')
-  const searchResults = await screen.findByTestId('tag-search-3665')
-  expect(searchResults).toHaveTextContent('??test@test')
+  it('renders activity screen', async () => {
+    jest.useFakeTimers()
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ActivityScreen />
+      </TamaguiProvider>
+    )
+    await act(async () => {
+      jest.advanceTimersByTime(2000)
+      jest.runAllTimers()
+    })
+    expect(screen.toJSON()).toMatchSnapshot('ActivityScreen')
+  })
+
+  it('returns the correct search results', async () => {
+    jest.useFakeTimers()
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ActivityScreen />
+      </TamaguiProvider>
+    )
+    const searchInput = screen.getByPlaceholderText('$Sendtag, Phone, Send ID')
+    await act(async () => {
+      fireEvent.changeText(searchInput, 'test')
+      jest.advanceTimersByTime(2000)
+      jest.runAllTimers()
+      await waitFor(() => screen.findByTestId('tag-search-3665'))
+    })
+
+    expect(searchInput.props.value).toBe('test')
+    const searchResults = await screen.findByTestId('tag-search-3665')
+    expect(searchResults).toHaveTextContent('??test@test')
+  })
 })
