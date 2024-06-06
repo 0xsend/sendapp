@@ -15,9 +15,9 @@ import {
   getFontSize,
   isWeb,
   useThemeName,
-} from 'tamagui'
-import { FieldError } from '../FieldError'
-import { Shake } from '../Shake'
+  FieldError,
+  Shake,
+} from '@my/ui'
 
 type SelectItem = {
   value: string

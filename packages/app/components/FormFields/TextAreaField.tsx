@@ -9,9 +9,9 @@ import {
   Theme,
   type ThemeName,
   useThemeName,
-} from 'tamagui'
-import { FieldError } from '../FieldError'
-import { Shake } from '../Shake'
+  FieldError,
+  Shake,
+} from '@my/ui'
 
 export const TextAreaField = (
   props: Pick<

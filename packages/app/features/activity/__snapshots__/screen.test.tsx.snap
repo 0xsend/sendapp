@@ -65,6 +65,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "flexDirection": "column",
             }
           }

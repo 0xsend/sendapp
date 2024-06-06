@@ -17,7 +17,7 @@ import {
   YStack,
   useThemeName,
   isWeb,
-} from 'tamagui'
+} from '@my/ui'
 
 type SelectItem = {
   value: string

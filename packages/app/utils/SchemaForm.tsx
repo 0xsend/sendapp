@@ -1,21 +1,17 @@
 import { createTsForm, createUniqueFieldSchema } from '@ts-react/form'
 
+import { FieldError, Form, FormWrapper, type FormProps, Theme } from '@my/ui'
 import {
   BooleanCheckboxField,
   BooleanField,
   BooleanSwitchField,
   CountryCodeField,
-  FieldError,
-  Form,
-  type FormProps,
-  FormWrapper,
   NumberField,
   OTPField,
   SelectField,
   TextAreaField,
   TextField,
-  Theme,
-} from '@my/ui'
+} from '../components/FormFields'
 import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
