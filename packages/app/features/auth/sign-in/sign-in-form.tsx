@@ -79,6 +79,9 @@ export const SignInForm = () => {
               focusStyle: {
                 borderBottomColor: '$accent3Light',
               },
+              fieldsetProps: {
+                f: 1,
+              },
             },
           }}
           renderAfter={({ submit }) => (
@@ -110,7 +113,7 @@ export const SignInForm = () => {
             </XStack>
           )}
         >
-          {(fields) => (
+          {({ countrycode: CountryCode, phone: Phone }) => (
             <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
               <BigHeading color="$color12">WELCOME TO SEND</BigHeading>
               <H3
@@ -128,7 +131,10 @@ export const SignInForm = () => {
                 <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
                   Your Phone
                 </Paragraph>
-                <XStack gap="$5">{Object.values(fields)}</XStack>
+                <XStack gap="$5">
+                  {CountryCode}
+                  {Phone}
+                </XStack>
               </YStack>
             </YStack>
           )}

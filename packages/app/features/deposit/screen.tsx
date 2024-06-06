@@ -43,7 +43,7 @@ export function DepositScreen() {
 
 export function DepositWelcome(props: YStackProps) {
   return (
-    <YStack mt="$4" mx="auto" width={'100%'} {...props}>
+    <YStack mt="$4" mx="auto" width={'100%'} $sm={{ maxWidth: 600 }} {...props}>
       <YStack w={'100%'} gap={'$4'}>
         <YStack gap="$2">
           <H3 size={'$8'} fontWeight={'300'} color={'$color05'}>

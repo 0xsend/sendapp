@@ -49,7 +49,15 @@ export const SelectField = ({
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
         {!!label && (
-          <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
+          <Label
+            size={props.size || '$5'}
+            // $mono font is broken in tests
+            fontFamily={'$mono'}
+            lineHeight={'$11'}
+            htmlFor={id}
+            textTransform={'uppercase'}
+            color="$olive"
+          >
             {label} {isOptional && '(Optional)'}
           </Label>
         )}
