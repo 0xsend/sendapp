@@ -44,12 +44,12 @@ const useDistribution = () => {
   return [distribution, setDistributionParam] as const
 }
 
-export const useDistributionScreenParams = () => {
+export const useRewardsScreenParams = () => {
   const { setParams } = useDistributionParams()
-  const [distributionNumber] = useDistribution()
+  const [distribution] = useDistribution()
   return [
     {
-      distributionNumber,
+      distribution,
     },
     setParams,
   ] as const

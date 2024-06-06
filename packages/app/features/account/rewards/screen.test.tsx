@@ -45,8 +45,7 @@ jest.mock('app/utils/useChainAddresses', () => ({
   useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
 }))
 jest.mock('app/routers/params', () => ({
-  useDistributionNumberParams: () => ({ distributionNumber: 1 }),
-  useDistributionNumber: () => [1, jest.fn()],
+  useRewardsScreenParams: () => [{ distributionNumber: 1 }, jest.fn()],
 }))
 jest.mock('wagmi')
 jest.mock('@rainbow-me/rainbowkit', () => ({

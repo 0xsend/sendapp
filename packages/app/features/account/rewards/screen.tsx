@@ -23,7 +23,7 @@ import {
   useDistributions,
   useSendMerkleDropTrancheActive,
 } from 'app/utils/distributions'
-import { useDistributionNumber } from 'app/routers/params'
+import { useRewardsScreenParams } from 'app/routers/params'
 import { type TimeRemaining, useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { DistributionClaimButton } from './components/DistributionClaimButton'
@@ -39,9 +39,9 @@ export function RewardsScreen() {
 
   const sortedDistributions = distributions?.sort((a, b) => a.number - b.number)
 
-  const [distributionNumberParam] = useDistributionNumber()
-  const selectedDistributionIndex = distributionNumberParam
-    ? distributionNumberParam - 1
+  const [queryParams] = useRewardsScreenParams()
+  const selectedDistributionIndex = queryParams.distribution
+    ? queryParams.distribution - 1
     : sortedDistributions
       ? sortedDistributions.length - 1
       : 0
@@ -58,16 +58,17 @@ export function RewardsScreen() {
   return (
     <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between">
       {selectedDistribution ? (
-        <YStack gap="$4" f={2} overflow={'hidden'}>
-          <DistributionRewardsSection distribution={selectedDistribution} />
-        </YStack>
+        <>
+          <YStack gap="$4" f={2} overflow={'hidden'}>
+            <DistributionRewardsSection distribution={selectedDistribution} />
+          </YStack>
+          <DistributionRewardsList distributions={sortedDistributions} />
+        </>
       ) : (
         <Stack f={1} gap="$6" jc="center" ai="center">
           <H2>No distributions available</H2>
         </Stack>
       )}
-
-      <DistributionRewardsList distributions={sortedDistributions} />
     </YStack>
   )
 }
@@ -494,7 +495,7 @@ const DistributionRewardsList = ({
   distributions,
 }: { distributions?: (UseDistributionsResultData[number] | undefined)[] }) => {
   const { isLoading, error } = useDistributions()
-  const [distributionNumberParam, setDistributionNumberParam] = useDistributionNumber()
+  const [queryParams, setParams] = useRewardsScreenParams()
 
   const mock = (len: number, start = 0) =>
     new Array(len).fill(undefined).map((_, i) => ({ number: start + i + 1 }))
@@ -537,8 +538,8 @@ const DistributionRewardsList = ({
                   {`# ${i + 1}`}
                 </ButtonText>
               </Button>
-            ) : distributionNumberParam === distribution?.number ||
-              (distributionNumberParam === undefined &&
+            ) : queryParams.distribution === distribution?.number ||
+              (queryParams.distribution === undefined &&
                 distribution?.number === distributions?.length) ? (
               <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
                 <View
@@ -558,7 +559,9 @@ const DistributionRewardsList = ({
                 />
 
                 <Button
-                  onPress={() => setDistributionNumberParam(distribution.number)}
+                  onPress={() =>
+                    setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
+                  }
                   bc={'$accent12Dark'}
                   br={6}
                   h="$2"
@@ -584,7 +587,9 @@ const DistributionRewardsList = ({
                 miw="$7"
                 h="$2"
                 br={6}
-                onPress={() => setDistributionNumberParam(distribution.number)}
+                onPress={() =>
+                  setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
+                }
               >
                 <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
                   {`# ${distribution?.number}  `}
