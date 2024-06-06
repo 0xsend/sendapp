@@ -10,13 +10,11 @@ import {
   type HeadingProps,
   type YStackProps,
 } from '@my/ui'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { IconEthereum } from 'app/components/icons'
 import { IconCoinbaseOnramp } from 'app/components/icons/IconCoinbaseOnramp'
-import { useSendAccount } from 'app/utils/send-accounts'
 import { usePathname } from 'app/utils/usePathname'
 import { createParam } from 'solito'
-import { useAccount } from 'wagmi'
+import { useLink } from 'solito/link'
 import { z } from 'zod'
 
 const DepositSchema = z.object({
@@ -43,9 +41,9 @@ export function DepositScreen() {
   return <DepositWelcome />
 }
 
-function DepositWelcome(props: YStackProps) {
+export function DepositWelcome(props: YStackProps) {
   return (
-    <YStack $gtSm={{ minWidth: 500 }} mx="auto" width={'100%'} mt="auto" {...props}>
+    <YStack mt="$4" mx="auto" width={'100%'} {...props}>
       <YStack w={'100%'} gap={'$4'}>
         <YStack gap="$2">
           <H3 size={'$8'} fontWeight={'300'} color={'$color05'}>
@@ -55,7 +53,7 @@ function DepositWelcome(props: YStackProps) {
 
         <AnimateEnter>
           <Stack gap={'$4'} w={'100%'} $gtMd={{ flexDirection: 'row' }}>
-            <DespositWeb3Wallet />
+            <DespositWeb3Link />
             <DespositCoinbasePay />
           </Stack>
         </AnimateEnter>
@@ -64,30 +62,14 @@ function DepositWelcome(props: YStackProps) {
   )
 }
 
-function DespositWeb3Wallet() {
-  const { openConnectModal } = useConnectModal()
-  const { address, isConnected } = useAccount()
-  const { data: sendAccount } = useSendAccount()
-
-  if (!isConnected) {
-    return (
-      <DepositStackButton>
-        <DepositButton
-          icon={<IconEthereum size={'$2.5'} color={'$color12'} />}
-          onPress={() => openConnectModal?.()}
-        />
-        <DepositStackSubheader>Connect to Deposit</DepositStackSubheader>
-      </DepositStackButton>
-    )
-  }
+function DespositWeb3Link() {
   return (
     <DepositStackButton>
       <DepositButton
         icon={<IconEthereum size={'$2.5'} color={'$color12'} />}
-        onPress={() => {
-          console.log('Deposit to', sendAccount?.address, 'from', address)
-          // show screen to send to send account
-        }}
+        {...useLink({
+          href: '/deposit/web3',
+        })}
       />
       <DepositStackSubheader>Web3 Wallet</DepositStackSubheader>
     </DepositStackButton>

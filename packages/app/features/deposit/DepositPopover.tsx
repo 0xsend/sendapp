@@ -9,7 +9,7 @@ import {
   useMedia,
 } from '@my/ui'
 import { IconClose, IconDeposit } from 'app/components/icons'
-import { DepositScreen } from './screen'
+import { DepositWelcome } from './screen'
 
 export function DepositPopover(props: PopoverProps) {
   const media = useMedia()
@@ -66,7 +66,7 @@ export function DepositPopover(props: PopoverProps) {
         <Popover.Arrow borderWidth={1} borderColor="$borderColor" />
 
         <YStack gap="$3">
-          <DepositScreen />
+          <DepositWelcome $gtSm={{ minWidth: 500 }} />
 
           <Popover.Close asChild>
             <Button
