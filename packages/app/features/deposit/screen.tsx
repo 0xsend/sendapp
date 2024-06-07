@@ -32,12 +32,6 @@ const { useParams } = createParam<DepositSchema>()
  * - ???
  */
 export function DepositScreen() {
-  const pathname = usePathname()
-  const params = useParams()
-
-  console.log('pathname', pathname)
-  console.log('params', params)
-
   return <DepositWelcome />
 }
 

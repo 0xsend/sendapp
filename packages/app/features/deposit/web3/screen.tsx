@@ -18,7 +18,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useForm } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { encodeFunctionData, erc20Abi, parseEther, parseUnits, zeroAddress } from 'viem'
-import { useAccount, usePrepareTransactionRequest } from 'wagmi'
+import { useAccount, usePrepareTransactionRequest, useSendTransaction } from 'wagmi'
 import { z } from 'zod'
 
 /**
@@ -77,16 +77,23 @@ function DepositForm() {
     isFetching: isFetchingTx,
     isFetched: isFetchedTx,
   } = request
-  console.log('txData', txData)
-  console.log('isLoadingTx', isLoadingTx)
-  console.log('isFetchingTx', isFetchingTx)
-  console.log('isFetchedTx', isFetchedTx)
-  console.log('txError', txError)
-  console.log('txError', txError)
+  const { data: hash, sendTransactionAsync } = useSendTransaction({})
+  const canSubmit = !!hash && !isLoadingTx && !isFetchingTx && !isFetchedTx && !txError
+
+  const onSubmit = async () => {
+    if (!canSubmit) return
+    assert(!!txData, 'Transaction data is required')
+    assert(!!txData.to, 'Transaction to is required')
+    await sendTransactionAsync({
+      ...txData,
+      to: txData.to, // do not know why typescript thinkgs to might be null
+    })
+  }
+
   return (
     <SchemaForm
       form={form}
-      onSubmit={console.log}
+      onSubmit={onSubmit}
       schema={schema}
       props={{
         token: {
@@ -105,11 +112,10 @@ function DepositForm() {
         token: first.value,
       }}
       renderBefore={() => (
-        <FormWrapper.Body pb="$4">
+        <FormWrapper.Body pb="$4" testID="DepositWeb3ScreeBefore">
           <Link
             href={`${baseMainnet.blockExplorers.default.url}/address/${account}`}
             target="_blank"
-            style={{ display: 'inline' }}
           >
             <H2 size={'$4'} fontWeight={'300'} color={'$color05'}>
               Depositing from {account}
@@ -118,7 +124,7 @@ function DepositForm() {
         </FormWrapper.Body>
       )}
       renderAfter={({ submit }) => (
-        <FormWrapper.Body>
+        <FormWrapper.Body testID="DepositWeb3ScreeAfter">
           <YStack gap="$2">
             {txError && (
               <Paragraph color="red">
@@ -127,13 +133,24 @@ function DepositForm() {
               </Paragraph>
             )}
             {isLoadingTx && <Spinner size="small" />}
-            <SubmitButton onPress={submit} $gtSm={{ miw: 200 }} br={12}>
+            <SubmitButton disabled={!canSubmit} onPress={submit} $gtSm={{ miw: 200 }} br={12}>
               <ButtonText col={'$color12'}>Deposit</ButtonText>
             </SubmitButton>
+            {hash && (
+              <Link href={`${baseMainnet.blockExplorers.default.url}/tx/${hash}`} target="_blank">
+                <ButtonText col={'$color12'}>
+                  View on ${baseMainnet.blockExplorers.default.name}
+                </ButtonText>
+              </Link>
+            )}
           </YStack>
         </FormWrapper.Body>
       )}
-    />
+    >
+      {(fields) => (
+        <FormWrapper.Body testID="DepositWeb3ScreeFields">{Object.values(fields)}</FormWrapper.Body>
+      )}
+    </SchemaForm>
   )
 }
 

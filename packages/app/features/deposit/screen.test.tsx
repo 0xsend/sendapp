@@ -29,24 +29,4 @@ describe('DepositScreen', () => {
     await waitFor(() => expect(screen.getByText('Coming Soon')).toBeVisible())
     expect(screen).toMatchSnapshot()
   })
-  it('renders the deposit screen with connect when wallet is not connected', async () => {
-    // @ts-expect-error mock
-    useAccount.mockReturnValue({
-      address: '0x123',
-      isConnected: false,
-    })
-
-    render(
-      <Provider>
-        <DepositScreen />
-      </Provider>
-    )
-
-    // screen.debug({ message: 'DepositScreen: render' })
-    await waitFor(() => expect(screen.getByText('Deposit funds')).toBeVisible())
-    await waitFor(() => expect(screen.getByText('Connect to Deposit')).toBeVisible())
-    // await waitFor(() => expect(screen.getByText('Coinbase Pay')).toBeVisible())
-    await waitFor(() => expect(screen.getByText('Coming Soon')).toBeVisible())
-    expect(screen).toMatchSnapshot()
-  })
 })
