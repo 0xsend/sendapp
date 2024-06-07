@@ -12,7 +12,6 @@ import {
   XStack,
   YStack,
   isWeb,
-  useToastController,
 } from '@my/ui'
 import {
   baseMainnetClient,

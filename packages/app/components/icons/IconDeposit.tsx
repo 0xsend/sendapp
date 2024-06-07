@@ -1,6 +1,6 @@
 import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
-import { Circle, G, Mask, Path, Rect, Svg } from 'react-native-svg'
+import { G, Mask, Path, Rect, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
 const Deposit = (props) => {

@@ -573,6 +573,7 @@ exports[`OnboardingScreen 1`] = `
                   "busy": false,
                 }
               }
+              accessible={true}
               cancelable={true}
               disabled={false}
               focusVisibleStyle={{}}

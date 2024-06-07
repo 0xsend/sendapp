@@ -1,11 +1,12 @@
 {
-  "name": "shovel",
+  "name": "@my/shovel",
   "module": "index.ts",
   "type": "module",
   "scripts": {
     "generate": "bun run src/generate.ts --path='./etc/config.json'",
     "test": "bun test",
-    "shovel:tilt": "bun run ./bin/shovel.tilt.ts"
+    "shovel:tilt": "bun run ./bin/shovel.tilt.ts",
+    "empty": "bun run ./bin/empty-shovel.dev.ts"
   },
   "devDependencies": {
     "@indexsupply/shovel-config": "^0.0.16",

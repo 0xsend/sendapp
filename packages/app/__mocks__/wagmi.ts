@@ -1,4 +1,5 @@
 const mockWagmi = {
+  __esModule: true,
   useChainId: jest.fn().mockReturnValue(845337),
   createConfig: jest.fn().mockReturnValue({
     chains: [845337],
@@ -26,8 +27,17 @@ const mockWagmi = {
   }),
   useAccount: jest.fn().mockReturnValue({
     isConnected: true,
-    address: '0x123',
-    chain: 845337,
+    address: '0xa71ce00000000000000000000000000000000000',
+    chainId: 845337,
+    chain: {
+      id: 845337,
+      name: 'Base',
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Ethereum',
+        symbol: 'ETH',
+      },
+    },
   }),
   useConnect: jest.fn().mockReturnValue({
     connect: jest.fn(),
@@ -86,6 +96,10 @@ const mockWagmi = {
     isPending: false,
     error: null,
   }),
+  useSwitchAccount: jest.fn().mockReturnValue({
+    switchAccount: jest.fn(),
+    connectos: [],
+  }),
 }
 
 export const useChainId = mockWagmi.useChainId
@@ -100,4 +114,5 @@ export const useWriteContract = mockWagmi.useWriteContract
 export const useWaitForTransactionReceipt = mockWagmi.useWaitForTransactionReceipt
 export const usePrepareTransactionRequest = mockWagmi.usePrepareTransactionRequest
 export const useSendTransaction = mockWagmi.useSendTransaction
+export const useSwitchAccount = mockWagmi.useSwitchAccount
 export default mockWagmi

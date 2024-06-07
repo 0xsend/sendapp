@@ -1,16 +1,7 @@
 import '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react-native'
 import { Provider } from 'app/__mocks__/app/provider'
-import { useAccount } from 'wagmi'
 import { DepositScreen } from './screen'
-
-jest.mock('@my/ui', () => ({
-  ...jest.requireActual('@my/ui'),
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => {
-    console.log('AnimatePresence', children)
-    return children
-  },
-}))
 
 jest.mock('wagmi')
 

@@ -1,6 +1,6 @@
-import { Button, Paragraph, Spinner, XStack, YStack } from '@my/ui'
+import { Button, Paragraph, Spinner, XStack, YStack, Fade } from '@my/ui'
 import { useActivityFeed } from './utils/useActivityFeed'
-import { TableLabel, MobileSectionLabel, RowLabel, AnimateEnter } from './screen'
+import { TableLabel, MobileSectionLabel, RowLabel } from './screen'
 import { ActivityRow } from './ActivityRow'
 import { Fragment } from 'react'
 import type { PostgrestError } from '@supabase/postgrest-js'
@@ -71,9 +71,9 @@ function ActivityFeed(
                     key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
                   >
                     {isNewDate ? <RowLabel>{lastDate}</RowLabel> : null}
-                    <AnimateEnter>
+                    <Fade>
                       <ActivityRow activity={activity} />
-                    </AnimateEnter>
+                    </Fade>
                   </Fragment>
                 )
               })
@@ -81,7 +81,7 @@ function ActivityFeed(
           }
         }
       })()}
-      <AnimateEnter>
+      <Fade>
         {!isLoadingActivities && (isFetchingNextPageActivities || hasNextPage) ? (
           <>
             {isFetchingNextPageActivities && <Spinner size="small" />}
@@ -100,7 +100,7 @@ function ActivityFeed(
             )}
           </>
         ) : null}
-      </AnimateEnter>
+      </Fade>
     </YStack>
   )
 }

@@ -485,7 +485,6 @@ local_resource(
     resource_deps = [
         "yarn:install",
         "anvil:base",
-        "supabase:test",
         "shovel:generate-config",
     ],
     serve_cmd = "yarn run shovel:tilt",
@@ -494,6 +493,19 @@ local_resource(
         "packages/shovel/bin/shovel.tilt.ts",
         "packages/shovel/etc/config.json",
     ],
+)
+
+cmd_button(
+    "shovel:empty",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn workspace @my/shovel run empty",
+    ],
+    icon_name = "delete_forever",
+    location = location.RESOURCE,
+    resource = "shovel",
+    text = "shovel:empty",
 )
 
 local_resource(

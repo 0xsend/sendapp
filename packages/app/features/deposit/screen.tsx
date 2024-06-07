@@ -12,18 +12,7 @@ import {
 } from '@my/ui'
 import { IconEthereum } from 'app/components/icons'
 import { IconCoinbaseOnramp } from 'app/components/icons/IconCoinbaseOnramp'
-import { usePathname } from 'app/utils/usePathname'
-import { createParam } from 'solito'
 import { useLink } from 'solito/link'
-import { z } from 'zod'
-
-const DepositSchema = z.object({
-  d: z.string().regex(/^0x[a-fA-F0-9]{40}$/i, 'Invalid token'),
-})
-
-type DepositSchema = z.infer<typeof DepositSchema>
-
-const { useParams } = createParam<DepositSchema>()
 
 /**
  * Deposit screen shows the various options for depositing funds.

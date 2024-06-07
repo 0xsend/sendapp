@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Container,
   Link,
   type LinkProps,
   Paragraph,

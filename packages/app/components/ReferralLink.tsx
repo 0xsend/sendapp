@@ -5,7 +5,6 @@ import {
   type ButtonProps,
   ButtonText,
   useToastController,
-  useMedia,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck } from '@tamagui/lucide-icons'

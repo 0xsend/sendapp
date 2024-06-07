@@ -5734,6 +5734,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@my/shovel@workspace:packages/shovel":
+  version: 0.0.0-use.local
+  resolution: "@my/shovel@workspace:packages/shovel"
+  dependencies:
+    "@indexsupply/shovel-config": "npm:^0.0.16"
+    "@my/wagmi": "workspace:*"
+    "@types/bun": "npm:latest"
+    permissionless: "npm:^0.1.14"
+    viem: "npm:^2.8.10"
+    zx: "npm:^8.1.2"
+  peerDependencies:
+    typescript: ^5.0.0
+  languageName: unknown
+  linkType: soft
+
 "@my/snaplet@workspace:*, @my/snaplet@workspace:packages/snaplet":
   version: 0.0.0-use.local
   resolution: "@my/snaplet@workspace:packages/snaplet"
@@ -11856,17 +11871,6 @@ __metadata:
   version: 1.0.0
   resolution: "@web3-storage/multipart-parser@npm:1.0.0"
   checksum: 20d7a4330392d83f727586477fc6e709f8fca3b3664365b0d9d3041abe2aeb13f53030a3997a28a39cc74930863ebb625878b8c90789e5c990e4b64d9f22a93d
-  languageName: node
-  linkType: hard
-
-"@welldone-software/why-did-you-render@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "@welldone-software/why-did-you-render@npm:7.0.1"
-  dependencies:
-    lodash: "npm:^4"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-  checksum: e4824b23f03b0fcaeec29584cd4501b87d6841ebb4c61ba67352bd1d1cfcb8db8b64140f7926f625ba3ee2c1e71be881899081d66881d63c0e1e77d2ef10b365
   languageName: node
   linkType: hard
 
@@ -22731,7 +22735,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4, lodash@npm:^4.17.13, lodash@npm:^4.17.14, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
+"lodash@npm:4.17.21, lodash@npm:^4.17.13, lodash@npm:^4.17.14, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532
@@ -23957,7 +23961,6 @@ __metadata:
     "@trpc/react-query": "npm:11.0.0-next-beta.264"
     "@trpc/server": "npm:11.0.0-next-beta.264"
     "@types/node": "npm:^20.11.0"
-    "@welldone-software/why-did-you-render": "npm:^7.0.1"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
     eslint-config-next: "npm:^14.0.4"
@@ -28463,21 +28466,6 @@ __metadata:
   checksum: af19ab5a1ec30cb4b2f91fd6df49a7442d5c4825a2e269b3712eded10eedd7f9efeaab96d57829880733fc55bcdd8e9b1d8589b4befb06667c731d08145e274d
   languageName: node
   linkType: hard
-
-"shovel@workspace:packages/shovel":
-  version: 0.0.0-use.local
-  resolution: "shovel@workspace:packages/shovel"
-  dependencies:
-    "@indexsupply/shovel-config": "npm:^0.0.16"
-    "@my/wagmi": "workspace:*"
-    "@types/bun": "npm:latest"
-    permissionless: "npm:^0.1.14"
-    viem: "npm:^2.8.10"
-    zx: "npm:^8.1.2"
-  peerDependencies:
-    typescript: ^5.0.0
-  languageName: unknown
-  linkType: soft
 
 "side-channel@npm:^1.0.4":
   version: 1.0.4
