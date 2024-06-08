@@ -1,7 +1,6 @@
 import { useAccount, useSignMessage } from 'wagmi'
 import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
 import { Button, ButtonText } from '@my/ui'
-import { Provider } from 'app/provider'
 import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import {
   type ChallengeResponse,
@@ -9,6 +8,7 @@ import {
   RecoveryOptions,
 } from '@my/api/src/routers/account-recovery/types'
 import type { SignState } from 'app/features/auth/account-recovery/account-recovery'
+import { RecoveryEOAPreamble } from '@my/api/src/routers/account-recovery/types'
 
 interface Props {
   challengeData: ChallengeResponse
@@ -20,9 +20,8 @@ interface Props {
 
 export default function RecoverWithEOA(props: Props) {
   const { signMessage } = useSignMessage()
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
 
-  // https://wagmi.sh/react/api/hooks/useSignMessage#onsuccess
   const onSuccess = async (
     data: SignMessageData,
     variables: SignMessageVariables,
@@ -40,7 +39,7 @@ export default function RecoverWithEOA(props: Props) {
     if (props.challengeData.challenge) {
       signMessage(
         {
-          message: props.challengeData.challenge,
+          message: RecoveryEOAPreamble + props.challengeData.challenge,
           account: address,
         },
         {
@@ -52,12 +51,10 @@ export default function RecoverWithEOA(props: Props) {
   }
 
   return (
-    <Provider>
-      <OpenConnectModalWrapper>
-        <Button onPress={onPress} width={'$12'}>
-          <ButtonText>EOA</ButtonText>
-        </Button>
-      </OpenConnectModalWrapper>
-    </Provider>
+    <OpenConnectModalWrapper>
+      <Button onPress={isConnected ? onPress : null} width={'$12'}>
+        <ButtonText testID="account-recovery-eoa-btn">EOA</ButtonText>
+      </Button>
+    </OpenConnectModalWrapper>
   )
 }

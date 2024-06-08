@@ -11,6 +11,7 @@ import { api } from 'app/utils/api'
 import { IconError, IconRefresh } from 'app/components/icons'
 import { useRouter } from 'solito/router'
 import RecoverWithPasskey from 'app/features/auth/account-recovery/passkey/RecoverWithPasskey'
+import type { SignMessageErrorType } from 'viem'
 
 interface Props {
   onClose?: () => void
@@ -64,9 +65,9 @@ export default function AccountRecovery(props: Props) {
     [validateSignatureMutateAsync, router]
   )
 
-  const onSignError = () => {
+  const onSignError = (e: SignMessageErrorType) => {
     setError({
-      message: 'Failed to sign challenge. Please try again.',
+      message: `Failed to sign challenge: ${e.message.split('.')[0]}. Please try again.`,
     })
   }
 
@@ -99,12 +100,22 @@ export default function AccountRecovery(props: Props) {
 
         {/* Heading */}
         <Text fontWeight="bold" textAlign="center">
-          {error ? 'Unable to recover account' : 'Recover account'}
+          {error ? (
+            <Text testID="account-recovery-heading-error">Unable to recover account</Text>
+          ) : (
+            <Text testID="account-recovery-heading">Recover account</Text>
+          )}
         </Text>
 
         {/* Description */}
         <Text textAlign="center">
-          {error?.message || `Recover with the ${getRecoveryOptionsStr()} linked to your account.`}
+          {error?.message ? (
+            <Text testID="account-recovery-description-error">{error.message}</Text>
+          ) : (
+            <Text testID="account-recovery-description">
+              Recover with the {getRecoveryOptionsStr()} linked to your account.
+            </Text>
+          )}
         </Text>
       </>
     )

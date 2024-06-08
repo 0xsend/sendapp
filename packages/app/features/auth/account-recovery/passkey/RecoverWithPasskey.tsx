@@ -6,7 +6,6 @@ import {
   type VerifyChallengeRequest,
 } from '@my/api/src/routers/account-recovery/types'
 import { bytesToHex, hexToBytes } from 'viem'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
 
 interface Props {
   challengeData: ChallengeResponse
@@ -18,7 +17,7 @@ interface Props {
 export default function RecoverWithPasskey(props: Props) {
   const onPress = async () => {
     const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
-      pgBase16ToHex(props.challengeData.challenge as `\\x${string}`)
+      props.challengeData.challenge as `0x${string}`
     )
 
     // SendVerifier.verifySignature expects the first byte to be the passkey keySlot, followed by the signature
@@ -36,7 +35,7 @@ export default function RecoverWithPasskey(props: Props) {
   }
 
   return (
-    <Button onPress={onPress} width="50%">
+    <Button onPress={onPress} width="50%" testID="account-recovery-passkey-btn">
       <ButtonText>PASSKEY</ButtonText>
     </Button>
   )

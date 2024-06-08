@@ -28,17 +28,6 @@ export const getPasskey = async (passkeyName: string) => {
 }
 
 /**
- * Inserts a challenge into the `challenges` table and returns the row
- */
-export const insertChallenge = async () => {
-  return await supabaseAdmin
-    .rpc('insert_challenge', {
-      challenge: generateChallenge(),
-    })
-    .single()
-}
-
-/**
  * Retrieves a challenge from the `challenges` table, from the challenge id.
  * @param {number} challengeId
  * @returns challenge row
@@ -73,17 +62,4 @@ export const isChallengeExpired = async (
     return true
   }
   return false
-}
-
-/**
- * Generates a 64-byte randomly generated challenge (hex)
- *
- * @returns {string} - challenge hex string
- * @see {insertChallenge} - avoid using `generateChallenge` directly. use `tryGenerateChallenge` instead.
- * @returns {Uint8Array} - 64-byte challenge
- */
-function generateChallenge(): Uint8Array {
-  const buffer = new Uint8Array(64)
-  crypto.getRandomValues(buffer)
-  return buffer
 }

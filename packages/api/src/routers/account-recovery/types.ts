@@ -17,3 +17,6 @@ export enum RecoveryOptions {
   EOA = 'EOA',
   WEBAUTHN = 'Passkey',
 }
+
+export const RecoveryEOAPreamble =
+  'I would like to recover my SEND.app account. Please verify my signature: '

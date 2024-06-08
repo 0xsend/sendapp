@@ -7,19 +7,20 @@ import {
   type ChallengeResponse,
   type VerifyChallengeResponse,
   RecoveryOptions,
+  RecoveryEOAPreamble,
 } from '@my/api/src/routers/account-recovery/types'
 import {
   getChallengeById,
   getChainAddress,
   getPasskey,
   isChallengeExpired,
-  insertChallenge,
 } from 'app/utils/account-recovery'
 import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
 import { verifyMessage, hexToBytes } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 const logger = debug('api:routers:account-recovery')
 
@@ -43,18 +44,21 @@ export const ValidateSignatureResponseSchema = z.object({
 
 export const accountRecoveryRouter = createTRPCRouter({
   getChallenge: publicProcedure.mutation(async () => {
-    const { data: challengeData, error: challengeError } = await insertChallenge()
+    const { data: challengeData, error: challengeError } = await supabaseAdmin
+      .rpc('insert_challenge')
+      .single()
 
     if (challengeError || !challengeData) {
-      logger('getChallenge:cant-upsert-challenge')
+      logger(`getChallenge:cant-insert-challenge: [${challengeError}]`)
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: formatErr('Cannot generate challenge: Internal server error'),
         cause: challengeError?.message,
       })
     }
-
-    return challengeData as ChallengeResponse
+    const challengeResponse = challengeData as ChallengeResponse
+    challengeResponse.challenge = pgBase16ToHex(challengeResponse.challenge as `\\x${string}`)
+    return challengeResponse
   }),
   validateSignature: publicProcedure
     .input(ValidateSignatureRequestSchema)
@@ -64,7 +68,7 @@ export const accountRecoveryRouter = createTRPCRouter({
       const { data: challengeData, error: getChallengeError } = await getChallengeById(challengeId)
 
       if (getChallengeError || !challengeData) {
-        logger('verifyChallenge:invalid-user-or-challenge')
+        logger(`verifyChallenge:invalid-user-or-challenge: [${getChallengeError}]`)
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: formatErr('Challenge not found'),
@@ -118,7 +122,7 @@ export const accountRecoveryRouter = createTRPCRouter({
       const jwt = mintAuthenticatedJWTToken(userId)
       const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
 
-      logger('api:accountRecoveryRouter:signature-verified')
+      console.log(`Account recovered - Recovery type: [${recoveryType}]. User: [${userId}].`)
       ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/`)
       return {
         jwt,
@@ -168,7 +172,7 @@ const verifyRecoverySignature = async (
   if (recoveryType === RecoveryOptions.EOA) {
     verified = await verifyMessage({
       address: identifier as `0x${string}`,
-      message: challengeData.challenge,
+      message: RecoveryEOAPreamble + pgBase16ToHex(challengeData.challenge),
       signature: signature,
     })
   } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
@@ -176,7 +180,7 @@ const verifyRecoverySignature = async (
     if (!passkeyData || passkeyError) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: formatErr('Unrecognised passkey'),
+        message: formatErr('Unrecognized passkey'),
       })
     }
 
@@ -219,7 +223,7 @@ const getUserIdByChainAddress = async (chainAddress: string): Promise<string> =>
   if (chainAddressError || !chainAddressData.user_id) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: formatErr('User not found: Unrecognised chain address'),
+      message: formatErr('Unrecognized chain address'),
       cause: `Could not find associated user to chain address: [${chainAddress}] Error: [${chainAddressError?.message}]`,
     })
   }
@@ -247,7 +251,7 @@ const getUserIdByPasskeyName = async (passkeyName: string): Promise<string> => {
   if (passkeyError || !passkeyData.user_id) {
     throw new TRPCError({
       code: 'NOT_FOUND',
-      message: formatErr('User not found: Unrecognised passkey credentials'),
+      message: formatErr('User not found: Unrecognized passkey credentials'),
       cause: `Could not find associated user to passkey name: [${passkeyName}] Error: [${passkeyError?.message}]`,
     })
   }
