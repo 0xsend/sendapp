@@ -134,7 +134,7 @@ describe('DepositWeb3Screen', () => {
         <DepositWeb3Screen />
       </Provider>
     )
-    const switchNetworkButton = screen.getByRole('button', { name: 'Switch to Base' })
+    const switchNetworkButton = screen.getByRole('button', { name: 'Switch' })
     await waitFor(() => expect(switchNetworkButton).toBeVisible())
     expect(screen).toMatchSnapshot()
     const user = userEvent.setup()

@@ -1,5 +1,4 @@
 import {
-  AnimatePresence,
   Button,
   H3,
   H4,
@@ -9,6 +8,7 @@ import {
   type ButtonProps,
   type HeadingProps,
   type YStackProps,
+  Fade,
 } from '@my/ui'
 import { IconEthereum } from 'app/components/icons'
 import { IconCoinbaseOnramp } from 'app/components/icons/IconCoinbaseOnramp'
@@ -34,12 +34,12 @@ export function DepositWelcome(props: YStackProps) {
           </H3>
         </YStack>
 
-        <AnimateEnter>
+        <Fade>
           <Stack gap={'$4'} w={'100%'} $gtMd={{ flexDirection: 'row' }}>
             <DespositWeb3Link />
             <DespositCoinbasePay />
           </Stack>
-        </AnimateEnter>
+        </Fade>
       </YStack>
     </YStack>
   )
@@ -74,25 +74,6 @@ function DespositCoinbasePay() {
       {/* <DepositStackSubheader>Coinbase Pay</DepositStackSubheader> */}
       <DepositStackSubheader>Coming Soon</DepositStackSubheader>
     </DepositStackButton>
-  )
-}
-
-function AnimateEnter({ children }: { children: React.ReactNode }) {
-  if (process.env.NODE_ENV === 'test') return <>{children}</> // figure out why mocking AnimatePresence is not working
-
-  return (
-    <AnimatePresence>
-      <Stack
-        key="enter"
-        animateOnly={['transform', 'opacity']}
-        animation="200ms"
-        enterStyle={{ opacity: 0, scale: 0.9 }}
-        exitStyle={{ opacity: 0, scale: 0.95 }}
-        opacity={1}
-      >
-        {children}
-      </Stack>
-    </AnimatePresence>
   )
 }
 

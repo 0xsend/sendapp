@@ -5,6 +5,11 @@ import { DepositScreen } from './screen'
 
 jest.mock('wagmi')
 
+jest.mock('@my/ui', () => ({
+  ...jest.requireActual('@my/ui'),
+  Fade: ({ children }) => children,
+}))
+
 describe('DepositScreen', () => {
   it('renders the deposit screen', async () => {
     render(

@@ -7,13 +7,15 @@ import {
   Paragraph,
   Shake,
   Spinner,
+  Stack,
   SubmitButton,
   XStack,
   YStack,
+  isWeb,
 } from '@my/ui'
 import { baseMainnet, useWriteErc20Transfer } from '@my/wagmi'
 import { useChainModal, useConnectModal } from '@rainbow-me/rainbowkit'
-import { IconEthereum } from 'app/components/icons'
+import { IconEthereum, IconRefresh } from 'app/components/icons'
 import { IconChainBase } from 'app/components/icons/IconChainBase'
 import { coins } from 'app/data/coins'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
@@ -53,7 +55,7 @@ export function DepositWeb3Screen() {
 
   if (!isConnected) {
     return (
-      <YStack gap="$4" mt="$4">
+      <Wrapper>
         <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
           Connect to Deposit
         </H2>
@@ -64,30 +66,42 @@ export function DepositWeb3Screen() {
           accessible
           icon={<IconEthereum size={'$1'} color={'$color12'} />}
           onPress={openConnectModal}
+          maxWidth={'$20'}
         >
           Connect to Deposit
         </Button>
-      </YStack>
+      </Wrapper>
     )
   }
 
   if (chainId !== baseMainnet.id) {
     return (
-      <YStack gap="$4" mt="$4">
+      <Wrapper>
         <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
-          Switch to Base
+          Switch to {baseMainnet.name}
         </H2>
         <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-          You are currently on {chain?.name}. Switch to Base to deposit funds.
+          You are currently on {chain?.name}. Switch to {baseMainnet.name} to deposit funds.
         </Paragraph>
-        <Button accessible icon={<IconChainBase size={'$1'} />} onPress={openChainModal}>
-          Switch to Base
+        <Button
+          accessible
+          icon={<IconChainBase size={'$1'} />}
+          onPress={openChainModal}
+          maxWidth={'$20'}
+        >
+          Switch
         </Button>
-      </YStack>
+      </Wrapper>
     )
   }
 
-  return <DepositForm />
+  return (
+    <Wrapper>
+      <FailsafeChainId>
+        <DepositForm />
+      </FailsafeChainId>
+    </Wrapper>
+  )
 }
 
 const schema = z.object({
@@ -229,7 +243,7 @@ function DepositForm() {
         })
         setDepositHash(hash)
       }
-      form.reset()
+      form.clearErrors('root')
       form.setValue('amount', '')
     } catch (e) {
       if (e.name !== 'Error') {
@@ -360,4 +374,94 @@ function DepositForm() {
       )}
     </SchemaForm>
   )
+}
+
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <YStack gap="$4" mt="$6" width={'100%'} maxWidth={600} mr="auto">
+      {children}
+    </YStack>
+  )
+}
+
+/**
+ * This component is used to fail safely when the user is on the wrong network.
+ * This happens when the window ethereum provider gets out of sync with the wagmi chainId.
+ * @see https://discord.com/channels/1156791276818157609/1156791580938739822/1249030557489299558
+ */
+function FailsafeChainId({ children }: { children: React.ReactNode }) {
+  const { chainId } = useAccount()
+  const [failsafeChainId, setFailsafeChainId] = useState<number>()
+  const [error, setError] = useState<string>()
+  const [ignoreError, setIgnoreError] = useState(false)
+  const { openChainModal, chainModalOpen } = useChainModal()
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: hack
+  useEffect(() => {
+    if (isWeb) {
+      window.ethereum
+        .request({ method: 'eth_chainId' })
+        .then((cid) => setFailsafeChainId(Number(cid)))
+        .catch((e) => setError(e.message?.split('.').at(0) ?? e.toString()))
+    }
+  }, [chainId, chainModalOpen])
+
+  if (!isWeb) return children // we don't need to do anything on non-web
+
+  if (failsafeChainId === undefined) {
+    return (
+      <Wrapper>
+        <Stack width="100%" f={1} jc="center">
+          <Spinner size="small" color="$accent10Dark" />
+        </Stack>
+      </Wrapper>
+    )
+  }
+
+  if (!ignoreError && error) {
+    return (
+      <Wrapper>
+        <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
+          Error
+        </H2>
+        <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+          {error}
+        </Paragraph>
+        <Button
+          accessible
+          icon={<IconRefresh size={'$1'} />}
+          onPress={() => {
+            setError('')
+            setIgnoreError(true)
+          }}
+          maxWidth={'$20'}
+        >
+          Continue anyway?
+        </Button>
+      </Wrapper>
+    )
+  }
+
+  if (chainId !== failsafeChainId) {
+    return (
+      <Wrapper>
+        <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
+          Switch to {baseMainnet.name}
+        </H2>
+        <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+          You are on the wrong network. Switch to {baseMainnet.name} to deposit funds.
+        </Paragraph>
+        <Button
+          accessible
+          icon={<IconChainBase size={'$1'} />}
+          onPress={openChainModal}
+          maxWidth={'$20'}
+        >
+          Switch
+        </Button>
+      </Wrapper>
+    )
+  }
+
+  return children
 }

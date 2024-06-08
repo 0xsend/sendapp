@@ -6,7 +6,10 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
     {
       "flexDirection": "column",
       "gap": 18,
-      "marginTop": 18,
+      "marginRight": "auto",
+      "marginTop": 32,
+      "maxWidth": 600,
+      "width": "100%",
     }
   }
 >
@@ -82,6 +85,7 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
         "flexWrap": "nowrap",
         "height": 44,
         "justifyContent": "center",
+        "maxWidth": 284,
         "paddingLeft": 18,
         "paddingRight": 18,
       }
@@ -317,323 +321,99 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
 exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connected 1`] = `
 [
   <View
-    onLayout={[Function]}
-    onSubmit={[Function]}
     style={
       {
-        "flex": 1,
         "flexDirection": "column",
         "gap": 18,
-        "justifyContent": "space-between",
+        "marginRight": "auto",
+        "marginTop": 32,
+        "maxWidth": 600,
+        "width": "100%",
       }
     }
   >
-    <RCTScrollView
-      scrollEnabled={true}
+    <View
+      onLayout={[Function]}
+      onSubmit={[Function]}
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 18,
+          "justifyContent": "space-between",
+        }
+      }
     >
-      <View>
-        <View
-          style={
-            {
-              "flexDirection": "column",
-              "gap": 7,
-              "paddingBottom": 18,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 18,
-            }
-          }
-          testID="DepositWeb3ScreenBefore"
-        >
-          <View
-            href="https://basescan.io/address/0x123"
-            target="_blank"
-            testID="MockSolitoLink"
-          >
-            <Text
-              accessibilityRole="header"
-              selectable={true}
-              style={
-                {
-                  "color": "hsla(0, 0%, 100%, 0.5)",
-                  "fontFamily": "System",
-                  "fontSize": 14,
-                  "fontWeight": "300",
-                  "lineHeight": 18,
-                  "marginBottom": 0,
-                  "marginLeft": 0,
-                  "marginRight": 0,
-                  "marginTop": 0,
-                  "textTransform": "uppercase",
-                }
-              }
-              suppressHighlighting={true}
-            >
-              Depositing from 
-              0x123
-            </Text>
-          </View>
-        </View>
-      </View>
-    </RCTScrollView>
-    <RCTScrollView
-      scrollEnabled={true}
-    >
-      <View>
-        <View
-          style={
-            {
-              "flexDirection": "column",
-              "gap": 7,
-              "paddingBottom": 46,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 18,
-            }
-          }
-          testID="DepositWeb3ScreeFields"
-        >
+      <RCTScrollView
+        scrollEnabled={true}
+      >
+        <View>
           <View
             style={
               {
-                "flex": 1,
-                "flexDirection": "row",
+                "flexDirection": "column",
                 "gap": 7,
-                "width": "100%",
+                "paddingBottom": 18,
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "paddingTop": 18,
               }
             }
+            testID="DepositWeb3ScreenBefore"
           >
             <View
-              style={
-                {
-                  "flexDirection": "column",
-                }
-              }
+              href="https://basescan.io/address/0x123"
+              target="_blank"
+              testID="MockSolitoLink"
             >
               <Text
-                cancelable={true}
-                disabled={false}
-                focusable={true}
-                htmlFor=":r0:"
-                id=":r1:"
-                minPressDuration={0}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onPress={[Function]}
-                onPressIn={[Function]}
-                onPressOut={[Function]}
+                accessibilityRole="header"
+                selectable={true}
                 style={
                   {
-                    "alignItems": "center",
-                    "backgroundColor": "transparent",
-                    "color": "#86AE80",
-                    "display": "flex",
+                    "color": "hsla(0, 0%, 100%, 0.5)",
                     "fontFamily": "System",
-                    "fontSize": 19.2,
-                    "fontWeight": "400",
-                    "lineHeight": 60,
+                    "fontSize": 14,
+                    "fontWeight": "300",
+                    "lineHeight": 18,
+                    "marginBottom": 0,
+                    "marginLeft": 0,
+                    "marginRight": 0,
+                    "marginTop": 0,
                     "textTransform": "uppercase",
                   }
                 }
                 suppressHighlighting={true}
-                userSelect="none"
               >
-                Token
-                 
+                Depositing from 
+                0x123
               </Text>
-              <View
-                animatedStyle={
-                  {
-                    "value": {
-                      "transform": [
-                        {
-                          "translateX": 0,
-                        },
-                      ],
-                    },
-                  }
-                }
-                collapsable={false}
-                style={
-                  {
-                    "transform": [
-                      {
-                        "translateX": 0,
-                      },
-                    ],
-                  }
-                }
-              >
-                <View
-                  accessibilityState={
-                    {
-                      "expanded": false,
-                    }
-                  }
-                  cancelable={true}
-                  disabled={false}
-                  focusVisibleStyle={
-                    {
-                      "outlineColor": "$outlineColor",
-                      "outlineStyle": "solid",
-                      "outlineWidth": 2,
-                    }
-                  }
-                  focusable={[Function]}
-                  id=":r0:"
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "backgroundColor": "hsla(191, 52%, 6%, 1)",
-                      "borderBottomColor": "hsla(191, 32%, 24%, 1)",
-                      "borderBottomLeftRadius": 16,
-                      "borderBottomRightRadius": 16,
-                      "borderBottomWidth": 1,
-                      "borderLeftColor": "hsla(191, 32%, 24%, 1)",
-                      "borderLeftWidth": 1,
-                      "borderRightColor": "hsla(191, 32%, 24%, 1)",
-                      "borderRightWidth": 1,
-                      "borderStyle": "solid",
-                      "borderTopColor": "hsla(191, 32%, 24%, 1)",
-                      "borderTopLeftRadius": 16,
-                      "borderTopRightRadius": 16,
-                      "borderTopWidth": 1,
-                      "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "justifyContent": "space-between",
-                      "maxWidth": "100%",
-                      "minHeight": 44,
-                      "overflow": "hidden",
-                      "paddingBottom": 10,
-                      "paddingLeft": 18,
-                      "paddingRight": 18,
-                      "paddingTop": 10,
-                      "width": 180,
-                    }
-                  }
-                  testID="TokenSelectTrigger"
-                >
-                  <Text
-                    lineBreakMode="clip"
-                    numberOfLines={1}
-                    pointerEvents="none"
-                    selectable={false}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 59%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                    testID="TokenSelectValue"
-                  />
-                  <View
-                    pointerEvents="none"
-                    style={
-                      {
-                        "height": 16.8,
-                        "minHeight": 16.8,
-                        "minWidth": 16.8,
-                        "width": 16.8,
-                      }
-                    }
-                  />
-                  <RNSVGSvgView
-                    align="xMidYMid"
-                    bbHeight="16.8"
-                    bbWidth="16.8"
-                    fill="none"
-                    focusable={false}
-                    height={16.8}
-                    meetOrSlice={0}
-                    minX={0}
-                    minY={0}
-                    stroke="hsla(112, 22%, 59%, 1)"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    style={
-                      [
-                        {
-                          "backgroundColor": "transparent",
-                          "borderWidth": 0,
-                        },
-                        {},
-                        {
-                          "flex": 0,
-                          "height": 16,
-                          "width": 16,
-                        },
-                      ]
-                    }
-                    vbHeight={24}
-                    vbWidth={24}
-                    width={16.8}
-                  >
-                    <RNSVGGroup
-                      fill={null}
-                      propList={
-                        [
-                          "fill",
-                          "stroke",
-                          "strokeWidth",
-                          "strokeLinecap",
-                          "strokeLinejoin",
-                        ]
-                      }
-                      stroke={
-                        {
-                          "payload": 4287016319,
-                          "type": 0,
-                        }
-                      }
-                      strokeLinecap={1}
-                      strokeLinejoin={1}
-                      strokeWidth="2"
-                    >
-                      <RNSVGPath
-                        d="m6 9 6 6 6-6"
-                        fill={
-                          {
-                            "payload": 4278190080,
-                            "type": 0,
-                          }
-                        }
-                        propList={
-                          [
-                            "stroke",
-                          ]
-                        }
-                        stroke={
-                          {
-                            "payload": 4287016319,
-                            "type": 0,
-                          }
-                        }
-                      />
-                    </RNSVGGroup>
-                  </RNSVGSvgView>
-                </View>
-              </View>
             </View>
+          </View>
+        </View>
+      </RCTScrollView>
+      <RCTScrollView
+        scrollEnabled={true}
+      >
+        <View>
+          <View
+            style={
+              {
+                "flexDirection": "column",
+                "gap": 7,
+                "paddingBottom": 46,
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "paddingTop": 18,
+              }
+            }
+            testID="DepositWeb3ScreeFields"
+          >
             <View
               style={
                 {
                   "flex": 1,
-                  "flexDirection": "column",
+                  "flexDirection": "row",
                   "gap": 7,
                   "width": "100%",
                 }
@@ -650,8 +430,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   cancelable={true}
                   disabled={false}
                   focusable={true}
-                  htmlFor=":r5:"
-                  id=":r6:"
+                  htmlFor=":r0:"
+                  id=":r1:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -676,7 +456,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   suppressHighlighting={true}
                   userSelect="none"
                 >
-                  Amount
+                  Token
                    
                 </Text>
                 <View
@@ -702,329 +482,548 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     }
                   }
                 >
-                  <TextInput
-                    accessibilityLabel="Amount"
-                    autoFocus={true}
-                    control={
+                  <View
+                    accessibilityState={
                       {
-                        "_defaultValues": {
-                          "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                        },
-                        "_disableForm": [Function],
-                        "_executeSchema": [Function],
-                        "_fields": {
-                          "amount": {
-                            "_f": {
-                              "mount": true,
-                              "name": "amount",
-                              "ref": {
-                                "name": "amount",
-                              },
-                              "value": undefined,
-                            },
-                          },
-                          "token": {
-                            "_f": {
-                              "mount": true,
-                              "name": "token",
-                              "ref": {
-                                "name": "token",
-                              },
-                              "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                            },
-                          },
-                        },
-                        "_formState": {
-                          "dirtyFields": {},
-                          "disabled": false,
-                          "errors": {},
-                          "isDirty": false,
-                          "isLoading": false,
-                          "isSubmitSuccessful": false,
-                          "isSubmitted": false,
-                          "isSubmitting": false,
-                          "isValid": true,
-                          "isValidating": false,
-                          "submitCount": 0,
-                          "touchedFields": {},
-                        },
-                        "_formValues": {
-                          "amount": undefined,
-                          "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-                        },
-                        "_getDirty": [Function],
-                        "_getFieldArray": [Function],
-                        "_getWatch": [Function],
-                        "_names": {
-                          "array": Set {},
-                          "focus": "",
-                          "mount": Set {
-                            "token",
-                            "amount",
-                          },
-                          "unMount": Set {},
-                          "watch": Set {
-                            "token",
-                            "amount",
-                          },
-                          "watchAll": false,
-                        },
-                        "_options": {
-                          "mode": "onSubmit",
-                          "reValidateMode": "onChange",
-                          "shouldFocusError": true,
-                        },
-                        "_proxyFormState": {
-                          "dirtyFields": false,
-                          "disabled": true,
-                          "errors": "all",
-                          "isDirty": false,
-                          "isSubmitting": true,
-                          "isValid": true,
-                          "isValidating": false,
-                          "touchedFields": false,
-                        },
-                        "_removeUnmounted": [Function],
-                        "_reset": [Function],
-                        "_resetDefaultValues": [Function],
-                        "_state": {
-                          "action": false,
-                          "mount": true,
-                          "watch": false,
-                        },
-                        "_subjects": {
-                          "array": {
-                            "next": [Function],
-                            "observers": [],
-                            "subscribe": [Function],
-                            "unsubscribe": [Function],
-                          },
-                          "state": {
-                            "next": [Function],
-                            "observers": [
-                              {
-                                "next": [Function],
-                              },
-                              {
-                                "next": [Function],
-                              },
-                              {
-                                "next": [Function],
-                              },
-                              {
-                                "next": [Function],
-                              },
-                            ],
-                            "subscribe": [Function],
-                            "unsubscribe": [Function],
-                          },
-                          "values": {
-                            "next": [Function],
-                            "observers": [
-                              {
-                                "next": [Function],
-                              },
-                              {
-                                "next": [Function],
-                              },
-                            ],
-                            "subscribe": [Function],
-                            "unsubscribe": [Function],
-                          },
-                        },
-                        "_updateDisabledField": [Function],
-                        "_updateFieldArray": [Function],
-                        "_updateFormState": [Function],
-                        "_updateValid": [Function],
-                        "getFieldState": [Function],
-                        "handleSubmit": [Function],
-                        "register": [Function],
-                        "setError": [Function],
-                        "unregister": [Function],
+                        "expanded": false,
                       }
                     }
-                    focusVisibleStyle={{}}
-                    focusable={true}
-                    id=":r5:"
-                    name="amount"
+                    cancelable={true}
+                    disabled={false}
+                    focusVisibleStyle={
+                      {
+                        "outlineColor": "$outlineColor",
+                        "outlineStyle": "solid",
+                        "outlineWidth": 2,
+                      }
+                    }
+                    focusable={[Function]}
+                    id=":r0:"
+                    minPressDuration={0}
                     onBlur={[Function]}
-                    onChangeText={[Function]}
                     onFocus={[Function]}
-                    placeholderTextColor="hsla(191, 32%, 50%, 1)"
-                    readOnly={false}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
                     style={
                       {
-                        "backgroundColor": "hsla(191, 32%, 10%, 1)",
-                        "borderBottomColor": "hsla(191, 32%, 32%, 1)",
-                        "borderBottomLeftRadius": 9,
-                        "borderBottomRightRadius": 9,
-                        "borderBottomWidth": 0,
-                        "borderLeftColor": "hsla(191, 32%, 32%, 1)",
-                        "borderLeftWidth": 0,
-                        "borderRightColor": "hsla(191, 32%, 32%, 1)",
-                        "borderRightWidth": 0,
+                        "alignItems": "center",
+                        "backgroundColor": "hsla(191, 52%, 6%, 1)",
+                        "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                        "borderBottomLeftRadius": 16,
+                        "borderBottomRightRadius": 16,
+                        "borderBottomWidth": 1,
+                        "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                        "borderLeftWidth": 1,
+                        "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                        "borderRightWidth": 1,
                         "borderStyle": "solid",
-                        "borderTopColor": "hsla(191, 32%, 32%, 1)",
-                        "borderTopLeftRadius": 9,
-                        "borderTopRightRadius": 9,
-                        "borderTopWidth": 0,
-                        "color": "hsl(0, 0%, 93.0%)",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontStyle": "italic",
-                        "fontWeight": "normal",
-                        "height": 44,
-                        "minWidth": 0,
-                        "paddingLeft": 16,
-                        "paddingRight": 16,
-                        "position": "relative",
+                        "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                        "borderTopLeftRadius": 16,
+                        "borderTopRightRadius": 16,
+                        "borderTopWidth": 1,
+                        "flexDirection": "row",
+                        "flexWrap": "nowrap",
+                        "justifyContent": "space-between",
+                        "maxWidth": "100%",
+                        "minHeight": 44,
+                        "overflow": "hidden",
+                        "paddingBottom": 10,
+                        "paddingLeft": 18,
+                        "paddingRight": 18,
+                        "paddingTop": 10,
+                        "width": 180,
                       }
                     }
-                    value=""
-                  />
+                    testID="TokenSelectTrigger"
+                  >
+                    <Text
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      pointerEvents="none"
+                      selectable={false}
+                      style={
+                        {
+                          "color": "hsla(112, 22%, 59%, 1)",
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      testID="TokenSelectValue"
+                    />
+                    <View
+                      pointerEvents="none"
+                      style={
+                        {
+                          "height": 16.8,
+                          "minHeight": 16.8,
+                          "minWidth": 16.8,
+                          "width": 16.8,
+                        }
+                      }
+                    />
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight="16.8"
+                      bbWidth="16.8"
+                      fill="none"
+                      focusable={false}
+                      height={16.8}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="hsla(112, 22%, 59%, 1)"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {},
+                          {
+                            "flex": 0,
+                            "height": 16,
+                            "width": 16,
+                          },
+                        ]
+                      }
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={16.8}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4287016319,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="m6 9 6 6 6-6"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4287016319,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
+                  </View>
                 </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "width": "100%",
+                  }
+                }
+              >
                 <View
                   style={
                     {
-                      "bottom": 10,
-                      "gap": 7,
-                      "position": "absolute",
-                      "right": 18,
+                      "flexDirection": "column",
                     }
                   }
-                />
-              </View>
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "hsla(112, 22%, 59%, 1)",
-                    "fontFamily": "System",
-                    "fontSize": 15.6,
-                    "fontWeight": "300",
-                    "lineHeight": 18,
+                >
+                  <Text
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    htmlFor=":r5:"
+                    id=":r6:"
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "transparent",
+                        "color": "#86AE80",
+                        "display": "flex",
+                        "fontFamily": "System",
+                        "fontSize": 19.2,
+                        "fontWeight": "400",
+                        "lineHeight": 60,
+                        "textTransform": "uppercase",
+                      }
+                    }
+                    suppressHighlighting={true}
+                    userSelect="none"
+                  >
+                    Amount
+                     
+                  </Text>
+                  <View
+                    animatedStyle={
+                      {
+                        "value": {
+                          "transform": [
+                            {
+                              "translateX": 0,
+                            },
+                          ],
+                        },
+                      }
+                    }
+                    collapsable={false}
+                    style={
+                      {
+                        "transform": [
+                          {
+                            "translateX": 0,
+                          },
+                        ],
+                      }
+                    }
+                  >
+                    <TextInput
+                      accessibilityLabel="Amount"
+                      autoFocus={true}
+                      control={
+                        {
+                          "_defaultValues": {
+                            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                          },
+                          "_disableForm": [Function],
+                          "_executeSchema": [Function],
+                          "_fields": {
+                            "amount": {
+                              "_f": {
+                                "mount": true,
+                                "name": "amount",
+                                "ref": {
+                                  "name": "amount",
+                                },
+                                "value": undefined,
+                              },
+                            },
+                            "token": {
+                              "_f": {
+                                "mount": true,
+                                "name": "token",
+                                "ref": {
+                                  "name": "token",
+                                },
+                                "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                              },
+                            },
+                          },
+                          "_formState": {
+                            "dirtyFields": {},
+                            "disabled": false,
+                            "errors": {},
+                            "isDirty": false,
+                            "isLoading": false,
+                            "isSubmitSuccessful": false,
+                            "isSubmitted": false,
+                            "isSubmitting": false,
+                            "isValid": true,
+                            "isValidating": false,
+                            "submitCount": 0,
+                            "touchedFields": {},
+                          },
+                          "_formValues": {
+                            "amount": undefined,
+                            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                          },
+                          "_getDirty": [Function],
+                          "_getFieldArray": [Function],
+                          "_getWatch": [Function],
+                          "_names": {
+                            "array": Set {},
+                            "focus": "",
+                            "mount": Set {
+                              "token",
+                              "amount",
+                            },
+                            "unMount": Set {},
+                            "watch": Set {
+                              "token",
+                              "amount",
+                            },
+                            "watchAll": false,
+                          },
+                          "_options": {
+                            "mode": "onSubmit",
+                            "reValidateMode": "onChange",
+                            "shouldFocusError": true,
+                          },
+                          "_proxyFormState": {
+                            "dirtyFields": false,
+                            "disabled": true,
+                            "errors": "all",
+                            "isDirty": false,
+                            "isSubmitting": true,
+                            "isValid": true,
+                            "isValidating": false,
+                            "touchedFields": false,
+                          },
+                          "_removeUnmounted": [Function],
+                          "_reset": [Function],
+                          "_resetDefaultValues": [Function],
+                          "_state": {
+                            "action": false,
+                            "mount": true,
+                            "watch": false,
+                          },
+                          "_subjects": {
+                            "array": {
+                              "next": [Function],
+                              "observers": [],
+                              "subscribe": [Function],
+                              "unsubscribe": [Function],
+                            },
+                            "state": {
+                              "next": [Function],
+                              "observers": [
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                              ],
+                              "subscribe": [Function],
+                              "unsubscribe": [Function],
+                            },
+                            "values": {
+                              "next": [Function],
+                              "observers": [
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                              ],
+                              "subscribe": [Function],
+                              "unsubscribe": [Function],
+                            },
+                          },
+                          "_updateDisabledField": [Function],
+                          "_updateFieldArray": [Function],
+                          "_updateFormState": [Function],
+                          "_updateValid": [Function],
+                          "getFieldState": [Function],
+                          "handleSubmit": [Function],
+                          "register": [Function],
+                          "setError": [Function],
+                          "unregister": [Function],
+                        }
+                      }
+                      focusVisibleStyle={{}}
+                      focusable={true}
+                      id=":r5:"
+                      name="amount"
+                      onBlur={[Function]}
+                      onChangeText={[Function]}
+                      onFocus={[Function]}
+                      placeholderTextColor="hsla(191, 32%, 50%, 1)"
+                      readOnly={false}
+                      style={
+                        {
+                          "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                          "borderBottomColor": "hsla(191, 32%, 32%, 1)",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderBottomWidth": 0,
+                          "borderLeftColor": "hsla(191, 32%, 32%, 1)",
+                          "borderLeftWidth": 0,
+                          "borderRightColor": "hsla(191, 32%, 32%, 1)",
+                          "borderRightWidth": 0,
+                          "borderStyle": "solid",
+                          "borderTopColor": "hsla(191, 32%, 32%, 1)",
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "borderTopWidth": 0,
+                          "color": "hsl(0, 0%, 93.0%)",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontStyle": "italic",
+                          "fontWeight": "normal",
+                          "height": 44,
+                          "minWidth": 0,
+                          "paddingLeft": 16,
+                          "paddingRight": 16,
+                          "position": "relative",
+                        }
+                      }
+                      value=""
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "bottom": 10,
+                        "gap": 7,
+                        "position": "absolute",
+                        "right": 18,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  selectable={true}
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 15.6,
+                      "fontWeight": "300",
+                      "lineHeight": 18,
+                    }
                   }
-                }
-                suppressHighlighting={true}
-              >
-                Balance:
-                 
-                &lt;0.00
-                 
-                USDC
-              </Text>
+                  suppressHighlighting={true}
+                >
+                  Balance:
+                   
+                  &lt;0.00
+                   
+                  USDC
+                </Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </RCTScrollView>
-    <View
-      onLayout={[Function]}
-      style={
-        {
-          "paddingBottom": 0,
-        }
-      }
-    >
+      </RCTScrollView>
       <View
+        onLayout={[Function]}
         style={
           {
-            "flexDirection": "column-reverse",
-            "gap": 18,
-            "paddingBottom": 18,
-            "paddingLeft": 18,
-            "paddingRight": 18,
+            "paddingBottom": 0,
           }
         }
       >
-        <RCTScrollView
-          scrollEnabled={true}
+        <View
+          style={
+            {
+              "flexDirection": "column-reverse",
+              "gap": 18,
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+            }
+          }
         >
-          <View>
-            <View
-              style={
-                {
-                  "flexDirection": "column",
-                  "gap": 7,
-                  "paddingBottom": 46,
-                  "paddingLeft": 18,
-                  "paddingRight": 18,
-                  "paddingTop": 18,
-                }
-              }
-              testID="DepositWeb3ScreenAfter"
-            >
+          <RCTScrollView
+            scrollEnabled={true}
+          >
+            <View>
               <View
                 style={
                   {
                     "flexDirection": "column",
                     "gap": 7,
+                    "paddingBottom": 46,
+                    "paddingLeft": 18,
+                    "paddingRight": 18,
+                    "paddingTop": 18,
                   }
                 }
+                testID="DepositWeb3ScreenAfter"
               >
                 <View
-                  accessibilityRole="button"
-                  accessibilityState={
-                    {
-                      "busy": false,
-                    }
-                  }
-                  accessible={true}
-                  cancelable={true}
-                  disabled={false}
-                  focusVisibleStyle={{}}
-                  focusable={[Function]}
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
                   style={
                     {
-                      "alignItems": "center",
-                      "backgroundColor": "hsla(125, 96%, 47%, 1)",
-                      "borderBottomColor": "transparent",
-                      "borderBottomLeftRadius": 12,
-                      "borderBottomRightRadius": 12,
-                      "borderBottomWidth": 1,
-                      "borderLeftColor": "transparent",
-                      "borderLeftWidth": 1,
-                      "borderRightColor": "transparent",
-                      "borderRightWidth": 1,
-                      "borderStyle": "solid",
-                      "borderTopColor": "transparent",
-                      "borderTopLeftRadius": 12,
-                      "borderTopRightRadius": 12,
-                      "borderTopWidth": 1,
-                      "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "height": 44,
-                      "justifyContent": "center",
-                      "paddingLeft": 18,
-                      "paddingRight": 18,
+                      "flexDirection": "column",
+                      "gap": 7,
                     }
                   }
-                  testID="SubmitButton"
                 >
-                  <Text
-                    lineBreakMode="clip"
-                    numberOfLines={1}
-                    style={
+                  <View
+                    accessibilityRole="button"
+                    accessibilityState={
                       {
-                        "color": "hsla(191, 32%, 10%, 1)",
-                        "flexGrow": 0,
-                        "flexShrink": 1,
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
+                        "busy": false,
                       }
                     }
-                    suppressHighlighting={true}
-                    userSelect="none"
+                    accessible={true}
+                    cancelable={true}
+                    disabled={false}
+                    focusVisibleStyle={{}}
+                    focusable={[Function]}
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                        "borderBottomColor": "transparent",
+                        "borderBottomLeftRadius": 12,
+                        "borderBottomRightRadius": 12,
+                        "borderBottomWidth": 1,
+                        "borderLeftColor": "transparent",
+                        "borderLeftWidth": 1,
+                        "borderRightColor": "transparent",
+                        "borderRightWidth": 1,
+                        "borderStyle": "solid",
+                        "borderTopColor": "transparent",
+                        "borderTopLeftRadius": 12,
+                        "borderTopRightRadius": 12,
+                        "borderTopWidth": 1,
+                        "flexDirection": "row",
+                        "flexWrap": "nowrap",
+                        "height": 44,
+                        "justifyContent": "center",
+                        "paddingLeft": 18,
+                        "paddingRight": 18,
+                      }
+                    }
+                    testID="SubmitButton"
                   >
                     <Text
                       lineBreakMode="clip"
@@ -1043,43 +1042,61 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                       suppressHighlighting={true}
                       userSelect="none"
                     >
-                      Deposit
+                      <Text
+                        lineBreakMode="clip"
+                        numberOfLines={1}
+                        style={
+                          {
+                            "color": "hsla(191, 32%, 10%, 1)",
+                            "flexGrow": 0,
+                            "flexShrink": 1,
+                            "fontFamily": "System",
+                            "fontSize": 16.8,
+                            "fontWeight": "400",
+                            "lineHeight": 19,
+                          }
+                        }
+                        suppressHighlighting={true}
+                        userSelect="none"
+                      >
+                        Deposit
+                      </Text>
                     </Text>
-                  </Text>
-                </View>
-                <View
-                  href="https://basescan.io/tx/0x123"
-                  target="_blank"
-                  testID="MockSolitoLink"
-                >
-                  <Text
-                    lineBreakMode="clip"
-                    numberOfLines={1}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 100%, 1)",
-                        "flexGrow": 0,
-                        "flexShrink": 1,
-                        "fontFamily": "System",
-                        "fontSize": 16.8,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                    userSelect="none"
+                  </View>
+                  <View
+                    href="https://basescan.io/tx/0x123"
+                    target="_blank"
+                    testID="MockSolitoLink"
                   >
-                    View 
-                    0x123
-                     on
-                     
-                    Basescan
-                  </Text>
+                    <Text
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "hsla(112, 22%, 100%, 1)",
+                          "flexGrow": 0,
+                          "flexShrink": 1,
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      userSelect="none"
+                    >
+                      View 
+                      0x123
+                       on
+                       
+                      Basescan
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        </RCTScrollView>
+          </RCTScrollView>
+        </View>
       </View>
     </View>
   </View>,
@@ -1449,7 +1466,10 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
     {
       "flexDirection": "column",
       "gap": 18,
-      "marginTop": 18,
+      "marginRight": "auto",
+      "marginTop": 32,
+      "maxWidth": 600,
+      "width": "100%",
     }
   }
 >
@@ -1472,7 +1492,8 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
     }
     suppressHighlighting={true}
   >
-    Switch to Base
+    Switch to 
+    Base
   </Text>
   <Text
     selectable={true}
@@ -1489,7 +1510,9 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
   >
     You are currently on 
     Ethereum
-    . Switch to Base to deposit funds.
+    . Switch to 
+    Base
+     to deposit funds.
   </Text>
   <View
     accessibilityRole="button"
@@ -1527,6 +1550,7 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
         "flexWrap": "nowrap",
         "height": 44,
         "justifyContent": "center",
+        "maxWidth": 284,
         "paddingLeft": 18,
         "paddingRight": 18,
       }
@@ -1619,7 +1643,7 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
       suppressHighlighting={true}
       userSelect="none"
     >
-      Switch to Base
+      Switch
     </Text>
   </View>
 </View>
