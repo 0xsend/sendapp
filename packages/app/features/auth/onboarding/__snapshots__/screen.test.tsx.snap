@@ -275,6 +275,7 @@ exports[`OnboardingScreen 1`] = `
             <View
               style={
                 {
+                  "flex": 1,
                   "flexDirection": "column",
                 }
               }

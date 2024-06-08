@@ -1,7 +1,7 @@
 import { useFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
 import { Fieldset, Label, Switch, type SwitchProps, Theme, useThemeName } from 'tamagui'
-import { FieldError } from '../FieldError'
+import { FieldError } from '@my/ui'
 
 export const BooleanSwitchField = (props: Pick<SwitchProps, 'size' | 'native'>) => {
   const {

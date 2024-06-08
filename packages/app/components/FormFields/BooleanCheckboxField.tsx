@@ -2,6 +2,7 @@ import { Check } from '@tamagui/lucide-icons'
 import { useFieldInfo, useTsController } from '@ts-react/form'
 import { useEffect, useState, useId } from 'react'
 import {
+  FieldError,
   Checkbox,
   type CheckboxProps,
   type CheckedState,
@@ -11,8 +12,7 @@ import {
   type ThemeName,
   XStack,
   useThemeName,
-} from 'tamagui'
-import { FieldError } from '../FieldError'
+} from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export const BooleanCheckboxField = (

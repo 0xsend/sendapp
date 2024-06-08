@@ -9,9 +9,9 @@ import {
   Theme,
   XStack,
   useThemeName,
-} from 'tamagui'
-import { FieldError } from '../FieldError'
-import { Shake } from '../Shake'
+  FieldError,
+  Shake,
+} from '@my/ui'
 
 export const OTPField = (props: InputProps) => {
   const {
@@ -34,10 +34,8 @@ export const OTPField = (props: InputProps) => {
 
   const onChange = async (event, index) => {
     let nextIndex = index
-    // @ts-ignore
     if (event.nativeEvent.inputType === 'deleteContentBackward' && index > 0) {
       nextIndex = index - 1
-      // @ts-ignore
     } else if (event.nativeEvent.inputType !== 'deleteContentBackward' && index < 6) {
       nextIndex = index + 1
     }
@@ -74,7 +72,7 @@ export const OTPField = (props: InputProps) => {
     <Theme name={error ? 'red' : themeName} forceClassName>
       <XStack gap={'$0.25'} jc={'flex-start'}>
         {[0, 1, 2, 3, 4, 5].map((index) => (
-          <Fieldset flex={1}>
+          <Fieldset flex={1} key={index}>
             {!!label && (
               <Label theme="alt1" size={props.size || '$3'} htmlFor={id}>
                 {label} {isOptional && '(Optional)'}

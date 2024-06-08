@@ -1,8 +1,16 @@
 import { useNumberFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
-import { Fieldset, Input, type InputProps, Label, Theme, useThemeName } from 'tamagui'
-import { FieldError } from '../FieldError'
-import { Shake } from '../Shake'
+
+import {
+  FieldError,
+  Shake,
+  Theme,
+  useThemeName,
+  Fieldset,
+  Label,
+  Input,
+  type InputProps,
+} from '@my/ui'
 
 export const NumberField = (props: InputProps) => {
   const {

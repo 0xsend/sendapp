@@ -11,13 +11,12 @@ import {
   Tooltip,
   useMedia,
   useThemeName,
-  type FieldsetProps,
-} from 'tamagui'
+  Shake,
+} from '@my/ui'
 
-import { Shake } from '../Shake'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 
-export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps }) => {
+export const TextField = (props: InputProps) => {
   const media = useMedia()
   const {
     field,
@@ -31,7 +30,8 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
   const disabled = isSubmitting
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
-      <Fieldset {...props.fieldsetProps}>
+      {/* flex 1 is needed to make the input fill the width of the parent in the case of a being in a container with flex direction row */}
+      <Fieldset f={1}>
         {!!label && (
           <Label
             size={props.size || '$5'}
