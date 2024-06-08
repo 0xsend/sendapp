@@ -1,4 +1,4 @@
-import { AnimatePresence, Stack } from '@my/ui'
+import { AnimatePresence, Stack } from 'tamagui'
 
 export function Fade({ children }: { children: React.ReactNode }) {
   return (
