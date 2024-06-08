@@ -24,17 +24,17 @@
   },
   "devDependencies": {
     "@safe-global/safe-deployments": "^1.26.0",
-    "@wagmi/cli": "^2.1.0",
+    "@wagmi/cli": "^2.1.8",
     "debug": "^4.3.4",
     "globby": "^14.0.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "@my/contracts": "workspace:*",
-    "@wagmi/core": "2.6.5",
+    "@wagmi/core": "^2.10.5",
     "change-case": "^5.4.2",
     "permissionless": "^0.1.14",
-    "viem": "^2.8.10",
-    "wagmi": "2.5.7"
+    "viem": "^2.13.7",
+    "wagmi": "^2.9.10"
   }
 }

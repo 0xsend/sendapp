@@ -53,6 +53,7 @@ function DespositWeb3Link() {
         {...useLink({
           href: '/deposit/web3',
         })}
+        accessibilityLabel="Deposit with Web3 Wallet"
       />
       <DepositStackSubheader>Web3 Wallet</DepositStackSubheader>
     </DepositStackButton>

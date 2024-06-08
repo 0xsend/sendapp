@@ -54,8 +54,8 @@
     "react-native-svg": "14.1.0",
     "solito": "^4.0.1",
     "superjson": "^1.13.1",
-    "viem": "^2.8.10",
-    "wagmi": "2.5.7",
+    "viem": "^2.13.7",
+    "wagmi": "^2.9.10",
     "zod": "^3.22.4"
   },
   "devDependencies": {

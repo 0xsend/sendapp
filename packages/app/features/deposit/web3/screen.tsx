@@ -11,26 +11,26 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, useWriteErc20Transfer } from '@my/wagmi'
 import { useChainModal, useConnectModal } from '@rainbow-me/rainbowkit'
 import { IconEthereum } from 'app/components/icons'
 import { IconChainBase } from 'app/components/icons/IconChainBase'
-import { coins, type coin } from 'app/data/coins'
+import { coins } from 'app/data/coins'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'solito/link'
-import { encodeFunctionData, erc20Abi, formatUnits, parseUnits, zeroAddress } from 'viem'
+import { formatUnits, parseUnits } from 'viem'
 import {
   useAccount,
   useBalance,
-  usePrepareTransactionRequest,
   useSendTransaction,
   useSwitchAccount,
+  useWaitForTransactionReceipt,
 } from 'wagmi'
 import { z } from 'zod'
 
@@ -104,6 +104,7 @@ function DepositForm() {
   assert(!!first, 'first coin not found')
 
   const coin = coins.find((coin) => coin.token === form.watch('token'))
+  const isCoinSelected = !!coin
   const amount = form.watch('amount')
   let value = 0n
   try {
@@ -119,51 +120,35 @@ function DepositForm() {
     data: depositorBalance,
     isLoading: isLoadingDepositorBalance,
     error: balanceDepositorError,
+    refetch: refetchDepositorBalance,
   } = useBalance({
     address: account,
     token: coin?.token === 'eth' ? undefined : coin?.token,
-    query: { enabled: !!account && !!coin },
+    query: { enabled: !!account && isCoinSelected },
     chainId: baseMainnet.id,
   })
   const isDepositorEmpty = depositorBalance?.value === 0n
   const {
     // helpful but not required for submitting
     data: sendAccountBalance,
+    refetch: refetchSendAccountBalance,
   } = useBalance({
     address: sendAccount?.address,
     token: coin?.token === 'eth' ? undefined : coin?.token,
-    query: { enabled: !!sendAccount && !!coin },
+    query: { enabled: !!sendAccount && isCoinSelected },
     chainId: baseMainnet.id,
   })
-  const request = useDepositTransactionRequest({
-    coin,
-    value,
-    account,
-    sendAccount,
-  })
+  const { writeContractAsync } = useWriteErc20Transfer()
+  const { sendTransactionAsync } = useSendTransaction()
+  const [depositHash, setDepositHash] = useState<`0x${string}`>()
   const {
-    data: txData,
-    isLoading: isLoadingTx,
-    error: txError,
-    isFetching: isFetchingTx,
-    isFetched: isFetchedTx,
-  } = request
-  const { data: hash, sendTransactionAsync } = useSendTransaction()
-  const canSubmit = !hash && !isLoadingTx && !isFetchingTx && isFetchedTx
-  const isSubmitting = form.formState.isSubmitting
-
-  // handle tx error
-  useEffect(() => {
-    if (txError) {
-      form.setError('root', {
-        type: 'custom',
-        message:
-          txError.name !== 'Error'
-            ? txError.details?.split('.').at(0)
-            : txError.message.split('.').at(0),
-      })
-    }
-  }, [txError, form])
+    data: receipt,
+    isLoading: isLoadingReceipt,
+    error: receiptError,
+  } = useWaitForTransactionReceipt({
+    hash: depositHash,
+  })
+  const canSubmit = !isLoadingReceipt
 
   // handle depositor balance error
   useEffect(() => {
@@ -205,17 +190,48 @@ function DepositForm() {
     balanceDepositorError,
   ])
 
+  // handle tx receipt error
+  useEffect(() => {
+    if (receiptError) {
+      form.setError('root', {
+        type: 'custom',
+        message: receiptError.message.split('.').at(0),
+      })
+    }
+    if (receipt?.status === 'reverted') {
+      form.setError('root', {
+        type: 'custom',
+        message: 'Transaction failed',
+      })
+    }
+    if (receipt) {
+      refetchDepositorBalance()
+      refetchSendAccountBalance()
+    }
+  }, [receiptError, form, receipt, refetchDepositorBalance, refetchSendAccountBalance])
+
   const onSubmit = async () => {
     if (!canSubmit) return
     try {
-      assert(!!txData, 'Transaction data is required')
-      assert(!!txData.to, 'Transaction to is required')
-      await sendTransactionAsync({
-        ...txData,
-        to: txData.to, // do not know why typescript thinkgs to might be null
-      })
+      assert(!!coin?.token, 'No coin selected')
+      assert(!!sendAccount, 'No send account found')
+      assert(value > 0n, 'Amount must be greater than 0')
+      if (coin?.token === 'eth') {
+        const hash = await sendTransactionAsync({
+          to: sendAccount.address,
+          value: value,
+        })
+        setDepositHash(hash)
+      } else {
+        const hash = await writeContractAsync({
+          args: [sendAccount.address, value],
+          address: coin.token,
+        })
+        setDepositHash(hash)
+      }
+      form.reset()
+      form.setValue('amount', '')
     } catch (e) {
-      console.error(e)
       if (e.name !== 'Error') {
         const message = e?.details?.split('.').at(0) ?? e?.message.split('.').at(0)
         form.setError('root', {
@@ -253,7 +269,7 @@ function DepositForm() {
         token: first.value,
       }}
       renderBefore={() => (
-        <FormWrapper.Body pb="$4" testID="DepositWeb3ScreeBefore">
+        <FormWrapper.Body pb="$4" testID="DepositWeb3ScreenBefore">
           <Link
             href={`${baseMainnet.blockExplorers.default.url}/address/${account}`}
             target="_blank"
@@ -265,27 +281,28 @@ function DepositForm() {
         </FormWrapper.Body>
       )}
       renderAfter={({ submit }) => (
-        <FormWrapper.Body testID="DepositWeb3ScreeAfter">
+        <FormWrapper.Body testID="DepositWeb3ScreenAfter">
           <YStack gap="$2">
             {form.formState.errors?.root?.message ? (
               <Shake>
-                <Paragraph color="red">{form.formState.errors?.root?.message}</Paragraph>
+                <Paragraph color="red" testID="DepositWeb3ScreenError">
+                  {form.formState.errors?.root?.message}
+                </Paragraph>
               </Shake>
             ) : null}
             {value > 0n ? (
               <Fade>
                 <Paragraph size="$3">
-                  Your new Send Account balance will be {(() => {
+                  After depositing, your Send Account balance will be {(() => {
                     const amount = (sendAccountBalance?.value ?? 0n) + value
-                    console.log('amount', amount)
                     return formatAmount(formatUnits(amount, coin?.decimals ?? 0))
                   })()} {coin?.symbol}.
                 </Paragraph>
               </Fade>
             ) : null}
             <SubmitButton
-              disabled={!canSubmit}
-              iconAfter={isLoadingTx || isSubmitting ? <Spinner size="small" /> : undefined}
+              disabled={!canSubmit || isLoadingReceipt}
+              iconAfter={isLoadingReceipt ? <Spinner size="small" /> : undefined}
               onPress={() => {
                 if (isDepositorEmpty) {
                   try {
@@ -305,17 +322,18 @@ function DepositForm() {
               br={12}
             >
               <ButtonText col={'$color12'}>
-                {(() => {
-                  if (isLoadingTx) return ''
-                  return 'Deposit'
-                })()}
+                {isLoadingReceipt ? 'Depositing...' : 'Deposit'}
               </ButtonText>
             </SubmitButton>
 
-            {hash && (
-              <Link href={`${baseMainnet.blockExplorers.default.url}/tx/${hash}`} target="_blank">
+            {receipt?.transactionHash && (
+              <Link
+                href={`${baseMainnet.blockExplorers.default.url}/tx/${receipt?.transactionHash}`}
+                target="_blank"
+              >
                 <ButtonText col={'$color12'}>
-                  View {shorten(hash)} on {baseMainnet.blockExplorers.default.name}
+                  View {shorten(receipt?.transactionHash)} on{' '}
+                  {baseMainnet.blockExplorers.default.name}
                 </ButtonText>
               </Link>
             )}
@@ -342,40 +360,4 @@ function DepositForm() {
       )}
     </SchemaForm>
   )
-}
-
-const useDepositTransactionRequest = ({
-  coin,
-  value,
-  account,
-  sendAccount,
-}: {
-  coin?: coin
-  value?: bigint
-  account?: `0x${string}`
-  sendAccount?: ReturnType<typeof useSendAccount>['data']
-}) => {
-  let data: `0x${string}` | undefined
-  let to: `0x${string}`
-  if (coin?.token !== 'eth') {
-    data = encodeFunctionData({
-      abi: erc20Abi,
-      functionName: 'transfer',
-      args: [sendAccount?.address ?? zeroAddress, value ?? 0n],
-    })
-    to = coin?.token ?? zeroAddress
-  } else {
-    to = sendAccount?.address ?? zeroAddress
-  }
-  return usePrepareTransactionRequest({
-    chainId: baseMainnet.id,
-    account,
-    to,
-    // @ts-expect-error wtf
-    data,
-    value,
-    query: {
-      enabled: !!sendAccount && (value ?? 0n) > 0n,
-    },
-  })
 }
