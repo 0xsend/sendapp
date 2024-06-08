@@ -4,7 +4,6 @@ import type { SendAccountTransfersEvent } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatar'
 
 export function TokenActivityRow({ activity }: { activity: SendAccountTransfersEvent }) {
-  const media = useMedia()
   const { created_at } = activity
   const amount = amountFromActivity(activity)
   const date = new Date(created_at).toLocaleString()

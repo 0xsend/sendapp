@@ -11,7 +11,6 @@ import {
   Text,
   XStack,
   YStack,
-  Stack,
 } from '@my/ui'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
@@ -125,23 +124,6 @@ function Suggestions() {
         ))}
       </ScrollView>
     </YStack>
-  )
-}
-
-export function AnimateEnter({ children }: { children: React.ReactNode }) {
-  return (
-    <AnimatePresence>
-      <Stack
-        key="enter"
-        animateOnly={['transform', 'opacity']}
-        animation="200ms"
-        enterStyle={{ opacity: 0, scale: 0.9 }}
-        exitStyle={{ opacity: 0, scale: 0.95 }}
-        opacity={1}
-      >
-        {children}
-      </Stack>
-    </AnimatePresence>
   )
 }
 

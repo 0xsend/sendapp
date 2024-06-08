@@ -1,17 +1,18 @@
 import {
-  AnimatePresence,
   Button,
-  ButtonText,
   H3,
-  Paragraph,
+  H4,
   Stack,
   YStack,
   useToastController,
   type ButtonProps,
+  type HeadingProps,
+  type YStackProps,
+  Fade,
 } from '@my/ui'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { useAccount } from 'wagmi'
+import { IconEthereum } from 'app/components/icons'
+import { IconCoinbaseOnramp } from 'app/components/icons/IconCoinbaseOnramp'
+import { useLink } from 'solito/link'
 
 /**
  * Deposit screen shows the various options for depositing funds.
@@ -20,8 +21,12 @@ import { useAccount } from 'wagmi'
  * - ???
  */
 export function DepositScreen() {
+  return <DepositWelcome />
+}
+
+export function DepositWelcome(props: YStackProps) {
   return (
-    <YStack $gtSm={{ minWidth: 500 }} mx="auto" width={'100%'} mt="auto">
+    <YStack mt="$4" mx="auto" width={'100%'} $sm={{ maxWidth: 600 }} {...props}>
       <YStack w={'100%'} gap={'$4'}>
         <YStack gap="$2">
           <H3 size={'$8'} fontWeight={'300'} color={'$color05'}>
@@ -29,71 +34,75 @@ export function DepositScreen() {
           </H3>
         </YStack>
 
-        <AnimateEnter>
+        <Fade>
           <Stack gap={'$4'} w={'100%'} $gtMd={{ flexDirection: 'row' }}>
-            <DespositWeb3Wallet />
+            <DespositWeb3Link />
             <DespositCoinbasePay />
           </Stack>
-        </AnimateEnter>
+        </Fade>
       </YStack>
     </YStack>
   )
 }
 
-function DespositWeb3Wallet() {
-  const { openConnectModal } = useConnectModal()
-  const { address, isConnected } = useAccount()
-  const { data: sendAccount } = useSendAccount()
-
-  if (!isConnected) {
-    return (
-      <DepositButton onPress={() => openConnectModal?.()}>
-        <ButtonText>Connect to Deposit</ButtonText>
-      </DepositButton>
-    )
-  }
+function DespositWeb3Link() {
   return (
-    <DepositButton
-      onPress={() => {
-        console.log('Deposit to', sendAccount?.address, 'from', address)
-        // show screen to send to send account
-      }}
-    >
-      <ButtonText>Web3 Wallet</ButtonText>
-    </DepositButton>
+    <DepositStackButton>
+      <DepositButton
+        icon={<IconEthereum size={'$2.5'} color={'$color12'} />}
+        {...useLink({
+          href: '/deposit/web3',
+        })}
+        accessibilityLabel="Deposit with Web3 Wallet"
+      />
+      <DepositStackSubheader>Web3 Wallet</DepositStackSubheader>
+    </DepositStackButton>
   )
 }
 
 function DespositCoinbasePay() {
   const toast = useToastController()
   return (
-    <DepositButton
-      onPress={() => {
-        console.log('Coinbase Pay')
-        toast.show('Coming Soon')
-      }}
-    >
-      <ButtonText>Coinbase Pay</ButtonText>
-    </DepositButton>
+    <DepositStackButton disabled disabledStyle={{ opacity: 0.5 }}>
+      <DepositButton
+        icon={<IconCoinbaseOnramp size={'$2.5'} color={'$color12'} />}
+        onPress={() => {
+          console.log('Coinbase Pay')
+          toast.show('Coming Soon')
+        }}
+      />
+      {/* <DepositStackSubheader>Coinbase Pay</DepositStackSubheader> */}
+      <DepositStackSubheader>Coming Soon</DepositStackSubheader>
+    </DepositStackButton>
   )
 }
 
-function AnimateEnter({ children }: { children: React.ReactNode }) {
-  if (process.env.NODE_ENV === 'test') return <>{children}</> // figure out why mocking AnimatePresence is not working
-
+function DepositStackButton({ children, ...props }: YStackProps) {
   return (
-    <AnimatePresence>
-      <Stack
-        key="enter"
-        animateOnly={['transform', 'opacity']}
-        animation="200ms"
-        enterStyle={{ opacity: 0, scale: 0.9 }}
-        exitStyle={{ opacity: 0, scale: 0.95 }}
-        opacity={1}
-      >
-        {children}
-      </Stack>
-    </AnimatePresence>
+    <YStack
+      gap={'$4'}
+      jc="center"
+      ai="center"
+      f={1}
+      width="100%"
+      $md={{
+        width: '100%',
+      }}
+      $gtMd={{
+        height: '$12',
+      }}
+      {...props}
+    >
+      {children}
+    </YStack>
+  )
+}
+
+function DepositStackSubheader({ children, ...props }: HeadingProps) {
+  return (
+    <H4 size={'$4'} fontWeight={'300'} color={'$color05'} ta="center" {...props}>
+      {children}
+    </H4>
   )
 }
 
@@ -102,17 +111,10 @@ function DepositButton({ children, ...props }: ButtonProps) {
     <Button
       chromeless
       f={1}
-      bc={'$color2'}
+      bc={'$color3'}
       height={'$8'}
       width="100%"
-      // minWidth={'$14'}
-      $sm={
-        {
-          // minWidth: '$20',
-        }
-      }
       $gtMd={{
-        // width: '50%',
         height: '$12',
       }}
       {...props}

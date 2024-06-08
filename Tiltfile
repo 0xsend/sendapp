@@ -191,7 +191,7 @@ local_resource(
 local_resource(
     name = "shovel:generate-config",
     allow_parallel = True,
-    cmd = "yarn workspace shovel generate",
+    cmd = "yarn workspace @my/shovel generate",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -208,7 +208,7 @@ cmd_button(
     argv = [
         "/bin/sh",
         "-c",
-        "yarn workspace shovel test --update-snapshots && yarn workspace shovel generate",
+        "yarn workspace @my/shovel test --update-snapshots && yarn workspace @my/shovel generate",
     ],
     icon_name = "restart_alt",
     location = location.RESOURCE,
@@ -485,7 +485,6 @@ local_resource(
     resource_deps = [
         "yarn:install",
         "anvil:base",
-        "supabase:test",
         "shovel:generate-config",
     ],
     serve_cmd = "yarn run shovel:tilt",
@@ -494,6 +493,19 @@ local_resource(
         "packages/shovel/bin/shovel.tilt.ts",
         "packages/shovel/etc/config.json",
     ],
+)
+
+cmd_button(
+    "shovel:empty",
+    argv = [
+        "/bin/sh",
+        "-c",
+        "yarn workspace @my/shovel run empty",
+    ],
+    icon_name = "delete_forever",
+    location = location.RESOURCE,
+    resource = "shovel",
+    text = "shovel:empty",
 )
 
 local_resource(
@@ -770,7 +782,7 @@ local_resource(
     name = "shovel:test",
     allow_parallel = True,
     auto_init = not CI,
-    cmd = "yarn workspace shovel test",
+    cmd = "yarn workspace @my/shovel test",
     labels = labels,
     resource_deps = [
         "yarn:install",

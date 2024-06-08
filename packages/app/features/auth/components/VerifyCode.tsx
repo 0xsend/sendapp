@@ -78,17 +78,12 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             autoComplete: 'one-time-code',
             outlineColor: 'transparent',
             theme: 'accent',
+            autoFocus: true,
+            fieldsetProps: {
+              f: 1,
+            },
             focusStyle: {
               borderBottomColor: '$accent3Light',
-              autoFocus: true,
-              focusStyle: {
-                '$theme-dark': {
-                  borderBottomColor: '$accent9Light',
-                },
-                '$theme-light': {
-                  borderBottomColor: '$black',
-                },
-              },
             },
           },
         }}
@@ -121,7 +116,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           </XStack>
         )}
       >
-        {(fields) => (
+        {({ token }) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <BigHeading color="$color12">VERIFY ACCOUNT</BigHeading>
             <H3
@@ -138,7 +133,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
               <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
                 Your Code
               </Paragraph>
-              <XStack gap="$2">{Object.values(fields)}</XStack>
+              {token}
             </YStack>
           </YStack>
         )}

@@ -3,7 +3,7 @@ import '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'
-import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
+import { render, screen } from '@testing-library/react-native'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 

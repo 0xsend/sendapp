@@ -108,6 +108,10 @@ export const OnboardingForm = () => {
             width: '100%',
             backgroundColor: 'transparent',
             outlineColor: 'transparent',
+            focusStyle: {
+              borderBottomColor: '$accent3Light',
+            },
+            autoFocus: true,
           },
         }}
         renderAfter={({ submit }) => (

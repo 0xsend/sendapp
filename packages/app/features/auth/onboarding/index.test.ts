@@ -55,6 +55,8 @@ import {
 } from 'permissionless'
 import { numberToBytes } from 'viem'
 
+jest.unmock('@my/wagmi')
+
 const sendAccountFactory = getContract({
   address: sendAccountFactoryAddress[baseMainnetClient.chain.id],
   abi: sendAccountFactoryAbi,

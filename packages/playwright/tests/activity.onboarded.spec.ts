@@ -87,8 +87,8 @@ test('can search on activity page', async ({ page, context }) => {
 
   await expect(activityHeading(page)).toBeVisible()
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
-  await page.getByRole('textbox', { name: 'Name, $Sendtag, Phone' }).fill('test')
-  await expect(page.getByRole('textbox', { name: 'Name, $Sendtag, Phone' })).toHaveValue('test')
+  await page.getByRole('textbox', { name: '$Sendtag, Phone, Send ID' }).fill('test')
+  await expect(page.getByRole('textbox', { name: '$Sendtag, Phone, Send ID' })).toHaveValue('test')
   await isLoading.waitFor({ state: 'detached' })
   await expect(page.getByRole('heading', { name: 'TAG' })).toBeVisible()
   for (const tag of testTags) {

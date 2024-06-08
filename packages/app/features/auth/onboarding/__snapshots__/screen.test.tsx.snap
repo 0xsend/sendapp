@@ -275,7 +275,6 @@ exports[`OnboardingScreen 1`] = `
             <View
               style={
                 {
-                  "flex": 1,
                   "flexDirection": "column",
                 }
               }
@@ -305,6 +304,7 @@ exports[`OnboardingScreen 1`] = `
               >
                 <TextInput
                   accessibilityLabel="Account name"
+                  autoFocus={true}
                   control={
                     {
                       "_defaultValues": {
@@ -573,6 +573,7 @@ exports[`OnboardingScreen 1`] = `
                   "busy": false,
                 }
               }
+              accessible={true}
               cancelable={true}
               disabled={false}
               focusVisibleStyle={{}}
