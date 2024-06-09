@@ -1,3 +1,4 @@
+import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { createParam } from 'solito'
 
 export type RootParams = { nav?: 'home' | 'settings'; token?: string }
@@ -76,8 +77,10 @@ const useAmount = () => {
   return [amount, setAmountParam] as const
 }
 
-const useSendToken = () => {
-  const [sendToken, setSendTokenParam] = useSendParam('sendToken')
+export const useSendToken = () => {
+  const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
+    initial: usdcAddress[baseMainnet.id],
+  })
 
   return [sendToken, setSendTokenParam] as const
 }

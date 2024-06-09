@@ -4,7 +4,9 @@
     "src",
     // dirty hack, but we need somehow included app/utils in the build
     "../app/utils/country",
-    "../app/utils/useGeoIp"
+    "../app/utils/useGeoIp",
+    "../app/utils/coins",
+    "@my/wagmi"
   ],
   "compilerOptions": {
     "composite": true,

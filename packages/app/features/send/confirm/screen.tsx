@@ -9,21 +9,18 @@ import {
   Button,
   Label,
   Avatar,
-  Input,
   ButtonText,
   ScrollView,
 } from '@my/ui'
 
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useAccountNonce } from 'app/utils/userop'
 import { assert } from 'app/utils/assert'
 
 import { baseMainnet } from '@my/wagmi'
 import { useBalance } from 'wagmi'
-import { useSendParams } from 'app/routers/params'
-import { formFields } from 'app/utils/SchemaForm'
+import { useSendScreenParams } from 'app/routers/params'
 import { useState } from 'react'
-import { z } from 'zod'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { type Hex, parseUnits, isAddress } from 'viem'
 import {
@@ -40,10 +37,8 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
 export function SendConfirmScreen() {
-  const {
-    params: { recipient, sendToken: tokenParam, amount: amountParam },
-  } = useSendParams()
-  const { data: profile, isLoading, error } = useProfileLookup('tag', recipient)
+  const [queryParams] = useSendScreenParams()
+  const { data: profile, isLoading, error } = useProfileLookup('tag', queryParams.recipient ?? '')
   const router = useRouter()
 
   if (isLoading) return <Spinner size="large" />
@@ -51,7 +46,11 @@ export function SendConfirmScreen() {
   if (!profile) {
     router.replace({
       pathname: '/send',
-      query: { recipient, sendToken: tokenParam, amount: amountParam },
+      query: {
+        recipient: queryParams.recipient,
+        sendToken: queryParams.sendToken,
+        amount: queryParams.amount,
+      },
     })
     return null
   }
@@ -61,12 +60,9 @@ export function SendConfirmScreen() {
 
 export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const toast = useToastController()
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
   const [sentUserOpTxHash, setSentUserOpTxHash] = useState<Hex>()
-  const {
-    params: { sendToken: tokenParam, amount: amountParam, recipient },
-  } = useSendParams()
+  const [queryParams] = useSendScreenParams()
 
   const router = useRouter()
   const {
@@ -76,17 +72,17 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     refetch: balanceRefetch,
   } = useBalance({
     address: sendAccount?.address,
-    token: tokenParam === 'eth' ? undefined : tokenParam,
+    token: queryParams.sendToken === 'eth' ? undefined : queryParams.sendToken,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
 
-  const amount = parseUnits((amountParam ?? '0').toString(), balance?.decimals ?? 0)
+  const amount = parseUnits((queryParams.amount ?? '0').toString(), balance?.decimals ?? 0)
   const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
   const { data: userOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
     to: profile?.address,
-    token: tokenParam === 'eth' ? undefined : tokenParam,
+    token: queryParams.sendToken === 'eth' ? undefined : queryParams.sendToken,
     amount: BigInt(amount),
     nonce: nonce ?? 0n,
   })
@@ -108,8 +104,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   // need balance to check if user has enough to send
 
   const canSubmit =
-    Number(amountParam) > 0 &&
-    coins.some((coin) => coin.token === tokenParam) &&
+    Number(queryParams.amount) > 0 &&
+    coins.some((coin) => coin.token === queryParams.sendToken) &&
     (balance?.value ?? BigInt(0) >= amount)
 
   async function onSubmit() {
@@ -129,7 +125,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
       assert(receipt.success, 'Failed to send user op')
       setSentUserOpTxHash(receipt.receipt.transactionHash)
       toast.show(`Sent user op ${receipt.receipt.transactionHash}!`)
-      router.replace({ pathname: '/', query: { token: tokenParam } })
+      router.replace({ pathname: '/', query: { token: queryParams.sendToken } })
     } catch (e) {
       console.error(e)
     }
@@ -167,7 +163,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                 onPress={() =>
                   router.push({
                     pathname: '/send',
-                    query: { sendToken: tokenParam, amount: amountParam },
+                    query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
                   })
                 }
               >
@@ -200,17 +196,17 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   lineHeight="$1"
                   color="$color11"
                 >
-                  @{profile?.tag_name}
+                  {profile?.tag ? `@${profile?.tag}` : `#${profile?.id}`}
                 </Paragraph>
               </YStack>
             </XStack>
           </YStack>
 
-          <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }}>
+          <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
             <XStack jc="space-between" ai="center" gap="$3">
               <Label
                 fontWeight="500"
-                fontSize={'$5'}
+                fontSize="$5"
                 textTransform="uppercase"
                 $theme-dark={{ col: '$gray8Light' }}
               >
@@ -225,7 +221,11 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                 onPress={() =>
                   router.push({
                     pathname: '/send',
-                    query: { recipient, sendToken: tokenParam, amount: amountParam },
+                    query: {
+                      recipient: queryParams.recipient,
+                      sendToken: queryParams.sendToken,
+                      amount: queryParams.amount,
+                    },
                   })
                 }
               >
@@ -242,10 +242,10 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
               f={1}
             >
               <Paragraph fontSize="$9" fontWeight="600" color="$color12">
-                {amountParam}
+                {queryParams.amount}
               </Paragraph>
               {(() => {
-                const coin = coins.find((coin) => coin.token === tokenParam)
+                const coin = coins.find((coin) => coin.token === queryParams.sendToken)
                 if (coin) {
                   return <IconCoin coin={coin} />
                 }

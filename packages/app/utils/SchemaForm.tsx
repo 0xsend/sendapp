@@ -5,6 +5,7 @@ import {
   BooleanCheckboxField,
   BooleanField,
   BooleanSwitchField,
+  CoinField,
   CountryCodeField,
   NumberField,
   OTPField,
@@ -44,6 +45,7 @@ export const formFields = {
    */
   countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
   otp: createUniqueFieldSchema(z.string(), 'otp'),
+  coin: createUniqueFieldSchema(z.string(), 'coin'),
 }
 
 const mapping = [
@@ -56,6 +58,7 @@ const mapping = [
   [formFields.select, SelectField] as const,
   [formFields.countrycode, CountryCodeField] as const,
   [formFields.otp, OTPField] as const,
+  [formFields.coin, CoinField],
 ] as const
 
 const FormComponent = (props: FormProps) => {
