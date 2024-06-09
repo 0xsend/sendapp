@@ -3,13 +3,19 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
+const aspectRatio = 28 / 22
+
 const Activity = (props) => {
   const { size, color, ...rest } = props
+
+  const height = size / aspectRatio
+  const width = size
+
   return (
     <Svg
       color={color as ColorTokens | undefined}
-      width={size ?? 28}
-      height={size ?? 22}
+      width={width}
+      height={height}
       viewBox="0 0 28 22"
       {...rest}
     >

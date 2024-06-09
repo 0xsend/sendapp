@@ -1,4 +1,7 @@
 import {
+  Avatar,
+  H4,
+  Link,
   Nav,
   Paragraph,
   ScrollView,
@@ -7,14 +10,17 @@ import {
   SideBarWrapper,
   XStack,
   YStack,
-  type YStackProps,
   useMedia,
-  Avatar,
-  H4,
+  type YStackProps,
 } from '@my/ui'
-import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
+import {
+  IconAccount,
+  IconActivity,
+  IconHome,
+  IconSendLogo,
+  IconDeviceReset,
+} from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -30,13 +36,13 @@ const links = [
     href: '/',
   },
   {
-    icon: <IconSLogo size={'$1'} />,
-    text: 'send',
+    icon: <IconActivity size={'$1'} />,
+    text: 'Send',
     href: '/send',
   },
   {
-    icon: <IconActivity size={'$1'} />,
-    text: 'activity',
+    icon: <IconDeviceReset size={'$1'} />,
+    text: 'Activity',
     href: '/activity',
   },
   {
