@@ -25,6 +25,7 @@ import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
 import { IconCoin } from './icons/IconCoin'
+import { Link } from 'solito/link'
 
 export enum ButtonOption {
   QR = 'QR',
@@ -165,11 +166,13 @@ export function TopNav({
         </Stack>
         {showLogo && media.lg ? (
           <XStack>
-            <IconSendLogo
-              size={'$2.5'}
-              color={'$color12'}
-              display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
-            />
+            <Link href="/send">
+              <IconSendLogo
+                size={'$2.5'}
+                color={'$color12'}
+                display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+              />
+            </Link>
           </XStack>
         ) : (
           <H2
