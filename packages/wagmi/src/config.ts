@@ -3,7 +3,11 @@ import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
 import { mainnetClient, baseMainnetClient } from './client'
 import { createConfig } from 'wagmi'
 
-export const chains = [baseMainnet, mainnet, baseMainnetOg, mainnetOg] as const
+export const chains = [
+  baseMainnet,
+  mainnet,
+  // baseMainnetOg, mainnetOg
+] as const
 
 export const client = ({ chain: { id: chainId } }) => {
   if (chainId === mainnet.id) return mainnetClient

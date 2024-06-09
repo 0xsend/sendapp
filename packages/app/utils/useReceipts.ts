@@ -1,14 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSupabase } from './supabase/useSupabase'
+import type { Tables } from '@my/supabase/database.types'
 
 export type Receipts = {
-  receipts:
-    | {
-        created_at: string | null
-        hash: string
-        user_id: string
-      }[]
-    | undefined
+  receipts: Tables<'receipts'>[]
   error: Error | null
   isLoading: boolean
   refetch: () => void
