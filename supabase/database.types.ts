@@ -82,7 +82,7 @@ export type Database = MergeDeep<
           }[]
         }
         profile_lookup: {
-          Returns: ProfileLookup
+          Returns: ProfileLookup[]
         }
       }
       Views: {

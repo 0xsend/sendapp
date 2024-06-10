@@ -14,6 +14,7 @@
     "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env -c --"
   },
   "dependencies": {
+    "@my/supabase": "workspace:*",
     "@plaiceholder/next": "^3.0.0",
     "@rainbow-me/rainbowkit": "^2.0.4",
     "@supabase/auth-helpers-react": "^0.4.2",

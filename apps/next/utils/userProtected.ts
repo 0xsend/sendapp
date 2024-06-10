@@ -5,6 +5,7 @@ import type { GetServerSideProps, PreviewData } from 'next'
 
 import debug from 'debug'
 import { userOnboarded } from './userOnboarded'
+import { logRequest } from './logRequest'
 
 const log = debug('next:utils:userProtected')
 
@@ -26,12 +27,7 @@ export function userProtectedGetSSP<
       data: { session },
     } = await supabase.auth.getSession()
 
-    // log user activity
-    console.log(
-      `${ctx.req.url} - ${ctx.req.headers['user-agent']}${
-        ctx.req.headers['x-forwarded-for'] ? ` - ${ctx.req.headers['x-forwarded-for']}` : ''
-      }`
-    )
+    logRequest(ctx)
 
     if (!session) {
       log('no session')

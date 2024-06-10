@@ -14,7 +14,7 @@ test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
 })
 
-test('can visit other user profile', async ({ page, seed }) => {
+test('can visit other user profile and send by tag', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
@@ -26,7 +26,25 @@ test('can visit other user profile', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
   await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
-  await expect(page.getByTestId('sendSearchContainer')).toBeVisible()
+  await page.waitForURL(`/send?recipient=${tag.name}`)
+  await expect(page.getByText('Enter Amount')).toBeVisible()
+
+  // visit another user but without a sendtag
+  const plan2 = await seed.users([{ ...userOnboarded, tags: [] }])
+  const tag2 = plan2.tags[0]
+  assert(!tag2, 'should not have a tag')
+  const profile2 = plan2.profiles[0]
+  assert(!!profile2?.sendId, 'profile send_id not found')
+  assert(!!profile2?.name, 'profile name not found')
+  assert(!!profile2?.about, 'profile about not found')
+  const profilePage2 = new ProfilePage(page, { name: profile2.name, about: profile2.about })
+  await page.goto(`/profile/${profile2.sendId}`)
+  await expect(profilePage2.sendButton).toBeVisible()
+  await expect(profilePage2.requestButton).toBeVisible()
+  await profilePage2.sendButton.click()
+  // fix sending to send IDs
+  // await page.waitForURL(`/account/send?recipient=${profile2.sendId}`)
+  await expect(page.getByText('Enter Amount')).toBeVisible()
 })
 
 test('can visit my own profile', async ({

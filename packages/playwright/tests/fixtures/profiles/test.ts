@@ -15,7 +15,7 @@ export class ProfilePage {
   }
 
   async visit(tag: string, expect?: Expect<ProfilePage>) {
-    await this.page.goto(`${tag}`)
+    await this.page.goto(`@${tag}`)
     const title = await this.page.title()
     expect?.(title).toBe('Send | Profile')
     await expect?.(this.page.getByRole('heading', { name: tag })).toBeVisible()

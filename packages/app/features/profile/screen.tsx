@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   H1,
   H2,
   Paragraph,
@@ -37,7 +36,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
       {profile ? (
         <YStack width="100%" gap="$2">
           <AvatarProfile profile={profile} /> <H1 nativeID="profileName">{profile.name}</H1>
-          <H2 theme="alt1">{formatTags(profile.all_tags)}</H2>
+          <H2 theme="alt1">{formatTags(profile.all_tags ?? [])}</H2>
           <Paragraph mb="$4">{profile.about}</Paragraph>
           {profile && user?.id !== profile?.id ? (
             <XStack jc="space-around" gap="$6" maxWidth={600}>
@@ -48,7 +47,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 onPress={() => {
                   router.push({
                     pathname: '/send',
-                    query: { recipient: profile.tag },
+                    query: { recipient: profile.tag ?? profile.sendid },
                   })
                 }}
                 theme="accent"
