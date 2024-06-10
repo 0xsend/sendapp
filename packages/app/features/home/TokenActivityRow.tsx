@@ -1,4 +1,4 @@
-import { Stack, Text, XStack, YStack, useMedia } from '@my/ui'
+import { Stack, Text, XStack, YStack } from '@my/ui'
 import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
 import type { SendAccountTransfersEvent } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatar'
