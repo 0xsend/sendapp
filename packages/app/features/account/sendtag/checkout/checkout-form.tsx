@@ -35,15 +35,6 @@ import { ConfirmButton } from './components/checkout-confirm-button'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { Link } from 'solito/link'
 
-const referralFromCookie = () => {
-  if (typeof document === 'undefined') return ''
-  const referral = document.cookie
-    .split(';')
-    .map((c) => c.trim())
-    .find((c) => c.startsWith('referral='))
-  return referral?.split('=')[1] ?? ''
-}
-
 export const CheckoutForm = () => {
   const user = useUser()
   const pendingTags = usePendingTags()
@@ -342,6 +333,14 @@ export const CheckoutForm = () => {
  * Shows the referral code and the user's profile if they have one
  */
 function ReferredBy() {
+  const referralFromCookie = () => {
+    if (typeof document === 'undefined') return ''
+    const referral = document.cookie
+      .split(';')
+      .map((c) => c.trim())
+      .find((c) => c.startsWith('referral='))
+    return referral?.split('=')[1] ?? ''
+  }
   const [refcode, setRefcode] = useState<string>(referralFromCookie())
   const { data: profile, error } = useProfileLookup('refcode', refcode)
 
@@ -365,11 +364,12 @@ function ReferredBy() {
       </Paragraph>
       <XStack gap="$2" ai={'center'} jc="flex-start">
         <YStack jc="flex-start" ai="flex-start">
-          <Label fontWeight="500" col={'$color12'}>
+          <Label fontWeight="500" col={'$color12'} htmlFor={'refcode'}>
             Referral Code:
           </Label>
           <XStack gap="$2" jc="flex-start" ai="flex-start">
             <Input
+              id={'refcode'}
               defaultValue={referralFromCookie()}
               onChangeText={(text) => setRefcode(text)}
               col={'$color12'}

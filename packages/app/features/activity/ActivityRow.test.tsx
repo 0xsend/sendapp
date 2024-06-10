@@ -84,12 +84,27 @@ describe('ActivityRow', () => {
 
   it('should render referrals event', () => {
     const activity = EventSchema.parse(mockReferral)
-    const { getByText } = render(
+    const { getByText, getByTestId } = render(
       <TamaguiProvider defaultTheme={'dark'} config={config}>
         <ActivityRow activity={activity} />
       </TamaguiProvider>
     )
     expect(getByText('Referral')).toBeOnTheScreen()
     expect(getByText('@disconnect_whorl7351')).toBeOnTheScreen()
+    expect(getByTestId('ActivityRowAmount')).toHaveTextContent('1 Referrals')
+  })
+
+  it('should render referred by event', () => {
+    const activity = EventSchema.parse(mockReferral)
+    activity.from_user = mockReferral.to_user
+    activity.to_user = mockReferral.from_user
+    const { getByText, getByTestId } = render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <ActivityRow activity={activity} />
+      </TamaguiProvider>
+    )
+    expect(getByText('Referred By')).toBeOnTheScreen()
+    expect(getByText('@disconnect_whorl7351')).toBeOnTheScreen()
+    expect(getByTestId('ActivityRowAmount')).toBeEmptyElement()
   })
 })

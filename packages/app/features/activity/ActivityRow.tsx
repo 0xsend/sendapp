@@ -28,7 +28,12 @@ export function ActivityRow({ activity }: { activity: Activity }) {
             <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
               {eventName}
             </Text>
-            <Text color="$color12" fontSize="$7" $gtMd={{ display: 'none', fontSize: '$5' }}>
+            <Text
+              color="$color12"
+              fontSize="$7"
+              $gtMd={{ display: 'none', fontSize: '$5' }}
+              testID="ActivityRowAmount"
+            >
               {amount}
             </Text>
           </XStack>
