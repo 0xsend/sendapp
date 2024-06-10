@@ -41,6 +41,13 @@ interface Table_auth_audit_log_entries {
   created_at: string | null;
   ip_address: string;
 }
+interface Table_public_auth_challenges {
+  id: string;
+  user_id: string;
+  challenge: string;
+  created_at: string;
+  expires_at: string;
+}
 interface Table_storage_buckets {
   id: string;
   name: string;

@@ -1,5 +1,7 @@
 import {
+  Anchor,
   BigHeading,
+  Button,
   ButtonText,
   FormWrapper,
   H3,
@@ -90,9 +92,9 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           <XStack
             f={1}
             mt={'0'}
-            jc={'flex-end'}
+            jc={'space-between'}
             $sm={{ jc: 'center', height: '100%' }}
-            ai={'flex-start'}
+            ai={'center'}
           >
             <SubmitButton
               onPress={() => submit()}

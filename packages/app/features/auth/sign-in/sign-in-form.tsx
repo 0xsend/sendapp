@@ -1,16 +1,19 @@
-import { ButtonText, BigHeading, Paragraph, SubmitButton, XStack, YStack, H3 } from '@my/ui'
+import { ButtonText, BigHeading, Paragraph, SubmitButton, XStack, YStack, H3, Anchor } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { api } from 'app/utils/api'
 import { useRouter } from 'solito/router'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { z } from 'zod'
+import { useState } from 'react'
+import AccountRecovery from 'app/features/auth/account-recovery/account-recovery'
 
 const SignInSchema = z.object({
   countrycode: formFields.countrycode,
   phone: formFields.text.min(1).max(20),
 })
 export const SignInForm = () => {
+  const [showRecoveryForm, setShowRecoveryForm] = useState<boolean>(false)
   const form = useForm<z.infer<typeof SignInSchema>>()
   const signInWithOtp = api.auth.signInWithOtp.useMutation()
 
@@ -43,6 +46,8 @@ export const SignInForm = () => {
             router.push('/')
           }}
         />
+      ) : showRecoveryForm ? (
+        <AccountRecovery onClose={() => setShowRecoveryForm(false)} />
       ) : (
         <SchemaForm
           flex={1}
@@ -88,10 +93,20 @@ export const SignInForm = () => {
             <XStack
               f={1}
               mt={'0'}
-              jc={'flex-end'}
+              jc={'space-between'}
               $sm={{ jc: 'center', height: '100%' }}
               ai={'flex-start'}
             >
+              <Anchor
+                href=""
+                onPress={(e) => {
+                  e.preventDefault()
+                  setShowRecoveryForm(true)
+                }}
+                fontSize="$3"
+              >
+                Forgot your phone number?
+              </Anchor>
               <SubmitButton
                 onPress={() => submit()}
                 br="$3"
