@@ -646,7 +646,6 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
               <View
                 style={
                   {
-                    "flex": 1,
                     "flexDirection": "column",
                   }
                 }
