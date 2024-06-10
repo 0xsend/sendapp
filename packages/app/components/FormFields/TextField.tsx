@@ -24,7 +24,8 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
     error,
     formState: {
       isSubmitting,
-      // isValid
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      isValid,
     },
   } = useTsController<string>()
 
