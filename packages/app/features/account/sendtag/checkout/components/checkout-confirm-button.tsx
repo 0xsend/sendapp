@@ -24,22 +24,21 @@ import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
+import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
 import { defaultUserOp, sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { checksumAddress, encodeFunctionData } from 'viem'
 import {
   useBalance,
-  useBlockNumber,
   useEstimateFeesPerGas,
   usePublicClient,
   useWaitForTransactionReceipt,
 } from 'wagmi'
 import { getPriceInWei, useSenderSafeReceivedEvents } from '../checkout-utils'
-import { throwIf } from 'app/utils/throwIf'
 
 export function ConfirmButton({
   onConfirmed,

@@ -22,7 +22,11 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
   const {
     field,
     error,
-    formState: { isSubmitting, isValid },
+    formState: {
+      isSubmitting,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      isValid,
+    },
   } = useTsController<string>()
 
   const { label, placeholder, isOptional, maxLength, isEmail } = useStringFieldInfo()

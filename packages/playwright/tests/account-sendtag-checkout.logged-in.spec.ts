@@ -112,6 +112,7 @@ test('can refer a tag', async ({
   const referrer = plan.profiles[0]
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
+  assert(!!referrer.referralCode, 'referral code not found')
   await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
   await checkoutPage.goto()
   const tagsCount = Math.floor(Math.random() * 5) + 1
@@ -122,6 +123,21 @@ test('can refer a tag', async ({
     await checkoutPage.addPendingTag(tagName)
     await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
   }
+
+  // check referral code and referrer are visible
+  const refcode = checkoutPage.page.getByLabel('Referral Code:')
+  const referredBy = checkoutPage.page.getByText(`@${referrerTags[0]}`)
+  await expect(refcode).toBeVisible()
+  await expect(refcode).toHaveValue(referrer.referralCode)
+  await expect(referredBy).toBeVisible() // show the referred
+  // can change the referral code
+  await refcode.fill('1234567890')
+  await expect(referredBy).toBeHidden() // invalid code, no referral
+  // can change the referrer to valid code
+  await refcode.fill(referrer.referralCode)
+  await expect(refcode).toBeVisible() // show the referral code
+  await expect(referredBy).toBeVisible() // show the referred
+
   await checkoutPage.confirmTags(expect)
   const { data: tags, error } = await supabase.from('tags').select('*').in('name', tagsToRegister)
   expect(error).toBeFalsy()

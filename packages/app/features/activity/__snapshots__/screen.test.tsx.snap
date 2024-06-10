@@ -824,6 +824,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       }
                     }
                     suppressHighlighting={true}
+                    testID="ActivityRowAmount"
                   >
                     0.019032 USDC
                   </Text>
@@ -1125,6 +1126,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       }
                     }
                     suppressHighlighting={true}
+                    testID="ActivityRowAmount"
                   >
                     0.02 ETH
                   </Text>
@@ -1431,6 +1433,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       }
                     }
                     suppressHighlighting={true}
+                    testID="ActivityRowAmount"
                   >
                     1 Referrals
                   </Text>
@@ -1758,6 +1761,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       }
                     }
                     suppressHighlighting={true}
+                    testID="ActivityRowAmount"
                   />
                 </View>
                 <View
@@ -2058,6 +2062,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       }
                     }
                     suppressHighlighting={true}
+                    testID="ActivityRowAmount"
                   />
                 </View>
                 <View
@@ -2379,6 +2384,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                       }
                     }
                     suppressHighlighting={true}
+                    testID="ActivityRowAmount"
                   >
                     0.077777 USDC
                   </Text>

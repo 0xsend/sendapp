@@ -16,8 +16,11 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
   if (isTagReceiptsEvent(activity)) {
     return from_user
   }
-  if (isReferralsEvent(activity)) {
+  if (isReferralsEvent(activity) && !!from_user?.id) {
     return to_user // show the referred
+  }
+  if (isReferralsEvent(activity) && !!to_user?.id) {
+    return from_user // show the referrer
   }
   if (isSendAccountTransfersEvent(activity)) {
     if (from_user?.id) {
@@ -50,9 +53,14 @@ export function amountFromActivity(activity: Activity): string {
       const amount = formatUnits(data.value, data.coin.decimals)
       return `${amount} ${data.coin.symbol}`
     }
-    case isReferralsEvent(activity): {
+    case isReferralsEvent(activity) && !!activity.from_user?.id: {
+      // only show if the user is the referrer
       const data = activity.data
       return `${data.tags.length} Referrals`
+    }
+    case isReferralsEvent(activity) && !!activity.to_user?.id: {
+      // only show if the user is the referred
+      return '' // no amount
     }
     case activity.event_name === 'send_account_signing_key_added': {
       return ''
@@ -80,8 +88,10 @@ export function eventNameFromActivity(activity: Activity) {
       return 'Sent'
     case isTagReceiptsEvent(activity):
       return 'Sendtag Registered'
-    case isReferralsEvent(activity):
+    case isReferralsEvent(activity) && !!from_user?.id:
       return 'Referral'
+    case isReferralsEvent(activity) && !!to_user?.id:
+      return 'Referred By'
     default:
       return event_name // catch-all i_am_rick_james -> I Am Rick James
         .split('_')
@@ -96,14 +106,19 @@ export function eventNameFromActivity(activity: Activity) {
 export function subtextFromActivity(activity: Activity): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user } = activity
-  if (isTagReceiptsEvent(activity) || isReferralsEvent(activity)) {
+  if (isTagReceiptsEvent(activity)) {
     return activity.data.tags.map((t) => `@${t}`).join(', ')
   }
-  if (_user) {
-    if (_user.tags?.[0]) {
-      return `@${_user.tags[0]}`
+  if (isReferralsEvent(activity)) {
+    if (from_user?.id) {
+      // show the referred
+      return userNameFromActivityUser(to_user)
     }
-    return `#${_user.send_id}`
+    // show the referrer
+    return userNameFromActivityUser(from_user)
+  }
+  if (_user) {
+    return userNameFromActivityUser(_user)
   }
   if (isSendAccountTransfersEvent(activity) && from_user?.id) {
     return activity.data.t
@@ -112,4 +127,30 @@ export function subtextFromActivity(activity: Activity): string | null {
     return activity.data.f
   }
   return null
+}
+
+/**
+ * Returns the name of the user from the activity user.
+ * The cascading fallback is to:
+ * 1. First, sendtag
+ * 2. 2nd, profile name
+ * 3. 3rd, Send ID
+ */
+export function userNameFromActivityUser(
+  user: Activity['from_user'] | Activity['to_user']
+): string {
+  switch (true) {
+    case !!user?.tags?.[0]:
+      return `@${user.tags[0]}`
+    case !!user?.name:
+      return user.name
+    case !!user?.send_id:
+      return `#${user.send_id}`
+    default:
+      console.error('no user name found', user)
+      if (__DEV__) {
+        throw new Error('no user name found')
+      }
+      return ''
+  }
 }
