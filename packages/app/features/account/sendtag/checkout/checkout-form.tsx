@@ -1,7 +1,10 @@
 import {
   AnimatePresence,
+  Avatar,
   Button,
   ButtonText,
+  Fade,
+  Input,
   Label,
   Paragraph,
   Stack,
@@ -13,14 +16,14 @@ import {
   useToastController,
 } from '@my/ui'
 
-import { X } from '@tamagui/lucide-icons'
-import { IconPlus } from 'app/components/icons'
+import { Check, X } from '@tamagui/lucide-icons'
+import { IconAccount, IconPlus } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatEther } from 'viem'
@@ -29,6 +32,17 @@ import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 import { getPriceInWei, maxNumSendTags, tagLengthToWei } from './checkout-utils'
 import { ConfirmButton } from './components/checkout-confirm-button'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { Link } from 'solito/link'
+
+const referralFromCookie = () => {
+  if (typeof document === 'undefined') return ''
+  const referral = document.cookie
+    .split(';')
+    .map((c) => c.trim())
+    .find((c) => c.startsWith('referral='))
+  return referral?.split('=')[1] ?? ''
+}
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -261,6 +275,9 @@ export const CheckoutForm = () => {
           )
         }}
       </SchemaForm>
+
+      <ReferredBy />
+
       {hasPendingTags && (
         <Theme name="accent">
           <AnimatePresence>
@@ -318,6 +335,94 @@ export const CheckoutForm = () => {
         </Theme>
       )}
     </FormProvider>
+  )
+}
+
+/**
+ * Shows the referral code and the user's profile if they have one
+ */
+function ReferredBy() {
+  const [refcode, setRefcode] = useState<string>(referralFromCookie())
+  const { data: profile, error } = useProfileLookup('refcode', refcode)
+
+  // set the referral cookie
+  useEffect(() => {
+    document.cookie = `referral=${refcode}; Max-Age=${30 * 24 * 60 * 60 * 1000}; Path=/;` // 30 days
+  }, [refcode])
+
+  return (
+    <YStack w="100%" mt="$4" gap="$2" borderBottomWidth={1} pb="$6" borderColor="$decay">
+      <Paragraph
+        fontFamily={'$mono'}
+        fontWeight={'400'}
+        $theme-light={{ col: '$gray11Light' }}
+        $theme-dark={{ col: '$gray11Dark' }}
+        fontSize={'$4'}
+        mb="$0"
+        pb="$0"
+      >
+        Referred by someone? Enter their referral code below.
+      </Paragraph>
+      <XStack gap="$2" ai={'center'} jc="flex-start">
+        <YStack jc="flex-start" ai="flex-start">
+          <Label fontWeight="500" col={'$color12'}>
+            Referral Code:
+          </Label>
+          <XStack gap="$2" jc="flex-start" ai="flex-start">
+            <Input
+              defaultValue={referralFromCookie()}
+              onChangeText={(text) => setRefcode(text)}
+              col={'$color12'}
+            />
+            {profile && (
+              <Fade>
+                <Check color="$accent10Dark" size="1" position="absolute" right="$3" top="$3" />
+              </Fade>
+            )}
+          </XStack>
+        </YStack>
+        {profile && (
+          <Fade jc="flex-end" ai="flex-start" h="100%">
+            <YStack gap="$2" jc="flex-end">
+              <Link href={`/profile/${profile.sendid}`}>
+                <Avatar size="$2" br="$3" mx="auto">
+                  <Avatar.Image src={profile.avatar_url ?? ''} />
+                  <Avatar.Fallback jc="center">
+                    <IconAccount size="$2" color="$olive" />
+                  </Avatar.Fallback>
+                </Avatar>
+                <Paragraph fontSize="$2" fontWeight="500" color="$color12">
+                  {(() => {
+                    switch (true) {
+                      case !!profile.tag:
+                        return `@${profile.tag}`
+                      case !!profile.name:
+                        return profile.name
+                      default:
+                        return `#${profile.sendid}`
+                    }
+                  })()}
+                </Paragraph>
+              </Link>
+            </YStack>
+          </Fade>
+        )}
+        {error && (
+          <Paragraph
+            fontFamily={'$mono'}
+            fontWeight={'400'}
+            $theme-light={{ col: '$gray11Light' }}
+            $theme-dark={{ col: '$gray11Dark' }}
+            fontSize={'$4'}
+            mb="$0"
+            pb="$0"
+            width={'100%'}
+          >
+            {error}
+          </Paragraph>
+        )}
+      </XStack>
+    </YStack>
   )
 }
 

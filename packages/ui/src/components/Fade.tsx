@@ -1,6 +1,6 @@
-import { AnimatePresence, Stack } from 'tamagui'
+import { AnimatePresence, Stack, type StackProps } from 'tamagui'
 
-export function Fade({ children }: { children: React.ReactNode }) {
+export function Fade(props: StackProps) {
   return (
     <AnimatePresence>
       <Stack
@@ -10,9 +10,8 @@ export function Fade({ children }: { children: React.ReactNode }) {
         enterStyle={{ opacity: 0, scale: 0.9 }}
         exitStyle={{ opacity: 0, scale: 0.95 }}
         opacity={1}
-      >
-        {children}
-      </Stack>
+        {...props}
+      />
     </AnimatePresence>
   )
 }

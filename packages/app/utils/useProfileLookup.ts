@@ -18,6 +18,10 @@ export function useProfileLookup(
         .rpc('profile_lookup', { lookup_type: lookup_type, identifier: identifier })
         .maybeSingle()
       if (error) {
+        if (error.code === 'PGRST116') {
+          // no rows found
+          return null
+        }
         throw error
       }
       return data

@@ -16,8 +16,11 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
   if (isTagReceiptsEvent(activity)) {
     return from_user
   }
-  if (isReferralsEvent(activity)) {
+  if (isReferralsEvent(activity) && !!from_user?.id) {
     return to_user // show the referred
+  }
+  if (isReferralsEvent(activity) && !!to_user?.id) {
+    return from_user // show the referrer
   }
   if (isSendAccountTransfersEvent(activity)) {
     if (from_user?.id) {
@@ -80,8 +83,10 @@ export function eventNameFromActivity(activity: Activity) {
       return 'Sent'
     case isTagReceiptsEvent(activity):
       return 'Sendtag Registered'
-    case isReferralsEvent(activity):
+    case isReferralsEvent(activity) && !!from_user?.id:
       return 'Referral'
+    case isReferralsEvent(activity) && !!to_user?.id:
+      return 'Referred By'
     default:
       return event_name // catch-all i_am_rick_james -> I Am Rick James
         .split('_')
@@ -96,8 +101,15 @@ export function eventNameFromActivity(activity: Activity) {
 export function subtextFromActivity(activity: Activity): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user } = activity
-  if (isTagReceiptsEvent(activity) || isReferralsEvent(activity)) {
+  if (isTagReceiptsEvent(activity)) {
     return activity.data.tags.map((t) => `@${t}`).join(', ')
+  }
+  if (isReferralsEvent(activity)) {
+    if (from_user?.id) {
+      // show the referrer
+      return `@${to_user?.tags?.[0]}`
+    }
+    return `@${from_user?.tags?.[0]}` // show the referred
   }
   if (_user) {
     if (_user.tags?.[0]) {

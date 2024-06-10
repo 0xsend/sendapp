@@ -29,7 +29,7 @@ function setReferralCodeCookie(context: GetServerSidePropsContext) {
   if (referralCode) {
     context.res.setHeader(
       'Set-Cookie',
-      `referral=${referralCode}; Max-Age=${30 * 24 * 60 * 60}; Path=/; HttpOnly` // 30 days
+      `referral=${referralCode}; Max-Age=${30 * 24 * 60 * 60}; Path=/;` // 30 days
     )
   }
 }
