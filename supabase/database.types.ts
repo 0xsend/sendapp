@@ -8,6 +8,12 @@ import type { PostgrestError } from '@supabase/supabase-js'
  **/
 export type PgBytea = `\\x${string}`
 
+type ProfileLookupRow =
+  DatabaseGenerated['public']['Functions']['profile_lookup']['Returns'][number]
+type ProfileLookup = {
+  [K in keyof ProfileLookupRow]: ProfileLookupRow[K] | null | undefined
+}
+
 export type Database = MergeDeep<
   DatabaseGenerated,
   {
@@ -76,19 +82,7 @@ export type Database = MergeDeep<
           }[]
         }
         profile_lookup: {
-          Returns: {
-            id: string | null
-            avatar_url: string | null
-            name: string | null
-            about: string | null
-            referral_code: string
-            tag_name: string
-            address: `0x${string}`
-            chain_id: number
-            is_public: boolean | null
-            send_id: number
-            all_tags: string[] | []
-          }[]
+          Returns: ProfileLookup[]
         }
       }
       Views: {

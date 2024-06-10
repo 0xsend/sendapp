@@ -66,7 +66,7 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
 
 test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myProfile } }) => {
   // test.setTimeout(60_000) // 60 seconds
-  const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
+  const tagName = `012345_${test.info().parallelIndex}` // ensure price is .002 ETH
   await checkoutPage.addPendingTag(tagName)
   await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
   await checkoutPage.confirmTags(expect)

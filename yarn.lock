@@ -23762,6 +23762,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "next-app@workspace:apps/next"
   dependencies:
+    "@my/supabase": "workspace:*"
     "@next/bundle-analyzer": "npm:^13.4.19"
     "@next/eslint-plugin-next": "npm:^14.0.4"
     "@plaiceholder/next": "npm:^3.0.0"

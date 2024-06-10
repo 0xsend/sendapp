@@ -1,22 +1,23 @@
-import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { useId } from 'react'
 import {
   Fieldset,
+  type FieldsetProps,
   Input,
   type InputProps,
   Label,
   Paragraph,
+  Shake,
   Stack,
   Theme,
   Tooltip,
   useMedia,
   useThemeName,
-  Shake,
 } from '@my/ui'
+import { useStringFieldInfo, useTsController } from '@ts-react/form'
+import { useId } from 'react'
 
 import { AlertTriangle } from '@tamagui/lucide-icons'
 
-export const TextField = (props: InputProps) => {
+export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps }) => {
   const media = useMedia()
   const {
     field,
@@ -30,8 +31,7 @@ export const TextField = (props: InputProps) => {
   const disabled = isSubmitting
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
-      {/* flex 1 is needed to make the input fill the width of the parent in the case of a being in a container with flex direction row */}
-      <Fieldset f={1}>
+      <Fieldset {...props.fieldsetProps}>
         {!!label && (
           <Label
             size={props.size || '$5'}

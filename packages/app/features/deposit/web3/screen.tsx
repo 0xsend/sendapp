@@ -96,11 +96,9 @@ export function DepositWeb3Screen() {
   }
 
   return (
-    <Wrapper>
-      <FailsafeChainId>
-        <DepositForm />
-      </FailsafeChainId>
-    </Wrapper>
+    <FailsafeChainId>
+      <DepositForm />
+    </FailsafeChainId>
   )
 }
 

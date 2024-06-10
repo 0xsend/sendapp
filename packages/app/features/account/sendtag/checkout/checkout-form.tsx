@@ -86,6 +86,9 @@ export const CheckoutForm = () => {
             'aria-label': 'Sendtag name',
             placeholder: 'Enter Sendtag name',
             bc: '$color2',
+            fieldsetProps: {
+              f: 1,
+            },
           },
         }}
         formProps={{

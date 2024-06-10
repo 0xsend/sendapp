@@ -1,6 +1,8 @@
 import 'zx/globals'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
+$.verbose = true
+
 /**
  * This script is used to deploy the SendMerkleDrop contract and add a tranche to the airdrop. It should be adapted as things are deployed to mainnet.
  */
@@ -42,10 +44,10 @@ void (async function main() {
       contractAddress: string
     }[]
   }
-  const merkleDropAddress = broadcast.transactions[0].contractAddress // should be the first transaction
+  const merkleDropAddress = broadcast.transactions[0]?.contractAddress // should be the first transaction
   console.log(chalk.blue(`Merkle drop address: ${merkleDropAddress}`))
 
-  // get latest distribution id from API
+  console.log(chalk.blue('Get latest distribution id from API'))
   const { data: distribution, error: distributionError } = await supabaseAdmin
     .from('distributions')
     .select('*')
@@ -57,6 +59,7 @@ void (async function main() {
     throw distributionError
   }
 
+  console.log(chalk.blue('Geting distribution merkle root from API'))
   const { root, total } = await fetch('http://localhost:3050/distributor/merkle', {
     method: 'POST',
     headers: {
@@ -64,7 +67,7 @@ void (async function main() {
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`,
     },
     body: JSON.stringify({ id: distribution.id }),
-  }).then((res) => (res.ok ? res.json() : Promise.reject(res)))
+  }).then(async (res) => (res.ok ? res.json() : Promise.reject(await res.text())))
 
   $.env.MERKLE_ROOT = root
   $.env.AMOUNT = total
