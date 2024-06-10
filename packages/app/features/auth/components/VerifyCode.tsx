@@ -11,7 +11,6 @@ import {
 import type { MobileOtpType } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
