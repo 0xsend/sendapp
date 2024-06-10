@@ -19,7 +19,7 @@ import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
 import { verifyMessage, hexToBytes } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { byteaToHex } from 'app/utils/byteaToHex'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
 const logger = debug('api:routers:account-recovery')
@@ -57,7 +57,7 @@ export const accountRecoveryRouter = createTRPCRouter({
       })
     }
     const challengeResponse = challengeData as ChallengeResponse
-    challengeResponse.challenge = pgBase16ToHex(challengeResponse.challenge as `\\x${string}`)
+    challengeResponse.challenge = byteaToHex(challengeResponse.challenge as `\\x${string}`)
     return challengeResponse
   }),
   validateSignature: publicProcedure
@@ -172,7 +172,7 @@ const verifyRecoverySignature = async (
   if (recoveryType === RecoveryOptions.EOA) {
     verified = await verifyMessage({
       address: identifier as `0x${string}`,
-      message: RecoveryEOAPreamble + pgBase16ToHex(challengeData.challenge),
+      message: RecoveryEOAPreamble + byteaToHex(challengeData.challenge),
       signature: signature,
     })
   } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
@@ -184,13 +184,13 @@ const verifyRecoverySignature = async (
       })
     }
 
-    const pubkey = COSEECDHAtoXY(hexToBytes(pgBase16ToHex(passkeyData.public_key)))
+    const pubkey = COSEECDHAtoXY(hexToBytes(byteaToHex(passkeyData.public_key)))
 
     // SendVerifier.sol expects hex value (`0x<hex>`) rather than hex string (`/x<hex>`)
     // challengeData.challenge = `0x${challengeData.challenge.slice(2)}`
 
     verified = await verifySignature(
-      pgBase16ToHex(challengeData.challenge as `\\x${string}`),
+      byteaToHex(challengeData.challenge as `\\x${string}`),
       signature,
       pubkey
     )
