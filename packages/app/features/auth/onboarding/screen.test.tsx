@@ -57,6 +57,12 @@ jest.mock('app/utils/send-accounts', () => ({
     isLoading: false,
     refetch: jest.fn(),
   }),
+  useSendAccount: jest.fn().mockReturnValue({
+    data: null,
+    error: null,
+    isLoading: false,
+    refetch: jest.fn(),
+  }),
 }))
 
 jest.mock('app/utils/userop', () => ({

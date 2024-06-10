@@ -5,9 +5,9 @@ SELECT plan(6);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
-SELECT tests.create_supabase_user('tag_owner');
+SELECT tests.create_supabase_user('bob');
 
-SELECT tests.authenticate_as('tag_owner');
+SELECT tests.authenticate_as('bob');
 
 SELECT throws_ok(
     $test$
@@ -16,9 +16,9 @@ SELECT throws_ok(
         'reservation',
         '0x0000000000000000000000000000000000000000'
       ) $test$,
-      'new row violates row-level security policy for table "tag_reservations"',
-      'User cannot add to the tag reserverations'
-  );
+    'new row violates row-level security policy for table "tag_reservations"',
+    'User cannot add to the tag reserverations'
+);
 
 -- service role can add to the tag reserverations and query it
 SET ROLE service_role;
@@ -27,104 +27,144 @@ INSERT INTO tag_reservations (tag_name, chain_address)
 VALUES (
     'reservation',
     '0x0000000000000000000000000000000000000000'
-  ),
-  ('reservation2', NULL);
+),
+('reservation2', NULL);
 
 SELECT isnt_empty(
     $test$
     SELECT *
     FROM tag_reservations $test$,
-      'Tag reserverations should not be empty'
-  );
+    'Tag reserverations should not be empty'
+);
 
 -- tag creator cannot reserve a tag that is on the reserverations with a different address
-SET ROLE to postgres;
+SET ROLE TO postgres;
 
--- verify the tag_owner address
-INSERT INTO chain_addresses(address, user_id)
+-- verify the bob address
+INSERT INTO chain_addresses (address, user_id)
 VALUES (
     '0x0000000000000000000000000000000000000000',
-    tests.get_supabase_uid('tag_owner')
-  );
+    tests.get_supabase_uid('bob')
+);
 
 -- create a tag taker
-SELECT tests.create_supabase_user('tag_taker');
+SELECT tests.create_supabase_user('alice');
 
-SELECT tests.authenticate_as('tag_taker');
+SELECT tests.authenticate_as('alice');
 
 SET ROLE TO postgres;
 
 -- verify the tag taker address
-INSERT INTO chain_addresses(address, user_id)
+INSERT INTO chain_addresses (address, user_id)
 VALUES (
     '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-    tests.get_supabase_uid('tag_taker')
-  );
+    tests.get_supabase_uid('alice')
+);
 
-SELECT tests.authenticate_as('tag_taker');
+SELECT tests.authenticate_as('alice');
 
 SELECT throws_ok(
     $test$
     INSERT INTO tags(name, user_id)
     VALUES (
         'reservation',
-        tests.get_supabase_uid('tag_taker')
+        tests.get_supabase_uid('alice')
       ) $test$,
-      'You don''t got the riz for the tag: reservation',
-      'User cannot reserve a tag that is on the reserverations with a different address'
-  );
+    'You don''t got the riz for the tag: reservation',
+    'User cannot reserve a tag that is on the reserverations with a different address'
+);
 
 SELECT throws_ok(
     $test$
     INSERT INTO tags(name, user_id)
     VALUES (
         'reservation2',
-        tests.get_supabase_uid('tag_taker')
+        tests.get_supabase_uid('alice')
       ) $test$,
-      'You don''t got the riz for the tag: reservation2',
-      'User cannot reserve a tag that is on the reserverations with a NULL address'
-  );
+    'You don''t got the riz for the tag: reservation2',
+    'User cannot reserve a tag that is on the reserverations with a NULL address'
+);
 
 -- tag owner can reserve a tag that is on the reserverations with the same verified address
-SELECT tests.authenticate_as('tag_owner');
+SELECT tests.authenticate_as('bob');
 
-INSERT INTO tags(name, user_id)
+INSERT INTO tags (name, user_id)
 VALUES (
     'reservation',
-    tests.get_supabase_uid('tag_owner')
-  );
+    tests.get_supabase_uid('bob')
+);
 
 SELECT isnt_empty(
     $test$
     SELECT *
     FROM tags
     WHERE name = 'reservation' $test$,
-      'Tag should be reserved'
-  );
+    'Tag should be reserved'
+);
 
 -- service role can confirm a tag that is on the
-set role to service_role;
+SET role TO service_role;
 
-select confirm_tags(
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('bob'),
+    '0xb0b0000000000000000000000000000000000000',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'
+);
+
+INSERT INTO send_revenues_safe_receives (
+    chain_id,
+    log_addr,
+    tx_hash,
+    sender,
+    v,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    block_time
+)
+VALUES (
+    8453,
+    '\x5afe000000000000000000000000000000000000',
+    '\x1234567890123456789012345678901234567890123456789012345678901234',
+    '\xb0b0000000000000000000000000000000000000',
+    1,
+    'send_revenues_safe_receives',
+    'send_revenues_safe_receives',
+    1,
+    0,
+    0,
+    0,
+    1234567890
+);
+
+SELECT confirm_tags(
     '{reservation}',
-    '0x1234567890123456789012345678901234567890123456789012345678901234',
-    null
-  );
+    (
+        SELECT event_id
+        FROM send_revenues_safe_receives
+        WHERE sender = '\xb0b0000000000000000000000000000000000000'
+    ),
+    NULL
+);
 
-set role to postgres;
+SET role TO postgres;
 
 -- tag should be confirmed
-SELECT tests.authenticate_as('tag_owner');
+SELECT tests.authenticate_as('bob');
 
 SELECT isnt_empty(
     $test$
     SELECT *
     FROM tags
     WHERE name = 'reservation' $test$,
-      'Tag should be confirmed'
-  );
+    'Tag should be confirmed'
+);
 
-SELECT *
-FROM finish();
+SELECT finish();
 
 ROLLBACK;

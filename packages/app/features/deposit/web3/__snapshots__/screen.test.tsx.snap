@@ -1,0 +1,1651 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DepositWeb3Screen renders the connect to deposit when wallet is not connected 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "column",
+      "gap": 18,
+      "marginRight": "auto",
+      "marginTop": 32,
+      "maxWidth": 600,
+      "width": "100%",
+    }
+  }
+>
+  <Text
+    accessibilityRole="header"
+    selectable={true}
+    style={
+      {
+        "color": "hsla(0, 0%, 100%, 0.5)",
+        "fontFamily": "System",
+        "fontSize": 23,
+        "fontWeight": "300",
+        "lineHeight": 27,
+        "marginBottom": 0,
+        "marginLeft": 0,
+        "marginRight": 0,
+        "marginTop": 0,
+        "textTransform": "none",
+      }
+    }
+    suppressHighlighting={true}
+  >
+    Connect to Deposit
+  </Text>
+  <Text
+    selectable={true}
+    style={
+      {
+        "color": "hsla(0, 0%, 100%, 0.5)",
+        "fontFamily": "System",
+        "fontSize": 21.599999999999998,
+        "fontWeight": "300",
+        "lineHeight": 23,
+      }
+    }
+    suppressHighlighting={true}
+  >
+    You need to connect to a wallet to deposit funds.
+  </Text>
+  <View
+    accessibilityRole="button"
+    accessible={true}
+    cancelable={true}
+    disabled={false}
+    focusVisibleStyle={{}}
+    focusable={[Function]}
+    minPressDuration={0}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    onPress={[Function]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "hsla(191, 32%, 19%, 1)",
+        "borderBottomColor": "transparent",
+        "borderBottomLeftRadius": 16,
+        "borderBottomRightRadius": 16,
+        "borderBottomWidth": 1,
+        "borderLeftColor": "transparent",
+        "borderLeftWidth": 1,
+        "borderRightColor": "transparent",
+        "borderRightWidth": 1,
+        "borderStyle": "solid",
+        "borderTopColor": "transparent",
+        "borderTopLeftRadius": 16,
+        "borderTopRightRadius": 16,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "flexWrap": "nowrap",
+        "height": 44,
+        "justifyContent": "center",
+        "maxWidth": 284,
+        "paddingLeft": 18,
+        "paddingRight": 18,
+      }
+    }
+  >
+    <RNSVGSvgView
+      align="xMidYMid"
+      bbHeight="20"
+      bbWidth="20"
+      color="hsla(112, 22%, 100%, 1)"
+      fill="none"
+      focusable={false}
+      height={20}
+      meetOrSlice={0}
+      minX={0}
+      minY={0}
+      strokeWidth="2"
+      style={
+        [
+          {
+            "backgroundColor": "transparent",
+            "borderWidth": 0,
+          },
+          {
+            "color": "hsla(112, 22%, 100%, 1)",
+          },
+          {
+            "flex": 0,
+            "height": 20,
+            "width": 20,
+          },
+        ]
+      }
+      tintColor="hsla(112, 22%, 100%, 1)"
+      vbHeight={32}
+      vbWidth={32}
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <RNSVGGroup
+        fill={null}
+        propList={
+          [
+            "fill",
+            "strokeWidth",
+          ]
+        }
+        strokeWidth="2"
+      >
+        <RNSVGPath
+          d="M0 16C0 7.16344 7.16344 0 16 0V0C24.8366 0 32 7.16344 32 16V16C32 24.8366 24.8366 32 16 32V32C7.16344 32 0 24.8366 0 16V16Z"
+          fill={
+            {
+              "payload": 4293519849,
+              "type": 0,
+            }
+          }
+          propList={
+            [
+              "fill",
+            ]
+          }
+        />
+        <RNSVGGroup
+          clipPath="clip0_265_2608"
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
+        >
+          <RNSVGPath
+            d="M15.9978 4L15.8415 4.51639V19.5007L15.9978 19.6524L23.1536 15.541L15.9978 4Z"
+            fill={
+              {
+                "payload": 4281611316,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+          <RNSVGPath
+            d="M15.9979 4L8.8421 15.541L15.9979 19.6524V12.3795V4Z"
+            fill={
+              {
+                "payload": 4287401100,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+          <RNSVGPath
+            d="M15.9978 20.9695L15.9097 21.0738V26.4116L15.9978 26.6616L23.1579 16.8601L15.9978 20.9695Z"
+            fill={
+              {
+                "payload": 4282137659,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+          <RNSVGPath
+            d="M15.9979 26.6617V20.9695L8.8421 16.8601L15.9979 26.6617Z"
+            fill={
+              {
+                "payload": 4287401100,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+          <RNSVGPath
+            d="M15.9978 19.6525L23.1535 15.5411L15.9978 12.3796V19.6525Z"
+            fill={
+              {
+                "payload": 4279505940,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+          <RNSVGPath
+            d="M8.8421 15.5411L15.9978 19.6525V12.3796L8.8421 15.5411Z"
+            fill={
+              {
+                "payload": 4281940281,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+        </RNSVGGroup>
+        <RNSVGDefs>
+          <RNSVGClipPath
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+            name="clip0_265_2608"
+          >
+            <RNSVGRect
+              fill={
+                {
+                  "payload": 4294967295,
+                  "type": 0,
+                }
+              }
+              height="22.6667"
+              matrix={
+                [
+                  1,
+                  0,
+                  0,
+                  1,
+                  8.8421,
+                  4,
+                ]
+              }
+              propList={
+                [
+                  "fill",
+                ]
+              }
+              width="14.3158"
+              x="0"
+              y="0"
+            />
+          </RNSVGClipPath>
+        </RNSVGDefs>
+      </RNSVGGroup>
+    </RNSVGSvgView>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "height": 0,
+          "minHeight": 0,
+          "minWidth": 11.088000000000001,
+          "width": 11.088000000000001,
+        }
+      }
+    />
+    <Text
+      lineBreakMode="clip"
+      numberOfLines={1}
+      style={
+        {
+          "color": "hsla(112, 22%, 59%, 1)",
+          "flexGrow": 0,
+          "flexShrink": 1,
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Connect to Deposit
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connected 1`] = `
+[
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 18,
+        "marginRight": "auto",
+        "marginTop": 32,
+        "maxWidth": 600,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      onLayout={[Function]}
+      onSubmit={[Function]}
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 18,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <RCTScrollView
+        scrollEnabled={true}
+      >
+        <View>
+          <View
+            style={
+              {
+                "flexDirection": "column",
+                "gap": 7,
+                "paddingBottom": 18,
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "paddingTop": 18,
+              }
+            }
+            testID="DepositWeb3ScreenBefore"
+          >
+            <View
+              href="https://basescan.io/address/0x123"
+              target="_blank"
+              testID="MockSolitoLink"
+            >
+              <Text
+                accessibilityRole="header"
+                selectable={true}
+                style={
+                  {
+                    "color": "hsla(0, 0%, 100%, 0.5)",
+                    "fontFamily": "System",
+                    "fontSize": 14,
+                    "fontWeight": "300",
+                    "lineHeight": 18,
+                    "marginBottom": 0,
+                    "marginLeft": 0,
+                    "marginRight": 0,
+                    "marginTop": 0,
+                    "textTransform": "uppercase",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Depositing from 
+                0x123
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+      <RCTScrollView
+        scrollEnabled={true}
+      >
+        <View>
+          <View
+            style={
+              {
+                "flexDirection": "column",
+                "gap": 7,
+                "paddingBottom": 46,
+                "paddingLeft": 18,
+                "paddingRight": 18,
+                "paddingTop": 18,
+              }
+            }
+            testID="DepositWeb3ScreeFields"
+          >
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "gap": 7,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  htmlFor=":r0:"
+                  id=":r1:"
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "color": "#86AE80",
+                      "display": "flex",
+                      "fontFamily": "System",
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 60,
+                      "textTransform": "uppercase",
+                    }
+                  }
+                  suppressHighlighting={true}
+                  userSelect="none"
+                >
+                  Token
+                   
+                </Text>
+                <View
+                  animatedStyle={
+                    {
+                      "value": {
+                        "transform": [
+                          {
+                            "translateX": 0,
+                          },
+                        ],
+                      },
+                    }
+                  }
+                  collapsable={false}
+                  style={
+                    {
+                      "transform": [
+                        {
+                          "translateX": 0,
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <View
+                    accessibilityState={
+                      {
+                        "expanded": false,
+                      }
+                    }
+                    cancelable={true}
+                    disabled={false}
+                    focusVisibleStyle={
+                      {
+                        "outlineColor": "$outlineColor",
+                        "outlineStyle": "solid",
+                        "outlineWidth": 2,
+                      }
+                    }
+                    focusable={[Function]}
+                    id=":r0:"
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "hsla(191, 52%, 6%, 1)",
+                        "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                        "borderBottomLeftRadius": 16,
+                        "borderBottomRightRadius": 16,
+                        "borderBottomWidth": 1,
+                        "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                        "borderLeftWidth": 1,
+                        "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                        "borderRightWidth": 1,
+                        "borderStyle": "solid",
+                        "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                        "borderTopLeftRadius": 16,
+                        "borderTopRightRadius": 16,
+                        "borderTopWidth": 1,
+                        "flexDirection": "row",
+                        "flexWrap": "nowrap",
+                        "justifyContent": "space-between",
+                        "maxWidth": "100%",
+                        "minHeight": 44,
+                        "overflow": "hidden",
+                        "paddingBottom": 10,
+                        "paddingLeft": 18,
+                        "paddingRight": 18,
+                        "paddingTop": 10,
+                        "width": 180,
+                      }
+                    }
+                    testID="TokenSelectTrigger"
+                  >
+                    <Text
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      pointerEvents="none"
+                      selectable={false}
+                      style={
+                        {
+                          "color": "hsla(112, 22%, 59%, 1)",
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      testID="TokenSelectValue"
+                    />
+                    <View
+                      pointerEvents="none"
+                      style={
+                        {
+                          "height": 16.8,
+                          "minHeight": 16.8,
+                          "minWidth": 16.8,
+                          "width": 16.8,
+                        }
+                      }
+                    />
+                    <RNSVGSvgView
+                      align="xMidYMid"
+                      bbHeight="16.8"
+                      bbWidth="16.8"
+                      fill="none"
+                      focusable={false}
+                      height={16.8}
+                      meetOrSlice={0}
+                      minX={0}
+                      minY={0}
+                      stroke="hsla(112, 22%, 59%, 1)"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      style={
+                        [
+                          {
+                            "backgroundColor": "transparent",
+                            "borderWidth": 0,
+                          },
+                          {},
+                          {
+                            "flex": 0,
+                            "height": 16,
+                            "width": 16,
+                          },
+                        ]
+                      }
+                      vbHeight={24}
+                      vbWidth={24}
+                      width={16.8}
+                    >
+                      <RNSVGGroup
+                        fill={null}
+                        propList={
+                          [
+                            "fill",
+                            "stroke",
+                            "strokeWidth",
+                            "strokeLinecap",
+                            "strokeLinejoin",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4287016319,
+                            "type": 0,
+                          }
+                        }
+                        strokeLinecap={1}
+                        strokeLinejoin={1}
+                        strokeWidth="2"
+                      >
+                        <RNSVGPath
+                          d="m6 9 6 6 6-6"
+                          fill={
+                            {
+                              "payload": 4278190080,
+                              "type": 0,
+                            }
+                          }
+                          propList={
+                            [
+                              "stroke",
+                            ]
+                          }
+                          stroke={
+                            {
+                              "payload": 4287016319,
+                              "type": 0,
+                            }
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGSvgView>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "width": "100%",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flex": 1,
+                      "flexDirection": "column",
+                    }
+                  }
+                >
+                  <Text
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    htmlFor=":r5:"
+                    id=":r6:"
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "transparent",
+                        "color": "#86AE80",
+                        "display": "flex",
+                        "fontFamily": "System",
+                        "fontSize": 19.2,
+                        "fontWeight": "400",
+                        "lineHeight": 60,
+                        "textTransform": "uppercase",
+                      }
+                    }
+                    suppressHighlighting={true}
+                    userSelect="none"
+                  >
+                    Amount
+                     
+                  </Text>
+                  <View
+                    animatedStyle={
+                      {
+                        "value": {
+                          "transform": [
+                            {
+                              "translateX": 0,
+                            },
+                          ],
+                        },
+                      }
+                    }
+                    collapsable={false}
+                    style={
+                      {
+                        "transform": [
+                          {
+                            "translateX": 0,
+                          },
+                        ],
+                      }
+                    }
+                  >
+                    <TextInput
+                      accessibilityLabel="Amount"
+                      autoFocus={true}
+                      control={
+                        {
+                          "_defaultValues": {
+                            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                          },
+                          "_disableForm": [Function],
+                          "_executeSchema": [Function],
+                          "_fields": {
+                            "amount": {
+                              "_f": {
+                                "mount": true,
+                                "name": "amount",
+                                "ref": {
+                                  "name": "amount",
+                                },
+                                "value": undefined,
+                              },
+                            },
+                            "token": {
+                              "_f": {
+                                "mount": true,
+                                "name": "token",
+                                "ref": {
+                                  "name": "token",
+                                },
+                                "value": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                              },
+                            },
+                          },
+                          "_formState": {
+                            "dirtyFields": {},
+                            "disabled": false,
+                            "errors": {},
+                            "isDirty": false,
+                            "isLoading": false,
+                            "isSubmitSuccessful": false,
+                            "isSubmitted": false,
+                            "isSubmitting": false,
+                            "isValid": true,
+                            "isValidating": false,
+                            "submitCount": 0,
+                            "touchedFields": {},
+                          },
+                          "_formValues": {
+                            "amount": undefined,
+                            "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                          },
+                          "_getDirty": [Function],
+                          "_getFieldArray": [Function],
+                          "_getWatch": [Function],
+                          "_names": {
+                            "array": Set {},
+                            "focus": "",
+                            "mount": Set {
+                              "token",
+                              "amount",
+                            },
+                            "unMount": Set {},
+                            "watch": Set {
+                              "token",
+                              "amount",
+                            },
+                            "watchAll": false,
+                          },
+                          "_options": {
+                            "mode": "onSubmit",
+                            "reValidateMode": "onChange",
+                            "shouldFocusError": true,
+                          },
+                          "_proxyFormState": {
+                            "dirtyFields": false,
+                            "disabled": true,
+                            "errors": "all",
+                            "isDirty": false,
+                            "isSubmitting": true,
+                            "isValid": true,
+                            "isValidating": false,
+                            "touchedFields": false,
+                          },
+                          "_removeUnmounted": [Function],
+                          "_reset": [Function],
+                          "_resetDefaultValues": [Function],
+                          "_state": {
+                            "action": false,
+                            "mount": true,
+                            "watch": false,
+                          },
+                          "_subjects": {
+                            "array": {
+                              "next": [Function],
+                              "observers": [],
+                              "subscribe": [Function],
+                              "unsubscribe": [Function],
+                            },
+                            "state": {
+                              "next": [Function],
+                              "observers": [
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                              ],
+                              "subscribe": [Function],
+                              "unsubscribe": [Function],
+                            },
+                            "values": {
+                              "next": [Function],
+                              "observers": [
+                                {
+                                  "next": [Function],
+                                },
+                                {
+                                  "next": [Function],
+                                },
+                              ],
+                              "subscribe": [Function],
+                              "unsubscribe": [Function],
+                            },
+                          },
+                          "_updateDisabledField": [Function],
+                          "_updateFieldArray": [Function],
+                          "_updateFormState": [Function],
+                          "_updateValid": [Function],
+                          "getFieldState": [Function],
+                          "handleSubmit": [Function],
+                          "register": [Function],
+                          "setError": [Function],
+                          "unregister": [Function],
+                        }
+                      }
+                      focusVisibleStyle={{}}
+                      focusable={true}
+                      id=":r5:"
+                      name="amount"
+                      onBlur={[Function]}
+                      onChangeText={[Function]}
+                      onFocus={[Function]}
+                      placeholderTextColor="hsla(191, 32%, 50%, 1)"
+                      readOnly={false}
+                      style={
+                        {
+                          "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                          "borderBottomColor": "hsla(191, 32%, 32%, 1)",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderBottomWidth": 0,
+                          "borderLeftColor": "hsla(191, 32%, 32%, 1)",
+                          "borderLeftWidth": 0,
+                          "borderRightColor": "hsla(191, 32%, 32%, 1)",
+                          "borderRightWidth": 0,
+                          "borderStyle": "solid",
+                          "borderTopColor": "hsla(191, 32%, 32%, 1)",
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "borderTopWidth": 0,
+                          "color": "hsl(0, 0%, 93.0%)",
+                          "fontFamily": "System",
+                          "fontSize": 19.2,
+                          "fontStyle": "italic",
+                          "fontWeight": "normal",
+                          "height": 44,
+                          "minWidth": 0,
+                          "paddingLeft": 16,
+                          "paddingRight": 16,
+                          "position": "relative",
+                        }
+                      }
+                      value=""
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "bottom": 10,
+                        "gap": 7,
+                        "position": "absolute",
+                        "right": 18,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  selectable={true}
+                  style={
+                    {
+                      "color": "hsla(112, 22%, 59%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 15.6,
+                      "fontWeight": "300",
+                      "lineHeight": 18,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Balance:
+                   
+                  &lt;0.00
+                   
+                  USDC
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+      <View
+        onLayout={[Function]}
+        style={
+          {
+            "paddingBottom": 0,
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column-reverse",
+              "gap": 18,
+              "paddingBottom": 18,
+              "paddingLeft": 18,
+              "paddingRight": 18,
+            }
+          }
+        >
+          <RCTScrollView
+            scrollEnabled={true}
+          >
+            <View>
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "paddingBottom": 46,
+                    "paddingLeft": 18,
+                    "paddingRight": 18,
+                    "paddingTop": 18,
+                  }
+                }
+                testID="DepositWeb3ScreenAfter"
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                      "gap": 7,
+                    }
+                  }
+                >
+                  <View
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "busy": false,
+                      }
+                    }
+                    accessible={true}
+                    cancelable={true}
+                    disabled={false}
+                    focusVisibleStyle={{}}
+                    focusable={[Function]}
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
+                    style={
+                      {
+                        "alignItems": "center",
+                        "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                        "borderBottomColor": "transparent",
+                        "borderBottomLeftRadius": 12,
+                        "borderBottomRightRadius": 12,
+                        "borderBottomWidth": 1,
+                        "borderLeftColor": "transparent",
+                        "borderLeftWidth": 1,
+                        "borderRightColor": "transparent",
+                        "borderRightWidth": 1,
+                        "borderStyle": "solid",
+                        "borderTopColor": "transparent",
+                        "borderTopLeftRadius": 12,
+                        "borderTopRightRadius": 12,
+                        "borderTopWidth": 1,
+                        "flexDirection": "row",
+                        "flexWrap": "nowrap",
+                        "height": 44,
+                        "justifyContent": "center",
+                        "paddingLeft": 18,
+                        "paddingRight": 18,
+                      }
+                    }
+                    testID="SubmitButton"
+                  >
+                    <Text
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "hsla(191, 32%, 10%, 1)",
+                          "flexGrow": 0,
+                          "flexShrink": 1,
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      userSelect="none"
+                    >
+                      <Text
+                        lineBreakMode="clip"
+                        numberOfLines={1}
+                        style={
+                          {
+                            "color": "hsla(191, 32%, 10%, 1)",
+                            "flexGrow": 0,
+                            "flexShrink": 1,
+                            "fontFamily": "System",
+                            "fontSize": 16.8,
+                            "fontWeight": "400",
+                            "lineHeight": 19,
+                          }
+                        }
+                        suppressHighlighting={true}
+                        userSelect="none"
+                      >
+                        Deposit
+                      </Text>
+                    </Text>
+                  </View>
+                  <View
+                    href="https://basescan.io/tx/0x123"
+                    target="_blank"
+                    testID="MockSolitoLink"
+                  >
+                    <Text
+                      lineBreakMode="clip"
+                      numberOfLines={1}
+                      style={
+                        {
+                          "color": "hsla(112, 22%, 100%, 1)",
+                          "flexGrow": 0,
+                          "flexShrink": 1,
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "400",
+                          "lineHeight": 19,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      userSelect="none"
+                    >
+                      View 
+                      0x123
+                       on
+                       
+                      Basescan
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </RCTScrollView>
+        </View>
+      </View>
+    </View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      animatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      onLayout={[Function]}
+      pointerEvents="none"
+      style={
+        {
+          "height": "80%",
+          "minHeight": "80%",
+          "opacity": 0,
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "width": "100%",
+          }
+        }
+      >
+        <RCTScrollView
+          onMoveShouldSetResponder={[Function]}
+          onResponderRelease={[Function]}
+          onScroll={[Function]}
+          onStartShouldSetResponder={[Function]}
+          scrollEnabled={true}
+          scrollEventThrottle={8}
+          style={
+            {
+              "flex": 1,
+            }
+          }
+        >
+          <View>
+            <View
+              style={
+                {
+                  "alignSelf": "flex-start",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <View
+                accessibilityLabelledBy=":r7:"
+                accessibilityRole="none"
+                disabled={false}
+                style={
+                  {
+                    "flexDirection": "column",
+                    "width": "100%",
+                  }
+                }
+              >
+                <View
+                  accessibilityLabelledBy=":r8:"
+                  accessibilityState={
+                    {
+                      "disabled": undefined,
+                      "selected": false,
+                    }
+                  }
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "hsla(191, 52%, 6%, 1)",
+                      "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                      "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                      "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                      "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <Text
+                    id=":r8:"
+                    lineBreakMode="clip"
+                    numberOfLines={1}
+                    style={
+                      {
+                        "color": "hsla(112, 22%, 59%, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "400",
+                        "lineHeight": 19,
+                      }
+                    }
+                    suppressHighlighting={true}
+                    userSelect="none"
+                  >
+                    USDC
+                  </Text>
+                </View>
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "height": 0,
+                      "minHeight": 0,
+                      "minWidth": 0,
+                      "width": 0,
+                    }
+                  }
+                />
+                <View
+                  accessibilityLabelledBy=":r9:"
+                  accessibilityState={
+                    {
+                      "disabled": undefined,
+                      "selected": false,
+                    }
+                  }
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "hsla(191, 52%, 6%, 1)",
+                      "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                      "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                      "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                      "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <Text
+                    id=":r9:"
+                    lineBreakMode="clip"
+                    numberOfLines={1}
+                    style={
+                      {
+                        "color": "hsla(112, 22%, 59%, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "400",
+                        "lineHeight": 19,
+                      }
+                    }
+                    suppressHighlighting={true}
+                    userSelect="none"
+                  >
+                    ETH
+                  </Text>
+                </View>
+                <View
+                  pointerEvents="none"
+                  style={
+                    {
+                      "height": 0,
+                      "minHeight": 0,
+                      "minWidth": 0,
+                      "width": 0,
+                    }
+                  }
+                />
+                <View
+                  accessibilityLabelledBy=":ra:"
+                  accessibilityState={
+                    {
+                      "disabled": undefined,
+                      "selected": false,
+                    }
+                  }
+                  cancelable={true}
+                  disabled={false}
+                  focusVisibleStyle={
+                    {
+                      "outlineColor": "$outlineColor",
+                      "outlineStyle": "solid",
+                      "outlineWidth": 1,
+                    }
+                  }
+                  focusable={true}
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "hsla(191, 52%, 6%, 1)",
+                      "borderBottomColor": "hsla(191, 32%, 24%, 1)",
+                      "borderLeftColor": "hsla(191, 32%, 24%, 1)",
+                      "borderRightColor": "hsla(191, 32%, 24%, 1)",
+                      "borderTopColor": "hsla(191, 32%, 24%, 1)",
+                      "flexDirection": "row",
+                      "flexWrap": "nowrap",
+                      "justifyContent": "space-between",
+                      "maxWidth": "100%",
+                      "minHeight": 44,
+                      "overflow": "hidden",
+                      "paddingBottom": 10,
+                      "paddingLeft": 18,
+                      "paddingRight": 18,
+                      "paddingTop": 10,
+                      "width": "100%",
+                    }
+                  }
+                  tabIndex={-1}
+                >
+                  <Text
+                    id=":ra:"
+                    lineBreakMode="clip"
+                    numberOfLines={1}
+                    style={
+                      {
+                        "color": "hsla(112, 22%, 59%, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "400",
+                        "lineHeight": 19,
+                      }
+                    }
+                    suppressHighlighting={true}
+                    userSelect="none"
+                  >
+                    SEND
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </RCTScrollView>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "position": "absolute",
+            "right": 0,
+            "shadowOpacity": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+]
+`;
+
+exports[`DepositWeb3Screen renders the switch network screen when base network is not selected 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "column",
+      "gap": 18,
+      "marginRight": "auto",
+      "marginTop": 32,
+      "maxWidth": 600,
+      "width": "100%",
+    }
+  }
+>
+  <Text
+    accessibilityRole="header"
+    selectable={true}
+    style={
+      {
+        "color": "hsla(0, 0%, 100%, 0.5)",
+        "fontFamily": "System",
+        "fontSize": 23,
+        "fontWeight": "300",
+        "lineHeight": 27,
+        "marginBottom": 0,
+        "marginLeft": 0,
+        "marginRight": 0,
+        "marginTop": 0,
+        "textTransform": "none",
+      }
+    }
+    suppressHighlighting={true}
+  >
+    Switch to 
+    Base
+  </Text>
+  <Text
+    selectable={true}
+    style={
+      {
+        "color": "hsla(0, 0%, 100%, 0.5)",
+        "fontFamily": "System",
+        "fontSize": 21.599999999999998,
+        "fontWeight": "300",
+        "lineHeight": 23,
+      }
+    }
+    suppressHighlighting={true}
+  >
+    You are currently on 
+    Ethereum
+    . Switch to 
+    Base
+     to deposit funds.
+  </Text>
+  <View
+    accessibilityRole="button"
+    accessible={true}
+    cancelable={true}
+    disabled={false}
+    focusVisibleStyle={{}}
+    focusable={[Function]}
+    minPressDuration={0}
+    onBlur={[Function]}
+    onFocus={[Function]}
+    onMouseEnter={[Function]}
+    onMouseLeave={[Function]}
+    onPress={[Function]}
+    onPressIn={[Function]}
+    onPressOut={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "hsla(191, 32%, 19%, 1)",
+        "borderBottomColor": "transparent",
+        "borderBottomLeftRadius": 16,
+        "borderBottomRightRadius": 16,
+        "borderBottomWidth": 1,
+        "borderLeftColor": "transparent",
+        "borderLeftWidth": 1,
+        "borderRightColor": "transparent",
+        "borderRightWidth": 1,
+        "borderStyle": "solid",
+        "borderTopColor": "transparent",
+        "borderTopLeftRadius": 16,
+        "borderTopRightRadius": 16,
+        "borderTopWidth": 1,
+        "flexDirection": "row",
+        "flexWrap": "nowrap",
+        "height": 44,
+        "justifyContent": "center",
+        "maxWidth": 284,
+        "paddingLeft": 18,
+        "paddingRight": 18,
+      }
+    }
+  >
+    <RNSVGSvgView
+      align="xMidYMid"
+      bbHeight="20"
+      bbWidth="20"
+      color="hsla(112, 22%, 59%, 1)"
+      fill="none"
+      focusable={false}
+      height={20}
+      meetOrSlice={0}
+      minX={0}
+      minY={0}
+      strokeWidth="2"
+      style={
+        [
+          {
+            "backgroundColor": "transparent",
+            "borderWidth": 0,
+          },
+          {
+            "color": "hsla(112, 22%, 59%, 1)",
+          },
+          {
+            "flex": 0,
+            "height": 20,
+            "width": 20,
+          },
+        ]
+      }
+      tintColor="hsla(112, 22%, 59%, 1)"
+      vbHeight={111}
+      vbWidth={111}
+      width={20}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <RNSVGGroup
+        fill={null}
+        propList={
+          [
+            "fill",
+            "strokeWidth",
+          ]
+        }
+        strokeWidth="2"
+      >
+        <RNSVGPath
+          d="M54.921 110.034c30.438 0 55.113-24.632 55.113-55.017S85.359 0 54.921 0C26.043 0 2.353 22.171 0 50.392h72.847v9.25H0c2.353 28.22 26.043 50.392 54.921 50.392z"
+          fill={
+            {
+              "type": 2,
+            }
+          }
+          propList={
+            [
+              "fill",
+            ]
+          }
+        />
+      </RNSVGGroup>
+    </RNSVGSvgView>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "height": 0,
+          "minHeight": 0,
+          "minWidth": 11.088000000000001,
+          "width": 11.088000000000001,
+        }
+      }
+    />
+    <Text
+      lineBreakMode="clip"
+      numberOfLines={1}
+      style={
+        {
+          "color": "hsla(112, 22%, 59%, 1)",
+          "flexGrow": 0,
+          "flexShrink": 1,
+          "fontFamily": "System",
+          "fontSize": 16.8,
+          "fontWeight": "400",
+          "lineHeight": 19,
+        }
+      }
+      suppressHighlighting={true}
+      userSelect="none"
+    >
+      Switch
+    </Text>
+  </View>
+</View>
+`;

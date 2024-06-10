@@ -16,6 +16,7 @@ const PROFILE = {
   tag_name: TAG_NAME,
   address: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
   chain_id: 845337,
+  all_tags: [TAG_NAME],
 }
 
 jest.mock('solito', () => ({
@@ -65,6 +66,12 @@ jest.mock('@my/wagmi', () => {
   }
 })
 
+jest.mock('solito/router', () => ({
+  useRouter: jest.fn().mockReturnValue({
+    push: jest.fn(),
+  }),
+}))
+
 test('ProfileScreen', async () => {
   jest.useFakeTimers()
 
@@ -91,18 +98,9 @@ test('ProfileScreen', async () => {
   expect(image.props.source).toStrictEqual({
     uri: PROFILE.avatar_url,
   })
-  const button1 = screen.getByTestId('openSendDialogButton')
+  const button1 = screen.getByText('Send')
   expect(button1).toBeOnTheScreen()
   const button2 = screen.getByText('Request')
   expect(button2).toBeOnTheScreen()
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
-
-  await act(async () => {
-    // await user.press(button1) // @note this does not work
-    button1.props.onPress()
-    jest.runAllTimers()
-  })
-
-  const dialog = screen.getByTestId('sendDialogContainer')
-  expect(dialog).toBeOnTheScreen()
 })

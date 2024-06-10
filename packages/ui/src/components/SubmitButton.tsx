@@ -20,6 +20,7 @@ export const SubmitButton = ({ children, theme = 'accent', ...props }: ButtonPro
   return (
     <Button
       testID={'SubmitButton'}
+      accessible
       aria-busy={isSubmitting}
       iconAfter={
         <Unspaced>

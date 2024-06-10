@@ -88,6 +88,24 @@ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --priva
 cast <subcommand>
 ```
 
+#### Send ERC20 via impersonation
+
+```shell
+# usdc
+export TOKEN=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+export SENDER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+export RECEIVER=0xa71CE00000000000000000000000000000000000
+
+# This calls Anvil and lets us impersonate our unlucky user
+cast rpc --rpc-url base-local anvil_impersonateAccount $SENDER
+cast send --rpc-url base-local $TOKEN \
+--from $SENDER \
+  "transfer(address,uint256)(bool)" \
+  $RECEIVER \
+  10000000 \
+  --unlocked
+```
+
 ### Help
 
 ```shell
@@ -119,6 +137,17 @@ forge script ./script/DeploySendMerkleDrop.s.sol:DeploySendMerkleDropScript \
   --rpc-url base-sepolia \
   --sender 0x647eb43401e13e995D89Cf26cD87e68890EE3f89 \
   --keystores ~/.foundry/keystores/send_deployer
+```
+
+#### Updating Token Paymaster Cached Price
+
+```shell
+PAYMASTER=0x7e84448C1c94978f480D1895E6566C31c32fb136 \
+forge script ./script/UpdateTokenPaymasterCachedPrice.s.sol:UpdateTokenPaymasterCachedPriceScript \
+  -vvv \
+  --rpc-url base-sepolia \
+  --sender 0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f \
+  --keystores ~/.foundry/keystores/send_core_dev
 ```
 
 #### Creating a Distribution Tranche

@@ -1,13 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import { getPriceInWei } from 'app/features/account/sendtag/checkout/checkout-utils'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { baseMainnetClient } from '@my/wagmi'
 import debug from 'debug'
-import { isAddressEqual } from 'viem'
+import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import type { PostgrestError } from '@supabase/supabase-js'
+import { byteaTxHash } from 'app/utils/zod'
 
 const log = debug('api:routers:tag')
 
@@ -40,173 +40,79 @@ export const tagRouter = createTRPCRouter({
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
       const ethAmount = getPriceInWei(pendingTags)
-      const isFree = ethAmount === BigInt(0)
+      const txBytea = byteaTxHash.safeParse(hexToBytea(txHash as `0x${string}`))
 
-      // transaction validation for rare Sendtags
-      if (!isFree) {
-        if (!txHash) {
-          log('transaction hash required')
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Transaction hash required.',
-          })
-        }
-
-        // transaction has not been claimed before in tag receipts
-        const { data: receipts, error: receiptsError } = await supabase
-          .from('receipts')
-          .select('hash')
-          .eq('hash', txHash)
-          .maybeSingle()
-
-        if (receiptsError) {
-          log('receipts error', receiptsError)
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: receiptsError.message,
-          })
-        }
-
-        if (receipts) {
-          log('transaction has already been claimed', `txHash=${txHash}`)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Transaction has already been claimed.',
-          })
-        }
-
-        // get transaction receipt
-        const [receipt, confirmations] = await Promise.all([
-          baseMainnetClient.getTransactionReceipt({
-            hash: txHash as `0x${string}`,
-          }),
-          baseMainnetClient.getTransactionConfirmations({
-            hash: txHash as `0x${string}`,
-          }),
-        ]).catch((error) => {
-          log('transaction error', error)
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error.message,
-          })
+      if (!txBytea.success) {
+        log('transaction hash required')
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: txBytea.error.message,
         })
+      }
 
-        // check if transaction is confirmed by at least 2 blocks
-        if (confirmations < 2) {
-          log('transaction too new', `txHash=${txHash}`)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Transaction too new. Please try again.',
-          })
+      const data = await withRetry(
+        async () => {
+          const { data, error } = await supabase
+            .from('send_revenues_safe_receives')
+            .select('*')
+            .eq('tx_hash', txBytea.data)
+            .single()
+
+          if (error) {
+            throw error
+          }
+
+          return data
+        },
+        {
+          retryCount: 10,
+          delay: 500,
+          shouldRetry({ error: e }) {
+            const error = e as unknown as PostgrestError
+            if (error.code === 'PGRST116') {
+              return true // retry on no rows
+            }
+            return false
+          },
         }
-
-        // check if transaction is successful
-        if (receipt.status === 'reverted') {
-          log('transaction failed', `txHash=${txHash}`)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Transaction failed. Please try again.',
-          })
-        }
-
-        const { data, error } = await supabase
-          .from('send_revenues_safe_receives')
-          .select('*')
-          .eq('tx_hash', hexToPgBase16(txHash as `0x${string}`))
-          .single()
-
-        if (error) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error.message,
-          })
-        }
-
-        if (data === null) {
+      ).catch((e) => {
+        const error = e as unknown as PostgrestError
+        if (error.code === 'PGRST116') {
           log('transaction is not a payment for tags', `txHash=${txHash}`)
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Transaction is not a payment for tags.',
           })
         }
+        log('error fetching transaction', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message,
+        })
+      })
 
-        const { sender: senderPgB16, v } = data
+      const { event_id, sender: senderPgB16, v } = data
 
-        if (!senderPgB16 || !v) {
-          log('no sender or v found', `txHash=${txHash}`)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'No sender or v found. Please try again.',
-          })
-        }
+      if (!senderPgB16 || !v) {
+        log('no sender or v found', `txHash=${txHash}`)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'No sender or v found. Please try again.',
+        })
+      }
 
-        const sender = pgBase16ToHex(senderPgB16 as `\\x${string}`)
-
-        if (!v || BigInt(v) !== ethAmount) {
-          log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Transaction is not a payment for tags or incorrect amount.',
-          })
-        }
-
-        // this check may be redundant
-        if (!sender || !isAddressEqual(sender, receipt.from)) {
-          log('transaction is not a payment for tags or incorrect sender', `txHash=${txHash}`)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Transaction is not a payment for tags or incorrect sender.',
-          })
-        }
-
-        // validate the the address is confirmed by the user
-        const { error: verifyAddressErr } = await supabase
-          .from('chain_addresses')
-          .select('address')
-          .eq('address', sender)
-          .single()
-
-        if (verifyAddressErr) {
-          if (verifyAddressErr.code === 'PGRST004') {
-            log('address not confirmed by user', `txHash=${txHash}`)
-            throw new TRPCError({
-              code: 'BAD_REQUEST',
-              message: 'Address not confirmed by user.',
-            })
-          }
-          log('verify address error', verifyAddressErr)
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: verifyAddressErr.message,
-          })
-        }
-      } else {
-        // if free just ensure there is a verified address
-        const { error: verifyAddressErr } = await supabase
-          .from('chain_addresses')
-          .select('address')
-          .single()
-
-        if (verifyAddressErr) {
-          if (verifyAddressErr.code === 'PGRST004') {
-            log('no verified address')
-            throw new TRPCError({
-              code: 'BAD_REQUEST',
-              message: 'No verified address.',
-            })
-          }
-          log('verify address error', verifyAddressErr)
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: verifyAddressErr.message,
-          })
-        }
+      if (!v || BigInt(v) !== ethAmount) {
+        log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Transaction is not a payment for tags or incorrect amount.',
+        })
       }
 
       // confirm all pending tags and save the transaction receipt
       const { error: confirmTagsErr } = await supabaseAdmin.rpc('confirm_tags', {
         tag_names: pendingTags.map((t) => t.name),
-        receipt_hash: txHash ?? '',
+        event_id,
         referral_code_input: referralCode ?? '',
       })
 

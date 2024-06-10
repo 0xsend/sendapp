@@ -22,9 +22,10 @@ export function SideBarNavLink({
   return (
     <Link {...props} href={props.disabled ? '' : props.href}>
       <Button
-        width={'100%'}
         disabled={props.disabled}
         bg={'transparent'}
+        p={0}
+        width={'100%'}
         hoverStyle={{
           position: 'relative',
           left: '2%',
@@ -43,10 +44,9 @@ export function SideBarNavLink({
         }}
         color={isActiveRoute ? iconActiveColor : iconInActiveColor}
         opacity={isActiveRoute ? 1 : 0.63}
-        gap={'$1.5'}
       >
         <ButtonIcon>{icon}</ButtonIcon>
-        <ButtonText f={1} fontFamily="$mono" fontWeight={isActiveRoute ? 'bold' : '300'}>
+        <ButtonText fontSize={'$7'} f={1} fontWeight={isActiveRoute ? '400' : '300'}>
           {text}
         </ButtonText>
       </Button>

@@ -1,199 +1,186 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`HomeScreen 1`] = `
-<View
-  style={
-    {
-      "alignSelf": "center",
-      "flex": 1,
-      "flexDirection": "column",
-      "paddingLeft": 18,
-      "paddingRight": 18,
-      "width": "100%",
-    }
-  }
->
-  <View
-    style={
-      {
-        "display": "none",
-      }
-    }
-  >
-    <View
-      accessibilityRole="button"
-      cancelable={true}
-      disabled={false}
-      focusVisibleStyle={{}}
-      focusable={[Function]}
-      minPressDuration={0}
-      onBlur={[Function]}
-      onFocus={[Function]}
-      onMouseEnter={[Function]}
-      onMouseLeave={[Function]}
-      onPress={[Function]}
-      onPressIn={[Function]}
-      onPressOut={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "transparent",
-          "borderBottomColor": "transparent",
-          "borderBottomLeftRadius": 100000,
-          "borderBottomRightRadius": 100000,
-          "borderBottomWidth": 1,
-          "borderLeftColor": "transparent",
-          "borderLeftWidth": 1,
-          "borderRightColor": "transparent",
-          "borderRightWidth": 1,
-          "borderStyle": "solid",
-          "borderTopColor": "transparent",
-          "borderTopLeftRadius": 100000,
-          "borderTopRightRadius": 100000,
-          "borderTopWidth": 1,
-          "display": "none",
-          "flexDirection": "row",
-          "flexWrap": "nowrap",
-          "height": 44,
-          "justifyContent": "center",
-          "maxHeight": 44,
-          "maxWidth": 44,
-          "minHeight": 44,
-          "minWidth": 44,
-          "paddingBottom": 0,
-          "paddingLeft": 0,
-          "paddingRight": 0,
-          "paddingTop": 0,
-          "position": "absolute",
-          "right": 0,
-          "shadowColor": "rgb(0,0,0)",
-          "shadowOffset": {
-            "height": 0,
-            "width": 0,
-          },
-          "shadowOpacity": 0,
-          "shadowRadius": 0,
-          "top": -46,
-          "width": 44,
-        }
-      }
-    >
-      <RNSVGSvgView
-        align="xMidYMid"
-        bbHeight="32"
-        bbWidth="32"
-        fill="none"
-        focusable={false}
-        height={32}
-        meetOrSlice={0}
-        minX={0}
-        minY={0}
-        stroke="hsla(112, 22%, 59%, 1)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        style={
-          [
-            {
-              "backgroundColor": "transparent",
-              "borderWidth": 0,
-            },
-            {
-              "color": "hsla(112, 22%, 59%, 1)",
-            },
-            {
-              "flex": 0,
-              "height": 32,
-              "width": 32,
-            },
-          ]
-        }
-        tintColor="hsla(112, 22%, 59%, 1)"
-        vbHeight={24}
-        vbWidth={24}
-        width={32}
-      >
-        <RNSVGGroup
-          fill={null}
-          propList={
-            [
-              "fill",
-              "stroke",
-              "strokeWidth",
-              "strokeLinecap",
-              "strokeLinejoin",
-            ]
-          }
-          stroke={
-            {
-              "payload": 4287016319,
-              "type": 0,
-            }
-          }
-          strokeLinecap={1}
-          strokeLinejoin={1}
-          strokeWidth="2"
-        >
-          <RNSVGPath
-            d="M18 6 6 18"
-            fill={
-              {
-                "payload": 4278190080,
-                "type": 0,
-              }
-            }
-            propList={
-              [
-                "stroke",
-              ]
-            }
-            stroke={
-              {
-                "payload": 4287016319,
-                "type": 0,
-              }
-            }
-          />
-          <RNSVGPath
-            d="m6 6 12 12"
-            fill={
-              {
-                "payload": 4278190080,
-                "type": 0,
-              }
-            }
-            propList={
-              [
-                "stroke",
-              ]
-            }
-            stroke={
-              {
-                "payload": 4287016319,
-                "type": 0,
-              }
-            }
-          />
-        </RNSVGGroup>
-      </RNSVGSvgView>
-    </View>
-  </View>
+[
   <View
     style={
       {
         "flex": 1,
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "width": "100%",
+        "flexDirection": "column",
       }
     }
   >
     <View
       style={
         {
-          "alignItems": "center",
-          "display": "flex",
-          "flexDirection": "column",
+          "display": "none",
+        }
+      }
+    >
+      <View
+        accessibilityRole="button"
+        cancelable={true}
+        disabled={false}
+        focusVisibleStyle={{}}
+        focusable={[Function]}
+        minPressDuration={0}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onPress={[Function]}
+        onPressIn={[Function]}
+        onPressOut={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "transparent",
+            "borderBottomColor": "transparent",
+            "borderBottomLeftRadius": 100000,
+            "borderBottomRightRadius": 100000,
+            "borderBottomWidth": 1,
+            "borderLeftColor": "transparent",
+            "borderLeftWidth": 1,
+            "borderRightColor": "transparent",
+            "borderRightWidth": 1,
+            "borderStyle": "solid",
+            "borderTopColor": "transparent",
+            "borderTopLeftRadius": 100000,
+            "borderTopRightRadius": 100000,
+            "borderTopWidth": 1,
+            "display": "none",
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 44,
+            "justifyContent": "center",
+            "maxHeight": 44,
+            "maxWidth": 44,
+            "minHeight": 44,
+            "minWidth": 44,
+            "paddingBottom": 0,
+            "paddingLeft": 0,
+            "paddingRight": 0,
+            "paddingTop": 0,
+            "position": "absolute",
+            "right": 0,
+            "shadowColor": "rgb(0,0,0)",
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "top": -46,
+            "width": 44,
+          }
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight="32"
+          bbWidth="32"
+          fill="none"
+          focusable={false}
+          height={32}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="hsla(112, 22%, 59%, 1)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "color": "hsla(112, 22%, 59%, 1)",
+              },
+              {
+                "flex": 0,
+                "height": 32,
+                "width": 32,
+              },
+            ]
+          }
+          tintColor="hsla(112, 22%, 59%, 1)"
+          vbHeight={24}
+          vbWidth={24}
+          width={32}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4287016319,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth="2"
+          >
+            <RNSVGPath
+              d="M18 6 6 18"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "stroke",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4287016319,
+                  "type": 0,
+                }
+              }
+            />
+            <RNSVGPath
+              d="m6 6 12 12"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "stroke",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4287016319,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
           "width": "100%",
         }
       }
@@ -202,166 +189,7 @@ exports[`HomeScreen 1`] = `
         style={
           {
             "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "width": "100%",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "flexDirection": "row",
-              "width": "100%",
-              "zIndex": 4,
-            }
-          }
-        >
-          <View
-            style={
-              {
-                "flexDirection": "column",
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "flexDirection": "column",
-                  "gap": 32,
-                  "justifyContent": "center",
-                  "paddingBottom": 32,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "gap": 10,
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "backgroundColor": "#40FB50",
-                      "height": 11,
-                      "width": 11,
-                    }
-                  }
-                />
-                <Text
-                  cancelable={true}
-                  disabled={false}
-                  focusable={true}
-                  id=":r0:"
-                  minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onPress={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "backgroundColor": "transparent",
-                      "color": "hsl(0, 0%, 90.9%)",
-                      "display": "flex",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "500",
-                      "lineHeight": 16,
-                      "textTransform": "uppercase",
-                      "zIndex": 1,
-                    }
-                  }
-                  suppressHighlighting={true}
-                  userSelect="none"
-                >
-                  Total Balance
-                </Text>
-              </View>
-              <View
-                style={
-                  {
-                    "color": "white",
-                    "flexDirection": "row",
-                    "gap": 10,
-                    "marginTop": 13,
-                  }
-                }
-              >
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(112, 22%, 100%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 136.79999999999998,
-                      "fontWeight": "500",
-                      "lineHeight": 97,
-                      "zIndex": 1,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  0
-                </Text>
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(112, 22%, 100%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 21.599999999999998,
-                      "fontWeight": "500",
-                      "lineHeight": 19,
-                      "zIndex": 1,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  USD
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-      <View
-        style={
-          {
-            "borderBottomColor": "#E6E6E6",
-            "borderBottomWidth": 1,
-            "borderLeftColor": "#E6E6E6",
-            "borderLeftWidth": 0,
-            "borderRightColor": "#E6E6E6",
-            "borderRightWidth": 0,
-            "borderStyle": "solid",
-            "borderTopColor": "#E6E6E6",
-            "borderTopWidth": 0,
-            "flex": 1,
-            "flexShrink": 0,
-            "height": 0,
-            "maxHeight": 0,
-            "transform": [
-              {
-                "translateY": -0.5,
-              },
-            ],
-            "width": "100%",
-          }
-        }
-      />
-      <View
-        style={
-          {
-            "alignItems": "center",
+            "display": "none",
             "flexDirection": "column",
             "width": "100%",
           }
@@ -370,51 +198,27 @@ exports[`HomeScreen 1`] = `
         <View
           style={
             {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "paddingTop": 39,
+              "borderBottomLeftRadius": 12,
+              "borderBottomRightRadius": 12,
+              "borderTopLeftRadius": 12,
+              "borderTopRightRadius": 12,
+              "gap": 32,
+              "justifyContent": "space-between",
+              "paddingBottom": 53,
+              "paddingLeft": 7,
+              "paddingRight": 7,
+              "paddingTop": 53,
               "width": "100%",
             }
           }
         >
           <View
-            accessibilityRole="button"
-            cancelable={true}
-            disabled={false}
-            focusVisibleStyle={{}}
-            focusable={[Function]}
-            minPressDuration={0}
-            onBlur={[Function]}
-            onFocus={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onPress={[Function]}
-            onPressIn={[Function]}
-            onPressOut={[Function]}
             style={
               {
                 "alignItems": "center",
-                "backgroundColor": "hsla(125, 96%, 47%, 1)",
-                "borderBottomColor": "transparent",
-                "borderBottomLeftRadius": 9,
-                "borderBottomRightRadius": 9,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
-                "borderTopLeftRadius": 9,
-                "borderTopRightRadius": 9,
-                "borderTopWidth": 1,
+                "flex": 1,
                 "flexDirection": "row",
-                "flexWrap": "nowrap",
-                "height": 64,
                 "justifyContent": "center",
-                "opacity": 1,
-                "paddingLeft": 16,
-                "paddingRight": 16,
                 "width": "100%",
               }
             }
@@ -422,155 +226,347 @@ exports[`HomeScreen 1`] = `
             <View
               style={
                 {
-                  "alignItems": "center",
                   "flexDirection": "row",
-                  "justifyContent": "space-between",
+                  "width": "100%",
+                  "zIndex": 4,
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                      "gap": 18,
+                      "justifyContent": "center",
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 10,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "backgroundColor": "#40FB50",
+                          "height": 11,
+                          "width": 11,
+                        }
+                      }
+                    />
+                    <Text
+                      cancelable={true}
+                      disabled={false}
+                      focusable={true}
+                      id=":r0:"
+                      minPressDuration={0}
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseEnter={[Function]}
+                      onMouseLeave={[Function]}
+                      onPress={[Function]}
+                      onPressIn={[Function]}
+                      onPressOut={[Function]}
+                      style={
+                        {
+                          "alignItems": "center",
+                          "backgroundColor": "transparent",
+                          "color": "hsl(0, 0%, 90.9%)",
+                          "display": "flex",
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "500",
+                          "lineHeight": 0,
+                          "textTransform": "uppercase",
+                          "zIndex": 1,
+                        }
+                      }
+                      suppressHighlighting={true}
+                      userSelect="none"
+                    >
+                      Total Balance
+                    </Text>
+                  </View>
+                  <View
+                    style={
+                      {
+                        "color": "white",
+                        "flexDirection": "row",
+                        "gap": 10,
+                        "marginTop": 13,
+                      }
+                    }
+                  >
+                    <Text
+                      selectable={true}
+                      style={
+                        {
+                          "color": "hsla(112, 22%, 100%, 1)",
+                          "fontFamily": "System",
+                          "fontSize": 96,
+                          "fontWeight": "500",
+                          "lineHeight": 119,
+                          "zIndex": 1,
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      0
+                    </Text>
+                    <Text
+                      selectable={true}
+                      style={
+                        {
+                          "color": "hsla(112, 22%, 100%, 1)",
+                          "fontFamily": "System",
+                          "fontSize": 21.599999999999998,
+                          "fontWeight": "500",
+                          "lineHeight": 19,
+                          "zIndex": 1,
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      USD
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "paddingTop": 18,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "expanded": false,
+                }
+              }
+              cancelable={true}
+              disabled={false}
+              focusVisibleStyle={{}}
+              focusable={[Function]}
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                  "borderBottomColor": "transparent",
+                  "borderBottomLeftRadius": 9,
+                  "borderBottomRightRadius": 9,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
+                  "borderTopLeftRadius": 9,
+                  "borderTopRightRadius": 9,
+                  "borderTopWidth": 1,
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "height": 48,
+                  "justifyContent": "center",
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
                   "width": "100%",
                 }
               }
             >
-              <Text
-                selectable={true}
-                style={
-                  {
-                    "color": "#122023",
-                    "fontFamily": "System",
-                    "fontSize": 16.8,
-                    "fontWeight": "500",
-                    "lineHeight": 19,
-                    "textTransform": "uppercase",
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                Deposit
-              </Text>
               <View
                 style={
                   {
                     "alignItems": "center",
                     "flexDirection": "row",
-                    "justifyContent": "center",
-                    "zIndex": 2,
+                    "justifyContent": "space-between",
+                    "width": "100%",
                   }
                 }
               >
-                <RNSVGSvgView
-                  align="xMidYMid"
-                  bbHeight="32"
-                  bbWidth="32"
-                  color="#122023"
-                  fill="none"
-                  focusable={false}
-                  height={32}
-                  meetOrSlice={0}
-                  minX={0}
-                  minY={0}
-                  strokeWidth="2"
+                <Text
+                  selectable={true}
                   style={
-                    [
-                      {
-                        "backgroundColor": "transparent",
-                        "borderWidth": 0,
-                      },
-                      {
-                        "color": "#122023",
-                      },
-                      {
-                        "flex": 0,
-                        "height": 32,
-                        "width": 32,
-                      },
-                    ]
+                    {
+                      "color": "#122023",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "500",
+                      "lineHeight": 19,
+                      "textTransform": "uppercase",
+                    }
                   }
-                  tintColor="#122023"
-                  vbHeight={40}
-                  vbWidth={40}
-                  width={32}
+                  suppressHighlighting={true}
                 >
-                  <RNSVGGroup
-                    fill={null}
-                    propList={
+                  Deposit
+                </Text>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                      "zIndex": 2,
+                    }
+                  }
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight="32"
+                    bbWidth="32"
+                    color="#122023"
+                    fill="none"
+                    focusable={false}
+                    height={32}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    strokeWidth="2"
+                    style={
                       [
-                        "fill",
-                        "strokeWidth",
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "color": "#122023",
+                        },
+                        {
+                          "flex": 0,
+                          "height": 32,
+                          "width": 32,
+                        },
                       ]
                     }
-                    strokeWidth="2"
+                    tintColor="#122023"
+                    vbHeight={24}
+                    vbWidth={24}
+                    width={32}
                   >
-                    <RNSVGCircle
-                      cx="19.9999"
-                      cy="20"
-                      fill={
-                        {
-                          "payload": 4278190080,
-                          "type": 0,
-                        }
-                      }
+                    <RNSVGGroup
+                      fill={null}
                       propList={
                         [
-                          "stroke",
+                          "fill",
                           "strokeWidth",
-                          "strokeLinecap",
                         ]
                       }
-                      r="19"
-                      stroke={
-                        {
-                          "type": 2,
-                        }
-                      }
-                      strokeLinecap={1}
                       strokeWidth="2"
-                    />
-                    <RNSVGPath
-                      d="M19.9997 12.5L19.9997 27.5"
-                      fill={
-                        {
-                          "payload": 4278190080,
-                          "type": 0,
+                    >
+                       
+                      <RNSVGRect
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
                         }
-                      }
-                      propList={
-                        [
-                          "stroke",
-                          "strokeWidth",
-                          "strokeLinecap",
-                        ]
-                      }
-                      stroke={
-                        {
-                          "type": 2,
+                        height="22"
+                        propList={
+                          [
+                            "stroke",
+                            "strokeWidth",
+                          ]
                         }
-                      }
-                      strokeLinecap={1}
-                      strokeWidth="2"
-                    />
-                    <RNSVGPath
-                      d="M27.4997 20L12.4997 20"
-                      fill={
-                        {
-                          "payload": 4278190080,
-                          "type": 0,
+                        rx="11"
+                        stroke={
+                          {
+                            "payload": 4279377955,
+                            "type": 0,
+                          }
                         }
-                      }
-                      propList={
-                        [
-                          "stroke",
-                          "strokeWidth",
-                          "strokeLinecap",
-                        ]
-                      }
-                      stroke={
-                        {
-                          "type": 2,
+                        strokeWidth="2"
+                        width="22"
+                        x="1"
+                        y="1"
+                      />
+                      <RNSVGMask
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
                         }
-                      }
-                      strokeLinecap={1}
-                      strokeWidth="2"
-                    />
-                  </RNSVGGroup>
-                </RNSVGSvgView>
+                        height="16"
+                        maskContentUnits={1}
+                        maskUnits={1}
+                        name="mask0_3996_6472"
+                        width="16"
+                        x="4"
+                        y="4"
+                      >
+                        <RNSVGRect
+                          fill={
+                            {
+                              "payload": 4292467161,
+                              "type": 0,
+                            }
+                          }
+                          height="14.625"
+                          propList={
+                            [
+                              "fill",
+                            ]
+                          }
+                          width="14.625"
+                          x="4.5"
+                          y="4.5"
+                        />
+                      </RNSVGMask>
+                      <RNSVGGroup
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        mask="mask0_3996_6472"
+                      >
+                        <RNSVGPath
+                          d="M11.3571 12.6429H6V11.3571H11.3571V6H12.6429V11.3571H18V12.6429H12.6429V18H11.3571V12.6429Z"
+                          fill={
+                            {
+                              "type": 2,
+                            }
+                          }
+                          propList={
+                            [
+                              "fill",
+                            ]
+                          }
+                        />
+                      </RNSVGGroup>
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
               </View>
             </View>
           </View>
@@ -578,17 +574,279 @@ exports[`HomeScreen 1`] = `
         <View
           style={
             {
-              "display": "flex",
-              "flexDirection": "column",
-              "paddingBottom": 88,
-              "paddingTop": 32,
+              "borderBottomColor": "#E6E6E6",
+              "borderBottomWidth": 1,
+              "borderLeftColor": "#E6E6E6",
+              "borderLeftWidth": 0,
+              "borderRightColor": "#E6E6E6",
+              "borderRightWidth": 0,
+              "borderStyle": "solid",
+              "borderTopColor": "#E6E6E6",
+              "borderTopWidth": 0,
+              "flex": 1,
+              "flexShrink": 0,
+              "height": 0,
+              "maxHeight": 0,
+              "transform": [
+                {
+                  "translateY": -0.5,
+                },
+              ],
               "width": "100%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "column",
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "display": "none",
+                "flexDirection": "column",
+                "width": "100%",
+              }
+            }
+          />
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "transparent",
+            "flex": 1,
+            "flexDirection": "column",
+            "gap": 24,
+            "paddingBottom": 32,
+            "paddingLeft": 32,
+            "paddingRight": 32,
+            "paddingTop": 32,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          accessibilityRole="header"
+          selectable={true}
+          style={
+            {
+              "color": "hsla(112, 22%, 100%, 1)",
+              "fontFamily": "System",
+              "fontSize": 30,
+              "fontWeight": "700",
+              "lineHeight": 27,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textAlign": "center",
+              "textTransform": "none",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Register Your Sendtag Today!
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 13,
+              "width": "100%",
+            }
+          }
+        >
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            By registering a Sendtag, you can:
+          </Text>
+          <View
+            style={
+              {
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1. Send and receive funds using your personalized identifier
+            </Text>
+            <Text
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(112, 22%, 100%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                }
+              }
+              suppressHighlighting={true}
+            >
+              2. Earn Send It Rewards based on your token balance and referrals
+            </Text>
+          </View>
+          <Text
+            selectable={true}
+            style={
+              {
+                "color": "hsla(112, 22%, 100%, 1)",
+                "fontFamily": "System",
+                "fontSize": 16.8,
+                "fontWeight": "400",
+                "lineHeight": 19,
+              }
+            }
+            suppressHighlighting={true}
+          >
+            Join us in shaping the Future of Finance.
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "justifyContent": "center",
+              "marginBottom": "auto",
+              "marginLeft": "auto",
+              "marginRight": "auto",
+              "marginTop": "auto",
             }
           }
         />
       </View>
     </View>
-     
-  </View>
-</View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      animatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      onLayout={[Function]}
+      pointerEvents="none"
+      style={
+        {
+          "height": "80%",
+          "minHeight": "80%",
+          "opacity": 0,
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "backgroundColor": "hsla(191, 52%, 6%, 1)",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "position": "absolute",
+            "right": 0,
+            "shadowOpacity": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+]
 `;

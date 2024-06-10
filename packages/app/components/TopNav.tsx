@@ -14,7 +14,7 @@ import {
   ButtonText,
   View,
 } from '@my/ui'
-import { useNav, useToken } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
@@ -24,6 +24,8 @@ import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBotto
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
+import { IconCoin } from './icons/IconCoin'
+import { Link } from 'solito/link'
 
 export enum ButtonOption {
   QR = 'QR',
@@ -53,24 +55,29 @@ export function TopNav({
   subheader,
   showLogo = false,
   showReferral = false,
-  button = ButtonOption.QR,
+  button,
   noSubroute = false,
 }: TopNavProps) {
-  const [nav, setNavParam] = useNav()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
   const { push } = useRouter()
   const media = useMedia()
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
-  const [, setTokenParam] = useToken()
 
   const handleHomeBottomSheet = () => {
-    setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'home' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const handleSettingsBottomSheet = () => {
-    setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'settings' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const hasSelectedCoin = selectedCoin !== undefined
@@ -78,7 +85,7 @@ export function TopNav({
   const handleBack = () => {
     // always pop to the base path. e.g. /account/settings/edit-profile -> /account
     if (hasSelectedCoin) {
-      setTokenParam(undefined)
+      setRootParams({ ...queryParams, token: undefined })
     }
     const newPath = parts.slice(0, 1).join('/')
     push(`/${newPath}`)
@@ -91,12 +98,14 @@ export function TopNav({
 
   const renderButton = () => {
     switch (true) {
+      case button === undefined:
+        return <Button opacity={0} disabled />
       case selectedCoin !== undefined:
         return (
           <ButtonOg
             disabled
             $gtLg={{ display: 'none' }}
-            icon={selectedCoin.icon}
+            icon={<IconCoin coin={selectedCoin} />}
             bc="transparent"
             chromeless
             jc={'flex-end'}
@@ -137,7 +146,7 @@ export function TopNav({
   }
 
   return (
-    <Header w="100%" pb="$6">
+    <Header w="100%">
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
@@ -157,11 +166,13 @@ export function TopNav({
         </Stack>
         {showLogo && media.lg ? (
           <XStack>
-            <IconSendLogo
-              size={'$2.5'}
-              color={'$color12'}
-              display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
-            />
+            <Link href="/send">
+              <IconSendLogo
+                size={'$2.5'}
+                color={'$color12'}
+                display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+              />
+            </Link>
           </XStack>
         ) : (
           <H2
@@ -203,13 +214,12 @@ export function TopNav({
       )}
       <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
-        <Container pos="relative">
+        <Container pos="relative" mt={'$4'}>
           <View
             position="absolute"
             $lg={{ right: '$6' }}
             $md={{ right: 0 }}
             right={0}
-            top={0}
             bottom={0}
             justifyContent="center"
           >

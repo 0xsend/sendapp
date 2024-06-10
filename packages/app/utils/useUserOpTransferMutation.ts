@@ -13,9 +13,16 @@ import {
   type GetUserOperationReceiptReturnType,
   type UserOperation,
 } from 'permissionless'
-import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from 'viem'
+import {
+  encodeFunctionData,
+  erc20Abi,
+  isAddress,
+  type Hex,
+  formatUnits,
+  type CallExecutionError,
+} from 'viem'
 import { assert } from './assert'
-import { USEROP_VALID_UNTIL, USEROP_VERSION, entrypoint, signUserOp } from './userop'
+import { entrypoint, signUserOp } from './userop'
 
 // default user op with preset gas values that work
 export const defaultUserOp: Pick<
@@ -40,6 +47,7 @@ export const defaultUserOp: Pick<
 export type UseUserOpTransferMutationArgs = {
   userOp: UserOperation<'v0.7'>
   validUntil?: number
+  version?: number
 }
 
 /**
@@ -56,7 +64,8 @@ export function useUserOpTransferMutation() {
 
 export async function sendUserOpTransfer({
   userOp,
-  validUntil = USEROP_VALID_UNTIL,
+  version,
+  validUntil,
 }: UseUserOpTransferMutationArgs): Promise<GetUserOperationReceiptReturnType> {
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
@@ -66,9 +75,23 @@ export async function sendUserOpTransfer({
     chainId,
   })
 
+  // simulate
+  await baseMainnetClient
+    .call({
+      account: entryPointAddress[baseMainnetClient.chain.id],
+      to: userOp.sender,
+      data: userOp.callData,
+    })
+    .catch((e) => {
+      const error = e as CallExecutionError
+      console.error('Failed to simulate userop', e)
+      if (error.shortMessage) throw error.shortMessage
+      throw e
+    })
+
   userOp.signature = await signUserOp({
     userOpHash,
-    version: USEROP_VERSION,
+    version,
     validUntil,
   })
 

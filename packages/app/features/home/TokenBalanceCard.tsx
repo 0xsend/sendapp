@@ -13,7 +13,7 @@ export const TokenBalanceCard = () => {
   return (
     <XStack w={'100%'} zIndex={4}>
       <YStack>
-        <YStack jc={'center'} gap={'$6'} pb="$6">
+        <YStack jc={'center'} gap={'$4'}>
           <TooltipGroup delay={{ open: 0, close: 1500 }}>
             <Tooltip placement="bottom">
               <Tooltip.Trigger>
@@ -26,7 +26,7 @@ export const TokenBalanceCard = () => {
                     $theme-dark={{ col: '$gray5Light' }}
                     $theme-light={{ col: '$color12' }}
                     textTransform={'uppercase'}
-                    lineHeight={'$1'}
+                    lineHeight={0}
                   >
                     Total Balance
                   </Label>
@@ -38,8 +38,8 @@ export const TokenBalanceCard = () => {
                     <Paragraph
                       color={'$color12'}
                       fontFamily={'$mono'}
-                      fontSize={'$15'}
-                      lineHeight={'$14'}
+                      fontSize={96}
+                      lineHeight={'$15'}
                       fontWeight={'500'}
                       zIndex={1}
                     >

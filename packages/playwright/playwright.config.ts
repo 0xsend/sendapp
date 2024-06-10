@@ -32,7 +32,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 3 : 0,
   /* Opt out of parallel tests on CI. */
   // workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -105,4 +105,31 @@ export default defineConfig({
     stdout: 'pipe',
     ignoreHTTPSErrors: false,
   },
+
+  /**
+   * **Make Visual Tests More Forgiving**
+   * Out of the box, visual tests are very strict. If a single pixel fails, your test fails.
+   * Thankfully, Playwright provides numerous controls for tuning how sensitive your visual tests should be.
+   * Here are your options:
+   * - `threshold`: How much must a single pixel vary for it to be considered different. Values are a percentage from 0 to 1, with 0.2 as the default.
+   * - `maxDiffPixels`: The maximum number of pixels that can differ while still passing the test. By default, this option is disabled.
+   * - `maxDiffPixelRatio`: The maximum percentage of pixels that can differ while still passing the test. Values are a percentage from 0 to 1, but this control is disabled by default.
+   */
+
+  // need to handle differences on various platforms and give developers ability to update snapshots cross platform easily
+  // add docker image with snapshot capabiltities
+
+  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
+  // expect: {
+  //   toHaveScreenshot: {
+  //     threshold: 0.25,
+  //     maxDiffPixelRatio: 0.125,
+  //     // maxDiffPixels: 25,
+  //   },
+  //   toMatchSnapshot: {
+  //     threshold: 0.25,
+  //     maxDiffPixelRatio: 0.125,
+  //     // maxDiffPixels: 25,
+  //   },
+  // },
 })

@@ -20,6 +20,7 @@ contract DeployTokenPaymasterScript is Script {
         address uniswap = vm.envAddress("UNISWAP_ROUTER");
         address tokenOracle = vm.envAddress("TOKEN_ORACLE");
         address nativeOracle = vm.envAddress("NATIVE_ORACLE");
+        uint256 cacheTimeToLive = vm.envOr("CACHE_TIME_TO_LIVE", uint256(3600));
 
         require(token != address(0), "TOKEN env variable not set");
         require(weth != address(0), "WETH env variable not set");
@@ -37,7 +38,7 @@ contract DeployTokenPaymasterScript is Script {
         });
 
         OracleHelperConfig memory ohc = OracleHelperConfig({
-            cacheTimeToLive: 3600, // 1 hour
+            cacheTimeToLive: uint48(cacheTimeToLive), // 1 hour
             maxOracleRoundAge: 86400, // 1 day
             nativeOracle: IOracle(nativeOracle),
             priceUpdateThreshold: PRICE_DENOM * 12 / 100, // 20%

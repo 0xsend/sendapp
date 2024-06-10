@@ -1,8 +1,11 @@
-import type { MergeDeep } from 'type-fest'
+import type { Merge, MergeDeep } from 'type-fest'
 import type { Database as DatabaseGenerated } from './database-generated.types'
 export type { Json } from './database-generated.types'
 import type { PostgrestError } from '@supabase/supabase-js'
 
+/**
+ * @see https://www.postgresql.org/docs/16/functions-binarystring.html#ENCODE-FORMAT-HEX
+ **/
 export type PgBytea = `\\x${string}`
 
 export type Database = MergeDeep<
@@ -84,7 +87,24 @@ export type Database = MergeDeep<
             chain_id: number
             is_public: boolean | null
             send_id: number
+            all_tags: string[] | []
           }[]
+        }
+      }
+      Views: {
+        activity_feed: {
+          Row: {
+            created_at: string
+            event_name: string
+            from_user: Merge<
+              DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
+              { tags: string[] }
+            > | null
+            to_user: Merge<
+              DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
+              { tags: string[] }
+            > | null
+          }
         }
       }
     }

@@ -1,6 +1,6 @@
 import { useBytecode } from 'wagmi'
 import { test } from '@jest/globals'
-import type { SendAccountQuery } from './send-accounts/useSendAccounts'
+import type { useSendAccount } from './send-accounts/useSendAccounts'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { useSendAccountInitCode } from './useSendAccountInitCode'
 import { assert } from './assert'
@@ -16,7 +16,10 @@ describe('useSendAccountInitCode', () => {
       isLoading: true,
       error: null,
     })
-    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as SendAccountQuery
+    const sendAccount = {
+      address: '0x123',
+      init_code: '0x456',
+    } as unknown as ReturnType<typeof useSendAccount>['data']
     const { result, unmount } = renderHook(() => useSendAccountInitCode({ sendAccount }), {
       wrapper: Wrapper,
     })
@@ -38,7 +41,9 @@ describe('useSendAccountInitCode', () => {
       isFetched: true,
       error: null,
     })
-    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as SendAccountQuery
+    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as ReturnType<
+      typeof useSendAccount
+    >['data']
     const { result, unmount } = renderHook(() => useSendAccountInitCode({ sendAccount }), {
       wrapper: Wrapper,
     })
@@ -58,7 +63,9 @@ describe('useSendAccountInitCode', () => {
       isFetched: true,
       error: null,
     })
-    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as SendAccountQuery
+    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as ReturnType<
+      typeof useSendAccount
+    >['data']
     const { result, unmount } = renderHook(() => useSendAccountInitCode({ sendAccount }), {
       wrapper: Wrapper,
     })
@@ -80,7 +87,9 @@ describe('useSendAccountInitCode', () => {
     })
 
     // jest.useFakeTimers()
-    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as SendAccountQuery
+    const sendAccount = { address: '0x123', init_code: '0x456' } as unknown as ReturnType<
+      typeof useSendAccount
+    >['data']
     const { result, unmount } = renderHook(() => useSendAccountInitCode({ sendAccount }), {
       wrapper: Wrapper,
     })

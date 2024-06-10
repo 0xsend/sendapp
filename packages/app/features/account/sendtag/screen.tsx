@@ -1,16 +1,5 @@
 import type { Tables } from '@my/supabase/database.types'
-import {
-  Container,
-  H3,
-  Label,
-  ListItem,
-  Paragraph,
-  Spinner,
-  Stack,
-  YStack,
-  Button,
-  ButtonText,
-} from '@my/ui'
+import { H3, Label, ListItem, Paragraph, Spinner, Stack, YStack, Button, ButtonText } from '@my/ui'
 
 import { useUser } from 'app/utils/useUser'
 import { maxNumSendTags } from './checkout/checkout-utils'
@@ -35,25 +24,23 @@ export function SendTagScreen() {
     )
 
   return (
-    <Container>
-      <YStack
-        f={1}
-        $lg={{ gap: '$2', ai: 'center' }}
-        $theme-dark={{ btc: '$gray7Dark' }}
-        $theme-light={{ btc: '$gray4Light' }}
-      >
-        <YStack gap="$2" $gtSm={{ py: '$6', gap: '$6' }}>
-          <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>
-            REGISTERED SENDTAGS [
-            <Paragraph fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$primary' }}>
-              {`${confirmedTags?.length || 0} / ${maxNumSendTags}`}
-            </Paragraph>
-            ]
-          </Label>
-        </YStack>
-        <SendtagList allTags={allTags} confirmedTags={confirmedTags} />
+    <YStack
+      f={1}
+      $lg={{ gap: '$2', ai: 'center' }}
+      $theme-dark={{ btc: '$gray7Dark' }}
+      $theme-light={{ btc: '$gray4Light' }}
+    >
+      <YStack gap="$2" py="$3" $gtSm={{ gap: '$6', py: '$6' }}>
+        <Label fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$olive' }}>
+          REGISTERED SENDTAGS [
+          <Paragraph fontFamily={'$mono'} fontSize={'$5'} $theme-dark={{ col: '$primary' }}>
+            {`${confirmedTags?.length || 0} / ${maxNumSendTags}`}
+          </Paragraph>
+          ]
+        </Label>
       </YStack>
-    </Container>
+      <SendtagList allTags={allTags} confirmedTags={confirmedTags} />
+    </YStack>
   )
 }
 
@@ -121,13 +108,7 @@ function TagItem({ tag }: { tag?: Tables<'tags'> }) {
     )
 
   return (
-    <ListItem
-      h={54}
-      br={12}
-      w="fit-content"
-      $theme-dark={{ bc: '$darkest' }}
-      $theme-light={{ bc: '$gray4Light' }}
-    >
+    <ListItem h={54} br={12} w="fit-content" bc="$color2">
       <H3 fontSize={32} fontWeight={'500'} fontFamily={'$mono'} $theme-dark={{ col: '$primary' }}>
         {tag.name}
       </H3>

@@ -5,7 +5,6 @@ import {
   type ButtonProps,
   ButtonText,
   useToastController,
-  useMedia,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck } from '@tamagui/lucide-icons'
@@ -15,13 +14,10 @@ import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
 
 export function ReferralLink(props: ButtonProps) {
-  const media = useMedia()
   const { profile } = useUser()
   const referralCode = profile?.referral_code
   const referralHref = `https://send.app?referral=${referralCode}`
-  const referralLinkVisual = media.gtLg
-    ? `send.app?referral=${referralCode}`
-    : `referral=${referralCode}`
+  const referralLinkVisual = `referral=${referralCode}`
   const toast = useToastController()
   const [hasCopied, setHasCopied] = useState(false)
   const [canShare, setCanShare] = useState(false)

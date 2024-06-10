@@ -10,7 +10,7 @@ jest.mock('app/utils/getReferralLink', () => ({
   getReferralHref: jest.fn().mockReturnValue('https://send.it/123'),
 }))
 jest.mock('app/routers/params', () => ({
-  useNav: jest.fn().mockReturnValue([undefined, jest.fn()]),
+  useRootScreenParams: jest.fn().mockReturnValue([{ nav: 'home', token: undefined }, jest.fn()]),
 }))
 describe('AccountScreen', () => {
   it('renders the account screen', async () => {

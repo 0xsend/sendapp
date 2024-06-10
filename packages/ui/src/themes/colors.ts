@@ -267,4 +267,9 @@ export const brandColors = {
   decay: '#3E4A3C',
   darkest: '#081619',
   jet: '#343434',
+  metalTouch: '#1C2A2D',
+  darkGrayTextField: '#666666', // hsla(0, 0%, 40%, 1)
+  lightGrayTextField: '#B3B3B3', // hsla(0, 0%, 70%, 1)
+  error: '#DE4747', // hsla(0, 70%, 57%, 1)
+  warning: '#FFD66E', // hsla(43, 100%, 72%, 1)
 }

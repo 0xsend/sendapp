@@ -146,16 +146,7 @@
         },
         {
           "name": "log_addr",
-          "column": "log_addr",
-          "filter_op": "contains",
-          "filter_arg": [
-            "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
-            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-          ]
+          "column": "log_addr"
         }
       ],
       "event": {
@@ -362,6 +353,188 @@
             "type": "uint256",
             "indexed": false,
             "column": "v"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
+      "name": "send_account_signing_key_added",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "integration": "send_account_created",
+            "column": "account"
+          }
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "account",
+            "type": "address",
+            "indexed": true,
+            "column": "account"
+          },
+          {
+            "name": "keySlot",
+            "type": "uint8",
+            "indexed": false,
+            "column": "key_slot"
+          },
+          {
+            "name": "key",
+            "type": "bytes32[2]",
+            "indexed": false,
+            "column": "key"
+          }
+        ],
+        "name": "SigningKeyAdded"
+      },
+      "table": {
+        "name": "send_account_signing_key_added",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "account",
+            "type": "bytea"
+          },
+          {
+            "name": "key_slot",
+            "type": "smallint"
+          },
+          {
+            "name": "key",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
+      "name": "send_account_signing_key_removed",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "integration": "send_account_created",
+            "column": "account"
+          }
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "account",
+            "type": "address",
+            "indexed": true,
+            "column": "account"
+          },
+          {
+            "name": "keySlot",
+            "type": "uint8",
+            "indexed": false,
+            "column": "key_slot"
+          },
+          {
+            "name": "key",
+            "type": "bytes32[2]",
+            "indexed": false,
+            "column": "key"
+          }
+        ],
+        "name": "SigningKeyRemoved"
+      },
+      "table": {
+        "name": "send_account_signing_key_removed",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "account",
+            "type": "bytea"
+          },
+          {
+            "name": "key_slot",
+            "type": "smallint"
+          },
+          {
+            "name": "key",
+            "type": "bytea"
           }
         ]
       },

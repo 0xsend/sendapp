@@ -1,8 +1,15 @@
 import { assert } from 'app/utils/assert'
 import { expect, test } from './fixtures/send-accounts'
+import { debug } from 'debug'
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/account')
+let log: debug.Debugger
+
+test.beforeEach(async ({ page, user: { user } }) => {
+  log = debug(`test:account:logged-in:${user.id}:${test.info().parallelIndex}`)
+  await page.goto('/')
+  await page.waitForURL('/')
+  await page.getByRole('link', { name: 'account' }).click()
+  await page.waitForURL('/account')
 })
 
 test('can visit account page', async ({ page, context, user: { profile } }) => {

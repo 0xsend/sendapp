@@ -12,19 +12,23 @@ import {
 } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
-import { useState } from 'react'
+import { useRouter } from 'solito/router'
 import { createParam } from 'solito'
-import { SendDialog } from './SendDialog'
 import { AvatarProfile } from './AvatarProfile'
+const { useParam } = createParam<{ sendid: string }>()
+interface ProfileScreenProps {
+  sendid?: string
+}
 
-const { useParam } = createParam<{ tag: string }>()
-
-export function ProfileScreen() {
+export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const { user } = useUser()
-  const [tag] = useParam('tag')
-  const { data: profile, isLoading, error } = useProfileLookup(tag)
-  const [showSendModal, setShowSendModal] = useState(false)
+  const [paramSendid] = useParam('sendid')
+  const sendid = propSendid || paramSendid
+  const { data: profile, isLoading, error } = useProfileLookup('sendid', sendid || '')
+  const router = useRouter()
   const toast = useToastController()
+
+  const formatTags = (tags: string[]) => tags?.map((tag) => `@${tag}`).join(' ')
 
   return (
     <Container>
@@ -34,7 +38,7 @@ export function ProfileScreen() {
         {profile ? (
           <YStack width="100%" gap="$2">
             <AvatarProfile profile={profile} /> <H1 nativeID="profileName">{profile.name}</H1>
-            <H2 theme="alt1">@{tag}</H2>
+            <H2 theme="alt1">{formatTags(profile.all_tags)}</H2>
             <Paragraph mb="$4">{profile.about}</Paragraph>
             {profile && user?.id !== profile?.id ? (
               <XStack jc="space-around" gap="$6" maxWidth={600}>
@@ -43,7 +47,10 @@ export function ProfileScreen() {
                   f={1}
                   width={'100%'}
                   onPress={() => {
-                    setShowSendModal(true)
+                    router.push({
+                      pathname: '/send',
+                      query: { recipient: profile.tag_name },
+                    })
                   }}
                   theme="accent"
                 >
@@ -61,7 +68,6 @@ export function ProfileScreen() {
                 </Button>
               </XStack>
             ) : null}
-            <SendDialog profile={profile} open={showSendModal} onOpenChange={setShowSendModal} />
           </YStack>
         ) : null}
       </YStack>

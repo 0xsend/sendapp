@@ -2,6 +2,7 @@ import type { SeedClientOptions, usersInputs } from '@snaplet/seed'
 import { pravatar, tagName } from './utils'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
 import { copycat, type Input } from '@snaplet/copycat'
+import crypto from 'node:crypto'
 
 export const models: SeedClientOptions['models'] = {
   users: {
@@ -69,7 +70,11 @@ export const userOnboarded: usersInputs = {
     })
     return phone.replace('+', '')
   },
-  profiles: [{}],
+  profiles: [
+    {
+      referralCode: (ctx) => crypto.randomBytes(8).toString('hex'),
+    },
+  ],
   tags: [
     {
       status: 'confirmed',

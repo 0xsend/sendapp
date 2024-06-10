@@ -2,11 +2,10 @@ import type { ColorTokens } from '@my/ui/types'
 import { themed } from '@tamagui/helpers-icon'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { useThemeSetting } from '@tamagui/next-theme'
-import * as React from 'react'
 import { memo } from 'react'
 import { Circle, Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 
-const IconSendTokenLight = (_props: IconProps) => {
+const IconSendTokenLight = (_props) => {
   const { size, color, ...props } = _props
   return (
     <Svg
@@ -25,10 +24,10 @@ const IconSendTokenLight = (_props: IconProps) => {
     </Svg>
   )
 }
-const IconSendTokenLightMemo = memo(themed(IconSendTokenLight))
+const IconSendTokenLightMemo = memo<IconProps>(themed(IconSendTokenLight))
 export { IconSendTokenLightMemo as IconSendTokenLight }
 
-const IconSendTokenDark = (_props: IconProps) => {
+const IconSendTokenDark = (_props) => {
   const { size, color, ...props } = _props
   return (
     <Svg
@@ -79,13 +78,13 @@ const IconSendTokenDark = (_props: IconProps) => {
     </Svg>
   )
 }
-const IconSendTokenDarkMemo = memo(themed(IconSendTokenDark))
+const IconSendTokenDarkMemo = memo<IconProps>(themed(IconSendTokenDark))
 export { IconSendTokenDarkMemo as IconSendTokenDark }
 
-const IconSendToken = (_props: IconProps) => {
+const IconSendToken = (_props) => {
   const { resolvedTheme } = useThemeSetting()
   const Icon = resolvedTheme === 'dark' ? IconSendTokenDark : IconSendTokenLight
   return <Icon {..._props} />
 }
-const IconSendTokenMemo = memo(themed(IconSendToken))
+const IconSendTokenMemo = memo<IconProps>(themed(IconSendToken))
 export { IconSendTokenMemo as IconSendToken }

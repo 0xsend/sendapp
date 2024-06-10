@@ -1,1 +1,1 @@
-export { useSendAccounts } from './useSendAccounts'
+export { useSendAccounts, useSendAccount } from './useSendAccounts'

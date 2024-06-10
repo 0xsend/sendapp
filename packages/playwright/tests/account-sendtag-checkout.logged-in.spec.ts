@@ -1,15 +1,21 @@
 import { faker } from '@faker-js/faker'
+import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
+import { userOnboarded } from '@my/snaplet/models'
 import type { Page } from '@playwright/test'
+import { devices, mergeTests } from '@playwright/test'
+import { assert } from 'app/utils/assert'
 import debug from 'debug'
+import { parseEther } from 'viem'
 import { getAuthSessionFromContext } from './fixtures/auth'
-import { expect, test } from './fixtures/checkout'
-import { devices } from '@playwright/test'
+import { test as checkoutTest, expect } from './fixtures/checkout'
 
-let log: debug.Debugger | undefined
+let log: debug.Debugger
+
+const test = mergeTests(checkoutTest, snapletTest)
 
 const debugAuthSession = async (page: Page) => {
   const { decoded } = await getAuthSessionFromContext(page.context())
-  log?.('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
+  log('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
 const pricingText = [
@@ -58,7 +64,7 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
   expect(checkoutPage.page.getByText('Only English alphabet, numbers, and underscore')).toBeTruthy()
 })
 
-test('can confirm a tag', async ({ checkoutPage, supabase }) => {
+test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myProfile } }) => {
   // test.setTimeout(60_000) // 60 seconds
   const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
   await checkoutPage.addPendingTag(tagName)
@@ -72,6 +78,75 @@ test('can confirm a tag', async ({ checkoutPage, supabase }) => {
 
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
   await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
+
+  const { data, error: activityError } = await supabase
+    .from('activity_feed')
+    .select('*')
+    .eq('event_name', 'tag_receipts')
+  expect(activityError).toBeFalsy()
+  expect(data).toHaveLength(1)
+  expect((data?.[0]?.data as { tags: string[] })?.tags).toEqual([tagName])
+
+  const receiptEvent = {
+    event_name: 'tag_receipts',
+    from_user: {
+      id: myProfile.id,
+      send_id: myProfile.send_id,
+    },
+    data: {
+      tags: [tagName],
+      value: parseEther('0.002').toString(),
+    },
+  }
+  await expect(supabase).toHaveEventInActivityFeed(receiptEvent)
+})
+
+test('can refer a tag', async ({
+  seed,
+  checkoutPage,
+  supabase,
+  pg,
+  user: { profile: myProfile },
+}) => {
+  const plan = await seed.users([userOnboarded])
+  const referrer = plan.profiles[0]
+  const referrerTags = plan.tags.map((t) => t.name)
+  assert(!!referrer, 'profile not found')
+  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
+  await checkoutPage.goto()
+  const tagsCount = Math.floor(Math.random() * 5) + 1
+  const tagsToRegister: string[] = []
+  for (let i = 0; i < tagsCount; i++) {
+    const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
+    tagsToRegister.push(tagName)
+    await checkoutPage.addPendingTag(tagName)
+    await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
+  }
+  await checkoutPage.confirmTags(expect)
+  const { data: tags, error } = await supabase.from('tags').select('*').in('name', tagsToRegister)
+  expect(error).toBeFalsy()
+  expect(tags).toHaveLength(tagsCount)
+
+  await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
+
+  for (const tag of tagsToRegister) {
+    await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
+  }
+
+  await expect(supabase).toHaveEventInActivityFeed({
+    event_name: 'referrals',
+    from_user: {
+      send_id: referrer.sendId,
+      tags: referrerTags,
+    },
+    to_user: {
+      id: myProfile.id,
+      send_id: myProfile.send_id,
+    },
+    data: {
+      tags: tagsToRegister,
+    },
+  })
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {
@@ -81,10 +156,10 @@ test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) =
   await checkoutPage.page.pause()
   const { data, error } = await supabase.rpc('confirm_tags', {
     tag_names: [tagName],
-    receipt_hash: '0x',
+    event_id: '',
     referral_code_input: '',
   })
-  log?.('cannot confirm a tag without paying', data, error)
+  log('cannot confirm a tag without paying', data, error)
   expect(error).toBeTruthy()
   expect(error?.code).toBe('42501')
   expect(error?.message).toBe('permission denied for function confirm_tags')

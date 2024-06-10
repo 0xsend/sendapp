@@ -11,13 +11,14 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
-import type { coins } from 'app/data/coins'
-import { useToken } from 'app/routers/params'
+import type { coins, coin } from 'app/data/coins'
+import { useRootScreenParams } from 'app/routers/params'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
-  const [tokenParam] = useToken()
+  const [{ token: tokenParam }] = useRootScreenParams()
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
 
@@ -44,10 +45,9 @@ const TokenBalanceItem = ({
   coin,
   ...props
 }: {
-  coin: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }
+  coin: coin
 } & Omit<LinkProps, 'children'>) => {
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
 
   const balance = useBalance({
     address: sendAccount?.address,
@@ -59,7 +59,7 @@ const TokenBalanceItem = ({
   return (
     <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
-        {coin.icon}
+        <IconCoin coin={coin} />
         <Paragraph
           fontSize={'$5'}
           fontWeight={'500'}

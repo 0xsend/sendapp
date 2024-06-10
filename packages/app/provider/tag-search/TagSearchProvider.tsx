@@ -9,6 +9,8 @@ import type { PostgrestError } from '@supabase/supabase-js'
 
 export const SearchSchema = z.object({
   query: formFields.text,
+  limit_val: formFields.number.optional(),
+  offset_val: formFields.number.optional(),
 })
 export type SearchSchema = z.infer<typeof SearchSchema>
 
@@ -23,14 +25,19 @@ const TagSearch = createContext<TagSearchContextValue>(null as unknown as TagSea
 
 let abortController: AbortController
 
-type SearchTagsArgs = { supabase: ReturnType<typeof useSupabase>; query: string }
-async function searchTags({ supabase, query }: SearchTagsArgs) {
+type SearchTagsArgs = {
+  supabase: ReturnType<typeof useSupabase>
+  query: string
+  limit_val?: number
+  offset_val?: number
+}
+async function searchTags({ supabase, query, limit_val, offset_val }: SearchTagsArgs) {
   if (abortController) {
     abortController.abort()
   }
   abortController = new AbortController()
   const { data, error } = await supabase
-    .rpc('tag_search', { query })
+    .rpc('tag_search', { query, limit_val, offset_val })
     .abortSignal(abortController.signal)
   return { data, error }
 }
@@ -47,8 +54,9 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
       try {
         setIsLoading(true)
         setError(null)
-        const result = await searchTags({ supabase, query })
+        const result = await searchTags({ supabase, query, limit_val: 10, offset_val: 0 })
         const { data, error } = result
+        const results = data && data.length > 0 ? data[0] : []
         if (error) {
           if (error.message.includes('user aborted')) {
             return
@@ -56,7 +64,7 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
           setError(error)
           return
         }
-        setResults(data === null ? [] : data)
+        setResults(results)
       } finally {
         setIsLoading(false)
       }
@@ -68,8 +76,8 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
   const query = form.watch('query', '')
 
   useEffect(() => {
-    if (query.length >= 2) {
-      onSearch({ query })
+    if (query.length >= 1) {
+      onSearch({ query, limit_val: 10 })
     } else {
       setIsLoading(false)
       setError(null)

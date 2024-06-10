@@ -1,5 +1,12 @@
-import { config, readSendTokenBalanceOf, type sendTokenAddress } from '@my/wagmi'
+import {
+  config,
+  readSendTokenBalanceOf,
+  type sendTokenAddress,
+  readSendMerkleDropTrancheActive,
+  type sendMerkleDropAddress,
+} from '@my/wagmi'
 import type { Tables } from '@my/supabase/database.types'
+
 /**
  * Fetches the balances of all hodler addresses in qualification period
  *
@@ -25,5 +32,12 @@ export function fetchAllBalances({
       address,
       balance: balance.toString(),
     }
+  })
+}
+
+export async function isMerkleDropActive(distribution: Tables<'distributions'>) {
+  return readSendMerkleDropTrancheActive(config, {
+    chainId: distribution.chain_id as keyof typeof sendMerkleDropAddress,
+    args: [BigInt(distribution.number - 1)], // number is 1-indexed
   })
 }

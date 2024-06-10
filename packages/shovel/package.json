@@ -1,19 +1,20 @@
 {
-  "name": "shovel",
+  "name": "@my/shovel",
   "module": "index.ts",
   "type": "module",
   "scripts": {
     "generate": "bun run src/generate.ts --path='./etc/config.json'",
     "test": "bun test",
-    "shovel:tilt": "bun run ./bin/shovel.tilt.ts"
+    "shovel:tilt": "bun run ./bin/shovel.tilt.ts",
+    "empty": "bun run ./bin/empty-shovel.dev.ts"
   },
   "devDependencies": {
-    "@indexsupply/shovel-config": "^0.0.11",
+    "@indexsupply/shovel-config": "^0.0.16",
     "@my/wagmi": "workspace:*",
     "@types/bun": "latest",
     "permissionless": "^0.1.14",
-    "viem": "^2.8.10",
-    "zx": "^8.0.2"
+    "viem": "^2.13.7",
+    "zx": "^8.1.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

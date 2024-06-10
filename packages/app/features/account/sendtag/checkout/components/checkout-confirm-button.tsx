@@ -1,70 +1,60 @@
 import {
-  Anchor,
+  Button,
   ButtonIcon,
+  ButtonText,
+  Paragraph,
   Spinner,
   Tooltip,
-  type ButtonProps,
-  useMedia,
   YStack,
-  Paragraph,
-  Button,
-  ButtonText,
+  useMedia,
+  type ButtonProps,
 } from '@my/ui'
 
-import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { getPriceInWei, useSenderSafeReceivedEvents, verifyAddressMsg } from '../checkout-utils'
 import {
-  useAccount,
+  baseMainnetClient,
+  sendAccountAbi,
+  sendRevenueSafeAddress,
+  tokenPaymasterAddress,
+} from '@my/wagmi'
+import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { TRPCClientError } from '@trpc/client'
+import { api } from 'app/utils/api'
+import { assert } from 'app/utils/assert'
+import { byteaToHex } from 'app/utils/byteaToHex'
+import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
+import { usePendingTags } from 'app/utils/tags'
+import { useReceipts } from 'app/utils/useReceipts'
+import { useUser } from 'app/utils/useUser'
+import { defaultUserOp, sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
+import { useAccountNonce } from 'app/utils/userop'
+import type { UserOperation } from 'permissionless'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { checksumAddress, encodeFunctionData } from 'viem'
+import {
   useBalance,
   useBlockNumber,
-  useConnect,
-  useEstimateGas,
+  useEstimateFeesPerGas,
   usePublicClient,
-  useSendTransaction,
-  useSignMessage,
   useWaitForTransactionReceipt,
 } from 'wagmi'
-import { baseMainnetClient, sendRevenueSafeAddress } from '@my/wagmi'
-import { assert } from 'app/utils/assert'
-import { api } from 'app/utils/api'
-import { shorten } from 'app/utils/strings'
-import { TRPCClientError } from '@trpc/client'
-import { useReceipts } from 'app/utils/useReceipts'
-import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
-import { usePendingTags } from 'app/utils/tags'
-import { useUser } from 'app/utils/useUser'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
-import { checksumAddress } from 'viem'
+import { getPriceInWei, useSenderSafeReceivedEvents } from '../checkout-utils'
+import { throwIf } from 'app/utils/throwIf'
 
 export function ConfirmButton({
   onConfirmed,
-  needsVerification,
 }: {
   onConfirmed: () => void
-  needsVerification: boolean
 }) {
   const media = useMedia()
   const { updateProfile } = useUser()
-
+  const { data: sendAccount } = useSendAccount()
   //Connect
+  const chainId = baseMainnetClient.chain.id
   const pendingTags = usePendingTags()
-
-  const { chainId } = useAccount()
-  const { openConnectModal } = useConnectModal()
-  const { openChainModal } = useChainModal()
-  const { error: connectError } = useConnect()
   const publicClient = usePublicClient()
-  const {
-    data: addresses,
-    isLoading: isLoadingAddresses,
-    isRefetching: isRefetchingAddresses,
-    refetch: updateAddresses,
-  } = useChainAddresses()
-  const { address: connectedAddress } = useAccount()
   const { data: ethBalance } = useBalance({
-    address: connectedAddress,
+    address: sendAccount?.address,
     chainId: baseMainnetClient.chain.id,
   })
   const weiAmount = useMemo(() => getPriceInWei(pendingTags ?? []), [pendingTags])
@@ -79,8 +69,7 @@ export function ConfirmButton({
 
   const { data: block } = useBlockNumber()
   const lookupSafeReceivedEvent = useCallback(async () => {
-    if (!addresses || addresses.length === 0) return
-    const address = addresses[0]?.address
+    const address = sendAccount?.address
     if (!address) return
     if (isLoadingReceipts) return
     if (receipts === undefined) return
@@ -92,8 +81,8 @@ export function ConfirmButton({
         assert(e.tx_hash.startsWith('\\x'), 'Hex string must start with \\x')
         assert(!!e.sender, 'sender is required')
         assert(e.sender.startsWith('\\x'), 'Hex string must start with \\x')
-        const sender = pgBase16ToHex(e.sender as `\\x${string}`)
-        const hash = pgBase16ToHex(e.tx_hash as `\\x${string}`)
+        const sender = byteaToHex(e.sender as `\\x${string}`)
+        const hash = byteaToHex(e.tx_hash as `\\x${string}`)
         const isPurchase =
           checksumAddress(sender) === checksumAddress(address) &&
           e.v &&
@@ -105,12 +94,12 @@ export function ConfirmButton({
 
     // check it against the receipts
     if (event?.tx_hash) {
-      submitTxToDb(pgBase16ToHex(event.tx_hash as `\\x${string}`))
+      submitTxToDb(byteaToHex(event.tx_hash as `\\x${string}`))
     }
   }, [
     receipts,
     publicClient,
-    addresses,
+    sendAccount,
     weiAmount,
     isLoadingReceipts,
     receiptHashes,
@@ -136,35 +125,87 @@ export function ConfirmButton({
   const [confirmed, setConfirmed] = useState(false)
 
   const [attempts, setAttempts] = useState(0)
-
-  const { sendTransactionAsync, isPending: sendTransactionIsPending } = useSendTransaction({
-    mutation: {
-      onSuccess: setSentTx,
-    },
-  })
-
-  const tx = {
-    to: sendRevenueSafeAddress[chainId as keyof typeof sendRevenueSafeAddress],
+  const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
+  const { data: feesPerGas, error: gasFeesError } = useEstimateFeesPerGas({
     chainId: baseMainnetClient.chain.id,
-    value: weiAmount,
-  } as const
-
-  const { data: txData, error: estimateGasErr } = useEstimateGas({
-    ...tx,
-    query: {
-      enabled: chainId !== undefined && canAffordTags,
+  })
+  const { maxFeePerGas, maxPriorityFeePerGas } = feesPerGas ?? {}
+  const {
+    data: userOp,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+  } = useQuery({
+    queryKey: [
+      'sendTransaction',
+      chainId,
+      sendAccount?.address,
+      String(nonce),
+      sendAccount,
+      String(maxFeePerGas),
+      String(maxPriorityFeePerGas),
+      String(weiAmount),
+      nonceError,
+      gasFeesError,
+    ],
+    enabled:
+      !!sendAccount &&
+      nonce !== undefined &&
+      maxFeePerGas !== undefined &&
+      maxPriorityFeePerGas !== undefined,
+    queryFn: async () => {
+      assert(!!sendAccount, 'No send account found')
+      assert(nonce !== undefined, 'No nonce found')
+      assert(maxFeePerGas !== undefined, 'No max fee per gas found')
+      assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
+      throwIf(nonceError)
+      throwIf(gasFeesError)
+      const callData = encodeFunctionData({
+        abi: sendAccountAbi,
+        functionName: 'executeBatch',
+        args: [
+          [
+            {
+              dest: sendRevenueSafeAddress[chainId as keyof typeof sendRevenueSafeAddress],
+              value: weiAmount,
+              data: '0x',
+            },
+          ],
+        ],
+      })
+      const paymaster = tokenPaymasterAddress[chainId]
+      const userOp: UserOperation<'v0.7'> = {
+        ...defaultUserOp,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        sender: sendAccount?.address,
+        nonce,
+        callData,
+        paymaster,
+        paymasterData: '0x',
+        signature: '0x',
+      }
+      return userOp
+    },
+  })
+  const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
+    mutationFn: sendUserOpTransfer,
+    onSuccess: (userOpReceipt) => {
+      if (userOpReceipt.success) {
+        setSentTx(userOpReceipt.receipt.transactionHash)
+      } else {
+        setError(`Something went wrong: ${userOpReceipt.receipt.transactionHash}`)
+      }
     },
   })
 
-  function handleCheckoutTx() {
-    assert(!!sendTransactionAsync, 'sendTransactionAsync is required')
-    sendTransactionAsync({
-      gas: txData,
-      ...tx,
-    }).catch((err) => {
-      console.error(err)
-      setError(err.message.split('.').at(0))
-    })
+  async function handleCheckoutTx() {
+    try {
+      throwIf(userOpError)
+      assert(!!userOp, 'User op is required')
+      await sendUserOp({ userOp })
+    } catch (e) {
+      setError(e.message.split('.').at(0))
+    }
   }
 
   function submitTxToDb(tx: string) {
@@ -175,8 +216,6 @@ export function ConfirmButton({
       .then(async () => {
         setConfirmed(true)
         setSubmitting(false)
-        // Is this comment still applicable after refactor?
-        // FIXME: these prob should be passed in as props since the portal and app root do not share the same providers
         await updateProfile().then(() => {
           refetchReceipts()
         })
@@ -200,11 +239,13 @@ export function ConfirmButton({
             return
           }
 
-          setError(err.message)
           return
         }
         console.error(err)
-        setError('Something went wrong')
+        setError(err?.message?.split('.').at(0) ?? 'Something went wrong')
+      })
+      .finally(() => {
+        setSubmitting(false)
       })
   }
 
@@ -214,48 +255,10 @@ export function ConfirmButton({
 
   useEffect(() => {
     if (txWaitError) {
-      setError(txWaitError.message)
+      setError(txWaitError.message.split('.').at(0))
     }
   }, [txWaitError])
 
-  const { signMessageAsync } = useSignMessage({
-    mutation: {
-      onError: (err) => {
-        setError('details' in err ? err?.details : err?.message)
-      },
-    },
-  })
-
-  const [savedAddress, setSavedAddress] = useState(addresses?.[0]?.address) //this only works cause we limit to 1 address\
-
-  useEffect(() => {
-    if (isLoadingAddresses || addresses?.length === 0) return
-    setSavedAddress(addresses?.[0]?.address)
-  }, [isLoadingAddresses, addresses])
-
-  const verify = api.chainAddress.verify.useMutation()
-
-  function handleVerify() {
-    assert(!!signMessageAsync, 'signMessageAsync is required')
-    assert(!!connectedAddress, 'connectedAddress is required')
-    signMessageAsync({ message: verifyAddressMsg(connectedAddress) })
-      .then((signature) => verify.mutateAsync({ address: connectedAddress, signature }))
-      .then(() => updateAddresses())
-      .then(({ data: addresses }) => {
-        setSavedAddress(addresses?.[0]?.address)
-      })
-      .catch((e) => {
-        if (e instanceof TRPCClientError) {
-          setError(e.message)
-        } else {
-          console.error(e)
-          setError(`Something went wrong: ${e.message ?? 'Unknown error'}`)
-        }
-      })
-  }
-
-  // @TODO: This is not native compatible
-  //We will need to seperate this logic so that we can switch between web and native
   if (sendRevenuesSafeReceivesError?.message) {
     return (
       <ConfirmButtonError>
@@ -263,87 +266,6 @@ export function ConfirmButton({
           <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
             {sendRevenuesSafeReceivesError?.message}
           </Paragraph>
-        </YStack>
-      </ConfirmButtonError>
-    )
-  }
-  if (connectError?.message) {
-    return (
-      <ConfirmButtonError onPress={openConnectModal}>
-        <YStack gap="$2" ai="center">
-          <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            {connectError?.message}
-          </Paragraph>
-        </YStack>
-      </ConfirmButtonError>
-    )
-  }
-
-  // @TODO: This is not native compatible
-  // We will need to seperate this logic so that we can switch between web and native
-  if (!connectedAddress) {
-    return (
-      <Button space="$1.5" onPress={openConnectModal} br={12} f={1}>
-        <ButtonText space="$1.5">Connect Wallet</ButtonText>
-        <ButtonIcon>
-          <AlertTriangle color={'$red500'} />
-        </ButtonIcon>
-      </Button>
-    )
-  }
-
-  if (chainId !== baseMainnetClient.chain.id) {
-    return (
-      <ConfirmButtonError buttonText={'Switch Network'} onPress={openChainModal}>
-        <YStack gap="$2" ai="center">
-          <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            Please switch to Base to confirm your Send Tags.
-          </Paragraph>
-        </YStack>
-      </ConfirmButtonError>
-    )
-  }
-
-  if ((!savedAddress && !isRefetchingAddresses) || needsVerification) {
-    return (
-      <ConfirmButtonError buttonText={'Verify Wallet'} onPress={handleVerify}>
-        <YStack gap="$2" ai="center">
-          <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            Please verify your wallet to confirm your Send Tags.
-          </Paragraph>
-        </YStack>
-      </ConfirmButtonError>
-    )
-  }
-
-  if (isRefetchingAddresses) {
-    return (
-      <>
-        <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-          Checking your wallet address...
-        </Paragraph>
-        <Spinner color="$color11" />
-      </>
-    )
-  }
-
-  if (savedAddress && savedAddress !== connectedAddress) {
-    return (
-      <ConfirmButtonError disabled>
-        <YStack gap="$2" ai="center">
-          <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            Please switch to the wallet address you verified earlier.
-          </Paragraph>
-          <Anchor
-            $theme-dark={{ col: '$white' }}
-            $theme-light={{ col: '$black' }}
-            href={`${
-              publicClient?.chain?.blockExplorers?.default?.url ?? ''
-            }/address/${savedAddress}`}
-            target="_blank"
-          >
-            {shorten(savedAddress)}
-          </Anchor>
         </YStack>
       </ConfirmButtonError>
     )
@@ -356,9 +278,6 @@ export function ConfirmButton({
         onPress={() => {
           setError(undefined)
           switch (true) {
-            case needsVerification || !savedAddress || connectedAddress !== savedAddress:
-              handleVerify()
-              break
             case !txReceipt || txWaitError !== null:
               handleCheckoutTx()
               break
@@ -411,21 +330,25 @@ export function ConfirmButton({
 
   return (
     <Button
-      disabled={(!needsVerification && (pendingTags ?? []).length === 0) || !canAffordTags}
+      disabled={(pendingTags ?? []).length === 0 || !canAffordTags}
       disabledStyle={{
         bc: '$gray5Light',
         pointerEvents: 'none',
         opacity: 0.5,
       }}
-      pointerEvents={submitting || txWaitLoading || sendTransactionIsPending ? 'none' : 'auto'}
-      space="$1.5"
+      pointerEvents={
+        submitting || txWaitLoading || sendTransactionIsPending || userOpError || isLoadingUserOp
+          ? 'none'
+          : 'auto'
+      }
+      gap="$1.5"
       onPress={handleCheckoutTx}
       br={12}
       f={1}
     >
       {(() => {
         switch (true) {
-          case (!canAffordTags || estimateGasErr !== null) && (!txWaitLoading || !submitting):
+          case !canAffordTags && (!txWaitLoading || !submitting):
             return <ButtonText>Insufficient funds</ButtonText>
           case sendTransactionIsPending:
             return (
@@ -498,8 +421,8 @@ const ConfirmButtonError = ({
         {children}
       </Tooltip.Content>
       <Tooltip.Trigger>
-        <Button space="$1.5" onPress={onPress} br={12} f={1} {...props}>
-          <ButtonText space="$1.5">{buttonText || 'Error'}</ButtonText>
+        <Button gap="$1.5" onPress={onPress} br={12} f={1} {...props}>
+          <ButtonText gap="$1.5">{buttonText || 'Error'}</ButtonText>
           <ButtonIcon>
             <AlertTriangle color={'$red500'} />
           </ButtonIcon>

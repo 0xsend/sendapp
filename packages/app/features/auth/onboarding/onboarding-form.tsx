@@ -11,13 +11,12 @@ import {
   YStack,
 } from '@my/ui'
 import { base16, base64 } from '@scure/base'
-import { TRPCClientError } from '@trpc/client'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { base64ToBase16 } from 'app/utils/base64ToBase16'
 import { parseCreateResponse } from 'app/utils/passkeys'
-import { useSendAccounts } from 'app/utils/send-accounts'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
@@ -33,54 +32,51 @@ export const OnboardingForm = () => {
   const sendAccountCreate = api.sendAccount.create.useMutation()
   const { user } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
-  const { refetch: refetchSendAccounts } = useSendAccounts()
+  const { refetch: refetchSendAccount } = useSendAccount()
   const { replace } = useRouter()
   const deviceName = Device.deviceName
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
 
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
-    assert(!!user?.id, 'No user id')
-    const keySlot = 0
-    const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
-    const [rawCred, authData] = await createPasskey({
-      domain: window.location.hostname,
-      challengeB64: base64.encode(Buffer.from('foobar')), // TODO: generate a random challenge from the server
-      passkeyName,
-      passkeyDisplayTitle: `Send App: ${accountName}`,
-    }).then((r) => [r, parseCreateResponse(r)] as const)
-
-    await sendAccountCreate
-      .mutateAsync({
-        accountName,
+    try {
+      assert(!!user?.id, 'No user id')
+      const keySlot = 0
+      const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
+      const [rawCred, authData] = await createPasskey({
+        domain: window.location.hostname,
+        challengeB64: base64.encode(Buffer.from('foobar')), // TODO: generate a random challenge from the server
         passkeyName,
-        rawCredentialIDB16: base64ToBase16(rawCred.credentialIDB64),
-        cosePublicKeyB16: base16.encode(authData.COSEPublicKey),
-        rawAttestationObjectB16: base64ToBase16(rawCred.rawAttestationObjectB64),
-        keySlot,
-      })
-      .then(async () => {
-        // success refetch accounts to check if account was created
-        const { data: sendAccts, error: refetchError } = await refetchSendAccounts()
-        if (refetchError) throw refetchError
-        if (sendAccts?.length && sendAccts.length > 0) {
-          replace('/')
-          return
-        }
-        form.setError('accountName', {
-          type: 'custom',
-          message: 'Account not created. Please try again.',
+        passkeyDisplayTitle: `Send App: ${accountName}`,
+      }).then((r) => [r, parseCreateResponse(r)] as const)
+
+      await sendAccountCreate
+        .mutateAsync({
+          accountName,
+          passkeyName,
+          rawCredentialIDB16: base64ToBase16(rawCred.credentialIDB64),
+          cosePublicKeyB16: base16.encode(authData.COSEPublicKey),
+          rawAttestationObjectB16: base64ToBase16(rawCred.rawAttestationObjectB64),
+          keySlot,
         })
-      })
-      .catch((error) => {
-        console.error('Error creating account', error)
-        if (error instanceof TRPCClientError) {
-          form.setError('accountName', { type: 'custom', message: error.message })
-          return
-        }
-        form.setError('accountName', { type: 'custom', message: error?.message ?? 'Unknown error' })
-        return
-      })
+        .then(async () => {
+          // success refetch accounts to check if account was created
+          const { data: sendAcct, error: refetchError } = await refetchSendAccount()
+          if (refetchError) throw refetchError
+          if (sendAcct) {
+            replace('/')
+            return
+          }
+          form.setError('accountName', {
+            type: 'custom',
+            message: 'Account not created. Please try again.',
+          })
+        })
+    } catch (error) {
+      console.error('Error creating account', error)
+      const message = error?.message.split('.')[0] ?? 'Unknown error'
+      form.setError('accountName', { type: 'custom', message: message })
+    }
   }
   const isClient = useIsClient()
   if (!isClient) return null
@@ -112,6 +108,10 @@ export const OnboardingForm = () => {
             width: '100%',
             backgroundColor: 'transparent',
             outlineColor: 'transparent',
+            focusStyle: {
+              borderBottomColor: '$accent3Light',
+            },
+            autoFocus: true,
           },
         }}
         renderAfter={({ submit }) => (

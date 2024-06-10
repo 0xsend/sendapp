@@ -26,7 +26,7 @@ test('can visit other user profile', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
   await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
-  await expect(page.getByTestId('sendDialogContainer')).toBeVisible()
+  await expect(page.getByTestId('sendSearchContainer')).toBeVisible()
 })
 
 test('can visit my own profile', async ({

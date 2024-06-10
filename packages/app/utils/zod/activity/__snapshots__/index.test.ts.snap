@@ -1,0 +1,193 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EventArraySchema should parse a valid event array 1`] = `
+[
+  {
+    "created_at": 2024-05-26T13:38:25.000Z,
+    "data": {
+      "block_num": 15164540n,
+      "coin": {
+        "coingeckoTokenId": "usd-coin",
+        "decimals": 6,
+        "label": "USDC",
+        "symbol": "USDC",
+        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      },
+      "f": "0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf",
+      "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "log_idx": 2n,
+      "t": "0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1",
+      "tx_hash": "0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4",
+      "tx_idx": 0n,
+      "v": 19032n,
+    },
+    "event_name": "send_account_transfers",
+    "from_user": null,
+    "to_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 65244,
+      "tags": [
+        "asdf",
+        "teq",
+        "yuw",
+      ],
+    },
+  },
+  {
+    "created_at": 2024-05-26T19:41:05.370Z,
+    "data": {
+      "block_num": 15164541n,
+      "coin": {
+        "coingeckoTokenId": "ethereum",
+        "decimals": 18,
+        "label": "Ethereum",
+        "symbol": "ETH",
+        "token": "eth",
+      },
+      "log_addr": "0x71fa02bb11e4b119bEDbeeD2f119F62048245301",
+      "log_idx": 2n,
+      "tags": [
+        "yuw",
+      ],
+      "tx_hash": "0x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c",
+      "tx_idx": 0n,
+      "value": 20000000000000000n,
+    },
+    "event_name": "tag_receipts",
+    "from_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 65244,
+      "tags": [
+        "asdf",
+        "teq",
+        "yuw",
+      ],
+    },
+    "to_user": null,
+  },
+  {
+    "created_at": 2024-05-26T19:41:05.370Z,
+    "data": {
+      "tags": [
+        "disconnect_whorl7351",
+      ],
+    },
+    "event_name": "referrals",
+    "from_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 65244,
+      "tags": [
+        "asdf",
+        "teq",
+        "yuw",
+      ],
+    },
+    "to_user": {
+      "avatar_url": "https://i.pravatar.cc/500?u=Hortense Ratke",
+      "id": null,
+      "name": "Mr. Dan Conn",
+      "send_id": 12530,
+      "tags": [
+        "disconnect_whorl7351",
+      ],
+    },
+  },
+  {
+    "created_at": 2024-05-29T13:34:26.000Z,
+    "data": {
+      "account": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+      "block_num": "15164541",
+      "key": [
+        "\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+        "\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43",
+      ],
+      "key_slot": 0,
+      "log_addr": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+      "log_idx": "2",
+      "tx_hash": "\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+      "tx_idx": "0",
+    },
+    "event_name": "send_account_signing_key_added",
+    "from_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 55617,
+      "tags": null,
+    },
+    "to_user": null,
+  },
+  {
+    "created_at": 2024-05-29T13:34:26.000Z,
+    "data": {
+      "account": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+      "block_num": "15164542",
+      "key": [
+        "\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07",
+        "\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43",
+      ],
+      "key_slot": 0,
+      "log_addr": "\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1",
+      "log_idx": "2",
+      "tx_hash": "\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
+      "tx_idx": "0",
+    },
+    "event_name": "send_account_signing_key_removed",
+    "from_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 55617,
+      "tags": null,
+    },
+    "to_user": null,
+  },
+  {
+    "created_at": 2024-05-27T13:36:07.156Z,
+    "data": {
+      "block_num": 15164541n,
+      "coin": {
+        "coingeckoTokenId": "usd-coin",
+        "decimals": 6,
+        "label": "USDC",
+        "symbol": "USDC",
+        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      },
+      "f": "0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf",
+      "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "log_idx": 2n,
+      "t": "0xbf65EE06b43B9cA718216241f0b9F81b5ff30CC1",
+      "tx_hash": "0xf1443b5abd14e6212dda2d9f5ff1d1d691599de3e8fa019ccc19b909d9bb46a4",
+      "tx_idx": 0n,
+      "v": 77777n,
+    },
+    "event_name": "send_account_transfers",
+    "from_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 65244,
+      "tags": [
+        "asdf",
+        "teq",
+        "yuw",
+      ],
+    },
+    "to_user": {
+      "avatar_url": "https://i.pravatar.cc/500?u=Hortense Ratke",
+      "id": null,
+      "name": "Mr. Dan Conn",
+      "send_id": 12530,
+      "tags": [
+        "dan",
+      ],
+    },
+  },
+]
+`;

@@ -9,7 +9,7 @@ jest.mock('app/utils/distributions', () => ({
       {
         number: 1,
         chain_id: 845337,
-        qualification_end: new Date(),
+        qualification_end: Date.UTC(2024, 6, 15),
         distribution_shares: [
           {
             amount: 1,
@@ -45,8 +45,7 @@ jest.mock('app/utils/useChainAddresses', () => ({
   useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
 }))
 jest.mock('app/routers/params', () => ({
-  useDistributionNumberParams: () => ({ distributionNumber: 1 }),
-  useDistributionNumber: () => [1, jest.fn()],
+  useRewardsScreenParams: () => [{ distributionNumber: 1 }, jest.fn()],
 }))
 jest.mock('wagmi')
 jest.mock('@rainbow-me/rainbowkit', () => ({
@@ -81,6 +80,8 @@ jest.mock('app/utils/tags', () => ({
 }))
 describe('EarnTokensScreen', () => {
   it('renders', () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(Date.UTC(2024, 6, 12))
     const tree = render(
       <Wrapper>
         <RewardsScreen />
