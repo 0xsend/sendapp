@@ -3,7 +3,7 @@ import type { Source, Integration } from '@indexsupply/shovel-config'
 import {
   sendAccountCreatedIntegration,
   sendAccountTransfersIntegration,
-  // sendAccountTransactionsIntegration,
+  sendAccountReceivesIntegration,
   sendTokenTransfersIntegration,
   sendRevenuesSafeReceives,
   sendAccountSigningKeyAdded,
@@ -55,11 +55,10 @@ export const integrations: Integration[] = [
     ...sendAccountSigningKeyRemoved,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
-  // @todo split this into two integrations, one for Receive and one for UserOperationEvent
-  // {
-  //   ...sendAccountTransactionsIntegration,
-  //   sources: [{ name: baseSrcBlockHeaders.name, start: '$BASE_BLOCK_START' }],
-  // },
+  {
+    ...sendAccountReceivesIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
 ]
 
 const c = makeConfig({
