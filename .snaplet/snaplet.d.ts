@@ -41,13 +41,6 @@ interface Table_auth_audit_log_entries {
   created_at: string | null;
   ip_address: string;
 }
-interface Table_public_auth_challenges {
-  id: string;
-  user_id: string;
-  challenge: string;
-  created_at: string;
-  expires_at: string;
-}
 interface Table_storage_buckets {
   id: string;
   name: string;
@@ -64,6 +57,12 @@ interface Table_public_chain_addresses {
   address: string;
   user_id: string;
   created_at: string;
+}
+interface Table_public_challenges {
+  id: number;
+  challenge: string;
+  created_at: string;
+  expires_at: string;
 }
 interface Table_public_distribution_shares {
   id: number;
@@ -587,6 +586,7 @@ interface Schema_pgtle {
 interface Schema_public {
   activity: Table_public_activity;
   chain_addresses: Table_public_chain_addresses;
+  challenges: Table_public_challenges;
   distribution_shares: Table_public_distribution_shares;
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;

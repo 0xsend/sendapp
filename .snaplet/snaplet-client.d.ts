@@ -53,6 +53,15 @@ type Override = {
       users?: string;
     };
   }
+  challenges?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      challenge?: string;
+      created_at?: string;
+      expires_at?: string;
+    };
+  }
   distribution_shares?: {
     name?: string;
     fields?: {
@@ -504,6 +513,11 @@ export interface Fingerprint {
   chainAddresses?: {
     createdAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+  }
+  challenges?: {
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    expiresAt?: FingerprintDateField;
   }
   distributionShares?: {
     id?: FingerprintNumberField;
