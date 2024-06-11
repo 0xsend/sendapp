@@ -45,6 +45,11 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   // fix sending to send IDs
   // await page.waitForURL(`/account/send?recipient=${profile2.sendId}`)
   await expect(page.getByText('Enter Amount')).toBeVisible()
+
+  // can visit profile withouth the @ prefix
+  await page.goto(`/${tag.name}`)
+  expect(await page.title()).toBe('Send | Profile')
+  await expect(page.getByText(tag.name)).toBeVisible()
 })
 
 test('can visit my own profile', async ({
