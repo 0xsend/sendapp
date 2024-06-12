@@ -933,6 +933,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         <View
           style={
             {
+              "backgroundColor": "hsla(191, 52%, 6%, 1)",
               "borderBottomLeftRadius": 9,
               "borderBottomRightRadius": 9,
               "borderTopLeftRadius": 9,
@@ -1043,7 +1044,9 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                     "backgroundColor": "transparent",
                     "borderWidth": 0,
                   },
-                  {},
+                  {
+                    "color": "hsla(125, 96%, 42%)",
+                  },
                   {
                     "flex": 0,
                     "height": 20,
