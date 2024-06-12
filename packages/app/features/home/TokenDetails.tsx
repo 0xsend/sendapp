@@ -79,12 +79,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
         <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
       </Stack>
       <YStack>
-        {(() => {
-          if (coin.token === 'eth') {
-            return <TokenDetailsHistoryComingSoon />
-          }
-          return <TokenDetailsHistory coin={coin} />
-        })()}
+        <TokenDetailsHistory coin={coin} />
       </YStack>
     </YStack>
   )

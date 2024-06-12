@@ -8,10 +8,9 @@ import { RowLabel, AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
 
 export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
-  assert(coin.token !== 'eth', 'ETH token does not have a history')
   const result = useTokenActivityFeed({
     pageSize: 10,
-    address: hexToBytea(coin.token),
+    address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
   })
   const {
     data,

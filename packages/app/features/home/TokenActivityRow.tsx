@@ -1,9 +1,9 @@
 import { Stack, Text, XStack, YStack } from '@my/ui'
 import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
-import type { SendAccountTransfersEvent } from 'app/utils/zod/activity'
+import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatar'
 
-export function TokenActivityRow({ activity }: { activity: SendAccountTransfersEvent }) {
+export function TokenActivityRow({ activity }: { activity: Activity }) {
   const { created_at } = activity
   const amount = amountFromActivity(activity)
   const date = new Date(created_at).toLocaleString()
