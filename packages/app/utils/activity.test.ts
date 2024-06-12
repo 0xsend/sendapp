@@ -10,6 +10,7 @@ import {
   MockActivityFeed,
   mockReceivedTransfer,
   mockReferral,
+  mockSendAccountReceive,
   mockSentTransfer,
   mockTagReceipt,
 } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
@@ -27,6 +28,18 @@ describe('test eventNameFromActivity', () => {
   it('should return the received when transfer and to user ID is present', () => {
     const activity = mockReceivedTransfer
     expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
+  })
+  it('should return the received when received eth and to user ID is present', () => {
+    const activity = mockSendAccountReceive
+    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
+  })
+  it('should return the sent when received eth and from user ID is present', () => {
+    const activity = { ...mockSendAccountReceive }
+    // @ts-expect-error mock
+    activity.from_user = { ...activity.from_user, id: '1234' }
+    // @ts-expect-error mock
+    activity.to_user = { ...activity.to_user, id: null }
+    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Sent')
   })
   it('should return the sent when transfer and from user ID is present', () => {
     const activity = mockSentTransfer

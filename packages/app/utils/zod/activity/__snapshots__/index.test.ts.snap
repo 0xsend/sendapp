@@ -189,5 +189,43 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       ],
     },
   },
+  {
+    "created_at": 2024-06-12T00:31:48.000Z,
+    "data": {
+      "block_num": 15681483n,
+      "coin": {
+        "coingeckoTokenId": "ethereum",
+        "decimals": 18,
+        "label": "Ethereum",
+        "symbol": "ETH",
+        "token": "eth",
+      },
+      "log_addr": "0xB2c21F54653531aa4AffA80F63593913f0C70628",
+      "log_idx": 0n,
+      "sender": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+      "tx_hash": "0xeec33cc50042cbba53fc1de714bd99b206635f890dbe29771c7986df6da0f6af",
+      "tx_idx": 0n,
+      "value": 10000000000000000n,
+    },
+    "event_name": "send_account_receives",
+    "from_user": {
+      "avatar_url": null,
+      "id": null,
+      "name": null,
+      "send_id": 65244,
+      "tags": null,
+    },
+    "to_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 65244,
+      "tags": [
+        "asdf",
+        "teq",
+        "yuw",
+      ],
+    },
+  },
 ]
 `;

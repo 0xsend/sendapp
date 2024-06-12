@@ -5,6 +5,7 @@ import type { SendAccountTransfersEvent } from './SendAccountTransfersEventSchem
 import type { TagReceiptsEvent } from './TagReceiptsEventSchema'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import type { ReferralsEvent } from './ReferralsEventSchema'
+import type { SendAccountReceiveEvent } from './SendAccountReceiveEventSchema'
 
 describe('EventArraySchema', () => {
   it('should parse a valid event array', () => {
@@ -14,8 +15,8 @@ describe('EventArraySchema', () => {
     }
     assert(result.success === true)
     expect(result.data).toMatchSnapshot()
-    expect(result.data).toHaveLength(6)
-    assert(result.data.length === 6)
+    expect(result.data).toHaveLength(7)
+    assert(result.data.length === 7)
     const transfer = result.data[0] as SendAccountTransfersEvent
     assert(!!transfer)
     expect(transfer.event_name).toBe('send_account_transfers')
@@ -74,5 +75,13 @@ describe('EventArraySchema', () => {
       '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
       '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
     ])
+    const sendAccountReceive = result.data[6] as SendAccountReceiveEvent
+    assert(!!sendAccountReceive)
+    expect(sendAccountReceive.event_name).toBe('send_account_receives')
+    expect(sendAccountReceive.created_at).toBeInstanceOf(Date)
+    expect(sendAccountReceive.from_user).not.toBeNull()
+    expect(sendAccountReceive.to_user).not.toBeNull()
+    expect(sendAccountReceive.data.sender).toBe('0xa0Ee7A142d267C1f36714E4a8F75612F20a79720')
+    expect(sendAccountReceive.data.value).toBe(10000000000000000n)
   })
 })
