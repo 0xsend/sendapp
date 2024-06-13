@@ -7,7 +7,9 @@ import { base, baseSepolia, mainnet, sepolia } from 'viem/chains'
 import { localhost, baseLocal } from './src/chains'
 import { iEntryPointAbi } from './src'
 
-const broadcasts = await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
+const broadcasts = (
+  await globby([`${process.cwd()}/../contracts/broadcast/**/run-latest.json`])
+).filter((f) => !f.includes('dry-run'))
 
 if (!broadcasts.length) throw new Error('No broadcasts found.')
 
