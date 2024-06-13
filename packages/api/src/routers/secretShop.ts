@@ -76,7 +76,7 @@ export const secretShopRouter = createTRPCRouter({
 
       // eth
       let ethTxHash: string | null = null
-      const eth = parseEther('0.1')
+      const eth = parseEther('0.05')
       if (ssEthBal < eth + BigInt(1e6)) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Insufficient ETH in secret shop' })
       }
@@ -101,7 +101,7 @@ export const secretShopRouter = createTRPCRouter({
       }
       // usdc
       let usdcTxHash: string | null = null
-      const usdc = BigInt(5e6) // $5 worth of USDC
+      const usdc = BigInt(50e6) // $50 worth of USDC
       if (usdcBal < usdc) {
         if (ssUsdcBal < usdc) {
           usdcTxHash = 'Error: Insufficient USDC in secret shop'
@@ -127,7 +127,7 @@ export const secretShopRouter = createTRPCRouter({
 
       // send
       let sendTxHash: string | null = null
-      const send = BigInt(1e5) // 100K SEND
+      const send = BigInt(15e5) // 150K SEND
       if (sendBal < send) {
         if (ssSendBal < send) {
           sendTxHash = 'Error: Insufficient SEND in secret shop'
