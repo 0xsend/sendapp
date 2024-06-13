@@ -7,7 +7,12 @@ import {
 } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { Events, SendAccountTransfersEventSchema } from 'app/utils/zod/activity'
+import {
+  EventArraySchema,
+  Events,
+  SendAccountTransfersEventSchema,
+  type Activity,
+} from 'app/utils/zod/activity'
 import { z, type ZodError } from 'zod'
 
 const SendAccountTransfersEvenArraySchema = z.array(SendAccountTransfersEventSchema)
@@ -23,29 +28,28 @@ type SendAccountTransfersEventArray = z.infer<typeof SendAccountTransfersEvenArr
  */
 export function useTokenActivityFeed(params: {
   pageSize?: number
-  address: PgBytea
-}): UseInfiniteQueryResult<
-  InfiniteData<SendAccountTransfersEventArray>,
-  PostgrestError | ZodError
-> {
+  address?: PgBytea
+}): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 10, address } = params
   const supabase = useSupabase()
 
-  async function fetchTokenActivityFeed({
-    pageParam,
-  }: { pageParam: number }): Promise<SendAccountTransfersEventArray> {
+  async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
-    const { data, error } = await supabase
-      .from('activity_feed')
-      .select('*')
-      .eq('event_name', Events.SendAccountTransfers)
-      .eq('data->>log_addr', address)
+    let query = supabase.from('activity_feed').select('*')
+
+    if (address) {
+      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
+    } else {
+      query = query.eq('event_name', Events.SendAccountReceive)
+    }
+
+    const { data, error } = await query
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)
-    return SendAccountTransfersEvenArraySchema.parse(data)
+    return EventArraySchema.parse(data)
   }
 
   return useInfiniteQuery({

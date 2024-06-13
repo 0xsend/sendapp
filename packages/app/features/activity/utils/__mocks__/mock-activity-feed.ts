@@ -64,7 +64,7 @@ export const mockTagReceipt = {
   to_user: null,
   data: {
     tags: ['yuw'],
-    value: 20000000000000000,
+    value: '20000000000000000',
     log_addr: '\\x71fa02bb11e4b119bEDbeeD2f119F62048245301',
     block_num: 15164541,
     tx_idx: 0,
@@ -94,6 +94,34 @@ export const mockReferral = {
     tags: ['disconnect_whorl7351'],
   },
 }
+
+export const mockSendAccountReceive = {
+  created_at: '2024-06-12T00:31:48+00:00',
+  event_name: 'send_account_receives',
+  from_user: {
+    id: null,
+    name: null,
+    avatar_url: null,
+    send_id: 65244,
+    tags: null,
+  },
+  to_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 65244,
+    tags: ['asdf', 'teq', 'yuw'],
+  },
+  data: {
+    value: '10000000000000000',
+    sender: '\\xa0ee7a142d267c1f36714e4a8f75612f20a79720',
+    tx_idx: '0',
+    log_idx: '0',
+    tx_hash: '\\xeec33cc50042cbba53fc1de714bd99b206635f890dbe29771c7986df6da0f6af',
+    log_addr: '\\xb2c21f54653531aa4affa80f63593913f0c70628',
+    block_num: '15681483',
+  },
+} as const
 
 // make it easier on yourself and add the events to the end of the array
 export const MockActivityFeed = [
@@ -151,6 +179,7 @@ export const MockActivityFeed = [
     },
   },
   mockSentTransfer,
+  mockSendAccountReceive,
 ] as const
 
 // you can use this to mock the activity feed by overriding the network request in the developer console

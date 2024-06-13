@@ -41,13 +41,6 @@ interface Table_auth_audit_log_entries {
   created_at: string | null;
   ip_address: string;
 }
-interface Table_public_auth_challenges {
-  id: string;
-  user_id: string;
-  challenge: string;
-  created_at: string;
-  expires_at: string;
-}
 interface Table_storage_buckets {
   id: string;
   name: string;
@@ -64,6 +57,12 @@ interface Table_public_chain_addresses {
   address: string;
   user_id: string;
   created_at: string;
+}
+interface Table_public_challenges {
+  id: number;
+  challenge: string;
+  created_at: string;
+  expires_at: string;
 }
 interface Table_public_distribution_shares {
   id: number;
@@ -330,6 +329,21 @@ interface Table_public_send_account_credentials {
   key_slot: number;
   created_at: string | null;
 }
+interface Table_public_send_account_receives {
+  id: number;
+  chain_id: number;
+  block_num: number;
+  block_time: number;
+  tx_hash: string;
+  tx_idx: number;
+  log_idx: number;
+  log_addr: string;
+  sender: string;
+  value: number;
+  ig_name: string;
+  src_name: string;
+  abi_idx: number;
+}
 interface Table_public_send_account_signing_key_added {
   chain_id: number;
   log_addr: string;
@@ -587,6 +601,7 @@ interface Schema_pgtle {
 interface Schema_public {
   activity: Table_public_activity;
   chain_addresses: Table_public_chain_addresses;
+  challenges: Table_public_challenges;
   distribution_shares: Table_public_distribution_shares;
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
@@ -596,6 +611,7 @@ interface Schema_public {
   referrals: Table_public_referrals;
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
+  send_account_receives: Table_public_send_account_receives;
   send_account_signing_key_added: Table_public_send_account_signing_key_added;
   send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
   send_account_transfers: Table_public_send_account_transfers;

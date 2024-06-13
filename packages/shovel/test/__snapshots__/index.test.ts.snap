@@ -531,6 +531,118 @@ exports[`shovel config 1`] = `
         "name": "send_account_signing_key_removed",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "column": "account",
+            "integration": "send_account_created",
+          },
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "filter_op": "contains",
+            "filter_ref": {
+              "column": "account",
+              "integration": "send_account_created",
+            },
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "value",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Received",
+        "type": "event",
+      },
+      "name": "send_account_receives",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "value",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_account_receives",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [

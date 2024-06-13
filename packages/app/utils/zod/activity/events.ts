@@ -14,4 +14,8 @@ export enum Events {
    * Sendtag referrals for a send account
    */
   Referrals = 'referrals',
+  /**
+   * Send account receives ETH
+   */
+  SendAccountReceive = 'send_account_receives',
 }

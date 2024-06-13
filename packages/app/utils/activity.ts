@@ -2,10 +2,11 @@ import { formatUnits } from 'viem'
 import formatAmount from './formatAmount'
 import { isTagReceiptsEvent, isReferralsEvent, isSendAccountTransfersEvent } from './zod/activity'
 import type { Activity } from 'app/utils/zod/activity'
+import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 
 /**
  * Returns the counterpart of the activity which could be the logged in user.
- * If the activity is a send account transfer,
+ * If the activity is a send account transfer or receive,
  *   if received, the counterpart is the user who sent the token.
  *   if sent, the counterpart is the user who received the token.
  * If the activity is a tag receipt, the actor is the user who created the tag.
@@ -22,7 +23,7 @@ export function counterpart(activity: Activity): Activity['from_user'] | Activit
   if (isReferralsEvent(activity) && !!to_user?.id) {
     return from_user // show the referrer
   }
-  if (isSendAccountTransfersEvent(activity)) {
+  if (isSendAccountTransfersEvent(activity) || isSendAccountReceiveEvent(activity)) {
     if (from_user?.id) {
       // if i am the sender, show the receiver
       return to_user
@@ -47,6 +48,14 @@ export function amountFromActivity(activity: Activity): string {
         return `${amount} ${coin.symbol}`
       }
       return formatAmount(`${v}`, 5, 0)
+    }
+    case isSendAccountReceiveEvent(activity): {
+      const { coin } = activity.data
+      if (coin) {
+        const amount = formatUnits(activity.data.value, coin.decimals)
+        return `${amount} ${coin.symbol}`
+      }
+      return formatAmount(`${activity.data.value}`, 5, 0)
     }
     case isTagReceiptsEvent(activity): {
       const data = activity.data
@@ -81,10 +90,12 @@ export function amountFromActivity(activity: Activity): string {
  */
 export function eventNameFromActivity(activity: Activity) {
   const { event_name, from_user, to_user } = activity
+  const isTransferOrReceive =
+    isSendAccountTransfersEvent(activity) || isSendAccountReceiveEvent(activity)
   switch (true) {
-    case isSendAccountTransfersEvent(activity) && !!to_user?.id:
+    case isTransferOrReceive && !!to_user?.id:
       return 'Received'
-    case isSendAccountTransfersEvent(activity) && !!from_user?.id:
+    case isTransferOrReceive && !!from_user?.id:
       return 'Sent'
     case isTagReceiptsEvent(activity):
       return 'Sendtag Registered'
@@ -123,8 +134,14 @@ export function subtextFromActivity(activity: Activity): string | null {
   if (isSendAccountTransfersEvent(activity) && from_user?.id) {
     return activity.data.t
   }
+  if (isSendAccountReceiveEvent(activity) && from_user?.id) {
+    return activity.data.sender
+  }
   if (isSendAccountTransfersEvent(activity) && to_user?.id) {
     return activity.data.f
+  }
+  if (isSendAccountReceiveEvent(activity) && to_user?.id) {
+    return activity.data.log_addr
   }
   return null
 }
