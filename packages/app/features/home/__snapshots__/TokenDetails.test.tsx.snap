@@ -33,7 +33,7 @@ exports[`TokenDetails 1`] = `
         {
           "alignItems": "center",
           "backgroundColor": "transparent",
-          "color": "#FFFFFF",
+          "color": "hsla(0, 0%, 100%, 1)",
           "display": "flex",
           "fontFamily": "System",
           "fontSize": 19.2,
@@ -52,7 +52,7 @@ exports[`TokenDetails 1`] = `
       selectable={true}
       style={
         {
-          "color": "#FFFFFF",
+          "color": "hsla(0, 0%, 100%, 1)",
           "fontFamily": "System",
           "fontSize": 64,
           "fontWeight": "700",
@@ -81,14 +81,14 @@ exports[`TokenDetails 1`] = `
     <View
       style={
         {
-          "borderBottomColor": "#343434",
+          "borderBottomColor": "hsla(111, 10%, 26%, 1)",
           "borderBottomWidth": 1,
-          "borderLeftColor": "#343434",
+          "borderLeftColor": "hsla(111, 10%, 26%, 1)",
           "borderLeftWidth": 0,
-          "borderRightColor": "#343434",
+          "borderRightColor": "hsla(111, 10%, 26%, 1)",
           "borderRightWidth": 0,
           "borderStyle": "solid",
-          "borderTopColor": "#343434",
+          "borderTopColor": "hsla(111, 10%, 26%, 1)",
           "borderTopWidth": 0,
           "flex": 1,
           "flexShrink": 0,
@@ -337,7 +337,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -349,7 +349,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -388,7 +388,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                     }
                   }
@@ -598,7 +598,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -610,7 +610,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -649,7 +649,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                     }
                   }
@@ -859,7 +859,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -871,7 +871,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -910,7 +910,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                     }
                   }

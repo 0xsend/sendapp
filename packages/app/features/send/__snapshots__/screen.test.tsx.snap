@@ -289,7 +289,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
           selectable={true}
           style={
             {
-              "color": "#FFFFFF",
+              "color": "hsla(0, 0%, 100%, 1)",
               "fontFamily": "System",
               "fontSize": 16.8,
               "fontWeight": "500",
@@ -304,7 +304,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
           selectable={true}
           style={
             {
-              "color": "#FFFFFF",
+              "color": "hsla(0, 0%, 100%, 1)",
               "fontFamily": "System",
               "fontSize": 16.8,
               "fontWeight": "400",
@@ -352,7 +352,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
     onPressOut={[Function]}
     style={
       {
-        "color": "#FFFFFF",
+        "color": "hsla(0, 0%, 100%, 1)",
         "fontFamily": "System",
         "fontSize": 16.8,
         "fontWeight": "400",
@@ -366,7 +366,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
     <Text
       style={
         {
-          "color": "#FFFFFF",
+          "color": "hsla(0, 0%, 100%, 1)",
           "display": "flex",
           "fontFamily": "System",
           "fontWeight": "bold",
@@ -379,7 +379,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
     <Text
       style={
         {
-          "color": "#FFFFFF",
+          "color": "hsla(0, 0%, 100%, 1)",
           "display": "flex",
           "fontFamily": "System",
         }
@@ -407,7 +407,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#111f22",
+        "backgroundColor": "hsla(191, 32%, 10%, 1)",
         "borderBottomColor": "transparent",
         "borderBottomLeftRadius": 16,
         "borderBottomRightRadius": 16,
@@ -439,7 +439,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
       numberOfLines={1}
       style={
         {
-          "color": "#FFFFFF",
+          "color": "hsla(0, 0%, 100%, 1)",
           "flexGrow": 0,
           "flexShrink": 1,
           "fontFamily": "System",
@@ -677,25 +677,25 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               onChangeText={[Function]}
               onFocus={[Function]}
               placeholder="Sendtag, Phone, Send ID"
-              placeholderTextColor="#081619"
+              placeholderTextColor="hsla(112, 22%, 50%, 1)"
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "#111f22",
-                  "borderBottomColor": "#111f22",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                  "borderBottomColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
                   "borderBottomWidth": 0,
-                  "borderLeftColor": "#111f22",
+                  "borderLeftColor": "hsla(191, 32%, 10%, 1)",
                   "borderLeftWidth": 0,
-                  "borderRightColor": "#111f22",
+                  "borderRightColor": "hsla(191, 32%, 10%, 1)",
                   "borderRightWidth": 0,
                   "borderStyle": "solid",
-                  "borderTopColor": "#111f22",
+                  "borderTopColor": "hsla(191, 32%, 10%, 1)",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 0,
-                  "color": "#FFFFFF",
+                  "color": "hsla(0, 0%, 100%, 1)",
                   "fontFamily": "System",
                   "fontSize": 19.2,
                   "fontStyle": "italic",
@@ -772,7 +772,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           align="xMidYMid"
           bbHeight="32"
           bbWidth="32"
-          color="#FFFFFF"
+          color="hsla(0, 0%, 100%, 1)"
           focusable={false}
           height={32}
           meetOrSlice={0}
@@ -796,7 +796,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               },
             ]
           }
-          tintColor="#FFFFFF"
+          tintColor="hsla(0, 0%, 100%, 1)"
           vbHeight={32}
           vbWidth={32}
           width={32}
@@ -1061,25 +1061,25 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               onChangeText={[Function]}
               onFocus={[Function]}
               placeholder="Sendtag, Phone, Send ID"
-              placeholderTextColor="#081619"
+              placeholderTextColor="hsla(112, 22%, 50%, 1)"
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "#111f22",
-                  "borderBottomColor": "#111f22",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                  "borderBottomColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
                   "borderBottomWidth": 0,
-                  "borderLeftColor": "#111f22",
+                  "borderLeftColor": "hsla(191, 32%, 10%, 1)",
                   "borderLeftWidth": 0,
-                  "borderRightColor": "#111f22",
+                  "borderRightColor": "hsla(191, 32%, 10%, 1)",
                   "borderRightWidth": 0,
                   "borderStyle": "solid",
-                  "borderTopColor": "#111f22",
+                  "borderTopColor": "hsla(191, 32%, 10%, 1)",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 0,
-                  "color": "#FFFFFF",
+                  "color": "hsla(0, 0%, 100%, 1)",
                   "fontFamily": "System",
                   "fontSize": 19.2,
                   "fontStyle": "normal",
@@ -1156,7 +1156,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           align="xMidYMid"
           bbHeight="32"
           bbWidth="32"
-          color="#FFFFFF"
+          color="hsla(0, 0%, 100%, 1)"
           focusable={false}
           height={32}
           meetOrSlice={0}
@@ -1180,7 +1180,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               },
             ]
           }
-          tintColor="#FFFFFF"
+          tintColor="hsla(0, 0%, 100%, 1)"
           vbHeight={32}
           vbWidth={32}
           width={32}
@@ -1460,7 +1460,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                           selectable={true}
                           style={
                             {
-                              "color": "#FFFFFF",
+                              "color": "hsla(0, 0%, 100%, 1)",
                               "fontFamily": "System",
                               "fontSize": 16.8,
                               "fontWeight": "400",
@@ -1510,7 +1510,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 16.8,
                       }

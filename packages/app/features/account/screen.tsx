@@ -11,23 +11,23 @@ import {
   TooltipSimple,
   useMedia,
   Theme,
-  H3,
-  Stack,
   Card,
   View,
   Heading,
   isWeb,
-  ButtonIcon,
-  ButtonText,
+  Dialog,
+  Adapt,
+  Sheet,
 } from '@my/ui'
 import {
   IconAccount,
   IconCopy,
   IconDollar,
   IconGear,
-  IconPlus,
   IconShare,
   IconBadgeCheck,
+  IconInfoCircle,
+  IconX,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
@@ -99,10 +99,14 @@ export function AccountScreen() {
       label: 'Referrals',
       description: 'Share your link',
       child: (
-        <View py={'$2.5'} px={'$size.0.9'} borderRadius={'$4'} flexShrink={1}>
-          <TooltipSimple
-            label={<Paragraph color="$white">{canShare ? 'Share' : 'Copy'}</Paragraph>}
-          >
+        <View
+          backgroundColor={'$color0'}
+          py={'$2.5'}
+          px={'$size.0.9'}
+          borderRadius={'$4'}
+          flexShrink={1}
+        >
+          <TooltipSimple label={<Paragraph>{canShare ? 'Share' : 'Copy'}</Paragraph>}>
             <Button
               bc={'$color0'}
               br="$2"
@@ -235,9 +239,6 @@ export function AccountScreen() {
             {card.child}
           </ActionCard>
         ))}
-
-        {tags?.length === 0 ? <NoTagsMessage /> : null}
-        <BottomButtonRow />
       </XStack>
     </YStack>
   )
@@ -272,10 +273,13 @@ const ActionCard = ({
         width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
       }}
     >
-      <Heading fontSize={'$9'} fontWeight={'600'} color={'$color12'} mb="$size.0.75">
-        {title}
-      </Heading>
-      <Paragraph size={'$6'} theme={'alt2'} mb="$size.1.5">
+      <XStack ai={'center'} gap={'$size.0.75'} mb="$size.0.75">
+        <Heading fontSize={'$9'} fontWeight={'600'} color={'$color12'} textTransform="uppercase">
+          {title}
+        </Heading>
+        {title === 'Sendtag' && <InfoDialog />}
+      </XStack>
+      <Paragraph size={'$6'} col="$color7" mb="$size.1.5">
         {description}
       </Paragraph>
       <XStack>{children}</XStack>
@@ -316,73 +320,86 @@ const BorderedLink = ({
   )
 }
 
-const NoTagsMessage = () => {
+const InfoDialog = () => {
+  const steps = [
+    'Qualify for Send.it Rewards based on your token balance',
+    'Send and receive funds using your personalized, easy-to-remember Sendtag',
+    'Claim your preferred Sendtag before someone else does',
+  ]
   return (
-    <>
-      <H3 fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
-        Register your Sendtag Today!
-      </H3>
+    <Dialog modal>
+      <Dialog.Trigger>
+        <Button unstyled cursor="pointer">
+          <IconInfoCircle size={'$1'} color={'$color7'} />
+        </Button>
+      </Dialog.Trigger>
+      <Adapt when="sm" platform="touch">
+        <Sheet zIndex={200000} modal dismissOnSnapToBottom disableDrag>
+          <Sheet.Frame padding="$4" gap="$4">
+            <Adapt.Contents />
+          </Sheet.Frame>
+          <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
+        </Sheet>
+      </Adapt>
 
-      <YStack w="100%" gap="$2.5" my="auto">
-        <Paragraph fontSize={'$6'} fontWeight={'700'} color={'$color12'} fontFamily={'$mono'}>
-          By registering a Sendtag, you can:
-        </Paragraph>
-        <YStack>
-          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-            1. Qualify for Send it Rewards based on your token balance
-          </Paragraph>
-          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-            2. Send and receive funds using your personalized, easy-to-remember Sendtag
-          </Paragraph>
-          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-            3. Claim your preferred Sendtag before someone else does
-          </Paragraph>
-        </YStack>
-        <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-          Join us in shaping the Future of Finance.
-        </Paragraph>
-      </YStack>
-    </>
-  )
-}
+      <Dialog.Portal>
+        <Dialog.Overlay
+          key="overlay"
+          animation="quick"
+          opacity={0.5}
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+        />
+        <Dialog.Content
+          maxWidth={400}
+          p={'$size.3.5'}
+          position="relative"
+          animateOnly={['transform', 'opacity']}
+          animation={[
+            'quick',
+            {
+              opacity: {
+                overshootClamping: true,
+              },
+            },
+          ]}
+          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+        >
+          <YStack gap={'$size.1.5'}>
+            <YStack>
+              <Dialog.Close position="absolute" right={-20} top={-20}>
+                <Button unstyled cursor="pointer" hoverStyle={{ opacity: 0.5 }}>
+                  <IconX width={24} height={24} color="$color12" />
+                </Button>
+              </Dialog.Close>
+              <Dialog.Title ta={'left'} col={'$color12'} fontWeight={'600'} fontSize={'$9'}>
+                By registering a Sendtag, you can:
+              </Dialog.Title>
+            </YStack>
 
-const BottomButtonRow = () => {
-  const tags = useConfirmedTags()
-  const media = useMedia()
+            <Separator
+              borderColor="$darkGrayTextField"
+              $theme-light={{ borderColor: '$lightGrayTextField' }}
+            />
+            {/* @TODO: font color */}
+            {steps.map((step, i) => (
+              <XStack key={step} gap={'$2'}>
+                <Paragraph>{i + 1}.</Paragraph>
+                <Paragraph>{step}</Paragraph>
+              </XStack>
+            ))}
 
-  if (media.gtMd && (tags === undefined || tags.length === 0))
-    return (
-      <Stack f={1} jc="center" $md={{ display: 'none' }}>
-        <Theme name="green">
-          <Link
-            href={'/account/sendtag/checkout'}
-            theme="Button"
-            borderRadius={'$4'}
-            p={'$3.5'}
-            px="$6"
-            maw={301}
-            bc="$background"
-            hoverStyle={{ bc: '$backgroundHover' }}
-          >
-            <XStack gap={'$1.5'} ai={'center'} jc="center">
-              <ButtonIcon>
-                <IconPlus size={'$1.25'} />
-              </ButtonIcon>
-              <ButtonText textTransform="uppercase">SENDTAGS</ButtonText>
-            </XStack>
-          </Link>
-        </Theme>
-      </Stack>
-    )
-
-  return (
-    <XStack gap={'$5'} f={1} display="flex" jc="center" $gtMd={{ display: 'none' }}>
-      <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-        Sendtags
-      </BorderedLink>
-      <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-        Rewards
-      </BorderedLink>
-    </XStack>
+            <Separator
+              borderColor="$darkGrayTextField"
+              $theme-light={{ borderColor: '$lightGrayTextField' }}
+            />
+            <Paragraph color={'$color7'} fontSize={'$2'}>
+              Join 7000+ Senders in shaping the Future of Finance.
+            </Paragraph>
+          </YStack>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   )
 }

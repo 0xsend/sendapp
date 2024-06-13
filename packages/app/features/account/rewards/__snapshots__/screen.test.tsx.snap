@@ -59,7 +59,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "color": "#FFFFFF",
+              "color": "hsla(0, 0%, 100%, 1)",
               "display": "flex",
               "fontFamily": "System",
               "fontSize": 19.2,
@@ -89,7 +89,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(0, 0%, 100%, 1)",
                   "fontFamily": "System",
                   "fontSize": 54,
                   "fontWeight": "300",
@@ -148,7 +148,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 19.2,
                     "fontWeight": "400",
@@ -184,7 +184,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   {
                     "alignItems": "center",
                     "backgroundColor": "transparent",
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "display": "flex",
                     "fontFamily": "System",
                     "fontSize": 16.8,
@@ -202,7 +202,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 16,
                     "fontWeight": "500",
@@ -297,7 +297,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "#666666",
+                      "color": "hsla(112, 22%, 59%, 1)",
                       "display": "flex",
                       "fontFamily": "System",
                       "fontSize": 19.2,
@@ -314,7 +314,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                       "fontWeight": "500",
@@ -386,7 +386,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "#666666",
+                      "color": "hsla(112, 22%, 59%, 1)",
                       "display": "flex",
                       "fontFamily": "System",
                       "fontSize": 19.2,
@@ -403,7 +403,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                       "fontWeight": "500",
@@ -465,7 +465,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "#666666",
+                      "color": "hsla(112, 22%, 59%, 1)",
                       "display": "flex",
                       "fontFamily": "System",
                       "fontSize": 19.2,
@@ -482,7 +482,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "#FFFFFF",
+                      "color": "hsla(0, 0%, 100%, 1)",
                       "fontFamily": "System",
                       "fontSize": 24,
                       "fontWeight": "500",
@@ -507,7 +507,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           <View
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 12,
                 "borderBottomRightRadius": 12,
                 "borderTopLeftRadius": 12,
@@ -579,7 +579,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "#111f22",
+                        "color": "hsla(191, 32%, 10%, 1)",
                         "fontFamily": "System",
                         "fontSize": 55.199999999999996,
                         "fontWeight": "500",
@@ -594,7 +594,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "#081619",
+                        "color": "hsla(112, 22%, 50%, 1)",
                         "fontFamily": "System",
                         "fontSize": 16.8,
                         "fontWeight": "400",
@@ -653,7 +653,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -673,7 +673,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -690,7 +690,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -710,7 +710,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -727,7 +727,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -747,7 +747,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -764,7 +764,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -784,7 +784,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -801,7 +801,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -821,7 +821,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -838,7 +838,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -858,7 +858,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -875,7 +875,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -895,7 +895,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -912,7 +912,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -932,7 +932,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -949,7 +949,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -969,7 +969,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -986,7 +986,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             disabled={true}
             style={
               {
-                "backgroundColor": "#111f22",
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
                 "borderTopLeftRadius": 6,
@@ -1006,7 +1006,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "#666666",
+                  "color": "hsla(112, 22%, 59%, 1)",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",

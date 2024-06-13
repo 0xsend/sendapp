@@ -219,25 +219,25 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               onChangeText={[Function]}
               onFocus={[Function]}
               placeholder="Sendtag, Phone, Send ID"
-              placeholderTextColor="#081619"
+              placeholderTextColor="hsla(112, 22%, 50%, 1)"
               readOnly={false}
               style={
                 {
-                  "backgroundColor": "#111f22",
-                  "borderBottomColor": "#111f22",
+                  "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                  "borderBottomColor": "hsla(191, 32%, 10%, 1)",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
                   "borderBottomWidth": 0,
-                  "borderLeftColor": "#111f22",
+                  "borderLeftColor": "hsla(191, 32%, 10%, 1)",
                   "borderLeftWidth": 0,
-                  "borderRightColor": "#111f22",
+                  "borderRightColor": "hsla(191, 32%, 10%, 1)",
                   "borderRightWidth": 0,
                   "borderStyle": "solid",
-                  "borderTopColor": "#111f22",
+                  "borderTopColor": "hsla(191, 32%, 10%, 1)",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 0,
-                  "color": "#FFFFFF",
+                  "color": "hsla(0, 0%, 100%, 1)",
                   "fontFamily": "System",
                   "fontSize": 19.2,
                   "fontStyle": "italic",
@@ -314,7 +314,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
           align="xMidYMid"
           bbHeight="32"
           bbWidth="32"
-          color="#FFFFFF"
+          color="hsla(0, 0%, 100%, 1)"
           focusable={false}
           height={32}
           meetOrSlice={0}
@@ -338,7 +338,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               },
             ]
           }
-          tintColor="#FFFFFF"
+          tintColor="hsla(0, 0%, 100%, 1)"
           vbHeight={32}
           vbWidth={32}
           width={32}
@@ -442,14 +442,14 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
     <View
       style={
         {
-          "borderBottomColor": "#343434",
+          "borderBottomColor": "hsla(111, 10%, 26%, 1)",
           "borderBottomWidth": 1,
-          "borderLeftColor": "#343434",
+          "borderLeftColor": "hsla(111, 10%, 26%, 1)",
           "borderLeftWidth": 0,
-          "borderRightColor": "#343434",
+          "borderRightColor": "hsla(111, 10%, 26%, 1)",
           "borderRightWidth": 0,
           "borderStyle": "solid",
-          "borderTopColor": "#343434",
+          "borderTopColor": "hsla(111, 10%, 26%, 1)",
           "borderTopWidth": 0,
           "flex": 1,
           "flexShrink": 0,
@@ -807,7 +807,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -819,7 +819,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -857,7 +857,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -869,7 +869,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -892,7 +892,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -906,7 +906,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",
@@ -1109,7 +1109,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -1121,7 +1121,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -1159,7 +1159,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -1171,7 +1171,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -1194,7 +1194,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -1208,7 +1208,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",
@@ -1416,7 +1416,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -1428,7 +1428,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -1466,7 +1466,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -1478,7 +1478,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -1501,7 +1501,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -1515,7 +1515,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",
@@ -1744,7 +1744,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -1756,7 +1756,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -1790,7 +1790,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -1802,7 +1802,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -1825,7 +1825,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -1839,7 +1839,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",
@@ -2045,7 +2045,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -2057,7 +2057,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -2091,7 +2091,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -2103,7 +2103,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -2126,7 +2126,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -2140,7 +2140,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",
@@ -2367,7 +2367,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -2379,7 +2379,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -2417,7 +2417,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -2429,7 +2429,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -2452,7 +2452,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -2466,7 +2466,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",
@@ -2690,7 +2690,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -2702,7 +2702,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                         "fontSize": 24,
                       }
@@ -2740,7 +2740,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "display": "none",
                         "fontFamily": "System",
                       }
@@ -2752,7 +2752,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   <Text
                     style={
                       {
-                        "color": "#FFFFFF",
+                        "color": "hsla(0, 0%, 100%, 1)",
                         "fontFamily": "System",
                       }
                     }
@@ -2775,7 +2775,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "justifyContent": "flex-end",
                     "minWidth": 184,
@@ -2789,7 +2789,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               <Text
                 style={
                   {
-                    "color": "#FFFFFF",
+                    "color": "hsla(0, 0%, 100%, 1)",
                     "fontFamily": "System",
                     "fontSize": 24,
                     "textAlign": "right",

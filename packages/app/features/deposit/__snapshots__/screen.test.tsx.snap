@@ -35,7 +35,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         selectable={true}
         style={
           {
-            "color": "#FFFFFF",
+            "color": "hsla(0, 0%, 100%, 1)",
             "fontFamily": "System",
             "fontSize": 23,
             "fontWeight": "300",
@@ -90,7 +90,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#343434",
+              "backgroundColor": "hsla(111, 10%, 26%, 1)",
               "borderBottomColor": "transparent",
               "borderBottomLeftRadius": 16,
               "borderBottomRightRadius": 16,
@@ -126,7 +126,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
             align="xMidYMid"
             bbHeight="32"
             bbWidth="32"
-            color="#FFFFFF"
+            color="hsla(0, 0%, 100%, 1)"
             fill="none"
             focusable={false}
             height={32}
@@ -141,7 +141,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                   "borderWidth": 0,
                 },
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(0, 0%, 100%, 1)",
                 },
                 {
                   "flex": 0,
@@ -150,7 +150,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                 },
               ]
             }
-            tintColor="#FFFFFF"
+            tintColor="hsla(0, 0%, 100%, 1)"
             vbHeight={32}
             vbWidth={32}
             width={32}
@@ -321,7 +321,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
           selectable={true}
           style={
             {
-              "color": "#FFFFFF",
+              "color": "hsla(0, 0%, 100%, 1)",
               "fontFamily": "System",
               "fontSize": 14,
               "fontWeight": "300",
@@ -370,7 +370,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#343434",
+              "backgroundColor": "hsla(111, 10%, 26%, 1)",
               "borderBottomColor": "transparent",
               "borderBottomLeftRadius": 16,
               "borderBottomRightRadius": 16,
@@ -406,7 +406,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
             align="xMidYMid"
             bbHeight="32"
             bbWidth="144"
-            color="#FFFFFF"
+            color="hsla(0, 0%, 100%, 1)"
             fill="none"
             focusable={false}
             height={32}
@@ -421,7 +421,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                   "borderWidth": 0,
                 },
                 {
-                  "color": "#FFFFFF",
+                  "color": "hsla(0, 0%, 100%, 1)",
                 },
                 {
                   "flex": 0,
@@ -430,7 +430,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                 },
               ]
             }
-            tintColor="#FFFFFF"
+            tintColor="hsla(0, 0%, 100%, 1)"
             vbHeight={32}
             vbWidth={144}
             width={144}
@@ -467,7 +467,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
           selectable={true}
           style={
             {
-              "color": "#FFFFFF",
+              "color": "hsla(0, 0%, 100%, 1)",
               "fontFamily": "System",
               "fontSize": 14,
               "fontWeight": "300",
