@@ -25,6 +25,7 @@ import { assert } from './assert'
 import { entrypoint, signUserOp } from './userop'
 
 // default user op with preset gas values that work
+// will probably need to move this to the database
 export const defaultUserOp: Pick<
   UserOperation<'v0.7'>,
   | 'callGasLimit'
@@ -41,7 +42,7 @@ export const defaultUserOp: Pick<
   maxFeePerGas: 10000000n,
   maxPriorityFeePerGas: 10000000n,
   paymasterVerificationGasLimit: 150000n,
-  paymasterPostOpGasLimit: 50000n,
+  paymasterPostOpGasLimit: 75000n,
 }
 
 export type UseUserOpTransferMutationArgs = {
