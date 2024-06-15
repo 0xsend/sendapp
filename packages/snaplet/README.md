@@ -31,7 +31,7 @@ bunx supabase db reset && \
 bunx snaplet snapshot restore --no-reset --latest && \
 git checkout ./supabase/migrations && \
 bunx supabase db push --local --include-all
-PGPASSWORD=postgres psql -U postgres -d postgres -h localhost -p 54322 -c "insert into send_accounts (user_id, address, chain_id, init_code) select u.id as user_id, c.address, '845337' as chain_id, CONCAT( '\\x00', upper( CONCAT( md5(random() :: text), md5(random() :: text), md5(random() :: text), md5(random() :: text) ) ) ) :: bytea as init_code from auth.users u join chain_addresses c on c.user_id = u.id where user_id not in ( select user_id from send_accounts );"
+psql $SUPABASE_DB_URL -c "insert into send_accounts (user_id, address, chain_id, init_code) select u.id as user_id, c.address, '845337' as chain_id, CONCAT( '\\x00', upper( CONCAT( md5(random() :: text), md5(random() :: text), md5(random() :: text), md5(random() :: text) ) ) ) :: bytea as init_code from auth.users u join chain_addresses c on c.user_id = u.id where user_id not in ( select user_id from send_accounts );"
 ```
 
 ## Capturing snapshots
