@@ -1,4 +1,4 @@
-import { SideBar, SideBarWrapper, Stack, Theme, YStack, type YStackProps, useMedia } from '@my/ui'
+import { SideBar, SideBarWrapper, Stack, Theme, YStack, type YStackProps } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
 import { OnboardingForm } from 'app/features/auth/onboarding/onboarding-form'
@@ -25,17 +25,11 @@ const AuthSideBar = ({ ...props }: YStackProps) => {
   )
 }
 
-export const AuthSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
-  const media = useMedia()
-  if (media.gtMd) {
-    return (
-      <SideBarWrapper
-        overflow="hidden"
-        sidebar={<AuthSideBar bc={'$background'} h={'92%'} ml={'$7'} my={'auto'} br={'$8'} />}
-      >
-        {children}
-      </SideBarWrapper>
-    )
-  }
-  return children
-}
+export const AuthSideBarWrapper = ({ children }: { children?: React.ReactNode }) => (
+  <SideBarWrapper
+    overflow="hidden"
+    sidebar={<AuthSideBar bc={'$background'} h={'92%'} ml={'$7'} my={'auto'} br={'$8'} />}
+  >
+    {children}
+  </SideBarWrapper>
+)
