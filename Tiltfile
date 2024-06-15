@@ -128,7 +128,7 @@ ui_theme_files = files_matching(
 
 ui_files = files_matching(
     os.path.join("packages", "ui", "src"),
-    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and (f.find("generated.ts") == -1 and f.find(ui_theme_dir) == -1),
+    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and (f.endswith("theme-generated.ts") or f.find(ui_theme_dir) == -1),
 )
 
 local_resource(
