@@ -95,7 +95,7 @@ export const SignInForm = () => {
               mt={'0'}
               jc={'space-between'}
               $sm={{ jc: 'center', height: '100%' }}
-              ai={'flex-start'}
+              ai={'center'}
             >
               <Anchor
                 href=""
@@ -104,6 +104,8 @@ export const SignInForm = () => {
                   setShowRecoveryForm(true)
                 }}
                 fontSize="$3"
+                display="none"
+                $gtMd={{ display: 'block' }}
               >
                 Forgot your phone number?
               </Anchor>
@@ -150,6 +152,17 @@ export const SignInForm = () => {
                   {CountryCode}
                   {Phone}
                 </XStack>
+                <Anchor
+                  href="#"
+                  onPress={(e) => {
+                    e.preventDefault()
+                    setShowRecoveryForm(true)
+                  }}
+                  fontSize="$3"
+                  $gtMd={{ display: 'none' }}
+                >
+                  Forgot your phone number?
+                </Anchor>
               </YStack>
             </YStack>
           )}
