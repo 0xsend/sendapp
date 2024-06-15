@@ -6,12 +6,13 @@ import {
   type VerifyChallengeRequest,
 } from '@my/api/src/routers/account-recovery/types'
 import { bytesToHex, hexToBytes } from 'viem'
+import type { SignMessageErrorType } from '@wagmi/core'
 
 interface Props {
   challengeData: ChallengeResponse
   onSignSuccess: (args: VerifyChallengeRequest) => void
   // https://wagmi.sh/react/api/hooks/useSignMessage#onerror
-  onSignError: () => void
+  onSignError: (e: SignMessageErrorType) => void
 }
 
 export default function RecoverWithPasskey(props: Props) {

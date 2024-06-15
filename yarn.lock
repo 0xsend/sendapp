@@ -12244,6 +12244,7 @@ __metadata:
     "@types/react": "npm:^18.2.15"
     "@vonovak/react-native-theme-control": "npm:^5.0.1"
     "@wagmi/chains": "npm:^1.8.0"
+    "@wagmi/core": "npm:^2.10.5"
     babel-preset-expo: "npm:^10.0.1"
     base64-arraybuffer: "npm:^1.0.2"
     burnt: "npm:^0.12.1"

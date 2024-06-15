@@ -172,7 +172,7 @@ const verifyRecoverySignature = async (
   if (recoveryType === RecoveryOptions.EOA) {
     verified = await verifyMessage({
       address: identifier as `0x${string}`,
-      message: RecoveryEOAPreamble + byteaToHex(challengeData.challenge),
+      message: RecoveryEOAPreamble + byteaToHex(challengeData.challenge as `\\x${string}`),
       signature: signature,
     })
   } else if (recoveryType === RecoveryOptions.WEBAUTHN) {
