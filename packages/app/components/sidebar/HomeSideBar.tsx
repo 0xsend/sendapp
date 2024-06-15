@@ -7,7 +7,6 @@ import {
   ScrollView,
   Separator,
   SideBar,
-  SideBarWrapper,
   XStack,
   YStack,
   useMedia,
@@ -127,18 +126,13 @@ const HomeBottomSheet = () => {
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
 
-  if (media.gtLg)
-    return (
-      <SideBarWrapper
-        sidebar={<HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />}
-      >
-        {children}
-      </SideBarWrapper>
-    )
   return (
-    <>
-      <HomeBottomSheet />
+    <XStack overflow="hidden" height={'100%'}>
+      {media.gtLg && (
+        <HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />
+      )}
       {children}
-    </>
+      <HomeBottomSheet />
+    </XStack>
   )
 }

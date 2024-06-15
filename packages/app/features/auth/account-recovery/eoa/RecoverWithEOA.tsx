@@ -9,13 +9,14 @@ import {
 } from '@my/api/src/routers/account-recovery/types'
 import type { SignState } from 'app/features/auth/account-recovery/account-recovery'
 import { RecoveryEOAPreamble } from '@my/api/src/routers/account-recovery/types'
+import type { SignMessageErrorType } from '@wagmi/core'
 
 interface Props {
   challengeData: ChallengeResponse
   signState: SignState
 
   onSignSuccess: (args: VerifyChallengeRequest) => Promise<void>
-  onSignError: () => void
+  onSignError: (e: SignMessageErrorType) => void
 }
 
 export default function RecoverWithEOA(props: Props) {
@@ -51,8 +52,8 @@ export default function RecoverWithEOA(props: Props) {
   }
 
   return (
-    <OpenConnectModalWrapper>
-      <Button onPress={isConnected ? onPress : null} width={'$12'}>
+    <OpenConnectModalWrapper width={'50%'}>
+      <Button onPress={isConnected ? onPress : null}>
         <ButtonText testID="account-recovery-eoa-btn">EOA</ButtonText>
       </Button>
     </OpenConnectModalWrapper>

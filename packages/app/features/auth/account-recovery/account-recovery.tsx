@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
-import { Stack, XStack, YStack, Text, Button, ButtonText } from '@my/ui'
+import { Stack, XStack, YStack, Text, Button, ButtonText, useToastController } from '@my/ui'
 import type {
   ChallengeResponse,
   VerifyChallengeRequest,
@@ -11,7 +11,7 @@ import { api } from 'app/utils/api'
 import { IconError, IconRefresh } from 'app/components/icons'
 import { useRouter } from 'solito/router'
 import RecoverWithPasskey from 'app/features/auth/account-recovery/passkey/RecoverWithPasskey'
-import type { SignMessageErrorType } from 'viem'
+import type { SignMessageErrorType } from '@wagmi/core'
 
 interface Props {
   onClose?: () => void
@@ -24,6 +24,7 @@ export enum SignState {
 }
 
 export default function AccountRecovery(props: Props) {
+  const toast = useToastController()
   const [error, setError] = useState<ErrorWithMessage>()
   // TODO: frontend: implement signing loading state
   const [signState, setSignState] = useState<SignState>(SignState.NOT_COMPLETE)
@@ -55,6 +56,7 @@ export default function AccountRecovery(props: Props) {
         ...verifyChallengeRequest,
       })
         .then(() => {
+          toast.show('Successfully recovered your account')
           // JWT is set via Set-Cookie header
           router.push('/')
         })
@@ -62,7 +64,7 @@ export default function AccountRecovery(props: Props) {
           setError(err)
         })
     },
-    [validateSignatureMutateAsync, router]
+    [validateSignatureMutateAsync, router, toast]
   )
 
   const onSignError = (e: SignMessageErrorType) => {
@@ -122,20 +124,13 @@ export default function AccountRecovery(props: Props) {
   }
 
   return (
-    <YStack mt={'0'} w={'100%'} h={'100%'} jc={'space-between'}>
+    <YStack mt={'0'} w={'100%'} h={'100%'} jc={'space-between'} maxWidth={600} mx="auto" pb="$6">
       <Stack flex={1} jc={'center'} alignItems="center" gap="$2">
         {showHeading()}
         {!error && challengeData && showRecoveryOptions()}
       </Stack>
 
-      <Button
-        w={'100%'}
-        backgroundColor={'$primary'}
-        hoverStyle={{ backgroundColor: '$primary' }}
-        pressStyle={{ backgroundColor: '$primary' }}
-        focusStyle={{ backgroundColor: '$primary' }}
-        onPress={props.onClose}
-      >
+      <Button w={'100%'} theme="accent" onPress={props.onClose}>
         <ButtonText>RETURN</ButtonText>
       </Button>
     </YStack>
