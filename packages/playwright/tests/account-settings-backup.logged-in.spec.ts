@@ -16,13 +16,14 @@ let log: debug.Debugger
 // navigate to backup page
 test.beforeEach(async ({ page, user: { user } }) => {
   log = debug(`test:account:logged-in:${user.id}:${test.info().parallelIndex}`)
+  const nextContainer = page.locator('[id="__next"]')
   await page.goto('/')
   await page.waitForURL('/')
-  await page.getByRole('link', { name: 'account' }).click()
+  await nextContainer.getByRole('link', { name: 'account' }).click()
   await page.waitForURL('/account')
-  await page.getByRole('link', { name: 'Settings' }).click()
+  await nextContainer.getByRole('link', { name: 'Settings' }).click()
   await page.waitForURL('/account/settings/edit-profile')
-  await page.locator('[id="__next"]').getByRole('link', { name: 'Backup' }).click()
+  await nextContainer.getByRole('link', { name: 'Backup' }).click()
   await expect(page).toHaveURL('/account/settings/backup')
 })
 
