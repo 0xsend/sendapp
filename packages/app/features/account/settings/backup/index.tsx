@@ -24,9 +24,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { IconDots, IconNote, IconX } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
+import { byteaToBytes } from 'app/utils/byteaToBytes'
 import { formatTimeDate } from 'app/utils/formatTimeDate'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { byteaToBytes } from 'app/utils/byteaToBytes'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
@@ -52,7 +52,7 @@ export const BackupScreen = () => {
           $theme-dark={{ color: '$lightGrayTextField' }}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Add Passkey as Signer
+          Add Passkeys as Signers
         </H1>
 
         <Paragraph
@@ -60,8 +60,8 @@ export const BackupScreen = () => {
           $theme-dark={{ color: '$lightGrayTextField' }}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Backup your Send Account by add up to 20 passkeys to your account. Passkeys are authorized
-          devices that can sign transactions for your account.
+          Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
+          authorized to sign your account&apos;s transactions.
         </Paragraph>
       </YStack>
 
