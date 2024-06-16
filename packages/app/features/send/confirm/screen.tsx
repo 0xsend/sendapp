@@ -81,6 +81,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
   const { data: userOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
+    // @ts-expect-error some work to do here
     to: profile?.address,
     token: queryParams.sendToken === 'eth' ? undefined : queryParams.sendToken,
     amount: BigInt(amount),

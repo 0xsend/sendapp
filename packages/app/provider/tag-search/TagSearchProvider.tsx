@@ -18,7 +18,7 @@ export interface TagSearchContextValue {
   form: ReturnType<typeof useForm<SearchSchema>>
   isLoading: boolean
   error: PostgrestError | null
-  results: Functions<'tag_search'> | null
+  results: Functions<'tag_search'>[number] | null
 }
 
 const TagSearch = createContext<TagSearchContextValue>(null as unknown as TagSearchContextValue)
@@ -37,7 +37,7 @@ async function searchTags({ supabase, query, limit_val, offset_val }: SearchTags
   }
   abortController = new AbortController()
   const { data, error } = await supabase
-    .rpc('tag_search', { query, limit_val, offset_val })
+    .rpc('tag_search', { query, limit_val: limit_val ?? 10, offset_val: offset_val ?? 0 })
     .abortSignal(abortController.signal)
   return { data, error }
 }
@@ -47,7 +47,7 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
   const supabase = useSupabase()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<PostgrestError | null>(null)
-  const [results, setResults] = useState<Functions<'tag_search'> | null>(null)
+  const [results, setResults] = useState<Functions<'tag_search'>[number] | null>(null)
 
   const onSearch = useDebounce(
     async function onSearch({ query }: SearchSchema) {
@@ -56,7 +56,6 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
         setError(null)
         const result = await searchTags({ supabase, query, limit_val: 10, offset_val: 0 })
         const { data, error } = result
-        const results = data && data.length > 0 ? data[0] : []
         if (error) {
           if (error.message.includes('user aborted')) {
             return
@@ -64,7 +63,7 @@ export const TagSearchProvider = ({ children }: { children: React.ReactNode }) =
           setError(error)
           return
         }
-        setResults(results)
+        setResults(data?.[0] ?? null)
       } finally {
         setIsLoading(false)
       }

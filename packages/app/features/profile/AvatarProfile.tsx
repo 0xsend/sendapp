@@ -1,7 +1,10 @@
-import { Avatar, type AvatarProps, SizableText } from '@my/ui'
-import type { ProfileProp } from './screen'
+import type { Functions } from '@my/supabase/database.types'
+import { Avatar, SizableText, type AvatarProps } from '@my/ui'
 
-export function AvatarProfile({ profile, ...rest }: AvatarProps & { profile: ProfileProp }) {
+export function AvatarProfile({
+  profile,
+  ...rest
+}: AvatarProps & { profile: Functions<'profile_lookup'>[number] }) {
   return (
     <Avatar testID="avatar" size="$8" br="$4" gap="$2" mx="auto" $gtSm={{ mx: '0' }} {...rest}>
       <Avatar.Image
