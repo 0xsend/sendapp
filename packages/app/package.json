@@ -9,6 +9,7 @@
   "scripts": {
     "lint": "tsc --noEmit && eslint .",
     "lint:fix": "eslint . --fix",
+    "clean": "rm .tsconfig.tsbuildinfo && rm -rf coverage && rm -rf .turbo",
     "test": "jest"
   },
   "dependencies": {
