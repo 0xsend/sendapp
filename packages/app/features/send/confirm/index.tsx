@@ -17,6 +17,7 @@ import { assert } from 'app/utils/assert'
 
 import { baseMainnet } from '@my/wagmi'
 import { useBalance } from 'wagmi'
+// @ts-expect-error some work to do here
 import { useSendParams } from 'app/routers/params'
 import { useForm } from 'react-hook-form'
 import { formFields } from 'app/utils/SchemaForm'
@@ -90,6 +91,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
   const { data: userOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
+    // @ts-expect-error some work to do here
     to: profile?.address,
     token: tokenParam === 'eth' ? undefined : tokenParam,
     amount: BigInt(amount),
@@ -184,7 +186,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   lineHeight="$1"
                   color="$color12"
                 >
-                  @{profile?.tag_name}
+                  @{profile?.tag}
                 </Paragraph>
               </YStack>
             </XStack>

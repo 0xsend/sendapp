@@ -19,7 +19,7 @@ export class ProfilePage {
     const title = await this.page.title()
     expect?.(title).toBe('Send | Profile')
     await expect?.(this.page.getByRole('heading', { name: tag })).toBeVisible()
-    await expect?.(this.page.getByRole('heading', { name: this.profile.name })).toBeVisible()
+    await expect?.(this.page.locator('#profileName')).toHaveText(this.profile.name)
     await expect?.(this.page.getByText(this.profile.about, { exact: true })).toBeVisible()
     await expect?.(this.page.getByAltText(this.profile.name)).toBeVisible()
   }

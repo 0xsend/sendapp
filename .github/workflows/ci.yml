@@ -42,6 +42,8 @@ jobs:
         env:
           YARN_ENABLE_HARDENED_MODE: 0
           SKIP_YARN_POST_INSTALL: 1
+      - name: Build
+        run: yarn build
       - name: Lint
         run: yarn lint
 

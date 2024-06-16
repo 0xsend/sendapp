@@ -1,4 +1,4 @@
-import { Separator, XStack, YStack, useMedia } from '@my/ui'
+import { Separator, XStack, YStack } from '@my/ui'
 import { SettingsLinks } from './SettingsLinks'
 
 export type SettingsLayoutProps = {
@@ -13,9 +13,7 @@ export type SettingsLayoutProps = {
 }
 
 export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
-  const media = useMedia()
-
-  return media.gtLg ? (
+  return (
     <XStack f={1} pt={'$4'}>
       <YStack
         backgroundColor="$color1"
@@ -24,6 +22,8 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
           transition: '200ms ease width',
         }}
         width="$14"
+        display="none"
+        $gtLg={{ display: 'flex' }}
       >
         <YStack width={'100%'} gap={'$4'}>
           <YStack jc={'space-between'} zIndex={4} flex={1} width={'100%'}>
@@ -33,12 +33,10 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
           </YStack>
         </YStack>
       </YStack>
-      <Separator vertical />
+      <Separator display="none" $gtLg={{ display: 'flex' }} vertical />
       <YStack f={1} ai="center" ml="$8">
         <YStack width="100%">{children}</YStack>
       </YStack>
     </XStack>
-  ) : (
-    <YStack width="100%">{children}</YStack>
   )
 }

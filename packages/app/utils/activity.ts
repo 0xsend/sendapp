@@ -3,6 +3,16 @@ import formatAmount from './formatAmount'
 import { isTagReceiptsEvent, isReferralsEvent, isSendAccountTransfersEvent } from './zod/activity'
 import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
+import { tokenPaymasterAddress } from '@my/wagmi'
+
+const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
+  Object.values(addresses).map((a) => [a, label])
+
+const AddressLabels = {
+  ...Object.fromEntries(wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), 'Paymaster')),
+}
+
+const labelAddress = (address: `0x${string}`): string => AddressLabels[address] ?? address
 
 /**
  * Returns the counterpart of the activity which could be the logged in user.
@@ -132,16 +142,16 @@ export function subtextFromActivity(activity: Activity): string | null {
     return userNameFromActivityUser(_user)
   }
   if (isSendAccountTransfersEvent(activity) && from_user?.id) {
-    return activity.data.t
+    return labelAddress(activity.data.t)
   }
   if (isSendAccountReceiveEvent(activity) && from_user?.id) {
-    return activity.data.sender
+    return labelAddress(activity.data.sender)
   }
   if (isSendAccountTransfersEvent(activity) && to_user?.id) {
-    return activity.data.f
+    return labelAddress(activity.data.f)
   }
   if (isSendAccountReceiveEvent(activity) && to_user?.id) {
-    return activity.data.log_addr
+    return labelAddress(activity.data.log_addr)
   }
   return null
 }

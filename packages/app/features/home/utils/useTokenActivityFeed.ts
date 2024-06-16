@@ -7,17 +7,8 @@ import {
 } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import {
-  EventArraySchema,
-  Events,
-  SendAccountTransfersEventSchema,
-  type Activity,
-} from 'app/utils/zod/activity'
-import { z, type ZodError } from 'zod'
-
-const SendAccountTransfersEvenArraySchema = z.array(SendAccountTransfersEventSchema)
-
-type SendAccountTransfersEventArray = z.infer<typeof SendAccountTransfersEvenArraySchema>
+import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
+import type { ZodError } from 'zod'
 
 /**
  * Infinite query to fetch ERC-20 token activity feed.

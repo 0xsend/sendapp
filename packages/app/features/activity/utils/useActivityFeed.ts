@@ -1,13 +1,19 @@
+import { tokenPaymasterAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
   useInfiniteQuery,
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
+
+const pgPaymasterCondValues = Object.values(tokenPaymasterAddress)
+  .map((a) => hexToBytea(a))
+  .join(',')
 
 /**
  * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
@@ -27,6 +33,8 @@ export function useActivityFeed({
       .from('activity_feed')
       .select('*')
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
+      .not('data->>t', 'in', `(${pgPaymasterCondValues})`) // filter out paymaster fees for gas
+      .not('data->>f', 'in', `(${pgPaymasterCondValues})`) // filter out paymaster refunds
       .order('created_at', { ascending: false })
       .range(from, to)
     throwIf(error)

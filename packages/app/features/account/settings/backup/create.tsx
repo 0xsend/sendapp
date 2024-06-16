@@ -145,8 +145,8 @@ const CreatePasskeyForm = ({
               Add Passkey
             </H1>
             <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-              Backup your Send Account by creating a passkey and adding it as a signer to your
-              account. Passkeys are authorized devices that can sign transactions for your account.
+              Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
+              authorized to sign your account&apos;s transactions.
             </Paragraph>
           </YStack>
         )}

@@ -82,11 +82,10 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
       gap={'$2'}
     >
       <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
-        Add Passkey as Signer
+        Passkey {webauthnCred?.display_name} has been saved
       </H2>
       <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-        Your passkey {webauthnCred?.display_name} has been saved. Add your new passkey as a signer.
-        This will allow you to sign transactions on your account with your new passkey.
+        Add your new passkey as a Signer to authorize it to sign transactions on your account.
       </Paragraph>
       <YStack gap={'$2'} jc="center">
         <AddSignerButton webauthnCred={webauthnCred} />

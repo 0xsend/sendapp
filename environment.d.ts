@@ -31,6 +31,10 @@ declare global {
        * Private key for the Send Account Factory wallet client used to create Send Accounts
        */
       SEND_ACCOUNT_FACTORY_PRIVATE_KEY: string
+      /**
+       * Enables the query dev tool in the browser
+       */
+      NEXT_PUBLIC_ENABLE_QUERY_DEV_TOOLS: string
     }
   }
   /**

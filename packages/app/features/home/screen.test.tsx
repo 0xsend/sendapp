@@ -3,6 +3,8 @@ import { TamaguiProvider, config } from '@my/ui'
 import { render } from '@testing-library/react-native'
 import { HomeScreen } from './screen'
 
+jest.mock('@my/wagmi')
+
 jest.mock('app/utils/useUser', () => ({
   useUser: jest.fn().mockReturnValue({
     user: {

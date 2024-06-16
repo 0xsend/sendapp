@@ -22,7 +22,7 @@ export function Provider({
     <AuthProvider initialSession={initialSession}>
       <Providers>
         {children}
-        <ReactQueryDevtools initialIsOpen={false} />
+        {process.env.NEXT_PUBLIC_ENABLE_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
       </Providers>
     </AuthProvider>
   )

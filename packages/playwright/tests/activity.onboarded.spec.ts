@@ -28,6 +28,7 @@ test('can visit activity page', async ({ context, page }) => {
   })
   await page.goto('/activity')
   await req
+  await page.waitForResponse(`${SUPABASE_URL}/rest/v1/activity_feed*`)
   log('beforeEach', `url=${page.url()}`)
   await expect.soft(activityHeading(page)).toBeVisible()
 
@@ -88,11 +89,11 @@ test('can search on activity page', async ({ page, context }) => {
       status: 200,
     })
   })
-
   await expect(activityHeading(page)).toBeVisible()
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
   await page.getByRole('textbox', { name: '$Sendtag, Phone, Send ID' }).fill('test')
   await expect(page.getByRole('textbox', { name: '$Sendtag, Phone, Send ID' })).toHaveValue('test')
+  await page.waitForResponse(`${SUPABASE_URL}/rest/v1/rpc/tag_search*`)
   await isLoading.waitFor({ state: 'detached' })
   await expect(page.getByRole('heading', { name: 'TAG' })).toBeVisible()
   for (const tag of testTags) {
