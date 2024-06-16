@@ -16,6 +16,10 @@ import {
 } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { byteaToHexEthAddress } from './zod'
 import { EventSchema } from './zod/activity'
+import { tokenPaymasterAddress } from '@my/wagmi'
+import { assert } from './assert'
+
+jest.mock('@my/wagmi')
 
 describe('test amountFromActivity', () => {
   it('should return the amount of the activity', () => {
@@ -80,6 +84,23 @@ describe('test subtextFromActivity', () => {
   it('should return the referrals when referrals event', () => {
     const activity = mockReferral
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('@disconnect_whorl7351')
+  })
+  it('should return Paymaster when sent to paymaster', () => {
+    const activity = mockSentTransfer
+    // @ts-expect-error mock
+    activity.to_user = null
+    const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
+    assert(!!anyPaymaster, 'anyPaymaster not found')
+    activity.data.t = anyPaymaster
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
+  })
+  it('should return Paymaster when received from paymaster', () => {
+    const activity = mockReceivedTransfer
+    activity.from_user = null
+    const anyPaymaster = Object.values(tokenPaymasterAddress)[0]
+    assert(!!anyPaymaster, 'anyPaymaster not found')
+    activity.data.f = anyPaymaster
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
   })
 })
 
