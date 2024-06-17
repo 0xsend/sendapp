@@ -14,7 +14,7 @@ export type SettingsLayoutProps = {
 
 export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
   return (
-    <XStack f={1} pt={'$4'}>
+    <XStack f={1} pt={'$4'} pb={'$6'}>
       <YStack
         backgroundColor="$color1"
         // this file is web-only so we can safely use CSS
@@ -34,7 +34,7 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
         </YStack>
       </YStack>
       <Separator display="none" $gtLg={{ display: 'flex' }} vertical />
-      <YStack f={1} ai="center" ml="$8">
+      <YStack f={1} ai="center" $gtLg={{ ml: '$8' }}>
         <YStack width="100%">{children}</YStack>
       </YStack>
     </XStack>

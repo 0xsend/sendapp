@@ -195,7 +195,8 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       const {
         receipt: { transactionHash },
       } = await sendUserOp({ userOp })
-      toast.show(`Sent user op ${transactionHash}!`)
+      console.log('sent user op', transactionHash)
+      toast.show('Success!')
       router.replace('/account/settings/backup')
     } catch (e) {
       console.error(e)
@@ -238,7 +239,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         {() => (
           <>
             {form.formState.errors?.root?.message ? (
-              <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+              <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
                 {form.formState.errors?.root?.message}
               </Paragraph>
             ) : null}
