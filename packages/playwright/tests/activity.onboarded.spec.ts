@@ -63,7 +63,7 @@ test('can visit activity page', async ({ page, pg, user: { profile }, seed }) =>
   // await expect.soft(page.getByText('@disconnect_whorl7351')).toBeVisible()
   await expect.soft(page.getByText('1 Referrals').nth(1)).toBeVisible()
 
-  await expect.soft(page.getByText('Send Account Signing Key Added')).toBeVisible()
+  await expect.soft(page.getByText('Send Account Signing Key Added').first()).toBeVisible()
   await expect.soft(page.getByText('Send Account Signing Key Removed')).toBeVisible()
 
   // await expect.soft(page.getByText('Sent')).toBeVisible()

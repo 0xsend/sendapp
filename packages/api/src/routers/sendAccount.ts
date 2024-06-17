@@ -1,7 +1,6 @@
 import {
   baseMainnet,
   baseMainnetClient,
-  config,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
@@ -10,9 +9,11 @@ import {
 } from '@my/wagmi'
 import { base16 } from '@scure/base'
 import { TRPCError } from '@trpc/server'
-import { waitForTransactionReceipt } from '@wagmi/core'
 import { base16Regex } from 'app/utils/base16Regex'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { throwIf } from 'app/utils/throwIf'
 import { USEROP_SALT, entrypoint, getSendAccountCreateArgs } from 'app/utils/userop'
 import debug from 'debug'
 import PQueue from 'p-queue'
@@ -145,13 +146,17 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
-        // @todo ensure address is not already deployed
-        // throw new TRPCError({
-        //   code: 'INTERNAL_SERVER_ERROR',
-        //   message: 'Address already deployed',
-        // })
+        const contractDeployed = await sendAccountFactoryClient.getBytecode({
+          address: senderAddress,
+        })
+        log('createAccount', 'contractDeployed', contractDeployed)
+        if (contractDeployed) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Address already deployed',
+          })
+        }
 
-        log('createAccount', 'start')
         const initCalls = [
           // approve USDC to paymaster
           {
@@ -183,14 +188,19 @@ export const sendAccountRouter = createTRPCRouter({
             throw e
           })
 
-        await withRetry(
+        const hash = await withRetry(
           async function createAccount() {
             const hash = await nonceQueue.add(async () => {
               log('createAccount queue', 'start')
-              const nonce = await sendAccountFactoryClient.getTransactionCount({
-                address: account.address,
-                blockTag: 'pending',
-              })
+              const nonce = await sendAccountFactoryClient
+                .getTransactionCount({
+                  address: account.address,
+                  blockTag: 'pending',
+                })
+                .catch((e) => {
+                  log('createAccount queue', 'getTransactionCount', e)
+                  throw e
+                })
               log('createAccount queue', 'tx request', `nonce=${nonce}`)
               const hash = await sendAccountFactoryClient
                 .writeContract({
@@ -208,19 +218,13 @@ export const sendAccountRouter = createTRPCRouter({
 
             log('createAccount', `hash=${hash}`)
 
-            await waitForTransactionReceipt(config, {
-              chainId: baseMainnetClient.chain.id,
-              hash: hash as `0x${string}`,
-            }).catch((e) => {
-              log('createAccount', 'waitForTransactionReceipt', e)
-              throw e
-            })
+            return hash
           },
           {
             retryCount: 20,
             delay: ({ count, error }) => {
               const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
-              log(`delay count=${count} backoff=${backoff} error=${error}`)
+              log(`createAccount delay count=${count} backoff=${backoff} error=${error}`)
               return backoff
             },
             shouldRetry({ count, error }) {
@@ -233,9 +237,56 @@ export const sendAccountRouter = createTRPCRouter({
             },
           }
         ).catch((e) => {
-          log('waitForTransactionReceipt', e)
+          log('createAccount failed', e)
+          console.error('createAccount failed', e)
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: e.message })
         })
+
+        if (!hash) {
+          log('createAccount', 'hash is null')
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to create send account',
+          })
+        }
+
+        await withRetry(
+          async function waitForTransactionReceipt() {
+            const { count, error } = await supabaseAdmin
+              .from('send_account_created')
+              .select('*', { count: 'exact', head: true })
+              .eq('tx_hash', hexToBytea(hash as `0x${string}`))
+              .eq('account', hexToBytea(senderAddress))
+              .single()
+            throwIf(error)
+            log('waitForTransactionReceipt', `count=${count}`)
+            return count
+          },
+          {
+            retryCount: 20,
+            delay: ({ count, error }) => {
+              const backoff = 500 + Math.random() * 100 // add some randomness to the backoff
+              log(`waitForTransactionReceipt delay count=${count} backoff=${backoff}`, error)
+              return backoff
+            },
+            shouldRetry({ count, error }) {
+              // @todo handle other errors like balance not enough, invalid nonce, etc
+              console.error('waitForTransactionReceipt failed', count, error)
+              if (error.message.includes('Failed to create send account')) {
+                return false
+              }
+              return true
+            },
+          }
+        ).catch((e) => {
+          log('waitForTransactionReceipt failed', e)
+          console.error('waitForTransactionReceipt failed', e)
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: e.message ?? 'Failed waiting for transaction receipt',
+          })
+        })
+
         const { error } = await supabase.rpc('create_send_account', {
           send_account: {
             address: senderAddress,
