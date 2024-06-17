@@ -109,6 +109,10 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
 
+    # for writing PR comments
+    permissions:
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -184,6 +188,24 @@ jobs:
             fi
           done
           yarn playwright test
+      - name: Playwright Markdown Report
+        if: always() && steps.playwright.outcome != 'skipped'
+        id: playwright-md-report
+        shell: bash
+        run: |
+          echo "Markdown report:"
+          echo "------------------"
+          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
+          cat playwright-report.md
+          echo "------------------"
+          echo "Markdown report end"
+      - uses: mshick/add-pr-comment@v2
+        if: always() && steps.playwright.outcome != 'skipped'
+        with:
+          message-id: playwright-report
+          refresh-message-position: true
+          message-path: |
+            playwright-report.md
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'

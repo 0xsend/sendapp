@@ -32,8 +32,13 @@ export class OnboardingPage {
     const response = this.page.waitForEvent('response', async (response) => {
       if (response.url().includes('/api/trpc/sendAccount.create')) {
         const json = await response.json()
-        expect(json.data?.error).toBeFalsy()
-        this.log?.('sendAccount.create response', response.url(), response.status(), json)
+        expect(json.data?.[0]?.error).toBeFalsy()
+        this.log?.(
+          'sendAccount.create response',
+          response.url(),
+          response.status(),
+          JSON.stringify(json)
+        )
         return true
       }
       return false
