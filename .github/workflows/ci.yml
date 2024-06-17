@@ -193,11 +193,6 @@ jobs:
           echo "------------------"
           bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
           cat playwright-report.md
-          {
-            echo 'report<<EOF'
-            cat playwright-report.md
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
           echo "------------------"
           echo "Markdown report end"
       - uses: mshick/add-pr-comment@v2
@@ -205,8 +200,8 @@ jobs:
         with:
           message-id: playwright-report
           refresh-message-position: true
-          message: |
-            ${{ steps.playwright-md-report.outputs.report }}
+          message-path: |
+            playwright-report.md
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'
