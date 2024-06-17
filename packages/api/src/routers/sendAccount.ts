@@ -13,19 +13,20 @@ import { TRPCError } from '@trpc/server'
 import { waitForTransactionReceipt } from '@wagmi/core'
 import { base16Regex } from 'app/utils/base16Regex'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { USEROP_SALT, getSendAccountCreateArgs, entrypoint } from 'app/utils/userop'
+import { USEROP_SALT, entrypoint, getSendAccountCreateArgs } from 'app/utils/userop'
 import debug from 'debug'
+import PQueue from 'p-queue'
 import { getSenderAddress } from 'permissionless'
 import {
   concat,
   createWalletClient,
   encodeFunctionData,
+  getAbiItem,
   http,
   maxUint256,
-  zeroAddress,
   publicActions,
-  getAbiItem,
   withRetry,
+  zeroAddress,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { z } from 'zod'
@@ -42,6 +43,9 @@ const sendAccountFactoryClient = createWalletClient({
   chain: baseMainnet,
   transport: http(baseMainnetClient.transport.url),
 }).extend(publicActions)
+
+// nonce storage to avoid nonce conflicts
+const nonceQueue = new PQueue({ concurrency: 1 })
 
 export const sendAccountRouter = createTRPCRouter({
   create: protectedProcedure
@@ -147,52 +151,66 @@ export const sendAccountRouter = createTRPCRouter({
         //   message: 'Address already deployed',
         // })
 
+        log('createAccount', 'start')
+        const initCalls = [
+          // approve USDC to paymaster
+          {
+            dest: usdcAddress[baseMainnetClient.chain.id],
+            value: 0n,
+            data: encodeFunctionData({
+              abi: sendTokenAbi,
+              functionName: 'approve',
+              args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
+            }),
+          },
+        ]
+
+        const { request } = await sendAccountFactoryClient
+          .simulateContract({
+            address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
+            abi: sendAccountFactoryAbi,
+            functionName: 'createAccount',
+            args: [
+              keySlot, // key slot
+              xyPubKey, // public key
+              initCalls, // init calls
+              USEROP_SALT, // salt
+            ],
+            value: 0n,
+          })
+          .catch((e) => {
+            log('createAccount', 'simulateContract', e)
+            throw e
+          })
+
         await withRetry(
           async function createAccount() {
-            log('createAccount', 'start')
-            const initCalls = [
-              // approve USDC to paymaster
-              {
-                dest: usdcAddress[baseMainnetClient.chain.id],
-                value: 0n,
-                data: encodeFunctionData({
-                  abi: sendTokenAbi,
-                  functionName: 'approve',
-                  args: [tokenPaymasterAddress[baseMainnetClient.chain.id], maxUint256],
-                }),
-              },
-            ]
-
-            const { request } = await sendAccountFactoryClient
-              .simulateContract({
-                address: sendAccountFactoryAddress[sendAccountFactoryClient.chain.id],
-                abi: sendAccountFactoryAbi,
-                functionName: 'createAccount',
-                args: [
-                  keySlot, // key slot
-                  xyPubKey, // public key
-                  initCalls, // init calls
-                  USEROP_SALT, // salt
-                ],
-                value: 0n,
+            const hash = await nonceQueue.add(async () => {
+              log('createAccount queue', 'start')
+              const nonce = await sendAccountFactoryClient.getTransactionCount({
+                address: account.address,
+                blockTag: 'pending',
               })
-              .catch((e) => {
-                log('createAccount', 'simulateContract', e)
-                throw e
-              })
+              log('createAccount queue', 'tx request', `nonce=${nonce}`)
+              const hash = await sendAccountFactoryClient
+                .writeContract({
+                  ...request,
+                  nonce: nonce,
+                })
+                .catch((e) => {
+                  log('createAccount queue', 'writeContract', e)
+                  throw e
+                })
 
-            log('createAccount', 'tx request')
-
-            const hash = await sendAccountFactoryClient.writeContract(request).catch((e) => {
-              log('createAccount', 'writeContract', e)
-              throw e
+              log('createAccount queue', `hash=${hash}`)
+              return hash
             })
 
             log('createAccount', `hash=${hash}`)
 
             await waitForTransactionReceipt(config, {
               chainId: baseMainnetClient.chain.id,
-              hash,
+              hash: hash as `0x${string}`,
             }).catch((e) => {
               log('createAccount', 'waitForTransactionReceipt', e)
               throw e
@@ -218,7 +236,6 @@ export const sendAccountRouter = createTRPCRouter({
           log('waitForTransactionReceipt', e)
           throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: e.message })
         })
-
         const { error } = await supabase.rpc('create_send_account', {
           send_account: {
             address: senderAddress,
