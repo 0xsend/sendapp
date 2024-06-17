@@ -184,6 +184,25 @@ jobs:
             fi
           done
           yarn playwright test
+      - name: Playwright Markdown Report
+        if: always() && steps.playwright.outcome != 'skipped'
+        id: playwright-md-report
+        shell: bash
+        run: |
+          echo "Markdown report:"
+          echo "------------------"
+          bun run ./bin/report-markdown.ts >> playwright-report/report.md
+          cat playwright-report/report.md
+          echo "report=$(cat playwright-report/report.md)" >> $GITHUB_OUTPUT
+          echo "------------------"
+          echo "Markdown report end"
+      - uses: mshick/add-pr-comment@v2
+        if: always() && steps.playwright.outcome != 'skipped'
+        with:
+          message-id: playwright-report
+          refresh-message-position: true
+          message: |
+            ${{ steps.playwright-md-report.outputs.report }}
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'
