@@ -193,7 +193,11 @@ jobs:
           echo "------------------"
           bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
           cat playwright-report.md
-          echo "report=$(cat playwright-report.md)" >> $GITHUB_OUTPUT
+          {
+            echo 'report<<EOF'
+            cat playwright-report.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
           echo "------------------"
           echo "Markdown report end"
       - uses: mshick/add-pr-comment@v2
