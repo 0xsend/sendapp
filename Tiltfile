@@ -40,6 +40,11 @@ local_resource(
     "yarn lint",
     allow_parallel = True,
     labels = labels,
+    resource_deps = [
+        "yarn:install",
+        "contracts:build",
+        "ui:build",
+    ],
 )
 
 cmd_button(
