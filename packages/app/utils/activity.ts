@@ -173,6 +173,8 @@ export function userNameFromActivityUser(
       return user.name
     case !!user?.send_id:
       return `#${user.send_id}`
+    case user === null:
+      return ''
     default:
       console.error('no user name found', user)
       if (__DEV__) {
