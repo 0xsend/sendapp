@@ -5,7 +5,7 @@ import {Script} from "forge-std/Script.sol";
 import {Helper} from "../src/Helper.sol";
 import "../src/SendCheck.sol";
 
-/// @dev forge script ./script/DeploySendCheckScript
+/// @dev forge script ./script/DeploySendCheck.s.sol:DeploySendCheckScript
 contract DeploySendCheckScript is Script, Helper {
     function setUp() public {
         this.labels();
