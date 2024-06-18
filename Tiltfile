@@ -401,6 +401,19 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-add-send-check-fixtures",
+    "yarn contracts dev:anvil-add-send-check-fixtures",
+    labels=labels,
+    resource_deps = [
+        "yarn:install",
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+    trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
+local_resource(
     "anvil:anvil-add-send-merkle-drop-fixtures",
     "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
     auto_init = False,
@@ -436,6 +449,7 @@ local_resource(
         "anvil:base",
         "anvil:send-account-fixtures",
         "anvil:anvil-add-token-paymaster-fixtures",
+        "anvil:anvil-add-send-check-fixtures"
     ],
 )
 
