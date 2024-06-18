@@ -1,0 +1,53 @@
+name: "Setup Docker Build Environment"
+description: "Set up Node.js, install Foundry, and set up Bun. Runs Yarn install run docker build"
+inputs:
+  build-nextjs-docker:
+    description: "Whether to build Next.js docker image"
+    required: false
+    default: "true"
+  push-nextjs-docker-image:
+    description: "Whether to push build to dockerhub"
+    required: false
+    default: "false"
+  dockerhub_username:
+    description: "Username to login to dockerhub"
+    required: false
+  dockerhub_password:
+    description: "Password to login to dockerhub"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Use Node.js
+      if: ${{ inputs.build-nextjs-docker == 'true' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .node-version
+        cache: "yarn"
+    - name: Setup Bun
+      if: ${{ inputs.build-nextjs-docker == 'true' }}
+      uses: oven-sh/setup-bun@v1
+    - name: Install Foundry
+      if: ${{ inputs.build-nextjs-docker == 'true' }}
+      uses: foundry-rs/foundry-toolchain@v1
+      with:
+        version: nightly
+    - name: Yarn Install
+      if: ${{ inputs.build-nextjs-docker == 'true' }}
+      shell: bash
+      run: yarn install --immutable
+    - name: Build Next.js
+      if: ${{ inputs.build-nextjs-docker == 'true' }}
+      shell: bash
+      run: |
+        cp .env.local.template .env.local
+        yarn web:docker:build
+        rm .env.local
+    - uses: docker/login-action@v3
+      if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
+      with:
+        username: ${{ inputs.dockerhub_username }}
+        password: ${{ inputs.dockerhub_password }}
+    - name: Push to dockerhub
+      if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
+      run: yarn web:docker:push

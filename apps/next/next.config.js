@@ -89,6 +89,7 @@ export default () => {
     experimental: {
       scrollRestoration: true,
     },
+    output: 'standalone',
   }
 
   for (const plugin of plugins) {

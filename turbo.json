@@ -1,7 +1,8 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
-  "globalEnv": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM"],
-  "pipeline": {
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM", "NEXT_*"],
+  "globalDependencies": ["**/.env.*local", "tsconfig*", "turbo.json"],
+  "tasks": {
     "build": {
       "env": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM"],
       "dependsOn": ["^build"],
@@ -11,8 +12,14 @@
         "build/**",
         "node_modules/.cache/metro/**",
         "dist/**",
+        "public/dist/**",
         "contracts/out/**"
       ]
+    },
+    "next-app#build": {
+      "env": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM", "NEXT_*", "SUPABASE*"],
+      "outputs": ["build/**", "dist/**", ".next/**", "!.next/cache/**"],
+      "dependsOn": ["^build"]
     },
     "dev": {
       "cache": false,

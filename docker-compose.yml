@@ -1,0 +1,34 @@
+
+services:
+  next-app:
+    image: sendapp/next-app:latest
+    build:
+      context: .
+      dockerfile: ./apps/next/Dockerfile
+      tags:
+        - sendapp/next-app:${GIT_HASH}
+        - sendapp/next-app:latest
+      secrets:
+        - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+        - NEXT_PUBLIC_SUPABASE_URL
+        - SUPABASE_SERVICE_ROLE
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - path: .env.local
+        required: false
+      - path: .env.production
+        required: false
+      - path: .env
+        required: false
+secrets:
+  NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
+    environment: NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+  NEXT_PUBLIC_SUPABASE_URL:
+    environment: NEXT_PUBLIC_SUPABASE_URL
+  SUPABASE_SERVICE_ROLE:
+    environment: SUPABASE_SERVICE_ROLE
+  NEXT_PUBLIC_SUPABASE_ANON_KEY:
+    environment: NEXT_PUBLIC_SUPABASE_ANON_KEY
