@@ -1,5 +1,7 @@
 *
 !package.json
+!.gitignore
+!turbo.json
 !.yarnrc.yml
 !.yarn/patches
 !.yarn/plugins
@@ -8,6 +10,7 @@
 !.yarn/versions
 !yarn.lock
 !foundry.toml
+!.foundry
 !remappings.txt
 !tsconfig.json
 !tsconfig.base.json

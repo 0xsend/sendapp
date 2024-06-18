@@ -253,6 +253,7 @@ if config.tilt_subcommand == "down":
     docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
     docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
     docker ps -a | grep otterscan-base | awk '{{print $1}}' | xargs -r docker rm -f
+    docker ps -a | grep next-app | awk '{{print $1}}' | xargs -r docker rm -f
     pkill anvil || true
     """)
     local("yarn clean")
@@ -545,7 +546,16 @@ local_resource(
 labels = ["apps"]
 
 # Next
-local_resource(
+if CI:
+    GIT_HASH = str(local('git rev-parse --short=10 HEAD')).strip()
+    os.putenv("GIT_HASH", GIT_HASH)
+    docker_build('sendapp/next-app', '.', dockerfile='apps/next/Dockerfile', extra_tag=['latest', GIT_HASH],
+                 secret=['id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID', 'id=NEXT_PUBLIC_SUPABASE_URL', 'id=SUPABASE_SERVICE_ROLE',
+                 'id=NEXT_PUBLIC_SUPABASE_ANON_KEY'], platform='linux/amd64')
+    docker_compose('./docker-compose.yml')
+    dc_resource('next-app', new_name = 'next:web')
+else:
+    local_resource(
     "next:web",
     "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
     labels = labels,
@@ -566,12 +576,12 @@ local_resource(
         "ui:generate-theme",
         "daimo-expo-passkeys:build",
         "anvil:fixtures",
-    ] + ([
-        "aa_bundler:base",
-    ] if not CI else []),
-    serve_cmd =
-        "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
-)
+      ] + ([
+          "aa_bundler:base",
+      ] if not CI else []),
+      serve_cmd =
+          "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
+      )
 
 local_resource(
     "distributor:web",
