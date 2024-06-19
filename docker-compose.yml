@@ -1,12 +1,12 @@
 services:
   next-app:
-    image: sendapp/next-app:latest
+    image: 0xsend/sendapp/next-app:latest
     build:
       context: .
       dockerfile: ./apps/next/Dockerfile
       tags:
-        - sendapp/next-app:${GIT_HASH:-latest}
-        - sendapp/next-app:latest
+        - 0xsend/sendapp/next-app:${GIT_HASH:-latest}
+        - 0xsend/sendapp/next-app:latest
       secrets:
         - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
         - NEXT_PUBLIC_SUPABASE_URL
@@ -20,10 +20,7 @@ services:
     env_file:
       - path: .env.local
         required: false
-      - path: .env.production
-        required: false
-      - path: .env
-        required: false
+      - path: .env.development.docker
 secrets:
   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:
     environment: NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID

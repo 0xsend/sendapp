@@ -5,3 +5,6 @@ packages/playwright/playwright-report
 /broadcast/**/run-*.json
 !/broadcast/**/run-latest.json
 **/coverage
+**/*.tsbuildinfo
+**/node_modules
+**/.turbo
