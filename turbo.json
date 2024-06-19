@@ -4,22 +4,9 @@
   "globalDependencies": ["**/.env.*local", "tsconfig*", "turbo.json"],
   "tasks": {
     "build": {
-      "env": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM"],
-      "dependsOn": ["^build"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "build/**",
-        "node_modules/.cache/metro/**",
-        "dist/**",
-        "public/dist/**",
-        "contracts/out/**"
-      ]
-    },
-    "next-app#build": {
       "env": ["DISABLE_EXTRACTION", "NODE_ENV", "EAS_BUILD_PLATFORM", "NEXT_*", "SUPABASE*"],
-      "outputs": ["build/**", "dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "out/**", "build/**"]
     },
     "dev": {
       "cache": false,
