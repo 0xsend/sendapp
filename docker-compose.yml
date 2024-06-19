@@ -1,4 +1,3 @@
-
 services:
   next-app:
     image: sendapp/next-app:latest

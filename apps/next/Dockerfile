@@ -4,6 +4,12 @@ FROM node:20-slim AS base
 
 FROM base AS builder
 WORKDIR /app
+ENV SHELL=/bin/bash
+SHELL ["/bin/bash", "-c"]
+RUN apt update && apt install -y curl git cargo build-essential
+RUN curl -Lo- https://foundry.paradigm.xyz | /bin/bash
+RUN source /root/.bashrc && foundryup
+ENV PATH "$PATH:/root/.foundry/bin"
 RUN corepack enable
 RUN yarn global add turbo
 COPY . .
@@ -13,19 +19,12 @@ RUN turbo prune next-app --docker
 
 FROM builder AS installer
 WORKDIR /app
-ENV SHELL=/bin/bash
-SHELL ["/bin/bash", "-c"]
-RUN apt update && apt install -y curl git cargo
-RUN curl -Lo- https://foundry.paradigm.xyz | /bin/bash
-RUN source /root/.bashrc && foundryup
-ENV PATH "$PATH:/root/.foundry/bin"
-
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
-COPY --from=builder /app/tsconfig* .
-RUN yarn install 
+COPY --from=builder /app/tsconfig* ./
+RUN yarn install
 
 
 
@@ -33,14 +32,14 @@ RUN yarn install
 COPY --from=builder /app/out/full/ .
 
 RUN --mount=type=secret,id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID \
-    --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_URL \
-    --mount=type=secret,id=SUPABASE_SERVICE_ROLE \
-    --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_ANON_KEY \
-    export NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$(cat /run/secrets/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) \
-    export NEXT_PUBLIC_SUPABASE_URL=$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_URL) \
-    export SUPABASE_SERVICE_ROLE="$(cat /run/secrets/SUPABASE_SERVICE_ROLE)" \
-    export NEXT_PUBLIC_SUPABASE_ANON_KEY="$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_ANON_KEY)" \
-    && yarn turbo run build --filter=next-app 
+  --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_URL \
+  --mount=type=secret,id=SUPABASE_SERVICE_ROLE \
+  --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+  export NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$(cat /run/secrets/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) \
+  export NEXT_PUBLIC_SUPABASE_URL=$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_URL) \
+  export SUPABASE_SERVICE_ROLE="$(cat /run/secrets/SUPABASE_SERVICE_ROLE)" \
+  export NEXT_PUBLIC_SUPABASE_ANON_KEY="$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_ANON_KEY)" \
+  && yarn turbo run build --filter=next-app 
 
 FROM base AS runner
 WORKDIR /app

@@ -3,9 +3,29 @@ load("ext://dotenv", "dotenv")
 load("ext://uibutton", "cmd_button", "location")
 load("./etc/tilt/utils.tiltfile", "files_matching", "require_tools")
 
+print(color.green("███████╗███████╗███╗   ██╗██████╗     ██╗████████╗"))
+
+print(color.green("██╔════╝██╔════╝████╗  ██║██╔══██╗    ██║╚══██╔══╝"))
+
+print(color.green("███████╗█████╗  ██╔██╗ ██║██║  ██║    ██║   ██║"))
+
+print(color.green("╚════██║██╔══╝  ██║╚██╗██║██║  ██║    ██║   ██║"))
+
+print(color.green("███████║███████╗██║ ╚████║██████╔╝    ██║   ██║"))
+
+print(color.green("╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝     ╚═╝   ╚═╝"))
+
 require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "caddy", "node", "bun")
 
 CI = os.getenv("CI") != None
+
+DEBUG = os.getenv("DEBUG", "").find("tilt") != -1
+
+config.define_bool("dockerize", False, "Whether to build and run the apps in docker")
+
+cfg = config.parse()
+
+print(color.cyan("Config: " + str(cfg)))
 
 if CI:
     print(color.magenta("Running in CI mode"))
@@ -546,42 +566,52 @@ local_resource(
 labels = ["apps"]
 
 # Next
-if CI:
-    GIT_HASH = str(local('git rev-parse --short=10 HEAD')).strip()
+if CI or cfg.get("dockerize"):
+    GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
     os.putenv("GIT_HASH", GIT_HASH)
-    docker_build('sendapp/next-app', '.', dockerfile='apps/next/Dockerfile', extra_tag=['latest', GIT_HASH],
-                 secret=['id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID', 'id=NEXT_PUBLIC_SUPABASE_URL', 'id=SUPABASE_SERVICE_ROLE',
-                 'id=NEXT_PUBLIC_SUPABASE_ANON_KEY'], platform='linux/amd64')
-    docker_compose('./docker-compose.yml')
-    dc_resource('next-app', new_name = 'next:web')
+    docker_build(
+        "sendapp/next-app",
+        ".",
+        dockerfile = "apps/next/Dockerfile",
+        extra_tag = ["latest", GIT_HASH],
+        platform = "linux/amd64",
+        secret = [
+            "id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
+            "id=NEXT_PUBLIC_SUPABASE_URL",
+            "id=SUPABASE_SERVICE_ROLE",
+            "id=NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        ],
+    )
+    docker_compose("./docker-compose.yml")
+    dc_resource("next-app", labels = ["apps"], new_name = "next:web")
 else:
     local_resource(
-    "next:web",
-    "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
-    labels = labels,
-    links = ["http://localhost:3000"],
-    readiness_probe = None if CI else probe(
-        http_get = http_get_action(
-            path = "/api/healthz",
-            port = 3000,
+        "next:web",
+        "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
+        labels = labels,
+        links = ["http://localhost:3000"],
+        readiness_probe = None if CI else probe(
+            http_get = http_get_action(
+                path = "/api/healthz",
+                port = 3000,
+            ),
+            period_secs = 15,
         ),
-        period_secs = 15,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "supabase",
-        "supabase:generate",
-        "wagmi:generate",
-        "ui:build",
-        "ui:generate-theme",
-        "daimo-expo-passkeys:build",
-        "anvil:fixtures",
-      ] + ([
-          "aa_bundler:base",
-      ] if not CI else []),
-      serve_cmd =
-          "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
-      )
+        resource_deps = [
+            "yarn:install",
+            "supabase",
+            "supabase:generate",
+            "wagmi:generate",
+            "ui:build",
+            "ui:generate-theme",
+            "daimo-expo-passkeys:build",
+            "anvil:fixtures",
+        ] + ([
+            "aa_bundler:base",
+        ] if not CI else []),
+        serve_cmd =
+            "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
+    )
 
 local_resource(
     "distributor:web",
