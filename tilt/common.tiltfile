@@ -1,0 +1,23 @@
+load("./utils.tiltfile", "files_matching")
+
+contract_files = files_matching(
+    os.path.join("packages", "contracts"),
+    lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
+)
+
+print(
+    "is ",
+    bool(""),
+    bool("0"),
+)
+
+CI = os.getenv("CI") != None
+
+config.define_bool("dockerize", False, "Whether to build and run the apps in docker")
+
+_cfg = config.parse()
+
+CFG = struct(
+    dockerize = _cfg.get("dockerize", CI),
+)
+
