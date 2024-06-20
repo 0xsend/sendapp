@@ -29,14 +29,16 @@ if CI:
 if not os.path.exists(".env.local"):
     local("cp .env.local.template .env.local", echo_off = True, quiet = True)
     if CI or CFG.dockerize:
+        sed = str(local("which gsed || which sed")).strip()
+        if sed == "":
+            print(color.red("Could not find sed. Please install it and try again."))
+            exit(1)
+
         # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
-        local("sed -i '' 's/localhost/host.docker.internal/' .env.local", echo_off = True, quiet = True)
+        local(sed + " -i 's/localhost/host.docker.internal/' .env.local", echo_off = True, quiet = True)
 
         # except for NEXT_PUBLIC_URL
-        local("sed -i '' 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local", echo_off = True, quiet = True)
-
-if not os.path.exists(".env.local.docker"):
-    local("cp .env.local.template .env.local.docker", echo_off = True, quiet = True)
+        local(sed + " -i 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local", echo_off = True, quiet = True)
 
 for dotfile in [
     ".env.development",
