@@ -166,7 +166,7 @@ jobs:
           sleep 1
           echo tilt is ready
           max_attempts=60
-          wait_timeout=5
+          wait_timeout=7
           for ((i=1; i<=max_attempts; i++)); do
             echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
             
