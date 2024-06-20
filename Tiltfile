@@ -95,7 +95,17 @@ if CI or CFG.dockerize:
     #     ]
     # )
     docker_compose("./docker-compose.yml")
-    dc_resource("next-app", labels = ["apps"], new_name = "next:web", resource_deps = next_app_resource_deps)
+    dc_resource(
+        "next-app",
+        labels = ["apps"],
+        new_name = "next:web",
+        resource_deps = [
+            "yarn:install",
+            "supabase",
+            "anvil:fixtures",
+            "aa_bundler:base",
+        ],
+    )
 else:
     local_resource(
         "next:web",
