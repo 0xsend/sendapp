@@ -49,5 +49,6 @@ runs:
         username: ${{ inputs.dockerhub_username }}
         password: ${{ inputs.dockerhub_password }}
     - name: Push to dockerhub
+      shell: bash
       if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
       run: yarn web:docker:push
