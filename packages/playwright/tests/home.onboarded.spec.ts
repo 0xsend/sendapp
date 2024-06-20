@@ -19,7 +19,8 @@ const heading = (page: Page) =>
 
 test('can visit token detail page', async ({ context, page }) => {
   const req = context.route(`${SUPABASE_URL}/rest/v1/activity_feed*`, async (route) => {
-    expect(route.request().url()).toMatchSnapshot('token-details-history-url')
+    const url = new URL(route.request().url())
+    expect(`${url.pathname}${url.search}`).toMatchSnapshot('token-details-history-url')
     await route.fulfill({
       body: JSON.stringify(mockUsdcTransfers),
       headers: { 'content-type': 'application/json; charset=utf-8' },

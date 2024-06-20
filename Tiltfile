@@ -28,6 +28,12 @@ if CI:
 # check if .env.local exists if not create it
 if not os.path.exists(".env.local"):
     local("cp .env.local.template .env.local", echo_off = True, quiet = True)
+    if CI or CFG.dockerize:
+        # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
+        local("sed -i '' 's/NEXT_PUBLIC_SUPABASE_URL=http:\\/\\/localhost/NEXT_PUBLIC_SUPABASE_URL=http:\\/\\/host.docker.internal/' .env.local", echo_off = True, quiet = True)
+
+if not os.path.exists(".env.local.docker"):
+    local("cp .env.local.template .env.local.docker", echo_off = True, quiet = True)
 
 for dotfile in [
     ".env",
@@ -44,24 +50,56 @@ include("tilt/deps.tiltfile")
 # APPS
 labels = ["apps"]
 
+next_app_resource_deps = [
+    "yarn:install",
+    "supabase",
+    "supabase:generate",
+    "wagmi:generate",
+    "ui:build",
+    "ui:generate-theme",
+    "daimo-expo-passkeys:build",
+    "anvil:fixtures",
+] + ([
+    "aa_bundler:base",
+] if not CI else [])
+
 # Next
 if CI or CFG.dockerize:
     GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
     os.putenv("GIT_HASH", GIT_HASH)
+
+    # figure out how to do this in a more elegant way
+    local("""
+    grep NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID.txt
+    grep NEXT_PUBLIC_SUPABASE_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_SUPABASE_URL.txt
+    grep NEXT_PUBLIC_SUPABASE_GRAPHQL_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_SUPABASE_GRAPHQL_URL.txt
+    grep NEXT_PUBLIC_MAINNET_RPC_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_MAINNET_RPC_URL.txt
+    grep NEXT_PUBLIC_BASE_RPC_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_BASE_RPC_URL.txt
+    grep NEXT_PUBLIC_BUNDLER_RPC_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_BUNDLER_RPC_URL.txt
+    grep SUPABASE_DB_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_DB_URL.txt
+    grep SUPABASE_SERVICE_ROLE .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_SERVICE_ROLE.txt
+    grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_SUPABASE_ANON_KEY.txt
+""")
     docker_build(
         "0xsend/sendapp/next-app",
         ".",
         dockerfile = "apps/next/Dockerfile",
         extra_tag = ["latest", GIT_HASH],
+        platform = "linux/amd64",
         secret = [
-            "id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
-            "id=NEXT_PUBLIC_SUPABASE_URL",
-            "id=SUPABASE_SERVICE_ROLE",
-            "id=NEXT_PUBLIC_SUPABASE_ANON_KEY",
+            "id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,src=./var/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID.txt",
+            "id=NEXT_PUBLIC_SUPABASE_URL,src=./var/NEXT_PUBLIC_SUPABASE_URL.txt",
+            "id=NEXT_PUBLIC_SUPABASE_GRAPHQL_URL,src=./var/NEXT_PUBLIC_SUPABASE_GRAPHQL_URL.txt",
+            "id=NEXT_PUBLIC_MAINNET_RPC_URL,src=./var/NEXT_PUBLIC_MAINNET_RPC_URL.txt",
+            "id=NEXT_PUBLIC_BASE_RPC_URL,src=./var/NEXT_PUBLIC_BASE_RPC_URL.txt",
+            "id=NEXT_PUBLIC_BUNDLER_RPC_URL,src=./var/NEXT_PUBLIC_BUNDLER_RPC_URL.txt",
+            "id=SUPABASE_DB_URL,src=./var/SUPABASE_DB_URL.txt",
+            "id=SUPABASE_SERVICE_ROLE,src=./var/SUPABASE_SERVICE_ROLE.txt",
+            "id=NEXT_PUBLIC_SUPABASE_ANON_KEY,src=./var/NEXT_PUBLIC_SUPABASE_ANON_KEY.txt",
         ],
     )
     docker_compose("./docker-compose.yml")
-    dc_resource("next-app", labels = ["apps"], new_name = "next:web")
+    dc_resource("next-app", labels = ["apps"], new_name = "next:web", resource_deps = next_app_resource_deps)
 else:
     local_resource(
         "next:web",
@@ -75,18 +113,7 @@ else:
             ),
             period_secs = 15,
         ),
-        resource_deps = [
-            "yarn:install",
-            "supabase",
-            "supabase:generate",
-            "wagmi:generate",
-            "ui:build",
-            "ui:generate-theme",
-            "daimo-expo-passkeys:build",
-            "anvil:fixtures",
-        ] + ([
-            "aa_bundler:base",
-        ] if not CI else []),
+        resource_deps = next_app_resource_deps,
         serve_cmd =
             "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
     )
