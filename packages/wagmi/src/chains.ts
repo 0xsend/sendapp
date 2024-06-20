@@ -61,14 +61,14 @@ const mainnetChains = {
     ...mainnetViem,
     rpcUrls: {
       default: { http: [MAINNET_RPC_URL] },
-      public: { http: [MAINNET_RPC_URL] },
+      public: { http: [process.env.NEXT_PUBLIC_MAINNET_RPC_URL] },
     },
   } as typeof mainnetViem,
   [String(sepolia.id)]: {
     ...sepolia,
     rpcUrls: {
       default: { http: [MAINNET_RPC_URL] },
-      public: { http: [MAINNET_RPC_URL] },
+      public: { http: [process.env.NEXT_PUBLIC_MAINNET_RPC_URL] },
     },
   } as typeof sepolia,
   [String(localhost.id)]: localhost,
@@ -79,14 +79,14 @@ const baseChains = {
     ...baseMainnetViem,
     rpcUrls: {
       default: { http: [BASE_RPC_URL] },
-      public: { http: [BASE_RPC_URL] },
+      public: { http: [process.env.NEXT_PUBLIC_MAINNET_RPC_URL] },
     },
   } as typeof baseMainnetViem,
   [String(baseSepolia.id)]: {
     ...baseSepolia,
     rpcUrls: {
       default: { http: [BASE_RPC_URL] },
-      public: { http: [BASE_RPC_URL] },
+      public: { http: [process.env.NEXT_PUBLIC_MAINNET_RPC_URL] },
     },
   } as typeof baseSepolia,
   [String(baseLocal.id)]: baseLocal,
@@ -103,6 +103,7 @@ export const mainnet: typeof mainnetViem | typeof localhost | typeof sepolia =
       return chain
     }
     if (__DEV__ || process.env.CI) {
+      log('mainnetFromEnv', 'using localhost')
       return localhost
     }
     log('mainnetFromEnv', 'using mainnetViem')
@@ -120,6 +121,7 @@ export const baseMainnet: typeof baseMainnetViem | typeof baseLocal | typeof bas
       return chain
     }
     if (__DEV__ || process.env.CI) {
+      log('baseMainnetFromEnv', 'using baseLocal')
       return baseLocal
     }
     log('baseMainnetFromEnv', 'using baseMainnetViem')
