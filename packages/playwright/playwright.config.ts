@@ -5,7 +5,7 @@ globalThis.__DEV__ = false
 
 // validate environment ensuring we aren't talking to prod or staging or something
 const _url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || '')
-if (!['127.0.0.1', 'localhost'].some((host) => _url.hostname === host)) {
+if (!['127.0.0.1', 'localhost', 'host.docker.internal'].some((host) => _url.hostname === host)) {
   console.log(`
 
 NEXT_PUBLIC_SUPABASE_URL is ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Please update your environment to point to a local supabase instance.

@@ -4,6 +4,14 @@ import { base as baseMainnetViem, mainnet as mainnetViem, baseSepolia, sepolia }
 
 const log = debug('wagmi:chains')
 
+// allow for creating private RPC url
+const MAINNET_RPC_URL =
+  process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'
+
+// allow for creating private RPC url
+const BASE_RPC_URL =
+  process.env.BASE_RPC_URL ?? process.env.NEXT_PUBLIC_BASE_RPC_URL ?? 'http://127.0.0.1:8546/'
+
 export const localhost = defineChain({
   id: 1_337,
   name: 'Mainnet Localhost',
@@ -13,8 +21,8 @@ export const localhost = defineChain({
     symbol: 'ETH',
   },
   rpcUrls: {
-    default: { http: ['http://127.0.0.1:8545'] },
-    public: { http: ['http://127.0.0.1:8545'] },
+    default: { http: [MAINNET_RPC_URL] },
+    public: { http: [process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'] },
   },
   blockExplorers: {
     default: {
@@ -37,8 +45,8 @@ export const baseLocal = defineChain({
     symbol: 'ETH',
   },
   rpcUrls: {
-    default: { http: ['http://127.0.0.1:8546'] },
-    public: { http: ['http://127.0.0.1:8546'] },
+    default: { http: [BASE_RPC_URL] },
+    public: { http: [process.env.NEXT_PUBLIC_BASE_RPC_URL ?? 'http://127.0.0.1:8546/'] },
   },
   blockExplorers: {
     default: {
@@ -47,10 +55,6 @@ export const baseLocal = defineChain({
     },
   },
 })
-
-// allow for creating private RPC url
-const MAINNET_RPC_URL =
-  process.env.MAINNET_RPC_URL ?? process.env.NEXT_PUBLIC_MAINNET_RPC_URL ?? 'http://127.0.0.1:8545/'
 
 const mainnetChains = {
   [String(mainnetViem.id)]: {
@@ -69,10 +73,6 @@ const mainnetChains = {
   } as typeof sepolia,
   [String(localhost.id)]: localhost,
 } as const
-
-// allow for creating private RPC url
-const BASE_RPC_URL =
-  process.env.BASE_RPC_URL ?? process.env.NEXT_PUBLIC_BASE_RPC_URL ?? 'http://127.0.0.1:8546/'
 
 const baseChains = {
   [String(baseMainnetViem.id)]: {

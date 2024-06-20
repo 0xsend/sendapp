@@ -21,6 +21,7 @@
 **/.turbo
 **/.cache/
 **/out
+**/*.snap
 .auth/
 
 *.log*
