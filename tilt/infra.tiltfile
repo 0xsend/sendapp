@@ -6,6 +6,8 @@ _prj_root = os.path.join(
     "..",
 )
 
+_infra_resource_deps = ["yarn:install"]
+
 labels = ["infra"]
 
 supabase_exclude = [
@@ -26,7 +28,7 @@ local_resource(
     allow_parallel = True,
     labels = labels,
     links = [link("http://localhost:54323/", "Supabase Studio")],
-    resource_deps = ["yarn:install"],
+    resource_deps = _infra_resource_deps,
     serve_cmd = "while true; do docker logs -f -n 1 supabase_db_send; sleep 1; done",
     serve_dir = _prj_root,
 )
@@ -143,10 +145,7 @@ local_resource(
         period_secs = 15,
         timeout_secs = 5,
     ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:base",
-    ],
+    resource_deps = _infra_resource_deps + ["anvil:mainnet"],
     serve_cmd = """
     docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs -r docker rm -f
     docker run --rm \
@@ -175,6 +174,7 @@ local_resource(
         period_secs = 2,
         timeout_secs = 5,
     ),
+    resource_deps = _infra_resource_deps,
     serve_cmd = "yarn contracts dev:anvil-base-node",
     serve_dir = _prj_root,
 )
@@ -184,8 +184,7 @@ local_resource(
     "yarn contracts dev:anvil-add-send-account-factory-fixtures",
     dir = _prj_root,
     labels = labels,
-    resource_deps = [
-        "yarn:install",
+    resource_deps = _infra_resource_deps + [
         "anvil:mainnet",
         "anvil:base",
         "contracts:build",
@@ -199,8 +198,7 @@ local_resource(
     auto_init = False,
     dir = _prj_root,
     labels = labels,
-    resource_deps = [
-        "yarn:install",
+    resource_deps = _infra_resource_deps + [
         "anvil:mainnet",
         "anvil:base",
         "contracts:build",
@@ -213,8 +211,7 @@ local_resource(
     "yarn contracts dev:anvil-add-token-paymaster-fixtures",
     dir = _prj_root,
     labels = labels,
-    resource_deps = [
-        "yarn:install",
+    resource_deps = _infra_resource_deps + [
         "anvil:mainnet",
         "anvil:base",
         "contracts:build",
@@ -245,7 +242,6 @@ local_resource(
         ),
     ),
     resource_deps = [
-        "yarn:install",
         "anvil:base",
     ],
     serve_cmd = """
@@ -283,8 +279,7 @@ local_resource(
             port = 8383,
         ),
     ),
-    resource_deps = [
-        "yarn:install",
+    resource_deps = _infra_resource_deps + [
         "anvil:base",
         "shovel:generate-config",
     ],
@@ -323,8 +318,7 @@ local_resource(
         period_secs = 15,
         timeout_secs = 5,
     ),
-    resource_deps = [
-        "yarn:install",
+    resource_deps = _infra_resource_deps + [
         "anvil:base",
     ],
     serve_cmd = """
