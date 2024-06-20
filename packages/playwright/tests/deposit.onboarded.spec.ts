@@ -88,9 +88,9 @@ test('can deposit USDC with web3 wallet', async ({
   await depositButton.click()
   await page.getByRole('link', { name: 'Deposit with Web3 Wallet' }).click()
   await page.waitForURL('/deposit/web3')
-  await expect(page.getByTestId('rk-connect-header-label')).toBeVisible()
+  await expect(page.locator('w3m-modal')).toBeVisible()
 
-  await page.getByTestId('rk-wallet-option-injected').click()
+  await page.locator('w3m-connect-injected-widget').click()
 
   await expect
     .poll(
@@ -219,9 +219,9 @@ test('can deposit ETH with web3 wallet', async ({
   await depositButton.click()
   await page.getByRole('link', { name: 'Deposit with Web3 Wallet' }).click()
   await page.waitForURL('/deposit/web3')
-  await expect(page.getByTestId('rk-connect-header-label')).toBeVisible()
+  await expect(page.locator('w3m-modal')).toBeVisible()
 
-  await page.getByTestId('rk-wallet-option-injected').click()
+  await page.locator('w3m-connect-injected-widget').click()
 
   await expect
     .poll(

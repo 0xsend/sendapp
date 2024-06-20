@@ -2345,6 +2345,119 @@ export const sendAirdropsSafeConfig = {
 } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendCheck
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const sendCheckAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'checks',
+    outputs: [
+      { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
+      { name: '_signature', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'claimCheck',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'ephemeralAddress', internalType: 'address', type: 'address' }],
+    name: 'claimCheckSelf',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+      { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'createCheck',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'check',
+        internalType: 'struct Check',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+        ],
+        indexed: false,
+      },
+      { name: 'redeemer', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'CheckClaimed',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'check',
+        internalType: 'struct Check',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+        ],
+        indexed: false,
+      },
+    ],
+    name: 'CheckCreated',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'AddressInsufficientBalance',
+  },
+  { type: 'error', inputs: [], name: 'ECDSAInvalidSignature' },
+  {
+    type: 'error',
+    inputs: [{ name: 'length', internalType: 'uint256', type: 'uint256' }],
+    name: 'ECDSAInvalidSignatureLength',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 's', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'ECDSAInvalidSignatureS',
+  },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  {
+    type: 'error',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendMerkleDrop
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -5979,6 +6092,98 @@ export const watchSendAccountFactoryAccountCreatedEvent = /*#__PURE__*/ createWa
   abi: sendAccountFactoryAbi,
   address: sendAccountFactoryAddress,
   eventName: 'AccountCreated',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const readSendCheck = /*#__PURE__*/ createReadContract({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"checks"`
+ */
+export const readSendCheckChecks = /*#__PURE__*/ createReadContract({
+  abi: sendCheckAbi,
+  functionName: 'checks',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const writeSendCheck = /*#__PURE__*/ createWriteContract({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ */
+export const writeSendCheckClaimCheck = /*#__PURE__*/ createWriteContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheck',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ */
+export const writeSendCheckClaimCheckSelf = /*#__PURE__*/ createWriteContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheckSelf',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ */
+export const writeSendCheckCreateCheck = /*#__PURE__*/ createWriteContract({
+  abi: sendCheckAbi,
+  functionName: 'createCheck',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const prepareWriteSendCheck = /*#__PURE__*/ createSimulateContract({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ */
+export const prepareWriteSendCheckClaimCheck = /*#__PURE__*/ createSimulateContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheck',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ */
+export const prepareWriteSendCheckClaimCheckSelf = /*#__PURE__*/ createSimulateContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheckSelf',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ */
+export const prepareWriteSendCheckCreateCheck = /*#__PURE__*/ createSimulateContract({
+  abi: sendCheckAbi,
+  functionName: 'createCheck',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const watchSendCheckEvent = /*#__PURE__*/ createWatchContractEvent({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckClaimed"`
+ */
+export const watchSendCheckCheckClaimedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendCheckAbi,
+  eventName: 'CheckClaimed',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckCreated"`
+ */
+export const watchSendCheckCheckCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendCheckAbi,
+  eventName: 'CheckCreated',
 })
 
 /**
@@ -10228,6 +10433,100 @@ export const useWatchSendAccountFactoryAccountCreatedEvent =
     address: sendAccountFactoryAddress,
     eventName: 'AccountCreated',
   })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const useReadSendCheck = /*#__PURE__*/ createUseReadContract({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"checks"`
+ */
+export const useReadSendCheckChecks = /*#__PURE__*/ createUseReadContract({
+  abi: sendCheckAbi,
+  functionName: 'checks',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const useWriteSendCheck = /*#__PURE__*/ createUseWriteContract({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ */
+export const useWriteSendCheckClaimCheck = /*#__PURE__*/ createUseWriteContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheck',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ */
+export const useWriteSendCheckClaimCheckSelf = /*#__PURE__*/ createUseWriteContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheckSelf',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ */
+export const useWriteSendCheckCreateCheck = /*#__PURE__*/ createUseWriteContract({
+  abi: sendCheckAbi,
+  functionName: 'createCheck',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const useSimulateSendCheck = /*#__PURE__*/ createUseSimulateContract({ abi: sendCheckAbi })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ */
+export const useSimulateSendCheckClaimCheck = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheck',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ */
+export const useSimulateSendCheckClaimCheckSelf = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendCheckAbi,
+  functionName: 'claimCheckSelf',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ */
+export const useSimulateSendCheckCreateCheck = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendCheckAbi,
+  functionName: 'createCheck',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__
+ */
+export const useWatchSendCheckEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendCheckAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckClaimed"`
+ */
+export const useWatchSendCheckCheckClaimedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendCheckAbi,
+  eventName: 'CheckClaimed',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckCreated"`
+ */
+export const useWatchSendCheckCheckCreatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendCheckAbi,
+  eventName: 'CheckCreated',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendMerkleDropAbi}__

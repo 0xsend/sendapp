@@ -4,17 +4,17 @@ import { Provider } from 'app/__mocks__/app/provider'
 import * as wagmi from 'wagmi'
 import * as myWagmi from '@my/wagmi'
 import { DepositWeb3Screen } from './screen'
-import * as rainbowkit from '@rainbow-me/rainbowkit'
+import * as web3modal from '@web3modal/wagmi/react'
 
 jest.mock('wagmi')
 jest.mock('@my/wagmi')
-jest.mock('@rainbow-me/rainbowkit')
+jest.mock('@web3modal/wagmi/react')
 
 const { useAccount, useSendTransaction, useBalance, useSwitchAccount } =
   wagmi as unknown as typeof import('app/__mocks__/wagmi')
 const { useWriteErc20Transfer } = myWagmi as unknown as typeof import('app/__mocks__/@my/wagmi')
-const { useChainModal, useConnectModal } =
-  rainbowkit as unknown as typeof import('app/__mocks__/@rainbow-me/rainbowkit')
+const { useWeb3Modal } =
+  web3modal as unknown as typeof import('app/__mocks__/@web3modal/wagmi/react')
 
 describe('DepositWeb3Screen', () => {
   afterEach(() => {
@@ -22,8 +22,7 @@ describe('DepositWeb3Screen', () => {
     useWriteErc20Transfer.mockClear()
     useSendTransaction.mockClear()
     useBalance.mockClear()
-    useConnectModal.mockClear()
-    useChainModal.mockClear()
+    useWeb3Modal.mockClear()
     useSwitchAccount.mockClear()
   })
   it('renders the deposit web3 form when wallet is connected', async () => {
@@ -93,8 +92,8 @@ describe('DepositWeb3Screen', () => {
     useAccount.mockReturnValue({
       isConnected: false,
     })
-    useConnectModal.mockReturnValue({
-      openConnectModal: jest.fn(),
+    useWeb3Modal.mockReturnValue({
+      open: jest.fn(),
     })
 
     render(
@@ -109,7 +108,7 @@ describe('DepositWeb3Screen', () => {
     expect(screen).toMatchSnapshot()
     const user = userEvent.setup()
     await user.press(screen.getByRole('button', { name: 'Connect to Deposit' }))
-    expect(useConnectModal).toHaveBeenCalled()
+    expect(useWeb3Modal).toHaveBeenCalled()
   })
   it('renders the switch network screen when base network is not selected', async () => {
     useAccount.mockReturnValue({
@@ -126,8 +125,8 @@ describe('DepositWeb3Screen', () => {
         },
       },
     })
-    useChainModal.mockReturnValue({
-      openChainModal: jest.fn(),
+    useWeb3Modal.mockReturnValue({
+      open: jest.fn(),
     })
     render(
       <Provider>
@@ -139,6 +138,6 @@ describe('DepositWeb3Screen', () => {
     expect(screen).toMatchSnapshot()
     const user = userEvent.setup()
     await user.press(switchNetworkButton)
-    expect(useChainModal).toHaveBeenCalled()
+    expect(useWeb3Modal).toHaveBeenCalled()
   })
 })

@@ -14,7 +14,7 @@ import {
   isWeb,
 } from '@my/ui'
 import { baseMainnet, useWriteErc20Transfer } from '@my/wagmi'
-import { useChainModal, useConnectModal } from '@rainbow-me/rainbowkit'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 import { IconEthereum, IconRefresh } from 'app/components/icons'
 import { IconChainBase } from 'app/components/icons/IconChainBase'
 import { coins } from 'app/data/coins'
@@ -43,9 +43,9 @@ import { z } from 'zod'
  * 3. Sign transaction
  */
 export function DepositWeb3Screen() {
-  const { openConnectModal } = useConnectModal()
+  const { open: openConnectModal } = useWeb3Modal()
   const { isConnected, chainId, chain } = useAccount()
-  const { openChainModal } = useChainModal()
+  // const { openChainModal } = useChainModal()
 
   useEffect(() => {
     if (!isConnected) {
@@ -65,7 +65,7 @@ export function DepositWeb3Screen() {
         <Button
           accessible
           icon={<IconEthereum size={'$1'} color={'$color12'} />}
-          onPress={openConnectModal}
+          onPress={() => openConnectModal()}
           maxWidth={'$20'}
         >
           Connect to Deposit
@@ -86,7 +86,7 @@ export function DepositWeb3Screen() {
         <Button
           accessible
           icon={<IconChainBase size={'$1'} />}
-          onPress={openChainModal}
+          onPress={() => openConnectModal({ view: 'Networks' })}
           maxWidth={'$20'}
         >
           Switch
@@ -312,6 +312,7 @@ function DepositForm() {
                 </Paragraph>
               </Fade>
             ) : null}
+
             <SubmitButton
               disabled={!canSubmit || isLoadingReceipt}
               iconAfter={isLoadingReceipt ? <Spinner size="small" /> : undefined}
@@ -392,7 +393,7 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
   const [failsafeChainId, setFailsafeChainId] = useState<number>()
   const [error, setError] = useState<string>()
   const [ignoreError, setIgnoreError] = useState(false)
-  const { openChainModal, chainModalOpen } = useChainModal()
+  const { open: openWeb3Modal } = useWeb3Modal()
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: hack
   useEffect(() => {
@@ -402,7 +403,7 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
         .then((cid) => setFailsafeChainId(Number(cid)))
         .catch((e) => setError(e.message?.split('.').at(0) ?? e.toString()))
     }
-  }, [chainId, chainModalOpen])
+  }, [chainId, openWeb3Modal])
 
   if (!isWeb) return children // we don't need to do anything on non-web
 
@@ -452,7 +453,7 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
         <Button
           accessible
           icon={<IconChainBase size={'$1'} />}
-          onPress={openChainModal}
+          onPress={() => openWeb3Modal({ view: 'Networks' })}
           maxWidth={'$20'}
         >
           Switch
