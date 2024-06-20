@@ -5,19 +5,21 @@ contract_files = files_matching(
     lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
 )
 
-print(
-    "is ",
-    bool(""),
-    bool("0"),
-)
-
 CI = os.getenv("CI") != None
+
+config.define_string_list(
+    "args",
+    args = True,
+)
 
 config.define_bool("dockerize", False, "Whether to build and run the apps in docker")
 
 _cfg = config.parse()
 
+config.set_enabled_resources(_cfg.get("args", []))
+
 CFG = struct(
+    args = _cfg.get("args", []),
     dockerize = _cfg.get("dockerize", CI),
 )
 
