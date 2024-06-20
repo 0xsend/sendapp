@@ -13,7 +13,7 @@ export const client = ({ chain: { id: chainId } }) => {
   if (chainId === mainnet.id) return mainnetClient
   if (chainId === baseMainnet.id) return baseMainnetClient
   // handle __DEV__ mode
-  if (__DEV__ || process.env.NODE_ENV === 'development') {
+  if (__DEV__ || process.env.NODE_ENV === 'development' || process.env.CI) {
     if (chainId === baseMainnetOg.id) {
       console.log(
         `⚠️ Overriding Base chain ID ${baseMainnetOg.id} with ${baseMainnetClient.chain.id} in __DEV__ mode`

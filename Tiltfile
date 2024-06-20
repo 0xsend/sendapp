@@ -30,12 +30,16 @@ if not os.path.exists(".env.local"):
     local("cp .env.local.template .env.local", echo_off = True, quiet = True)
     if CI or CFG.dockerize:
         # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
-        local("sed -i '' 's/NEXT_PUBLIC_SUPABASE_URL=http:\\/\\/localhost/NEXT_PUBLIC_SUPABASE_URL=http:\\/\\/host.docker.internal/' .env.local", echo_off = True, quiet = True)
+        local("sed -i '' 's/localhost/host.docker.internal/' .env.local", echo_off = True, quiet = True)
+
+        # except for NEXT_PUBLIC_URL
+        local("sed -i '' 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local", echo_off = True, quiet = True)
 
 if not os.path.exists(".env.local.docker"):
     local("cp .env.local.template .env.local.docker", echo_off = True, quiet = True)
 
 for dotfile in [
+    ".env.development",
     ".env",
     ".env.local",  # last one wins
 ]:
@@ -65,39 +69,29 @@ next_app_resource_deps = [
 
 # Next
 if CI or CFG.dockerize:
-    GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
-    os.putenv("GIT_HASH", GIT_HASH)
+    # GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
+    # os.putenv("GIT_HASH", GIT_HASH)
 
     # figure out how to do this in a more elegant way
     local("""
-    grep NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID.txt
-    grep NEXT_PUBLIC_SUPABASE_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_SUPABASE_URL.txt
-    grep NEXT_PUBLIC_SUPABASE_GRAPHQL_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_SUPABASE_GRAPHQL_URL.txt
-    grep NEXT_PUBLIC_MAINNET_RPC_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_MAINNET_RPC_URL.txt
-    grep NEXT_PUBLIC_BASE_RPC_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_BASE_RPC_URL.txt
-    grep NEXT_PUBLIC_BUNDLER_RPC_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_BUNDLER_RPC_URL.txt
     grep SUPABASE_DB_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_DB_URL.txt
     grep SUPABASE_SERVICE_ROLE .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_SERVICE_ROLE.txt
-    grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/NEXT_PUBLIC_SUPABASE_ANON_KEY.txt
-""")
-    docker_build(
-        "0xsend/sendapp/next-app",
-        ".",
-        dockerfile = "apps/next/Dockerfile",
-        extra_tag = ["latest", GIT_HASH],
-        platform = "linux/amd64",
-        secret = [
-            "id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,src=./var/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID.txt",
-            "id=NEXT_PUBLIC_SUPABASE_URL,src=./var/NEXT_PUBLIC_SUPABASE_URL.txt",
-            "id=NEXT_PUBLIC_SUPABASE_GRAPHQL_URL,src=./var/NEXT_PUBLIC_SUPABASE_GRAPHQL_URL.txt",
-            "id=NEXT_PUBLIC_MAINNET_RPC_URL,src=./var/NEXT_PUBLIC_MAINNET_RPC_URL.txt",
-            "id=NEXT_PUBLIC_BASE_RPC_URL,src=./var/NEXT_PUBLIC_BASE_RPC_URL.txt",
-            "id=NEXT_PUBLIC_BUNDLER_RPC_URL,src=./var/NEXT_PUBLIC_BUNDLER_RPC_URL.txt",
-            "id=SUPABASE_DB_URL,src=./var/SUPABASE_DB_URL.txt",
-            "id=SUPABASE_SERVICE_ROLE,src=./var/SUPABASE_SERVICE_ROLE.txt",
-            "id=NEXT_PUBLIC_SUPABASE_ANON_KEY,src=./var/NEXT_PUBLIC_SUPABASE_ANON_KEY.txt",
-        ],
-    )
+""", echo_off = True, quiet = True)
+    # FIXME: when we support dev mode and dockerize.
+    # docker_build(
+    #     "0xsend/sendapp/next-app",
+    #     ".",
+    #     dockerfile = "apps/next/Dockerfile",
+    #     extra_tag = ["latest", GIT_HASH],
+    #     platform = "linux/amd64",
+    #     secret = [
+    #         "id=SUPABASE_DB_URL,src=./var/SUPABASE_DB_URL.txt",
+    #         "id=SUPABASE_SERVICE_ROLE,src=./var/SUPABASE_SERVICE_ROLE.txt",
+    #     ],
+    #     build_args=[
+
+    #     ]
+    # )
     docker_compose("./docker-compose.yml")
     dc_resource("next-app", labels = ["apps"], new_name = "next:web", resource_deps = next_app_resource_deps)
 else:

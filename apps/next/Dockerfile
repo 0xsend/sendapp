@@ -18,7 +18,7 @@ FROM base AS installer
 COPY yarn.lock yarn.lock
 COPY .yarnrc.yml .yarnrc.yml
 COPY .yarn .yarn
-# git ls-files | grep 'package\.json$' | sort
+# git ls-files | grep 'package\.json$' | sort | sed 's#\(.*\)#COPY \1 \1#'     
 COPY apps/distributor/package.json apps/distributor/package.json
 COPY apps/expo/package.json apps/expo/package.json
 COPY apps/next/package.json apps/next/package.json
@@ -36,36 +36,49 @@ COPY packages/wagmi/package.json packages/wagmi/package.json
 COPY packages/webauthn-authenticator/package.json packages/webauthn-authenticator/package.json
 COPY supabase/package.json supabase/package.json
 
-
 RUN --mount=type=cache,target=/root/.yarn/berry \
   --mount=type=cache,target=/tmp/yarn-cache \
   SKIP_YARN_POST_INSTALL=1 \
+  NODE_ENV=development \
   yarn install --immutable
 
 FROM base AS builder
 WORKDIR /sendapp
 COPY . .
 COPY --from=installer /src/node_modules ./node_modules
+ARG CI=
+ARG DEBUG=
+ARG NEXT_PUBLIC_SUPABASE_PROJECT_ID
+ARG NEXT_PUBLIC_URL
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_GRAPHQL_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_MAINNET_RPC_URL
+ARG NEXT_PUBLIC_BASE_RPC_URL
+ARG NEXT_PUBLIC_BUNDLER_RPC_URL
+ARG NEXT_PUBLIC_MAINNET_CHAIN_ID
+ARG NEXT_PUBLIC_BASE_CHAIN_ID
+ARG NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+ENV CI=${CI}
+ENV DEBUG=${DEBUG}
+ENV NEXT_PUBLIC_SUPABASE_PROJECT_ID=${NEXT_PUBLIC_SUPABASE_PROJECT_ID}
+ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_GRAPHQL_URL=${NEXT_PUBLIC_SUPABASE_GRAPHQL_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+ENV NEXT_PUBLIC_MAINNET_RPC_URL=${NEXT_PUBLIC_MAINNET_RPC_URL}
+ENV NEXT_PUBLIC_BASE_RPC_URL=${NEXT_PUBLIC_BASE_RPC_URL}
+ENV NEXT_PUBLIC_BUNDLER_RPC_URL=${NEXT_PUBLIC_BUNDLER_RPC_URL}
+ENV NEXT_PUBLIC_MAINNET_CHAIN_ID=${NEXT_PUBLIC_MAINNET_CHAIN_ID}
+ENV NEXT_PUBLIC_BASE_CHAIN_ID=${NEXT_PUBLIC_BASE_CHAIN_ID}
+ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
 RUN --mount=type=cache,target=/tmp/yarn-cache \
   --mount=type=cache,target=/tmp/turbo-cache \
-  --mount=type=secret,id=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID \
-  --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_URL \
-  --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_GRAPHQL_URL \
-  --mount=type=secret,id=NEXT_PUBLIC_MAINNET_RPC_URL \
-  --mount=type=secret,id=NEXT_PUBLIC_BASE_RPC_URL \
-  --mount=type=secret,id=NEXT_PUBLIC_BUNDLER_RPC_URL \
   --mount=type=secret,id=SUPABASE_DB_URL \
   --mount=type=secret,id=SUPABASE_SERVICE_ROLE \
   --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_ANON_KEY \
-  export NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="$(cat /run/secrets/NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID)" \
-  export NEXT_PUBLIC_SUPABASE_URL="$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_URL)" \
-  export NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_GRAPHQL_URL)" \
-  export NEXT_PUBLIC_MAINNET_RPC_URL="$(cat /run/secrets/NEXT_PUBLIC_MAINNET_RPC_URL)" \
-  export NEXT_PUBLIC_BASE_RPC_URL="$(cat /run/secrets/NEXT_PUBLIC_BASE_RPC_URL)" \
-  export NEXT_PUBLIC_BUNDLER_RPC_URL="$(cat /run/secrets/NEXT_PUBLIC_BUNDLER_RPC_URL)" \
   export SUPABASE_DB_URL="$(cat /run/secrets/SUPABASE_DB_URL)" \
   export SUPABASE_SERVICE_ROLE="$(cat /run/secrets/SUPABASE_SERVICE_ROLE)" \
-  export NEXT_PUBLIC_SUPABASE_ANON_KEY="$(cat /run/secrets/NEXT_PUBLIC_SUPABASE_ANON_KEY)" \
   && yarn turbo build --cache-dir=/tmp/turbo-cache --filter=next-app
 
 FROM node:20-slim AS runner

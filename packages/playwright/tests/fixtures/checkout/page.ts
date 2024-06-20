@@ -1,7 +1,7 @@
 import path from 'node:path'
 import type { Expect, Locator, Page } from '@playwright/test'
 import debug from 'debug'
-import { type Web3ProviderBackend, Web3RequestKind } from 'headless-web3-provider'
+import type { Web3ProviderBackend } from 'headless-web3-provider'
 
 const log = debug('test:fixtures:checkout:page')
 
