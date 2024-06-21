@@ -1,8 +1,8 @@
 load("ext://color", "color")
 load("ext://dotenv", "dotenv")
 load("ext://uibutton", "cmd_button", "location")
-load("./tilt/common.tiltfile", "CFG", "CI", "contract_files")
-load("./tilt/utils.tiltfile", "files_matching", "require_tools")
+load("./tilt/common.tiltfile", "CFG", "CI", "DEBUG", "contract_files")
+load("./tilt/utils.tiltfile", "files_matching", "require_env", "require_tools")
 
 print(color.green("███████╗███████╗███╗   ██╗██████╗     ██╗████████╗"))
 
@@ -17,8 +17,6 @@ print(color.green("███████║███████╗██║ ╚
 print(color.green("╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝     ╚═╝   ╚═╝"))
 
 require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "caddy", "node", "bun")
-
-DEBUG = os.getenv("DEBUG", "").find("tilt") != -1
 
 print(color.cyan("Config: " + str(CFG)))
 
@@ -41,16 +39,28 @@ if not os.path.exists(".env.local"):
         # except for NEXT_PUBLIC_URL
         local(sed + " -i 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local")
         print(color.green("📝 Dockerized .env.local"))
-    local("cat .env.local")
 
 for dotfile in [
-    ".env.development",
     ".env",
+    ".env.development",
     ".env.local",  # last one wins
 ]:
     if os.path.exists(dotfile):
         print(color.green("Loading environment from " + dotfile))
         dotenv(fn = dotfile)
+
+require_env(
+    "ANVIL_BASE_FORK_URL",
+    "ANVIL_MAINNET_FORK_URL",
+)
+
+# ensure .env matches what's in .env.local.template
+for line in str(read_file(".env.local.template")).split("\n"):
+    if line.startswith("#") or line == "":
+        continue
+    key, _ = line.split("=", 1)
+    print(color.blue("checking for " + key)) if DEBUG else None
+    require_env(key)
 
 include("tilt/infra.tiltfile")
 
@@ -368,4 +378,7 @@ local_resource(
         "distributor:test",
     ],
 )
+
+if config.tilt_subcommand == "down":
+    include("./tilt/cleanup.tiltfile")
 
