@@ -28,10 +28,10 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - path: .env.local
-        required: false
       - path: .env.development
       - path: .env.development.docker
+      - path: .env.local
+        required: false
       - path: .env.local.docker
         required: false
     secrets:

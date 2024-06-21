@@ -21,6 +21,7 @@ const blockHeight = await $`cast bn --rpc-url $ANVIL_MAINNET_FORK_URL`.then(
 await $`docker rm -f sendapp-anvil-ethmainnet || true`
 
 await $`docker run --rm \
+          --platform=linux/amd64 \
           --network=supabase_network_send \
           -p=0.0.0.0:8546:8546 \
           --name=sendapp-anvil-ethmainnet \
