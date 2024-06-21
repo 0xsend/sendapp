@@ -27,7 +27,7 @@ if CI:
 if not os.path.exists(".env.local"):
     local("cp .env.local.template .env.local")
     print(color.green("📝 Created .env.local"))
-    if CI or CFG.dockerize:
+    if CFG.dockerize:
         sed = str(local("which gsed || which sed")).strip()
         if sed == "":
             print(color.red("Could not find sed. Please install it and try again."))
@@ -35,10 +35,19 @@ if not os.path.exists(".env.local"):
 
         # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
         local(sed + " -i 's/localhost/host.docker.internal/' .env.local")
-
-        # except for NEXT_PUBLIC_URL
-        local(sed + " -i 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local")
         print(color.green("📝 Dockerized .env.local"))
+
+if CFG.dockerize:
+    # ensure host.docker.internal is resolvable
+    host_docker_rdy = str(local("nslookup host.docker.internal || true", echo_off = True, quiet = True)).strip()
+    if host_docker_rdy.find("server can't find host.docker.interna") != -1:
+        print(color.red("Could not resolve host.docker.internal domain.") + """
+    
+Add the following to your /etc/hosts file:
+    
+127.0.0.1 host.docker.internal
+        """)
+        fail(color.red("Could not resolve host.docker.internal domain."))
 
 for dotfile in [
     ".env",
@@ -83,7 +92,7 @@ next_app_resource_deps = [
 ] if not CI else [])
 
 # Next
-if CI or CFG.dockerize:
+if CFG.dockerize:
     # GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
     # os.putenv("GIT_HASH", GIT_HASH)
 

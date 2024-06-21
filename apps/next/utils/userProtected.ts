@@ -7,7 +7,7 @@ import debug from 'debug'
 import { userOnboarded } from './userOnboarded'
 import { logRequest } from './logRequest'
 
-const log = debug('next:utils:userProtected')
+const log = debug('api:utils:userProtected')
 
 /**
  * getServerSideProps for auth pages - will redirect authenticated users - pass your own function as the only arg
@@ -21,6 +21,7 @@ export function userProtectedGetSSP<
   getServerSideProps?: GetServerSideProps<Props, Params, Preview>
 ): GetServerSideProps<Props, Params, Preview> {
   return async (ctx) => {
+    log('connecting to supabase', process.env.NEXT_PUBLIC_SUPABASE_URL)
     const supabase = createPagesServerClient<Database>(ctx)
 
     const {
