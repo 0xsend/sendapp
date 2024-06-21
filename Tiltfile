@@ -39,7 +39,7 @@ if not os.path.exists(".env.local"):
 
 if CFG.dockerize:
     # ensure host.docker.internal is resolvable
-    host_docker_rdy = str(local("nslookup host.docker.internal || true", echo_off = True, quiet = True)).strip()
+    host_docker_rdy = str(local("ping -c 1 host.docker.internal || true", echo_off = True, quiet = True)).strip()
     if host_docker_rdy.find("server can't find host.docker.interna") != -1:
         print(color.red("Could not resolve host.docker.internal domain.") + """
     
