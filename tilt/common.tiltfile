@@ -5,6 +5,8 @@ contract_files = files_matching(
     lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
 )
 
+DEBUG = os.getenv("DEBUG", "").find("tilt") != -1
+
 CI = os.getenv("CI") != None
 
 config.define_string_list(

@@ -33,18 +33,6 @@ local_resource(
     serve_dir = _prj_root,
 )
 
-if config.tilt_subcommand == "down":
-    local("""
-    bun run ../bin/reset-supabase.ts || true
-    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep otterscan-base | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep next-app | awk '{{print $1}}' | xargs -r docker rm -f
-    pkill anvil || true
-    """)
-    local("yarn clean || true")
-
 cmd_button(
     "supabase:db reset",
     argv = [
@@ -249,7 +237,7 @@ local_resource(
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
-        -p 127.0.0.1:3030:3030 \
+        -p 0.0.0.0:3030:3030 \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./apps/aabundler/etc:/app/etc/aabundler \
         -e "DEBUG={bundler_debug}" \

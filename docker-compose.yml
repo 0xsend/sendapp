@@ -37,8 +37,16 @@ services:
     secrets:
       - SUPABASE_DB_URL
       - SUPABASE_SERVICE_ROLE
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - supabase_network_send
 secrets:
   SUPABASE_DB_URL:
     file: ./var/SUPABASE_DB_URL.txt
   SUPABASE_SERVICE_ROLE:
     file: ./var/SUPABASE_SERVICE_ROLE.txt
+
+networks:
+  supabase_network_send:
+    external: true
