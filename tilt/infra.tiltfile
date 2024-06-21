@@ -105,6 +105,7 @@ local_resource(
         period_secs = 2,
         timeout_secs = 5,
     ),
+    resource_deps = _infra_resource_deps + ["supabase"],
     serve_cmd = [cmd for cmd in [
         "anvil",
         "--host=0.0.0.0",
@@ -133,7 +134,7 @@ local_resource(
         period_secs = 15,
         timeout_secs = 5,
     ),
-    resource_deps = _infra_resource_deps + ["anvil:mainnet"],
+    resource_deps = ["anvil:mainnet"],
     serve_cmd = """
     docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs -r docker rm -f
     docker run --rm \
@@ -162,7 +163,7 @@ local_resource(
         period_secs = 2,
         timeout_secs = 5,
     ),
-    resource_deps = _infra_resource_deps,
+    resource_deps = _infra_resource_deps + ["supabase"],
     serve_cmd = "yarn contracts dev:anvil-base-node",
     serve_dir = _prj_root,
 )
