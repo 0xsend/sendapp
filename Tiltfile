@@ -35,6 +35,9 @@ if not os.path.exists(".env.local"):
 
         # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
         local(sed + " -i 's/localhost/host.docker.internal/' .env.local")
+
+        # except NEXT_PUBLIC_URL
+        local(sed + " -i 's/host.docker.internal/localhost/' .env.local")
         print(color.green("📝 Dockerized .env.local"))
 
 if CFG.dockerize:
