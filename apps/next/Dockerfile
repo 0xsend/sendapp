@@ -76,7 +76,6 @@ RUN --mount=type=cache,target=/tmp/yarn-cache \
   --mount=type=cache,target=/tmp/turbo-cache \
   --mount=type=secret,id=SUPABASE_DB_URL \
   --mount=type=secret,id=SUPABASE_SERVICE_ROLE \
-  --mount=type=secret,id=NEXT_PUBLIC_SUPABASE_ANON_KEY \
   export SUPABASE_DB_URL="$(cat /run/secrets/SUPABASE_DB_URL)" \
   export SUPABASE_SERVICE_ROLE="$(cat /run/secrets/SUPABASE_SERVICE_ROLE)" \
   && yarn turbo build --cache-dir=/tmp/turbo-cache --filter=next-app
