@@ -138,7 +138,7 @@ test('can deposit USDC with web3 wallet', async ({
   })
   await wallet.authorize(Web3RequestKind.SendTransaction)
 
-  await expect(depositButton).not.toBeDisabled()
+  await expect(depositButton).not.toBeDisabled({ timeout: 10000 }) // wait for tx to be mined
   await expect(page.getByText(/View 0x[0-9a-f]{4}\.\.\.[0-9a-f]{3} on.+/i)).toBeVisible()
 
   expect(
