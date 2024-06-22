@@ -6,14 +6,6 @@ import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
 
-import { projectId, config as wagmiConfig } from 'app/provider/wagmi/config'
-import { createWeb3Modal } from '@web3modal/wagmi'
-
-createWeb3Modal({
-  wagmiConfig,
-  projectId,
-})
-
 export const Page: NextPageWithLayout = () => {
   return (
     <>
