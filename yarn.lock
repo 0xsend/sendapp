@@ -17,9 +17,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xbigboss/@0xbigboss/headless-web3-provider@npm:0.2.5":
+"@0xbigboss/headless-web3-provider@npm:0.2.5":
   version: 0.2.5
-  resolution: "@0xbigboss/@0xbigboss/headless-web3-provider@npm:0.2.5"
+  resolution: "@0xbigboss/headless-web3-provider@npm:0.2.5"
   dependencies:
     "@metamask/eth-sig-util": "npm:^6.0.0"
     "@metamask/json-rpc-engine": "npm:^8.0.1"
@@ -5640,7 +5640,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/playwright@workspace:packages/playwright"
   dependencies:
-    "@0xbigboss/@0xbigboss/headless-web3-provider": "npm:0.2.5"
+    "@0xbigboss/headless-web3-provider": "npm:0.2.5"
     "@0xsend/webauthn-authenticator": "workspace:*"
     "@biomejs/biome": "npm:^1.6.3"
     "@faker-js/faker": "npm:^8.1.0"
