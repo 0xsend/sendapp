@@ -48,8 +48,8 @@ jest.mock('app/routers/params', () => ({
   useRewardsScreenParams: () => [{ distributionNumber: 1 }, jest.fn()],
 }))
 jest.mock('wagmi')
-jest.mock('@rainbow-me/rainbowkit', () => ({
-  useConnectModal: jest.fn().mockReturnValue({ openConnectModal: jest.fn() }),
+jest.mock('@web3modal/wagmi/react', () => ({
+  useWeb3Modal: jest.fn().mockReturnValue({ open: jest.fn() }),
 }))
 jest.mock('@my/wagmi', () => ({
   __esModule: true,

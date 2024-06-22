@@ -5,8 +5,8 @@
 import { expect, test as sendAccountTest } from './fixtures/send-accounts'
 import { test as ethereumTest } from './fixtures/ethereum'
 import debug from 'debug'
-import { mergeTests, type Page } from '@playwright/test'
-import { Web3RequestKind } from 'headless-web3-provider'
+import { mergeTests } from '@playwright/test'
+import { Web3RequestKind } from '@0xbigboss/headless-web3-provider'
 import { assert } from 'app/utils/assert'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { testBaseClient, usdcAddress } from './fixtures/viem'
@@ -88,9 +88,9 @@ test('can deposit USDC with web3 wallet', async ({
   await depositButton.click()
   await page.getByRole('link', { name: 'Deposit with Web3 Wallet' }).click()
   await page.waitForURL('/deposit/web3')
-  await expect(page.getByTestId('rk-connect-header-label')).toBeVisible()
+  await expect(page.locator('w3m-modal')).toBeVisible()
 
-  await page.getByTestId('rk-wallet-option-injected').click()
+  await page.locator('w3m-connect-injected-widget').click()
 
   await expect
     .poll(
@@ -138,7 +138,7 @@ test('can deposit USDC with web3 wallet', async ({
   })
   await wallet.authorize(Web3RequestKind.SendTransaction)
 
-  await expect(depositButton).not.toBeDisabled()
+  await expect(depositButton).not.toBeDisabled({ timeout: 10000 }) // wait for tx to be mined
   await expect(page.getByText(/View 0x[0-9a-f]{4}\.\.\.[0-9a-f]{3} on.+/i)).toBeVisible()
 
   expect(
@@ -219,9 +219,9 @@ test('can deposit ETH with web3 wallet', async ({
   await depositButton.click()
   await page.getByRole('link', { name: 'Deposit with Web3 Wallet' }).click()
   await page.waitForURL('/deposit/web3')
-  await expect(page.getByTestId('rk-connect-header-label')).toBeVisible()
+  await expect(page.locator('w3m-modal')).toBeVisible()
 
-  await page.getByTestId('rk-wallet-option-injected').click()
+  await page.locator('w3m-connect-injected-widget').click()
 
   await expect
     .poll(
@@ -271,7 +271,7 @@ test('can deposit ETH with web3 wallet', async ({
   })
   await wallet.authorize(Web3RequestKind.SendTransaction)
 
-  await expect(depositButton).not.toBeDisabled()
+  await expect(depositButton).not.toBeDisabled({ timeout: 10000 }) // wait for tx to be mined
   await expect(page.getByText(/View 0x[0-9a-f]{4}\.\.\.[0-9a-f]{3} on.+/i)).toBeVisible()
 
   expect(
