@@ -11,6 +11,8 @@
     "native": "cd apps/expo && yarn start",
     "watch": "yarn workspaces foreach -pi run watch",
     "web": "yarn build && cd apps/next && yarn dev",
+    "web:docker:build": "GIT_HASH=$(git rev-parse --short=10 HEAD) docker compose --progress=plain build",
+    "web:docker:push": "GIT_HASH=$(git rev-parse --short=10 HEAD) docker compose push",
     "web:extract": "DISABLE_EXTRACTION=false yarn workspace next-app dev",
     "web:prod": "yarn workspace next-app build",
     "web:prod:serve": "yarn workspace next-app serve",
@@ -51,7 +53,7 @@
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
     "pierre": "^2.0.0-alpha.8",
-    "turbo": "^1.10.3",
+    "turbo": "^2.0.3",
     "typescript": "^5.3.3"
   },
   "packageManager": "yarn@4.0.2",

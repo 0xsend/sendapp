@@ -283,7 +283,7 @@ export const sendAccountRouter = createTRPCRouter({
           console.error('waitForTransactionReceipt failed', e)
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
-            message: e.message ?? 'Failed waiting for transaction receipt',
+            message: e.message ? e.message : 'Failed waiting for transaction receipt',
           })
         })
 

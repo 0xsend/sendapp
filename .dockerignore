@@ -1,22 +1,8 @@
-*
-!package.json
-!.yarnrc.yml
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-!yarn.lock
-!foundry.toml
-!remappings.txt
-!tsconfig.json
-!tsconfig.base.json
-!apps
-!packages
-!supabase/package.json
-!supabase/tsconfig.json
-!supabase/*.types.ts
 # may be redundant but last thing we want is large dockerfiles. from here on out, it mostly mirrors the .gitignore
+**/Tiltfile
+**/**.tiltfile
+**/**.Tiltfile
+**/*.tsbuildinfo
 **/dist
 **/node_modules
 **/out
@@ -24,10 +10,18 @@
 **/coverage
 **/.next
 **/.expo
-/build
+**/build
 **/test-results
 **/playwright-report
-.cache/
+**/.next
+**/.expo
+**/.auth
+**/.tamagui/*
+**/coverage
+**/.turbo
+**/.cache/
+**/out
+**/*.snap
 .auth/
 
 *.log*
@@ -65,6 +59,11 @@ tmp
 .parcel-cache
 
 # Foundry stuff
-cache/
-out/
-broadcast
+**/cache/
+**/out/
+**/var
+**/broadcast
+!**/broadcast/**/run-latest.json
+**/Dockerfile
+**/.dockerignore
+**/.tamagui
