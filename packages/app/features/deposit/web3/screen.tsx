@@ -398,6 +398,7 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: hack
   useEffect(() => {
     if (isWeb) {
+      // @ts-expect-error wagmi connector ensures this is there
       window.ethereum
         .request({ method: 'eth_chainId' })
         .then((cid) => setFailsafeChainId(Number(cid)))
