@@ -45,7 +45,6 @@ import { z } from 'zod'
 export function DepositWeb3Screen() {
   const { open: openConnectModal } = useWeb3Modal()
   const { isConnected, chainId, chain } = useAccount()
-  // const { openChainModal } = useChainModal()
 
   useEffect(() => {
     if (!isConnected) {
