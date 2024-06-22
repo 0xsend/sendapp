@@ -1,6 +1,7 @@
 {
   "name": "@my/playwright",
   "devDependencies": {
+    "@0xbigboss/@0xbigboss/headless-web3-provider": "0.2.5",
     "@0xsend/webauthn-authenticator": "workspace:*",
     "@biomejs/biome": "^1.6.3",
     "@faker-js/faker": "^8.1.0",
@@ -16,7 +17,6 @@
     "debug": "^4.3.4",
     "dotenv-cli": "^7.3.0",
     "extract-zip": "^2.0.1",
-    "headless-web3-provider": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "viem": "^2.13.7"
   },

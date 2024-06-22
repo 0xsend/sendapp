@@ -17,6 +17,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@0xbigboss/@0xbigboss/headless-web3-provider@npm:0.2.5":
+  version: 0.2.5
+  resolution: "@0xbigboss/@0xbigboss/headless-web3-provider@npm:0.2.5"
+  dependencies:
+    "@metamask/eth-sig-util": "npm:^6.0.0"
+    "@metamask/json-rpc-engine": "npm:^8.0.1"
+    ethers: "npm:^5.7.1"
+    rxjs: "npm:^7.5.7"
+  checksum: 8b82945635df1d8c7a52b91c1294b4eede33bdca4822a724e592567ce83f74c06447ad8c32aa3ccf93bae580154559d5e8c6605da2e2c5c87185a9bea5e0ec49
+  languageName: node
+  linkType: hard
+
 "@0xsend/webauthn-authenticator@workspace:*, @0xsend/webauthn-authenticator@workspace:packages/webauthn-authenticator":
   version: 0.0.0-use.local
   resolution: "@0xsend/webauthn-authenticator@workspace:packages/webauthn-authenticator"
@@ -5272,6 +5284,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metamask/json-rpc-engine@npm:^8.0.1":
+  version: 8.0.2
+  resolution: "@metamask/json-rpc-engine@npm:8.0.2"
+  dependencies:
+    "@metamask/rpc-errors": "npm:^6.2.1"
+    "@metamask/safe-event-emitter": "npm:^3.0.0"
+    "@metamask/utils": "npm:^8.3.0"
+  checksum: f088f4b648b9b55875b56e8237853e7282f13302a9db6a1f9bba06314dfd6cd0a23b3d27f8fde05a157b97ebb03b67bc2699ba455c99553dfb2ecccd73ab3474
+  languageName: node
+  linkType: hard
+
 "@metamask/json-rpc-middleware-stream@npm:^6.0.2":
   version: 6.0.2
   resolution: "@metamask/json-rpc-middleware-stream@npm:6.0.2"
@@ -5617,6 +5640,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@my/playwright@workspace:packages/playwright"
   dependencies:
+    "@0xbigboss/@0xbigboss/headless-web3-provider": "npm:0.2.5"
     "@0xsend/webauthn-authenticator": "workspace:*"
     "@biomejs/biome": "npm:^1.6.3"
     "@faker-js/faker": "npm:^8.1.0"
@@ -5632,7 +5656,6 @@ __metadata:
     debug: "npm:^4.3.4"
     dotenv-cli: "npm:^7.3.0"
     extract-zip: "npm:^2.0.1"
-    headless-web3-provider: "npm:^0.2.3"
     jsonwebtoken: "npm:^9.0.2"
     permissionless: "npm:^0.1.14"
     pg: "npm:^8.11.3"
@@ -19828,17 +19851,6 @@ __metadata:
     capital-case: "npm:^1.0.4"
     tslib: "npm:^2.0.3"
   checksum: 571c83eeb25e8130d172218712f807c0b96d62b020981400bccc1503a7cf14b09b8b10498a962d2739eccf231d950e3848ba7d420b58a6acd2f9283439546cd9
-  languageName: node
-  linkType: hard
-
-"headless-web3-provider@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "headless-web3-provider@npm:0.2.3"
-  dependencies:
-    "@metamask/eth-sig-util": "npm:^6.0.0"
-    ethers: "npm:^5.7.1"
-    rxjs: "npm:^7.5.7"
-  checksum: ba65be358d584907ca9fbf7c7315849b63b164664a310021f5c18635260f21294648bd6d0811d51880ec7d3aa5e05f768518d98769e61ab5dcc9b1a284ec2608
   languageName: node
   linkType: hard
 
