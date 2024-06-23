@@ -28,7 +28,7 @@ import { IconError, IconX } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { IconCoin } from '../icons/IconCoin'
-
+import { CheckCircle as IconCheckCircle } from '@tamagui/lucide-icons'
 export const CoinField = ({ native = false, ...props }: Pick<SelectProps, 'size' | 'native'>) => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -119,7 +119,14 @@ export const CoinField = ({ native = false, ...props }: Pick<SelectProps, 'size'
                   <Select.Group disabled={disabled} space="$0">
                     {/* <Select.Label>{label}</Select.Label> */}
                     {coins.map((coin, i) => {
-                      return <CoinFieldItem coin={coin} index={i} key={coin.token} />
+                      return (
+                        <CoinFieldItem
+                          active={coin.token === field.value}
+                          coin={coin}
+                          index={i}
+                          key={coin.token}
+                        />
+                      )
                     })}
                   </Select.Group>
                   {/* special icon treatment for native */}
@@ -149,9 +156,11 @@ export const CoinField = ({ native = false, ...props }: Pick<SelectProps, 'size'
 }
 
 const CoinFieldItem = ({
+  active,
   coin,
   index,
 }: {
+  active: boolean
   coin: coin
   index: number
 }) => {
@@ -176,6 +185,7 @@ const CoinFieldItem = ({
         >
           {coin.symbol}
         </Select.ItemText>
+        {active && <IconCheckCircle color={'$color12'} size={'$1.5'} />}
       </XStack>
       <XStack gap={'$3.5'} ai={'center'}>
         <TokenBalance balance={balance} />
