@@ -4,6 +4,7 @@ import {
   ButtonText,
   H4,
   Paragraph,
+  ScrollView,
   Spinner,
   Text,
   View,
@@ -54,7 +55,7 @@ function SearchResults() {
     return <Text mt="$4">No results for {query}... 😢</Text>
   }
   return (
-    <YStack
+    <ScrollView
       testID="searchResults"
       key="searchResults"
       animation="quick"
@@ -76,7 +77,7 @@ function SearchResults() {
           {SEARCH_RESULTS_KEYS.map((key) =>
             Array.isArray(results[key]) && results[key].length ? (
               <SearchFilterButton
-                key={key}
+                key={`filter-${key}`}
                 title={formatResultsKey(key)}
                 active={resultsFilter === key}
                 onPress={() => setResultsFilter(key as SearchResultsKeysType)}
@@ -89,7 +90,7 @@ function SearchResults() {
         Array.isArray(results[key]) &&
         results[key].length &&
         (!resultsFilter || resultsFilter === key) ? (
-          <YStack key={key} gap="$3.5">
+          <YStack key={`results-${key}`} gap="$3.5">
             <H4
               $theme-dark={{ color: '$lightGrayTextField' }}
               $theme-light={{ color: '$darkGrayTextField' }}
@@ -103,7 +104,7 @@ function SearchResults() {
             <XStack gap="$5" flexWrap="wrap">
               {results[key].map((item: SearchResultCommonType) => (
                 <SearchResultRow
-                  key={item.send_id}
+                  key={`${key}-${item.tag_name}-${item.send_id}`}
                   keyField={key as SearchResultsKeysType}
                   item={item}
                   query={query}
@@ -113,7 +114,7 @@ function SearchResults() {
           </YStack>
         ) : null
       )}
-    </YStack>
+    </ScrollView>
   )
 }
 
@@ -189,7 +190,7 @@ function SearchResultRow({
   return (
     <View
       br="$5"
-      key={item.send_id}
+      key={`SearchResultRow-${keyField}-${item.tag_name}-${item.send_id}`}
       width="100%"
       $gtLg={{
         width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
