@@ -68,7 +68,7 @@ export function SendAmountForm() {
     !balanceIsLoading &&
     balance?.value !== undefined &&
     sendParams.amount !== undefined &&
-    balance?.value > parsedAmount &&
+    balance?.value > parsedAmount && // @todo: ensure enough USDC for gas fees
     parsedAmount > BigInt(0)
 
   async function onSubmit() {
@@ -102,24 +102,28 @@ export function SendAmountForm() {
             '$theme-light': {
               bc: '$gray3Light',
             },
-            $sm: { bc: 'transparent', w: '100%', ta: 'center' },
+            $sm: {
+              bc: 'transparent',
+              w: '100%',
+              ta: 'center',
+            },
             color: '$color12',
             fontSize: 112,
             fontWeight: '400',
             lineHeight: '$1',
             autoFocus: true,
-            borderColor: 'transparent',
-            outlineColor: 'transparent',
             hoverStyle: {
               borderColor: 'transparent',
               outlineColor: 'transparent',
             },
             focusStyle: {
-              borderColor: 'transparent',
-              outlineColor: 'transparent',
+              borderColor: '$borderColorFocus',
             },
+            outlineColor: '$outlineColor',
+            outlineWidth: 1,
+            outlineStyle: 'solid',
             fontFamily: '$mono',
-            keyboardType: balance?.decimals ? 'decimal-pad' : 'numeric',
+            inputMode: balance?.decimals ? 'decimal' : 'numeric',
             onChangeText: (text) => {
               const formattedText = removeDuplicateInString(text, '.').replace(/[^0-9.]/g, '') //remove duplicate "." then filter out any letters
               form.setValue('amount', formattedText)
