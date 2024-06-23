@@ -106,7 +106,7 @@ function SearchResults() {
                 <SearchResultRow
                   key={`${key}-${item.tag_name}-${item.send_id}`}
                   keyField={key as SearchResultsKeysType}
-                  item={item}
+                  profile={item}
                   query={query}
                 />
               ))}
@@ -176,21 +176,21 @@ function SearchFilterButton({
 
 function SearchResultRow({
   keyField,
-  item,
+  profile,
   query,
 }: {
   keyField: SearchResultsKeysType
-  item: SearchResultCommonType
+  profile: SearchResultCommonType
   query: string
 }) {
-  const href = useSearchResultHref(item)
+  const href = useSearchResultHref(profile)
   const { resolvedTheme } = useThemeSetting()
   const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
 
   return (
     <View
       br="$5"
-      key={`SearchResultRow-${keyField}-${item.tag_name}-${item.send_id}`}
+      key={`SearchResultRow-${keyField}-${profile.tag_name}-${profile.send_id}`}
       width="100%"
       $gtLg={{
         width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
@@ -202,13 +202,13 @@ function SearchResultRow({
       }}
     >
       <Link href={href}>
-        <XStack testID={`tag-search-${item.send_id}`} ai="center" gap="$4">
+        <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
           <Avatar size="$4.5" br="$3">
-            <Avatar.Image src={item.avatar_url} />
+            <Avatar.Image src={profile.avatar_url} />
             <Avatar.Fallback>
               <Avatar size="$4.5" br="$3">
                 <Avatar.Image
-                  src={`https://ui-avatars.com/api.jpg?name=${item.tag_name}&size=256`}
+                  src={`https://ui-avatars.com/api.jpg?name=${profile.tag_name}&size=256`}
                 />
                 <Avatar.Fallback>
                   <Paragraph>??</Paragraph>
@@ -221,11 +221,11 @@ function SearchResultRow({
               text={(() => {
                 switch (keyField) {
                   case 'phone_matches':
-                    return item.phone
+                    return profile.phone
                   case 'tag_matches':
-                    return item.tag_name
+                    return profile.tag_name
                   case 'send_id_matches':
-                    return `#${item.send_id}`
+                    return `#${profile.send_id}`
                   default:
                     return ''
                 }
@@ -238,7 +238,7 @@ function SearchResultRow({
               $theme-light={{ color: '$darkGrayTextField' }}
               $gtSm={{ fontSize: '$2' }}
             >
-              {item.tag_name ? `@${item.tag_name}` : `#${item.send_id}`}
+              {profile.tag_name ? `@${profile.tag_name}` : `#${profile.send_id}`}
             </Text>
           </YStack>
         </XStack>

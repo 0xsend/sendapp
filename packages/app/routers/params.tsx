@@ -1,3 +1,4 @@
+import type { Enums } from '@my/supabase/database.types'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { createParam } from 'solito'
 
@@ -57,6 +58,7 @@ export const useRewardsScreenParams = () => {
 }
 
 export type SendScreenParams = {
+  idType?: Enums<'lookup_type_enum'>
   recipient?: string
   amount?: string
   sendToken?: `0x${string}` | 'eth'
@@ -64,6 +66,15 @@ export type SendScreenParams = {
 }
 
 const { useParam: useSendParam, useParams: useSendParams } = createParam<SendScreenParams>()
+
+const useIdType = () => {
+  const [idType, setIdTypeParam] = useSendParam('idType', {
+    initial: undefined,
+    parse: (value) => value as Enums<'lookup_type_enum'>,
+  })
+
+  return [idType, setIdTypeParam] as const
+}
 
 const useRecipient = () => {
   const [recipient, setRecipientParam] = useSendParam('recipient')
@@ -93,6 +104,7 @@ const useNote = () => {
 
 export const useSendScreenParams = () => {
   const { setParams } = useSendParams()
+  const [idType] = useIdType()
   const [recipient] = useRecipient()
   const [amount] = useAmount()
   const [sendToken] = useSendToken()
@@ -100,6 +112,7 @@ export const useSendScreenParams = () => {
 
   return [
     {
+      idType,
       recipient,
       amount,
       sendToken,

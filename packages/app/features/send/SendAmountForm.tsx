@@ -18,7 +18,6 @@ const removeDuplicateInString = (text: string, substring: string) => {
   return first + (after.length ? `${substring}${after.join('')}` : '')
 }
 
-// @todo add currency field
 const SendAmountSchema = z.object({
   amount: formFields.text,
   token: formFields.coin,
