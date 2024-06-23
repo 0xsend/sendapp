@@ -11,6 +11,7 @@ import {
   Avatar,
   ButtonText,
   ScrollView,
+  type YStackProps,
 } from '@my/ui'
 
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -65,12 +66,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const [queryParams] = useSendScreenParams()
 
   const router = useRouter()
-  const {
-    data: balance,
-    isLoading: balanceIsLoading,
-    error: balanceError,
-    refetch: balanceRefetch,
-  } = useBalance({
+  const { data: balance, isLoading: balanceIsLoading } = useBalance({
     address: sendAccount?.address,
     token: queryParams.sendToken === 'eth' ? undefined : queryParams.sendToken,
     query: { enabled: !!sendAccount },
@@ -94,10 +90,6 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     isPending: isTransferPending,
     error: transferError,
   } = useUserOpTransferMutation()
-
-  const sentTxLink = useLink({
-    href: `${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`,
-  })
 
   console.log('gasEstimate', gasEstimate)
   console.log('userOp', userOp)
@@ -145,63 +137,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     >
       <YStack gap="$10" width="100%" f={1} maw={784}>
         <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
-          <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }}>
-            <XStack jc="space-between" ai="center" gap="$3">
-              <Label
-                fontWeight="500"
-                fontSize={'$5'}
-                textTransform="uppercase"
-                $theme-dark={{ col: '$gray8Light' }}
-              >
-                TO
-              </Label>
-              <Button
-                bc="transparent"
-                chromeless
-                hoverStyle={{ bc: 'transparent' }}
-                pressStyle={{ bc: 'transparent' }}
-                focusStyle={{ bc: 'transparent' }}
-                onPress={() =>
-                  router.push({
-                    pathname: '/send',
-                    query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
-                  })
-                }
-              >
-                <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-              </Button>
-            </XStack>
-            <XStack
-              ai="center"
-              gap="$3"
-              bc="$metalTouch"
-              p="$2"
-              br="$3"
-              $theme-light={{ bc: '$gray3Light' }}
-              f={1}
-            >
-              <Avatar size="$4.5" br="$3">
-                <Avatar.Image src={profile?.avatar_url ?? ''} />
-                <Avatar.Fallback jc="center">
-                  <IconAccount size="$4.5" color="$olive" />
-                </Avatar.Fallback>
-              </Avatar>
-              <YStack gap="$1.5">
-                <Paragraph fontSize="$4" fontWeight="500" color="$color12">
-                  {profile?.name}
-                </Paragraph>
-                <Paragraph
-                  fontFamily="$mono"
-                  fontSize="$4"
-                  fontWeight="400"
-                  lineHeight="$1"
-                  color="$color11"
-                >
-                  {profile?.tag ? `@${profile?.tag}` : `#${profile?.id}`}
-                </Paragraph>
-              </YStack>
-            </XStack>
-          </YStack>
+          <SendRecipient $gtLg={{ maw: 350 }} />
 
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
             <XStack jc="space-between" ai="center" gap="$3">
@@ -324,6 +260,72 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
         )}
       </Stack>
     </Container>
+  )
+}
+
+export function SendRecipient(props: YStackProps) {
+  const [queryParams] = useSendScreenParams()
+  const { data: profile } = useProfileLookup('tag', queryParams.recipient ?? '')
+  const router = useRouter()
+
+  return (
+    <YStack gap="$2.5" f={1} {...props}>
+      <XStack jc="space-between" ai="center" gap="$3">
+        <Label
+          fontWeight="500"
+          fontSize={'$5'}
+          textTransform="uppercase"
+          $theme-dark={{ col: '$gray8Light' }}
+        >
+          TO
+        </Label>
+        <Button
+          bc="transparent"
+          chromeless
+          hoverStyle={{ bc: 'transparent' }}
+          pressStyle={{ bc: 'transparent' }}
+          focusStyle={{ bc: 'transparent' }}
+          onPress={() =>
+            router.push({
+              pathname: '/send',
+              query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
+            })
+          }
+        >
+          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
+        </Button>
+      </XStack>
+      <XStack
+        ai="center"
+        gap="$3"
+        bc="$metalTouch"
+        p="$2"
+        br="$3"
+        $theme-light={{ bc: '$gray3Light' }}
+        f={1}
+      >
+        <Avatar size="$4.5" br="$3">
+          <Avatar.Image src={profile?.avatar_url ?? ''} />
+          <Avatar.Fallback jc="center">
+            <IconAccount size="$4.5" color="$olive" />
+          </Avatar.Fallback>
+        </Avatar>
+        <YStack gap="$1.5">
+          <Paragraph fontSize="$4" fontWeight="500" color="$color12">
+            {profile?.name}
+          </Paragraph>
+          <Paragraph
+            fontFamily="$mono"
+            fontSize="$4"
+            fontWeight="400"
+            lineHeight="$1"
+            color="$color11"
+          >
+            {profile?.tag ? `@${profile?.tag}` : `#${profile?.id}`}
+          </Paragraph>
+        </YStack>
+      </XStack>
+    </YStack>
   )
 }
 

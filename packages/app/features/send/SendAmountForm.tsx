@@ -12,6 +12,7 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import { coins, type coin } from 'app/data/coins'
+import { SendRecipient } from './confirm/screen'
 
 const removeDuplicateInString = (text: string, substring: string) => {
   const [first, ...after] = text.split(substring)
@@ -156,6 +157,7 @@ export function SendAmountForm() {
       >
         {({ amount, token }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
+            <SendRecipient />
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack
