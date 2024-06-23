@@ -1,17 +1,16 @@
-import { Button, Paragraph, Spinner, SubmitButton, XStack, YStack, Stack } from '@my/ui'
-import { z } from 'zod'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { FormProvider, useForm } from 'react-hook-form'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { formatUnits, parseUnits } from 'viem'
+import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { useBalance } from 'wagmi'
-import formatAmount from 'app/utils/formatAmount'
-import { useSendScreenParams } from 'app/routers/params'
-
-import { useEffect } from 'react'
-import { useRouter } from 'solito/router'
 import { coins, type coin } from 'app/data/coins'
+import { useSendScreenParams } from 'app/routers/params'
+import { SchemaForm, formFields } from 'app/utils/SchemaForm'
+import formatAmount from 'app/utils/formatAmount'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useEffect } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { formatUnits, parseUnits } from 'viem'
+import { useBalance } from 'wagmi'
+import { z } from 'zod'
 import { SendRecipient } from './confirm/screen'
 
 const removeDuplicateInString = (text: string, substring: string) => {
@@ -39,7 +38,6 @@ export function SendAmountForm() {
     data: balance,
     isLoading: balanceIsLoading,
     error: balanceError,
-    refetch: balanceRefetch,
   } = useBalance({
     address: sendAccount?.address,
     token: (token === 'eth' ? undefined : token) as `0x${string}` | undefined,

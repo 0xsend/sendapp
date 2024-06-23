@@ -1,39 +1,36 @@
 import {
-  useToastController,
-  Paragraph,
+  Avatar,
+  Button,
+  ButtonText,
   Container,
+  Label,
+  Paragraph,
+  ScrollView,
   Spinner,
+  Stack,
   XStack,
   YStack,
-  Stack,
-  Button,
-  Label,
-  Avatar,
-  ButtonText,
-  ScrollView,
+  useToastController,
   type YStackProps,
 } from '@my/ui'
-
-import { useSendAccount } from 'app/utils/send-accounts'
-import { useAccountNonce } from 'app/utils/userop'
-import { assert } from 'app/utils/assert'
-
 import { baseMainnet } from '@my/wagmi'
-import { useBalance } from 'wagmi'
+import { IconAccount } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { coins } from 'app/data/coins'
 import { useSendScreenParams } from 'app/routers/params'
-import { useState } from 'react'
+import { assert } from 'app/utils/assert'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { type Hex, parseUnits, isAddress } from 'viem'
 import {
   useGenerateTransferUserOp,
   useUserOpGasEstimate,
   useUserOpTransferMutation,
 } from 'app/utils/useUserOpTransferMutation'
-import { useLink } from 'solito/link'
+import { useAccountNonce } from 'app/utils/userop'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { coins } from 'app/data/coins'
-import { IconAccount } from 'app/components/icons'
-import { IconCoin } from 'app/components/icons/IconCoin'
+import { isAddress, parseUnits, type Hex } from 'viem'
+import { useBalance } from 'wagmi'
 
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
@@ -42,20 +39,19 @@ export function SendConfirmScreen() {
   const { data: profile, isLoading, error } = useProfileLookup('tag', queryParams.recipient ?? '')
   const router = useRouter()
 
-  if (isLoading) return <Spinner size="large" />
+  useEffect(() => {
+    if (!profile || !queryParams.recipient)
+      router.replace({
+        pathname: '/send',
+        query: {
+          recipient: queryParams.recipient,
+          sendToken: queryParams.sendToken,
+          amount: queryParams.amount,
+        },
+      })
+  }, [profile, queryParams, router])
   if (error) throw new Error(error.message)
-  if (!profile) {
-    router.replace({
-      pathname: '/send',
-      query: {
-        recipient: queryParams.recipient,
-        sendToken: queryParams.sendToken,
-        amount: queryParams.amount,
-      },
-    })
-    return null
-  }
-
+  if (isLoading || !profile) return <Spinner size="large" />
   return <SendConfirm profile={profile} />
 }
 

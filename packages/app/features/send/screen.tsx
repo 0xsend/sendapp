@@ -1,9 +1,9 @@
 import { AnimatePresence, Container, H4, Spinner, Text, YStack } from '@my/ui'
+import Search from 'app/components/SearchBar'
+import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { SendAmountForm } from './SendAmountForm'
-import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
-import Search from 'app/components/SearchBar'
 
 export const SendScreen = () => {
   const [{ recipient }] = useSendScreenParams()
