@@ -204,7 +204,7 @@ function SearchResultRow({
       <Link href={href}>
         <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
           <Avatar size="$4.5" br="$3">
-            <Avatar.Image src={profile.avatar_url} />
+            <Avatar.Image testID="avatar" src={profile.avatar_url} />
             <Avatar.Fallback>
               <Avatar size="$4.5" br="$3">
                 <Avatar.Image
@@ -267,6 +267,7 @@ function Search() {
             schema={SearchSchema}
             props={{
               query: {
+                accessibilityRole: 'search',
                 placeholder: '$Sendtag, Phone, Send ID',
                 pr: '$size.3.5',
               },

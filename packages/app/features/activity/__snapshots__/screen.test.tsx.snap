@@ -93,6 +93,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
             }
           >
             <TextInput
+              accessibilityLabel="query"
+              accessibilityRole="search"
               control={
                 {
                   "_defaultValues": {

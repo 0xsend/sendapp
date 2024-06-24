@@ -57,6 +57,6 @@ describe('useSearchResultHref', () => {
   it('throws an error for unhandled paths', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/unhandled-path')
-    expect(() => useSearchResultHref(item)).toThrow('Unhandled path in `useSearchResultHref`')
+    expect(() => useSearchResultHref(item)).toThrow('Unhandled path: /unhandled-path')
   })
 })

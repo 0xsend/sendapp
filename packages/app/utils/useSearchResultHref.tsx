@@ -25,7 +25,7 @@ export const useSearchResultHref = (profile: SearchResultCommonType) => {
       }).toString()}`
     }
     default: {
-      throw new Error('Unhandled path in `useSearchResultHref`')
+      throw new Error(`Unhandled path: ${path}`)
     }
   }
 }

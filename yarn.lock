@@ -9606,9 +9606,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react-native@npm:^12.4.3":
-  version: 12.4.3
-  resolution: "@testing-library/react-native@npm:12.4.3"
+"@testing-library/react-native@npm:^12.5.1":
+  version: 12.5.1
+  resolution: "@testing-library/react-native@npm:12.5.1"
   dependencies:
     jest-matcher-utils: "npm:^29.7.0"
     pretty-format: "npm:^29.7.0"
@@ -9621,7 +9621,7 @@ __metadata:
   peerDependenciesMeta:
     jest:
       optional: true
-  checksum: f60b6158c63aa32470e6e40016c823917b7de3e8cc4aac8b7c906153a6edae40727092ae3e2750c468182ad84cb39ccb2329e8e03e13563c920f18b5485c754a
+  checksum: 451b8b7f794ccd56e4789e984896cd86f0be0ebf87c62a628b3ff151611e6e6ad339eb58047fa352201feabdd5915b21a72932eb83f207161eaa37742d457bcd
   languageName: node
   linkType: hard
 
@@ -12429,7 +12429,7 @@ __metadata:
     "@tamagui/themes": "npm:^1.93.2"
     "@tanstack/eslint-plugin-query": "npm:^5.20.1"
     "@tanstack/react-query": "npm:^5.18.1"
-    "@testing-library/react-native": "npm:^12.4.3"
+    "@testing-library/react-native": "npm:^12.5.1"
     "@trpc/client": "npm:11.0.0-next-beta.264"
     "@types/jsonwebtoken": "npm:^9.0.2"
     "@types/react": "npm:^18.2.15"
@@ -12463,7 +12463,7 @@ __metadata:
     react-native: "npm:0.73.6"
     react-native-safe-area-context: "npm:4.8.2"
     react-native-svg: "npm:14.1.0"
-    react-test-renderer: "npm:^18.2.0"
+    react-test-renderer: "npm:^18.3.1"
     solito: "npm:^4.0.1"
     superjson: "npm:^1.13.1"
     typescript: "npm:^5.3.3"
@@ -26715,6 +26715,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-is@npm:^18.3.1":
+  version: 18.3.1
+  resolution: "react-is@npm:18.3.1"
+  checksum: d5f60c87d285af24b1e1e7eaeb123ec256c3c8bdea7061ab3932e3e14685708221bf234ec50b21e10dd07f008f1b966a2730a0ce4ff67905b3872ff2042aec22
+  languageName: node
+  linkType: hard
+
 "react-native-clean-project@npm:^4.0.3":
   version: 4.0.3
   resolution: "react-native-clean-project@npm:4.0.3"
@@ -27041,7 +27048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-test-renderer@npm:18.2.0, react-test-renderer@npm:^18.2.0":
+"react-test-renderer@npm:18.2.0":
   version: 18.2.0
   resolution: "react-test-renderer@npm:18.2.0"
   dependencies:
@@ -27051,6 +27058,19 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
   checksum: 39473e43f64eec92da35db9d4411f3887b368038670787d49dd23172eb3a29953eb13767d1bfa34cbe2665b6e25632cad146e362e8910ce33755d343537763ae
+  languageName: node
+  linkType: hard
+
+"react-test-renderer@npm:^18.3.1":
+  version: 18.3.1
+  resolution: "react-test-renderer@npm:18.3.1"
+  dependencies:
+    react-is: "npm:^18.3.1"
+    react-shallow-renderer: "npm:^16.15.0"
+    scheduler: "npm:^0.23.2"
+  peerDependencies:
+    react: ^18.3.1
+  checksum: d53137315c677bdfba702a7179a69828233fc7635ae1e0c03b203923d643400ace72b343cb3dd3dafba8911c20bef53f55bff7aa2e4ddff3ccc423fdd9deeee2
   languageName: node
   linkType: hard
 
@@ -28001,6 +28021,15 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.1.0"
   checksum: 0c4557aa37bafca44ff21dc0ea7c92e2dbcb298bc62eae92b29a39b029134f02fb23917d6ebc8b1fa536b4184934314c20d8864d156a9f6357f3398aaf7bfda8
+  languageName: node
+  linkType: hard
+
+"scheduler@npm:^0.23.2":
+  version: 0.23.2
+  resolution: "scheduler@npm:0.23.2"
+  dependencies:
+    loose-envify: "npm:^1.1.0"
+  checksum: e8d68b89d18d5b028223edf090092846868a765a591944760942b77ea1f69b17235f7e956696efbb62c8130ab90af7e0949bfb8eba7896335507317236966bc9
   languageName: node
   linkType: hard
 
