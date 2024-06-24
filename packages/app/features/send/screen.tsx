@@ -73,20 +73,25 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
   const toast = useToastController()
   const [clicked, setClicked] = useState(false)
   return (
-    <YStack gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>
+    <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>
       <SendRecipient width={'100%'} profile={profile} />
       <H4 theme={'alt2'} color="$olive">
         No send account
       </H4>
-      <Anchor href={`/profile/${profile.sendid}`} textDecorationLine="none" color="$color12">
-        <Text fontWeight="bold" display="inline" color="$color12">
+      <Anchor
+        testID="NoSendAccountLink"
+        href={`/profile/${profile.sendid}`}
+        textDecorationLine="none"
+        color="$color12"
+      >
+        <Text fontWeight="bold" display="flex" color="$color12">
           {(() => {
             if (profile.tag) return `@${profile.tag}`
             if (profile.name) return profile.name
             return `#${profile.sendid}`
           })()}
         </Text>
-        <Text display="inline" color="$color12">
+        <Text display="flex" color="$color12">
           {' '}
           has no send account! Ask them to create one or write a /send Check.
         </Text>

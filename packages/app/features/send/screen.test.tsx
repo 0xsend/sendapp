@@ -14,13 +14,13 @@ jest.mock('solito', () => {
   const mockCreateParam = jest.fn(() => {
     // console.log('createParam in')
     return {
-      useParam: jest.fn((args) => {
-        // console.log('useParam', args)
+      useParam: jest.fn((name, opts) => {
+        // console.log('useParam', name, opts)
         return ['test', jest.fn()]
       }),
-      useParams: jest.fn((args) => {
-        // console.log('useParams', args)
-        return ['test', jest.fn()]
+      useParams: jest.fn((name, opts) => {
+        // console.log('useParams', name, opts)
+        return [name, jest.fn()]
       }),
     }
   })
@@ -57,9 +57,11 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
 }))
 
 import { SendScreen } from './screen'
+import { usePathname } from 'expo-router'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
 
 describe('SendScreen', () => {
-  it('should render with search', async () => {
+  it('should render with search when on /send and no recipient in params', async () => {
     jest.useFakeTimers()
 
     const tree = render(
@@ -96,6 +98,48 @@ describe('SendScreen', () => {
     expect(link).toBeOnTheScreen()
     expect(link.props.href).toBe(
       '/send?idType=tag&recipient=test&amount=test&sendToken=test&note=test'
+    )
+  })
+
+  it('should render /send check when no send account', async () => {
+    // @ts-expect-error mock
+    usePathname.mockReturnValue('/send?recipient=test&idType=tag')
+    // @ts-expect-error mock
+    useProfileLookup.mockReturnValue({
+      data: {
+        avatar_url: 'https://avatars.githubusercontent.com/u/123',
+        name: 'test',
+        about: 'test',
+        refcode: 'test',
+        tag: 'test',
+        address: null,
+        phone: 'test',
+        chain_id: 1,
+        is_public: true,
+        sendid: 1,
+        all_tags: ['test'],
+      },
+      isLoading: false,
+      error: null,
+    })
+
+    jest.useFakeTimers()
+    render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <SendScreen />
+      </TamaguiProvider>
+    )
+
+    await act(async () => {
+      jest.runAllTimers()
+      await waitFor(() => screen.getByText('Write /send Check'))
+    })
+
+    expect(screen.toJSON()).toMatchSnapshot('render')
+
+    // screen.debug('amount form')
+    expect(screen.getByTestId('NoSendAccountLink')).toHaveTextContent(
+      '@test has no send account! Ask them to create one or write a /send Check.'
     )
   })
 })
