@@ -1,3 +1,4 @@
+import type { Functions } from '@my/supabase/database.types'
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { coins, type coin } from 'app/data/coins'
@@ -23,13 +24,12 @@ const SendAmountSchema = z.object({
   token: formFields.coin,
 })
 
-export function SendAmountForm() {
+export function SendAmountForm({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const { data: sendAccount } = useSendAccount()
   const router = useRouter()
 
   const [sendParams, setSendParams] = useSendScreenParams()
-
   const token = form.watch('token')
 
   // need balance to check if user has enough to send
@@ -131,14 +131,17 @@ export function SendAmountForm() {
         formProps={{
           testID: 'SendForm',
           $gtSm: { maxWidth: '100%' },
-          jc: 'space-between',
+          jc: 'flex-start',
+          als: 'flex-start',
+          f: 1,
+          height: '100%',
         }}
         defaultValues={{
           token: sendParams.sendToken || usdcAddress[baseMainnet.id],
           amount: sendParams.amount,
         }}
         renderAfter={({ submit }) => (
-          <XStack $gtLg={{ ai: 'flex-end', ml: 'auto' }} jc="center" mt="auto">
+          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
             <SubmitButton
               theme="accent"
               onPress={submit}
@@ -149,12 +152,12 @@ export function SendAmountForm() {
             >
               <Button.Text>Continue</Button.Text>
             </SubmitButton>
-          </XStack>
+          </YStack>
         )}
       >
         {({ amount, token }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
-            <SendRecipient />
+            <SendRecipient profile={profile} />
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack

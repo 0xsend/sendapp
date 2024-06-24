@@ -2,7 +2,6 @@ import {
   Avatar,
   Button,
   ButtonText,
-  Container,
   Label,
   Paragraph,
   ScrollView,
@@ -10,7 +9,7 @@ import {
   Stack,
   XStack,
   YStack,
-  useToastController,
+  type ParagraphProps,
   type YStackProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
@@ -56,7 +55,6 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm({ profile }: { profile: ProfileProp }) {
-  const toast = useToastController()
   const { data: sendAccount } = useSendAccount()
   const [sentUserOpTxHash, setSentUserOpTxHash] = useState<Hex>()
   const [queryParams] = useSendScreenParams()
@@ -81,11 +79,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   })
 
   const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    error: transferError,
-  } = useUserOpTransferMutation()
+  const { mutateAsync: sendUserOp, isPending: isTransferPending } = useUserOpTransferMutation()
+  const [error, setError] = useState<Error>()
 
   console.log('gasEstimate', gasEstimate)
   console.log('userOp', userOp)
@@ -113,17 +108,17 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
       })
       assert(receipt.success, 'Failed to send user op')
       setSentUserOpTxHash(receipt.receipt.transactionHash)
-      toast.show(`Sent user op ${receipt.receipt.transactionHash}!`)
       router.replace({ pathname: '/', query: { token: queryParams.sendToken } })
     } catch (e) {
       console.error(e)
+      setError(e)
     }
   }
 
   if (balanceIsLoading) return <Spinner size="large" />
 
   return (
-    <Container
+    <YStack
       $gtLg={{ jc: 'flex-start', ai: 'flex-start' }}
       flexDirection="column"
       jc="center"
@@ -131,9 +126,9 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
       f={1}
       pb="$5"
     >
-      <YStack gap="$10" width="100%" f={1} maw={784}>
+      <YStack gap="$6" width="100%" f={1} maw={784}>
         <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
-          <SendRecipient $gtLg={{ maw: 350 }} profile={profile} />
+          <SendRecipient $gtLg={{ f: 1, maw: 350 }} profile={profile} />
 
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
             <XStack jc="space-between" ai="center" gap="$3">
@@ -222,16 +217,22 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
             fontFamily="$mono"
           />
         </YStack> */}
-      </YStack>
-      <Stack jc="flex-end" ai="center" $gtLg={{ ai: 'flex-end', ml: 'auto' }} mt="auto">
         <Button
           theme="accent"
           onPress={onSubmit}
-          px="$15"
           br={12}
           disabledStyle={{ opacity: 0.5 }}
           disabled={!canSubmit}
           gap={4}
+          mx="auto"
+          $gtXs={{
+            maw: 350,
+          }}
+          $gtLg={{
+            mr: '0',
+            ml: 'auto',
+          }}
+          width={'100%'}
         >
           {(() => {
             switch (true) {
@@ -251,11 +252,21 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
             }
           })()}
         </Button>
-        {transferError && (
-          <ErrorMessage error={`Error sending user op. ${transferError.message}`} />
+        {error && (
+          <ErrorMessage
+            mx="auto"
+            $gtXs={{
+              maw: 350,
+            }}
+            $gtLg={{
+              mr: '0',
+              ml: 'auto',
+            }}
+            error={(error as { details?: string }).details ?? error.message ?? 'Error sending'}
+          />
         )}
-      </Stack>
-    </Container>
+      </YStack>
+    </YStack>
   )
 }
 
@@ -325,12 +336,12 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
   )
 }
 
-function ErrorMessage({ error }: { error?: string }) {
+function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) {
   if (!error) return null
 
   return (
-    <ScrollView pos="absolute" $gtLg={{ top: '$-12' }} top="$-10" height="$4">
-      <Paragraph size="$1" w="$20" col={'$red500'} ta="center">
+    <ScrollView height="$4">
+      <Paragraph size="$2" maw="$20" width="100%" col={'$red500'} {...props}>
         {error.split('.').at(0)}
       </Paragraph>
     </ScrollView>

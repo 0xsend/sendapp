@@ -41,7 +41,7 @@ export const SendScreen = () => {
     return <NoSendAccount profile={profile} />
 
   return (
-    <SendAmountForm />
+    <SendAmountForm profile={profile} />
     // <Container $gtLg={{ jc: 'flex-start' }} flexDirection="column" jc="center" ai="center" f={1}>
     //   <SendAmountForm />
     // </Container>
