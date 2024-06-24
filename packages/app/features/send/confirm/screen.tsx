@@ -133,7 +133,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     >
       <YStack gap="$10" width="100%" f={1} maw={784}>
         <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
-          <SendRecipient $gtLg={{ maw: 350 }} />
+          <SendRecipient $gtLg={{ maw: 350 }} profile={profile} />
 
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
             <XStack jc="space-between" ai="center" gap="$3">
@@ -259,13 +259,13 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   )
 }
 
-export function SendRecipient(props: YStackProps) {
+export function SendRecipient({ profile, ...props }: YStackProps & { profile: ProfileProp }) {
   const [queryParams] = useSendScreenParams()
-  const { data: profile } = useProfileLookup('tag', queryParams.recipient ?? '')
+
   const router = useRouter()
 
   return (
-    <YStack gap="$2.5" f={1} {...props}>
+    <YStack gap="$2.5" {...props}>
       <XStack jc="space-between" ai="center" gap="$3">
         <Label
           fontWeight="500"
