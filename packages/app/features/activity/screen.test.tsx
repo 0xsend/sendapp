@@ -3,7 +3,7 @@ import { TamaguiProvider, View as MockView, config } from '@my/ui'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
-
+jest.unmock('app/provider/tag-search')
 jest.mock('app/utils/useSearchResultHref')
 
 jest.mock('app/features/activity/utils/useActivityFeed')

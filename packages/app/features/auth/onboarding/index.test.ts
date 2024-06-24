@@ -4,9 +4,13 @@ import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   baseMainnetBundlerClient as bundlerClient,
+  entryPointAddress,
+  iEntryPointAbi,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
+  sendVerifierAbi,
+  sendVerifierProxyAddress,
   tokenPaymasterAbi,
   tokenPaymasterAddress,
   usdcAddress,
@@ -40,11 +44,9 @@ import { base64urlnopad } from '@scure/base'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import {
   USEROP_VERSION,
-  entrypoint,
   generateChallenge,
   getSendAccountCreateArgs,
   testClient,
-  verifier,
 } from 'app/utils/userop'
 import nock from 'nock'
 import {
@@ -56,6 +58,14 @@ import {
 import { numberToBytes } from 'viem'
 
 jest.unmock('@my/wagmi')
+
+const sendVerifierAddress = sendVerifierProxyAddress[845337] // TODO: use chain id
+
+const verifier = getContract({
+  abi: sendVerifierAbi,
+  client: baseMainnetClient,
+  address: sendVerifierAddress,
+})
 
 const sendAccountFactory = getContract({
   address: sendAccountFactoryAddress[baseMainnetClient.chain.id],
@@ -240,6 +250,12 @@ async function createAccountAndVerifySignature() {
 
   return { userOp: _userOp, userOpHash }
 }
+
+const entrypoint = getContract({
+  abi: iEntryPointAbi,
+  address: entryPointAddress[baseMainnetClient.chain.id],
+  client: baseMainnetClient,
+})
 
 export async function generateUserOp(publicKey: [Hex, Hex]) {
   const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
