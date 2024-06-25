@@ -148,6 +148,62 @@ contract AccountSendUseropTest is BaseSepoliaForkTest, WebAuthnTest {
         entryPoint.handleOps(ops, payable(address(acc)));
     }
 
+    function testETHTransferOp() public {
+        P256KeyPair memory keyPair = demoP256KeyPair();
+        bytes32[2] memory key = [bytes32(keyPair.publicKeyX), bytes32(keyPair.publicKeyY)];
+        SendAccount.Call[] memory calls = new SendAccount.Call[](0);
+        SendAccount acc = factory.createAccount(0, key, calls, 42);
+        SendAccount acc1 = factory.createAccount(1, key, calls, 42);
+        // solhint-disable-next-line
+        console.log("new account address:", address(acc));
+        // solhint-disable-next-line
+        console.log("new account address:", address(acc1));
+        vm.deal(address(acc), 10 ether);
+
+        SendAccount.Call[] memory calls1 = new SendAccount.Call[](1);
+        calls1[0] = SendAccount.Call({dest: address(acc1), value: 1 ether, data: ""});
+
+        // dummy op
+        PackedUserOperation memory op = PackedUserOperation({
+            sender: address(acc),
+            nonce: 0,
+            initCode: hex"",
+            callData: abi.encodeCall(SendAccount.executeBatch, (calls1)),
+            // accountGasLimits = callGasLimit, verificationGasLimit
+            accountGasLimits: bytes32(abi.encodePacked(uint128(2000000), uint128(2000000))),
+            preVerificationGas: 2100000,
+            gasFees: bytes32(abi.encodePacked(uint128(3e11), uint128(1e11))), // maxFeePerGas, maxPriorityFeePerGas
+            paymasterAndData: hex"",
+            signature: hex"00"
+        });
+
+        bytes32 hash = entryPoint.getUserOpHash(op);
+        uint8 version = 1;
+        uint48 validUntil = 0;
+        bytes memory challenge = abi.encodePacked(version, validUntil, hash);
+        assertEq(challenge.length, 39);
+        (Signature memory sig,) = signP256(keyPair.privateKey, challenge);
+        bytes memory ownerSig = abi.encodePacked(
+            version,
+            validUntil,
+            uint8(0), // keySlot
+            abi.encode(sig) // signature
+        );
+
+        op.signature = ownerSig;
+
+        // expect a valid but reverting op
+        PackedUserOperation[] memory ops = new PackedUserOperation[](1);
+        ops[0] = op;
+        vm.recordLogs();
+        entryPoint.handleOps(ops, payable(address(acc)));
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+        assertEq(logs.length, 5);
+        assertEq(logs[2].topics[0], keccak256("Received(address,uint256)"));
+        assertEq(logs[2].topics[1], bytes32(uint256(uint160(address(acc)))));
+        assertEq(abi.decode(logs[2].data, (uint256)), 1 ether);
+    }
+
     function testSignP256() public {
         P256KeyPair memory keyPair = demoP256KeyPair();
         bytes32 digest = sha256(abi.encodePacked("hello world"));

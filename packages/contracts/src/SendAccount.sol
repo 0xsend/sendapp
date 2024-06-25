@@ -62,7 +62,9 @@ contract SendAccount is IAccount, UUPSUpgradeable, Initializable, IERC1271 {
 
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {
-        emit Received(msg.sender, msg.value);
+        if (msg.value > 0) {
+            emit Received(msg.sender, msg.value);
+        }
     }
 
     /// Runs at deploy time. Implementation contract = no init, no state.
