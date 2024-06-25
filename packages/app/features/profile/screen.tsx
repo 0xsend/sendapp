@@ -47,7 +47,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 onPress={() => {
                   router.push({
                     pathname: '/send',
-                    query: { recipient: profile.tag ?? profile.sendid },
+                    query: {
+                      recipient: profile.tag ?? profile.sendid,
+                      idType: profile.tag ? 'tag' : 'sendid',
+                    },
                   })
                 }}
                 theme="accent"

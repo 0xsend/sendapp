@@ -9,33 +9,13 @@ import { mergeTests } from '@playwright/test'
 import { Web3RequestKind } from '@0xbigboss/headless-web3-provider'
 import { assert } from 'app/utils/assert'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { testBaseClient, usdcAddress } from './fixtures/viem'
+import { testBaseClient, usdcAddress, lookupBalance } from './fixtures/viem'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { parseEther } from 'viem'
 
 const test = mergeTests(sendAccountTest, ethereumTest)
 
 let log: debug.Debugger
-
-const lookupBalance = async ({
-  address,
-  tokenAddress,
-}: { address: `0x${string}`; tokenAddress: `0x${string}` }) => {
-  return await testBaseClient.readContract({
-    address: tokenAddress,
-    abi: [
-      {
-        type: 'function',
-        name: 'balanceOf',
-        stateMutability: 'view',
-        inputs: [{ type: 'address' }],
-        outputs: [{ type: 'uint256' }],
-      },
-    ],
-    functionName: 'balanceOf',
-    args: [address],
-  })
-}
 
 test('can deposit USDC with web3 wallet', async ({
   page,
