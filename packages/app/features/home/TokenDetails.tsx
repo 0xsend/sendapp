@@ -1,7 +1,6 @@
 import {
   AnimatePresence,
   BigHeading,
-  H1,
   H4,
   Label,
   Paragraph,
@@ -194,19 +193,6 @@ const TokenDetailsBalance = ({
         </Paragraph>
       </Tooltip.Content>
     </Tooltip>
-  )
-}
-
-const TokenDetailsHistoryComingSoon = () => {
-  return (
-    <>
-      <Label fontSize="$7" fontWeight="500" color={'$color11'} textTransform={'uppercase'}>
-        HISTORY
-      </Label>
-      <H1 fontSize="$9" fontWeight="700" color={'$color12'}>
-        Coming Soon
-      </H1>
-    </>
   )
 }
 

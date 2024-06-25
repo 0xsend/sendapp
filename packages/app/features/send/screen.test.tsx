@@ -14,13 +14,13 @@ jest.mock('solito', () => {
   const mockCreateParam = jest.fn(() => {
     // console.log('createParam in')
     return {
-      useParam: jest.fn((name, opts) => {
+      useParam: jest.fn(() => {
         // console.log('useParam', name, opts)
         return ['test', jest.fn()]
       }),
-      useParams: jest.fn((name, opts) => {
+      useParams: jest.fn(() => {
         // console.log('useParams', name, opts)
-        return [name, jest.fn()]
+        return ['test', jest.fn()]
       }),
     }
   })
