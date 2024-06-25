@@ -37,6 +37,26 @@ const mockMyWagmi = {
   tokenPaymasterAddress: {
     845337: '0x5e421172B27658f2bD83BCBD13738ADdE00E7CA9',
   },
+  entryPointAddress: {
+    845337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
+  },
+  sendVerifierAbi: [
+    {
+      type: 'function',
+      inputs: [
+        { name: 'message', internalType: 'bytes', type: 'bytes' },
+        { name: 'signature', internalType: 'bytes', type: 'bytes' },
+        { name: 'x', internalType: 'uint256', type: 'uint256' },
+        { name: 'y', internalType: 'uint256', type: 'uint256' },
+      ],
+      name: 'verifySignature',
+      outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+      stateMutability: 'view',
+    },
+  ],
+  sendVerifierProxyAddress: {
+    845337: '0x6c38612d3f645711dd080711021fC1bA998a5628',
+  },
   useWriteErc20Transfer: jest.fn().mockReturnValue({
     data: '0x123',
     writeContract: jest.fn(),
@@ -51,4 +71,7 @@ export const baseMainnet = mockMyWagmi.baseMainnet
 export const usdcAddress = mockMyWagmi.usdcAddress
 export const sendTokenAddress = mockMyWagmi.sendTokenAddress
 export const tokenPaymasterAddress = mockMyWagmi.tokenPaymasterAddress
+export const entryPointAddress = mockMyWagmi.entryPointAddress
+export const sendVerifierAbi = mockMyWagmi.sendVerifierAbi
+export const sendVerifierProxyAddress = mockMyWagmi.sendVerifierProxyAddress
 export default mockMyWagmi

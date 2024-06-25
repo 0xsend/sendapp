@@ -6,6 +6,7 @@ import type { SearchResultCommonType } from 'app/components/SearchBar'
 import type { SendScreenParams } from 'app/routers/params'
 
 const sendParams: SendScreenParams = {
+  idType: 'tag',
   recipient: 'alice',
   amount: '0.01',
   sendToken: '0x123',
@@ -45,17 +46,17 @@ describe('useSearchResultHref', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/send')
     const href = useSearchResultHref(item)
-    expect(href).toBe('/send?recipient=alice&amount=0.01&sendToken=0x123')
+    expect(href).toBe('/send?idType=tag&recipient=alice&amount=0.01&sendToken=0x123')
   })
   it('should return the correct href for send screen when user does not have sendtag', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/send')
     const href = useSearchResultHref({ ...item, tag_name: '' })
-    expect(href).toBe('/send?recipient=12530&amount=0.01&sendToken=0x123')
+    expect(href).toBe('/send?idType=sendid&recipient=12530&amount=0.01&sendToken=0x123')
   })
   it('throws an error for unhandled paths', () => {
     // @ts-expect-error mock
     usePathname.mockReturnValue('/unhandled-path')
-    expect(() => useSearchResultHref(item)).toThrow('Unhandled path in `useSearchResultHref`')
+    expect(() => useSearchResultHref(item)).toThrow('Unhandled path: /unhandled-path')
   })
 })

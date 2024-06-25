@@ -1,38 +1,42 @@
 import {
-  useToastController,
+  Avatar,
+  Button,
+  ButtonText,
+  Label,
   Paragraph,
-  Container,
+  ScrollView,
   Spinner,
+  Stack,
   XStack,
   YStack,
-  Stack,
-  Button,
-  Label,
-  Avatar,
-  ButtonText,
-  ScrollView,
+  type ParagraphProps,
+  type YStackProps,
 } from '@my/ui'
-
-import { useSendAccount } from 'app/utils/send-accounts'
-import { useAccountNonce } from 'app/utils/userop'
-import { assert } from 'app/utils/assert'
-
 import { baseMainnet } from '@my/wagmi'
-import { useBalance } from 'wagmi'
+import { IconAccount } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { coins } from 'app/data/coins'
+import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { useSendScreenParams } from 'app/routers/params'
-import { useState } from 'react'
+import { assert } from 'app/utils/assert'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { type Hex, parseUnits, isAddress } from 'viem'
 import {
   useGenerateTransferUserOp,
   useUserOpGasEstimate,
   useUserOpTransferMutation,
 } from 'app/utils/useUserOpTransferMutation'
-import { useLink } from 'solito/link'
+import { useAccountNonce } from 'app/utils/userop'
+import {
+  isSendAccountReceiveEvent,
+  isSendAccountTransfersEvent,
+  type Activity,
+} from 'app/utils/zod/activity'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { coins } from 'app/data/coins'
-import { IconAccount } from 'app/components/icons'
-import { IconCoin } from 'app/components/icons/IconCoin'
+import { isAddress, parseUnits, type Hex } from 'viem'
+import { useBalance } from 'wagmi'
 
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
@@ -41,38 +45,32 @@ export function SendConfirmScreen() {
   const { data: profile, isLoading, error } = useProfileLookup('tag', queryParams.recipient ?? '')
   const router = useRouter()
 
-  if (isLoading) return <Spinner size="large" />
+  useEffect(() => {
+    if (!profile || !queryParams.recipient)
+      router.replace({
+        pathname: '/send',
+        query: {
+          recipient: queryParams.recipient,
+          sendToken: queryParams.sendToken,
+          amount: queryParams.amount,
+        },
+      })
+  }, [profile, queryParams, router])
   if (error) throw new Error(error.message)
-  if (!profile) {
-    router.replace({
-      pathname: '/send',
-      query: {
-        recipient: queryParams.recipient,
-        sendToken: queryParams.sendToken,
-        amount: queryParams.amount,
-      },
-    })
-    return null
-  }
-
+  if (isLoading || !profile) return <Spinner size="large" />
   return <SendConfirm profile={profile} />
 }
 
 export function SendConfirm({ profile }: { profile: ProfileProp }) {
-  const toast = useToastController()
   const { data: sendAccount } = useSendAccount()
-  const [sentUserOpTxHash, setSentUserOpTxHash] = useState<Hex>()
+  const [sentTxHash, setSentTxHash] = useState<Hex>()
   const [queryParams] = useSendScreenParams()
+  const { sendToken } = queryParams
 
   const router = useRouter()
-  const {
-    data: balance,
-    isLoading: balanceIsLoading,
-    error: balanceError,
-    refetch: balanceRefetch,
-  } = useBalance({
+  const { data: balance, isLoading: balanceIsLoading } = useBalance({
     address: sendAccount?.address,
-    token: queryParams.sendToken === 'eth' ? undefined : queryParams.sendToken,
+    token: sendToken === 'eth' ? undefined : sendToken,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
@@ -83,21 +81,25 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     sender: sendAccount?.address,
     // @ts-expect-error some work to do here
     to: profile?.address,
-    token: queryParams.sendToken === 'eth' ? undefined : queryParams.sendToken,
+    token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(amount),
     nonce: nonce ?? 0n,
   })
 
   const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    error: transferError,
-  } = useUserOpTransferMutation()
+  const { mutateAsync: sendUserOp, isPending: isTransferPending } = useUserOpTransferMutation()
+  const [error, setError] = useState<Error>()
 
-  const sentTxLink = useLink({
-    href: `${baseMainnet.blockExplorers.default.url}/tx/${sentUserOpTxHash}`,
+  const {
+    data: transfers,
+    error: tokenActivityError,
+    dataUpdatedAt,
+  } = useTokenActivityFeed({
+    address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
+    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
+    enabled: !!sentTxHash,
   })
+  const [dataFirstFetch, setDataFirstFetch] = useState<number>()
 
   console.log('gasEstimate', gasEstimate)
   console.log('userOp', userOp)
@@ -106,8 +108,9 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
 
   const canSubmit =
     Number(queryParams.amount) > 0 &&
-    coins.some((coin) => coin.token === queryParams.sendToken) &&
-    (balance?.value ?? BigInt(0) >= amount)
+    coins.some((coin) => coin.token === sendToken) &&
+    (balance?.value ?? BigInt(0) >= amount) &&
+    !sentTxHash
 
   async function onSubmit() {
     try {
@@ -124,18 +127,47 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
         userOp,
       })
       assert(receipt.success, 'Failed to send user op')
-      setSentUserOpTxHash(receipt.receipt.transactionHash)
-      toast.show(`Sent user op ${receipt.receipt.transactionHash}!`)
-      router.replace({ pathname: '/', query: { token: queryParams.sendToken } })
+      setSentTxHash(receipt.receipt.transactionHash)
     } catch (e) {
       console.error(e)
+      setError(e)
     }
   }
+
+  useEffect(() => {
+    if (!dataFirstFetch && dataUpdatedAt) {
+      setDataFirstFetch(dataUpdatedAt)
+    }
+    if (!dataFirstFetch) return
+    if (!dataUpdatedAt) return
+    const hasBeenLongEnough = dataUpdatedAt - dataFirstFetch > 5_000
+    if (sentTxHash) {
+      const tfr = transfers?.pages.some((page) =>
+        page.some((activity: Activity) => {
+          if (isSendAccountTransfersEvent(activity)) {
+            return activity.data.tx_hash === sentTxHash
+          }
+          if (isSendAccountReceiveEvent(activity)) {
+            return activity.data.tx_hash === sentTxHash
+          }
+          return false
+        })
+      )
+
+      if (tokenActivityError) {
+        console.error(tokenActivityError)
+      }
+      // found the transfer or we waited 5 seconds or we got an error 😢
+      if (tfr || tokenActivityError || hasBeenLongEnough) {
+        router.replace({ pathname: '/', query: { token: sendToken } })
+      }
+    }
+  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
 
   if (balanceIsLoading) return <Spinner size="large" />
 
   return (
-    <Container
+    <YStack
       $gtLg={{ jc: 'flex-start', ai: 'flex-start' }}
       flexDirection="column"
       jc="center"
@@ -143,65 +175,17 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
       f={1}
       pb="$5"
     >
-      <YStack gap="$10" width="100%" f={1} maw={784}>
+      <YStack
+        gap="$6"
+        width="100%"
+        f={1}
+        maw={784}
+        $sm={{
+          jc: 'space-between',
+        }}
+      >
         <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
-          <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }}>
-            <XStack jc="space-between" ai="center" gap="$3">
-              <Label
-                fontWeight="500"
-                fontSize={'$5'}
-                textTransform="uppercase"
-                $theme-dark={{ col: '$gray8Light' }}
-              >
-                TO
-              </Label>
-              <Button
-                bc="transparent"
-                chromeless
-                hoverStyle={{ bc: 'transparent' }}
-                pressStyle={{ bc: 'transparent' }}
-                focusStyle={{ bc: 'transparent' }}
-                onPress={() =>
-                  router.push({
-                    pathname: '/send',
-                    query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
-                  })
-                }
-              >
-                <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-              </Button>
-            </XStack>
-            <XStack
-              ai="center"
-              gap="$3"
-              bc="$metalTouch"
-              p="$2"
-              br="$3"
-              $theme-light={{ bc: '$gray3Light' }}
-              f={1}
-            >
-              <Avatar size="$4.5" br="$3">
-                <Avatar.Image src={profile?.avatar_url ?? ''} />
-                <Avatar.Fallback jc="center">
-                  <IconAccount size="$4.5" color="$olive" />
-                </Avatar.Fallback>
-              </Avatar>
-              <YStack gap="$1.5">
-                <Paragraph fontSize="$4" fontWeight="500" color="$color12">
-                  {profile?.name}
-                </Paragraph>
-                <Paragraph
-                  fontFamily="$mono"
-                  fontSize="$4"
-                  fontWeight="400"
-                  lineHeight="$1"
-                  color="$color11"
-                >
-                  {profile?.tag ? `@${profile?.tag}` : `#${profile?.id}`}
-                </Paragraph>
-              </YStack>
-            </XStack>
-          </YStack>
+          <SendRecipient $gtLg={{ f: 1, maw: 350 }} profile={profile} />
 
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
             <XStack jc="space-between" ai="center" gap="$3">
@@ -290,16 +274,22 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
             fontFamily="$mono"
           />
         </YStack> */}
-      </YStack>
-      <Stack jc="flex-end" ai="center" $gtLg={{ ai: 'flex-end', ml: 'auto' }} mt="auto">
         <Button
           theme="accent"
           onPress={onSubmit}
-          px="$15"
           br={12}
           disabledStyle={{ opacity: 0.5 }}
           disabled={!canSubmit}
           gap={4}
+          mx="auto"
+          $gtXs={{
+            maw: 350,
+          }}
+          $gtLg={{
+            mr: '0',
+            ml: 'auto',
+          }}
+          width={'100%'}
         >
           {(() => {
             switch (true) {
@@ -312,27 +302,117 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                     <Button.Text>Sending...</Button.Text>
                   </>
                 )
-              case sentUserOpTxHash !== undefined:
-                return null
+              case sentTxHash !== undefined:
+                return (
+                  <>
+                    <Button.Icon>
+                      <Spinner size="small" color="$color" />
+                    </Button.Icon>
+                    <Button.Text>Confirming...</Button.Text>
+                  </>
+                )
               default:
                 return <Button.Text>/SEND</Button.Text>
             }
           })()}
         </Button>
-        {transferError && (
-          <ErrorMessage error={`Error sending user op. ${transferError.message}`} />
+        {error && (
+          <ErrorMessage
+            mx="auto"
+            $gtXs={{
+              maw: 350,
+            }}
+            $gtLg={{
+              mr: '0',
+              ml: 'auto',
+            }}
+            error={(error as { details?: string }).details ?? error.message ?? 'Error sending'}
+          />
         )}
-      </Stack>
-    </Container>
+      </YStack>
+    </YStack>
   )
 }
 
-function ErrorMessage({ error }: { error?: string }) {
+export function SendRecipient({ profile, ...props }: YStackProps & { profile: ProfileProp }) {
+  const [queryParams] = useSendScreenParams()
+
+  const router = useRouter()
+
+  return (
+    <YStack gap="$2.5" {...props}>
+      <XStack jc="space-between" ai="center" gap="$3">
+        <Label
+          fontWeight="500"
+          fontSize={'$5'}
+          textTransform="uppercase"
+          $theme-dark={{ col: '$gray8Light' }}
+        >
+          TO
+        </Label>
+        <Button
+          bc="transparent"
+          chromeless
+          hoverStyle={{ bc: 'transparent' }}
+          pressStyle={{ bc: 'transparent' }}
+          focusStyle={{ bc: 'transparent' }}
+          onPress={() =>
+            router.push({
+              pathname: '/send',
+              query: { sendToken: queryParams.sendToken, amount: queryParams.amount },
+            })
+          }
+        >
+          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
+        </Button>
+      </XStack>
+      <XStack
+        ai="center"
+        gap="$3"
+        bc="$metalTouch"
+        p="$2"
+        br="$3"
+        $theme-light={{ bc: '$gray3Light' }}
+        f={1}
+      >
+        <Avatar size="$4.5" br="$3">
+          <Avatar.Image src={profile?.avatar_url ?? ''} />
+          <Avatar.Fallback jc="center">
+            <IconAccount size="$4.5" color="$olive" />
+          </Avatar.Fallback>
+        </Avatar>
+        <YStack gap="$1.5">
+          <Paragraph fontSize="$4" fontWeight="500" color="$color12">
+            {profile?.name}
+          </Paragraph>
+          <Paragraph
+            fontFamily="$mono"
+            fontSize="$4"
+            fontWeight="400"
+            lineHeight="$1"
+            color="$color11"
+          >
+            {profile?.tag ? `@${profile?.tag}` : `#${profile?.id}`}
+          </Paragraph>
+        </YStack>
+      </XStack>
+    </YStack>
+  )
+}
+
+function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) {
   if (!error) return null
 
   return (
-    <ScrollView pos="absolute" $gtLg={{ top: '$-12' }} top="$-10" height="$4">
-      <Paragraph size="$1" w="$20" col={'$red500'} ta="center">
+    <ScrollView height="$4">
+      <Paragraph
+        testID="SendConfirmError"
+        size="$2"
+        maw="$20"
+        width="100%"
+        col={'$red500'}
+        {...props}
+      >
         {error.split('.').at(0)}
       </Paragraph>
     </ScrollView>

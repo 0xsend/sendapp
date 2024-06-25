@@ -26,7 +26,12 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
   await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
-  await page.waitForURL(`/send?recipient=${tag.name}`)
+  await page.waitForURL(/\/send/)
+  let url = new URL(page.url())
+  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+    recipient: tag.name,
+    idType: 'tag',
+  })
   await expect(page.getByText('Enter Amount')).toBeVisible()
 
   // visit another user but without a sendtag
@@ -42,8 +47,12 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   await expect(profilePage2.sendButton).toBeVisible()
   await expect(profilePage2.requestButton).toBeVisible()
   await profilePage2.sendButton.click()
-  // fix sending to send IDs
-  // await page.waitForURL(`/account/send?recipient=${profile2.sendId}`)
+  await page.waitForURL(/\/send/)
+  url = new URL(page.url())
+  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+    recipient: profile2?.sendId.toString(),
+    idType: 'sendid',
+  })
   await expect(page.getByText('Enter Amount')).toBeVisible()
 
   // can visit profile withouth the @ prefix

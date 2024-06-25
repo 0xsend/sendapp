@@ -20,8 +20,10 @@ import type { ZodError } from 'zod'
 export function useTokenActivityFeed(params: {
   pageSize?: number
   address?: PgBytea
+  refetchInterval?: number
+  enabled?: boolean
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
-  const { pageSize = 10, address } = params
+  const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
 
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
@@ -57,5 +59,7 @@ export function useTokenActivityFeed(params: {
       return firstPageParam - 1
     },
     queryFn: fetchTokenActivityFeed,
+    refetchInterval,
+    enabled,
   })
 }

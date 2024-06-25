@@ -1,6 +1,7 @@
 import {
   baseMainnet,
   baseMainnetClient,
+  entryPointAddress,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
@@ -14,7 +15,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
-import { USEROP_SALT, entrypoint, getSendAccountCreateArgs } from 'app/utils/userop'
+import { USEROP_SALT, getSendAccountCreateArgs } from 'app/utils/userop'
 import debug from 'debug'
 import PQueue from 'p-queue'
 import { getSenderAddress } from 'permissionless'
@@ -91,6 +92,7 @@ export const sendAccountRouter = createTRPCRouter({
 
         const xyPubKey = COSEECDHAtoXY(base16.decode(cosePublicKeyB16))
         const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]
+        const entryPoint = entryPointAddress[baseMainnetClient.chain.id]
         const factoryData = encodeFunctionData({
           abi: [getAbiItem({ abi: sendAccountFactoryAbi, name: 'createAccount' })],
           args: getSendAccountCreateArgs(xyPubKey),
@@ -99,7 +101,7 @@ export const sendAccountRouter = createTRPCRouter({
         const senderAddress = await getSenderAddress(baseMainnetClient, {
           factory,
           factoryData,
-          entryPoint: entrypoint.address,
+          entryPoint,
         })
         const raw_credential_id = `\\x${rawCredentialIDB16}`
         const public_key = `\\x${cosePublicKeyB16}`

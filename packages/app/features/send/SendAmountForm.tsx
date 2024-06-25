@@ -1,36 +1,35 @@
-import { Button, Paragraph, Spinner, SubmitButton, XStack, YStack, Stack } from '@my/ui'
-import { z } from 'zod'
-import { SchemaForm, formFields } from 'app/utils/SchemaForm'
-import { FormProvider, useForm } from 'react-hook-form'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { formatUnits, parseUnits } from 'viem'
+import type { Functions } from '@my/supabase/database.types'
+import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { useBalance } from 'wagmi'
-import formatAmount from 'app/utils/formatAmount'
-import { useSendScreenParams } from 'app/routers/params'
-
-import { useEffect } from 'react'
-import { useRouter } from 'solito/router'
 import { coins, type coin } from 'app/data/coins'
+import { useSendScreenParams } from 'app/routers/params'
+import { SchemaForm, formFields } from 'app/utils/SchemaForm'
+import formatAmount from 'app/utils/formatAmount'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useEffect } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
+import { formatUnits, parseUnits } from 'viem'
+import { useBalance } from 'wagmi'
+import { z } from 'zod'
+import { SendRecipient } from './confirm/screen'
 
 const removeDuplicateInString = (text: string, substring: string) => {
   const [first, ...after] = text.split(substring)
   return first + (after.length ? `${substring}${after.join('')}` : '')
 }
 
-// @todo add currency field
 const SendAmountSchema = z.object({
   amount: formFields.text,
   token: formFields.coin,
 })
 
-export function SendAmountForm() {
+export function SendAmountForm({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const { data: sendAccount } = useSendAccount()
   const router = useRouter()
 
   const [sendParams, setSendParams] = useSendScreenParams()
-
   const token = form.watch('token')
 
   // need balance to check if user has enough to send
@@ -38,7 +37,6 @@ export function SendAmountForm() {
     data: balance,
     isLoading: balanceIsLoading,
     error: balanceError,
-    refetch: balanceRefetch,
   } = useBalance({
     address: sendAccount?.address,
     token: (token === 'eth' ? undefined : token) as `0x${string}` | undefined,
@@ -68,7 +66,7 @@ export function SendAmountForm() {
     !balanceIsLoading &&
     balance?.value !== undefined &&
     sendParams.amount !== undefined &&
-    balance?.value > parsedAmount &&
+    balance?.value > parsedAmount && // @todo: ensure enough USDC for gas fees
     parsedAmount > BigInt(0)
 
   async function onSubmit() {
@@ -102,24 +100,28 @@ export function SendAmountForm() {
             '$theme-light': {
               bc: '$gray3Light',
             },
-            $sm: { bc: 'transparent', w: '100%', ta: 'center' },
+            $sm: {
+              bc: 'transparent',
+              w: '100%',
+              ta: 'center',
+            },
             color: '$color12',
             fontSize: 112,
             fontWeight: '400',
             lineHeight: '$1',
             autoFocus: true,
-            borderColor: 'transparent',
-            outlineColor: 'transparent',
             hoverStyle: {
               borderColor: 'transparent',
               outlineColor: 'transparent',
             },
             focusStyle: {
-              borderColor: 'transparent',
-              outlineColor: 'transparent',
+              borderColor: '$borderColorFocus',
             },
+            outlineColor: '$outlineColor',
+            outlineWidth: 1,
+            outlineStyle: 'solid',
             fontFamily: '$mono',
-            keyboardType: balance?.decimals ? 'decimal-pad' : 'numeric',
+            inputMode: balance?.decimals ? 'decimal' : 'numeric',
             onChangeText: (text) => {
               const formattedText = removeDuplicateInString(text, '.').replace(/[^0-9.]/g, '') //remove duplicate "." then filter out any letters
               form.setValue('amount', formattedText)
@@ -129,14 +131,17 @@ export function SendAmountForm() {
         formProps={{
           testID: 'SendForm',
           $gtSm: { maxWidth: '100%' },
-          jc: 'space-between',
+          jc: 'flex-start',
+          als: 'flex-start',
+          f: 1,
+          height: '100%',
         }}
         defaultValues={{
           token: sendParams.sendToken || usdcAddress[baseMainnet.id],
           amount: sendParams.amount,
         }}
         renderAfter={({ submit }) => (
-          <XStack $gtLg={{ ai: 'flex-end', ml: 'auto' }} jc="center" mt="auto">
+          <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
             <SubmitButton
               theme="accent"
               onPress={submit}
@@ -147,11 +152,12 @@ export function SendAmountForm() {
             >
               <Button.Text>Continue</Button.Text>
             </SubmitButton>
-          </XStack>
+          </YStack>
         )}
       >
         {({ amount, token }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
+            <SendRecipient profile={profile} />
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack

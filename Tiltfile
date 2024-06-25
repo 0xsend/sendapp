@@ -90,6 +90,7 @@ next_app_resource_deps = [
     "ui:generate-theme",
     "daimo-expo-passkeys:build",
     "anvil:fixtures",
+    "shovel",
 ] + ([
     "aa_bundler:base",
 ] if not CI else [])
@@ -129,6 +130,7 @@ if CFG.dockerize:
             "supabase",
             "anvil:fixtures",
             "aa_bundler:base",
+            "shovel",
         ],
     )
 else:

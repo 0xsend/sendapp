@@ -22,7 +22,7 @@ import {
   type CallExecutionError,
 } from 'viem'
 import { assert } from './assert'
-import { entrypoint, signUserOp } from './userop'
+import { signUserOp } from './userop'
 
 // default user op with preset gas values that work
 // will probably need to move this to the database
@@ -124,7 +124,7 @@ export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'
 
       const requiredPreFund = getRequiredPrefund({
         userOperation: userOp,
-        entryPoint: entrypoint.address,
+        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
       })
       // calculate the required usdc balance
       const [priceMarkup, , refundPostopCost, , baseFee] = await baseMainnetClient.readContract({

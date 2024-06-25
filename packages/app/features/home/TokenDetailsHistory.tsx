@@ -1,6 +1,5 @@
 import { Button, Paragraph, Spinner, YStack } from '@my/ui'
 import type { coins } from 'app/data/coins'
-import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { Fragment } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
