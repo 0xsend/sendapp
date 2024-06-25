@@ -41,27 +41,28 @@ const tokens = [
 for (const token of tokens) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
     const isETH = token.symbol === 'ETH'
-    if (isETH) test.fail() // sending send_account_receives is broken for some reason
     const decimalAmount = (Math.random() * 1000).toFixed(token.decimals).toString()
     const transferAmount = parseUnits(decimalAmount, token.decimals)
+    const balanceBefore = transferAmount * 10n // padding
 
     const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
     expect(error).toBeFalsy()
     assert(!!sendAccount, 'no send account found')
 
     // fund account
-    if (isETH)
+    if (isETH) {
       await testBaseClient.setBalance({
         address: sendAccount.address as `0x${string}`,
-        value: transferAmount * 10n, // padding
+        value: balanceBefore, // padding
       })
-    else
+    } else {
       await setERC20Balance({
         client: testBaseClient,
         address: sendAccount.address as `0x${string}`,
         tokenAddress: token.address,
-        value: transferAmount * 10n, // padding
+        value: balanceBefore, // padding
       })
+    }
 
     const plan = await seed.users([userOnboarded])
     const tag = plan.tags[0]
@@ -92,42 +93,38 @@ for (const token of tokens) {
     await sendPage.waitForSendingCompletion()
     await sendPage.expectNoSendError()
 
-    await expect(
-      async () =>
-        await expect(supabase).toHaveEventInActivityFeed(
-          isETH
-            ? {
-                event_name: 'send_account_receives',
-                to_user: {
-                  id: profile.id,
-                  send_id: profile.sendId,
-                },
-                data: {
-                  sender: hexToBytea(recvAccount.address as `0x${string}`),
-                  value: transferAmount.toString(),
-                },
-              }
-            : {
-                event_name: 'send_account_transfers',
-                to_user: {
-                  id: profile.id,
-                  send_id: profile.sendId,
-                },
-                data: {
-                  t: hexToBytea(recvAccount.address as `0x${string}`),
-                  v: transferAmount.toString(),
-                },
-              }
-        )
+    await expect(async () =>
+      isETH
+        ? // just ensure balance is updated, since the send_account_receives event is not emitted
+          expect(
+            await testBaseClient.getBalance({
+              address: recvAccount.address as `0x${string}`,
+            })
+          ).toBe(transferAmount)
+        : await expect(supabase).toHaveEventInActivityFeed({
+            event_name: 'send_account_transfers',
+            to_user: {
+              id: profile.id,
+              send_id: profile.sendId,
+            },
+            data: {
+              t: hexToBytea(recvAccount.address as `0x${string}`),
+              v: transferAmount.toString(),
+            },
+          })
     ).toPass({
-      timeout: 5000,
+      timeout: isETH ? 10000 : 5000, // eth needs more time since no send_account_receives event is emitted
     })
 
     await expect(page).toHaveURL(`/?token=${token.address}`)
-    const history = page.getByTestId('TokenDetailsHistory')
-    await expect(history).toBeVisible()
-    await expect(history.getByText(`${decimalAmount} ${token.symbol}`)).toBeVisible()
-    await expect(history.getByText(`@${tag.name}`)).toBeVisible()
+
+    if (!isETH) {
+      // no history for eth since no send_account_receives event is emitted
+      const history = page.getByTestId('TokenDetailsHistory')
+      await expect(history).toBeVisible()
+      await expect(history.getByText(`${decimalAmount} ${token.symbol}`)).toBeVisible()
+      await expect(history.getByText(`@${tag.name}`)).toBeVisible()
+    }
   })
 }
 

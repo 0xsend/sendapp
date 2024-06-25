@@ -50,8 +50,8 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   await page.waitForURL(/\/send/)
   url = new URL(page.url())
   expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-    recipient: tag.name,
-    idType: 'tag',
+    recipient: profile2?.sendId.toString(),
+    idType: 'sendid',
   })
   await expect(page.getByText('Enter Amount')).toBeVisible()
 
