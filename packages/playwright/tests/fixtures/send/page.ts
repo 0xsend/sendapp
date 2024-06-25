@@ -20,7 +20,13 @@ export class SendPage {
   async expectTokenSelect(tokenSymbol: string) {
     await this.expect(this.tokenSelect).toBeVisible()
     await this.tokenSelect.click()
-    await this.page.getByLabel(tokenSymbol).click()
+    await this.expect(this.tokenSelect).toBeVisible()
+    const tokenOption = this.page.getByLabel(tokenSymbol)
+    await tokenOption.click()
+    if (await tokenOption.isVisible()) {
+      await tokenOption.click() // sometimes firefox needs a double click
+    }
+    await this.expect(tokenOption).toBeHidden()
   }
 
   async fillAndSubmitForm(amount: string) {

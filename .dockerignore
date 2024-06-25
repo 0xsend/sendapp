@@ -67,3 +67,4 @@ tmp
 **/Dockerfile
 **/.dockerignore
 **/.tamagui
+.watchman**
