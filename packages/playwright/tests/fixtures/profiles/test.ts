@@ -4,14 +4,12 @@ export { test } from '@playwright/test'
 
 export class ProfilePage {
   public sendButton: Locator
-  public requestButton: Locator
 
   constructor(
     public readonly page: Page,
     public readonly profile: { name: string; about: string }
   ) {
     this.sendButton = page.getByTestId('openSendDialogButton')
-    this.requestButton = page.getByRole('button', { name: 'Request' })
   }
 
   async visit(tag: string, expect?: Expect<ProfilePage>) {

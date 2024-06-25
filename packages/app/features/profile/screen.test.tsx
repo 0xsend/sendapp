@@ -17,6 +17,7 @@ const PROFILE = {
   address: '0x3D0B692e4b10A6975658808a6DB9F56C89d3d4a4',
   chain_id: 845337,
   all_tags: [TAG_NAME],
+  id: 2,
 }
 
 jest.mock('solito', () => ({
@@ -37,6 +38,32 @@ jest.mock('app/utils/useUser', () => ({
   useUser: jest.fn().mockReturnValue({
     user: {
       id: '1',
+    },
+  }),
+}))
+
+jest.mock('./utils/useInterUserActivityFeed', () => ({
+  useInterUserActivityFeed: jest.fn().mockReturnValue({
+    isLoading: false,
+    error: null,
+    isFetching: false,
+    isFetchingNextPage: false,
+    fetchNextPage: () => {},
+    hasNextPage: false,
+    data: {
+      pages: [
+        [
+          {
+            created_at: new Date('2024-5-19 GMT'),
+            event_name: 'send_account_transfers',
+            from_user: { id: 1 },
+            to_user: { id: 2 },
+            data: {
+              v: 10000n,
+            },
+          },
+        ],
+      ],
     },
   }),
 }))
@@ -93,8 +120,7 @@ test('ProfileScreen', async () => {
   expect(h1).toBeOnTheScreen()
   const h2 = screen.getByText(`/${PROFILE.tag_name}`)
   expect(h2).toBeOnTheScreen()
-  const paragraph = screen.getByText(PROFILE.about)
-  expect(paragraph).toBeOnTheScreen()
+
   const avatar = screen.getByTestId('avatar')
   expect(avatar).toBeOnTheScreen()
   const image = screen.getByRole('image', { name: PROFILE.name })
@@ -102,9 +128,13 @@ test('ProfileScreen', async () => {
   expect(image.props.source).toStrictEqual({
     uri: PROFILE.avatar_url,
   })
-  const button1 = screen.getByText('Send')
+  const button1 = screen.getByText('/SEND')
   expect(button1).toBeOnTheScreen()
-  const button2 = screen.getByText('Request')
-  expect(button2).toBeOnTheScreen()
+
+  const activity = screen.getByTestId('activityTest')
+  expect(activity).toBeOnTheScreen()
+  const activityLabel = screen.getByText('You Sent')
+  expect(activityLabel).toBeOnTheScreen()
+
   expect(screen.toJSON()).toMatchSnapshot('ProfileScreen')
 })
