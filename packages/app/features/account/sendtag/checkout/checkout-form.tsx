@@ -9,28 +9,26 @@ import {
   Theme,
   XStack,
   YStack,
-  useToastController,
   useMedia,
+  useToastController,
 } from '@my/ui'
 
 import { X } from '@tamagui/lucide-icons'
+import { IconPlus } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useRouter } from 'solito/router'
 import { formatEther } from 'viem'
 import type { z } from 'zod'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 import { getPriceInWei, maxNumSendTags, tagLengthToWei } from './checkout-utils'
-import { IconPlus } from 'app/components/icons'
-import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import { ConfirmButton } from './components/checkout-confirm-button'
-import { useRouter } from 'solito/router'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -41,15 +39,10 @@ export const CheckoutForm = () => {
   const supabase = useSupabase()
   const toast = useToastController()
   const has5Tags = user?.tags?.length === 5
-  const [needsVerification, setNeedsVerification] = React.useState(false)
   const media = useMedia()
   const router = useRouter()
 
-  const { data: addresses } = useChainAddresses()
-
   async function createSendTag({ name }: z.infer<typeof CheckoutTagSchema>) {
-    setNeedsVerification(false) // reset verification state
-
     if (!user.user) return console.error('No user')
     const { error } = await supabase.from('tags').insert({ name })
 
@@ -58,15 +51,6 @@ export const CheckoutForm = () => {
       switch (error.code) {
         case '23505':
           form.setError('name', { type: 'custom', message: 'This Sendtag is already taken' })
-          break
-        case 'P0001':
-          if (error.message?.includes(`You don't got the riz for the tag:`)) {
-            setNeedsVerification(!!addresses && addresses.length === 0)
-          }
-          form.setError('name', {
-            type: 'custom',
-            message: error.message ?? 'Something went wrong',
-          })
           break
         default:
           form.setError('name', {
@@ -321,12 +305,7 @@ export const CheckoutForm = () => {
                   py="$4"
                 >
                   <YStack maw={200} width="100%">
-                    <OpenConnectModalWrapper>
-                      <ConfirmButton
-                        onConfirmed={onConfirmed}
-                        needsVerification={needsVerification}
-                      />
-                    </OpenConnectModalWrapper>
+                    <ConfirmButton onConfirmed={onConfirmed} />
                   </YStack>
                 </Stack>
                 <TotalPrice />

@@ -5,7 +5,7 @@ import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
 import { useContext, useEffect } from 'react'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-// import { getRemoteAssets } from 'utils/getRemoteAssets'
+import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { InferGetServerSidePropsType } from 'next'
 
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
@@ -27,12 +27,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP(
-  async () => {
-    // disable for now
-    return { redirect: { destination: '/', permanent: false } }
-  }
-  /*async () => {
+export const getServerSideProps = userProtectedGetSSP(async () => {
   const paths = [
     'app_images/auth_image_1.jpg?raw=true',
     'app_images/auth_image_2.jpg?raw=true',
@@ -40,8 +35,7 @@ export const getServerSideProps = userProtectedGetSSP(
   ]
   const images = await getRemoteAssets(paths)
   return { props: { images } }
-}*/
-)
+})
 
 Page.getLayout = (children) => <AuthLayout>{children}</AuthLayout>
 

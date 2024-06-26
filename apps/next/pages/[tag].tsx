@@ -24,9 +24,6 @@ export const Page: NextPageWithLayout = ({ sendid }) => {
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
-  // disable for now
-  return { redirect: { destination: '/', permanent: false } }
-  /*
   const { tag } = ctx.params ?? {}
 
   // ensure identifier is valid before proceeding
@@ -79,7 +76,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
       sendid: profile.sendid,
     },
   }
-  */
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (

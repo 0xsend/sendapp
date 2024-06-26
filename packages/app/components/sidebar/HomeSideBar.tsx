@@ -14,14 +14,7 @@ import {
 } from '@my/ui'
 import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import {
-  IconAccount,
-  // IconActivity,
-  IconHome,
-  // IconSLogo,
-  IconSendLogo,
-  IconX,
-} from 'app/components/icons'
+import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -36,16 +29,16 @@ const links = [
     text: 'Home',
     href: '/',
   },
-  // {
-  //   icon: <IconSLogo size={'$1'} />,
-  //   text: 'Send',
-  //   href: '/send',
-  // },
-  // {
-  //   icon: <IconActivity size={'$1'} />,
-  //   text: 'Activity',
-  //   href: '/activity',
-  // },
+  {
+    icon: <IconSLogo size={'$1'} />,
+    text: 'send',
+    href: '/send',
+  },
+  {
+    icon: <IconActivity size={'$1'} />,
+    text: 'activity',
+    href: '/activity',
+  },
   {
     icon: <IconAccount size={'$1'} />,
     text: 'Account',
