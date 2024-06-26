@@ -4,7 +4,7 @@ import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const TelegramLogo = (props: IconProps) => {
+const TelegramLogo = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -21,5 +21,5 @@ const TelegramLogo = (props: IconProps) => {
     </Svg>
   )
 }
-const IconTelegram = memo(themed(TelegramLogo))
+const IconTelegram = memo<IconProps>(themed(TelegramLogo))
 export { IconTelegram }

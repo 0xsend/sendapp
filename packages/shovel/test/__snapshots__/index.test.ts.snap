@@ -97,15 +97,6 @@ exports[`shovel config 1`] = `
         },
         {
           "column": "log_addr",
-          "filter_arg": [
-            "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
-            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          ],
-          "filter_op": "contains",
           "name": "log_addr",
         },
       ],
@@ -447,6 +438,209 @@ exports[`shovel config 1`] = `
           },
         ],
         "name": "send_account_signing_key_added",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "column": "account",
+            "integration": "send_account_created",
+          },
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "account",
+            "indexed": true,
+            "name": "account",
+            "type": "address",
+          },
+          {
+            "column": "key_slot",
+            "indexed": false,
+            "name": "keySlot",
+            "type": "uint8",
+          },
+          {
+            "column": "key",
+            "indexed": false,
+            "name": "key",
+            "type": "bytes32[2]",
+          },
+        ],
+        "name": "SigningKeyRemoved",
+        "type": "event",
+      },
+      "name": "send_account_signing_key_removed",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "account",
+            "type": "bytea",
+          },
+          {
+            "name": "key_slot",
+            "type": "smallint",
+          },
+          {
+            "name": "key",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_account_signing_key_removed",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "column": "account",
+            "integration": "send_account_created",
+          },
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "filter_op": "contains",
+            "filter_ref": {
+              "column": "account",
+              "integration": "send_account_created",
+            },
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "value",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Received",
+        "type": "event",
+      },
+      "name": "send_account_receives",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "value",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_account_receives",
       },
     },
   ],

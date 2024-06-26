@@ -46,6 +46,7 @@ export function useSenderSafeReceivedEvents() {
       }
       return data
     },
+    refetchInterval: 1000 * 5, // 5 seconds
   })
 }
 export const hasFreeTag = (tagName: string, confirmedTags: Tables<'tags'>[]) => {

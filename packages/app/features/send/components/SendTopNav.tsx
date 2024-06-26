@@ -1,27 +1,30 @@
 // TopNav.tsx
 import {
-  H2,
-  Header,
-  Stack,
-  useMedia,
   Button as ButtonOg,
   Container,
+  H2,
+  Header,
   Separator,
+  Stack,
+  useMedia,
   type ButtonProps,
 } from '@my/ui'
-import { useNav, useRecipient } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconHamburger } from 'app/components/icons'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 
 export function SendTopNav() {
-  const [nav, setNavParam] = useNav()
-  const [recipient] = useRecipient()
+  const [rootParams, setRootParams] = useRootScreenParams()
+  const [sendParams] = useSendScreenParams()
 
   const media = useMedia()
 
   const handleHomeBottomSheet = () => {
-    setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
+    setRootParams(
+      { ...rootParams, nav: rootParams.nav ? undefined : 'home' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const { resolvedTheme } = useThemeSetting()
@@ -51,7 +54,7 @@ export function SendTopNav() {
             display={'flex'}
             als={'center'}
           >
-            {recipient ? 'Enter Amount' : 'Select Recipient'}
+            {sendParams.recipient ? 'Enter Amount' : 'Select Recipient'}
           </H2>
         </Stack>
         <Stack />

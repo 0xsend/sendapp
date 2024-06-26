@@ -1,4 +1,3 @@
-import '@rainbow-me/rainbowkit/styles.css'
 import '../public/reset.css'
 import '../styles/globals.css'
 
@@ -14,6 +13,15 @@ import Head from 'next/head'
 import type { ReactElement, ReactNode } from 'react'
 import type { SolitoAppProps } from 'solito'
 import { Provider } from 'app/provider'
+import { projectId, config as wagmiConfig } from 'app/provider/wagmi/config'
+import { createWeb3Modal } from '@web3modal/wagmi/react'
+import { baseMainnetClient } from '@my/wagmi'
+
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  defaultChain: baseMainnetClient.chain,
+})
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')

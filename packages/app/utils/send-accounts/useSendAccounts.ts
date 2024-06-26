@@ -29,12 +29,14 @@ export function useSendAccounts() {
   })
 }
 
+const useSendAccountQueryKey = 'send_account'
+
 export function useSendAccount() {
   const { user } = useUser()
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: ['send_account'],
+    queryKey: [useSendAccountQueryKey],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,3 +55,5 @@ export function useSendAccount() {
     },
   })
 }
+
+useSendAccount.queryKey = useSendAccountQueryKey

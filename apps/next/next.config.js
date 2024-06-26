@@ -89,6 +89,7 @@ export default () => {
     experimental: {
       scrollRestoration: true,
     },
+    output: process.env.NODE_ENV === 'production' ? 'standalone' : null,
   }
 
   for (const plugin of plugins) {

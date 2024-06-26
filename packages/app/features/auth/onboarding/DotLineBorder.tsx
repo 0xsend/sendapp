@@ -9,16 +9,17 @@ export const DotLineBorder = memo(
   themed((props: IconProps) => {
     const { size: sizeToken, color, ...rest } = props
 
-    const size =
-      // @ts-expect-error because tamagui expects size tokens to not be prefixed with $
-      typeof sizeToken === 'string' ? getTokens().size[sizeToken] : props.size
+    const size = typeof sizeToken === 'string' ? getTokens().size[sizeToken] : props.size
 
     return (
+      // @ts-expect-error some work to do here
       <Svg
         color={color as ColorTokens | undefined}
         fill="none"
-        width={aspectRatio * size}
-        height={size}
+        // biome-ignore lint/suspicious/noExplicitAny: not sure how to get the size from the theme typed correctly
+        width={(aspectRatio * size) as any}
+        // biome-ignore lint/suspicious/noExplicitAny: not sure how to get the size from the theme typed correctly
+        height={size as any}
         viewBox="0 0 47 310"
         {...rest}
       >

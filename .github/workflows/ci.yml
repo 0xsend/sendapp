@@ -42,6 +42,8 @@ jobs:
         env:
           YARN_ENABLE_HARDENED_MODE: 0
           SKIP_YARN_POST_INSTALL: 1
+      - name: Build
+        run: yarn build
       - name: Lint
         run: yarn lint
 
@@ -107,6 +109,10 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
 
+    # for writing PR comments
+    permissions:
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -160,7 +166,7 @@ jobs:
           sleep 1
           echo tilt is ready
           max_attempts=60
-          wait_timeout=5
+          wait_timeout=7
           for ((i=1; i<=max_attempts; i++)); do
             echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
             
@@ -182,6 +188,24 @@ jobs:
             fi
           done
           yarn playwright test
+      - name: Playwright Markdown Report
+        if: always() && steps.playwright.outcome != 'skipped'
+        id: playwright-md-report
+        shell: bash
+        run: |
+          echo "Markdown report:"
+          echo "------------------"
+          bun run packages/playwright/bin/report-markdown.ts > playwright-report.md
+          cat playwright-report.md
+          echo "------------------"
+          echo "Markdown report end"
+      - uses: mshick/add-pr-comment@v2
+        if: always() && steps.playwright.outcome != 'skipped'
+        with:
+          message-id: playwright-report
+          refresh-message-position: true
+          message-path: |
+            playwright-report.md
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.playwright.outcome != 'skipped'
@@ -193,6 +217,13 @@ jobs:
         with:
           name: playwright-report
           path: packages/playwright/playwright-report/
+          retention-days: 30
+      - name: Playwright Test Results
+        uses: actions/upload-artifact@v4
+        if: always() && steps.playwright.outcome == 'failure'
+        with:
+          name: playwright-test-results
+          path: packages/playwright/test-results/
           retention-days: 30
 
   vercel-deploy-preview:

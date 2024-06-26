@@ -3,14 +3,12 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const Star = (props: IconProps) => {
+const Star = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
       color={color as ColorTokens | undefined}
-      // @ts-expect-error - size is not nullable
       width={size}
-      // @ts-expect-error - size is not nullable
       height={size}
       viewBox="0 0 20 20"
       {...rest}
@@ -22,5 +20,5 @@ const Star = (props: IconProps) => {
     </Svg>
   )
 }
-const IconStar = memo(themed(Star))
+const IconStar = memo<IconProps>(themed(Star))
 export { IconStar }

@@ -4,7 +4,7 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Defs, LinearGradient, Path, Stop, Svg } from 'react-native-svg'
 
-const Settings = (props: IconProps) => {
+const Settings = (props) => {
   const { size, color, ...rest } = props
   return (
     <YStack px={'$1.5'}>
@@ -67,5 +67,5 @@ const Settings = (props: IconProps) => {
     </YStack>
   )
 }
-const IconSettings = memo(themed(Settings))
+const IconSettings = memo<IconProps>(themed(Settings))
 export { IconSettings }

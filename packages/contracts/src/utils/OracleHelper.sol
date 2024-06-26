@@ -90,8 +90,9 @@ abstract contract OracleHelper {
             tokenPrice, nativeAssetPrice, oracleHelperConfig.tokenOracleReverse, oracleHelperConfig.nativeOracleReverse
         );
         uint256 priceRatio = PRICE_DENOMINATOR * newPrice / _cachedPrice;
-        bool updateRequired = force || priceRatio > PRICE_DENOMINATOR + priceUpdateThreshold
-            || priceRatio < PRICE_DENOMINATOR - priceUpdateThreshold;
+        bool updateRequired = force || cacheAge > cacheTimeToLive // cache is expired
+            || priceRatio > PRICE_DENOMINATOR + priceUpdateThreshold // price is too high
+            || priceRatio < PRICE_DENOMINATOR - priceUpdateThreshold; // price is too low
         if (!updateRequired) {
             return _cachedPrice;
         }

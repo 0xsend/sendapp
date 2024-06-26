@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const Notification = (props: IconProps) => {
+const Notification = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -29,5 +29,5 @@ const Notification = (props: IconProps) => {
     </Svg>
   )
 }
-const IconNotification = memo(themed(Notification))
+const IconNotification = memo<IconProps>(themed(Notification))
 export { IconNotification }

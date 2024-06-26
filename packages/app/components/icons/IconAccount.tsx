@@ -3,7 +3,7 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const Account = (props: IconProps) => {
+const Account = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -21,5 +21,5 @@ const Account = (props: IconProps) => {
     </Svg>
   )
 }
-const IconAccount = memo(themed(Account))
+const IconAccount = memo<IconProps>(themed(Account))
 export { IconAccount }

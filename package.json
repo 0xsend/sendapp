@@ -11,11 +11,13 @@
     "native": "cd apps/expo && yarn start",
     "watch": "yarn workspaces foreach -pi run watch",
     "web": "yarn build && cd apps/next && yarn dev",
+    "web:docker:build": "GIT_HASH=$(git rev-parse --short=10 HEAD) docker compose --progress=plain build",
+    "web:docker:push": "GIT_HASH=$(git rev-parse --short=10 HEAD) docker compose push",
     "web:extract": "DISABLE_EXTRACTION=false yarn workspace next-app dev",
     "web:prod": "yarn workspace next-app build",
     "web:prod:serve": "yarn workspace next-app serve",
     "fix": "manypkg fix",
-    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && turbo build --filter='!next-app')",
+    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && yarn build)",
     "build": "yarn workspaces foreach --all --exclude next-app run build",
     "biome:check": "biome check .",
     "biome:check:fix": "biome check . --apply",
@@ -30,8 +32,8 @@
     "next-app": "yarn workspace next-app",
     "playwright": "yarn workspace @my/playwright",
     "distributor": "yarn workspace distributor",
-    "snaplet:seed": "DRY=0 bunx tsx ./packages/snaplet/seed.ts",
-    "snaplet:snapshot:restore": "bunx snaplet snapshot restore --no-reset --latest",
+    "snaplet": "yarn workspace @my/snaplet",
+    "shovel": "yarn workspace @my/shovel",
     "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
@@ -51,7 +53,7 @@
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
     "pierre": "^2.0.0-alpha.8",
-    "turbo": "^1.10.3",
+    "turbo": "^2.0.3",
     "typescript": "^5.3.3"
   },
   "packageManager": "yarn@4.0.2",
@@ -60,6 +62,6 @@
     "jest": "^29.7.0",
     "jest-expo": "^50.0.0",
     "lefthook": "^1.5.5",
-    "zx": "^8.0.2"
+    "zx": "^8.1.2"
   }
 }

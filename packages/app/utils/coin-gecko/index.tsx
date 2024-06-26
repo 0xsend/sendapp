@@ -53,6 +53,7 @@ export const useTokenPrice = <T extends coins[number]['coingeckoTokenId']>(token
       return data as { [key in T]: { usd: number } }
     },
     refetchInterval: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 

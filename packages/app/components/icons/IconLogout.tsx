@@ -4,7 +4,7 @@ import React, { memo } from 'react'
 import { Line, Path, Polyline, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const Icon = (props: IconProps) => {
+const Icon = (props) => {
   const { color, size, ...otherProps } = props
   return (
     <Svg

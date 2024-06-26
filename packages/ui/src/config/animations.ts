@@ -9,6 +9,11 @@ export const animations = createAnimations({
     type: 'timing',
     duration: 200,
   },
+  '10000ms': {
+    // debug animation, don't actually use this
+    type: 'timing',
+    duration: 10000,
+  },
   bouncy: {
     type: 'spring',
     damping: 10,

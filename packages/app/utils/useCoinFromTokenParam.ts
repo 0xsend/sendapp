@@ -1,8 +1,8 @@
 import { coins } from 'app/data/coins'
-import { useToken } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 
 export const useCoinFromTokenParam = () => {
-  const [tokenParam] = useToken()
+  const [{ token: tokenParam }] = useRootScreenParams()
   const selectedCoin = coins.find((c) => c.token === tokenParam)
   return selectedCoin
 }

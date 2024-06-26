@@ -13,11 +13,19 @@ import {
   type GetUserOperationReceiptReturnType,
   type UserOperation,
 } from 'permissionless'
-import { encodeFunctionData, erc20Abi, isAddress, type Hex, formatUnits } from 'viem'
+import {
+  encodeFunctionData,
+  erc20Abi,
+  isAddress,
+  type Hex,
+  formatUnits,
+  type CallExecutionError,
+} from 'viem'
 import { assert } from './assert'
-import { entrypoint, signUserOp } from './userop'
+import { signUserOp } from './userop'
 
 // default user op with preset gas values that work
+// will probably need to move this to the database
 export const defaultUserOp: Pick<
   UserOperation<'v0.7'>,
   | 'callGasLimit'
@@ -34,7 +42,7 @@ export const defaultUserOp: Pick<
   maxFeePerGas: 10000000n,
   maxPriorityFeePerGas: 10000000n,
   paymasterVerificationGasLimit: 150000n,
-  paymasterPostOpGasLimit: 50000n,
+  paymasterPostOpGasLimit: 75000n,
 }
 
 export type UseUserOpTransferMutationArgs = {
@@ -67,6 +75,20 @@ export async function sendUserOpTransfer({
     entryPoint,
     chainId,
   })
+
+  // simulate
+  await baseMainnetClient
+    .call({
+      account: entryPointAddress[baseMainnetClient.chain.id],
+      to: userOp.sender,
+      data: userOp.callData,
+    })
+    .catch((e) => {
+      const error = e as CallExecutionError
+      console.error('Failed to simulate userop', e)
+      if (error.shortMessage) throw error.shortMessage
+      throw e
+    })
 
   userOp.signature = await signUserOp({
     userOpHash,
@@ -102,7 +124,7 @@ export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'
 
       const requiredPreFund = getRequiredPrefund({
         userOperation: userOp,
-        entryPoint: entrypoint.address,
+        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
       })
       // calculate the required usdc balance
       const [priceMarkup, , refundPostopCost, , baseFee] = await baseMainnetClient.readContract({

@@ -28,6 +28,9 @@ describe('abbreviateNumber', () => {
   it('should handle digit parameter', () => {
     expect(formatAmount(1_234)).toBe('1,234') // default digit is 1
   })
+  it('should handle zero', () => {
+    expect(formatAmount(0)).toBe('0.00') // defaults to 2 max decimals
+  })
 })
 
 describe('formatAmount', () => {

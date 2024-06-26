@@ -4,9 +4,13 @@ import {
   baseMainnetBundlerClient,
   baseMainnetClient,
   baseMainnetBundlerClient as bundlerClient,
+  entryPointAddress,
+  iEntryPointAbi,
   sendAccountFactoryAbi,
   sendAccountFactoryAddress,
   sendTokenAbi,
+  sendVerifierAbi,
+  sendVerifierProxyAddress,
   tokenPaymasterAbi,
   tokenPaymasterAddress,
   usdcAddress,
@@ -39,13 +43,10 @@ import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import {
-  USEROP_VALID_UNTIL,
   USEROP_VERSION,
-  entrypoint,
   generateChallenge,
   getSendAccountCreateArgs,
   testClient,
-  verifier,
 } from 'app/utils/userop'
 import nock from 'nock'
 import {
@@ -55,6 +56,16 @@ import {
   type UserOperation,
 } from 'permissionless'
 import { numberToBytes } from 'viem'
+
+jest.unmock('@my/wagmi')
+
+const sendVerifierAddress = sendVerifierProxyAddress[845337] // TODO: use chain id
+
+const verifier = getContract({
+  abi: sendVerifierAbi,
+  client: baseMainnetClient,
+  address: sendVerifierAddress,
+})
 
 const sendAccountFactory = getContract({
   address: sendAccountFactoryAddress[baseMainnetClient.chain.id],
@@ -193,11 +204,11 @@ async function createAccountAndVerifySignature() {
   const { userOp, userOpHash } = await generateUserOp([key1, key2])
 
   const bVersion = numberToBytes(USEROP_VERSION, { size: 1 })
-  const bValidUntil = numberToBytes(USEROP_VALID_UNTIL, { size: 6 })
+  const bValidUntil = numberToBytes(0, { size: 6 })
   const { challenge } = generateChallenge({
     userOpHash,
     version: USEROP_VERSION,
-    validUntil: USEROP_VALID_UNTIL,
+    validUntil: 0,
   })
   const { keySlot, encodedSig: sig } = await signer(challenge)
   const bKeySlot = numberToBytes(keySlot, { size: 1 })
@@ -239,6 +250,12 @@ async function createAccountAndVerifySignature() {
 
   return { userOp: _userOp, userOpHash }
 }
+
+const entrypoint = getContract({
+  abi: iEntryPointAbi,
+  address: entryPointAddress[baseMainnetClient.chain.id],
+  client: baseMainnetClient,
+})
 
 export async function generateUserOp(publicKey: [Hex, Hex]) {
   const factory = sendAccountFactoryAddress[baseMainnetClient.chain.id]

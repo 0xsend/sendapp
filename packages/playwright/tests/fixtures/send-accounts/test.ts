@@ -16,33 +16,36 @@ const sendAccountTest = base.extend<{
   setEthBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
   setUsdcBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
 }>({
-  page: async ({ page, context, supabase, setEthBalance, setUsdcBalance, user: { user } }, use) => {
-    log = debug(`test:send-accounts:${user.id}:${test.info().parallelIndex}`)
-    log('start onboarding')
+  page: [
+    async ({ page, context, supabase, setEthBalance, setUsdcBalance, user: { user } }, use) => {
+      log = debug(`test:send-accounts:${user.id}:${test.info().parallelIndex}`)
+      log('start onboarding')
 
-    // @todo use webauthn authenticator and supabase API to create a send account
-    const onboardingPage = new OnboardingPage(await context.newPage(), log)
-    await onboardingPage.completeOnboarding(expect).catch((e) => {
-      log('onboarding error', e)
-      throw e
-    })
-    log('onboarding complete')
+      // @todo use webauthn authenticator and supabase API to create a send account
+      const onboardingPage = new OnboardingPage(await context.newPage(), log)
+      await onboardingPage.completeOnboarding(expect).catch((e) => {
+        log('onboarding error', e)
+        throw e
+      })
+      log('onboarding complete')
 
-    const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
-    if (error) {
-      log('error fetching send account', error)
-      throw error
-    }
-    assert(!!sendAccount, 'no send account found')
-    assert(sendAccount.address !== zeroAddress, 'send account address is zero')
+      const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
+      if (error) {
+        log('error fetching send account', error)
+        throw error
+      }
+      assert(!!sendAccount, 'no send account found')
+      assert(sendAccount.address !== zeroAddress, 'send account address is zero')
 
-    await setEthBalance({ address: sendAccount.address, value: parseEther('1') })
-    await setUsdcBalance({ address: sendAccount.address, value: 100n * 10n ** 6n })
+      await setEthBalance({ address: sendAccount.address, value: parseEther('1') })
+      await setUsdcBalance({ address: sendAccount.address, value: 100n * 10n ** 6n })
 
-    await onboardingPage.page.close() // close the onboarding page
+      await onboardingPage.page.close() // close the onboarding page
 
-    await use(page)
-  },
+      await use(page)
+    },
+    { timeout: 60000, scope: 'test' },
+  ],
   // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
   setEthBalance: async ({}, use) => {
     use(async ({ address, value }) => {

@@ -3,7 +3,7 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const Search = (props: IconProps) => {
+const Search = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -20,5 +20,5 @@ const Search = (props: IconProps) => {
     </Svg>
   )
 }
-const IconSearch = memo(themed(Search))
+const IconSearch = memo<IconProps>(themed(Search))
 export { IconSearch }

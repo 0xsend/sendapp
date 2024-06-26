@@ -1,20 +1,25 @@
 import {
+  Avatar,
+  H4,
+  Link,
   Nav,
   Paragraph,
   ScrollView,
   Separator,
   SideBar,
-  SideBarWrapper,
   XStack,
   YStack,
-  type YStackProps,
   useMedia,
-  Avatar,
-  H4,
+  type YStackProps,
 } from '@my/ui'
-import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import { IconAccount, IconActivity, IconHome, IconSLogo, IconSendLogo } from 'app/components/icons'
+import {
+  IconAccount,
+  IconActivity,
+  IconHome,
+  IconSendLogo,
+  IconDeviceReset,
+} from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -30,13 +35,13 @@ const links = [
     href: '/',
   },
   {
-    icon: <IconSLogo size={'$1'} />,
-    text: 'send',
+    icon: <IconActivity size={'$1'} />,
+    text: 'Send',
     href: '/send',
   },
   {
-    icon: <IconActivity size={'$1'} />,
-    text: 'activity',
+    icon: <IconDeviceReset size={'$1'} />,
+    text: 'Activity',
     href: '/activity',
   },
   {
@@ -121,18 +126,13 @@ const HomeBottomSheet = () => {
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
 
-  if (media.gtLg)
-    return (
-      <SideBarWrapper
-        sidebar={<HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />}
-      >
-        {children}
-      </SideBarWrapper>
-    )
   return (
-    <>
-      <HomeBottomSheet />
+    <XStack overflow="hidden" height={'100%'}>
+      {media.gtLg && (
+        <HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />
+      )}
       {children}
-    </>
+      <HomeBottomSheet />
+    </XStack>
   )
 }

@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   H1,
   H2,
   Paragraph,
@@ -31,46 +30,47 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const formatTags = (tags: string[]) => tags?.map((tag) => `@${tag}`).join(' ')
 
   return (
-    <Container>
-      <YStack f={1} gap="$6">
-        {error && <Text theme="error">{error.message}</Text>}
-        {isLoading && <Spinner size="large" color="$color10" />}
-        {profile ? (
-          <YStack width="100%" gap="$2">
-            <AvatarProfile profile={profile} /> <H1 nativeID="profileName">{profile.name}</H1>
-            <H2 theme="alt1">{formatTags(profile.all_tags)}</H2>
-            <Paragraph mb="$4">{profile.about}</Paragraph>
-            {profile && user?.id !== profile?.id ? (
-              <XStack jc="space-around" gap="$6" maxWidth={600}>
-                <Button
-                  testID="openSendDialogButton"
-                  f={1}
-                  width={'100%'}
-                  onPress={() => {
-                    router.push({
-                      pathname: '/send',
-                      query: { recipient: profile.tag_name },
-                    })
-                  }}
-                  theme="accent"
-                >
-                  Send
-                </Button>
-                <Button
-                  f={1}
-                  width={'100%'}
-                  onPress={() => {
-                    console.log('Request', profile.address)
-                    toast.show('TODO: Request')
-                  }}
-                >
-                  Request
-                </Button>
-              </XStack>
-            ) : null}
-          </YStack>
-        ) : null}
-      </YStack>
-    </Container>
+    <YStack f={1} gap="$6" pt="$6" $gtMd={{ pt: '$0' }}>
+      {error && <Text theme="error">{error.message}</Text>}
+      {isLoading && <Spinner size="large" color="$color10" />}
+      {profile ? (
+        <YStack width="100%" gap="$2">
+          <AvatarProfile profile={profile} /> <H1 nativeID="profileName">{profile.name}</H1>
+          <H2 theme="alt1">{formatTags(profile.all_tags ?? [])}</H2>
+          <Paragraph mb="$4">{profile.about}</Paragraph>
+          {profile && user?.id !== profile?.id ? (
+            <XStack jc="space-around" gap="$6" maxWidth={600}>
+              <Button
+                testID="openSendDialogButton"
+                f={1}
+                width={'100%'}
+                onPress={() => {
+                  router.push({
+                    pathname: '/send',
+                    query: {
+                      recipient: profile.tag ?? profile.sendid,
+                      idType: profile.tag ? 'tag' : 'sendid',
+                    },
+                  })
+                }}
+                theme="accent"
+              >
+                Send
+              </Button>
+              <Button
+                f={1}
+                width={'100%'}
+                onPress={() => {
+                  console.log('Request', profile.address)
+                  toast.show('Coming Soon')
+                }}
+              >
+                Request
+              </Button>
+            </XStack>
+          ) : null}
+        </YStack>
+      ) : null}
+    </YStack>
   )
 }

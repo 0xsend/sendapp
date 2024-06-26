@@ -1,19 +1,16 @@
 import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
+  entryPointAddress,
   sendAccountAbi,
+  sendTokenAbi,
   sendVerifierAbi,
   sendVerifierProxyAddress,
-  entryPointAddress,
-  iEntryPointAbi,
-  iEntryPointSimulationsAbi,
-  sendTokenAbi,
   tokenPaymasterAddress,
   usdcAddress,
 } from '@my/wagmi'
-
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { getAccountNonce } from 'permissionless'
 import {
-  http,
-  type Hex,
   bytesToHex,
   concat,
   createTestClient,
@@ -22,16 +19,16 @@ import {
   getAbiItem,
   getContract,
   hexToBytes,
-  numberToBytes,
+  http,
   isHex,
-  publicActions,
   maxUint256,
+  numberToBytes,
+  publicActions,
+  type Hex,
 } from 'viem'
+import { assert } from './assert'
 import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
 import { baseMainnetClient } from './viem'
-import { assert } from './assert'
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { getAccountNonce } from 'permissionless'
 
 export const testClient = createTestClient({
   chain: baseMainnetClient.chain,
@@ -39,24 +36,10 @@ export const testClient = createTestClient({
   mode: 'anvil',
 }).extend(publicActions)
 
-export const entrypoint = getContract({
-  abi: iEntryPointAbi,
-  address: entryPointAddress[baseMainnetClient.chain.id],
-  client: baseMainnetClient,
-})
-
-export const entrypointSimulations = getContract({
-  abi: iEntryPointSimulationsAbi,
-  address: entryPointAddress[baseMainnetClient.chain.id],
-  client: baseMainnetClient,
-})
-
-export const sendVerifierAddress = sendVerifierProxyAddress[845337] // TODO: use chain id
-
-export const verifier = getContract({
+const verifier = getContract({
   abi: sendVerifierAbi,
   client: baseMainnetClient,
-  address: sendVerifierAddress,
+  address: sendVerifierProxyAddress[baseMainnetClient.chain.id],
 })
 
 /**
@@ -145,7 +128,6 @@ export function generateChallenge({
  * struct for the SendVerifier contract.
  */
 export async function signChallenge(challenge: Hex) {
-  assert(isHex(challenge) && challenge.length === 80, 'Invalid challenge')
   const challengeBytes = hexToBytes(challenge)
   const challengeB64 = Buffer.from(challengeBytes).toString('base64')
   const sign = await signWithPasskey({
@@ -217,9 +199,11 @@ export async function signUserOp({
   return bytesToHex(signature)
 }
 
+const useAccountNonceQueryKey = 'accountNonce'
+
 export function useAccountNonce({ sender }): UseQueryResult<bigint, Error> {
   return useQuery({
-    queryKey: ['accountNonce', sender],
+    queryKey: [useAccountNonceQueryKey, sender],
     queryFn: async () => {
       const nonce = await getAccountNonce(baseMainnetClient, {
         sender,
@@ -229,3 +213,5 @@ export function useAccountNonce({ sender }): UseQueryResult<bigint, Error> {
     },
   })
 }
+
+useAccountNonce.queryKey = useAccountNonceQueryKey

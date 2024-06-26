@@ -53,6 +53,11 @@ export const models: SeedClientOptions['models'] = {
       chainId: 845337,
     },
   },
+  chainAddresses: {
+    data: {
+      address: () => privateKeyToAddress(generatePrivateKey()),
+    },
+  },
 }
 
 export const userOnboarded: usersInputs = {
@@ -80,4 +85,5 @@ export const userOnboarded: usersInputs = {
       chainId: 845337,
     },
   ],
+  chainAddresses: [{}],
 }

@@ -39,6 +39,7 @@ jest.mock('@my/wagmi', () => ({
         maxPriorityFeePerGas: BigInt(0),
       })
     ),
+    call: jest.fn().mockResolvedValue({}),
   },
   baseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
