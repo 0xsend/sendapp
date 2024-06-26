@@ -66,7 +66,9 @@ test('can deposit USDC with web3 wallet', async ({
 
   const depositButton = page.getByRole('button', { name: 'Deposit' })
   await depositButton.click()
-  await page.getByRole('link', { name: 'Deposit with Web3 Wallet' }).click()
+  const depositWeb3Link = page.getByRole('link', { name: 'Deposit with Web3 Wallet' })
+  await expect(depositWeb3Link).toBeVisible()
+  await depositWeb3Link.click()
   await page.waitForURL('/deposit/web3')
   await expect(page.locator('w3m-modal')).toBeVisible()
 

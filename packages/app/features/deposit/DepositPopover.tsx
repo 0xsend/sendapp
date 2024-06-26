@@ -24,8 +24,8 @@ export function DepositPopover(props: PopoverProps) {
       {...props}
       offset={{ mainAxis: 0, crossAxis: 0, alignmentAxis: 0 }}
     >
-      <Popover.Trigger asChild>
-        <Theme name="green">
+      <Theme name="green">
+        <Popover.Trigger asChild>
           <Button px={'$3.5'} h={'$4.5'} width={'100%'} borderRadius={'$4'}>
             <XStack w={'100%'} jc={'space-between'} ai={'center'}>
               <ButtonText fontWeight={'500'} textTransform={'uppercase'}>
@@ -36,8 +36,8 @@ export function DepositPopover(props: PopoverProps) {
               </XStack>
             </XStack>
           </Button>
-        </Theme>
-      </Popover.Trigger>
+        </Popover.Trigger>
+      </Theme>
 
       <Adapt when="sm" platform="touch">
         <Popover.Sheet dismissOnSnapToBottom dismissOnOverlayPress modal>
