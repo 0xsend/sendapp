@@ -100,7 +100,7 @@ for (const token of tokens) {
 
       // fill search input
       const searchInput = page.getByPlaceholder('$Sendtag, Phone, Send ID')
-      await searchInput.fill(profile.sendId.toString())
+      await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 
       // click user
