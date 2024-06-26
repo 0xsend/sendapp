@@ -41,6 +41,14 @@ export const OnboardingForm = () => {
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     try {
       assert(!!user?.id, 'No user id')
+
+      // double check that the user has not already created a send account before creating a passkey
+      const { data: sendAcct, error: refetchError } = await refetchSendAccount()
+      if (refetchError) throw refetchError
+      if (sendAcct) {
+        throw new Error(`Account already created: ${sendAcct.address}`)
+      }
+
       const keySlot = 0
       const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
       const [rawCred, authData] = await createPasskey({
