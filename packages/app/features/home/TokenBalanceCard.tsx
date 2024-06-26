@@ -7,6 +7,7 @@ import {
   XStack,
   YStack,
   Stack,
+  BigHeading,
   styled,
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
@@ -53,15 +54,28 @@ export const TokenBalanceCard = () => {
                 {totalBalance === undefined ? (
                   <Spinner size={'large'} />
                 ) : (
-                  <Paragraph
-                    fontFamily={'$mono'}
+                  <BigHeading
+                    $platform-web={{ width: 'fit-content' }}
+                    $sm={{
+                      fontSize: (() => {
+                        switch (true) {
+                          case formattedBalance.length > 8:
+                            return '$11'
+                          case formattedBalance.length > 5:
+                            return '$12'
+                          default:
+                            return 96
+                        }
+                      })(),
+                    }}
                     fontSize={96}
                     lineHeight={'$15'}
                     fontWeight={'500'}
+                    color={'$color12'}
                     zIndex={1}
                   >
-                    {formatAmount(totalBalance, 4, 0)}
-                  </Paragraph>
+                    {formattedBalance}
+                  </BigHeading>
                 )}
                 <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1}>
                   {'USD'}
