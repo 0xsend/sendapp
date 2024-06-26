@@ -17,10 +17,7 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP(async () => {
-  // disable for now
-  return { redirect: { destination: '/', permanent: false } }
-})
+export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
   <SendLayout TopNav={<TopNav header="Preview and Send" noSubroute />}>{children}</SendLayout>

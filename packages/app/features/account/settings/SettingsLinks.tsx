@@ -34,7 +34,6 @@ export function SettingsLinks(): JSX.Element {
     {
       text: 'Backup',
       href: '/account/settings/backup',
-      disabled: true,
     },
   ]
   return (
