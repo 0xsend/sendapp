@@ -1,4 +1,4 @@
-import { SizableText, YStack } from '@my/ui'
+import { SizableText, Spinner, YStack } from '@my/ui'
 import { IconRefresh } from 'app/components/icons'
 import { Camera } from '@tamagui/lucide-icons'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -19,6 +19,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
   const { user, profile, updateProfile } = useUser()
   const supabase = useSupabase()
   const [errMsg, setErrMsg] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
 
   useImperativeHandle(ref, () => ({ pickImage }))
 
@@ -63,6 +64,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
       // console.error('ArrayBuffer is null')
       return null
     }
+    setIsUploading(true)
     const result = await supabase.storage
       .from('avatars')
       .upload(`${user.id}/${Number(new Date())}.jpeg`, res, {
@@ -71,10 +73,12 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
       })
     if (result.error) {
       setErrMsg(result.error.message)
+      setIsUploading(false)
       return
       // console.log(result.error)
       // throw new Error(result.error.message)
     }
+
     const publicUrlRes = await supabase.storage
       .from('avatars')
       .getPublicUrl(result.data.path.replace('avatars/', ''))
@@ -87,6 +91,8 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
       setErrMsg(update_error.message)
       return
     }
+    setIsUploading(false)
+
     await updateProfile()
   }
 
@@ -121,11 +127,16 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
             bottom={0}
           />
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
-            {profile?.avatar_url ? (
-              <IconRefresh color="primary" />
-            ) : (
-              <Camera color="primary" size={'$4'} />
-            )}
+            {(() => {
+              switch (true) {
+                case isUploading:
+                  return <Spinner size="small" />
+                case !!profile?.avatar_url:
+                  return <IconRefresh color="primary" />
+                default:
+                  return <Camera color="primary" size={'$4'} />
+              }
+            })()}
           </YStack>
         </YStack>
       </YStack>

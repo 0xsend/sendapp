@@ -410,7 +410,7 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
         $theme-light={{ bc: '$gray3Light' }}
         f={1}
       >
-        <LinkableAvatar size="$4.5" br="$3" href={`/profile/${profile?.sendid}`}>
+        <LinkableAvatar size="$4.5" br="$3" href={`/profile/${profile.sendid}`}>
           <Avatar.Image src={profile?.avatar_url ?? ''} />
           <Avatar.Fallback jc="center">
             <IconAccount size="$4.5" color="$olive" />

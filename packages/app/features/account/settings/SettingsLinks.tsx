@@ -13,7 +13,7 @@ export function SettingsLinks(): JSX.Element {
       href: '/account/settings/personal-info',
     },
     {
-      text: 'Notification',
+      text: 'Notifications',
       href: '/account/settings/notification',
       disabled: true,
     },
@@ -28,12 +28,12 @@ export function SettingsLinks(): JSX.Element {
       disabled: true,
     },
     {
-      text: 'Support',
-      href: '/account/settings/support',
-    },
-    {
       text: 'Backup',
       href: '/account/settings/backup',
+    },
+    {
+      text: 'Support',
+      href: '/account/settings/support',
     },
   ]
   return (

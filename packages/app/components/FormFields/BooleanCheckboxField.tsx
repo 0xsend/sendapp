@@ -62,25 +62,10 @@ export const BooleanCheckboxField = (
             ref={field.ref}
             id={id}
             borderWidth={0}
-            $theme-dark={{
-              bc: '$green1Dark',
-            }}
-            $theme-light={{
-              bc: '$green1Light',
-            }}
             {...props}
           >
             <Checkbox.Indicator>
-              <Check
-                $theme-dark={{
-                  bc: '$green1Dark',
-                  color: '$green12Dark',
-                }}
-                $theme-light={{
-                  bc: '$green1Light',
-                  color: '$green12Light',
-                }}
-              />
+              <Check />
             </Checkbox.Indicator>
           </Checkbox>
         </XStack>
