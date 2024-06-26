@@ -73,7 +73,6 @@ export function HomeScreen() {
             jc="space-between"
             br={12}
             gap="$6"
-            bc="$background"
           >
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />

@@ -55,10 +55,10 @@ export function RewardsScreen() {
     )
 
   return (
-    <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8' }} jc="space-between" h="95%">
+    <YStack f={1} my="auto" gap="$6" pb="$2" $gtSm={{ pb: '$8', h: '95%' }} jc="space-between">
       {selectedDistribution ? (
         <>
-          <YStack gap="$4" f={2} overflow={'hidden'}>
+          <YStack gap="$4" f={2}>
             <DistributionRewardsSection distribution={selectedDistribution} />
           </YStack>
           <DistributionRewardsList distributions={sortedDistributions} />

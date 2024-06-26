@@ -7,7 +7,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
       "flex": 1,
       "flexDirection": "column",
       "gap": 32,
-      "height": "95%",
       "justifyContent": "space-between",
       "marginBottom": "auto",
       "marginTop": "auto",
@@ -21,7 +20,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
         "flex": 2,
         "flexDirection": "column",
         "gap": 18,
-        "overflow": "hidden",
       }
     }
   >
