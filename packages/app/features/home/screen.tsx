@@ -9,8 +9,9 @@ import {
   Link,
   H3,
   Card,
+  LinkButton,
 } from '@my/ui'
-import { IconPlus } from 'app/components/icons'
+import { IconArrowRight, IconPlus } from 'app/components/icons'
 import { coins } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -20,9 +21,11 @@ import { TokenBalanceCard } from './TokenBalanceCard'
 import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
 import { X } from '@tamagui/lucide-icons'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 export function HomeScreen() {
   const [queryParams, setParams] = useRootScreenParams()
+  const { totalBalance } = useSendAccountBalances()
 
   const selectedCoin = useCoinFromTokenParam()
   const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
@@ -77,8 +80,22 @@ export function HomeScreen() {
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />
             </XStack>
-            <XStack w={'100%'} ai={'center'} pt={'$4'}>
+            <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
               <DepositPopover />
+              {!!totalBalance && (
+                <Stack f={1}>
+                  <LinkButton href={'/send'} theme="green" br="$4" px={'$3.5'} h={'$4.5'} bw={1}>
+                    <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
+                      <Button.Text fontWeight={'500'} textTransform={'uppercase'}>
+                        Send
+                      </Button.Text>
+                      <Button.Icon>
+                        <IconArrowRight size={'2.5'} />
+                      </Button.Icon>
+                    </XStack>
+                  </LinkButton>
+                </Stack>
+              )}
             </XStack>
           </Card>
           <Separator $gtLg={{ display: 'none' }} w={'100%'} />

@@ -345,6 +345,8 @@ exports[`HomeScreen 1`] = `
               {
                 "alignItems": "center",
                 "flexDirection": "row",
+                "gap": 18,
+                "justifyContent": "space-around",
                 "paddingTop": 18,
                 "width": "100%",
               }
@@ -565,6 +567,13 @@ exports[`HomeScreen 1`] = `
                 </View>
               </View>
             </View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                }
+              }
+            />
           </View>
         </View>
         <View
