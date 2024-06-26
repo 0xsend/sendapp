@@ -1,21 +1,18 @@
 import { createTsForm, createUniqueFieldSchema } from '@ts-react/form'
 
+import { FieldError, Form, FormWrapper, type FormProps, Theme } from '@my/ui'
 import {
   BooleanCheckboxField,
   BooleanField,
   BooleanSwitchField,
+  CoinField,
   CountryCodeField,
-  FieldError,
-  Form,
-  type FormProps,
-  FormWrapper,
   NumberField,
   OTPField,
   SelectField,
   TextAreaField,
   TextField,
-  Theme,
-} from '@my/ui'
+} from '../components/FormFields'
 import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
@@ -48,6 +45,7 @@ export const formFields = {
    */
   countrycode: createUniqueFieldSchema(z.string(), 'countrycode_select'),
   otp: createUniqueFieldSchema(z.string(), 'otp'),
+  coin: createUniqueFieldSchema(z.string(), 'coin'),
 }
 
 const mapping = [
@@ -60,6 +58,7 @@ const mapping = [
   [formFields.select, SelectField] as const,
   [formFields.countrycode, CountryCodeField] as const,
   [formFields.otp, OTPField] as const,
+  [formFields.coin, CoinField],
 ] as const
 
 const FormComponent = (props: FormProps) => {

@@ -4,3 +4,8 @@
 
 # Snaplet
 .snaplet/snapshots
+
+# Supabase
+.branches
+.temp
+.env

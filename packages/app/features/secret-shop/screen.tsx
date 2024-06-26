@@ -33,7 +33,7 @@ export function SecretShopScreen() {
     return (
       <Container>
         <Theme>
-          <Spinner fullscreen size="large" color={'$accent10Light'} />
+          <Spinner fullscreen size="large" color={'$green10Light'} />
         </Theme>
       </Container>
     )
@@ -51,7 +51,7 @@ export function SecretShopScreen() {
     <Container>
       <YStack w="100%" space="$4" f={1}>
         <Stack f={1} maw={600}>
-          <Theme name="dim">
+          <Theme name="alt1">
             <YStack pt="$4" gap="$4">
               <YStack gap="$2">
                 <Paragraph>

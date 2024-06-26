@@ -1,11 +1,11 @@
 import { Stack, Theme, type StackProps } from '@my/ui'
 
 import { useAccount } from 'wagmi'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 
 export const OpenConnectModalWrapper = ({ children, ...props }: StackProps) => {
   const { address } = useAccount()
-  const { openConnectModal } = useConnectModal()
+  const { open: openConnectModal } = useWeb3Modal()
 
   const handleClick = (e) => {
     if (address || !openConnectModal) return

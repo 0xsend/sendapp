@@ -1,9 +1,8 @@
 import type { MaskOptions } from '@tamagui/create-theme'
 
-import { palettes } from './palettes'
-
 export const { templates, maskOptions } = (() => {
-  const templateColors = {
+  const templateColorsSpecific = {
+    color0: 0,
     color1: 1,
     color2: 2,
     color3: 3,
@@ -21,28 +20,28 @@ export const { templates, maskOptions } = (() => {
   // templates use the palette and specify index
   // negative goes backwards from end so -1 is the last item
   const template = {
-    ...templateColors,
+    ...templateColorsSpecific,
     // the background, color, etc keys here work like generics - they make it so you
     // can publish components for others to use without mandating a specific color scale
     // the @tamagui/button Button component looks for `$background`, so you set the
-    // dark_red_Button theme to have a stronger background than the dark_red theme.
-    // Integer value represent the index of color in 12 color palette. The platte values can be located in token-colors.ts file
-    background: 2,
-    backgroundHover: 2,
-    backgroundPress: 2,
-    backgroundFocus: 2,
-    backgroundStrong: 1,
-    backgroundTransparent: 0,
-    color: -1,
-    colorHover: -2,
-    colorPress: -1,
-    colorFocus: -2,
-    colorTransparent: -0,
-    borderColor: 1,
-    borderColorHover: 6,
-    borderColorFocus: 2,
-    borderColorPress: 2,
-    placeholderColor: -4,
+    // dark_red_Button theme to have a stronger background than the dark_red theme.a
+    // Integer value represent the index of color in 12 color palette. The palette values can be located in token-colors.ts file
+    background: 0,
+    backgroundHover: 1,
+    backgroundPress: 0,
+    backgroundFocus: 1,
+    backgroundStrong: 2,
+    backgroundTransparent: 'transparent',
+    color: -0,
+    colorHover: -1,
+    colorPress: -0,
+    colorFocus: -1,
+    colorTransparent: 'transparent',
+    borderColor: 0,
+    borderColorHover: 7,
+    borderColorFocus: 7,
+    borderColorPress: 7,
+    placeholderColor: 7,
   }
 
   const templates = {
@@ -57,62 +56,36 @@ export const { templates, maskOptions } = (() => {
     },
   }
 
-  const overrideShadows = {
+  const shadows = {
     shadowColor: 0,
     shadowColorHover: 0,
     shadowColorPress: 0,
     shadowColorFocus: 0,
   }
 
-  const overrideWithColors = {
-    ...overrideShadows,
-    color: 0,
-    colorHover: 0,
-    colorFocus: 0,
-    colorPress: 0,
-  }
-
   const baseMaskOptions: MaskOptions = {
-    override: overrideShadows,
-    skip: overrideShadows,
-    // avoids the transparent ends
-    max: palettes.light.length - 2,
-    min: 1,
+    override: shadows,
+    skip: shadows,
   }
 
-  const skipShadowsAndColors = {
-    ...overrideShadows,
-    ...templateColors,
+  const skipShadowsAndSpecificColors = {
+    ...shadows,
+    ...templateColorsSpecific,
   }
 
   const maskOptions = {
     component: {
       ...baseMaskOptions,
-      override: overrideWithColors,
-      skip: skipShadowsAndColors,
+      override: shadows,
+      skip: skipShadowsAndSpecificColors,
     },
     alt: {
       ...baseMaskOptions,
     },
     button: {
       ...baseMaskOptions,
-      override: {
-        ...overrideWithColors,
-        borderColor: 'transparent',
-        borderColorHover: 'transparent',
-        borderColorPress: 2,
-        borderColorFocus: 1,
-        backgroundPress: 2,
-        backgroundFocus: 2,
-        backgroundStrong: 1,
-        backgroundTransparent: 0,
-        color: 0,
-        colorHover: -2,
-        colorPress: -1,
-        colorFocus: -2,
-        colorTransparent: -0,
-      },
-      skip: skipShadowsAndColors,
+      override: shadows,
+      skip: skipShadowsAndSpecificColors,
     },
   } satisfies Record<string, MaskOptions>
 

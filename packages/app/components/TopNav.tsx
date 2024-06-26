@@ -14,7 +14,7 @@ import {
   ButtonText,
   View,
 } from '@my/ui'
-import { useNav, useToken } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
@@ -25,6 +25,8 @@ import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
 import { usePwa } from 'app/utils/usePwa'
+import { IconCoin } from './icons/IconCoin'
+import { Link } from 'solito/link'
 
 export enum ButtonOption {
   QR = 'QR',
@@ -57,22 +59,27 @@ export function TopNav({
   button,
   noSubroute = false,
 }: TopNavProps) {
-  const [nav, setNavParam] = useNav()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
   const { push } = useRouter()
   const media = useMedia()
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
-  const [, setTokenParam] = useToken()
   const isPwa = usePwa()
 
   const handleHomeBottomSheet = () => {
-    setNavParam(nav ? undefined : 'home', { webBehavior: 'replace' })
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'home' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const handleSettingsBottomSheet = () => {
-    setNavParam(nav ? undefined : 'settings', { webBehavior: 'replace' })
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'settings' },
+      { webBehavior: 'replace' }
+    )
   }
 
   const hasSelectedCoin = selectedCoin !== undefined
@@ -80,7 +87,7 @@ export function TopNav({
   const handleBack = () => {
     // always pop to the base path. e.g. /account/settings/edit-profile -> /account
     if (hasSelectedCoin) {
-      setTokenParam(undefined)
+      setRootParams({ ...queryParams, token: undefined })
     }
     const newPath = parts.slice(0, 1).join('/')
     push(`/${newPath}`)
@@ -100,7 +107,7 @@ export function TopNav({
           <ButtonOg
             disabled
             $gtLg={{ display: 'none' }}
-            icon={selectedCoin.icon}
+            icon={<IconCoin coin={selectedCoin} />}
             bc="transparent"
             chromeless
             jc={'flex-end'}
@@ -161,17 +168,18 @@ export function TopNav({
         </Stack>
         {showLogo && media.lg ? (
           <XStack>
-            <IconSendLogo
-              size={'$2.5'}
-              color={'$color12'}
-              display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
-            />
+            <Link href="/send">
+              <IconSendLogo
+                size={'$2.5'}
+                color={'$color12'}
+                display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+              />
+            </Link>
           </XStack>
         ) : (
           <H2
             fontWeight={'300'}
-            $theme-light={{ col: '$gray10Light' }}
-            $theme-dark={{ col: '$gray8Light' }}
+            col="$color10"
             lineHeight={32}
             $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
             display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
@@ -197,8 +205,7 @@ export function TopNav({
             py="$3"
             $gtSm={{ py: '$6' }}
             $gtLg={{ pl: '$1', pb: '$6', pt: '$0', ...{ ml: isSubRoute ? '$10' : '$1' } }}
-            $theme-light={{ col: '$gray10Light' }}
-            $theme-dark={{ col: '$gray8Light' }}
+            col="$color10"
           >
             {subheader}
           </Paragraph>
@@ -255,7 +262,7 @@ function Button(props: ButtonProps) {
       focusStyle={{
         backgroundColor: 'transparent',
       }}
-      theme="accent"
+      theme="green"
       {...props}
     />
   )

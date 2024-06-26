@@ -1,65 +1,47 @@
+import { brandColors } from './colors'
 import { objectFromEntries, objectKeys } from './helpers'
 import { colorTokens } from './token-colors'
 
 export const palettes = (() => {
-  const lightTransparent = 'rgba(22, 22, 25, 0)'
-  const darkTransparent = 'rgba(241, 241, 238, 0)'
-
-  const transparent = (hsl: string, opacity = 0) =>
-    hsl.replace('%)', `%, ${opacity})`).replace('hsl(', 'hsla(')
-
-  const getColorPalette = (colors: object, color = colors[0]): string[] => {
+  const getColorPalette = (colors: object, color = colors[-1]): string[] => {
     const colorPalette = Object.values(colors)
-
-    // were re-ordering these
     const [head, tail] = [colorPalette.slice(0, 6), colorPalette.slice(colorPalette.length - 5)]
 
-    // add our transparent colors first/last
-    // and make sure the last (foreground) color is white/black rather than colorful
-    // this is mostly for consistency with the older theme-base
-    return [
-      transparent(colorPalette[0]),
-      ...head,
-      ...tail,
-      color,
-      transparent(colorPalette[colorPalette.length - 1]),
-    ]
+    return [...head, ...tail, color, color]
   }
 
-  const lightColor = 'rgba(22, 22, 25, 1)'
+  const lightColor = brandColors.darkest
+  const darkColor = brandColors.white
   const lightPalette = [
-    lightTransparent,
-    '#fff',
-    '#f9f9f9',
-    'hsl(0, 0%, 97.3%)',
-    'hsl(0, 0%, 95.1%)',
-    'hsl(0, 0%, 94.0%)',
-    'hsl(0, 0%, 92.0%)',
-    'hsl(0, 0%, 89.5%)',
-    'hsl(0, 0%, 81.0%)',
-    'hsl(0, 0%, 56.1%)',
-    'hsl(0, 0%, 50.3%)',
-    'hsl(0, 0%, 42.5%)',
-    lightColor,
-    darkTransparent,
+    brandColors.white,
+    brandColors.alabaster,
+    brandColors.darkAlabaster,
+    brandColors.silverChalice,
+    brandColors.white,
+    brandColors.white,
+    brandColors.white,
+    brandColors.white,
+    brandColors.white,
+    brandColors.darkAlabaster,
+    brandColors.darkGrayTextField,
+    brandColors.darkest,
+    brandColors.darkest,
   ]
 
-  const darkColor = '#101010'
   const darkPalette = [
-    darkTransparent,
-    '#101010',
-    '#151515',
-    '#191919',
-    '#212121',
-    '#282828',
-    '#323232',
-    '#424242',
-    '#494949',
-    '#545454',
-    '#626262',
-    '#a5a5a5',
-    darkColor,
-    lightTransparent,
+    brandColors.darkest,
+    brandColors.aztec,
+    brandColors.lunarGreen,
+    brandColors.mineShaft,
+    brandColors.darkGrayTextField,
+    brandColors.darkest,
+    brandColors.darkest,
+    brandColors.darkest,
+    brandColors.darkest,
+    brandColors.darkGrayTextField,
+    brandColors.silverChalice,
+    brandColors.white,
+    brandColors.white,
   ]
 
   const lightPalettes = objectFromEntries(

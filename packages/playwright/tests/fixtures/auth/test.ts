@@ -1,11 +1,12 @@
-import { type BrowserContext, mergeTests, test as base } from '@playwright/test'
+import { type BrowserContext, mergeTests } from '@playwright/test'
 import { test as ethereumTest } from '../ethereum'
 import { test as webauthnTest } from '../webauthn'
+import { test as snapletTest } from '../snaplet'
 
 import type { Database, Tables } from '@my/supabase/database.types'
 import { type Session, type SupabaseClient, type User, createClient } from '@supabase/supabase-js'
 import { countries } from 'app/utils/country'
-import { SUPABASE_URL, supabaseAdmin } from 'app/utils/supabase/admin'
+import { SUPABASE_URL, SUPABASE_SUBDOMAIN, supabaseAdmin } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../../playwright.config'
@@ -39,7 +40,7 @@ export const getAuthSessionFromContext = async (context: BrowserContext) => {
   return { token, decoded }
 }
 
-const authTest = base.extend<{
+const authTest = snapletTest.extend<{
   context: BrowserContext
   supabase: SupabaseClient<Database>
   authSession: { token: string; decoded: JwtPayload }
@@ -49,7 +50,7 @@ const authTest = base.extend<{
     profile: Tables<'profiles'>
   }
 }>({
-  context: async ({ context, user: { user, session } }, use) => {
+  context: async ({ pg, context, user: { user, session } }, use) => {
     const { parallelIndex } = test.info()
 
     log = debug(`test:auth:${user.id}:${parallelIndex}`)
@@ -60,9 +61,8 @@ const authTest = base.extend<{
     const { access_token, refresh_token } = session
 
     // @note see how Supabase does it here: https://github.com/supabase/supabase-js/blob/f6bf008d8017ae013450ecd3fa806acad735bacc/src/SupabaseClient.ts#L95
-    const subdomain = new URL(SUPABASE_URL).hostname.split('.')[0]
-    assert(!!subdomain, 'subdomain not found')
-    const name = `sb-${subdomain}-auth-token`
+    assert(!!SUPABASE_SUBDOMAIN, 'subdomain not found')
+    const name = `sb-${SUPABASE_SUBDOMAIN}-auth-token`
     const domain = new URL(config.use.baseURL).hostname
     assert(!!domain, 'domain not found')
 
@@ -87,11 +87,15 @@ const authTest = base.extend<{
     try {
       await use(context)
     } finally {
+      // @todo figure out why this doesn't work after adding activity feed
       // delete the user
-      await supabaseAdmin.auth.admin.deleteUser(user.id).then(({ error }) => {
-        if (error) {
-          log('error deleting user', `id=${parallelIndex}`, `user=${user.id}`, error?.message)
-        }
+      // await supabaseAdmin.auth.admin.deleteUser(user.id).then(({ error }) => {
+      //   if (error) {
+      //     log('error deleting user', `id=${parallelIndex}`, `user=${user.id}`, error)
+      //   }
+      // })
+      await pg.query('delete from auth.users where id = $1', [user.id]).catch((e) => {
+        log('error deleting user', `id=${parallelIndex}`, `user=${user.id}`, e)
       })
     }
   },

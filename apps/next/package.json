@@ -14,8 +14,10 @@
     "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env -c --"
   },
   "dependencies": {
+    "@my/api": "workspace:*",
+    "@my/supabase": "workspace:*",
+    "@my/ui": "workspace:*",
     "@plaiceholder/next": "^3.0.0",
-    "@rainbow-me/rainbowkit": "^2.0.4",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
     "@supabase/supabase-js": "2.41.1",
@@ -46,7 +48,6 @@
     "@next/eslint-plugin-next": "^14.0.4",
     "@tamagui/next-plugin": "^1.93.2",
     "@types/node": "^20.11.0",
-    "@welldone-software/why-did-you-render": "^7.0.1",
     "dotenv-cli": "^7.3.0",
     "eslint-config-next": "^14.0.4"
   }

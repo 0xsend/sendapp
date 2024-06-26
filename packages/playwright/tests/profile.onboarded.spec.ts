@@ -14,7 +14,7 @@ test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
 })
 
-test('can visit other user profile', async ({ page, seed }) => {
+test('can visit other user profile and send by tag', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
@@ -26,7 +26,39 @@ test('can visit other user profile', async ({ page, seed }) => {
   await expect(profilePage.sendButton).toBeVisible()
   await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
-  await expect(page.getByTestId('sendDialogContainer')).toBeVisible()
+  await page.waitForURL(/\/send/)
+  let url = new URL(page.url())
+  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+    recipient: tag.name,
+    idType: 'tag',
+  })
+  await expect(page.getByText('Enter Amount')).toBeVisible()
+
+  // visit another user but without a sendtag
+  const plan2 = await seed.users([{ ...userOnboarded, tags: [] }])
+  const tag2 = plan2.tags[0]
+  assert(!tag2, 'should not have a tag')
+  const profile2 = plan2.profiles[0]
+  assert(!!profile2?.sendId, 'profile send_id not found')
+  assert(!!profile2?.name, 'profile name not found')
+  assert(!!profile2?.about, 'profile about not found')
+  const profilePage2 = new ProfilePage(page, { name: profile2.name, about: profile2.about })
+  await page.goto(`/profile/${profile2.sendId}`)
+  await expect(profilePage2.sendButton).toBeVisible()
+  await expect(profilePage2.requestButton).toBeVisible()
+  await profilePage2.sendButton.click()
+  await page.waitForURL(/\/send/)
+  url = new URL(page.url())
+  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+    recipient: profile2?.sendId.toString(),
+    idType: 'sendid',
+  })
+  await expect(page.getByText('Enter Amount')).toBeVisible()
+
+  // can visit profile withouth the @ prefix
+  await page.goto(`/${tag.name}`)
+  expect(await page.title()).toBe('Send | Profile')
+  await expect(page.getByText(tag.name)).toBeVisible()
 })
 
 test('can visit my own profile', async ({

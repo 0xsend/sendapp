@@ -7,8 +7,11 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
       "flex": 1,
       "flexDirection": "column",
       "gap": 32,
+      "height": "95%",
       "justifyContent": "space-between",
-      "paddingBottom": 24,
+      "marginBottom": "auto",
+      "marginTop": "auto",
+      "paddingBottom": 7,
     }
   }
 >
@@ -56,7 +59,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             {
               "alignItems": "center",
               "backgroundColor": "transparent",
-              "color": "hsla(112, 22%, 59%, 1)",
+              "color": "#FFFFFF",
               "display": "flex",
               "fontFamily": "System",
               "fontSize": 19.2,
@@ -86,7 +89,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "hsla(0, 0%, 99%, 1)",
+                  "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 54,
                   "fontWeight": "300",
@@ -145,7 +148,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(0, 0%, 99%, 1)",
+                    "color": "#FFFFFF",
                     "fontFamily": "System",
                     "fontSize": 19.2,
                     "fontWeight": "400",
@@ -181,7 +184,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   {
                     "alignItems": "center",
                     "backgroundColor": "transparent",
-                    "color": "hsla(112, 22%, 59%, 1)",
+                    "color": "#FFFFFF",
                     "display": "flex",
                     "fontFamily": "System",
                     "fontSize": 16.8,
@@ -199,7 +202,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 selectable={true}
                 style={
                   {
-                    "color": "hsla(0, 0%, 99%, 1)",
+                    "color": "#FFFFFF",
                     "fontFamily": "System",
                     "fontSize": 16,
                     "fontWeight": "500",
@@ -250,16 +253,12 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               style={
                 {
                   "backgroundColor": "transparent",
-                  "borderBottomColor": "#3E4A3C",
                   "borderBottomLeftRadius": 12,
                   "borderBottomRightRadius": 12,
                   "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
                   "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
                   "borderRightWidth": 1,
                   "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
                   "borderTopLeftRadius": 12,
                   "borderTopRightRadius": 12,
                   "borderTopWidth": 1,
@@ -298,7 +297,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "#86AE80",
+                      "color": "#666666",
                       "display": "flex",
                       "fontFamily": "System",
                       "fontSize": 19.2,
@@ -315,7 +314,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                       "fontWeight": "500",
@@ -342,16 +341,12 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               style={
                 {
                   "backgroundColor": "transparent",
-                  "borderBottomColor": "#3E4A3C",
                   "borderBottomLeftRadius": 12,
                   "borderBottomRightRadius": 12,
                   "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
                   "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
                   "borderRightWidth": 1,
                   "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
                   "borderTopLeftRadius": 12,
                   "borderTopRightRadius": 12,
                   "borderTopWidth": 1,
@@ -391,7 +386,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "#86AE80",
+                      "color": "#666666",
                       "display": "flex",
                       "fontFamily": "System",
                       "fontSize": 19.2,
@@ -408,7 +403,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "hsla(191, 32%, 10%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                       "fontWeight": "500",
@@ -425,16 +420,12 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               style={
                 {
                   "backgroundColor": "transparent",
-                  "borderBottomColor": "#3E4A3C",
                   "borderBottomLeftRadius": 12,
                   "borderBottomRightRadius": 12,
                   "borderBottomWidth": 1,
-                  "borderLeftColor": "#3E4A3C",
                   "borderLeftWidth": 1,
-                  "borderRightColor": "#3E4A3C",
                   "borderRightWidth": 1,
                   "borderStyle": "solid",
-                  "borderTopColor": "#3E4A3C",
                   "borderTopLeftRadius": 12,
                   "borderTopRightRadius": 12,
                   "borderTopWidth": 1,
@@ -474,7 +465,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "#86AE80",
+                      "color": "#666666",
                       "display": "flex",
                       "fontFamily": "System",
                       "fontSize": 19.2,
@@ -491,7 +482,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   selectable={true}
                   style={
                     {
-                      "color": "hsla(191, 32%, 10%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                       "fontWeight": "500",
@@ -516,7 +507,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           <View
             style={
               {
-                "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 12,
                 "borderBottomRightRadius": 12,
                 "borderTopLeftRadius": 12,
@@ -588,7 +579,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "hsla(191, 32%, 10%, 1)",
+                        "color": "#111f22",
                         "fontFamily": "System",
                         "fontSize": 55.199999999999996,
                         "fontWeight": "500",
@@ -603,7 +594,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     selectable={true}
                     style={
                       {
-                        "color": "hsla(191, 32%, 41%, 1)",
+                        "color": "#081619",
                         "fontFamily": "System",
                         "fontSize": 16.8,
                         "fontWeight": "400",
@@ -640,6 +631,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           "marginBottom": "auto",
           "marginTop": "auto",
           "overflow": "scroll",
+          "paddingBottom": 24,
         }
       }
     >
@@ -658,51 +650,30 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           }
         >
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -711,57 +682,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 1
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -770,57 +719,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 2
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -829,57 +756,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 3
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -888,57 +793,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 4
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -947,57 +830,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 5
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -1006,57 +867,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 6
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -1065,57 +904,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 7
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -1124,57 +941,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 8
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -1183,57 +978,35 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 9
             </Text>
           </View>
           <View
-            accessibilityRole="button"
-            focusVisibleStyle={
-              {
-                "borderColor": "$background",
-              }
-            }
-            pointerEvents="none"
+            disabled={true}
             style={
               {
-                "alignItems": "center",
-                "backgroundColor": "#081619",
-                "borderBottomColor": "transparent",
+                "backgroundColor": "#111f22",
                 "borderBottomLeftRadius": 6,
                 "borderBottomRightRadius": 6,
-                "borderBottomWidth": 1,
-                "borderLeftColor": "transparent",
-                "borderLeftWidth": 1,
-                "borderRightColor": "transparent",
-                "borderRightWidth": 1,
-                "borderStyle": "solid",
-                "borderTopColor": "transparent",
                 "borderTopLeftRadius": 6,
                 "borderTopRightRadius": 6,
-                "borderTopWidth": 1,
                 "flex": 1,
-                "flexDirection": "row",
-                "flexWrap": "nowrap",
+                "flexDirection": "column",
                 "height": 28,
                 "justifyContent": "center",
                 "maxWidth": 84,
                 "minWidth": 74,
-                "opacity": 0.4,
-                "paddingLeft": 18,
-                "paddingRight": 18,
+                "opacity": 0.5,
+                "position": "relative",
               }
             }
           >
             <Text
-              lineBreakMode="clip"
-              numberOfLines={1}
+              selectable={true}
               style={
                 {
-                  "color": "#86AE80",
-                  "flexGrow": 0,
-                  "flexShrink": 1,
+                  "color": "#666666",
                   "fontFamily": "System",
                   "fontSize": 13.2,
                   "fontWeight": "300",
@@ -1242,7 +1015,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                 }
               }
               suppressHighlighting={true}
-              userSelect="none"
             >
               # 10
             </Text>

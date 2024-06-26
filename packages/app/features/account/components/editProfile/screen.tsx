@@ -24,7 +24,7 @@ export const EditProfile = () => {
 }
 function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
   const { id, name, about, is_public, avatar_url } = profile
-  const mutation = useProfileMutation(id)
+  const { mutate, error } = useProfileMutation(id)
   const avatarRef = useRef<UploadAvatarRefObject>(null)
 
   return (
@@ -47,9 +47,10 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
         about: about ? about : '',
         isPublic: is_public !== null ? is_public : true,
       }}
-      onSubmit={(values) => mutation.mutate(values)}
+      onSubmit={(values) => mutate(values)}
       renderAfter={({ submit }) => (
         <YStack ai={'center'}>
+          {error && <Paragraph theme="red">{error.message}</Paragraph>}
           <SubmitButton
             f={1}
             marginTop={'$5'}
@@ -57,7 +58,7 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
             py={'$5'}
             fontWeight={'500'}
             onPress={() => submit()}
-            theme="accent"
+            theme="green"
           >
             SAVE
           </SubmitButton>

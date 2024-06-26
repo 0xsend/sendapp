@@ -62,3 +62,6 @@ tmp
 
 # ignore for now
 Brewfile.lock.json
+
+# asdf
+.tool-versions

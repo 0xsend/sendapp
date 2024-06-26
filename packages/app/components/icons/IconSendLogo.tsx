@@ -5,7 +5,7 @@ import { ClipPath, Defs, G, Path, Rect, Svg } from 'react-native-svg'
 
 const aspectRatio = 132 / 48
 
-const SendLogo = (props: IconProps) => {
+const SendLogo = (props) => {
   const { size: sizeToken, color, ...rest } = props
 
   const size =
@@ -47,4 +47,4 @@ const SendLogo = (props: IconProps) => {
   )
 }
 
-export const IconSendLogo = memo(themed(SendLogo))
+export const IconSendLogo = memo<IconProps>(themed(SendLogo))

@@ -1,5 +1,7 @@
 import {
+  Anchor,
   BigHeading,
+  Button,
   ButtonText,
   FormWrapper,
   H3,
@@ -11,7 +13,6 @@ import {
 import type { MobileOtpType } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -54,10 +55,10 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           token: {
             accessibilityLabel: 'One-time Password',
             '$theme-dark': {
-              borderBottomColor: '$accent10Dark',
+              borderBottomColor: '$green10Dark',
             },
             '$theme-light': {
-              borderBottomColor: '$accent9Light',
+              borderBottomColor: '$green9Light',
             },
 
             borderWidth: 0,
@@ -77,18 +78,13 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
             textContentType: 'oneTimeCode',
             autoComplete: 'one-time-code',
             outlineColor: 'transparent',
-            theme: 'accent',
+            theme: 'green',
+            autoFocus: true,
+            fieldsetProps: {
+              f: 1,
+            },
             focusStyle: {
-              borderBottomColor: '$accent3Light',
-              autoFocus: true,
-              focusStyle: {
-                '$theme-dark': {
-                  borderBottomColor: '$accent9Light',
-                },
-                '$theme-light': {
-                  borderBottomColor: '$black',
-                },
-              },
+              borderBottomColor: '$green3Light',
             },
           },
         }}
@@ -96,14 +92,14 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           <XStack
             f={1}
             mt={'0'}
-            jc={'flex-end'}
+            jc={'space-between'}
             $sm={{ jc: 'center', height: '100%' }}
-            ai={'flex-start'}
+            ai={'center'}
           >
             <SubmitButton
               onPress={() => submit()}
               br="$3"
-              bc={'$accent9Light'}
+              bc={'$green9Light'}
               $sm={{ w: '100%' }}
               $gtMd={{
                 mt: '0',
@@ -121,7 +117,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
           </XStack>
         )}
       >
-        {(fields) => (
+        {({ token }) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <BigHeading color="$color12">VERIFY ACCOUNT</BigHeading>
             <H3
@@ -138,7 +134,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
               <Paragraph color="$color12" size={'$1'} fontWeight={'500'}>
                 Your Code
               </Paragraph>
-              <XStack gap="$2">{Object.values(fields)}</XStack>
+              {token}
             </YStack>
           </YStack>
         )}

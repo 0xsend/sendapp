@@ -3,13 +3,17 @@ import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
 import { mainnetClient, baseMainnetClient } from './client'
 import { createConfig } from 'wagmi'
 
-export const chains = [baseMainnet, mainnet, baseMainnetOg, mainnetOg] as const
+export const chains = [
+  baseMainnet,
+  mainnet,
+  // baseMainnetOg, mainnetOg
+] as const
 
 export const client = ({ chain: { id: chainId } }) => {
   if (chainId === mainnet.id) return mainnetClient
   if (chainId === baseMainnet.id) return baseMainnetClient
   // handle __DEV__ mode
-  if (__DEV__ || process.env.NODE_ENV === 'development') {
+  if (__DEV__ || process.env.NODE_ENV === 'development' || process.env.CI) {
     if (chainId === baseMainnetOg.id) {
       console.log(
         `⚠️ Overriding Base chain ID ${baseMainnetOg.id} with ${baseMainnetClient.chain.id} in __DEV__ mode`

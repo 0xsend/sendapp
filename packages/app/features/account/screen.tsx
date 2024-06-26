@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Container,
   Link,
   type LinkProps,
   Paragraph,
@@ -11,10 +10,15 @@ import {
   useToastController,
   TooltipSimple,
   useMedia,
-  useThemeName,
   Theme,
   H3,
   Stack,
+  Card,
+  View,
+  Heading,
+  isWeb,
+  ButtonIcon,
+  ButtonText,
 } from '@my/ui'
 import {
   IconAccount,
@@ -23,15 +27,15 @@ import {
   IconGear,
   IconPlus,
   IconShare,
+  IconBadgeCheck,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
-import { useNav } from 'app/routers/params'
+import { useRootScreenParams } from 'app/routers/params'
 import type React from 'react'
 import { type ElementType, useEffect, useState } from 'react'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { useConfirmedTags } from 'app/utils/tags'
 
 export function AccountScreen() {
@@ -42,10 +46,9 @@ export function AccountScreen() {
   const send_id = profile?.send_id
   const avatar_url = profile?.avatar_url
   const tags = useConfirmedTags()
-  const sendTags = useConfirmedTags()?.reduce((prev, tag) => `${prev} @${tag.name}`, '')
   const refCode = profile?.referral_code ?? ''
   const referralHref = getReferralHref(refCode)
-  const [, setNavParam] = useNav()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const [canShare, setCanShare] = useState(false)
 
   useEffect(() => {
@@ -67,108 +70,216 @@ export function AccountScreen() {
         toast.show('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
           customData: {
-            theme: 'error',
+            theme: 'red',
           },
         })
       )
   }
 
-  const facts = [
-    { label: 'Send ID', value: send_id },
-    { label: 'Sendtags', value: sendTags },
+  const cards = [
     {
-      label: 'Referral Link',
-      value: (
-        <TooltipSimple label={canShare ? 'Share' : 'Copy'}>
-          <Button
-            accessibilityLabel={canShare ? 'Share' : 'Copy'}
-            f={1}
-            fd="row"
-            unstyled
-            onPress={shareOrCopyOnPress}
-            color="$color12"
-            iconAfter={
-              canShare ? (
-                <Theme name="accent">
-                  <IconShare color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
-                </Theme>
-              ) : (
-                <Theme name="accent">
-                  <IconCopy color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
-                </Theme>
-              )
-            }
+      label: 'Sendtag',
+      description: 'Add sendtag now!',
+      child: (
+        <BorderedLink href={'/account/sendtag'} Icon={IconBadgeCheck}>
+          Add
+        </BorderedLink>
+      ),
+    },
+    {
+      label: 'Rewards',
+      description: 'Start earning now!',
+      child: (
+        <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
+          Earn
+        </BorderedLink>
+      ),
+    },
+    {
+      label: 'Referrals',
+      description: 'Share your link',
+      child: (
+        <View py={'$2.5'} px={'$size.0.9'} borderRadius={'$4'} flexShrink={1}>
+          <TooltipSimple
+            label={<Paragraph color="$white">{canShare ? 'Share' : 'Copy'}</Paragraph>}
           >
-            <Button.Text>{refCode}</Button.Text>
-          </Button>
-        </TooltipSimple>
+            <Button
+              bc={'$color0'}
+              br="$2"
+              accessibilityLabel={canShare ? 'Share' : 'Copy'}
+              f={1}
+              fd="row"
+              chromeless
+              onPress={shareOrCopyOnPress}
+              color="$color12"
+              iconAfter={
+                <Theme name="green">
+                  {canShare ? (
+                    <IconShare size="$1" $platform-web={{ cursor: 'pointer' }} />
+                  ) : (
+                    <IconCopy size="$1" $platform-web={{ cursor: 'pointer' }} />
+                  )}
+                </Theme>
+              }
+            >
+              <Button.Text size={'$6'}>SEND.APP/{refCode}</Button.Text>
+            </Button>
+          </TooltipSimple>
+        </View>
       ),
     },
   ]
 
   return (
-    <>
-      <YStack w={'100%'} ai={'center'} gap={'$6'} py="$6">
-        <XStack w={'100%'} ai={'center'} jc={'space-between'} $md={{ jc: 'center' }} zIndex={4}>
-          <XStack ai={'center'} jc={'center'} gap={'$5'} $md={{ flexDirection: 'column' }}>
-            <Avatar $gtMd={{ size: 133.5 }} size={'$10'} borderRadius={'$3'}>
+    <YStack w={'100%'} ai={'center'} gap={'$size.1.5'} py="$6">
+      <Card p={'$size.3.5'} w={'100%'}>
+        <XStack gap={'$size.3.5'} w={'100%'} flexWrap="wrap">
+          <View width={'100%'} $gtMd={{ width: 'auto' }}>
+            <Avatar $gtMd={{ size: 256 }} size={'$10'} borderRadius={'$3'}>
               <Avatar.Image
-                $gtMd={{ w: 133.5, h: 133.5 }}
+                $gtMd={{ w: 256, h: 256 }}
                 w={'$10'}
                 h="$10"
                 accessibilityLabel=""
                 src={avatar_url ?? ''}
               />
-              <Avatar.Fallback f={1} jc={'center'} ai={'center'} backgroundColor={'$decay'}>
-                <IconAccount size="$6" color="$olive" />
+              <Avatar.Fallback
+                f={1}
+                jc={'center'}
+                ai={'center'}
+                backgroundColor={'$decay'}
+                $theme-light={{ backgroundColor: '$white' }}
+              >
+                <IconAccount size={256} color="$olive" />
               </Avatar.Fallback>
             </Avatar>
-            <YStack gap={'$2'} $md={{ ai: 'center' }}>
-              <Paragraph fontSize={'$9'} fontWeight={'700'} color={'$color12'}>
-                {name ? name : '---'}
-              </Paragraph>
+          </View>
+          <YStack gap="$size.1.5" flex={1}>
+            <YStack gap={'$size.0.75'}>
+              <Heading fontSize={'$9'} fontWeight={'900'} color={'$color12'}>
+                {name ? name.toUpperCase() : '---'}
+              </Heading>
+
               {tags?.[0] ? (
-                <Paragraph fontFamily={'$mono'} opacity={0.6}>
+                <Paragraph fontSize={'$7'} fontWeight={'600'} theme={'alt2'}>
                   @{tags[0].name}
                 </Paragraph>
               ) : null}
             </YStack>
-          </XStack>
-          <XStack gap={'$5'} $md={{ display: 'none' }}>
-            <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-              Sendtags
-            </BorderedLink>
-            <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-              Rewards
-            </BorderedLink>
-            <BorderedLink
-              href="/account/settings/edit-profile"
-              Icon={IconGear}
-              // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
-              {...(media.lg
-                ? {
-                    onPress: (e) => {
-                      if (media.lg) {
-                        e.preventDefault()
-                        setNavParam('settings', { webBehavior: 'replace' })
+
+            <Separator />
+
+            <YStack gap={'$3'}>
+              {typeof send_id === 'number' && (
+                <XStack gap={'$3.5'}>
+                  <InfoLabel text="SEND ID" />
+                  <InfoItem text={send_id?.toString()} />
+                </XStack>
+              )}
+
+              {tags?.[0] && (
+                <XStack gap={'$3.5'}>
+                  <InfoLabel text="SENDTAGS" />
+                  <XStack gap={'$3.5'} flexWrap="wrap" flex={1}>
+                    {tags.map((tag) => (
+                      <InfoItem text={`@${tag.name}`} key={tag.name} />
+                    ))}
+                  </XStack>
+                </XStack>
+              )}
+            </YStack>
+
+            <XStack pt={'$size.0.9'}>
+              <Theme name="green">
+                <Link
+                  href="/account/settings/edit-profile"
+                  theme={'ghost_Button'}
+                  borderRadius={'$4'}
+                  color="$borderColor"
+                  $theme-light={{ boc: '$color12' }}
+                  bw={1}
+                  p={'$3.5'}
+                  px="$6"
+                  maw={301}
+                  // on smaller screens, we don't want to navigate to the settings screen but open bottom sheet
+                  {...(media.lg
+                    ? {
+                        onPress: (e) => {
+                          if (media.lg) {
+                            e.preventDefault()
+                            setRootParams(
+                              { ...queryParams, nav: 'settings' },
+                              { webBehavior: 'replace' }
+                            )
+                          }
+                        },
                       }
-                    },
-                  }
-                : {})}
-            >
-              Settings
-            </BorderedLink>
-          </XStack>
+                    : {})}
+                >
+                  <XStack gap={'$1.5'} ai={'center'} jc="center">
+                    <IconGear color="$color12" />
+                    <Paragraph textTransform="uppercase" color={'$color12'}>
+                      Settings
+                    </Paragraph>
+                  </XStack>
+                </Link>
+              </Theme>
+            </XStack>
+          </YStack>
         </XStack>
-        <Separator w={'100%'} />
-        <ProfileFacts facts={facts} />
-        <Separator w={'100%'} />
-        <YStack w="100%" gap="$5" f={1}>
-          {tags?.length === 0 ? <NoTagsMessage /> : null}
-          <BottomButtonRow />
-        </YStack>
-      </YStack>
-    </>
+      </Card>
+
+      <XStack gap={'$size.1.5'} w={'100%'} flexWrap="wrap">
+        {cards.map((card) => (
+          <ActionCard key={card.label} title={card.label} description={card.description}>
+            {card.child}
+          </ActionCard>
+        ))}
+
+        {tags?.length === 0 ? <NoTagsMessage /> : null}
+        <BottomButtonRow />
+      </XStack>
+    </YStack>
+  )
+}
+
+const InfoLabel = ({ text }: { text: string }) => {
+  return (
+    <Paragraph fontSize={'$5'} minWidth={'$size.8'} fontWeight={'500'}>
+      {text}:
+    </Paragraph>
+  )
+}
+const InfoItem = ({ text }: { text: string }) => {
+  return (
+    <Paragraph fontSize={'$5'} fontWeight={'500'}>
+      {text}
+    </Paragraph>
+  )
+}
+
+const ActionCard = ({
+  title,
+  description,
+  children,
+}: { title: string; description: string; children: React.ReactNode }) => {
+  return (
+    <Card
+      p={'$size.3.5'}
+      flex={1}
+      width="100%"
+      $gtLg={{
+        width: isWeb ? 'calc((100% - 48px) / 3)' : '100%',
+      }}
+    >
+      <Heading fontSize={'$9'} fontWeight={'600'} color={'$color12'} mb="$size.0.75">
+        {title}
+      </Heading>
+      <Paragraph size={'$6'} theme={'alt2'} mb="$size.1.5">
+        {description}
+      </Paragraph>
+      <XStack>{children}</XStack>
+    </Card>
   )
 }
 
@@ -177,61 +288,31 @@ const BorderedLink = ({
   children,
   ...props
 }: { Icon?: ElementType; children: React.ReactNode } & LinkProps) => {
-  const themeName = useThemeName()
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = (resolvedTheme ?? themeName)?.startsWith('dark') ? '$color10' : '$color1'
   return (
     <Link
-      borderWidth={1}
-      color={iconColor}
-      theme="accent"
-      borderRadius={'$4'}
-      p={'$3'}
-      px="$4"
       {...props}
+      theme={'green_ghost_Button'}
+      boc={'$borderColor'}
+      bw={1}
+      br={'$4'}
+      p={'$3'}
+      px={'$4'}
+      $theme-light={{ color: '$color12', boc: '$color12' }}
     >
-      <XStack gap={'$1.5'} ai={'center'}>
-        {Icon && <Icon color={iconColor} />}
-        <Paragraph color={iconColor} textTransform="uppercase">
+      <XStack gap={'$2'} ai={'center'}>
+        {Icon && (
+          <Icon $theme-light={{ color: '$color12', boc: '$color12' }} color="$borderColor" />
+        )}
+        <Paragraph
+          textTransform="uppercase"
+          size={'$6'}
+          color="$borderColor"
+          $theme-light={{ color: '$color12', boc: '$color12' }}
+        >
           {children}
         </Paragraph>
       </XStack>
     </Link>
-  )
-}
-
-const ProfileFacts = ({ facts }: { facts: { label: string; value?: React.ReactNode }[] }) => {
-  return (
-    <>
-      <XStack w={'100%'} $md={{ jc: 'center' }} $sm={{ display: 'none' }}>
-        <YStack gap={'$5'} w={'$12'}>
-          {facts.map((fact) => (
-            <Paragraph key={fact.label} fontSize={'$5'} fontWeight={'500'}>
-              {fact.label}
-            </Paragraph>
-          ))}
-        </YStack>
-        <YStack gap={'$5'}>
-          {facts.map((fact) => (
-            <Paragraph key={fact.label} color={'$color12'} fontSize={'$5'} fontWeight={'700'}>
-              {fact.value ? fact.value : `No ${fact.label.toLowerCase()}`}
-            </Paragraph>
-          ))}
-        </YStack>
-      </XStack>
-      <YStack w={'100%'} gap={'$6'} $gtSm={{ display: 'none' }}>
-        {facts.map((fact) => (
-          <YStack key={fact.label} gap={'$2'}>
-            <Paragraph fontSize={'$5'} fontWeight={'500'}>
-              {fact.label}
-            </Paragraph>
-            <Paragraph color={'$color12'} fontSize={'$5'} fontWeight={'500'}>
-              {fact.value ? fact.value : `No ${fact.label.toLowerCase()}`}
-            </Paragraph>
-          </YStack>
-        ))}
-      </YStack>
-    </>
   )
 }
 
@@ -272,22 +353,25 @@ const BottomButtonRow = () => {
   if (media.gtMd && (tags === undefined || tags.length === 0))
     return (
       <Stack f={1} jc="center" $md={{ display: 'none' }}>
-        <Link
-          href={'/account/sendtag/checkout'}
-          theme="accent"
-          borderRadius={'$4'}
-          p={'$3.5'}
-          px="$6"
-          maw={301}
-          bg="$primary"
-        >
-          <XStack gap={'$1.5'} ai={'center'} jc="center">
-            <IconPlus col={'$black'} />
-            <Paragraph textTransform="uppercase" col={'$black'}>
-              SENDTAGS
-            </Paragraph>
-          </XStack>
-        </Link>
+        <Theme name="green">
+          <Link
+            href={'/account/sendtag/checkout'}
+            theme="Button"
+            borderRadius={'$4'}
+            p={'$3.5'}
+            px="$6"
+            maw={301}
+            bc="$background"
+            hoverStyle={{ bc: '$backgroundHover' }}
+          >
+            <XStack gap={'$1.5'} ai={'center'} jc="center">
+              <ButtonIcon>
+                <IconPlus size={'$1.25'} />
+              </ButtonIcon>
+              <ButtonText textTransform="uppercase">SENDTAGS</ButtonText>
+            </XStack>
+          </Link>
+        </Theme>
       </Stack>
     )
 

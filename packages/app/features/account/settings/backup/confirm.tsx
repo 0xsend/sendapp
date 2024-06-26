@@ -13,15 +13,11 @@ import { useQuery } from '@tanstack/react-query'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { pgBase16ToBytes } from 'app/utils/pgBase16ToBytes'
+import { byteaToBytes } from 'app/utils/byteaToBytes'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import {
-  defaultUserOp,
-  useUserOpGasEstimate,
-  useUserOpTransferMutation,
-} from 'app/utils/useUserOpTransferMutation'
+import { defaultUserOp, useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -86,11 +82,10 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
       gap={'$2'}
     >
       <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
-        Add Passkey as Signer
+        Passkey {webauthnCred?.display_name} has been saved
       </H2>
       <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-        Your passkey {webauthnCred?.display_name} has been saved. Add your new passkey as a signer.
-        This will allow you to sign transactions on your account with your new passkey.
+        Add your new passkey as a Signer to authorize it to sign transactions on your account.
       </Paragraph>
       <YStack gap={'$2'} jc="center">
         <AddSignerButton webauthnCred={webauthnCred} />
@@ -154,7 +149,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       assert(nonce !== undefined, 'No nonce found')
       assert(maxFeePerGas !== undefined, 'No max fee per gas found')
       assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
-      const xY = COSEECDHAtoXY(pgBase16ToBytes(webauthnCred.public_key as `\\x${string}`))
+      const xY = COSEECDHAtoXY(byteaToBytes(webauthnCred.public_key as `\\x${string}`))
       const callData = encodeFunctionData({
         abi: sendAccountAbi,
         functionName: 'executeBatch',
@@ -200,12 +195,18 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       const {
         receipt: { transactionHash },
       } = await sendUserOp({ userOp })
-      toast.show(`Sent user op ${transactionHash}!`)
+      console.log('sent user op', transactionHash)
+      toast.show('Success!')
       router.replace('/account/settings/backup')
     } catch (e) {
+      console.error(e)
+      const message =
+        e.details?.toString().split('.').at(0) ??
+        e.mesage?.split('.').at(0) ??
+        e.toString().split('.').at(0)
       form.setError('root', {
         type: 'custom',
-        message: e.mesage ?? `Something went wrong: ${e}`,
+        message,
       })
     }
   }
@@ -238,7 +239,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         {() => (
           <>
             {form.formState.errors?.root?.message ? (
-              <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+              <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
                 {form.formState.errors?.root?.message}
               </Paragraph>
             ) : null}

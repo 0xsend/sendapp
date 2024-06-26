@@ -21,25 +21,24 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { byteaToHex } from 'app/utils/byteaToHex'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { usePendingTags } from 'app/utils/tags'
+import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
 import { defaultUserOp, sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import type { UserOperation } from 'permissionless'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { checksumAddress, encodeFunctionData } from 'viem'
 import {
   useBalance,
-  useBlockNumber,
   useEstimateFeesPerGas,
   usePublicClient,
   useWaitForTransactionReceipt,
 } from 'wagmi'
 import { getPriceInWei, useSenderSafeReceivedEvents } from '../checkout-utils'
-import { throwIf } from 'app/utils/throwIf'
 
 export function ConfirmButton({
   onConfirmed,
@@ -62,13 +61,11 @@ export function ConfirmButton({
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
   const { receipts, refetch: refetchReceipts, isLoading: isLoadingReceipts } = useReceipts()
-  const receiptHashes = useMemo(() => receipts?.map((r) => r.hash) ?? [], [receipts])
+  const receiptEventIds = useMemo(() => receipts?.map((r) => r.event_id) ?? [], [receipts])
   const [sentTx, setSentTx] = useState<`0x${string}`>()
   const { data: sendRevenuesSafeReceives, error: sendRevenuesSafeReceivesError } =
     useSenderSafeReceivedEvents()
-
-  const { data: block } = useBlockNumber()
-  const lookupSafeReceivedEvent = useCallback(async () => {
+  const lookupSafeReceivedEvent = async () => {
     const address = sendAccount?.address
     if (!address) return
     if (isLoadingReceipts) return
@@ -81,36 +78,31 @@ export function ConfirmButton({
         assert(e.tx_hash.startsWith('\\x'), 'Hex string must start with \\x')
         assert(!!e.sender, 'sender is required')
         assert(e.sender.startsWith('\\x'), 'Hex string must start with \\x')
-        const sender = pgBase16ToHex(e.sender as `\\x${string}`)
-        const hash = pgBase16ToHex(e.tx_hash as `\\x${string}`)
+        const sender = byteaToHex(e.sender as `\\x${string}`)
+        const hash = byteaToHex(e.tx_hash as `\\x${string}`)
         const isPurchase =
-          checksumAddress(sender) === checksumAddress(address) &&
-          e.v &&
-          BigInt(e.v) === weiAmount &&
-          !receiptHashes.includes(hash)
+          checksumAddress(sender) === checksumAddress(address) && // check the correct sender
+          e.v && // check the correct v
+          BigInt(e.v) === weiAmount && // check the correct amount
+          !receiptEventIds.includes(e.event_id) && // don't double submit
+          (!sentTx || sentTx === hash) // use the most recent tx if available
         return isPurchase
       })
       .shift()
 
     // check it against the receipts
-    if (event?.tx_hash) {
-      submitTxToDb(pgBase16ToHex(event.tx_hash as `\\x${string}`))
+    if (event?.tx_hash && !confirm.isPending) {
+      submitTxToDb(byteaToHex(event.tx_hash as `\\x${string}`))
     }
-  }, [
-    receipts,
-    publicClient,
-    sendAccount,
-    weiAmount,
-    isLoadingReceipts,
-    receiptHashes,
-    sendRevenuesSafeReceives,
-  ])
+  }
 
   useEffect(() => {
-    if (block) {
-      lookupSafeReceivedEvent()
+    if (sendRevenuesSafeReceives?.length) {
+      lookupSafeReceivedEvent().catch((e) => {
+        console.error('Error looking up safe received events', e)
+      })
     }
-  }, [block, lookupSafeReceivedEvent])
+  }, [sendRevenuesSafeReceives, lookupSafeReceivedEvent])
 
   const {
     data: txReceipt,
@@ -118,7 +110,6 @@ export function ConfirmButton({
     error: txWaitError,
   } = useWaitForTransactionReceipt({
     hash: sentTx,
-    confirmations: 2,
   })
 
   const [error, setError] = useState<string>()

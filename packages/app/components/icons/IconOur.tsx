@@ -4,7 +4,7 @@ import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const XLogo = (props: IconProps) => {
+const XLogo = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -21,5 +21,5 @@ const XLogo = (props: IconProps) => {
     </Svg>
   )
 }
-const IconOur = memo(themed(XLogo))
+const IconOur = memo<IconProps>(themed(XLogo))
 export { IconOur }

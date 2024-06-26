@@ -10,8 +10,9 @@ import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/Checkou
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
+import { logRequest } from 'utils/logRequest'
 
-export const Page: NextPageWithLayout = ({ sendid }) => {
+export const Page: NextPageWithLayout<{ sendid: string }> = ({ sendid }) => {
   return (
     <>
       <Head>
@@ -24,23 +25,25 @@ export const Page: NextPageWithLayout = ({ sendid }) => {
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
-  const { tag } = ctx.params ?? {}
+  const { tag: tagParam } = ctx.params ?? {}
 
   // ensure identifier is valid before proceeding
-  const { success } = CheckoutTagSchema.safeParse({ name: tag })
-  if (!success) {
+  const result = CheckoutTagSchema.safeParse({
+    name: tagParam?.toString().match(/^@/) ? tagParam.toString().slice(1) : tagParam,
+  })
+
+  if (!result.success) {
     return {
       notFound: true,
     }
   }
+
+  const { name: tag } = result.data
+
   assert(!!tag, 'tag is required')
   assert(typeof tag === 'string', 'Identifier tag must be a string')
 
-  console.log(
-    `${ctx.req.url} - ${ctx.req.headers['user-agent']}${
-      ctx.req.headers['x-forwarded-for'] ? ` - ${ctx.req.headers['x-forwarded-for']}` : ''
-    }`
-  )
+  logRequest(ctx)
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -55,7 +58,10 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   // check if profile exists
   const { data: profile, error } = await supabaseAdmin
-    .rpc('profile_lookup', { lookup_type: 'tag', identifier: tag })
+    .rpc('profile_lookup', {
+      lookup_type: 'tag',
+      identifier: tag,
+    })
     .maybeSingle()
 
   if (error) {

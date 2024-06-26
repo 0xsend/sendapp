@@ -11,8 +11,7 @@
       "@daimo/expo-passkeys/*": ["./packages/daimo-expo-passkeys/src/*"],
       "@0xsend/webauthn-authenticator/*": ["./packages/webauthn-authenticator/src/*"],
       "@my/playwright/*": ["./packages/playwright/tests/*"],
-      "@my/snaplet/*": ["./packages/snaplet/*"],
-      "@my/*": ["packages/*"]
+      "@my/snaplet/*": ["./packages/snaplet/*"]
     },
     "importHelpers": true,
     "allowJs": false,
@@ -33,6 +32,7 @@
     "useUnknownInCatchVariables": false,
     "preserveConstEnums": true,
     "noUncheckedIndexedAccess": true,
+    "strictNullChecks": true,
     // DONT DO THIS so jsdoc will remain
     "removeComments": false,
     "strict": true,

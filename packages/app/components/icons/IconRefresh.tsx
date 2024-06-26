@@ -3,7 +3,7 @@ import { type IconProps, themed } from '@tamagui/helpers-icon'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const Refresh = (props: IconProps) => {
+const Refresh = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -21,5 +21,5 @@ const Refresh = (props: IconProps) => {
     </Svg>
   )
 }
-const IconRefresh = memo(themed(Refresh))
+const IconRefresh = memo<IconProps>(themed(Refresh))
 export { IconRefresh }

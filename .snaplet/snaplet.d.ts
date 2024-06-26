@@ -25,6 +25,15 @@ interface Table_net_http_response {
   error_msg: string | null;
   created: string;
 }
+interface Table_public_activity {
+  id: number;
+  event_name: string;
+  event_id: string;
+  from_user_id: string | null;
+  to_user_id: string | null;
+  data: Json | null;
+  created_at: string;
+}
 interface Table_auth_audit_log_entries {
   instance_id: string | null;
   id: string;
@@ -48,6 +57,12 @@ interface Table_public_chain_addresses {
   address: string;
   user_id: string;
   created_at: string;
+}
+interface Table_public_challenges {
+  id: number;
+  challenge: string;
+  created_at: string;
+  expires_at: string;
 }
 interface Table_public_distribution_shares {
   id: number;
@@ -232,9 +247,11 @@ interface Table_public_profiles {
   send_id: number;
 }
 interface Table_public_receipts {
-  hash: string;
+  hash: string | null;
   created_at: string | null;
   user_id: string;
+  id: number;
+  event_id: string;
 }
 interface Table_public_referrals {
   referrer_id: string;
@@ -293,23 +310,39 @@ interface Table_vault_secrets {
   updated_at: string;
 }
 interface Table_public_send_account_created {
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
   user_op_hash: string | null;
-  tx_hash: string | null;
-  account: string | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
+  tx_hash: string;
+  account: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  id: number;
 }
 interface Table_public_send_account_credentials {
   account_id: string;
   credential_id: string;
   key_slot: number;
   created_at: string | null;
+}
+interface Table_public_send_account_receives {
+  id: number;
+  chain_id: number;
+  block_num: number;
+  block_time: number;
+  tx_hash: string;
+  tx_idx: number;
+  log_idx: number;
+  log_addr: string;
+  sender: string;
+  value: number;
+  ig_name: string;
+  src_name: string;
+  abi_idx: number;
 }
 interface Table_public_send_account_signing_key_added {
   chain_id: number;
@@ -325,22 +358,39 @@ interface Table_public_send_account_signing_key_added {
   tx_idx: number;
   log_idx: number;
   abi_idx: number;
+  id: number;
+}
+interface Table_public_send_account_signing_key_removed {
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  account: string;
+  key_slot: number;
+  key: string;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+  id: number;
 }
 interface Table_public_send_account_transfers {
   id: number;
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  f: string | null;
-  t: string | null;
-  v: number | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  f: string;
+  t: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
 }
 interface Table_public_send_accounts {
   id: string;
@@ -358,45 +408,35 @@ interface Table_public_send_liquidity_pools {
   chain_id: number;
 }
 interface Table_public_send_revenues_safe_receives {
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  sender: string | null;
-  v: number | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  sender: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+  id: number;
 }
 interface Table_public_send_token_transfers {
   id: number;
-  chain_id: number | null;
-  log_addr: string | null;
-  block_time: number | null;
-  tx_hash: string | null;
-  f: string | null;
-  t: string | null;
-  v: number | null;
-  ig_name: string | null;
-  src_name: string | null;
-  block_num: number | null;
-  tx_idx: number | null;
-  log_idx: number | null;
-  abi_idx: number | null;
-}
-interface Table_public_send_transfer_logs {
-  from: string;
-  to: string;
-  value: number;
-  block_number: number;
-  block_timestamp: string;
-  block_hash: string;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
   tx_hash: string;
-  log_index: number;
-  created_at: string | null;
+  f: string;
+  t: string;
+  v: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
 }
 interface Table_auth_sessions {
   id: string;
@@ -431,7 +471,10 @@ interface Table_auth_sso_providers {
 }
 interface Table_public_tag_receipts {
   tag_name: string;
-  hash: string;
+  hash: string | null;
+  event_id: string | null;
+  id: number;
+  created_at: string | null;
 }
 interface Table_public_tag_reservations {
   tag_name: string;
@@ -556,7 +599,9 @@ interface Schema_pgtle {
   feature_info: Table_pgtle_feature_info;
 }
 interface Schema_public {
+  activity: Table_public_activity;
   chain_addresses: Table_public_chain_addresses;
+  challenges: Table_public_challenges;
   distribution_shares: Table_public_distribution_shares;
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
@@ -566,13 +611,14 @@ interface Schema_public {
   referrals: Table_public_referrals;
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
+  send_account_receives: Table_public_send_account_receives;
   send_account_signing_key_added: Table_public_send_account_signing_key_added;
+  send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
   send_liquidity_pools: Table_public_send_liquidity_pools;
   send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_token_transfers: Table_public_send_token_transfers;
-  send_transfer_logs: Table_public_send_transfer_logs;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
   tags: Table_public_tags;
@@ -631,6 +677,15 @@ interface Extension {
   vault: "supabase_vault";
 }
 interface Tables_relationships {
+  "public.activity": {
+    parent: {
+       activity_from_user_id_fkey: "auth.users";
+       activity_to_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
   "storage.buckets": {
     parent: {
 
@@ -754,7 +809,7 @@ interface Tables_relationships {
        receipts_user_id_fkey: "auth.users";
     };
     children: {
-       tag_receipts_hash_fkey: "public.tag_receipts";
+
     };
   };
   "public.referrals": {
@@ -846,7 +901,6 @@ interface Tables_relationships {
   };
   "public.tag_receipts": {
     parent: {
-       tag_receipts_hash_fkey: "public.receipts";
        tag_receipts_tag_name_fkey: "public.tags";
     };
     children: {
@@ -870,6 +924,8 @@ interface Tables_relationships {
        identities_user_id_fkey: "auth.identities";
        mfa_factors_user_id_fkey: "auth.mfa_factors";
        sessions_user_id_fkey: "auth.sessions";
+       activity_from_user_id_fkey: "public.activity";
+       activity_to_user_id_fkey: "public.activity";
        chain_addresses_user_id_fkey: "public.chain_addresses";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
