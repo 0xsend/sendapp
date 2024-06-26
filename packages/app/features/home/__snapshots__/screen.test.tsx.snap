@@ -411,7 +411,7 @@ exports[`HomeScreen 1`] = `
                   numberOfLines={1}
                   style={
                     {
-                      "color": "#081619",
+                      "color": "#12643F",
                       "flexGrow": 0,
                       "flexShrink": 1,
                       "fontFamily": "System",
@@ -440,7 +440,7 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="32"
                     bbWidth="32"
-                    color="#081619"
+                    color="#12643F"
                     fill="none"
                     focusable={false}
                     height={32}
@@ -462,7 +462,7 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
-                    tintColor="#081619"
+                    tintColor="#12643F"
                     vbHeight={24}
                     vbWidth={24}
                     width={32}
