@@ -63,13 +63,6 @@ exports[`HomeScreen 1`] = `
             "paddingTop": 0,
             "position": "absolute",
             "right": 0,
-            "shadowColor": "rgb(0,0,0)",
-            "shadowOffset": {
-              "height": 0,
-              "width": 0,
-            },
-            "shadowOpacity": 0,
-            "shadowRadius": 0,
             "top": -46,
             "width": 44,
           }
@@ -85,7 +78,7 @@ exports[`HomeScreen 1`] = `
           meetOrSlice={0}
           minX={0}
           minY={0}
-          stroke="hsla(112, 22%, 59%, 1)"
+          stroke="#FFFFFF"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2"
@@ -96,7 +89,7 @@ exports[`HomeScreen 1`] = `
                 "borderWidth": 0,
               },
               {
-                "color": "hsla(112, 22%, 59%, 1)",
+                "color": "#FFFFFF",
               },
               {
                 "flex": 0,
@@ -105,7 +98,7 @@ exports[`HomeScreen 1`] = `
               },
             ]
           }
-          tintColor="hsla(112, 22%, 59%, 1)"
+          tintColor="#FFFFFF"
           vbHeight={24}
           vbWidth={24}
           width={32}
@@ -123,7 +116,7 @@ exports[`HomeScreen 1`] = `
             }
             stroke={
               {
-                "payload": 4287016319,
+                "payload": 4294967295,
                 "type": 0,
               }
             }
@@ -146,7 +139,7 @@ exports[`HomeScreen 1`] = `
               }
               stroke={
                 {
-                  "payload": 4287016319,
+                  "payload": 4294967295,
                   "type": 0,
                 }
               }
@@ -166,7 +159,7 @@ exports[`HomeScreen 1`] = `
               }
               stroke={
                 {
-                  "payload": 4287016319,
+                  "payload": 4294967295,
                   "type": 0,
                 }
               }
@@ -198,16 +191,19 @@ exports[`HomeScreen 1`] = `
         <View
           style={
             {
+              "backgroundColor": "transparent",
               "borderBottomLeftRadius": 12,
               "borderBottomRightRadius": 12,
               "borderTopLeftRadius": 12,
               "borderTopRightRadius": 12,
+              "flexDirection": "column",
               "gap": 32,
               "justifyContent": "space-between",
               "paddingBottom": 53,
               "paddingLeft": 7,
               "paddingRight": 7,
               "paddingTop": 53,
+              "position": "relative",
               "width": "100%",
             }
           }
@@ -236,118 +232,104 @@ exports[`HomeScreen 1`] = `
                 style={
                   {
                     "flexDirection": "column",
+                    "gap": 18,
+                    "justifyContent": "center",
                   }
                 }
               >
                 <View
                   style={
                     {
-                      "flexDirection": "column",
-                      "gap": 18,
-                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "gap": 10,
                     }
                   }
                 >
                   <View
                     style={
                       {
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                        "gap": 10,
+                        "backgroundColor": "#40FB50",
+                        "height": 11,
+                        "width": 11,
                       }
                     }
-                  >
-                    <View
-                      style={
-                        {
-                          "backgroundColor": "#40FB50",
-                          "height": 11,
-                          "width": 11,
-                        }
-                      }
-                    />
-                    <Text
-                      cancelable={true}
-                      disabled={false}
-                      focusable={true}
-                      id=":r0:"
-                      minPressDuration={0}
-                      onBlur={[Function]}
-                      onFocus={[Function]}
-                      onMouseEnter={[Function]}
-                      onMouseLeave={[Function]}
-                      onPress={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      style={
-                        {
-                          "alignItems": "center",
-                          "backgroundColor": "transparent",
-                          "color": "hsl(0, 0%, 90.9%)",
-                          "display": "flex",
-                          "fontFamily": "System",
-                          "fontSize": 16.8,
-                          "fontWeight": "500",
-                          "lineHeight": 0,
-                          "textTransform": "uppercase",
-                          "zIndex": 1,
-                        }
-                      }
-                      suppressHighlighting={true}
-                      userSelect="none"
-                    >
-                      Total Balance
-                    </Text>
-                  </View>
-                  <View
+                  />
+                  <Text
+                    cancelable={true}
+                    disabled={false}
+                    focusable={true}
+                    id=":r0:"
+                    minPressDuration={0}
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    onPress={[Function]}
+                    onPressIn={[Function]}
+                    onPressOut={[Function]}
                     style={
                       {
-                        "color": "white",
-                        "flexDirection": "row",
-                        "gap": 10,
-                        "marginTop": 13,
+                        "alignItems": "center",
+                        "backgroundColor": "transparent",
+                        "color": "#B2B2B2",
+                        "display": "flex",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "500",
+                        "lineHeight": 0,
+                        "textTransform": "uppercase",
+                        "zIndex": 1,
                       }
                     }
+                    suppressHighlighting={true}
+                    userSelect="none"
                   >
-                    <Text
-                      accessibilityRole="header"
-                      selectable={true}
-                      style={
-                        {
-                          "color": "hsla(112, 22%, 100%, 1)",
-                          "fontFamily": "System",
-                          "fontSize": 96,
-                          "fontWeight": "700",
-                          "lineHeight": 118,
-                          "marginBottom": 0,
-                          "marginLeft": 0,
-                          "marginRight": 0,
-                          "marginTop": 0,
-                          "textTransform": "none",
-                          "zIndex": 1,
-                        }
+                    Total Balance
+                  </Text>
+                </View>
+                <View
+                  style={
+                    {
+                      "color": "white",
+                      "flexDirection": "row",
+                      "gap": 10,
+                      "marginTop": 13,
+                    }
+                  }
+                >
+                  <Text
+                    selectable={true}
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 96,
+                        "fontWeight": "500",
+                        "lineHeight": 119,
+                        "zIndex": 1,
                       }
-                      suppressHighlighting={true}
-                    >
-                      0
-                    </Text>
-                    <Text
-                      selectable={true}
-                      style={
-                        {
-                          "color": "hsla(112, 22%, 100%, 1)",
-                          "fontFamily": "System",
-                          "fontSize": 21.599999999999998,
-                          "fontWeight": "500",
-                          "lineHeight": 19,
-                          "zIndex": 1,
-                        }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    0
+                  </Text>
+                  <Text
+                    selectable={true}
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 21.599999999999998,
+                        "fontWeight": "500",
+                        "lineHeight": 19,
+                        "zIndex": 1,
                       }
-                      suppressHighlighting={true}
-                    >
-                      USD
-                    </Text>
-                  </View>
+                    }
+                    suppressHighlighting={true}
+                  >
+                    USD
+                  </Text>
                 </View>
               </View>
             </View>
@@ -364,11 +346,6 @@ exports[`HomeScreen 1`] = `
           >
             <View
               accessibilityRole="button"
-              accessibilityState={
-                {
-                  "expanded": false,
-                }
-              }
               cancelable={true}
               disabled={false}
               focusVisibleStyle={{}}
@@ -384,7 +361,7 @@ exports[`HomeScreen 1`] = `
               style={
                 {
                   "alignItems": "center",
-                  "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                  "backgroundColor": "#40FB50",
                   "borderBottomColor": "transparent",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
@@ -419,10 +396,13 @@ exports[`HomeScreen 1`] = `
                 }
               >
                 <Text
-                  selectable={true}
+                  lineBreakMode="clip"
+                  numberOfLines={1}
                   style={
                     {
-                      "color": "#122023",
+                      "color": "#081619",
+                      "flexGrow": 0,
+                      "flexShrink": 1,
                       "fontFamily": "System",
                       "fontSize": 16.8,
                       "fontWeight": "500",
@@ -431,6 +411,7 @@ exports[`HomeScreen 1`] = `
                     }
                   }
                   suppressHighlighting={true}
+                  userSelect="none"
                 >
                   Deposit
                 </Text>
@@ -448,7 +429,7 @@ exports[`HomeScreen 1`] = `
                     align="xMidYMid"
                     bbHeight="32"
                     bbWidth="32"
-                    color="#122023"
+                    color="#081619"
                     fill="none"
                     focusable={false}
                     height={32}
@@ -462,9 +443,7 @@ exports[`HomeScreen 1`] = `
                           "backgroundColor": "transparent",
                           "borderWidth": 0,
                         },
-                        {
-                          "color": "#122023",
-                        },
+                        {},
                         {
                           "flex": 0,
                           "height": 32,
@@ -472,7 +451,7 @@ exports[`HomeScreen 1`] = `
                         },
                       ]
                     }
-                    tintColor="#122023"
+                    tintColor="#081619"
                     vbHeight={24}
                     vbWidth={24}
                     width={32}
@@ -580,14 +559,14 @@ exports[`HomeScreen 1`] = `
         <View
           style={
             {
-              "borderBottomColor": "#E6E6E6",
+              "borderBottomColor": "#343434",
               "borderBottomWidth": 1,
-              "borderLeftColor": "#E6E6E6",
+              "borderLeftColor": "#343434",
               "borderLeftWidth": 0,
-              "borderRightColor": "#E6E6E6",
+              "borderRightColor": "#343434",
               "borderRightWidth": 0,
               "borderStyle": "solid",
-              "borderTopColor": "#E6E6E6",
+              "borderTopColor": "#343434",
               "borderTopWidth": 0,
               "flex": 1,
               "flexShrink": 0,
@@ -619,7 +598,56 @@ exports[`HomeScreen 1`] = `
                 "width": "100%",
               }
             }
-          />
+          >
+            <View
+              style={
+                {
+                  "borderBottomColor": "#343434",
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#343434",
+                  "borderLeftWidth": 0,
+                  "borderRightColor": "#343434",
+                  "borderRightWidth": 0,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#343434",
+                  "borderTopWidth": 0,
+                  "flex": 1,
+                  "flexShrink": 0,
+                  "height": 0,
+                  "maxHeight": 0,
+                  "transform": [
+                    {
+                      "translateY": -0.5,
+                    },
+                  ],
+                }
+              }
+            />
+            <View
+              style={
+                {
+                  "borderBottomColor": "#343434",
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#343434",
+                  "borderLeftWidth": 0,
+                  "borderRightColor": "#343434",
+                  "borderRightWidth": 0,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#343434",
+                  "borderTopWidth": 0,
+                  "flex": 1,
+                  "flexShrink": 0,
+                  "height": 0,
+                  "maxHeight": 0,
+                  "transform": [
+                    {
+                      "translateY": -0.5,
+                    },
+                  ],
+                }
+              }
+            />
+          </View>
         </View>
       </View>
       <View
@@ -643,7 +671,7 @@ exports[`HomeScreen 1`] = `
           selectable={true}
           style={
             {
-              "color": "hsla(112, 22%, 100%, 1)",
+              "color": "#FFFFFF",
               "fontFamily": "System",
               "fontSize": 30,
               "fontWeight": "700",
@@ -673,7 +701,7 @@ exports[`HomeScreen 1`] = `
             selectable={true}
             style={
               {
-                "color": "hsla(112, 22%, 100%, 1)",
+                "color": "#FFFFFF",
                 "fontFamily": "System",
                 "fontSize": 16.8,
                 "fontWeight": "400",
@@ -695,7 +723,7 @@ exports[`HomeScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "hsla(112, 22%, 100%, 1)",
+                  "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
@@ -710,7 +738,7 @@ exports[`HomeScreen 1`] = `
               selectable={true}
               style={
                 {
-                  "color": "hsla(112, 22%, 100%, 1)",
+                  "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
@@ -726,7 +754,7 @@ exports[`HomeScreen 1`] = `
             selectable={true}
             style={
               {
-                "color": "hsla(112, 22%, 100%, 1)",
+                "color": "#FFFFFF",
                 "fontFamily": "System",
                 "fontSize": 16.8,
                 "fontWeight": "400",
@@ -804,7 +832,7 @@ exports[`HomeScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 52%, 6%, 1)",
+            "backgroundColor": "#111f22",
             "borderTopLeftRadius": 16,
             "borderTopRightRadius": 16,
             "flex": 1,
@@ -823,7 +851,7 @@ exports[`HomeScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "hsla(191, 52%, 6%, 1)",
+            "backgroundColor": "#111f22",
             "borderBottomLeftRadius": 0,
             "borderBottomRightRadius": 0,
             "borderBottomWidth": 0,

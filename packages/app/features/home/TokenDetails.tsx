@@ -7,6 +7,7 @@ import {
   Separator,
   Spinner,
   Stack,
+  Theme,
   Tooltip,
   XStack,
   YStack,
@@ -74,14 +75,14 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
           )}
         </XStack>
       )}
-      <YStack pt="$4">
-        <Label fontSize={'$5'} fontWeight={'500'} color={'$color11'} textTransform={'uppercase'}>
+      <YStack>
+        <Label fontSize={'$5'} fontWeight={'500'} textTransform={'uppercase'}>
           {`${coin.label} BALANCE`}
         </Label>
         <TokenDetailsBalance balance={balance} symbol={coin.symbol} />
       </YStack>
       <Stack w={'100%'} py={'$6'}>
-        <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
+        <Separator />
       </Stack>
       <YStack>
         <TokenDetailsHistory coin={coin} />
@@ -114,31 +115,19 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
     const fixedChange = change.toFixed(2)
     if (change > 0)
       return (
-        <>
-          <Paragraph fontSize="$4" fontWeight="500" color={'$olive'}>{`${fixedChange}%`}</Paragraph>
-          <ArrowUp col={'$olive'} size={'$0.9'} />
-        </>
+        <Theme name="green_active">
+          <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
+          <ArrowUp size={'$0.9'} />
+        </Theme>
       )
     if (change < 0)
       return (
-        <>
-          <Paragraph
-            fontSize="$4"
-            fontWeight="500"
-            color={'$redVibrant'}
-          >{`${fixedChange}%`}</Paragraph>
-          <ArrowDown col={'$redVibrant'} size={'$0.9'} />
-        </>
+        <Theme name="red_active">
+          <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
+          <ArrowDown size={'$0.9'} />
+        </Theme>
       )
-    return (
-      <>
-        <Paragraph
-          fontSize="$4"
-          fontWeight="500"
-          color={'$redVibrant'}
-        >{`${fixedChange}%`}</Paragraph>
-      </>
-    )
+    return <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
   }
 
   return (

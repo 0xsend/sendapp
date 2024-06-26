@@ -10,10 +10,11 @@ import {
   useToastController,
   TooltipSimple,
   useMedia,
-  useThemeName,
   Theme,
   H3,
   Stack,
+  ButtonIcon,
+  ButtonText,
 } from '@my/ui'
 import {
   IconAccount,
@@ -30,7 +31,6 @@ import * as Sharing from 'expo-sharing'
 import { useRootScreenParams } from 'app/routers/params'
 import type React from 'react'
 import { type ElementType, useEffect, useState } from 'react'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { useConfirmedTags } from 'app/utils/tags'
 
 export function AccountScreen() {
@@ -66,7 +66,7 @@ export function AccountScreen() {
         toast.show('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
           customData: {
-            theme: 'error',
+            theme: 'red',
           },
         })
       )
@@ -88,11 +88,11 @@ export function AccountScreen() {
             color="$color12"
             iconAfter={
               canShare ? (
-                <Theme name="accent">
+                <Theme name="green">
                   <IconShare color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
                 </Theme>
               ) : (
-                <Theme name="accent">
+                <Theme name="green">
                   <IconCopy color="$color1" size="$1" $platform-web={{ cursor: 'pointer' }} />
                 </Theme>
               )
@@ -179,26 +179,25 @@ const BorderedLink = ({
   children,
   ...props
 }: { Icon?: ElementType; children: React.ReactNode } & LinkProps) => {
-  const themeName = useThemeName()
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = (resolvedTheme ?? themeName)?.startsWith('dark') ? '$color10' : '$color1'
   return (
-    <Link
-      borderWidth={1}
-      color={iconColor}
-      theme="accent"
-      borderRadius={'$4'}
-      p={'$3'}
-      px="$4"
-      {...props}
-    >
-      <XStack gap={'$1.5'} ai={'center'}>
-        {Icon && <Icon color={iconColor} />}
-        <Paragraph color={iconColor} textTransform="uppercase">
-          {children}
-        </Paragraph>
-      </XStack>
-    </Link>
+    <Theme name={'green'}>
+      <Link
+        {...props}
+        theme="ghost"
+        $theme-light={{ color: '$color12' }}
+        bw={1}
+        br={'$4'}
+        p={'$3'}
+        px={'$4'}
+      >
+        <XStack gap={'$1.5'} ai={'center'}>
+          {Icon && <Icon $theme-light={{ color: '$color12' }} />}
+          <Paragraph textTransform="uppercase" $theme-light={{ color: '$color12' }}>
+            {children}
+          </Paragraph>
+        </XStack>
+      </Link>
+    </Theme>
   )
 }
 
@@ -274,22 +273,25 @@ const BottomButtonRow = () => {
   if (media.gtMd && (tags === undefined || tags.length === 0))
     return (
       <Stack f={1} jc="center" $md={{ display: 'none' }}>
-        <Link
-          href={'/account/sendtag/checkout'}
-          theme="accent"
-          borderRadius={'$4'}
-          p={'$3.5'}
-          px="$6"
-          maw={301}
-          bg="$primary"
-        >
-          <XStack gap={'$1.5'} ai={'center'} jc="center">
-            <IconPlus col={'$black'} />
-            <Paragraph textTransform="uppercase" col={'$black'}>
-              SENDTAGS
-            </Paragraph>
-          </XStack>
-        </Link>
+        <Theme name="green">
+          <Link
+            href={'/account/sendtag/checkout'}
+            theme="Button"
+            borderRadius={'$4'}
+            p={'$3.5'}
+            px="$6"
+            maw={301}
+            bc="$background"
+            hoverStyle={{ bc: '$backgroundHover' }}
+          >
+            <XStack gap={'$1.5'} ai={'center'} jc="center">
+              <ButtonIcon>
+                <IconPlus size={'$1.25'} />
+              </ButtonIcon>
+              <ButtonText textTransform="uppercase">SENDTAGS</ButtonText>
+            </XStack>
+          </Link>
+        </Theme>
       </Stack>
     )
 

@@ -50,7 +50,7 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
       onSubmit={(values) => mutate(values)}
       renderAfter={({ submit }) => (
         <YStack ai={'center'}>
-          {error && <Paragraph theme="error">{error.message}</Paragraph>}
+          {error && <Paragraph theme="red">{error.message}</Paragraph>}
           <SubmitButton
             f={1}
             marginTop={'$5'}
@@ -58,7 +58,7 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
             py={'$5'}
             fontWeight={'500'}
             onPress={() => submit()}
-            theme="accent"
+            theme="green"
           >
             SAVE
           </SubmitButton>

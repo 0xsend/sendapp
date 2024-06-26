@@ -29,7 +29,7 @@ export const AuthSideBarWrapper = ({ children }: { children?: React.ReactNode })
   const media = useMedia()
   return (
     <XStack overflow="hidden" height={'100%'}>
-      {media.gtMd && <AuthSideBar bc={'$background'} h={'92%'} ml={'$7'} my={'auto'} br={'$8'} />}
+      {media.gtMd && <AuthSideBar h={'92%'} ml={'$7'} my={'auto'} br={'$8'} />}
       {children}
     </XStack>
   )

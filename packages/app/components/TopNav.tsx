@@ -179,8 +179,7 @@ export function TopNav({
         ) : (
           <H2
             fontWeight={'300'}
-            $theme-light={{ col: '$gray10Light' }}
-            $theme-dark={{ col: '$gray8Light' }}
+            col="$color10"
             lineHeight={32}
             $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
             display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
@@ -206,8 +205,7 @@ export function TopNav({
             py="$3"
             $gtSm={{ py: '$6' }}
             $gtLg={{ pl: '$1', pb: '$6', pt: '$0', ...{ ml: isSubRoute ? '$10' : '$1' } }}
-            $theme-light={{ col: '$gray10Light' }}
-            $theme-dark={{ col: '$gray8Light' }}
+            col="$color10"
           >
             {subheader}
           </Paragraph>
@@ -264,7 +262,7 @@ function Button(props: ButtonProps) {
       focusStyle={{
         backgroundColor: 'transparent',
       }}
-      theme="accent"
+      theme="green"
       {...props}
     />
   )

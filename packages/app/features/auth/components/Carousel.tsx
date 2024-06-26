@@ -58,7 +58,7 @@ const CarouselProgress = () => {
             key={title}
             f={1}
             h={1}
-            backgroundColor={'$gray500'}
+            backgroundColor={'$color3'}
             direction="ltr"
             miw={0}
             value={carouselProgress < i ? 0 : carouselProgress === i ? progressWidth : 100}

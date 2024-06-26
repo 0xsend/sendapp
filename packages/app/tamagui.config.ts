@@ -8,7 +8,7 @@ declare module 'tamagui' {
 
 declare module '@tamagui/toast' {
   interface CustomData {
-    theme?: 'error' | 'success'
+    theme?: 'red' | 'yellow' | 'green'
   }
 }
 

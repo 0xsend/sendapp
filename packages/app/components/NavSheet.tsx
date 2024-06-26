@@ -38,7 +38,7 @@ export function NavSheet({
             circular
             icon={<IconX size="$3" $theme-light={{ color: '$color12' }} color="$color9" />}
             onPress={() => onOpenChange()}
-            theme="accent"
+            theme="green"
           />
         </Stack>
         <Separator $theme-dark={{ bc: '$decay' }} />

@@ -17,7 +17,7 @@ exports[`OnboardingScreen 1`] = `
       align="xMidYMid"
       bbHeight="28"
       bbWidth="77"
-      color="hsla(0, 0%, 99%, 1)"
+      color="#FFFFFF"
       focusable={false}
       height={28}
       meetOrSlice={0}
@@ -31,7 +31,7 @@ exports[`OnboardingScreen 1`] = `
             "borderWidth": 0,
           },
           {
-            "color": "hsla(0, 0%, 99%, 1)",
+            "color": "#FFFFFF",
           },
           {
             "flex": 0,
@@ -40,7 +40,7 @@ exports[`OnboardingScreen 1`] = `
           },
         ]
       }
-      tintColor="hsla(0, 0%, 99%, 1)"
+      tintColor="#FFFFFF"
       vbHeight={48}
       vbWidth={132}
       width={77}
@@ -203,7 +203,7 @@ exports[`OnboardingScreen 1`] = `
           selectable={true}
           style={
             {
-              "color": "hsla(0, 0%, 99%, 1)",
+              "color": "#FFFFFF",
               "fontFamily": "System",
               "fontSize": 64,
               "fontWeight": "700",
@@ -224,7 +224,7 @@ exports[`OnboardingScreen 1`] = `
           selectable={true}
           style={
             {
-              "color": "hsla(112, 22%, 59%, 1)",
+              "color": "#FFFFFF",
               "fontFamily": "System",
               "fontSize": 16,
               "fontWeight": "700",
@@ -252,7 +252,7 @@ exports[`OnboardingScreen 1`] = `
             selectable={true}
             style={
               {
-                "color": "hsla(0, 0%, 99%, 1)",
+                "color": "#FFFFFF",
                 "fontFamily": "System",
                 "fontSize": 13.2,
                 "fontWeight": "500",
@@ -435,25 +435,25 @@ exports[`OnboardingScreen 1`] = `
                   onChangeText={[Function]}
                   onFocus={[Function]}
                   placeholder="My Send Account"
-                  placeholderTextColor="hsla(191, 32%, 50%, 1)"
+                  placeholderTextColor="#081619"
                   readOnly={false}
                   style={
                     {
                       "backgroundColor": "transparent",
-                      "borderBottomColor": "hsla(125, 96%, 55%, 1)",
+                      "borderBottomColor": "#40FB50",
                       "borderBottomLeftRadius": 0,
                       "borderBottomRightRadius": 0,
                       "borderBottomWidth": 2,
-                      "borderLeftColor": "hsla(191, 32%, 32%, 1)",
+                      "borderLeftColor": "#111f22",
                       "borderLeftWidth": 0,
-                      "borderRightColor": "hsla(191, 32%, 32%, 1)",
+                      "borderRightColor": "#111f22",
                       "borderRightWidth": 0,
                       "borderStyle": "solid",
-                      "borderTopColor": "hsla(191, 32%, 32%, 1)",
+                      "borderTopColor": "#111f22",
                       "borderTopLeftRadius": 0,
                       "borderTopRightRadius": 0,
                       "borderTopWidth": 0,
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 20,
                       "fontStyle": "normal",
@@ -493,7 +493,7 @@ exports[`OnboardingScreen 1`] = `
               onPressOut={[Function]}
               style={
                 {
-                  "color": "hsla(125, 96%, 40%, 1)",
+                  "color": "#FFFFFF",
                   "display": "flex",
                   "fontFamily": "System",
                   "fontSize": 16.8,
@@ -554,7 +554,7 @@ exports[`OnboardingScreen 1`] = `
               onPressOut={[Function]}
               style={
                 {
-                  "color": "hsla(125, 96%, 40%, 1)",
+                  "color": "#081619",
                   "display": "none",
                   "fontFamily": "System",
                   "fontSize": 16.8,
@@ -590,7 +590,7 @@ exports[`OnboardingScreen 1`] = `
                 {
                   "alignItems": "center",
                   "alignSelf": "auto",
-                  "backgroundColor": "hsla(125, 96%, 47%, 1)",
+                  "backgroundColor": "#40FB50",
                   "borderBottomColor": "transparent",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
@@ -613,6 +613,7 @@ exports[`OnboardingScreen 1`] = `
                   "marginRight": "auto",
                   "paddingLeft": 18,
                   "paddingRight": 18,
+                  "right": true,
                   "width": "100%",
                 }
               }
@@ -623,7 +624,7 @@ exports[`OnboardingScreen 1`] = `
                 numberOfLines={1}
                 style={
                   {
-                    "color": "hsla(191, 32%, 10%, 1)",
+                    "color": "#081619",
                     "flexGrow": 0,
                     "flexShrink": 1,
                     "fontFamily": "System",

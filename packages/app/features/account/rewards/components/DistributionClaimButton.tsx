@@ -274,7 +274,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           writeClaim(claimWriteConfig.request)
           refetchIsClaimed()
         }}
-        theme={'accent'}
+        theme={'green'}
       >
         {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim Reward'}
       </Button>
@@ -305,7 +305,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 }
 
 function Button(props: ButtonProps) {
-  return <ButtonOg py="$3.5" w="100%" br={12} bc="$accent12Dark" {...props} />
+  return <ButtonOg py="$3.5" w="100%" br={12} bc="$green12Dark" {...props} />
 }
 
 function ErrorMessage({ error }: { error?: string }) {

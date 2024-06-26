@@ -249,8 +249,7 @@ function SearchResultRow({
 
 function Search() {
   const { form } = useTagSearch()
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$olive' : '$black'
+
   return (
     <>
       <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
@@ -268,7 +267,7 @@ function Search() {
             props={{
               query: {
                 accessibilityRole: 'search',
-                placeholder: '$Sendtag, Phone, Send ID',
+                placeholder: 'Sendtag, Phone, Send ID',
                 pr: '$size.3.5',
               },
             }}
@@ -303,7 +302,7 @@ function Search() {
           onPress={() => form.setValue('query', '')}
           aria-label="Clear input."
         >
-          <IconX width="$size.1.5" height="$size.1.5" color={iconColor} />
+          <IconX width="$size.1.5" height="$size.1.5" />
         </Button>
       </View>
     </>

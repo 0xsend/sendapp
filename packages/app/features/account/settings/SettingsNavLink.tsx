@@ -17,7 +17,7 @@ export function SettingsNavLink({
     : false // no href is never active
 
   const { resolvedTheme } = useThemeSetting()
-  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$accent3Light'
+  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$green3Light'
   const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$gray5Light' : '$color12'
 
   return (
@@ -42,7 +42,7 @@ export function SettingsNavLink({
       {isActiveRoute && !sheet.open && (
         <Separator
           vertical
-          borderColor="$accentBackground"
+          borderColor="$greenBackground"
           pos="absolute"
           right={-1.5}
           top={-2}

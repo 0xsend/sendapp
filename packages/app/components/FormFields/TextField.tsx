@@ -92,21 +92,12 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
                 fontSize={'$5'}
                 fontStyle={field.value ? 'normal' : 'italic'}
                 fontWeight={field.value ? 'bold' : 'normal'}
-                bc={'$color2'}
                 $theme-dark={{
-                  color: '$gray12Dark',
-                  // placeholderTextColor fails in test env for some reason
                   ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
                 }}
                 $theme-light={{
-                  color: '$black',
-                  // placeholderTextColor fails in test env for some reason
                   ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
                 }}
-                // @todo use the theme colors if we ever have the palette scales
-                // bc={'$color2'}
-                // color={'$color12'}
-                // placeholderTextColor={'$color10'}
                 spellCheck={isEmail ? false : undefined}
                 autoCapitalize={isEmail ? 'none' : undefined}
                 keyboardType={isEmail ? 'email-address' : undefined}

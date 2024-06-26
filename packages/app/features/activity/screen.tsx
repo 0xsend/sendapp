@@ -11,6 +11,8 @@ import {
   Text,
   XStack,
   YStack,
+  Stack,
+  Card,
 } from '@my/ui'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
@@ -46,7 +48,7 @@ function ActivityBody() {
   return (
     <AnimatePresence>
       {error && (
-        <YStack key="error" gap="$4" mb="$4">
+        <YStack key="red" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
           <Text>{error.message.split('.').at(0)}</Text>
         </YStack>

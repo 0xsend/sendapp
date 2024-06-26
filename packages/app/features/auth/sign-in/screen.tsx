@@ -85,32 +85,27 @@ const SignInScreensMobile = () => {
 const ContinueButton = ({ nextScreen }: { nextScreen: () => void }) => (
   <Stack w="100%" jc="center" py="$5" gap="$2">
     <Button
-      bc="transparent"
-      hoverStyle={{ backgroundColor: '$transparent', boc: '$accentBackground' }}
+      variant="outlined"
+      theme={'green_ghost'}
+      hoverStyle={{ boc: '$borderColor' }}
       bw={1}
-      boc={'$accentBackground'}
       br="$5"
       onPress={nextScreen}
     >
-      <ButtonText col={'$accentBackground'}>CONTINUE</ButtonText>
+      <ButtonText>CONTINUE</ButtonText>
     </Button>
   </Stack>
 )
 
 const SignInButtons = ({ nextScreen }: { nextScreen: () => void }) => (
   <XStack w="100%" jc="center" py="$5" gap="$4">
-    <Button f={1} bg="$accentBackground" br="$5" onPress={nextScreen}>
-      <ButtonText col="$black">LOGIN</ButtonText>
-    </Button>
-    <Button
-      bg="transparent"
-      bw={1}
-      borderColor={'$accentBackground'}
-      f={1}
-      br="$5"
-      onPress={nextScreen}
-    >
-      <ButtonText col={'$accentBackground'}>SIGN UP</ButtonText>
-    </Button>
+    <Theme name={'green'}>
+      <Button f={1} br="$5" onPress={nextScreen}>
+        <ButtonText>LOGIN</ButtonText>
+      </Button>
+      <Button variant="outlined" theme="ghost" bw={1} f={1} br="$5" onPress={nextScreen}>
+        <ButtonText>SIGN UP</ButtonText>
+      </Button>
+    </Theme>
   </XStack>
 )

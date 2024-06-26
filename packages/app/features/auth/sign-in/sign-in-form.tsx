@@ -79,10 +79,10 @@ export const SignInForm = () => {
                   phone: {
                     'aria-label': 'Phone number',
                     '$theme-dark': {
-                      borderBottomColor: '$accent10Dark',
+                      borderBottomColor: '$green10Dark',
                     },
                     '$theme-light': {
-                      borderBottomColor: '$accent9Light',
+                      borderBottomColor: '$green9Light',
                     },
                     fontFamily: '$mono',
                     fontVariant: ['tabular-nums'],
@@ -95,9 +95,9 @@ export const SignInForm = () => {
                     backgroundColor: 'transparent',
                     color: '$color12',
                     outlineColor: 'transparent',
-                    theme: 'accent',
+                    theme: 'green',
                     focusStyle: {
-                      borderBottomColor: '$accent3Light',
+                      borderBottomColor: '$green3Light',
                     },
                     fieldsetProps: {
                       f: 1,
@@ -123,7 +123,7 @@ export const SignInForm = () => {
                     <SubmitButton
                       onPress={() => submit()}
                       br="$3"
-                      bc={'$accent9Light'}
+                      bc={'$green9Light'}
                       $sm={{ w: '100%' }}
                       $gtMd={{
                         mt: '0',
@@ -190,7 +190,7 @@ export const SignInForm = () => {
 const ForgotPhoneNumberLink = (props: AnchorProps) => (
   <Anchor
     $theme-dark={{
-      col: '$accentBackground',
+      col: '$background',
     }}
     $theme-light={{ col: '$black' }}
     href=""

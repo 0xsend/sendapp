@@ -63,22 +63,22 @@ export const BooleanCheckboxField = (
             id={id}
             borderWidth={0}
             $theme-dark={{
-              bc: '$accent1Dark',
+              bc: '$green1Dark',
             }}
             $theme-light={{
-              bc: '$accent1Light',
+              bc: '$green1Light',
             }}
             {...props}
           >
             <Checkbox.Indicator>
               <Check
                 $theme-dark={{
-                  bc: '$accent1Dark',
-                  color: '$accent12Dark',
+                  bc: '$green1Dark',
+                  color: '$green12Dark',
                 }}
                 $theme-light={{
-                  bc: '$accent1Light',
-                  color: '$accent12Light',
+                  bc: '$green1Light',
+                  color: '$green12Light',
                 }}
               />
             </Checkbox.Indicator>

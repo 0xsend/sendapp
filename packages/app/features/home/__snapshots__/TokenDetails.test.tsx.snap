@@ -13,7 +13,6 @@ exports[`TokenDetails 1`] = `
     style={
       {
         "flexDirection": "column",
-        "paddingTop": 18,
       }
     }
   >
@@ -34,7 +33,7 @@ exports[`TokenDetails 1`] = `
         {
           "alignItems": "center",
           "backgroundColor": "transparent",
-          "color": "hsla(112, 22%, 59%, 1)",
+          "color": "#FFFFFF",
           "display": "flex",
           "fontFamily": "System",
           "fontSize": 19.2,
@@ -53,7 +52,7 @@ exports[`TokenDetails 1`] = `
       selectable={true}
       style={
         {
-          "color": "hsla(112, 22%, 100%, 1)",
+          "color": "#FFFFFF",
           "fontFamily": "System",
           "fontSize": 64,
           "fontWeight": "700",
@@ -82,14 +81,14 @@ exports[`TokenDetails 1`] = `
     <View
       style={
         {
-          "borderBottomColor": "#3E4A3C",
+          "borderBottomColor": "#343434",
           "borderBottomWidth": 1,
-          "borderLeftColor": "#3E4A3C",
+          "borderLeftColor": "#343434",
           "borderLeftWidth": 0,
-          "borderRightColor": "#3E4A3C",
+          "borderRightColor": "#343434",
           "borderRightWidth": 0,
           "borderStyle": "solid",
-          "borderTopColor": "#3E4A3C",
+          "borderTopColor": "#343434",
           "borderTopWidth": 0,
           "flex": 1,
           "flexShrink": 0,
@@ -338,7 +337,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -350,7 +349,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -389,7 +388,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                     }
                   }
@@ -599,7 +598,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -611,7 +610,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -650,7 +649,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                     }
                   }
@@ -860,7 +859,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -872,7 +871,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 100%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 24,
                     }
@@ -911,7 +910,7 @@ exports[`TokenDetails 1`] = `
                 <Text
                   style={
                     {
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "color": "#FFFFFF",
                       "fontFamily": "System",
                     }
                   }

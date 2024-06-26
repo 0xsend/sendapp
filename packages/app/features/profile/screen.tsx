@@ -31,7 +31,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
 
   return (
     <YStack f={1} gap="$6" pt="$6" $gtMd={{ pt: '$0' }}>
-      {error && <Text theme="error">{error.message}</Text>}
+      {error && <Text theme="red">{error.message}</Text>}
       {isLoading && <Spinner size="large" color="$color10" />}
       {profile ? (
         <YStack width="100%" gap="$2">
@@ -53,7 +53,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     },
                   })
                 }}
-                theme="accent"
+                theme="green"
               >
                 Send
               </Button>

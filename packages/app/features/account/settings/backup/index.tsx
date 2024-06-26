@@ -119,7 +119,7 @@ const WebauthnCreds = ({
     <YStack w={'100%'} gap={'$size.3'}>
       <XStack w={'100%'} gap={'$2'} jc="space-between" ai="center">
         <YStack>
-          <Button theme="accent" {...addPasskeyLink}>
+          <Button theme="green" {...addPasskeyLink}>
             Add Passkey
           </Button>
         </YStack>
@@ -264,7 +264,7 @@ const SendAccountCredentials = ({
                             text="Passkey is not confirmed onchain. Finish confirming the passkey onchain."
                             warningText
                           />
-                          <Button theme={'accent'} color="$primary" variant="outlined" {...link}>
+                          <Button theme={'green'} color="$primary" variant="outlined" {...link}>
                             CONFIRM
                           </Button>
                         </YStack>
@@ -511,7 +511,7 @@ const RemovePasskeyConfirmation = ({
             </Button>
             <SubmitButton
               testID={'RemovePasskeyButton'}
-              theme={'error'}
+              theme={'red'}
               color={'$error'}
               variant="outlined"
               flex={1}
