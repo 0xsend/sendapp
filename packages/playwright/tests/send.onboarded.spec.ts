@@ -96,10 +96,17 @@ for (const token of tokens) {
 
       // goto send page
       await page.goto('/')
-      await page.locator('[id="__next"]').getByRole('button', { name: 'Send' }).click()
+      const navSendLink = page
+        .locator('[id="__next"]')
+        .getByRole('navigation')
+        .getByRole('link', { name: 'Send' })
+      await expect(navSendLink).toBeVisible()
+      await navSendLink.click()
+      await expect(page).toHaveURL(/\/send/)
 
       // fill search input
       const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID')
+      await expect(searchInput).toBeVisible()
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 

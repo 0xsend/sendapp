@@ -346,6 +346,11 @@ exports[`HomeScreen 1`] = `
           >
             <View
               accessibilityRole="button"
+              accessibilityState={
+                {
+                  "expanded": false,
+                }
+              }
               cancelable={true}
               disabled={false}
               focusVisibleStyle={{}}

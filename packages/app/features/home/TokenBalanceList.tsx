@@ -8,8 +8,8 @@ import {
   type LinkProps,
   Separator,
   Theme,
+  Stack,
 } from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
@@ -18,15 +18,15 @@ import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import type { coins, coin } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { Fragment } from 'react'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
   const [{ token: tokenParam }] = useRootScreenParams()
 
   return coins.map((coin, index) => (
-    <>
+    <Fragment key={`token-balance-list-${coin.label}`}>
       <TokenBalanceItem
         coin={coin}
-        key={coin.label}
         jc={'space-between'}
         ai={'center'}
         py={'$3.5'}
@@ -38,7 +38,7 @@ export const TokenBalanceList = ({ coins }: { coins: coins }) => {
         }}
       />
       {index !== coins.length - 1 && <Separator />}
-    </>
+    </Fragment>
   ))
 }
 

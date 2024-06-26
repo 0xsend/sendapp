@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { useSupabase } from '../supabase/useSupabase'
 import { useUser } from '../useUser'
 
@@ -31,11 +31,14 @@ export function useSendAccounts() {
 
 const useSendAccountQueryKey = 'send_account'
 
-export function useSendAccount() {
-  const { user } = useUser()
-  const supabase = useSupabase()
-
-  return useQuery({
+function sendAccountQueryOptions({
+  user,
+  supabase,
+}: {
+  user: ReturnType<typeof useUser>['user']
+  supabase: ReturnType<typeof useSupabase>
+}) {
+  return queryOptions({
     queryKey: [useSendAccountQueryKey],
     enabled: !!user?.id,
     queryFn: async () => {
@@ -54,6 +57,13 @@ export function useSendAccount() {
       return data
     },
   })
+}
+
+export function useSendAccount() {
+  const { user } = useUser()
+  const supabase = useSupabase()
+
+  return useQuery(sendAccountQueryOptions({ user, supabase }))
 }
 
 useSendAccount.queryKey = useSendAccountQueryKey
