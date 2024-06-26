@@ -631,7 +631,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           "marginBottom": "auto",
           "marginTop": "auto",
           "overflow": "scroll",
-          "paddingBottom": 18,
+          "paddingBottom": 24,
         }
       }
     >

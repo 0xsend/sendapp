@@ -489,7 +489,7 @@ const DistributionRewardsList = ({
         overflow="scroll"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        pb="$4"
+        pb="$5"
       >
         <XStack w="100%" gap="$2" jc={'space-between'} maw={1072} mx="auto">
           {allDistributions?.map((distribution, i) => {
