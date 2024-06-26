@@ -24,6 +24,7 @@ import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBotto
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
+import { usePwa } from 'app/utils/usePwa'
 import { IconCoin } from './icons/IconCoin'
 import { Link } from 'solito/link'
 
@@ -65,6 +66,7 @@ export function TopNav({
   const media = useMedia()
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
+  const isPwa = usePwa()
 
   const handleHomeBottomSheet = () => {
     setRootParams(
@@ -151,7 +153,7 @@ export function TopNav({
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        $lg={{ py: '$6' }}
+        $lg={{ pt: isPwa ? '$0' : '$5', pb: '$5' }}
       >
         <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
           {isSubRoute || hasSelectedCoin ? (
@@ -209,18 +211,19 @@ export function TopNav({
           >
             {subheader}
           </Paragraph>
-          <Separator w={'100%'} borderColor="$jet" />
+          <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
       <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
-        <Container pos="relative" mt={'$4'}>
+        <Container pos="relative">
           <View
             position="absolute"
             $lg={{ right: '$6' }}
             $md={{ right: 0 }}
             right={0}
             bottom={0}
+            top={0}
             justifyContent="center"
           >
             <View
@@ -228,7 +231,8 @@ export function TopNav({
               br={'$2'}
               $theme-dark={{ boc: '$decay' }}
               $theme-light={{ boc: '$gray4Light' }}
-              p={'$2'}
+              py={'$1.5'}
+              px={'$2'}
               miw="$18"
               bc="$background"
             >

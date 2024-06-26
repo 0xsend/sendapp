@@ -8,9 +8,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
       "flexDirection": "column",
       "gap": 32,
       "justifyContent": "space-between",
-      "marginBottom": "auto",
-      "marginTop": "auto",
-      "paddingBottom": 7,
+      "paddingBottom": 24,
     }
   }
 >
@@ -27,74 +25,175 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
     <View
       style={
         {
-          "alignSelf": "center",
           "flex": 1,
-          "flexDirection": "row",
-          "paddingLeft": 18,
-          "paddingRight": 18,
-          "width": "100%",
+          "flexDirection": "column",
+          "gap": 24,
+          "paddingTop": 32,
         }
       }
     >
       <View
         style={
           {
-            "borderTopColor": "hsl(0, 0%, 24.3%)",
-            "flex": 1,
-            "flexDirection": "column",
-            "gap": 24,
+            "gap": 7,
           }
         }
       >
+        <Text
+          cancelable={true}
+          disabled={false}
+          focusable={true}
+          id=":r0:"
+          minPressDuration={0}
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onPress={[Function]}
+          onPressIn={[Function]}
+          onPressOut={[Function]}
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "transparent",
+              "color": "hsla(112, 22%, 59%, 1)",
+              "display": "flex",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+            }
+          }
+          suppressHighlighting={true}
+          userSelect="none"
+        >
+          ROUND
+        </Text>
         <View
           style={
             {
-              "gap": 7,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-around",
+              "marginTop": "auto",
+              "width": "100%",
             }
           }
         >
-          <Text
-            cancelable={true}
-            disabled={false}
-            focusable={true}
-            id=":r0:"
-            minPressDuration={0}
-            onBlur={[Function]}
-            onFocus={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onPress={[Function]}
-            onPressIn={[Function]}
-            onPressOut={[Function]}
-            style={
-              {
-                "alignItems": "center",
-                "backgroundColor": "transparent",
-                "color": "hsla(112, 22%, 59%, 1)",
-                "display": "flex",
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
+          <View>
+            <Text
+              accessibilityRole="header"
+              selectable={true}
+              style={
+                {
+                  "color": "hsla(0, 0%, 99%, 1)",
+                  "fontFamily": "System",
+                  "fontSize": 54,
+                  "fontWeight": "300",
+                  "lineHeight": 51,
+                  "marginBottom": 0,
+                  "marginLeft": 0,
+                  "marginRight": 0,
+                  "marginTop": 0,
+                }
               }
-            }
-            suppressHighlighting={true}
-            userSelect="none"
-          >
-            ROUND
-          </Text>
+              suppressHighlighting={true}
+            >
+              #
+              1
+            </Text>
+          </View>
           <View
             style={
               {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "space-around",
-                "marginTop": "auto",
-                "width": "100%",
+                "alignItems": "stretch",
+                "borderBottomColor": "#3E4A3C",
+                "borderLeftColor": "#3E4A3C",
+                "borderRightColor": "#3E4A3C",
+                "borderRightWidth": 1,
+                "borderStyle": "solid",
+                "borderTopColor": "#3E4A3C",
+                "height": "100%",
+                "marginLeft": 18,
+                "marginRight": 18,
+                "width": 0,
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "column",
+                "gap": 18,
+                "justifyContent": "space-between",
               }
             }
           >
-            <View>
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "gap": 7,
+                  "justifyContent": "center",
+                  "maxWidth": 312,
+                }
+              }
+            >
+              <Text
+                selectable={true}
+                style={
+                  {
+                    "color": "hsla(0, 0%, 99%, 1)",
+                    "fontFamily": "System",
+                    "fontSize": 19.2,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Expired Jul 12, 2024
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "column",
+                }
+              }
+            >
+              <Text
+                cancelable={true}
+                disabled={false}
+                focusable={true}
+                id=":r1:"
+                minPressDuration={0}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "transparent",
+                    "color": "hsla(112, 22%, 59%, 1)",
+                    "display": "flex",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                  }
+                }
+                suppressHighlighting={true}
+                userSelect="none"
+              >
+                Status
+              </Text>
               <Text
                 accessibilityRole="header"
                 selectable={true}
@@ -102,79 +201,83 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   {
                     "color": "hsla(0, 0%, 99%, 1)",
                     "fontFamily": "System",
-                    "fontSize": 54,
-                    "fontWeight": "300",
-                    "lineHeight": 51,
+                    "fontSize": 16,
+                    "fontWeight": "500",
+                    "lineHeight": 27,
                     "marginBottom": 0,
                     "marginLeft": 0,
                     "marginRight": 0,
                     "marginTop": 0,
+                    "textTransform": "none",
                   }
                 }
                 suppressHighlighting={true}
               >
-                #
-                1
+                OPEN
               </Text>
             </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          {
+            "flex": 1,
+            "flexDirection": "column",
+            "gap": 7,
+            "marginBottom": "auto",
+            "marginTop": "auto",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "flexDirection": "column",
+              "gap": 7,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flex": 1,
+                "gap": 7,
+              }
+            }
+          >
             <View
               style={
                 {
-                  "alignItems": "stretch",
+                  "backgroundColor": "transparent",
                   "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 12,
+                  "borderBottomRightRadius": 12,
+                  "borderBottomWidth": 1,
                   "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
                   "borderRightColor": "#3E4A3C",
                   "borderRightWidth": 1,
                   "borderStyle": "solid",
                   "borderTopColor": "#3E4A3C",
-                  "height": "100%",
-                  "marginLeft": 18,
-                  "marginRight": 18,
-                  "width": 0,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "flex": 1,
+                  "borderTopLeftRadius": 12,
+                  "borderTopRightRadius": 12,
+                  "borderTopWidth": 1,
                   "flexDirection": "column",
-                  "gap": 18,
-                  "justifyContent": "space-between",
+                  "justifyContent": "center",
+                  "paddingBottom": 18,
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                  "paddingTop": 18,
+                  "position": "relative",
                 }
               }
             >
               <View
                 style={
                   {
-                    "flex": 1,
                     "flexDirection": "column",
                     "gap": 7,
-                    "justifyContent": "center",
-                    "maxWidth": 312,
-                  }
-                }
-              >
-                <Text
-                  selectable={true}
-                  style={
-                    {
-                      "color": "hsla(0, 0%, 99%, 1)",
-                      "fontFamily": "System",
-                      "fontSize": 19.2,
-                      "fontWeight": "400",
-                      "lineHeight": 19,
-                    }
-                  }
-                  suppressHighlighting={true}
-                >
-                  Expired Jul 12, 2024
-                </Text>
-              </View>
-              <View
-                style={
-                  {
-                    "flexDirection": "column",
                   }
                 }
               >
@@ -182,7 +285,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   cancelable={true}
                   disabled={false}
                   focusable={true}
-                  id=":r1:"
+                  id=":r2:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -195,10 +298,10 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     {
                       "alignItems": "center",
                       "backgroundColor": "transparent",
-                      "color": "hsla(112, 22%, 59%, 1)",
+                      "color": "#86AE80",
                       "display": "flex",
                       "fontFamily": "System",
-                      "fontSize": 16.8,
+                      "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
                     }
@@ -206,28 +309,198 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   suppressHighlighting={true}
                   userSelect="none"
                 >
-                  Status
+                  Snapshot Send Balance
                 </Text>
                 <Text
-                  accessibilityRole="header"
                   selectable={true}
                   style={
                     {
-                      "color": "hsla(0, 0%, 99%, 1)",
+                      "color": "hsla(112, 22%, 100%, 1)",
                       "fontFamily": "System",
-                      "fontSize": 16,
+                      "fontSize": 24,
                       "fontWeight": "500",
-                      "lineHeight": 27,
-                      "marginBottom": 0,
-                      "marginLeft": 0,
-                      "marginRight": 0,
-                      "marginTop": 0,
-                      "textTransform": "none",
+                      "lineHeight": 19,
                     }
                   }
                   suppressHighlighting={true}
                 >
-                  OPEN
+                  0 SEND
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "gap": 7,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 12,
+                  "borderBottomRightRadius": 12,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 12,
+                  "borderTopRightRadius": 12,
+                  "borderTopWidth": 1,
+                  "flex": 2,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "paddingBottom": 18,
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                  "paddingTop": 18,
+                  "position": "relative",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 7,
+                  }
+                }
+              >
+                <Text
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  id=":r3:"
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "color": "#86AE80",
+                      "display": "flex",
+                      "fontFamily": "System",
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                    }
+                  }
+                  suppressHighlighting={true}
+                  userSelect="none"
+                >
+                  Min Balance required
+                </Text>
+                <Text
+                  selectable={true}
+                  style={
+                    {
+                      "color": "hsla(191, 32%, 10%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                      "fontWeight": "500",
+                      "lineHeight": 19,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  ?
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "#3E4A3C",
+                  "borderBottomLeftRadius": 12,
+                  "borderBottomRightRadius": 12,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#3E4A3C",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#3E4A3C",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "#3E4A3C",
+                  "borderTopLeftRadius": 12,
+                  "borderTopRightRadius": 12,
+                  "borderTopWidth": 1,
+                  "flex": 1,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "paddingBottom": 18,
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                  "paddingTop": 18,
+                  "position": "relative",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "column",
+                    "gap": 7,
+                  }
+                }
+              >
+                <Text
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  id=":r4:"
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "color": "#86AE80",
+                      "display": "flex",
+                      "fontFamily": "System",
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                    }
+                  }
+                  suppressHighlighting={true}
+                  userSelect="none"
+                >
+                  Referrals
+                </Text>
+                <Text
+                  selectable={true}
+                  style={
+                    {
+                      "color": "hsla(191, 32%, 10%, 1)",
+                      "fontFamily": "System",
+                      "fontSize": 24,
+                      "fontWeight": "500",
+                      "lineHeight": 19,
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  123
                 </Text>
               </View>
             </View>
@@ -237,399 +510,111 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           style={
             {
               "flex": 1,
-              "flexDirection": "column",
-              "gap": 7,
-              "marginBottom": "auto",
-              "marginTop": "auto",
             }
           }
         >
           <View
             style={
               {
-                "flexDirection": "column",
-                "gap": 7,
-              }
-            }
-          >
-            <View
-              style={
-                {
-                  "flex": 1,
-                  "gap": 7,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "backgroundColor": "transparent",
-                    "borderBottomColor": "#3E4A3C",
-                    "borderBottomLeftRadius": 12,
-                    "borderBottomRightRadius": 12,
-                    "borderBottomWidth": 1,
-                    "borderLeftColor": "#3E4A3C",
-                    "borderLeftWidth": 1,
-                    "borderRightColor": "#3E4A3C",
-                    "borderRightWidth": 1,
-                    "borderStyle": "solid",
-                    "borderTopColor": "#3E4A3C",
-                    "borderTopLeftRadius": 12,
-                    "borderTopRightRadius": 12,
-                    "borderTopWidth": 1,
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "paddingBottom": 18,
-                    "paddingLeft": 18,
-                    "paddingRight": 18,
-                    "paddingTop": 18,
-                    "position": "relative",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "column",
-                      "gap": 7,
-                    }
-                  }
-                >
-                  <Text
-                    cancelable={true}
-                    disabled={false}
-                    focusable={true}
-                    id=":r2:"
-                    minPressDuration={0}
-                    onBlur={[Function]}
-                    onFocus={[Function]}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    onPress={[Function]}
-                    onPressIn={[Function]}
-                    onPressOut={[Function]}
-                    style={
-                      {
-                        "alignItems": "center",
-                        "backgroundColor": "transparent",
-                        "color": "#86AE80",
-                        "display": "flex",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                    userSelect="none"
-                  >
-                    Snapshot Send Balance
-                  </Text>
-                  <Text
-                    selectable={true}
-                    style={
-                      {
-                        "color": "hsla(112, 22%, 100%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 24,
-                        "fontWeight": "500",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    0 SEND
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View
-              style={
-                {
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "gap": 7,
-                }
-              }
-            >
-              <View
-                style={
-                  {
-                    "backgroundColor": "transparent",
-                    "borderBottomColor": "#3E4A3C",
-                    "borderBottomLeftRadius": 12,
-                    "borderBottomRightRadius": 12,
-                    "borderBottomWidth": 1,
-                    "borderLeftColor": "#3E4A3C",
-                    "borderLeftWidth": 1,
-                    "borderRightColor": "#3E4A3C",
-                    "borderRightWidth": 1,
-                    "borderStyle": "solid",
-                    "borderTopColor": "#3E4A3C",
-                    "borderTopLeftRadius": 12,
-                    "borderTopRightRadius": 12,
-                    "borderTopWidth": 1,
-                    "flex": 2,
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "paddingBottom": 18,
-                    "paddingLeft": 18,
-                    "paddingRight": 18,
-                    "paddingTop": 18,
-                    "position": "relative",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "column",
-                      "gap": 7,
-                    }
-                  }
-                >
-                  <Text
-                    cancelable={true}
-                    disabled={false}
-                    focusable={true}
-                    id=":r3:"
-                    minPressDuration={0}
-                    onBlur={[Function]}
-                    onFocus={[Function]}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    onPress={[Function]}
-                    onPressIn={[Function]}
-                    onPressOut={[Function]}
-                    style={
-                      {
-                        "alignItems": "center",
-                        "backgroundColor": "transparent",
-                        "color": "#86AE80",
-                        "display": "flex",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                    userSelect="none"
-                  >
-                    Min Balance required
-                  </Text>
-                  <Text
-                    selectable={true}
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 10%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 24,
-                        "fontWeight": "500",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    ?
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={
-                  {
-                    "backgroundColor": "transparent",
-                    "borderBottomColor": "#3E4A3C",
-                    "borderBottomLeftRadius": 12,
-                    "borderBottomRightRadius": 12,
-                    "borderBottomWidth": 1,
-                    "borderLeftColor": "#3E4A3C",
-                    "borderLeftWidth": 1,
-                    "borderRightColor": "#3E4A3C",
-                    "borderRightWidth": 1,
-                    "borderStyle": "solid",
-                    "borderTopColor": "#3E4A3C",
-                    "borderTopLeftRadius": 12,
-                    "borderTopRightRadius": 12,
-                    "borderTopWidth": 1,
-                    "flex": 1,
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "paddingBottom": 18,
-                    "paddingLeft": 18,
-                    "paddingRight": 18,
-                    "paddingTop": 18,
-                    "position": "relative",
-                  }
-                }
-              >
-                <View
-                  style={
-                    {
-                      "flexDirection": "column",
-                      "gap": 7,
-                    }
-                  }
-                >
-                  <Text
-                    cancelable={true}
-                    disabled={false}
-                    focusable={true}
-                    id=":r4:"
-                    minPressDuration={0}
-                    onBlur={[Function]}
-                    onFocus={[Function]}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    onPress={[Function]}
-                    onPressIn={[Function]}
-                    onPressOut={[Function]}
-                    style={
-                      {
-                        "alignItems": "center",
-                        "backgroundColor": "transparent",
-                        "color": "#86AE80",
-                        "display": "flex",
-                        "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                    userSelect="none"
-                  >
-                    Referrals
-                  </Text>
-                  <Text
-                    selectable={true}
-                    style={
-                      {
-                        "color": "hsla(191, 32%, 10%, 1)",
-                        "fontFamily": "System",
-                        "fontSize": 24,
-                        "fontWeight": "500",
-                        "lineHeight": 19,
-                      }
-                    }
-                    suppressHighlighting={true}
-                  >
-                    123
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View
-            style={
-              {
+                "backgroundColor": "hsla(191, 32%, 10%, 1)",
+                "borderBottomLeftRadius": 12,
+                "borderBottomRightRadius": 12,
+                "borderTopLeftRadius": 12,
+                "borderTopRightRadius": 12,
                 "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "center",
+                "minHeight": 198,
+                "paddingBottom": 32,
+                "paddingLeft": 32,
+                "paddingRight": 32,
+                "paddingTop": 32,
+                "position": "relative",
               }
             }
           >
             <View
               style={
                 {
-                  "backgroundColor": "#081619",
-                  "borderBottomLeftRadius": 12,
-                  "borderBottomRightRadius": 12,
-                  "borderTopLeftRadius": 12,
-                  "borderTopRightRadius": 12,
-                  "flex": 1,
+                  "alignItems": "center",
                   "flexDirection": "column",
+                  "gap": 18,
                   "justifyContent": "center",
-                  "minHeight": 198,
-                  "paddingBottom": 32,
-                  "paddingLeft": 32,
-                  "paddingRight": 32,
-                  "paddingTop": 32,
-                  "position": "relative",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
                 }
               }
             >
               <View
                 style={
                   {
-                    "alignItems": "center",
-                    "flexDirection": "column",
-                    "gap": 18,
-                    "justifyContent": "center",
-                    "marginLeft": "auto",
-                    "marginRight": "auto",
+                    "gap": 32,
                   }
                 }
               >
-                <View
+                <Text
+                  cancelable={true}
+                  disabled={false}
+                  focusable={true}
+                  id=":r5:"
+                  minPressDuration={0}
+                  onBlur={[Function]}
+                  onFocus={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onPress={[Function]}
+                  onPressIn={[Function]}
+                  onPressOut={[Function]}
                   style={
                     {
-                      "gap": 32,
+                      "alignItems": "center",
+                      "backgroundColor": "transparent",
+                      "color": "#86AE80",
+                      "display": "flex",
+                      "fontFamily": "System",
+                      "fontSize": 19.2,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "textAlign": "left",
                     }
                   }
+                  suppressHighlighting={true}
+                  userSelect="none"
                 >
+                  Rewards
+                </Text>
+                <View>
                   <Text
-                    cancelable={true}
-                    disabled={false}
-                    focusable={true}
-                    id=":r5:"
-                    minPressDuration={0}
-                    onBlur={[Function]}
-                    onFocus={[Function]}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    onPress={[Function]}
-                    onPressIn={[Function]}
-                    onPressOut={[Function]}
+                    selectable={true}
                     style={
                       {
-                        "alignItems": "center",
-                        "backgroundColor": "transparent",
-                        "color": "#86AE80",
-                        "display": "flex",
+                        "color": "hsla(191, 32%, 10%, 1)",
                         "fontFamily": "System",
-                        "fontSize": 19.2,
-                        "fontWeight": "400",
-                        "lineHeight": 19,
-                        "textAlign": "left",
+                        "fontSize": 55.199999999999996,
+                        "fontWeight": "500",
+                        "lineHeight": 40,
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
-                    Rewards
+                    1 SEND
                   </Text>
-                  <View>
-                    <Text
-                      selectable={true}
-                      style={
-                        {
-                          "color": "hsla(191, 32%, 10%, 1)",
-                          "fontFamily": "System",
-                          "fontSize": 55.199999999999996,
-                          "fontWeight": "500",
-                          "lineHeight": 40,
-                        }
+                  <Text
+                    selectable={true}
+                    style={
+                      {
+                        "color": "hsla(191, 32%, 41%, 1)",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                        "fontWeight": "400",
+                        "lineHeight": 19,
+                        "opacity": 0.6,
                       }
-                      suppressHighlighting={true}
-                    >
-                      1 SEND
-                    </Text>
-                    <Text
-                      selectable={true}
-                      style={
-                        {
-                          "color": "hsla(191, 32%, 41%, 1)",
-                          "fontFamily": "System",
-                          "fontSize": 16.8,
-                          "fontWeight": "400",
-                          "lineHeight": 19,
-                          "opacity": 0.6,
-                        }
-                      }
-                      suppressHighlighting={true}
-                    >
-                      1.00 USD
-                    </Text>
-                  </View>
+                    }
+                    suppressHighlighting={true}
+                  >
+                    1.00 USD
+                  </Text>
                 </View>
               </View>
             </View>
@@ -641,12 +626,8 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
   <View
     style={
       {
-        "alignSelf": "center",
-        "flex": 1,
-        "flexDirection": "row",
-        "paddingLeft": 18,
-        "paddingRight": 18,
-        "width": "100%",
+        "marginBottom": "auto",
+        "marginTop": "auto",
       }
     }
   >
@@ -656,9 +637,9 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
       showsVerticalScrollIndicator={false}
       style={
         {
-          "flex": 0,
+          "marginBottom": "auto",
+          "marginTop": "auto",
           "overflow": "scroll",
-          "paddingBottom": 18,
         }
       }
     >
@@ -672,8 +653,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               "marginLeft": "auto",
               "marginRight": "auto",
               "maxWidth": 1072,
-              "paddingBottom": 7,
-              "paddingTop": 7,
               "width": "100%",
             }
           }

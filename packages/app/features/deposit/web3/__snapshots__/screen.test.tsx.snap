@@ -913,7 +913,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
               >
                 Balance:
                  
-                &lt;0.00
+                &gt;0.00
                  
                 USDC
               </Text>

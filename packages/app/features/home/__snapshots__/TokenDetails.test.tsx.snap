@@ -13,6 +13,7 @@ exports[`TokenDetails 1`] = `
     style={
       {
         "flexDirection": "column",
+        "paddingTop": 18,
       }
     }
   >

@@ -45,7 +45,11 @@ export default class Document extends NextDocument {
         <Head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         </Head>
-        <body style={{ height: 'calc(100vh - (100vh - 100%))' }}>
+        <body
+          style={{
+            height: 'calc(100vh - (100vh - 100%))',
+          }}
+        >
           <Main />
           <NextScript />
         </body>
