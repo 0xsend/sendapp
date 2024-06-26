@@ -1,9 +1,10 @@
 {
-  "gasFactor": "1.1",
-  "minBalance": "1",
+  "gasFactor": "1",
+  "minBalance": "0.0005",
   "maxBundleGas": 5e6,
-  "minStake": "1",
-  "minUnstakeDelay": 0,
-  "autoBundleInterval": 2,
-  "autoBundleMempoolSize": 10
+  "minStake": "0.0005",
+  "minUnstakeDelay": 86400,
+  "autoBundleInterval": 1,
+  "autoBundleMempoolSize": 10,
+  "unsafe": true
 }

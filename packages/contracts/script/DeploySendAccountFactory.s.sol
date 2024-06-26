@@ -14,7 +14,7 @@ contract DeploySendAccountFactoryScript is Script, Helper {
 
     function run() public {
         address verifier = vm.computeCreate2Address(0, hashInitCode(type(SendVerifier).creationCode));
-        address owner = SEND_DEPLOYER; // FIXME: pick a multisig
+        address owner = msg.sender;
         bytes memory args = abi.encode(verifier, abi.encodeWithSelector(SendVerifier.init.selector, owner));
         address verifierProxy = vm.computeCreate2Address(0, hashInitCode(type(SendVerifierProxy).creationCode, args));
 
@@ -26,6 +26,7 @@ contract DeploySendAccountFactoryScript is Script, Helper {
         console2.log("SendVerifier address:", verifier);
         console2.log("SendVerifierProxy address:", verifierProxy);
         console2.log("SendAccountFactory address:", factory);
+        console2.log("SendAccountFactory owner:", owner);
         vm.stopBroadcast();
     }
 }

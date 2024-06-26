@@ -22,7 +22,7 @@ console.log(`
 | -------- | ------- | ---------- | ----- | -------- |
 | ${report.stats.expected} | ${report.stats.skipped} | ${report.stats.unexpected} | ${
   report.stats.flaky
-}| ${report.stats.duration / 1000}s |
+}| ${(report.stats.duration / 1000).toFixed(2)}s |
 `)
 
 console.log('\n## Suites')
@@ -38,27 +38,52 @@ for (const suite of report.suites) {
     acc[spec.title].push(spec)
     return acc
   }, {})
-
   for (const [specTitle, specs] of Object.entries(specsByTitle)) {
     console.log(`#### ${specTitle}`)
     for (const spec of specs) {
       for (const test of spec.tests) {
         const result = test.results[test.results.length - 1] as TestResult // Last result
-        if (result.status === 'passed') {
-          console.log(`- ${test.projectName}: ✅`)
-        } else if (result.status === 'failed') {
-          console.log(`- ${test.projectName}: ❌`)
+        const emoji = o2S(test.status)
+        console.log(`- ${test.projectName}: ${emoji}`)
+        if (result.status === 'failed') {
           console.log(`  - ${result.errors[0]?.message}`)
-        } else if (result.status === 'skipped') {
-          console.log(`- ${test.projectName}: ⏭`)
-        } else if (result.status === 'timedOut') {
-          console.log(`- ${test.projectName}: ⏰`)
-        } else if (result.status === 'interrupted') {
-          console.log(`- ${test.projectName}: 🚨`)
-        } else {
-          console.log(`- ${test.projectName}: 😕`)
         }
       }
     }
+  }
+}
+
+// result status to emoji
+function s2E(status: string) {
+  // 'passed' | 'failed' | 'timedOut' | 'skipped' | 'interrupted'
+  switch (status) {
+    case 'passed':
+      return '✅'
+    case 'failed':
+      return '❌'
+    case 'skipped':
+      return '⏭'
+    case 'timedOut':
+      return '⏱'
+    case 'interrupted':
+      return '🚨'
+    default:
+      return '😕'
+  }
+}
+// outcome status to emoji
+function o2S(status: string) {
+  // "skipped"|"expected"|"unexpected"|"flaky"
+  switch (status) {
+    case 'skipped':
+      return '⏭'
+    case 'expected':
+      return '✅'
+    case 'unexpected':
+      return '❌'
+    case 'flaky':
+      return '🚨'
+    default:
+      return '😕'
   }
 }

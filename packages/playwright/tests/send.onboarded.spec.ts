@@ -322,7 +322,7 @@ async function handleTokenTransfer({
     timeout: isETH ? 10000 : 5000, // eth needs more time since no send_account_receives event is emitted
   })
 
-  await expect(page).toHaveURL(`/?token=${token.address}`)
+  await expect(page).toHaveURL(`/?token=${token.address}`, { timeout: isETH ? 10_000 : undefined }) // sometimes ETH needs more time
 
   if (!isETH) {
     // no history for eth since no send_account_receives event is emitted

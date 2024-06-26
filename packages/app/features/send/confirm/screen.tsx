@@ -78,7 +78,13 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   })
 
   const amount = parseUnits((queryParams.amount ?? '0').toString(), balance?.decimals ?? 0)
-  const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
+  const {
+    data: nonce,
+    error: nonceError,
+    isLoading: nonceIsLoading,
+  } = useAccountNonce({
+    sender: sendAccount?.address,
+  })
   const { data: userOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
     // @ts-expect-error some work to do here
@@ -109,6 +115,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   // need balance to check if user has enough to send
 
   const canSubmit =
+    !nonceIsLoading &&
     Number(queryParams.amount) > 0 &&
     coins.some((coin) => coin.token === sendToken) &&
     (balance?.value ?? BigInt(0) >= amount) &&
@@ -166,7 +173,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     }
   }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
 
-  if (balanceIsLoading) return <Spinner size="large" />
+  if (balanceIsLoading || nonceIsLoading) return <Spinner size="large" color={'$color'} />
 
   return (
     <YStack
