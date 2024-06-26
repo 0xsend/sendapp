@@ -77,6 +77,7 @@ export function SendAmountForm({ profile }: { profile: Functions<'profile_lookup
     router.push({
       pathname: '/send/confirm',
       query: {
+        idType: sendParams.idType,
         recipient: sendParams.recipient,
         amount: amount,
         sendToken: sendToken,

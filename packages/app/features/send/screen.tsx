@@ -20,8 +20,8 @@ import { SendAmountForm } from './SendAmountForm'
 import { SendRecipient } from './confirm/screen'
 
 export const SendScreen = () => {
-  const [{ recipient }] = useSendScreenParams()
-  const { data: profile, isLoading, error } = useProfileLookup('tag', recipient ?? '')
+  const [{ recipient, idType }] = useSendScreenParams()
+  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
   if (!profile)

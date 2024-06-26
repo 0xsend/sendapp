@@ -42,20 +42,22 @@ type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
-  const { data: profile, isLoading, error } = useProfileLookup('tag', queryParams.recipient ?? '')
+  const { recipient, idType, sendToken, amount } = queryParams
+  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const router = useRouter()
 
   useEffect(() => {
-    if (!profile || !queryParams.recipient)
+    if (!profile || !recipient)
       router.replace({
         pathname: '/send',
         query: {
-          recipient: queryParams.recipient,
-          sendToken: queryParams.sendToken,
-          amount: queryParams.amount,
+          idType: idType,
+          recipient: recipient,
+          sendToken: sendToken,
+          amount: amount,
         },
       })
-  }, [profile, queryParams, router])
+  }, [profile, recipient, idType, router, sendToken, amount])
   if (error) throw new Error(error.message)
   if (isLoading || !profile) return <Spinner size="large" />
   return <SendConfirm profile={profile} />
@@ -65,7 +67,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const { data: sendAccount } = useSendAccount()
   const [sentTxHash, setSentTxHash] = useState<Hex>()
   const [queryParams] = useSendScreenParams()
-  const { sendToken } = queryParams
+  const { sendToken, recipient, idType } = queryParams
 
   const router = useRouter()
   const { data: balance, isLoading: balanceIsLoading } = useBalance({
@@ -207,7 +209,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   router.push({
                     pathname: '/send',
                     query: {
-                      recipient: queryParams.recipient,
+                      recipient,
+                      idType,
                       sendToken: queryParams.sendToken,
                       amount: queryParams.amount,
                     },
@@ -392,7 +395,7 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
             lineHeight="$1"
             color="$color11"
           >
-            {profile?.tag ? `@${profile?.tag}` : `#${profile?.id}`}
+            {profile?.tag ? `@${profile?.tag}` : `#${profile?.sendid}`}
           </Paragraph>
         </YStack>
       </XStack>
