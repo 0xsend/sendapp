@@ -12,8 +12,8 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/deployer.key
           chmod 600 ~/.ssh/deployer.key
-          for h in $DEV_DOCKER_DEPLOYMENT_TARGETS; do echo Deploying to $h && \
-          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no $DEPLOYER_USERNAME@$h \
+          for h in $DEPLOYMENT_TARGETS; do echo Deploying to $h && \
+          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no $SSH_USER@$h \
           'cd /opt/next-app-dev && docker compose pull && docker compose up -d' ; done
         env:
           SSH_USER: ${{ secrets.DEPLOYER_SSH_USER }}
