@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext, PreviewData, Redirect } from 'next'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import debug from 'debug'
 
-const log = debug('next:utils:userOnboarded')
+const log = debug('api:utils:userOnboarded')
 
 /**
  * check if user is onboarded and redirect to onboarding page
@@ -16,13 +16,13 @@ export async function userOnboarded<
   supabase: SupabaseClient<Database>,
   ctx: GetServerSidePropsContext<Params, Preview>
 ): Promise<null | { redirect: Redirect }> {
-  // check for send accounts and redirect to onboarding if none
+  log('check for send accounts and redirect to onboarding if none.')
   const { error, count: sendAcctCount } = await supabase
     .from('send_accounts')
     .select('*', { count: 'exact', head: true })
 
   if (error) {
-    log('error getting send accounts', error)
+    console.error('error getting send accounts', error, (error as unknown as Error).cause ?? null)
     throw error
   }
 

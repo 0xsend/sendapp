@@ -1,560 +1,161 @@
 load("ext://color", "color")
 load("ext://dotenv", "dotenv")
 load("ext://uibutton", "cmd_button", "location")
-load("./etc/tilt/utils.tiltfile", "files_matching", "require_tools")
+load("./tilt/common.tiltfile", "CFG", "CI", "DEBUG", "contract_files")
+load("./tilt/utils.tiltfile", "files_matching", "require_env", "require_tools")
+
+print(color.green("███████╗███████╗███╗   ██╗██████╗     ██╗████████╗"))
+
+print(color.green("██╔════╝██╔════╝████╗  ██║██╔══██╗    ██║╚══██╔══╝"))
+
+print(color.green("███████╗█████╗  ██╔██╗ ██║██║  ██║    ██║   ██║"))
+
+print(color.green("╚════██║██╔══╝  ██║╚██╗██║██║  ██║    ██║   ██║"))
+
+print(color.green("███████║███████╗██║ ╚████║██████╔╝    ██║   ██║"))
+
+print(color.green("╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝     ╚═╝   ╚═╝"))
 
 require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "caddy", "node", "bun")
 
-CI = os.getenv("CI") != None
+print(color.cyan("Config: " + str(CFG)))
 
 if CI:
     print(color.magenta("Running in CI mode"))
 
 # check if .env.local exists if not create it
 if not os.path.exists(".env.local"):
-    local("cp .env.local.template .env.local", echo_off = True, quiet = True)
+    local("cp .env.local.template .env.local")
+    print(color.green("📝 Created .env.local"))
+    if CFG.dockerize:
+        sed = str(local("which gsed || which sed")).strip()
+        if sed == "":
+            print(color.red("Could not find sed. Please install it and try again."))
+            exit(1)
+
+        # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
+        local(sed + " -i 's/localhost/host.docker.internal/' .env.local")
+
+        # except NEXT_PUBLIC_URL
+        local(sed + " -i 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local")
+        print(color.green("📝 Dockerized .env.local"))
 
 for dotfile in [
     ".env",
+    ".env.development",
     ".env.local",  # last one wins
 ]:
     if os.path.exists(dotfile):
         print(color.green("Loading environment from " + dotfile))
         dotenv(fn = dotfile)
 
-# DEPS
-labels = ["deps"]
-
-local_resource(
-    "yarn:install",
-    "yarn install" if not CI else "yarn install --immutable",
-    labels = labels,
-    deps = [
-        "package.json",
-        "yarn.lock",
-    ],
+require_env(
+    "ANVIL_BASE_FORK_URL",
+    "ANVIL_MAINNET_FORK_URL",
 )
 
-local_resource(
-    "lint",
-    "yarn lint",
-    allow_parallel = True,
-    labels = labels,
-)
+# ensure .env matches what's in .env.local.template
+for line in str(read_file(".env.local.template")).split("\n"):
+    if line.startswith("#") or line == "":
+        continue
+    key, _ = line.split("=", 1)
+    print(color.blue("checking for " + key)) if DEBUG else None
+    require_env(key)
 
-cmd_button(
-    "lint:fix",
-    argv = [
-        "yarn",
-        "lint:fix",
-    ],
-    icon_name = "handyman",
-    location = location.RESOURCE,
-    resource = "lint",
-    text = "yarn lint:fix",
-)
+# dockerize checks
+if CFG.dockerize:
+    # ensure host.docker.internal is resolvable
+    host_docker_rdy = str(local("ping -c 1 host.docker.internal || true", echo_off = True, quiet = True)).strip()
+    if host_docker_rdy.find("server can't find host.docker.interna") != -1:
+        print(color.red("Could not resolve host.docker.internal domain.") + """
+    
+Add the following to your /etc/hosts file:
+    
+127.0.0.1 host.docker.internal
+        """)
+        fail(color.red("Could not resolve host.docker.internal domain."))
 
-contract_files = files_matching(
-    os.path.join("packages", "contracts"),
-    lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
-)
+    # ensure NEXT_PUBLIC_SUPABASE_URL is pointing to the correct host
+    if not os.getenv("NEXT_PUBLIC_SUPABASE_URL").startswith("http://host.docker.internal"):
+        print(color.red("NEXT_PUBLIC_SUPABASE_URL is not pointing to host.docker.internal. Please update your environment to point to a local supabase instance."))
+        fail(color.red("NEXT_PUBLIC_SUPABASE_URL is not pointing to host.docker.internal"))
 
-local_resource(
-    name = "contracts:build",
-    allow_parallel = True,
-    cmd = "yarn contracts build --sizes",
-    labels = labels,
-    resource_deps = ["yarn:install"],
-    deps = contract_files,
-)
+include("tilt/infra.tiltfile")
 
-local_resource(
-    name = "wagmi:generate",
-    allow_parallel = True,
-    cmd = "yarn wagmi generate",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "contracts:build",
-        "anvil:fixtures",
-    ],
-    deps =
-        [os.path.join("packages", "wagmi", "wagmi.config.ts")] +
-        files_matching(
-            os.path.join("packages", "wagmi", "src"),
-            lambda f: f.endswith(".ts") and f.find("generated.ts") == -1,
-        ) + files_matching(
-            os.path.join("packages", "contracts", "broadcast"),
-            lambda f: f.endswith("run-latest.json"),
-        ),
-)
-
-local_resource(
-    name = "supabase:generate",
-    allow_parallel = True,
-    cmd = "yarn supabase g",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "supabase",
-    ],
-    deps = files_matching(
-        os.path.join("supabase", "migrations"),
-        lambda f: f.endswith(".sql"),
-    ),
-)
-
-local_resource(
-    name = "snaplet:generate",
-    allow_parallel = True,
-    cmd = "bunx snaplet generate",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "supabase",
-    ],
-    deps = files_matching(
-        os.path.join("supabase", "migrations"),
-        lambda f: f.endswith(".sql"),
-    ),
-)
-
-ui_theme_dir = os.path.join("packages", "ui", "src", "themes")
-
-ui_theme_files = files_matching(
-    ui_theme_dir,
-    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and f.find("generated.ts") == -1,
-)
-
-ui_files = files_matching(
-    os.path.join("packages", "ui", "src"),
-    lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and (f.find("generated.ts") == -1 and f.find(ui_theme_dir) == -1),
-)
-
-local_resource(
-    name = "ui:build",
-    allow_parallel = True,
-    cmd = "yarn workspace @my/ui build",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-    ],
-    deps = ui_files,
-)
-
-local_resource(
-    name = "ui:generate-theme",
-    allow_parallel = True,
-    cmd = "yarn workspace @my/ui generate-theme",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-    ],
-    deps = ui_theme_files,
-)
-
-local_resource(
-    name = "daimo-expo-passkeys:build",
-    allow_parallel = True,
-    cmd = "yarn workspace @daimo/expo-passkeys build",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-    ],
-    deps = files_matching(
-               os.path.join("packages", "daimo-expo-passkeys", "src"),
-               lambda f: (f.endswith(".tsx") or f.endswith(".ts")),
-           ) +
-           files_matching(
-               os.path.join("packages", "daimo-expo-passkeys", "ios"),
-               lambda f: f.endswith(".swift"),
-           ) +
-           files_matching(
-               os.path.join("packages", "daimo-expo-passkeys", "android"),
-               lambda f: f.endswith(".kt"),
-           ),
-)
-
-local_resource(
-    name = "webauthn-authenticator:build",
-    allow_parallel = True,
-    cmd = "yarn workspace @0xsend/webauthn-authenticator build",
-    labels = labels,
-    resource_deps = ["yarn:install"],
-    deps =
-        files_matching(
-            os.path.join("packages", "webauthn-authenticator", "src"),
-            lambda f: f.endswith(".ts"),
-        ),
-)
-
-local_resource(
-    name = "shovel:generate-config",
-    allow_parallel = True,
-    cmd = "yarn workspace shovel generate",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "wagmi:generate",
-    ],
-    deps = files_matching(
-        os.path.join("packages", "shovel"),
-        lambda f: f.endswith(".ts"),
-    ),
-)
-
-cmd_button(
-    name = "shovel:update-snapshot",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "yarn workspace shovel test --update-snapshots && yarn workspace shovel generate",
-    ],
-    icon_name = "restart_alt",
-    location = location.RESOURCE,
-    resource = "shovel:test",
-    text = "shovel update-snapshot",
-)
-
-# INFRA
-labels = ["infra"]
-
-supabase_exclude = [
-    "edge-runtime",
-    "realtime",
-    "logflare",
-    "vector",
-] + (["studio"] if CI else [])
-
-local_resource(
-    "supabase",
-    [
-        "yarn",
-        "supabase",
-        "start",
-        "--exclude",
-    ] + supabase_exclude,
-    allow_parallel = True,
-    labels = labels,
-    links = [link("http://localhost:54323/", "Supabase Studio")],
-    resource_deps = ["yarn:install"],
-    serve_cmd = "while true; do docker logs -f -n 1 supabase_db_send; sleep 1; done",
-)
-
-if config.tilt_subcommand == "down":
-    local("""
-    bun run ./bin/reset-supabase.ts
-    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
-    docker ps -a | grep otterscan-base | awk '{{print $1}}' | xargs -r docker rm -f
-    pkill anvil || true
-    """)
-    local("yarn clean")
-
-cmd_button(
-    "supabase:db reset",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "yarn workspace @my/supabase reset && yarn workspace @my/supabase generate",
-    ],
-    icon_name = "restart_alt",
-    location = location.NAV,
-    resource = "supabase",
-    text = "supabase db reset",
-)
-
-cmd_button(
-    "supabase:db migrate",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "bunx supabase db push --local --include-all",
-    ],
-    dir = "supabase",
-    icon_name = "play_arrow",
-    location = location.RESOURCE,
-    resource = "supabase",
-    text = "supabase db migrate",
-)
-
-cmd_button(
-    "snaplet:seed",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "yarn snaplet:seed",
-    ],
-    icon_name = "compost",
-    location = location.NAV,
-    resource = "supabase",
-    text = "snaplet seed",
-)
-
-cmd_button(
-    "snaplet:snapshot:restore",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "yarn snaplet:snapshot:restore",
-    ],
-    icon_name = "settings_backup_restore",
-    location = location.NAV,
-    resource = "supabase",
-    text = "snaplet snapshot restore",
-)
-
-local_resource(
-    "anvil:mainnet",
-    allow_parallel = True,
-    labels = labels,
-    readiness_probe = probe(
-        exec = exec_action(
-            command = [
-                "cast",
-                "bn",
-                "--rpc-url=127.0.0.1:8545",
-            ],
-        ),
-        initial_delay_secs = 1,
-        period_secs = 2,
-        timeout_secs = 5,
-    ),
-    serve_cmd = [cmd for cmd in [
-        "anvil",
-        "--host=0.0.0.0",
-        "--port=8545",
-        "--chain-id=" + os.getenv("NEXT_PUBLIC_MAINNET_CHAIN_ID", "1337"),
-        "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
-        "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
-        "--no-storage-caching",
-        "--prune-history",
-        os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
-    ] if cmd],
-)
-
-local_resource(
-    "otterscan:mainnet",
-    allow_parallel = True,
-    auto_init = False,
-    labels = labels,
-    links = [link("http://localhost:5100/", "Otterscan Mainnet")],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = 5100,
-        ),
-        period_secs = 15,
-        timeout_secs = 5,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:base",
-    ],
-    serve_cmd = """
-    docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs -r docker rm -f
-    docker run --rm \
-        --name otterscan-mainnet \
-        -p 5100:80 \
-        --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:8545" \
-        otterscan/otterscan:v2.3.0
-    """,
-)
-
-local_resource(
-    "anvil:base",
-    allow_parallel = True,
-    labels = labels,
-    readiness_probe = probe(
-        exec = exec_action(
-            command = [
-                "cast",
-                "bn",
-                "--rpc-url=127.0.0.1:8546",
-            ],
-        ),
-        initial_delay_secs = 1,
-        period_secs = 2,
-        timeout_secs = 5,
-    ),
-    serve_cmd = "yarn contracts dev:anvil-base-node",
-)
-
-local_resource(
-    "anvil:send-account-fixtures",
-    "yarn contracts dev:anvil-add-send-account-factory-fixtures",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "anvil:mainnet",
-        "anvil:base",
-        "contracts:build",
-    ],
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
-
-local_resource(
-    "anvil:anvil-add-send-merkle-drop-fixtures",
-    "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
-    auto_init = False,
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "anvil:mainnet",
-        "anvil:base",
-        "contracts:build",
-    ],
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
-
-local_resource(
-    "anvil:anvil-add-token-paymaster-fixtures",
-    "yarn contracts dev:anvil-add-token-paymaster-fixtures",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "anvil:mainnet",
-        "anvil:base",
-        "contracts:build",
-    ],
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
-
-local_resource(
-    "anvil:fixtures",
-    "echo 🥳",
-    labels = labels,
-    resource_deps = [
-        "anvil:mainnet",
-        "anvil:base",
-        "anvil:send-account-fixtures",
-        "anvil:anvil-add-token-paymaster-fixtures",
-    ],
-)
-
-local_resource(
-    "aa_bundler:base",
-    allow_parallel = True,
-    labels = labels,
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = 3030,
-        ),
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:base",
-    ],
-    serve_cmd = """
-    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
-    docker run --rm \
-        --name aa-bundler \
-        --add-host=host.docker.internal:host-gateway \
-        -p 127.0.0.1:3030:3030 \
-        -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        -v ./apps/aabundler/etc:/app/etc/aabundler \
-        -e "DEBUG={bundler_debug}" \
-        -e "DEBUG_COLORS=true" \
-        docker.io/0xbigboss/bundler:0.7.0 \
-        --port 3030 \
-        --config /app/etc/aabundler/aabundler.config.json \
-        --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        --network http://host.docker.internal:8546 \
-        --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
-        --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        --unsafe
-""".format(
-        bundler_debug = os.getenv("BUNDLER_DEBUG", "aa.rpc"),
-    ),
-)
-
-local_resource(
-    "shovel",
-    allow_parallel = True,
-    labels = labels,
-    links = ["http://localhost:8383/"],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/diag",
-            port = 8383,
-        ),
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:base",
-        "supabase:test",
-        "shovel:generate-config",
-    ],
-    serve_cmd = "yarn run shovel:tilt",
-    serve_dir = "packages/shovel",
-    trigger_mode = TRIGGER_MODE_MANUAL,
-    deps = [
-        "packages/shovel/etc/config.json",
-    ],
-)
-
-local_resource(
-    "otterscan:base",
-    allow_parallel = True,
-    labels = labels,
-    links = [link("http://localhost:5101/", "Otterscan Base")],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = 5101,
-        ),
-        period_secs = 15,
-        timeout_secs = 5,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "anvil:base",
-    ],
-    serve_cmd = """
-    docker ps -a | grep otterscan-base | awk '{print $1}' | xargs -r docker rm -f
-    docker run --rm \
-        --name otterscan-base \
-        -p 5101:80 \
-        --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:8546" \
-        otterscan/otterscan:v2.3.0
-    """,
-)
+include("tilt/deps.tiltfile")
 
 # APPS
 labels = ["apps"]
 
+next_app_resource_deps = [
+    "yarn:install",
+    "supabase",
+    "supabase:generate",
+    "wagmi:generate",
+    "ui:build",
+    "ui:generate-theme",
+    "daimo-expo-passkeys:build",
+    "anvil:fixtures",
+    "shovel",
+] + ([
+    "aa_bundler:base",
+] if not CI else [])
+
 # Next
-local_resource(
-    "next:web",
-    "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
-    labels = labels,
-    links = ["http://localhost:3000"],
-    readiness_probe = None if CI else probe(
-        http_get = http_get_action(
-            path = "/api/healthz",
-            port = 3000,
+if CFG.dockerize:
+    # GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
+    # os.putenv("GIT_HASH", GIT_HASH)
+
+    # figure out how to do this in a more elegant way
+    local("""
+    grep SUPABASE_DB_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_DB_URL.txt
+    grep SUPABASE_SERVICE_ROLE .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_SERVICE_ROLE.txt
+""", echo_off = True, quiet = True)
+    # FIXME: when we support dev mode and dockerize.
+    # docker_build(
+    #     "0xsend/sendapp/next-app",
+    #     ".",
+    #     dockerfile = "apps/next/Dockerfile",
+    #     extra_tag = ["latest", GIT_HASH],
+    #     platform = "linux/amd64",
+    #     secret = [
+    #         "id=SUPABASE_DB_URL,src=./var/SUPABASE_DB_URL.txt",
+    #         "id=SUPABASE_SERVICE_ROLE,src=./var/SUPABASE_SERVICE_ROLE.txt",
+    #     ],
+    #     build_args=[
+
+    #     ]
+    # )
+    docker_compose("./docker-compose.yml")
+    dc_resource(
+        "next-app",
+        labels = ["apps"],
+        new_name = "next:web",
+        resource_deps = [
+            "yarn:install",
+            "supabase",
+            "anvil:fixtures",
+            "aa_bundler:base",
+            "shovel",
+        ],
+    )
+else:
+    local_resource(
+        "next:web",
+        "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
+        labels = labels,
+        links = ["http://localhost:3000"],
+        readiness_probe = None if CI else probe(
+            http_get = http_get_action(
+                path = "/api/healthz",
+                port = 3000,
+            ),
+            period_secs = 15,
         ),
-        period_secs = 15,
-    ),
-    resource_deps = [
-        "yarn:install",
-        "supabase",
-        "supabase:generate",
-        "wagmi:generate",
-        "ui:build",
-        "ui:generate-theme",
-        "daimo-expo-passkeys:build",
-        "anvil:fixtures",
-    ] + ([
-        "aa_bundler:base",
-    ] if not CI else []),
-    serve_cmd =
-        "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
-)
+        resource_deps = next_app_resource_deps,
+        serve_cmd =
+            "" if CI else "yarn next-app dev",  # In CI, playwright tests start the web server
+    )
 
 local_resource(
     "distributor:web",
@@ -657,6 +258,7 @@ local_resource(
         "snaplet:generate",
         "next:web",
         "supabase",
+        "shovel",
     ],
 )
 
@@ -755,6 +357,7 @@ local_resource(
     "contracts:cov",
     "yarn contracts test:cov -vvv",
     allow_parallel = True,
+    auto_init = False,
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -768,7 +371,7 @@ local_resource(
     name = "shovel:test",
     allow_parallel = True,
     auto_init = not CI,
-    cmd = "yarn workspace shovel test",
+    cmd = "yarn workspace @my/shovel test",
     labels = labels,
     resource_deps = [
         "yarn:install",
@@ -792,8 +395,10 @@ local_resource(
         "webauthn-authenticator:test",
         "supabase:test",
         "contracts:test",
-        "contracts:cov",
         "distributor:test",
     ],
 )
+
+if config.tilt_subcommand == "down":
+    include("./tilt/cleanup.tiltfile")
 

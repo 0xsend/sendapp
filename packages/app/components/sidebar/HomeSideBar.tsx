@@ -1,26 +1,24 @@
 import {
+  Avatar,
+  H4,
+  Link,
   Nav,
   Paragraph,
   ScrollView,
   Separator,
   SideBar,
-  SideBarWrapper,
   XStack,
   YStack,
-  type YStackProps,
   useMedia,
-  Avatar,
-  H4,
+  type YStackProps,
 } from '@my/ui'
-import { Link } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
-  // IconActivity,
+  IconActivity,
   IconHome,
-  // IconSLogo,
   IconSendLogo,
-  IconX,
+  IconDeviceReset,
 } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
@@ -32,22 +30,22 @@ import { ReferralLink } from '../ReferralLink'
 
 const links = [
   {
-    icon: <IconHome size={'$1.75'} />,
+    icon: <IconHome size={'$1.75'} color={'inherit'} />,
     text: 'Home',
     href: '/',
   },
-  // {
-  //   icon: <IconSLogo size={'$1'} />,
-  //   text: 'Send',
-  //   href: '/send',
-  // },
-  // {
-  //   icon: <IconActivity size={'$1'} />,
-  //   text: 'Activity',
-  //   href: '/activity',
-  // },
   {
-    icon: <IconAccount size={'$1'} />,
+    icon: <IconActivity size={'$1'} color={'inherit'} />,
+    text: 'Send',
+    href: '/send',
+  },
+  {
+    icon: <IconDeviceReset size={'$1'} color={'inherit'} />,
+    text: 'Activity',
+    href: '/activity',
+  },
+  {
+    icon: <IconAccount size={'$1'} color={'inherit'} />,
     text: 'Account',
     href: '/account',
   },
@@ -62,17 +60,16 @@ const links = [
 
 const HomeSideBar = ({ ...props }: YStackProps) => {
   return (
-    <SideBar {...props}>
-      <Nav display="flex" w="100%" pl={'$7'}>
-        <Link href={'/'} display="flex">
-          <IconSendLogo size={'$2.5'} color={'$color12'} />
-        </Link>
-        <YStack gap={'$3.5'} pt={'$10'}>
-          {links.map((link) => (
-            <SideBarNavLink key={link.href} {...link} />
-          ))}
-        </YStack>
-      </Nav>
+    <SideBar {...props} ai={'flex-start'} pl="$7">
+      <Link href={'/'}>
+        <IconSendLogo color={'$color12'} size={'$2.5'} />
+      </Link>
+
+      <YStack gap={'$7'} pt={'$10'} jc={'space-between'}>
+        {links.map((link) => (
+          <SideBarNavLink key={link.href} {...link} />
+        ))}
+      </YStack>
     </SideBar>
   )
 }
@@ -128,18 +125,11 @@ const HomeBottomSheet = () => {
 export const HomeSideBarWrapper = ({ children }: { children?: React.ReactNode }) => {
   const media = useMedia()
 
-  if (media.gtLg)
-    return (
-      <SideBarWrapper
-        sidebar={<HomeSideBar bc="$color2" width={234} minWidth={234} pt={80} jc="flex-start" />}
-      >
-        {children}
-      </SideBarWrapper>
-    )
   return (
-    <>
-      <HomeBottomSheet />
+    <XStack overflow="hidden" height={'100%'}>
+      {media.gtLg && <HomeSideBar width={234} minWidth={234} pt={80} jc="flex-start" />}
       {children}
-    </>
+      <HomeBottomSheet />
+    </XStack>
   )
 }

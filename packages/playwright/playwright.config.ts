@@ -5,7 +5,7 @@ globalThis.__DEV__ = false
 
 // validate environment ensuring we aren't talking to prod or staging or something
 const _url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || '')
-if (!['127.0.0.1', 'localhost'].some((host) => _url.hostname === host)) {
+if (!['127.0.0.1', 'localhost', 'host.docker.internal'].some((host) => _url.hostname === host)) {
   console.log(`
 
 NEXT_PUBLIC_SUPABASE_URL is ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Please update your environment to point to a local supabase instance.
@@ -39,6 +39,7 @@ export default defineConfig({
   reporter: [
     process.env.CI ? ['github'] : ['list'],
     ['html', { host: '127.0.0.1', open: 'never' }],
+    ['json', { outputFile: 'playwright-report/report.json' }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -100,9 +101,37 @@ export default defineConfig({
       ? 'yarn workspace next-app run serve --port 3000'
       : 'yarn workspace next-app run dev',
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    // reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     stderr: 'pipe',
     stdout: 'pipe',
     ignoreHTTPSErrors: false,
   },
+
+  /**
+   * **Make Visual Tests More Forgiving**
+   * Out of the box, visual tests are very strict. If a single pixel fails, your test fails.
+   * Thankfully, Playwright provides numerous controls for tuning how sensitive your visual tests should be.
+   * Here are your options:
+   * - `threshold`: How much must a single pixel vary for it to be considered different. Values are a percentage from 0 to 1, with 0.2 as the default.
+   * - `maxDiffPixels`: The maximum number of pixels that can differ while still passing the test. By default, this option is disabled.
+   * - `maxDiffPixelRatio`: The maximum percentage of pixels that can differ while still passing the test. Values are a percentage from 0 to 1, but this control is disabled by default.
+   */
+
+  // need to handle differences on various platforms and give developers ability to update snapshots cross platform easily
+  // add docker image with snapshot capabiltities
+
+  snapshotPathTemplate: '{testDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
+  // expect: {
+  //   toHaveScreenshot: {
+  //     threshold: 0.25,
+  //     maxDiffPixelRatio: 0.125,
+  //     // maxDiffPixels: 25,
+  //   },
+  //   toMatchSnapshot: {
+  //     threshold: 0.25,
+  //     maxDiffPixelRatio: 0.125,
+  //     // maxDiffPixels: 25,
+  //   },
+  // },
 })

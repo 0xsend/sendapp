@@ -88,6 +88,24 @@ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --priva
 cast <subcommand>
 ```
 
+#### Send ERC20 via impersonation
+
+```shell
+# usdc
+export TOKEN=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+export SENDER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+export RECEIVER=0xa71CE00000000000000000000000000000000000
+
+# This calls Anvil and lets us impersonate our unlucky user
+cast rpc --rpc-url base-local anvil_impersonateAccount $SENDER
+cast send --rpc-url base-local $TOKEN \
+--from $SENDER \
+  "transfer(address,uint256)(bool)" \
+  $RECEIVER \
+  10000000 \
+  --unlocked
+```
+
 ### Help
 
 ```shell
@@ -154,4 +172,20 @@ cast send $SEND_AIRDROP \
     --from $AIRDROP_MULTISIG_SAFE \
     "addTranche(bytes32,uint256)" \
     $TRANCHE_MERKLE_ROOT $TRANCHE_AMOUNT
+```
+
+#### Deploy TokenPaymaster
+
+```shell
+export TOKEN='0x036CbD53842c5426634e7929541eC2318f3dCF7e' #  USDC
+export WETH='0x4200000000000000000000000000000000000006'
+export UNISWAP_ROUTER='0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4' #  Uniswap V3 SwapRouter
+export TOKEN_ORACLE='0xC4480eEdB68c93C11bb3494eb13fAfD4455ef60F' #  USDC/USD
+export NATIVE_ORACLE='0x3d6ea9029f70077a999190dA6ce420c12440603d' #  ETH/USD
+forge script ./script/DeployTokenPaymaster.s.sol:DeployTokenPaymasterScript \
+              -vvvv \
+              --rpc-url base-sepolia \
+              --verify \
+              --chain 84532 \
+              --etherscan-api-key $BASESCAN_API_KEY
 ```

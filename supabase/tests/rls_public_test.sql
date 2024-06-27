@@ -1,6 +1,6 @@
 BEGIN;
 
-select plan(1);
+SELECT plan(1);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -21,7 +21,9 @@ CREATE EXTENSION "basejump-supabase_test_helpers";
  *   ROLLBACK;
  * ```
  */
-CREATE OR REPLACE FUNCTION tests.rls_enabled (testing_schema text, exclude_tables text []) RETURNS text AS $$
+CREATE OR REPLACE FUNCTION tests.rls_enabled(
+    testing_schema text, exclude_tables text []
+) RETURNS text AS $$
 select is(
     (
       select count(pc.relname)::integer
@@ -41,12 +43,11 @@ select is(
 
 $$ LANGUAGE sql;
 
-select tests.rls_enabled(
+SELECT tests.rls_enabled(
     'public',
-    ARRAY ['distribution_verifications_summary']
-  );
+    ARRAY['distribution_verifications_summary']
+);
 
-SELECT *
-FROM finish();
+SELECT finish();
 
 ROLLBACK;

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 
-const Theme = (props: IconProps) => {
+const Theme = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -22,5 +22,5 @@ const Theme = (props: IconProps) => {
     </Svg>
   )
 }
-const IconTheme = memo(themed(Theme))
+const IconTheme = memo<IconProps>(themed(Theme))
 export { IconTheme }

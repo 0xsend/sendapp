@@ -27,10 +27,8 @@ export const authRouter = createTRPCRouter({
         const result = await supabaseAdmin.auth
           .signInWithOtp({ phone: `${countrycode}${phone}` })
           .then(async (r) => {
-            if (
-              __DEV__ ||
-              process.env.CI // TODO: potentially add a fake numbers list for app store reviewers
-            ) {
+            // TODO: potentially add a fake numbers list for app store reviewers
+            if (__DEV__ || process.env.CI) {
               log('fake_otp_credentials', { phone: `${countrycode}${phone}` })
               return await supabaseAdmin.rpc('fake_otp_credentials', {
                 phone: `${countrycode}${phone}`,

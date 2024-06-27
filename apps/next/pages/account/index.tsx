@@ -23,7 +23,7 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Account" button={ButtonOption.SETTINGS} showReferral />}>
+  <HomeLayout TopNav={<TopNav header="Account" button={ButtonOption.SETTINGS} />}>
     {children}
   </HomeLayout>
 )

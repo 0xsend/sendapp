@@ -5,7 +5,7 @@ import {
   type ButtonProps,
   ButtonText,
   useToastController,
-  useMedia,
+  Theme,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
 import { CheckCheck } from '@tamagui/lucide-icons'
@@ -42,7 +42,7 @@ export function ReferralLink(props: ButtonProps) {
         toast.show('Something went wrong', {
           message: 'We were unable to copy your referral link to the clipboard',
           customData: {
-            theme: 'error',
+            theme: 'red',
           },
         })
       )
@@ -59,7 +59,6 @@ export function ReferralLink(props: ButtonProps) {
   if (!referralCode) return null
   return (
     <Button
-      bc="transparent"
       chromeless
       hoverStyle={{
         backgroundColor: 'transparent',
@@ -77,16 +76,17 @@ export function ReferralLink(props: ButtonProps) {
       }}
       {...props}
     >
-      <ButtonText
-        fontSize={'$4'}
-        bc="$primary"
-        fontWeight={'500'}
-        fontFamily={'$mono'}
-        theme="accent"
-        px="$2"
-      >
-        {referralLinkVisual}
-      </ButtonText>
+      <Theme name="green">
+        <ButtonText
+          fontSize={'$4'}
+          fontWeight={'500'}
+          fontFamily={'$mono'}
+          px="$2"
+          bc="$background"
+        >
+          {referralLinkVisual}
+        </ButtonText>
+      </Theme>
       <ButtonIcon>
         <AnimatePresence exitBeforeEnter>
           {hasCopied ? (

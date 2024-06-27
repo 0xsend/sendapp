@@ -6,12 +6,9 @@ import {
   XStack,
   YStack,
   Stack,
-  SubmitButton,
   Button,
-  Link,
   Label,
   Avatar,
-  Input,
 } from '@my/ui'
 
 import { useSendAccounts } from 'app/utils/send-accounts'
@@ -20,9 +17,10 @@ import { assert } from 'app/utils/assert'
 
 import { baseMainnet } from '@my/wagmi'
 import { useBalance } from 'wagmi'
+// @ts-expect-error some work to do here
 import { useSendParams } from 'app/routers/params'
-import { useForm, FormProvider } from 'react-hook-form'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { useForm } from 'react-hook-form'
+import { formFields } from 'app/utils/SchemaForm'
 import { useState } from 'react'
 import { z } from 'zod'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
@@ -36,6 +34,7 @@ import { useLink } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { coins } from 'app/data/coins'
 import { IconAccount } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
@@ -92,6 +91,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
   const { data: userOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
+    // @ts-expect-error some work to do here
     to: profile?.address,
     token: tokenParam === 'eth' ? undefined : tokenParam,
     amount: BigInt(amount),
@@ -186,7 +186,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
                   lineHeight="$1"
                   color="$color12"
                 >
-                  @{profile?.tag_name}
+                  @{profile?.tag}
                 </Paragraph>
               </YStack>
             </XStack>
@@ -220,7 +220,13 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
               <Paragraph fontSize="$5" fontWeight="500" color="$color12">
                 {amountParam}
               </Paragraph>
-              {coins.find((coin) => coin.token === tokenParam)?.icon}
+              {(() => {
+                const coin = coins.find((coin) => coin.token === tokenParam)
+                if (coin) {
+                  return <IconCoin coin={coin} />
+                }
+                return null
+              })()}
             </XStack>
           </YStack>
         </Stack>
@@ -255,7 +261,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
         </YStack> */}
         <Stack w="100%" jc="flex-end" ai="center" $gtLg={{ ai: 'flex-end' }} mt="auto">
           <Button
-            theme="accent"
+            theme="green"
             onPress={onSubmit}
             px="$15"
             br={12}

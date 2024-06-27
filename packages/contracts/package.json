@@ -22,7 +22,8 @@
     "dev:anvil-base-node": "bun run ./script/anvil-base-node.ts",
     "dev:anvil-add-send-merkle-drop-fixtures": "bun run ./script/anvil-add-send-merkle-drop-fixtures.ts",
     "dev:anvil-add-send-account-factory-fixtures": "bun run ./script/anvil-add-send-account-factory-fixtures.ts",
-    "dev:anvil-add-token-paymaster-fixtures": "bun run ./script/anvil-add-token-paymaster-fixtures.ts"
+    "dev:anvil-add-token-paymaster-fixtures": "bun run ./script/anvil-add-token-paymaster-fixtures.ts",
+    "dev:anvil-add-send-check-fixtures": "bun run ./script/anvil-add-send-check-fixtures.ts"
   },
   "devDependencies": {
     "@my/supabase": "workspace:*",
@@ -32,6 +33,6 @@
     "@uniswap/v3-periphery": "^1.4.4",
     "debug": "^4.3.4",
     "solhint": "^3.6.2",
-    "zx": "^8.0.2"
+    "zx": "^8.1.2"
   }
 }

@@ -26,7 +26,7 @@ import {
 } from 'wagmi'
 
 import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
@@ -59,7 +59,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
   })
   const { isConnected, address: account, chain: accountChain } = useAccount()
-  const { openConnectModal } = useConnectModal()
+  const { open: openConnectModal } = useWeb3Modal()
   const { error: connectError } = useConnect()
   const { chains, switchChain, error: switchError } = useSwitchChain()
   const {
@@ -147,7 +147,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <>
         <OpenConnectModalWrapper>
-          <Button onPress={openConnectModal}>
+          <Button onPress={() => openConnectModal()}>
             <ButtonText col="$black">Connect Wallet to Claim</ButtonText>
           </Button>
         </OpenConnectModalWrapper>
@@ -274,7 +274,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           writeClaim(claimWriteConfig.request)
           refetchIsClaimed()
         }}
-        theme={'accent'}
+        theme={'green'}
       >
         {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim Reward'}
       </Button>
@@ -305,7 +305,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 }
 
 function Button(props: ButtonProps) {
-  return <ButtonOg py="$3.5" w="100%" br={12} bc="$accent12Dark" {...props} />
+  return <ButtonOg py="$3.5" w="100%" br={12} bc="$green12Dark" {...props} />
 }
 
 function ErrorMessage({ error }: { error?: string }) {

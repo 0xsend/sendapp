@@ -1,32 +1,49 @@
 import {
+  AnimatePresence,
   BigHeading,
-  H1,
+  H4,
   Label,
   Paragraph,
   Separator,
   Spinner,
   Stack,
+  Theme,
   Tooltip,
   XStack,
   YStack,
   useMedia,
 } from '@my/ui'
-import type { coins } from 'app/data/coins'
-import { type UseBalanceReturnType, useBalance } from 'wagmi'
 import { baseMainnet } from '@my/wagmi'
-// import { useSendAccounts } from 'app/utils/send-accounts'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
-import formatAmount from 'app/utils/formatAmount'
-import { useTokenMarketData } from 'app/utils/coin-gecko'
+import type { coins } from 'app/data/coins'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useBalance, type UseBalanceReturnType } from 'wagmi'
+
 import { ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { IconError } from 'app/components/icons'
+import { useTokenMarketData } from 'app/utils/coin-gecko'
+import formatAmount from 'app/utils/formatAmount'
+import type { PropsWithChildren } from 'react'
+import { TokenDetailsHistory } from './TokenDetailsHistory'
 
+export function AnimateEnter({ children }: { children: React.ReactNode }) {
+  return (
+    <AnimatePresence>
+      <Stack
+        key="enter"
+        animateOnly={['transform', 'opacity']}
+        animation="200ms"
+        enterStyle={{ opacity: 0, scale: 0.9 }}
+        exitStyle={{ opacity: 0, scale: 0.95 }}
+        opacity={1}
+      >
+        {children}
+      </Stack>
+    </AnimatePresence>
+  )
+}
 export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   const media = useMedia()
-  // const { data: sendAccounts } = useSendAccounts()
-  // const sendAccount = sendAccounts?.[0]
-  const { data: addresses } = useChainAddresses()
-  const sendAccount = addresses?.[0]
+  const { data: sendAccount } = useSendAccount()
   const balance = useBalance({
     address: sendAccount?.address,
     token: coin.token === 'eth' ? undefined : coin.token,
@@ -58,22 +75,17 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
           )}
         </XStack>
       )}
-      <YStack pt="$4">
-        <Label fontSize={'$5'} fontWeight={'500'} color={'$color11'} textTransform={'uppercase'}>
+      <YStack>
+        <Label fontSize={'$5'} fontWeight={'500'} textTransform={'uppercase'}>
           {`${coin.label} BALANCE`}
         </Label>
         <TokenDetailsBalance balance={balance} symbol={coin.symbol} />
       </YStack>
       <Stack w={'100%'} py={'$6'}>
-        <Separator $theme-dark={{ boc: '$decay' }} $theme-light={{ boc: '$gray4Light' }} />
+        <Separator />
       </Stack>
       <YStack>
-        <Label fontSize="$7" fontWeight="500" color={'$color11'} textTransform={'uppercase'}>
-          HISTORY
-        </Label>
-        <H1 fontSize="$9" fontWeight="700" color={'$color12'}>
-          Coming Soon
-        </H1>
+        <TokenDetailsHistory coin={coin} />
       </YStack>
     </YStack>
   )
@@ -103,31 +115,19 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
     const fixedChange = change.toFixed(2)
     if (change > 0)
       return (
-        <>
-          <Paragraph fontSize="$4" fontWeight="500" color={'$olive'}>{`${fixedChange}%`}</Paragraph>
-          <ArrowUp col={'$olive'} size={'$0.9'} />
-        </>
+        <Theme name="green_active">
+          <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
+          <ArrowUp size={'$0.9'} />
+        </Theme>
       )
     if (change < 0)
       return (
-        <>
-          <Paragraph
-            fontSize="$4"
-            fontWeight="500"
-            color={'$redVibrant'}
-          >{`${fixedChange}%`}</Paragraph>
-          <ArrowDown col={'$redVibrant'} size={'$0.9'} />
-        </>
+        <Theme name="red_active">
+          <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
+          <ArrowDown size={'$0.9'} />
+        </Theme>
       )
-    return (
-      <>
-        <Paragraph
-          fontSize="$4"
-          fontWeight="500"
-          color={'$redVibrant'}
-        >{`${fixedChange}%`}</Paragraph>
-      </>
-    )
+    return <Paragraph fontSize="$4" fontWeight="500">{`${fixedChange}%`}</Paragraph>
   }
 
   return (
@@ -196,5 +196,22 @@ const TokenDetailsBalance = ({
         </Paragraph>
       </Tooltip.Content>
     </Tooltip>
+  )
+}
+
+export function RowLabel({ children }: PropsWithChildren) {
+  return (
+    <H4
+      // @TODO: Update with theme color variable
+      color="hsl(0, 0%, 42.5%)"
+      fontFamily={'$mono'}
+      fontWeight={'500'}
+      size={'$5'}
+      mt="$3"
+      display="none"
+      $gtMd={{ display: 'inline' }}
+    >
+      {children}
+    </H4>
   )
 }

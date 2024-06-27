@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const QrLogo = (props: IconProps) => {
+const QrLogo = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -29,5 +29,5 @@ const QrLogo = (props: IconProps) => {
     </Svg>
   )
 }
-const IconQr = memo(themed(QrLogo))
+const IconQr = memo<IconProps>(themed(QrLogo))
 export { IconQr }

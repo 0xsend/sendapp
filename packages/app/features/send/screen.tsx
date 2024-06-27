@@ -1,42 +1,56 @@
-import { AnimatePresence, Container, H4, Spinner, Text, YStack } from '@my/ui'
-import { useSendParams } from 'app/routers/params'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { SendAmountForm } from './SendAmountForm'
+import type { Functions } from '@my/supabase/database.types'
+import {
+  Anchor,
+  AnimatePresence,
+  Button,
+  Fade,
+  H4,
+  Paragraph,
+  Spinner,
+  Text,
+  YStack,
+  useToastController,
+} from '@my/ui'
+import Search from 'app/components/SearchBar'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
-import { Search, SearchResults } from 'app/features/send/components/SendSearch'
+import { useSendScreenParams } from 'app/routers/params'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { useState } from 'react'
+import { SendAmountForm } from './SendAmountForm'
+import { SendRecipient } from './confirm/screen'
 
 export const SendScreen = () => {
-  const {
-    params: { recipient },
-  } = useSendParams()
-  const { data: profile, isLoading, error } = useProfileLookup('tag', recipient)
+  const [{ recipient, idType }] = useSendScreenParams()
+  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
   if (!profile)
     return (
       <TagSearchProvider>
-        <Container>
-          <YStack f={1} width={'100%'} pb="$4" gap="$6">
-            <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-              <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
-                SEARCH BY
-              </H4>
-              <Search />
-            </YStack>
-            <SendSearchBody />
+        <YStack f={1} width={'100%'} pb="$4" gap="$6">
+          <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
+            <Search />
           </YStack>
-        </Container>
+          <SendSearchBody />
+        </YStack>
       </TagSearchProvider>
     )
+
+  if (!profile.address)
+    // handle when user has no send account
+    return <NoSendAccount profile={profile} />
+
   return (
-    <Container $gtLg={{ jc: 'flex-start' }} flexDirection="column" jc="center" ai="center" f={1}>
-      <SendAmountForm />
-    </Container>
+    <SendAmountForm profile={profile} />
+    // <Container $gtLg={{ jc: 'flex-start' }} flexDirection="column" jc="center" ai="center" f={1}>
+    //   <SendAmountForm />
+    // </Container>
   )
 }
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
+
   return (
     <AnimatePresence>
       {isLoading && (
@@ -45,12 +59,64 @@ function SendSearchBody() {
         </YStack>
       )}
       {error && (
-        <YStack key="error" gap="$4" mb="$4">
+        <YStack key="red" gap="$4" mb="$4">
           <H4 theme={'alt2'}>Error</H4>
           <Text>{error.message}</Text>
         </YStack>
       )}
-      <SearchResults />
+      <Search.Results />
     </AnimatePresence>
+  )
+}
+
+function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
+  const toast = useToastController()
+  const [clicked, setClicked] = useState(false)
+  return (
+    <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>
+      <SendRecipient width={'100%'} profile={profile} />
+      <H4 theme={'alt2'} color="$olive">
+        No send account
+      </H4>
+      <Anchor
+        testID="NoSendAccountLink"
+        href={`/profile/${profile.sendid}`}
+        textDecorationLine="none"
+        color="$color12"
+      >
+        <Text fontWeight="bold" display="flex" color="$color12">
+          {(() => {
+            if (profile.tag) return `@${profile.tag}`
+            if (profile.name) return profile.name
+            return `#${profile.sendid}`
+          })()}
+        </Text>
+        <Text display="flex" color="$color12">
+          {' '}
+          has no send account! Ask them to create one or write a /send Check.
+        </Text>
+      </Anchor>
+
+      <Button
+        mx="auto"
+        miw="$16"
+        maw="$20"
+        disabled={clicked}
+        onPress={() => {
+          setClicked(true)
+          console.error('TODO: create send account')
+          toast.show('Coming soon')
+        }}
+      >
+        Write /send Check
+      </Button>
+      {clicked && (
+        <Fade>
+          <Paragraph width={'100%'} textAlign="center" color="$color12">
+            <Text>/send Checks Coming Soon</Text>
+          </Paragraph>
+        </Fade>
+      )}
+    </YStack>
   )
 }

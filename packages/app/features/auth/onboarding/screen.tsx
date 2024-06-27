@@ -39,9 +39,7 @@ export function OnboardingScreen() {
   return (
     <YStack w="100%" h={'100%'} jc="flex-start" pt="$7">
       <Stack $gtMd={{ dsp: 'none' }}>
-        <Theme inverse={true}>
-          <IconSendLogo size={'$2'} color="$background" />
-        </Theme>
+        <IconSendLogo size={'$2'} color="$color12" />
       </Stack>
 
       <YStack f={3} jc="center" maw={'100%'} space="$4" gap="$4">

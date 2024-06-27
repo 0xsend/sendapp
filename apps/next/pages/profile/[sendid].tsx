@@ -6,10 +6,9 @@ import type { NextPageWithLayout } from '../_app'
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
-import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
-import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
+import { logRequest } from 'utils/logRequest'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -24,19 +23,17 @@ export const Page: NextPageWithLayout = () => {
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
-  // disable for now
-  return { redirect: { destination: '/', permanent: false } }
-  /*
-  const { sendid } = ctx.params ?? {}
+  const { sendid: sendidParam } = ctx.params ?? {}
+  const sendid = Number(sendidParam)
 
-  assert(!!sendid, 'sendid is required')
+  if (Number.isNaN(sendid)) {
+    return {
+      notFound: true,
+    }
+  }
 
   // log user activity
-  console.log(
-    `${ctx.req.url} - ${ctx.req.headers['user-agent']}${
-      ctx.req.headers['x-forwarded-for'] ? ` - ${ctx.req.headers['x-forwarded-for']}` : ''
-    }`
-  )
+  logRequest(ctx)
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -71,7 +68,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   return {
     props: {},
   }
-  */
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (

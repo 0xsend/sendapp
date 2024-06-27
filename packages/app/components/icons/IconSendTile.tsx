@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Path, Svg } from 'react-native-svg'
 import type { ColorTokens } from '@my/ui/types'
 
-const SendTile = (props: IconProps) => {
+const SendTile = (props) => {
   const { size, color, ...rest } = props
   return (
     <Svg
@@ -27,5 +27,5 @@ const SendTile = (props: IconProps) => {
     </Svg>
   )
 }
-const IconSendTile = memo(themed(SendTile))
+const IconSendTile = memo<IconProps>(themed(SendTile))
 export { IconSendTile }

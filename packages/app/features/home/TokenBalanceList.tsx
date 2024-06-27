@@ -6,38 +6,39 @@ import {
   XStack,
   Link,
   type LinkProps,
+  Separator,
+  Theme,
+  Stack,
 } from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
-// import { useSendAccounts } from 'app/utils/send-accounts'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { type UseBalanceReturnType, useBalance } from 'wagmi'
-import type { coins } from 'app/data/coins'
-import { useToken } from 'app/routers/params'
+import type { coins, coin } from 'app/data/coins'
+import { useRootScreenParams } from 'app/routers/params'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { Fragment } from 'react'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
-  const [tokenParam] = useToken()
-  const { resolvedTheme } = useThemeSetting()
-  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+  const [{ token: tokenParam }] = useRootScreenParams()
 
   return coins.map((coin, index) => (
-    <TokenBalanceItem
-      coin={coin}
-      key={coin.label}
-      jc={'space-between'}
-      ai={'center'}
-      py={'$3.5'}
-      borderColor={separatorColor}
-      disabled={tokenParam !== undefined && tokenParam !== coin.token}
-      disabledStyle={{ opacity: 0.5 }}
-      href={{
-        pathname: '/',
-        query: { token: coin.token },
-      }}
-      borderBottomWidth={index !== coins.length - 1 ? 1 : 0}
-    />
+    <Fragment key={`token-balance-list-${coin.label}`}>
+      <TokenBalanceItem
+        coin={coin}
+        jc={'space-between'}
+        ai={'center'}
+        py={'$3.5'}
+        disabled={tokenParam !== undefined && tokenParam !== coin.token}
+        disabledStyle={{ opacity: 0.5 }}
+        href={{
+          pathname: '/',
+          query: { token: coin.token },
+        }}
+      />
+      {index !== coins.length - 1 && <Separator />}
+    </Fragment>
   ))
 }
 
@@ -45,12 +46,9 @@ const TokenBalanceItem = ({
   coin,
   ...props
 }: {
-  coin: { label: string; token: `0x${string}` | 'eth'; icon: JSX.Element }
+  coin: coin
 } & Omit<LinkProps, 'children'>) => {
-  // const { data: sendAccounts } = useSendAccounts()
-  // const sendAccount = sendAccounts?.[0]
-  const { data: addresses } = useChainAddresses()
-  const sendAccount = addresses?.[0]
+  const { data: sendAccount } = useSendAccount()
 
   const balance = useBalance({
     address: sendAccount?.address,
@@ -62,7 +60,7 @@ const TokenBalanceItem = ({
   return (
     <Link display="flex" {...props}>
       <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'}>
-        {coin.icon}
+        <IconCoin coin={coin} />
         <Paragraph
           fontSize={'$5'}
           fontWeight={'500'}
@@ -80,9 +78,6 @@ const TokenBalanceItem = ({
 }
 
 const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
-
   if (balance) {
     if (balance.isError) {
       return (
@@ -103,8 +98,8 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
       return <></>
     }
     return (
-      <>
-        <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'} color={'$color12'}>
+      <Theme name="green">
+        <Paragraph fontFamily={'$mono'} fontSize={'$9'} fontWeight={'500'}>
           {formatAmount(
             (Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)).toString(),
             10,
@@ -112,10 +107,10 @@ const TokenBalance = ({ balance }: { balance: UseBalanceReturnType }) => {
           )}
         </Paragraph>
 
-        <XStack $lg={{ display: 'none' }}>
-          <IconArrowRight color={iconColor} />
+        <XStack $lg={{ display: 'none' }} theme="green">
+          <IconArrowRight col={'$background'} />
         </XStack>
-      </>
+      </Theme>
     )
   }
 }

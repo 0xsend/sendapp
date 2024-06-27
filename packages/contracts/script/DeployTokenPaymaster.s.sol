@@ -2,14 +2,18 @@
 pragma solidity ^0.8.20;
 
 import {Script, console2} from "forge-std/Script.sol";
-
+import {Helper} from "../src/Helper.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../src/TokenPaymaster.sol";
 
-contract DeployTokenPaymasterScript is Script {
+contract DeployTokenPaymasterScript is Script, Helper {
     uint256 private constant PRICE_DENOM = 1e26;
     uint40 private constant BASE_FEE_DEFAULT = 5e4; // ¢5
+
+    function setUp() public {
+        this.labels();
+    }
 
     function run() public {
         bytes32 salt = bytes32(uint256(1));
@@ -20,6 +24,7 @@ contract DeployTokenPaymasterScript is Script {
         address uniswap = vm.envAddress("UNISWAP_ROUTER");
         address tokenOracle = vm.envAddress("TOKEN_ORACLE");
         address nativeOracle = vm.envAddress("NATIVE_ORACLE");
+        uint256 cacheTimeToLive = vm.envOr("CACHE_TIME_TO_LIVE", uint256(3600));
 
         require(token != address(0), "TOKEN env variable not set");
         require(weth != address(0), "WETH env variable not set");
@@ -37,7 +42,7 @@ contract DeployTokenPaymasterScript is Script {
         });
 
         OracleHelperConfig memory ohc = OracleHelperConfig({
-            cacheTimeToLive: 3600, // 1 hour
+            cacheTimeToLive: uint48(cacheTimeToLive), // 1 hour
             maxOracleRoundAge: 86400, // 1 day
             nativeOracle: IOracle(nativeOracle),
             priceUpdateThreshold: PRICE_DENOM * 12 / 100, // 20%
@@ -61,11 +66,12 @@ contract DeployTokenPaymasterScript is Script {
             msg.sender
         );
 
-        // solhint-disable-next-line no-console
+        // solhint-disable no-console
         console2.log("Deployed TokenPaymaster at address: ", address(paymaster));
+        console2.log("Deployed TokenPaymaster owner: ", msg.sender);
 
-        IEntryPoint(entryPoint).depositTo{value: 0.25 ether}(address(paymaster));
-        paymaster.addStake{value: 0.25 ether}(1);
+        IEntryPoint(entryPoint).depositTo{value: 0.025 ether}(address(paymaster));
+        paymaster.addStake{value: 0.025 ether}(1);
         vm.stopBroadcast();
     }
 }

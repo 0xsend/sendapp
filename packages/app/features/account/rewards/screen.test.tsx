@@ -45,12 +45,11 @@ jest.mock('app/utils/useChainAddresses', () => ({
   useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
 }))
 jest.mock('app/routers/params', () => ({
-  useDistributionNumberParams: () => ({ distributionNumber: 1 }),
-  useDistributionNumber: () => [1, jest.fn()],
+  useRewardsScreenParams: () => [{ distributionNumber: 1 }, jest.fn()],
 }))
 jest.mock('wagmi')
-jest.mock('@rainbow-me/rainbowkit', () => ({
-  useConnectModal: jest.fn().mockReturnValue({ openConnectModal: jest.fn() }),
+jest.mock('@web3modal/wagmi/react', () => ({
+  useWeb3Modal: jest.fn().mockReturnValue({ open: jest.fn() }),
 }))
 jest.mock('@my/wagmi', () => ({
   __esModule: true,

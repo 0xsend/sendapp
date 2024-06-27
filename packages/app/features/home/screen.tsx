@@ -4,35 +4,28 @@ import {
   Separator,
   XStack,
   YStack,
-  useToastController,
   Stack,
   Spinner,
   Link,
   H3,
+  Card,
 } from '@my/ui'
-import { IconDeposit, IconPlus } from 'app/components/icons'
-import { TokenBalanceList } from './TokenBalanceList'
+import { IconPlus } from 'app/components/icons'
 import { coins } from 'app/data/coins'
-import { TokenBalanceCard } from './TokenBalanceCard'
-import { useToken } from 'app/routers/params'
-import { useThemeSetting } from '@tamagui/next-theme'
-import { X } from '@tamagui/lucide-icons'
-import { TokenDetails } from './TokenDetails'
+import { useRootScreenParams } from 'app/routers/params'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-// import { useSendAccounts } from 'app/utils/send-accounts'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
+import { DepositPopover } from '../deposit/DepositPopover'
+import { TokenBalanceCard } from './TokenBalanceCard'
+import { TokenBalanceList } from './TokenBalanceList'
+import { TokenDetails } from './TokenDetails'
+import { X } from '@tamagui/lucide-icons'
 
 export function HomeScreen() {
-  const toast = useToastController()
-  const [, setTokenParam] = useToken()
-
-  const { resolvedTheme } = useThemeSetting()
-  const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
+  const [queryParams, setParams] = useRootScreenParams()
 
   const selectedCoin = useCoinFromTokenParam()
-  // const { data: sendAccounts, isLoading: sendAccountLoading } = useSendAccounts()
-  const { data: sendAccounts, isLoading: sendAccountLoading } = useChainAddresses()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
 
   const hasSendAccount = !!sendAccount
 
@@ -44,7 +37,6 @@ export function HomeScreen() {
           right={0}
           position="absolute"
           bc="transparent"
-          chromeless
           circular
           jc={'center'}
           ai={'center'}
@@ -59,9 +51,9 @@ export function HomeScreen() {
           focusStyle={{
             backgroundColor: 'transparent',
           }}
-          icon={<X size={'$2.5'} color={'$color11'} />}
+          icon={<X size={'$2.5'} />}
           onPress={() => {
-            setTokenParam(undefined)
+            setParams({ ...queryParams, token: undefined })
           }}
         />
       </Stack>
@@ -72,49 +64,25 @@ export function HomeScreen() {
           width="100%"
           ai={'center'}
         >
-          <Stack
-            $gtLg={{ bc: '$color2', p: 36 }}
+          <Card
+            $gtLg={{ p: 36 }}
+            $lg={{ bc: 'transparent' }}
             py={'$9'}
             px={'$2'}
             w={'100%'}
             jc="space-between"
             br={12}
             gap="$6"
+            bc="$background"
           >
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />
             </XStack>
             <XStack w={'100%'} ai={'center'} pt={'$4'}>
-              <Button
-                px={'$3.5'}
-                h={'$4.5'}
-                width={'100%'}
-                theme="accent"
-                borderRadius={'$4'}
-                onPress={() => {
-                  // @todo onramp / deposit
-                  toast.show('Coming Soon: Deposit')
-                }}
-                disabled={selectedCoin !== undefined}
-                disabledStyle={{ opacity: 0.5 }}
-              >
-                <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                  <Paragraph
-                    // fontFamily={'$mono'}
-                    fontWeight={'500'}
-                    textTransform={'uppercase'}
-                    color={'$black'}
-                  >
-                    Deposit
-                  </Paragraph>
-                  <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                    <IconDeposit size={'$2.5'} color={'$black'} />
-                  </XStack>
-                </XStack>
-              </Button>
+              <DepositPopover />
             </XStack>
-          </Stack>
-          <Separator $gtLg={{ display: 'none' }} w={'100%'} borderColor={separatorColor} />
+          </Card>
+          <Separator $gtLg={{ display: 'none' }} w={'100%'} />
           <YStack w={'100%'} ai={'center'}>
             <YStack width="100%" $gtLg={{ pt: '$3' }} display={hasSendAccount ? 'flex' : 'none'}>
               <TokenBalanceList coins={coins} />
@@ -141,7 +109,7 @@ export function HomeScreen() {
                   <Stack jc="center" ai="center" $gtLg={{ mt: 'auto' }} $lg={{ m: 'auto' }}>
                     <Link
                       href={'/account/sendtag/checkout'}
-                      theme="accent"
+                      theme="green"
                       borderRadius={'$4'}
                       p={'$3.5'}
                       $xs={{ p: '$2.5', px: '$4' }}

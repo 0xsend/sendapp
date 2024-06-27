@@ -41,6 +41,14 @@ export const OnboardingForm = () => {
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     try {
       assert(!!user?.id, 'No user id')
+
+      // double check that the user has not already created a send account before creating a passkey
+      const { data: sendAcct, error: refetchError } = await refetchSendAccount()
+      if (refetchError) throw refetchError
+      if (sendAcct) {
+        throw new Error(`Account already created: ${sendAcct.address}`)
+      }
+
       const keySlot = 0
       const passkeyName = `${user.id}.${keySlot}` // 64 bytes max
       const [rawCred, authData] = await createPasskey({
@@ -92,7 +100,7 @@ export const OnboardingForm = () => {
           accountName: {
             'aria-label': 'Account name',
             '$theme-dark': {
-              borderBottomColor: '$accent9Light',
+              borderBottomColor: '$green9Light',
             },
             '$theme-light': {
               borderBottomColor: '$black',
@@ -108,6 +116,10 @@ export const OnboardingForm = () => {
             width: '100%',
             backgroundColor: 'transparent',
             outlineColor: 'transparent',
+            focusStyle: {
+              borderBottomColor: '$green3Light',
+            },
+            autoFocus: true,
           },
         }}
         renderAfter={({ submit }) => (
@@ -120,7 +132,7 @@ export const OnboardingForm = () => {
           >
             <Anchor
               $theme-dark={{
-                col: '$accentBackground',
+                col: '$background',
               }}
               $theme-light={{ col: '$black' }}
               href="https://info.send.it/send/mission-vision-and-values"
@@ -130,28 +142,29 @@ export const OnboardingForm = () => {
             >
               Why Passkey?
             </Anchor>
-            <Theme name={'accent_Button'}>
-              <SubmitButton
-                onPress={submit}
-                mb="auto"
-                als="auto"
-                br="$4"
-                mx="auto"
-                w="100%"
-                $gtMd={{
-                  mt: '0',
-                  als: 'flex-end',
-                  mx: 0,
-                  ml: 'auto',
-                  maw: '$12',
-                  h: '$3.5',
-                }}
-              >
-                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                  CREATE PASSKEY
-                </ButtonText>
-              </SubmitButton>
-            </Theme>
+
+            <SubmitButton
+              onPress={submit}
+              theme={'green'}
+              mb="auto"
+              als="auto"
+              r
+              br="$4"
+              mx="auto"
+              w="100%"
+              $gtMd={{
+                mt: '0',
+                als: 'flex-end',
+                mx: 0,
+                ml: 'auto',
+                maw: '$12',
+                h: '$3.5',
+              }}
+            >
+              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
+                CREATE PASSKEY
+              </ButtonText>
+            </SubmitButton>
           </XStack>
         )}
       >
@@ -180,7 +193,7 @@ export const OnboardingForm = () => {
                 {Object.values(fields)}
                 <Anchor
                   $theme-dark={{
-                    col: '$accentBackground',
+                    col: '$greenBackground',
                   }}
                   $theme-light={{ col: '$black' }}
                   href="https://info.send.it/send/mission-vision-and-values"

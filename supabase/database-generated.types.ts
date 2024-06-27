@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      activity: {
+        Row: {
+          created_at: string
+          data: Json | null
+          event_id: string
+          event_name: string
+          from_user_id: string | null
+          id: number
+          to_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          event_id: string
+          event_name: string
+          from_user_id?: string | null
+          id?: number
+          to_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          event_id?: string
+          event_name?: string
+          from_user_id?: string | null
+          id?: number
+          to_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_to_user_id_fkey"
+            columns: ["to_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chain_addresses: {
         Row: {
           address: string
@@ -34,6 +79,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      challenges: {
+        Row: {
+          challenge: string
+          created_at: string
+          expires_at: string
+          id: number
+        }
+        Insert: {
+          challenge?: string
+          created_at?: string
+          expires_at?: string
+          id?: number
+        }
+        Update: {
+          challenge?: string
+          created_at?: string
+          expires_at?: string
+          id?: number
+        }
+        Relationships: []
       }
       distribution_shares: {
         Row: {
@@ -267,17 +333,23 @@ export type Database = {
       receipts: {
         Row: {
           created_at: string | null
-          hash: string
+          event_id: string
+          hash: string | null
+          id: number
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          hash: string
+          event_id: string
+          hash?: string | null
+          id?: number
           user_id: string
         }
         Update: {
           created_at?: string | null
-          hash?: string
+          event_id?: string
+          hash?: string | null
+          id?: number
           user_id?: string
         }
         Relationships: [
@@ -335,42 +407,48 @@ export type Database = {
       }
       send_account_created: {
         Row: {
-          account: string | null
-          block_num: number | null
-          block_time: number | null
-          chain_id: number | null
-          ig_name: string | null
-          log_addr: string | null
-          log_idx: number | null
-          src_name: string | null
-          tx_hash: string | null
-          tx_idx: number | null
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
           user_op_hash: string | null
         }
         Insert: {
-          account?: string | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
           user_op_hash?: string | null
         }
         Update: {
-          account?: string | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
+          account?: string
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
           user_op_hash?: string | null
         }
         Relationships: []
@@ -411,6 +489,57 @@ export type Database = {
           },
         ]
       }
+      send_account_receives: {
+        Row: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          sender: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          value: number
+        }
+        Insert: {
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          sender: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          value: number
+        }
+        Update: {
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          sender?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+          value?: number
+        }
+        Relationships: []
+      }
       send_account_signing_key_added: {
         Row: {
           abi_idx: number
@@ -418,6 +547,8 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
+          event_id: string
+          id: number
           ig_name: string
           key: string
           key_slot: number
@@ -433,6 +564,8 @@ export type Database = {
           block_num: number
           block_time: number
           chain_id: number
+          event_id?: string
+          id?: number
           ig_name: string
           key: string
           key_slot: number
@@ -448,6 +581,62 @@ export type Database = {
           block_num?: number
           block_time?: number
           chain_id?: number
+          event_id?: string
+          id?: number
+          ig_name?: string
+          key?: string
+          key_slot?: number
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
+      send_account_signing_key_removed: {
+        Row: {
+          abi_idx: number
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          key: string
+          key_slot: number
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          account: string
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: number
+          ig_name: string
+          key: string
+          key_slot: number
+          log_addr: string
+          log_idx: number
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          account?: string
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: number
           ig_name?: string
           key?: string
           key_slot?: number
@@ -461,52 +650,55 @@ export type Database = {
       }
       send_account_transfers: {
         Row: {
-          abi_idx: number | null
-          block_num: number | null
-          block_time: number | null
-          chain_id: number | null
-          f: string | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          f: string
           id: number
-          ig_name: string | null
-          log_addr: string | null
-          log_idx: number | null
-          src_name: string | null
-          t: string | null
-          tx_hash: string | null
-          tx_idx: number | null
-          v: number | null
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
         }
         Insert: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          f?: string | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          f: string
           id?: number
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          src_name?: string | null
-          t?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          v?: number | null
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
         }
         Update: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          f?: string | null
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          f?: string
           id?: number
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          src_name?: string | null
-          t?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          v?: number | null
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          t?: string
+          tx_hash?: string
+          tx_idx?: number
+          v?: number
         }
         Relationships: []
       }
@@ -571,157 +763,132 @@ export type Database = {
       }
       send_revenues_safe_receives: {
         Row: {
-          abi_idx: number | null
-          block_num: number | null
-          block_time: number | null
-          chain_id: number | null
-          ig_name: string | null
-          log_addr: string | null
-          log_idx: number | null
-          sender: string | null
-          src_name: string | null
-          tx_hash: string | null
-          tx_idx: number | null
-          v: number | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          sender: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          v: number
         }
         Insert: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          sender?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          v?: number | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          sender: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+          v: number
         }
         Update: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          sender?: string | null
-          src_name?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          v?: number | null
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          sender?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+          v?: number
         }
         Relationships: []
       }
       send_token_transfers: {
         Row: {
-          abi_idx: number | null
-          block_num: number | null
-          block_time: number | null
-          chain_id: number | null
-          f: string | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          f: string
           id: number
-          ig_name: string | null
-          log_addr: string | null
-          log_idx: number | null
-          src_name: string | null
-          t: string | null
-          tx_hash: string | null
-          tx_idx: number | null
-          v: number | null
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
         }
         Insert: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          f?: string | null
+          abi_idx: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          f: string
           id?: number
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          src_name?: string | null
-          t?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          v?: number | null
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          src_name: string
+          t: string
+          tx_hash: string
+          tx_idx: number
+          v: number
         }
         Update: {
-          abi_idx?: number | null
-          block_num?: number | null
-          block_time?: number | null
-          chain_id?: number | null
-          f?: string | null
+          abi_idx?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          f?: string
           id?: number
-          ig_name?: string | null
-          log_addr?: string | null
-          log_idx?: number | null
-          src_name?: string | null
-          t?: string | null
-          tx_hash?: string | null
-          tx_idx?: number | null
-          v?: number | null
-        }
-        Relationships: []
-      }
-      send_transfer_logs: {
-        Row: {
-          block_hash: string
-          block_number: number
-          block_timestamp: string
-          created_at: string | null
-          from: string
-          log_index: number
-          to: string
-          tx_hash: string
-          value: number
-        }
-        Insert: {
-          block_hash: string
-          block_number: number
-          block_timestamp: string
-          created_at?: string | null
-          from: string
-          log_index: number
-          to: string
-          tx_hash: string
-          value: number
-        }
-        Update: {
-          block_hash?: string
-          block_number?: number
-          block_timestamp?: string
-          created_at?: string | null
-          from?: string
-          log_index?: number
-          to?: string
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          src_name?: string
+          t?: string
           tx_hash?: string
-          value?: number
+          tx_idx?: number
+          v?: number
         }
         Relationships: []
       }
       tag_receipts: {
         Row: {
-          hash: string
+          created_at: string | null
+          event_id: string | null
+          hash: string | null
+          id: number
           tag_name: string
         }
         Insert: {
-          hash: string
+          created_at?: string | null
+          event_id?: string | null
+          hash?: string | null
+          id?: number
           tag_name: string
         }
         Update: {
-          hash?: string
+          created_at?: string | null
+          event_id?: string | null
+          hash?: string | null
+          id?: number
           tag_name?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "tag_receipts_hash_fkey"
-            columns: ["hash"]
-            isOneToOne: false
-            referencedRelation: "receipts"
-            referencedColumns: ["hash"]
-          },
           {
             foreignKeyName: "tag_receipts_tag_name_fkey"
             columns: ["tag_name"]
@@ -833,6 +1000,20 @@ export type Database = {
       }
     }
     Views: {
+      activity_feed: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          event_name: string | null
+          from_user:
+            | Database["public"]["CompositeTypes"]["activity_feed_user"]
+            | null
+          to_user:
+            | Database["public"]["CompositeTypes"]["activity_feed_user"]
+            | null
+        }
+        Relationships: []
+      }
       distribution_verifications_summary: {
         Row: {
           distribution_id: number | null
@@ -911,7 +1092,7 @@ export type Database = {
       confirm_tags: {
         Args: {
           tag_names: string[]
-          receipt_hash: string
+          event_id: string
           referral_code_input: string
         }
         Returns: undefined
@@ -944,11 +1125,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      insert_send_transfer_logs: {
-        Args: {
-          _send_transfer_logs: unknown[]
+      insert_challenge: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          challenge: string
+          created_at: string
+          expires_at: string
+          id: number
         }
-        Returns: undefined
       }
       profile_lookup: {
         Args: {
@@ -1022,6 +1206,13 @@ export type Database = {
       verification_type: "tag_registration" | "tag_referral"
     }
     CompositeTypes: {
+      activity_feed_user: {
+        id: string
+        name: string
+        avatar_url: string
+        send_id: number
+        tags: unknown
+      }
       tag_search_result: {
         avatar_url: string
         tag_name: string

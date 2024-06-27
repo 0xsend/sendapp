@@ -85,7 +85,7 @@ function AddTagButton() {
       ai="center"
       icon={<IconPlus color={'black'} />}
     >
-      <ButtonText fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="accent">
+      <ButtonText fontSize={'$4'} fontWeight={'500'} fontFamily={'$mono'} theme="green">
         New Tag
       </ButtonText>
     </Button>

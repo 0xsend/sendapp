@@ -2,7 +2,7 @@ import { SendConfirmScreen } from 'app/features/send/confirm/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
-import { SendLayout } from 'app/features/send/layout.web'
+import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
@@ -17,13 +17,10 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP(async () => {
-  // disable for now
-  return { redirect: { destination: '/', permanent: false } }
-})
+export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <SendLayout TopNav={<TopNav header="Preview and Send" noSubroute />}>{children}</SendLayout>
+  <HomeLayout TopNav={<TopNav header="Preview and Send" noSubroute />}>{children}</HomeLayout>
 )
 
 export default Page

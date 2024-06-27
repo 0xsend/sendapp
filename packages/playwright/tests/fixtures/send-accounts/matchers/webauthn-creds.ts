@@ -3,9 +3,9 @@ import { parseCredAuthData } from '@0xsend/webauthn-authenticator/utils'
 import type { Database } from '@my/supabase/database-generated.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { assert } from 'app/utils/assert'
-import { hexToPgBase16 } from 'app/utils/hexToPgBase16'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
-import { pgBase16ToHex } from 'app/utils/pgBase16ToHex'
+import { byteaToHex } from 'app/utils/byteaToHex'
 import { withRetry, checksumAddress } from 'viem'
 import cbor from 'cbor'
 import { expect } from '@playwright/test'
@@ -78,8 +78,8 @@ expect.extend({
         `\\x${COSEPublicKey}`
       )
       const [xHex, yHex] = COSEECDHAtoXY(COSEPublicKeyBytes)
-      const xPgB16 = hexToPgBase16(xHex)
-      const yPgB16 = hexToPgBase16(yHex)
+      const xPgB16 = hexToBytea(xHex)
+      const yPgB16 = hexToBytea(yHex)
 
       // retry until signing key is added to the account
       const keyAdded = await withRetry(
@@ -118,10 +118,10 @@ expect.extend({
       expect(keyAdded[1]?.key, `Missing Y key for credential at index ${index}`).toBe(yPgB16)
       const account = checksumAddress(sendAcct.address as `0x${string}`)
       expect(account, `Missing account for credential at index ${index}`).toBe(
-        checksumAddress(pgBase16ToHex(keyAdded[0]?.account as `\\x${string}`))
+        checksumAddress(byteaToHex(keyAdded[0]?.account as `\\x${string}`))
       )
       expect(account, `Missing account for credential at index ${index}`).toBe(
-        checksumAddress(pgBase16ToHex(keyAdded[1]?.account as `\\x${string}`))
+        checksumAddress(byteaToHex(keyAdded[1]?.account as `\\x${string}`))
       )
     }
 

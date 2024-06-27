@@ -598,6 +598,71 @@ contract TokenPaymaster6Test is Test {
         assertEq(cachedPriceTimestamp, block.timestamp);
     }
 
+    // should revert if cached token price is expired
+    function testShouldRevertIfCachedTokenPriceIsExpired() external {
+        token.sudoMint(address(account), 1e18);
+        token.sudoApprove(address(account), address(paymaster), type(uint256).max);
+        vm.startPrank(operator);
+        vm.stopPrank();
+        vm.warp(10000000); // expire cache
+
+        PackedUserOperation memory op =
+            fillUserOp(account, userKey, address(counter), 0, abi.encodeWithSelector(TestCounter.count.selector));
+        op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(3e5), uint128(3e5));
+        op.signature = signUserOp(op, userKey);
+
+        uint256 maxFeePerGas = UserOperationLib.unpackLow128(op.gasFees);
+        vm.fee(maxFeePerGas);
+        vm.txGasPrice(maxFeePerGas);
+        vm.recordLogs();
+        PackedUserOperation[] memory ops = new PackedUserOperation[](1);
+        ops[0] = op;
+        vm.expectRevert(
+            abi.encodeWithSelector(IEntryPoint.FailedOp.selector, uint256(0), "AA32 paymaster expired or not due")
+        );
+        entryPoint.handleOps{gas: 3e7}(ops, beneficiary);
+    }
+
+    // should update token price if cache is expired but price max age is not reached
+    function testShouldUpdateTokenPriceIfCacheIsExpired() external {
+        token.sudoMint(address(account), 1e18);
+        token.sudoApprove(address(account), address(paymaster), type(uint256).max);
+        vm.startPrank(operator);
+        vm.stopPrank();
+        vm.warp(100); // expire cache
+
+        PackedUserOperation memory op =
+            fillUserOp(account, userKey, address(counter), 0, abi.encodeWithSelector(TestCounter.count.selector));
+        op.paymasterAndData = abi.encodePacked(address(paymaster), uint128(3e5), uint128(3e5));
+        op.signature = signUserOp(op, userKey);
+
+        uint256 maxFeePerGas = UserOperationLib.unpackLow128(op.gasFees);
+        vm.fee(maxFeePerGas);
+        vm.txGasPrice(maxFeePerGas);
+        vm.recordLogs();
+        PackedUserOperation[] memory ops = new PackedUserOperation[](1);
+        ops[0] = op;
+        entryPoint.handleOps{gas: 3e7}(ops, beneficiary);
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+
+        assertEq(entries.length, 7, "entries.length != 5");
+        assertEq(entries[0].topics[0], keccak256("Transfer(address,address,uint256)"), "precharge transfer");
+        assertEq(entries[2].topics[0], keccak256("TokenPriceUpdated(uint256,uint256,uint256)"), "token price updated");
+        assertEq(entries[3].topics[0], keccak256("Transfer(address,address,uint256)"), "postOp transfer");
+        assertEq(
+            entries[5].topics[0],
+            keccak256("UserOperationSponsored(address,uint256,uint256,uint256,uint256)"),
+            "UserOperationSponsored"
+        );
+        assertEq(
+            entries[6].topics[0],
+            keccak256("UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)"),
+            "UserOperationEvent"
+        );
+        (,, uint256 cachedPriceTimestamp) = abi.decode(entries[2].data, (uint256, uint256, uint256));
+        assertEq(cachedPriceTimestamp, block.timestamp);
+    }
+
     // should use token price supplied by the client if it is better than cached
     function testShouldUseTokenPriceSuppliedByTheClientIfItIsBetterThanCached() external {
         token.sudoMint(address(account), 1 ether);
