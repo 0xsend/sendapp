@@ -40,18 +40,6 @@ if not os.path.exists(".env.local"):
         local(sed + " -i 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local")
         print(color.green("📝 Dockerized .env.local"))
 
-if CFG.dockerize:
-    # ensure host.docker.internal is resolvable
-    host_docker_rdy = str(local("ping -c 1 host.docker.internal || true", echo_off = True, quiet = True)).strip()
-    if host_docker_rdy.find("server can't find host.docker.interna") != -1:
-        print(color.red("Could not resolve host.docker.internal domain.") + """
-    
-Add the following to your /etc/hosts file:
-    
-127.0.0.1 host.docker.internal
-        """)
-        fail(color.red("Could not resolve host.docker.internal domain."))
-
 for dotfile in [
     ".env",
     ".env.development",
@@ -73,6 +61,24 @@ for line in str(read_file(".env.local.template")).split("\n"):
     key, _ = line.split("=", 1)
     print(color.blue("checking for " + key)) if DEBUG else None
     require_env(key)
+
+# dockerize checks
+if CFG.dockerize:
+    # ensure host.docker.internal is resolvable
+    host_docker_rdy = str(local("ping -c 1 host.docker.internal || true", echo_off = True, quiet = True)).strip()
+    if host_docker_rdy.find("server can't find host.docker.interna") != -1:
+        print(color.red("Could not resolve host.docker.internal domain.") + """
+    
+Add the following to your /etc/hosts file:
+    
+127.0.0.1 host.docker.internal
+        """)
+        fail(color.red("Could not resolve host.docker.internal domain."))
+
+    # ensure NEXT_PUBLIC_SUPABASE_URL is pointing to the correct host
+    if not os.getenv("NEXT_PUBLIC_SUPABASE_URL").startswith("http://host.docker.internal"):
+        print(color.red("NEXT_PUBLIC_SUPABASE_URL is not pointing to host.docker.internal. Please update your environment to point to a local supabase instance."))
+        fail(color.red("NEXT_PUBLIC_SUPABASE_URL is not pointing to host.docker.internal"))
 
 include("tilt/infra.tiltfile")
 

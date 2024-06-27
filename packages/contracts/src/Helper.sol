@@ -11,7 +11,12 @@ abstract contract Helper is Script {
     /**
      * The address of the Send manager and deployer on mainnet.
      */
-    address constant SEND_DEPLOYER = 0x647eb43401e13e995D89Cf26cD87e68890EE3f89;
+    address constant OG_SEND_DEPLOYER = 0x647eb43401e13e995D89Cf26cD87e68890EE3f89;
+    /**
+     * The address of the Send manager and deployer on base.
+     * https://basescan.org/address/0x436454a68bef94901014e2af90f86e7355a029f3
+     */
+    address constant BASE_SEND_MVP_DEPLOYER = 0x436454a68BEF94901014E2AF90f86E7355a029F3;
     /**
      * Send: Treasury
      * https://etherscan.io/address/0x4bB2f4c771ccB60723a78a974a2537AD339071c7
@@ -39,7 +44,8 @@ abstract contract Helper is Script {
 
     function labels() public {
         vm.label(SEND_TOKEN, "SEND_TOKEN");
-        vm.label(SEND_DEPLOYER, "SEND_DEPLOYER");
+        vm.label(OG_SEND_DEPLOYER, "OG_SEND_DEPLOYER");
+        vm.label(BASE_SEND_MVP_DEPLOYER, "BASE_SEND_MVP_DEPLOYER");
         vm.label(SEND_TREASURY_SAFE, "SEND_TREASURY_SAFE");
         vm.label(SEND_AIRDROPS_SAFE, "SEND_AIRDROPS_SAFE");
         vm.label(AA_ENTRY_POINT_V0_6, "AA_ENTRY_POINT_V0_6");

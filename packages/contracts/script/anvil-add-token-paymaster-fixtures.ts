@@ -1,5 +1,5 @@
 import 'zx/globals'
-// $.verbose = true
+$.verbose = true
 /**
  * This script is used to deploy the TokenPaymaster
  */

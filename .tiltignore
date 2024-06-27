@@ -8,3 +8,74 @@ packages/playwright/playwright-report
 **/*.tsbuildinfo
 **/node_modules
 **/.turbo
+# may be redundant but last thing we want is large dockerfiles. from here on out, it mostly mirrors the .gitignore
+**/Tiltfile
+**/**.tiltfile
+**/**.Tiltfile
+**/*.tsbuildinfo
+**/dist
+**/node_modules
+**/out
+**/.tamagui/*
+**/coverage
+**/.next
+**/.expo
+**/build
+**/test-results
+**/playwright-report
+**/.next
+**/.expo
+**/.auth
+**/.tamagui/*
+**/coverage
+**/.turbo
+**/.cache/
+**/out
+**/*.snap
+.auth/
+
+*.log*
+.env
+.env.local
+.env.local*
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# os
+.DS_Store
+THUMBS_DB
+thumbs.db
+
+**/node_modules/*
+
+# intellij
+.idea
+
+# Turborepo
+.turbo
+
+volumes
+
+tmp
+
+.parcel-cache
+
+# Foundry stuff
+**/cache/
+**/out/
+**/var
+**/broadcast
+!**/broadcast/**/run-latest.json
+**/Dockerfile
+**/.dockerignore
+**/.tamagui
+.watchman**
+**/vitest.config.ts.timestamp**

@@ -43,20 +43,24 @@ const deployments = await broadcasts.reduce(async (accP, file) => {
   return acc
 }, Promise.resolve({}))
 
+// if deployment has base.id set, use for the baseLocal.id chain
+for (const [contract, addresses] of Object.entries(deployments) as [
+  string,
+  Record<number, string>,
+][]) {
+  const baseAddress = addresses[base.id]
+  if (baseAddress) {
+    console.log('using', base.id, 'for', contract, 'as local fork')
+    addresses[baseLocal.id] = baseAddress
+    deployments[contract] = addresses
+  }
+}
+
 console.log({ deployments })
 
 // @ts-expect-error it's parsed JSON
 const deployedSendMerkleDrop = deployments.SendMerkleDrop
-
 if (!deployedSendMerkleDrop) throw new Error('No SendMerkleDrop found.')
-
-// @ts-expect-error it's parsed JSON
-const accountFactory = deployments.SendAccountFactory
-if (!accountFactory) throw new Error('No SendAccountFactory found.')
-if (accountFactory[base.id])
-  throw new Error(
-    'SendAccountFactory already deployed on base mainnet. Failing to avoid duplicate.'
-  )
 
 export default defineConfig({
   out: 'src/generated.ts',
@@ -145,10 +149,6 @@ export default defineConfig({
           [baseSepolia.id]: '0x91dA349c74576Ab7ff05c16DaC4E4F92E9a798bE', // base sepolia
           [baseLocal.id]: '0x614F5273FdB63C1E1972fe1457Ce77DF1Ca440A6', // base localnet
           ...deployedSendMerkleDrop,
-        },
-        SendAccountFactory: {
-          ...accountFactory,
-          [base.id]: '0x95DaEEEF8Ac6f28648559aDBEdbcAC00ef4d1745', // not deployed yet
         },
       },
       include: [

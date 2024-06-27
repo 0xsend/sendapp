@@ -68,3 +68,4 @@ tmp
 **/.dockerignore
 **/.tamagui
 .watchman**
+**/vitest.config.ts.timestamp**

@@ -1,5 +1,5 @@
 import 'zx/globals'
-
+$.verbose = true
 const RPC_URL = 'http://localhost:8546'
 void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))

@@ -16,16 +16,18 @@ contract DeploySendVerifierScript is Script, Helper {
 
         // use send verifier implementation for now
         address verifier = address(new SendVerifier{salt: 0}());
-        address owner = SEND_DEPLOYER; // FIXME: pick a multisig
+        address owner = msg.sender;
 
         // solhint-disable-next-line no-console
         console2.log("verifier address:", verifier);
+        // solhint-disable-next-line no-console
+        console2.log("owner address:", owner);
 
-        SendVerifierProxy dvp =
+        SendVerifierProxy svp =
             new SendVerifierProxy{salt: 0}(verifier, abi.encodeWithSelector(SendVerifier.init.selector, owner));
 
         // solhint-disable-next-line no-console
-        console2.log("SendVerifierProxy address:", address(dvp));
+        console2.log("SendVerifierProxy address:", address(svp));
 
         vm.stopBroadcast();
     }
