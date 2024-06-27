@@ -1,12 +1,12 @@
 services:
   next-app:
-    image: 0xsend/sendapp/next-app:latest
+    image: sendapp/next-app-dev:latest
     build:
       context: .
       dockerfile: ./apps/next/Dockerfile
       tags:
-        - 0xsend/sendapp/next-app:${GIT_HASH:-latest}
-        - 0xsend/sendapp/next-app:latest
+        - sendapp/next-app-${GIT_BRANCH:-dev}:${GIT_HASH:-latest}
+        - sendapp/next-app-${GIT_BRANCH:-dev}:latest
       args:
         - CI=${CI:-}
         - DEBUG=${DEBUG:-}
