@@ -12,6 +12,10 @@ jest.mock('expo-router', () => ({
   usePathname: jest.fn(),
 }))
 
+jest.mock('app/routers/params', () => ({
+  useRootScreenParams: jest.fn().mockReturnValue([{ search: '' }, jest.fn()]),
+}))
+
 jest.mock('app/utils/supabase/useSupabase', () => ({
   useSupabase: jest.fn().mockReturnValue({
     rpc: jest.fn().mockReturnValue({

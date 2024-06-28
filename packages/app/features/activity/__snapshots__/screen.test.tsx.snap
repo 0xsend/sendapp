@@ -196,6 +196,9 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         {
                           "next": [Function],
                         },
+                        {
+                          "next": [Function],
+                        },
                       ],
                       "subscribe": [Function],
                       "unsubscribe": [Function],
@@ -264,115 +267,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
             }
           />
         </View>
-      </View>
-      <View
-        aria-label="Clear input."
-        cancelable={true}
-        disabled={false}
-        focusVisibleStyle={{}}
-        focusable={[Function]}
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        role="button"
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderBottomColor": "transparent",
-            "borderBottomLeftRadius": 0,
-            "borderBottomRightRadius": 9,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "transparent",
-            "borderLeftWidth": 1,
-            "borderRightColor": "transparent",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "transparent",
-            "borderTopLeftRadius": 0,
-            "borderTopRightRadius": 9,
-            "borderTopWidth": 1,
-            "flexDirection": "row",
-            "flexWrap": "nowrap",
-            "height": 44,
-            "justifyContent": "center",
-            "paddingBottom": 0,
-            "paddingLeft": 4,
-            "paddingRight": 4,
-            "paddingTop": 0,
-            "position": "absolute",
-            "right": "0",
-            "top": "0",
-          }
-        }
-      >
-        <RNSVGSvgView
-          align="xMidYMid"
-          bbHeight={32}
-          bbWidth={32}
-          color="#FFFFFF"
-          focusable={false}
-          height={32}
-          meetOrSlice={0}
-          minX={0}
-          minY={0}
-          strokeWidth="2"
-          style={
-            [
-              {
-                "backgroundColor": "transparent",
-                "borderWidth": 0,
-              },
-              {
-                "height": 24,
-                "width": 24,
-              },
-              {
-                "flex": 0,
-                "height": 32,
-                "width": 32,
-              },
-            ]
-          }
-          tintColor="#FFFFFF"
-          vbHeight={32}
-          vbWidth={32}
-          width={32}
-        >
-          <RNSVGGroup
-            fill={
-              {
-                "payload": 4278190080,
-                "type": 0,
-              }
-            }
-            propList={
-              [
-                "strokeWidth",
-              ]
-            }
-            strokeWidth="2"
-          >
-            <RNSVGPath
-              d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
-              fill={
-                {
-                  "type": 2,
-                }
-              }
-              propList={
-                [
-                  "fill",
-                ]
-              }
-            />
-          </RNSVGGroup>
-        </RNSVGSvgView>
       </View>
     </View>
   </View>
