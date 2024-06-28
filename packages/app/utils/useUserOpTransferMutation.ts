@@ -7,21 +7,17 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
-import {
-  getRequiredPrefund,
-  getUserOperationHash,
-  type GetUserOperationReceiptReturnType,
-  type UserOperation,
-} from 'permissionless'
+import { getRequiredPrefund, getUserOperationHash, type UserOperation } from 'permissionless'
 import {
   encodeFunctionData,
   erc20Abi,
-  isAddress,
-  type Hex,
   formatUnits,
+  isAddress,
   type CallExecutionError,
+  type Hex,
 } from 'viem'
 import { assert } from './assert'
+import { byteaToBase64 } from './byteaToBase64'
 import { signUserOp } from './userop'
 
 // default user op with preset gas values that work
@@ -46,9 +42,22 @@ export const defaultUserOp: Pick<
 }
 
 export type UseUserOpTransferMutationArgs = {
+  /**
+   * The user operation to send.
+   */
   userOp: UserOperation<'v0.7'>
+  /**
+   * The valid until epoch timestamp for the user op.
+   */
   validUntil?: number
+  /**
+   * The signature version of the user op.
+   */
   version?: number
+  /**
+   * The list of send account credentials to use for signing the user op.
+   */
+  webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
 }
 
 /**
@@ -67,7 +76,8 @@ export async function sendUserOpTransfer({
   userOp,
   version,
   validUntil,
-}: UseUserOpTransferMutationArgs): Promise<GetUserOperationReceiptReturnType> {
+  webauthnCreds,
+}: UseUserOpTransferMutationArgs) {
   const chainId = baseMainnetClient.chain.id
   const entryPoint = entryPointAddress[chainId]
   const userOpHash = getUserOperationHash({
@@ -94,6 +104,11 @@ export async function sendUserOpTransfer({
     userOpHash,
     version,
     validUntil,
+    allowedCredentials:
+      webauthnCreds?.map((c) => ({
+        id: byteaToBase64(c.raw_credential_id),
+        userHandle: c.name,
+      })) ?? [],
   })
 
   const hash = await baseMainnetBundlerClient.sendUserOperation({

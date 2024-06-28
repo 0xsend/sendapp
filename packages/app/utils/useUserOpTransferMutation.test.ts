@@ -109,7 +109,7 @@ describe('useUserOpTransferMutation', () => {
 
     expect(result.current).toBeDefined()
     await act(async () => {
-      await result.current.mutateAsync({ userOp, validUntil: 0 })
+      await result.current.mutateAsync({ userOp, validUntil: 0, webauthnCreds: [] })
       jest.runAllTimers()
     })
     expect(signUserOp).toHaveBeenCalledTimes(1)

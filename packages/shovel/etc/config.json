@@ -42,7 +42,6 @@
           "filter_op": "contains",
           "filter_arg": [
             "0x008c9561857b6555584d20aC55110335759Aa2c2",
-            "0x1E6a7C7aA90Ea75d9aD9e02AEA71e3acbe05F8F5",
             "0xe4C5EF95e8cDA5DB09393a08E30645F883e187B8"
           ]
         }

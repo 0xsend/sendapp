@@ -90,6 +90,7 @@ const expectedParsedAssertions = [
 const mockAssertions: [SignResult, (typeof expectedParsedAssertions)[number]][] = [
   [
     {
+      id: '1',
       passkeyName: 'sendappuser.1',
       rawClientDataJSONB64:
         'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiWVc1dmRHaGxjaUJqYUdGc2JHVnVaMlUiLCJvcmlnaW4iOiJodHRwczovL3NlbmRhcHAubG9jYWxob3N0In0=',
@@ -221,6 +222,7 @@ const createResult = {
 }
 
 const signResult = {
+  id: '1',
   passkeyName: 'test33.128',
   rawAuthenticatorDataB64: 'izwk775fdfZnAPIbCJXH2QqOQs1ZeTxiGxM/cExRMsQdAAAAAA==',
   rawClientDataJSONB64:
