@@ -714,71 +714,20 @@ exports[`TokenDetails 1`] = `
             }
           >
             <View
-              style={
-                {
-                  "alignItems": "center",
-                  "borderBottomLeftRadius": 9,
-                  "borderBottomRightRadius": 9,
-                  "borderTopLeftRadius": 9,
-                  "borderTopRightRadius": 9,
-                  "flexDirection": "column",
-                  "gap": 7,
-                  "height": 48,
-                  "justifyContent": "center",
-                  "maxHeight": 48,
-                  "maxWidth": 48,
-                  "minHeight": 48,
-                  "minWidth": 48,
-                  "overflow": "hidden",
-                  "position": "relative",
-                  "width": 48,
-                }
-              }
+              href="/profile/42"
+              testID="MockSolitoLink"
             >
-              <View
+              <Text
                 style={
                   {
-                    "bottom": 0,
-                    "flexDirection": "column",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                    "zIndex": 1,
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
                   }
                 }
-              >
-                <Image
-                  fullscreen={true}
-                  onError={[Function]}
-                  onLoad={[Function]}
-                  source={
-                    {
-                      "uri": "https://i.pravatar.cc/500?u=alice",
-                    }
-                  }
-                  style={
-                    {
-                      "height": 48,
-                      "width": 48,
-                    }
-                  }
-                />
-              </View>
-              <View
-                style={
-                  {
-                    "backgroundColor": "#86AE80",
-                    "bottom": 0,
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "left": 0,
-                    "position": "absolute",
-                    "right": 0,
-                    "top": 0,
-                    "zIndex": 0,
-                  }
-                }
+                suppressHighlighting={true}
               >
                 <View
                   style={
@@ -789,6 +738,7 @@ exports[`TokenDetails 1`] = `
                       "borderTopLeftRadius": 9,
                       "borderTopRightRadius": 9,
                       "flexDirection": "column",
+                      "gap": 7,
                       "height": 48,
                       "justifyContent": "center",
                       "maxHeight": 48,
@@ -820,7 +770,7 @@ exports[`TokenDetails 1`] = `
                       onLoad={[Function]}
                       source={
                         {
-                          "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
+                          "uri": "https://i.pravatar.cc/500?u=alice",
                         }
                       }
                       style={
@@ -831,8 +781,76 @@ exports[`TokenDetails 1`] = `
                       }
                     />
                   </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#86AE80",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "justifyContent": "center",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 9,
+                          "borderBottomRightRadius": 9,
+                          "borderTopLeftRadius": 9,
+                          "borderTopRightRadius": 9,
+                          "flexDirection": "column",
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 1,
+                          }
+                        }
+                      >
+                        <Image
+                          fullscreen={true}
+                          onError={[Function]}
+                          onLoad={[Function]}
+                          source={
+                            {
+                              "uri": "https://ui-avatars.com/api/?name=Alice&size=256&format=png&background=86ad7f",
+                            }
+                          }
+                          style={
+                            {
+                              "height": 48,
+                              "width": 48,
+                            }
+                          }
+                        />
+                      </View>
+                    </View>
+                  </View>
                 </View>
-              </View>
+              </Text>
             </View>
             <View
               style={

@@ -17,6 +17,7 @@ import {
   isWeb,
   ButtonIcon,
   ButtonText,
+  LinkableAvatar,
   LinkButton,
 } from '@my/ui'
 import {
@@ -180,7 +181,12 @@ export function AccountScreen() {
       <Card p={'$size.3.5'} w={'100%'}>
         <XStack gap={'$size.3.5'} w={'100%'} flexWrap="wrap">
           <View width={'100%'} $gtMd={{ width: 'auto' }}>
-            <Avatar $gtMd={{ size: 316 }} size={'$10'} borderRadius={'$3'}>
+            <LinkableAvatar
+              $gtMd={{ size: 316 }}
+              size={'$10'}
+              borderRadius={'$3'}
+              href={`/profile/${profile.send_id}`}
+            >
               <Avatar.Image
                 $gtMd={{ w: 316, h: 264 }}
                 w={'$10'}
@@ -198,7 +204,7 @@ export function AccountScreen() {
               >
                 <IconAccount size={256} color="$olive" />
               </Avatar.Fallback>
-            </Avatar>
+            </LinkableAvatar>
           </View>
           <YStack gap="$size.1.5" flex={1}>
             <YStack gap={'$size.0.75'}>

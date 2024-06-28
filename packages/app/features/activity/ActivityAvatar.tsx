@@ -1,13 +1,14 @@
-import { Avatar } from '@my/ui'
+import { LinkableAvatar, Avatar } from '@my/ui'
 import { counterpart } from 'app/utils/activity'
 import { isSendAccountTransfersEvent, type Activity } from 'app/utils/zod/activity'
 
 export function ActivityAvatar({ activity }: { activity: Activity }) {
   const user = counterpart(activity)
   const { from_user } = activity
+
   if (user) {
     return (
-      <Avatar size="$4.5" br="$4" gap="$2">
+      <LinkableAvatar size="$4.5" br="$4" gap="$2" href={`/profile/${user.send_id}`}>
         <Avatar.Image src={user?.avatar_url ?? undefined} />
         <Avatar.Fallback jc="center" bc="$olive">
           <Avatar size="$4.5" br="$4">
@@ -18,12 +19,14 @@ export function ActivityAvatar({ activity }: { activity: Activity }) {
             />
           </Avatar>
         </Avatar.Fallback>
-      </Avatar>
+      </LinkableAvatar>
     )
   }
+
   if (isSendAccountTransfersEvent(activity)) {
     // is transfer, but an unknown user
     const address = from_user?.id ? activity.data.t : activity.data.f
+
     return (
       <Avatar size="$4.5" br="$4" gap="$2">
         <Avatar.Image

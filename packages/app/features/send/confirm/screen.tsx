@@ -11,6 +11,7 @@ import {
   YStack,
   type ParagraphProps,
   type YStackProps,
+  LinkableAvatar,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
@@ -409,12 +410,12 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
         $theme-light={{ bc: '$gray3Light' }}
         f={1}
       >
-        <Avatar size="$4.5" br="$3">
+        <LinkableAvatar size="$4.5" br="$3" href={`/profile/${profile?.send_id}`}>
           <Avatar.Image src={profile?.avatar_url ?? ''} />
           <Avatar.Fallback jc="center">
             <IconAccount size="$4.5" color="$olive" />
           </Avatar.Fallback>
-        </Avatar>
+        </LinkableAvatar>
         <YStack gap="$1.5">
           <Paragraph fontSize="$4" fontWeight="500" color="$color12">
             {profile?.name}

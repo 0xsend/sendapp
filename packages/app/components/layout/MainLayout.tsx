@@ -1,4 +1,4 @@
-import { Avatar, Link, ScrollView, Spinner, XStack, YStack } from '@my/ui'
+import { Avatar, Link, ScrollView, Spinner, XStack, YStack, LinkableAvatar } from '@my/ui'
 import { LinearGradient } from '@tamagui/linear-gradient'
 import { IconQr } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
@@ -20,7 +20,7 @@ const MainLayout = ({
         <XStack borderColor={separatorColor} borderBottomWidth={1} pt={'$6'}>
           <XStack w={'90%'} ai={'center'} jc={'space-between'} marginHorizontal={'5%'} py={'$6'}>
             <Link href={'/account'}>
-              <Avatar br={'$6'} size={'$4.5'}>
+              <LinkableAvatar br={'$6'} size={'$4.5'} href={`/profile/${profile?.send_id}`}>
                 {avatar_url ? (
                   <Avatar.Image src={avatar_url} width={48} height={48} />
                 ) : (
@@ -28,7 +28,7 @@ const MainLayout = ({
                     <Spinner size="large" color="$color" />
                   </Avatar.Fallback>
                 )}
-              </Avatar>
+              </LinkableAvatar>
             </Link>
             <IconQr color={iconColor} />
           </XStack>

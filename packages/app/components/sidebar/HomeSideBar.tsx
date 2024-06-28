@@ -10,6 +10,7 @@ import {
   XStack,
   YStack,
   useMedia,
+  LinkableAvatar,
   type YStackProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
@@ -81,12 +82,12 @@ const HomeBottomSheet = () => {
   return (
     <NavSheet navId="home">
       <XStack gap="$4" ai="center">
-        <Avatar size="$4.5" br={'$3'}>
+        <LinkableAvatar size="$4.5" br={'$3'} href={`/profile/${profile?.send_id}`}>
           <Avatar.Image src={avatarUrl ?? ''} />
           <Avatar.Fallback jc={'center'} delayMs={200}>
             <IconAccount size="$4.5" color="$olive" />
           </Avatar.Fallback>
-        </Avatar>
+        </LinkableAvatar>
         <YStack>
           <H4>{profile?.name ?? `#${profile?.send_id}`}</H4>
           <ReferralLink p={0} />
