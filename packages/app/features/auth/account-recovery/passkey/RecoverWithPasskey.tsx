@@ -38,7 +38,15 @@ export default function RecoverWithPasskey(props: Props) {
   }
 
   return (
-    <Button onPress={onPress} width="50%" testID="account-recovery-passkey-btn">
+    <Button
+      onPress={onPress}
+      width="50%"
+      theme={'green_ghost'}
+      boc="$borderColor"
+      bw={1}
+      br="$4"
+      testID="account-recovery-passkey-btn"
+    >
       <ButtonText>PASSKEY</ButtonText>
     </Button>
   )

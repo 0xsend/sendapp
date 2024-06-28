@@ -53,7 +53,7 @@ export default function RecoverWithEOA(props: Props) {
 
   return (
     <OpenConnectModalWrapper width={'50%'}>
-      <Button onPress={isConnected ? onPress : null}>
+      <Button onPress={isConnected ? onPress : null} theme="green" br="$4">
         <ButtonText testID="account-recovery-eoa-btn">EOA</ButtonText>
       </Button>
     </OpenConnectModalWrapper>
