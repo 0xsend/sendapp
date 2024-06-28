@@ -1,4 +1,5 @@
 import * as solito from 'solito'
+import * as params from 'app/routers/params'
 import { describe, expect, it } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { act, render, screen, userEvent, waitFor } from '@testing-library/react-native'
@@ -6,8 +7,6 @@ import { act, render, screen, userEvent, waitFor } from '@testing-library/react-
 jest.mock('expo-router', () => ({
   usePathname: jest.fn().mockReturnValue('/send'),
 }))
-
-// const params = {}
 
 jest.mock('solito', () => {
   // console.log('mock solito')
@@ -56,10 +55,22 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
   }),
 }))
 
+jest.mock('app/routers/params', () => ({
+  useSendScreenParams: jest
+    .fn()
+    .mockReturnValue([
+      { idType: 'tag', recipient: 'test', amount: 'test', sendToken: 'test', note: 'test' },
+      jest.fn(),
+    ]),
+  useRootScreenParams: jest.fn().mockReturnValue([{ search: 'test' }, jest.fn()]),
+}))
+
 import { SendScreen } from './screen'
 import { usePathname } from 'expo-router'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 
+// @ts-expect-error mock
+usePathname.mockReturnValue('/send')
 describe('SendScreen', () => {
   it('should render with search when on /send and no recipient in params', async () => {
     jest.useFakeTimers()
@@ -77,7 +88,7 @@ describe('SendScreen', () => {
     expect(tree).toMatchSnapshot('render')
 
     expect(await screen.findByText('SEARCH BY')).toBeOnTheScreen()
-    expect(solito.createParam).toHaveBeenCalled()
+    expect(params.useRootScreenParams).toHaveBeenCalled()
 
     const searchBy = await screen.findByRole('search', { name: 'query' })
     const user = userEvent.setup()

@@ -2,7 +2,7 @@ import type { Enums } from '@my/supabase/database.types'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { createParam } from 'solito'
 
-export type RootParams = { nav?: 'home' | 'settings'; token?: string }
+export type RootParams = { nav?: 'home' | 'settings'; token?: string; search?: string }
 
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
 
@@ -18,15 +18,23 @@ const useToken = () => {
   return [token, setTokenParam] as const
 }
 
+const useSearch = () => {
+  const [search, setSearchParam] = useRootParam('search')
+
+  return [search, setSearchParam] as const
+}
+
 export const useRootScreenParams = () => {
   const { setParams } = useRootParams()
   const [nav] = useNav()
   const [token] = useToken()
+  const [search] = useSearch()
 
   return [
     {
       nav,
       token,
+      search,
     },
     setParams,
   ] as const
