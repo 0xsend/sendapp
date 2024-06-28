@@ -16,6 +16,8 @@ import { Provider } from 'app/provider'
 import { projectId, config as wagmiConfig } from 'app/provider/wagmi/config'
 import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { baseMainnetClient } from '@my/wagmi'
+import { YStack, H1, H2, SendLogo, SendLogoComplete } from '@my/ui'
+import { IconSendLogo } from 'app/components/icons'
 
 createWeb3Modal({
   wagmiConfig,
@@ -73,7 +75,11 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession}>
-          {getLayout(<Component {...pageProps} />)}
+          {process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true' ? (
+            <MaintenanceMode />
+          ) : (
+            getLayout(<Component {...pageProps} />)
+          )}
         </Provider>
       </NextThemeProvider>
     </>
@@ -81,3 +87,26 @@ function MyApp({
 }
 
 export default api.withTRPC(MyApp)
+
+function MaintenanceMode() {
+  return (
+    <YStack
+      ai="center"
+      jc="center"
+      w="100%"
+      h="100%"
+      $gtMd={{
+        ai: 'flex-start',
+        jc: 'flex-start',
+      }}
+    >
+      <IconSendLogo size={'$2.5'} color="$color12" />
+      <H1 $gtMd={{ size: '$8' }} fontWeight={'300'} color="$color12">
+        currently undergoing maintenance
+      </H1>
+      <H2 $gtMd={{ size: '$6' }} fontWeight={'300'} color="$color12">
+        We will be back shortly!
+      </H2>
+    </YStack>
+  )
+}
