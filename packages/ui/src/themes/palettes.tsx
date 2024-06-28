@@ -16,7 +16,7 @@ export const palettes = (() => {
     brandColors.white,
     brandColors.alabaster,
     brandColors.darkAlabaster,
-    brandColors.silverChalice,
+    brandColors.lightGrayTextField,
     brandColors.white,
     brandColors.white,
     brandColors.white,
