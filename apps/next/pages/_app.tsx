@@ -16,7 +16,7 @@ import { Provider } from 'app/provider'
 import { projectId, config as wagmiConfig } from 'app/provider/wagmi/config'
 import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { baseMainnetClient } from '@my/wagmi'
-import { YStack, H1, H2, SendLogo, SendLogoComplete } from '@my/ui'
+import { YStack, H1, H2 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 
 createWeb3Modal({
