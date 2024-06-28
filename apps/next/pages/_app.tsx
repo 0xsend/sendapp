@@ -91,20 +91,22 @@ export default api.withTRPC(MyApp)
 function MaintenanceMode() {
   return (
     <YStack
+      p="$4"
       ai="center"
       jc="center"
       w="100%"
       h="100%"
       $gtMd={{
+        p: '$6',
         ai: 'flex-start',
         jc: 'flex-start',
       }}
     >
       <IconSendLogo size={'$2.5'} color="$color12" />
-      <H1 $gtMd={{ size: '$8' }} fontWeight={'300'} color="$color12">
+      <H1 $gtMd={{ size: '$8' }} size="$4" fontWeight={'300'} color="$color12">
         currently undergoing maintenance
       </H1>
-      <H2 $gtMd={{ size: '$6' }} fontWeight={'300'} color="$color12">
+      <H2 $gtMd={{ size: '$6' }} size="$4" fontWeight={'300'} color="$color12">
         We will be back shortly!
       </H2>
     </YStack>
