@@ -104,6 +104,10 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
   const keySlot = sendAccount?.send_account_credentials?.find(
     (c) => c.webauthn_credentials?.raw_credential_id === webauthnCred.raw_credential_id
   )?.key_slot
+  const webauthnCreds =
+    sendAccount?.send_account_credentials
+      .filter((c) => !!c.webauthn_credentials && c.key_slot !== keySlot)
+      .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const router = useRouter()
   const form = useForm()
   const {
@@ -194,7 +198,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       assert(!!userOp, 'User op is required')
       const {
         receipt: { transactionHash },
-      } = await sendUserOp({ userOp })
+      } = await sendUserOp({ userOp, webauthnCreds })
       console.log('sent user op', transactionHash)
       toast.show('Success!')
       router.replace('/account/settings/backup')

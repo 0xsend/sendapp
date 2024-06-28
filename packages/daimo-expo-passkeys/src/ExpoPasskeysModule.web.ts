@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { base64 } from '@scure/base'
+import { base64, base64urlnopad } from '@scure/base'
 
 /**
  * Check if WebAuthn is available.
@@ -48,8 +48,8 @@ const ExpoPasskeysModuleWeb = {
         },
       ],
       authenticatorSelection: {
-        authenticatorAttachment: 'platform',
         userVerification: 'required',
+        requireResidentKey: true,
       },
     } as PublicKeyCredentialCreationOptions
 
@@ -68,9 +68,11 @@ const ExpoPasskeysModuleWeb = {
 
   async signWithPasskey(
     domain: string,
-    challengeBase64: string
+    challengeBase64: string,
+    rawIdsB64: string[]
   ): Promise<{
-    passkeyName: string
+    id: string
+    passkeyName: string | null
     signature: string
     rawAuthenticatorDataB64: string
     rawClientDataJSONB64: string
@@ -83,6 +85,11 @@ const ExpoPasskeysModuleWeb = {
     const publicKeyCredentialRequestOptions = {
       challenge,
       rpId: domain,
+      userVerification: 'required',
+      allowCredentials: rawIdsB64.map((rawIdB64) => ({
+        id: base64.decode(rawIdB64),
+        type: 'public-key',
+      })),
     } as PublicKeyCredentialRequestOptions
 
     const assertion = (await navigator.credentials.get({
@@ -98,9 +105,13 @@ const ExpoPasskeysModuleWeb = {
       new Uint8Array(assertion.response.authenticatorData)
     )
     const rawClientDataJSONB64 = base64.encode(new Uint8Array(assertion.response.clientDataJSON))
-    const passkeyName = decoder.decode(assertion.response.userHandle as ArrayBuffer)
+    const passkeyName = assertion.response.userHandle
+      ? decoder.decode(assertion.response.userHandle as ArrayBuffer)
+      : null
+    const id = base64.encode(base64urlnopad.decode(assertion.id))
 
     return {
+      id,
       passkeyName,
       signature,
       rawAuthenticatorDataB64,

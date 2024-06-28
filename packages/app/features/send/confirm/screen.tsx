@@ -65,6 +65,10 @@ export function SendConfirmScreen() {
 
 export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const { data: sendAccount } = useSendAccount()
+  const webauthnCreds =
+    sendAccount?.send_account_credentials
+      .filter((c) => !!c.webauthn_credentials)
+      .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const [sentTxHash, setSentTxHash] = useState<Hex>()
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType } = queryParams
@@ -134,6 +138,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
 
       const receipt = await sendUserOp({
         userOp,
+        webauthnCreds,
       })
       assert(receipt.success, 'Failed to send user op')
       setSentTxHash(receipt.receipt.transactionHash)

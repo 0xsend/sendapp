@@ -17,8 +17,10 @@ interface Props {
 
 export default function RecoverWithPasskey(props: Props) {
   const onPress = async () => {
+    const rawIdsB64: { id: string; userHandle: string }[] = [] // this user is anon so only resident keys are allowed
     const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
-      props.challengeData.challenge as `0x${string}`
+      props.challengeData.challenge as `0x${string}`,
+      rawIdsB64
     )
 
     // SendVerifier.verifySignature expects the first byte to be the passkey keySlot, followed by the signature

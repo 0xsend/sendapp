@@ -48,6 +48,10 @@ export function ConfirmButton({
   const media = useMedia()
   const { updateProfile } = useUser()
   const { data: sendAccount } = useSendAccount()
+  const webauthnCreds =
+    sendAccount?.send_account_credentials
+      .filter((c) => !!c.webauthn_credentials)
+      .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   //Connect
   const chainId = baseMainnetClient.chain.id
   const pendingTags = usePendingTags()
@@ -193,7 +197,7 @@ export function ConfirmButton({
     try {
       throwIf(userOpError)
       assert(!!userOp, 'User op is required')
-      await sendUserOp({ userOp })
+      await sendUserOp({ userOp, webauthnCreds })
     } catch (e) {
       setError(e.message.split('.').at(0))
     }
