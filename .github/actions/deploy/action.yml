@@ -27,6 +27,10 @@ inputs:
     description: "The URL to use for notifying QA of a new deployment."
     required: false
     default: ""
+  skip-supabase-deploy:
+    description: "Whether to skip the Supabase deployment."
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -36,13 +40,14 @@ runs:
         yarn-install: false
       env:
         YARN_ENABLE_HARDENED_MODE: "0"
-    # - name: Supabase Deploy
-    #   id: deploy
-    #   uses: ./.github/actions/supabase-deploy
-    #   with:
-    #     supabase-project-id: ${{ inputs.supabase-project-id }}
-    #     supabase-access-token: ${{ inputs.supabase-access-token }}
-    #     supabase-db-password: ${{ inputs.supabase-db-password }}
+    - name: Supabase Deploy
+      if: ${{ inputs.skip-supabase-deploy != 'true' }}
+      id: deploy
+      uses: ./.github/actions/supabase-deploy
+      with:
+        supabase-project-id: ${{ inputs.supabase-project-id }}
+        supabase-access-token: ${{ inputs.supabase-access-token }}
+        supabase-db-password: ${{ inputs.supabase-db-password }}
     - name: Extract Branch
       id: extract-branch
       uses: ./.github/actions/extract-branch
