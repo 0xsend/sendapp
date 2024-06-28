@@ -7,7 +7,31 @@ jest.mock('expo-router', () => ({
   usePathname: jest.fn().mockReturnValue('/send'),
 }))
 
-// const params = {}
+jest.mock('solito', () => {
+  // console.log('mock solito')
+  const mockCreateParam = jest.fn(() => {
+    // console.log('createParam in')
+    return {
+      useParam: jest.fn(() => {
+        // console.log('useParam')
+        return [
+          'test',
+          () => {
+            // console.log('called!')
+          },
+        ]
+      }),
+      useParams: jest.fn(() => {
+        // console.log('useParams')
+        return {
+          setParams: () => {
+            // console.log('setParams')
+          },
+        }
+      }),
+    }
+  })
+})
 
 jest.mock('solito', () => {
   // console.log('mock solito')
@@ -60,6 +84,8 @@ import { SendScreen } from './screen'
 import { usePathname } from 'expo-router'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 
+// @ts-expect-error mock
+usePathname.mockReturnValue('/send')
 describe('SendScreen', () => {
   it('should render with search when on /send and no recipient in params', async () => {
     jest.useFakeTimers()
