@@ -36,13 +36,13 @@ runs:
         yarn-install: false
       env:
         YARN_ENABLE_HARDENED_MODE: "0"
-    - name: Supabase Deploy
-      id: deploy
-      uses: ./.github/actions/supabase-deploy
-      with:
-        supabase-project-id: ${{ inputs.supabase-project-id }}
-        supabase-access-token: ${{ inputs.supabase-access-token }}
-        supabase-db-password: ${{ inputs.supabase-db-password }}
+    # - name: Supabase Deploy
+    #   id: deploy
+    #   uses: ./.github/actions/supabase-deploy
+    #   with:
+    #     supabase-project-id: ${{ inputs.supabase-project-id }}
+    #     supabase-access-token: ${{ inputs.supabase-access-token }}
+    #     supabase-db-password: ${{ inputs.supabase-db-password }}
     - name: Extract Branch
       id: extract-branch
       uses: ./.github/actions/extract-branch
