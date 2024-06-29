@@ -25,7 +25,8 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 
 export function HomeScreen() {
   const [queryParams, setParams] = useRootScreenParams()
-  const { totalBalance } = useSendAccountBalances()
+  const { totalBalance, balances } = useSendAccountBalances()
+  const usdcBalance = balances?.[0]?.result
 
   const selectedCoin = useCoinFromTokenParam()
   const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
@@ -82,7 +83,7 @@ export function HomeScreen() {
             </XStack>
             <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
               <DepositPopover />
-              {!!totalBalance && (
+              {!!totalBalance && usdcBalance && usdcBalance > 0n && (
                 <Stack f={1}>
                   <LinkButton href={'/send'} theme="green" br="$4" px={'$3.5'} h={'$4.5'} bw={1}>
                     <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
