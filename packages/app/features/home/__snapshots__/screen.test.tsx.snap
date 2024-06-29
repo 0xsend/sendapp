@@ -388,13 +388,13 @@ exports[`HomeScreen 1`] = `
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 1,
+                  "flex": 1,
                   "flexDirection": "row",
                   "flexWrap": "nowrap",
                   "height": 48,
                   "justifyContent": "center",
                   "paddingLeft": 16,
                   "paddingRight": 16,
-                  "width": "100%",
                 }
               }
             >
@@ -567,13 +567,6 @@ exports[`HomeScreen 1`] = `
                 </View>
               </View>
             </View>
-            <View
-              style={
-                {
-                  "flex": 1,
-                }
-              }
-            />
           </View>
         </View>
         <View
