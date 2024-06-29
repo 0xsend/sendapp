@@ -393,10 +393,12 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string>()
   const [ignoreError, setIgnoreError] = useState(false)
   const { open: openWeb3Modal } = useWeb3Modal()
+  // @ts-expect-error wagmi connector ensures this is there
+  const canCheckChainId = isWeb && window.ethereum
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: hack
   useEffect(() => {
-    if (isWeb) {
+    if (canCheckChainId) {
       // @ts-expect-error wagmi connector ensures this is there
       window.ethereum
         .request({ method: 'eth_chainId' })
@@ -405,7 +407,7 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
     }
   }, [chainId, openWeb3Modal])
 
-  if (!isWeb) return children // we don't need to do anything on non-web
+  if (!canCheckChainId) return children // we don't need to do anything on non-web or wallet connect somtimes does not add ethereum provider
 
   if (failsafeChainId === undefined) {
     return (
