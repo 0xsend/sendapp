@@ -327,6 +327,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
         >
           <View
+            accessibilityRole="link"
             href="/account/settings/edit-profile"
             testID="MockSolitoLink"
           >
@@ -351,7 +352,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 1,
-                  "color": "#40FB50",
+                  "color": "#111f22",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
@@ -530,6 +531,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
       >
         <View
+          accessibilityRole="link"
           href="/account/sendtag"
           testID="MockSolitoLink"
         >
@@ -549,7 +551,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 "borderTopLeftRadius": 9,
                 "borderTopRightRadius": 9,
                 "borderTopWidth": 1,
-                "color": "#081619",
+                "color": "#40FB50",
                 "fontFamily": "System",
                 "fontSize": 16.8,
                 "fontWeight": "400",
@@ -747,6 +749,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
       >
         <View
+          accessibilityRole="link"
           href="/account/rewards"
           testID="MockSolitoLink"
         >
@@ -766,7 +769,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 "borderTopLeftRadius": 9,
                 "borderTopRightRadius": 9,
                 "borderTopWidth": 1,
-                "color": "#081619",
+                "color": "#40FB50",
                 "fontFamily": "System",
                 "fontSize": 16.8,
                 "fontWeight": "400",
@@ -1109,6 +1112,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
       }
     >
       <View
+        accessibilityRole="link"
         href="/account/sendtag"
         testID="MockSolitoLink"
       >
@@ -1128,7 +1132,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               "borderTopLeftRadius": 9,
               "borderTopRightRadius": 9,
               "borderTopWidth": 1,
-              "color": "#081619",
+              "color": "#40FB50",
               "fontFamily": "System",
               "fontSize": 16.8,
               "fontWeight": "400",
@@ -1228,6 +1232,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         </Text>
       </View>
       <View
+        accessibilityRole="link"
         href="/account/rewards"
         testID="MockSolitoLink"
       >
@@ -1247,7 +1252,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               "borderTopLeftRadius": 9,
               "borderTopRightRadius": 9,
               "borderTopWidth": 1,
-              "color": "#081619",
+              "color": "#40FB50",
               "fontFamily": "System",
               "fontSize": 16.8,
               "fontWeight": "400",
