@@ -86,7 +86,7 @@ const ContinueButton = ({ nextScreen }: { nextScreen: () => void }) => (
   <Stack w="100%" jc="center" py="$5" gap="$2">
     <Button
       variant="outlined"
-      theme={'green_ghost'}
+      theme={'green_ghost_dim'}
       hoverStyle={{ boc: '$borderColor' }}
       bw={1}
       br="$5"
@@ -103,7 +103,7 @@ const SignInButtons = ({ nextScreen }: { nextScreen: () => void }) => (
       <Button f={1} br="$5" onPress={nextScreen}>
         <ButtonText>LOGIN</ButtonText>
       </Button>
-      <Button variant="outlined" theme="ghost" bw={1} f={1} br="$5" onPress={nextScreen}>
+      <Button variant="outlined" theme="ghost_dim" bw={1} f={1} br="$5" onPress={nextScreen}>
         <ButtonText>SIGN UP</ButtonText>
       </Button>
     </Theme>

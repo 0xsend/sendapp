@@ -1308,9 +1308,13 @@ export const dark_green_Input = n122
 export const dark_green_Surface = n122
 export const dark_green_alt1_ListItem = n122
 export const dark_green_alt2_TooltipContent = n122
-const n123 = t([[13, 23],[14, 24],[15, 23],[16, 24],[17, 10],[18, 61],[19, 5],[20, 23],[21, 48],[22, 23],[23, 61],[24, 23],[25, 24],[26, 24],[27, 24],[28, 24]])
+const n123 = t([[13, 23],[14, 24],[15, 23],[16, 24],[17, 10],[18, 61],[19, 48],[20, 23],[21, 48],[22, 23],[23, 61],[24, 23],[25, 24],[26, 24],[27, 24],[28, 24]])
 
 export const dark_green_Button = n123
+export const dark_green_alt2_SliderTrackActive = n123
+export const dark_green_active_SliderThumb = n123
+export const dark_green_active_Tooltip = n123
+export const dark_green_active_ProgressIndicator = n123
 const n124 = t([[13, 24],[14, 48],[15, 24],[16, 48],[17, 23],[19, 0],[20, 23],[21, 0],[22, 23],[24, 24],[25, 23],[26, 23],[27, 23],[28, 23]])
 
 export const dark_green_Checkbox = n124
@@ -1524,9 +1528,13 @@ export const dark_yellow_ghost_dim_SliderTrackActive = n158
 const n159 = t([[13, 6],[14, 6],[15, 37],[16, 38],[17, 39],[18, 6],[19, 37],[20, 0],[21, 37],[22, 0],[23, 6],[24, 38],[25, 44],[26, 44],[27, 44],[28, 19]])
 
 export const dark_yellow_ghost_TextArea = n159
-const n160 = t([[13, 61],[14, 61],[15, 23],[16, 24],[17, 10],[18, 61],[19, 5],[20, 23],[21, 23],[22, 23],[23, 61],[24, 23],[25, 24],[26, 24],[27, 24],[28, 24]])
+const n160 = t([[13, 61],[14, 61],[15, 23],[16, 24],[17, 10],[18, 61],[19, 23],[20, 23],[21, 23],[22, 23],[23, 61],[24, 23],[25, 24],[26, 24],[27, 24],[28, 24]])
 
 export const dark_green_ghost_Button = n160
+export const dark_green_ghost_alt2_SliderTrackActive = n160
+export const dark_green_ghost_active_SliderThumb = n160
+export const dark_green_ghost_active_Tooltip = n160
+export const dark_green_ghost_active_ProgressIndicator = n160
 const n161 = t([[13, 61],[14, 61],[15, 0],[16, 0],[17, 0],[18, 61],[19, 0],[20, 5],[21, 0],[22, 5],[23, 61],[24, 0],[25, 10],[26, 10],[27, 10],[28, 10]])
 
 export const dark_green_ghost_SwitchThumb = n161
@@ -2056,9 +2064,10 @@ export const dark_yellow_dim_TextArea = n268
 const n269 = t([[13, 40],[14, 40],[15, 40],[16, 40],[17, 41],[19, 45],[20, 45],[21, 45],[22, 45],[24, 40],[25, 45],[26, 45],[27, 45],[28, 45]])
 
 export const dark_yellow_dim_Separator = n269
-const n270 = t([[13, 24],[14, 10],[15, 24],[16, 10],[17, 5],[19, 47],[20, 5],[21, 23],[22, 5],[24, 24],[25, 47],[26, 47],[27, 47],[28, 47]])
+const n270 = t([[13, 24],[14, 10],[15, 24],[16, 10],[17, 5],[19, 23],[20, 5],[21, 23],[22, 5],[24, 24],[25, 47],[26, 47],[27, 47],[28, 47]])
 
 export const dark_green_alt1_Button = n270
+export const dark_green_active_SliderTrackActive = n270
 const n271 = t([[13, 5],[14, 47],[15, 5],[16, 47],[17, 24],[19, 0],[20, 0],[21, 0],[22, 0],[24, 5],[25, 10],[26, 10],[27, 10],[28, 10]])
 
 export const dark_green_alt1_TooltipContent = n271
@@ -2083,779 +2092,762 @@ export const dark_green_active_Progress = n274
 export const dark_green_active_TooltipArrow = n274
 export const dark_green_active_Input = n274
 export const dark_green_active_Surface = n274
-const n275 = t([[13, 10],[14, 5],[15, 10],[16, 5],[17, 5],[19, 24],[20, 5],[21, 5],[22, 5],[24, 10],[25, 5],[26, 5],[27, 5],[28, 5]])
+const n275 = t([[13, 10],[14, 5],[15, 10],[16, 5],[17, 5],[19, 5],[20, 5],[21, 5],[22, 5],[24, 10],[25, 5],[26, 5],[27, 5],[28, 5]])
 
 export const dark_green_alt2_Button = n275
-const n276 = t([[13, 23],[14, 24],[15, 23],[16, 24],[17, 10],[19, 48],[20, 23],[21, 48],[22, 23],[24, 23],[25, 24],[26, 24],[27, 24],[28, 24]])
-
-export const dark_green_alt2_SliderTrackActive = n276
-export const dark_green_active_SliderThumb = n276
-export const dark_green_active_Tooltip = n276
-export const dark_green_active_ProgressIndicator = n276
-const n277 = t([[13, 24],[14, 48],[15, 24],[16, 48],[17, 23],[19, 0],[20, 23],[21, 0],[22, 23],[24, 48],[25, 0],[26, 0],[27, 0],[28, 23]])
-
-export const dark_green_alt2_TextArea = n277
-const n278 = t([[13, 5],[14, 5],[15, 5],[16, 5],[17, 10],[19, 10],[20, 5],[21, 10],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_alt2_Separator = n278
-export const dark_green_active_Checkbox = n278
-export const dark_green_active_Switch = n278
-export const dark_green_active_SliderTrack = n278
-const n279 = t([[13, 5],[14, 5],[15, 5],[16, 5],[17, 23],[19, 48],[20, 10],[21, 5],[22, 10],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_green_active_Button = n279
-const n280 = t([[13, 24],[14, 10],[15, 24],[16, 10],[17, 5],[19, 23],[20, 5],[21, 23],[22, 5],[24, 24],[25, 47],[26, 47],[27, 47],[28, 47]])
-
-export const dark_green_active_SliderTrackActive = n280
-const n281 = t([[13, 48],[14, 23],[15, 48],[16, 23],[17, 5],[19, 23],[20, 24],[21, 23],[22, 24],[24, 23],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_active_TextArea = n281
-const n282 = t([[13, 5],[14, 10],[15, 5],[16, 10],[17, 24],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_active_Separator = n282
-const n283 = t([[13, 47],[14, 47],[15, 47],[16, 47],[17, 24],[19, 0],[20, 0],[21, 0],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 10]])
-
-export const dark_green_dim_Card = n283
-export const dark_green_dim_DrawerFrame = n283
-export const dark_green_dim_Progress = n283
-export const dark_green_dim_TooltipArrow = n283
-export const dark_green_dim_Input = n283
-export const dark_green_dim_Surface = n283
-const n284 = t([[13, 23],[14, 23],[15, 23],[16, 23],[17, 24],[19, 5],[20, 48],[21, 48],[22, 48],[24, 23],[25, 48],[26, 48],[27, 48],[28, 48]])
-
-export const dark_green_dim_Button = n284
-const n285 = t([[13, 24],[14, 24],[15, 24],[16, 24],[17, 48],[19, 0],[20, 0],[21, 0],[22, 0],[24, 24],[25, 24],[26, 24],[27, 24],[28, 24]])
-
-export const dark_green_dim_Checkbox = n285
-export const dark_green_dim_Switch = n285
-export const dark_green_dim_SliderTrack = n285
-const n286 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 5],[20, 5],[21, 5],[22, 5],[24, 0],[25, 24],[26, 24],[27, 24],[28, 24]])
-
-export const dark_green_dim_SwitchThumb = n286
-const n287 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 47],[20, 47],[21, 47],[22, 47],[24, 0],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_green_dim_SliderTrackActive = n287
-const n288 = t([[13, 5],[14, 5],[15, 5],[16, 5],[17, 47],[19, 0],[20, 0],[21, 0],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 5]])
-
-export const dark_green_dim_TextArea = n288
-const n289 = t([[13, 48],[14, 48],[15, 48],[16, 48],[17, 23],[19, 23],[20, 23],[21, 23],[22, 23],[24, 48],[25, 23],[26, 23],[27, 23],[28, 23]])
-
-export const dark_green_dim_Separator = n289
-const n290 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 49],[20, 49],[21, 49],[22, 49],[24, 0],[25, 55],[26, 55],[27, 55],[28, 55]])
-
-export const dark_red_alt1_SwitchThumb = n290
-export const dark_red_dim_SliderThumb = n290
-export const dark_red_dim_Tooltip = n290
-export const dark_red_dim_ProgressIndicator = n290
-const n291 = t([[13, 49],[14, 50],[15, 49],[16, 50],[17, 51],[19, 0],[20, 0],[21, 0],[22, 0],[24, 49],[25, 33],[26, 33],[27, 33],[28, 33]])
-
-export const dark_red_alt1_TooltipContent = n291
-const n292 = t([[13, 58],[14, 57],[15, 58],[16, 57],[17, 56],[19, 51],[20, 52],[21, 51],[22, 52],[24, 58],[25, 52],[26, 52],[27, 52],[28, 52]])
-
-export const dark_red_alt1_SliderTrackActive = n292
-export const dark_red_alt2_SliderThumb = n292
-export const dark_red_alt2_Tooltip = n292
-export const dark_red_alt2_ProgressIndicator = n292
-const n293 = t([[13, 50],[14, 51],[15, 50],[16, 51],[17, 52],[19, 0],[20, 58],[21, 0],[22, 58],[24, 51],[25, 57],[26, 57],[27, 57],[28, 56]])
-
-export const dark_red_alt1_TextArea = n293
-const n294 = t([[13, 53],[14, 54],[15, 53],[16, 54],[17, 55],[19, 56],[20, 33],[21, 56],[22, 33],[24, 53],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_red_alt1_Separator = n294
-export const dark_red_alt2_Checkbox = n294
-export const dark_red_alt2_Switch = n294
-export const dark_red_alt2_SliderTrack = n294
-export const dark_red_active_Card = n294
-export const dark_red_active_Button = n294
-export const dark_red_active_DrawerFrame = n294
-export const dark_red_active_Progress = n294
-export const dark_red_active_TooltipArrow = n294
-export const dark_red_active_Input = n294
-export const dark_red_active_Surface = n294
-const n295 = t([[13, 57],[14, 56],[15, 57],[16, 56],[17, 33],[19, 52],[20, 53],[21, 52],[22, 53],[24, 57],[25, 51],[26, 51],[27, 51],[28, 51]])
-
-export const dark_red_alt2_SliderTrackActive = n295
-export const dark_red_active_SliderThumb = n295
-export const dark_red_active_Tooltip = n295
-export const dark_red_active_ProgressIndicator = n295
-const n296 = t([[13, 51],[14, 52],[15, 51],[16, 52],[17, 53],[19, 58],[20, 57],[21, 58],[22, 57],[24, 52],[25, 58],[26, 58],[27, 58],[28, 57]])
-
-export const dark_red_alt2_TextArea = n296
-const n297 = t([[13, 54],[14, 55],[15, 54],[16, 55],[17, 33],[19, 33],[20, 55],[21, 33],[22, 55],[24, 54],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_red_alt2_Separator = n297
-export const dark_red_active_Checkbox = n297
-export const dark_red_active_Switch = n297
-export const dark_red_active_SliderTrack = n297
-const n298 = t([[13, 56],[14, 33],[15, 56],[16, 33],[17, 55],[19, 53],[20, 54],[21, 53],[22, 54],[24, 56],[25, 50],[26, 50],[27, 50],[28, 50]])
-
-export const dark_red_active_SliderTrackActive = n298
-const n299 = t([[13, 52],[14, 53],[15, 52],[16, 53],[17, 54],[19, 57],[20, 56],[21, 57],[22, 56],[24, 53],[25, 0],[26, 0],[27, 0],[28, 58]])
-
-export const dark_red_active_TextArea = n299
-const n300 = t([[13, 55],[14, 33],[15, 55],[16, 33],[17, 56],[19, 55],[20, 54],[21, 55],[22, 54],[24, 55],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_red_active_Separator = n300
-const n301 = t([[13, 50],[14, 50],[15, 50],[16, 50],[17, 51],[19, 0],[20, 0],[21, 0],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 33]])
-
-export const dark_red_dim_Card = n301
-export const dark_red_dim_Button = n301
-export const dark_red_dim_DrawerFrame = n301
-export const dark_red_dim_Progress = n301
-export const dark_red_dim_TooltipArrow = n301
-export const dark_red_dim_Input = n301
-export const dark_red_dim_Surface = n301
-const n302 = t([[13, 51],[14, 51],[15, 51],[16, 51],[17, 52],[19, 58],[20, 58],[21, 58],[22, 58],[24, 51],[25, 56],[26, 56],[27, 56],[28, 56]])
-
-export const dark_red_dim_Checkbox = n302
-export const dark_red_dim_Switch = n302
-export const dark_red_dim_SliderTrack = n302
-const n303 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 49],[20, 49],[21, 49],[22, 49],[24, 0],[25, 56],[26, 56],[27, 56],[28, 56]])
-
-export const dark_red_dim_SwitchThumb = n303
-const n304 = t([[13, 49],[14, 49],[15, 49],[16, 49],[17, 49],[19, 0],[20, 0],[21, 0],[22, 0],[24, 49],[25, 54],[26, 54],[27, 54],[28, 54]])
-
-export const dark_red_dim_TooltipContent = n304
-const n305 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 58],[19, 50],[20, 50],[21, 50],[22, 50],[24, 0],[25, 54],[26, 54],[27, 54],[28, 54]])
-
-export const dark_red_dim_SliderTrackActive = n305
-const n306 = t([[13, 49],[14, 49],[15, 49],[16, 49],[17, 50],[19, 0],[20, 0],[21, 0],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 55]])
-
-export const dark_red_dim_TextArea = n306
-const n307 = t([[13, 52],[14, 52],[15, 52],[16, 52],[17, 53],[19, 57],[20, 57],[21, 57],[22, 57],[24, 52],[25, 57],[26, 57],[27, 57],[28, 57]])
-
-export const dark_red_dim_Separator = n307
-const n308 = t([[15, 0],[16, 1],[17, 2],[19, 0],[20, 5],[21, 0],[22, 5],[24, 0],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const light_ghost_alt1_ListItem = n308
-export const light_ghost_alt1_TooltipContent = n308
-const n309 = t([[15, 4],[16, 2],[17, 0],[19, 4],[20, 3],[21, 4],[22, 3],[24, 4],[25, 3],[26, 3],[27, 3],[28, 3]])
-
-export const light_ghost_alt1_SliderTrackActive = n309
-export const light_ghost_alt2_SliderThumb = n309
-export const light_ghost_alt2_Tooltip = n309
-export const light_ghost_alt2_ProgressIndicator = n309
-const n310 = t([[15, 0],[16, 1],[17, 2],[19, 0],[20, 5],[21, 0],[22, 5],[24, 2],[25, 2],[26, 2],[27, 2],[28, 0]])
-
-export const light_ghost_alt1_TextArea = n310
-const n311 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 0],[21, 0],[22, 0],[24, 0],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const light_ghost_alt1_Separator = n311
-export const light_ghost_alt2_Checkbox = n311
-export const light_ghost_alt2_Switch = n311
-export const light_ghost_alt2_SliderTrack = n311
-export const light_ghost_alt2_Separator = n311
-export const light_ghost_active_Card = n311
-export const light_ghost_active_Button = n311
-export const light_ghost_active_Checkbox = n311
-export const light_ghost_active_Switch = n311
-export const light_ghost_active_DrawerFrame = n311
-export const light_ghost_active_Progress = n311
-export const light_ghost_active_TooltipArrow = n311
-export const light_ghost_active_SliderTrack = n311
-export const light_ghost_active_Input = n311
-export const light_ghost_active_Separator = n311
-export const light_ghost_active_Surface = n311
-const n312 = t([[15, 2],[16, 0],[17, 0],[19, 2],[20, 0],[21, 2],[22, 0],[24, 2],[25, 2],[26, 2],[27, 2],[28, 2]])
-
-export const light_ghost_alt2_SliderTrackActive = n312
-export const light_ghost_active_SliderThumb = n312
-export const light_ghost_active_Tooltip = n312
-export const light_ghost_active_ProgressIndicator = n312
-const n313 = t([[15, 1],[16, 2],[17, 3],[19, 1],[20, 4],[21, 1],[22, 4],[24, 3],[25, 4],[26, 4],[27, 4],[28, 0]])
-
-export const light_ghost_alt2_TextArea = n313
-const n314 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 0],[21, 0],[22, 0],[24, 0],[25, 1],[26, 1],[27, 1],[28, 1]])
-
-export const light_ghost_active_SliderTrackActive = n314
-const n315 = t([[15, 2],[16, 3],[17, 0],[19, 2],[20, 2],[21, 2],[22, 2],[24, 0],[25, 5],[26, 5],[27, 5],[28, 2]])
-
-export const light_ghost_active_TextArea = n315
-const n316 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 5],[21, 0],[22, 5],[24, 0],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const light_ghost_dim_ListItem = n316
-export const light_ghost_dim_TooltipContent = n316
-const n317 = t([[15, 1],[16, 1],[17, 2],[19, 1],[20, 5],[21, 1],[22, 5],[24, 1],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const light_ghost_dim_Card = n317
-export const light_ghost_dim_Button = n317
-export const light_ghost_dim_DrawerFrame = n317
-export const light_ghost_dim_Progress = n317
-export const light_ghost_dim_TooltipArrow = n317
-export const light_ghost_dim_Input = n317
-export const light_ghost_dim_Surface = n317
-const n318 = t([[15, 2],[16, 2],[17, 3],[19, 2],[20, 4],[21, 2],[22, 4],[24, 2],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const light_ghost_dim_Checkbox = n318
-export const light_ghost_dim_Switch = n318
-export const light_ghost_dim_SliderTrack = n318
-const n319 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 5],[21, 0],[22, 5],[24, 1],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const light_ghost_dim_TextArea = n319
-const n320 = t([[15, 3],[16, 3],[17, 0],[19, 3],[20, 2],[21, 3],[22, 2],[24, 3],[25, 2],[26, 2],[27, 2],[28, 2]])
-
-export const light_ghost_dim_Separator = n320
-const n321 = t([[15, 5],[16, 9],[17, 10],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_ghost_alt1_TooltipContent = n321
-const n322 = t([[15, 3],[16, 4],[17, 5],[19, 3],[20, 11],[21, 3],[22, 11],[24, 3],[25, 11],[26, 11],[27, 11],[28, 11]])
-
-export const dark_ghost_alt1_SliderTrackActive = n322
-export const dark_ghost_alt2_SliderThumb = n322
-export const dark_ghost_alt2_Tooltip = n322
-export const dark_ghost_alt2_ProgressIndicator = n322
-const n323 = t([[15, 9],[16, 10],[17, 11],[19, 9],[20, 3],[21, 9],[22, 3],[24, 10],[25, 4],[26, 4],[27, 4],[28, 5]])
-
-export const dark_ghost_alt1_TextArea = n323
-const n324 = t([[15, 4],[16, 5],[17, 5],[19, 4],[20, 5],[21, 4],[22, 5],[24, 4],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_ghost_alt1_Separator = n324
-export const dark_ghost_alt2_Checkbox = n324
-export const dark_ghost_alt2_Switch = n324
-export const dark_ghost_alt2_SliderTrack = n324
-export const dark_ghost_active_Card = n324
-export const dark_ghost_active_Button = n324
-export const dark_ghost_active_DrawerFrame = n324
-export const dark_ghost_active_Progress = n324
-export const dark_ghost_active_TooltipArrow = n324
-export const dark_ghost_active_Input = n324
-export const dark_ghost_active_Surface = n324
-const n325 = t([[15, 4],[16, 5],[17, 5],[19, 4],[20, 4],[21, 4],[22, 4],[24, 4],[25, 10],[26, 10],[27, 10],[28, 10]])
-
-export const dark_ghost_alt2_SliderTrackActive = n325
-export const dark_ghost_active_SliderThumb = n325
-export const dark_ghost_active_Tooltip = n325
-export const dark_ghost_active_ProgressIndicator = n325
-const n326 = t([[15, 10],[16, 11],[17, 4],[19, 10],[20, 4],[21, 10],[22, 4],[24, 11],[25, 3],[26, 3],[27, 3],[28, 4]])
-
-export const dark_ghost_alt2_TextArea = n326
-const n327 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_ghost_alt2_Separator = n327
-export const dark_ghost_active_Checkbox = n327
-export const dark_ghost_active_Switch = n327
-export const dark_ghost_active_SliderTrack = n327
-export const dark_ghost_active_Separator = n327
-const n328 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 9],[26, 9],[27, 9],[28, 9]])
-
-export const dark_ghost_active_SliderTrackActive = n328
-const n329 = t([[15, 11],[16, 4],[17, 5],[19, 11],[20, 5],[21, 11],[22, 5],[24, 4],[25, 0],[26, 0],[27, 0],[28, 3]])
-
-export const dark_ghost_active_TextArea = n329
-const n330 = t([[15, 9],[16, 9],[17, 10],[19, 9],[20, 0],[21, 9],[22, 0],[24, 9],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_ghost_dim_Card = n330
-export const dark_ghost_dim_Button = n330
-export const dark_ghost_dim_DrawerFrame = n330
-export const dark_ghost_dim_Progress = n330
-export const dark_ghost_dim_TooltipArrow = n330
-export const dark_ghost_dim_Input = n330
-export const dark_ghost_dim_Surface = n330
-const n331 = t([[15, 10],[16, 10],[17, 11],[19, 10],[20, 3],[21, 10],[22, 3],[24, 10],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_ghost_dim_Checkbox = n331
-export const dark_ghost_dim_Switch = n331
-export const dark_ghost_dim_SliderTrack = n331
-const n332 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_ghost_dim_TooltipContent = n332
-export const dark_green_ghost_dim_TooltipContent = n332
-const n333 = t([[15, 5],[16, 5],[17, 9],[19, 5],[20, 0],[21, 5],[22, 0],[24, 9],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_ghost_dim_TextArea = n333
-const n334 = t([[15, 11],[16, 11],[17, 4],[19, 11],[20, 4],[21, 11],[22, 4],[24, 11],[25, 4],[26, 4],[27, 4],[28, 4]])
-
-export const dark_ghost_dim_Separator = n334
-const n335 = t([[15, 12],[16, 13],[17, 14],[19, 16],[20, 5],[21, 12],[22, 5],[24, 16],[25, 17],[26, 16],[27, 16],[28, 19]])
-
-export const light_yellow_ghost_alt1_ListItem = n335
-export const light_yellow_ghost_alt1_TooltipContent = n335
-const n336 = t([[15, 5],[16, 5],[17, 5],[19, 21],[20, 12],[21, 5],[22, 12],[24, 21],[25, 20],[26, 21],[27, 21],[28, 18]])
-
-export const light_yellow_ghost_alt1_SwitchThumb = n336
-export const light_yellow_ghost_dim_SliderThumb = n336
-export const light_yellow_ghost_dim_Tooltip = n336
-export const light_yellow_ghost_dim_ProgressIndicator = n336
-const n337 = t([[15, 22],[16, 21],[17, 20],[19, 18],[20, 15],[21, 22],[22, 15],[24, 18],[25, 17],[26, 18],[27, 18],[28, 15]])
-
-export const light_yellow_ghost_alt1_SliderTrackActive = n337
-export const light_yellow_ghost_alt2_SliderThumb = n337
-export const light_yellow_ghost_alt2_Tooltip = n337
-export const light_yellow_ghost_alt2_ProgressIndicator = n337
-const n338 = t([[15, 12],[16, 13],[17, 14],[19, 16],[20, 5],[21, 12],[22, 5],[24, 18],[25, 19],[26, 18],[27, 18],[28, 19]])
-
-export const light_yellow_ghost_alt1_TextArea = n338
-const n339 = t([[15, 16],[16, 17],[17, 18],[19, 20],[20, 19],[21, 16],[22, 19],[24, 20],[25, 21],[26, 20],[27, 20],[28, 5]])
-
-export const light_yellow_ghost_alt1_Separator = n339
-export const light_yellow_ghost_alt2_Checkbox = n339
-export const light_yellow_ghost_alt2_Switch = n339
-export const light_yellow_ghost_alt2_SliderTrack = n339
-export const light_yellow_ghost_active_Card = n339
-export const light_yellow_ghost_active_Button = n339
-export const light_yellow_ghost_active_DrawerFrame = n339
-export const light_yellow_ghost_active_Progress = n339
-export const light_yellow_ghost_active_TooltipArrow = n339
-export const light_yellow_ghost_active_Input = n339
-export const light_yellow_ghost_active_Surface = n339
-const n340 = t([[15, 21],[16, 20],[17, 19],[19, 17],[20, 16],[21, 21],[22, 16],[24, 17],[25, 16],[26, 17],[27, 17],[28, 14]])
-
-export const light_yellow_ghost_alt2_SliderTrackActive = n340
-export const light_yellow_ghost_active_SliderThumb = n340
-export const light_yellow_ghost_active_Tooltip = n340
-export const light_yellow_ghost_active_ProgressIndicator = n340
-const n341 = t([[15, 13],[16, 14],[17, 15],[19, 17],[20, 22],[21, 13],[22, 22],[24, 19],[25, 20],[26, 19],[27, 19],[28, 20]])
-
-export const light_yellow_ghost_alt2_TextArea = n341
-const n342 = t([[15, 17],[16, 18],[17, 19],[19, 21],[20, 18],[21, 17],[22, 18],[24, 21],[25, 22],[26, 21],[27, 21],[28, 5]])
-
-export const light_yellow_ghost_alt2_Separator = n342
-export const light_yellow_ghost_active_Checkbox = n342
-export const light_yellow_ghost_active_Switch = n342
-export const light_yellow_ghost_active_SliderTrack = n342
-const n343 = t([[15, 20],[16, 19],[17, 18],[19, 16],[20, 17],[21, 20],[22, 17],[24, 16],[25, 15],[26, 16],[27, 16],[28, 13]])
-
-export const light_yellow_ghost_active_SliderTrackActive = n343
-const n344 = t([[15, 14],[16, 15],[17, 16],[19, 18],[20, 21],[21, 14],[22, 21],[24, 20],[25, 21],[26, 20],[27, 20],[28, 21]])
-
-export const light_yellow_ghost_active_TextArea = n344
-const n345 = t([[15, 18],[16, 19],[17, 20],[19, 22],[20, 17],[21, 18],[22, 17],[24, 22],[25, 5],[26, 22],[27, 22],[28, 5]])
-
-export const light_yellow_ghost_active_Separator = n345
-const n346 = t([[15, 12],[16, 12],[17, 12],[19, 14],[20, 5],[21, 12],[22, 5],[24, 14],[25, 15],[26, 14],[27, 14],[28, 17]])
-
-export const light_yellow_ghost_dim_ListItem = n346
-export const light_yellow_ghost_dim_TooltipContent = n346
-const n347 = t([[15, 13],[16, 13],[17, 14],[19, 16],[20, 5],[21, 13],[22, 5],[24, 16],[25, 17],[26, 16],[27, 16],[28, 19]])
-
-export const light_yellow_ghost_dim_Card = n347
-export const light_yellow_ghost_dim_Button = n347
-export const light_yellow_ghost_dim_DrawerFrame = n347
-export const light_yellow_ghost_dim_Progress = n347
-export const light_yellow_ghost_dim_TooltipArrow = n347
-export const light_yellow_ghost_dim_Input = n347
-export const light_yellow_ghost_dim_Surface = n347
-const n348 = t([[15, 14],[16, 14],[17, 15],[19, 17],[20, 22],[21, 14],[22, 22],[24, 17],[25, 18],[26, 17],[27, 17],[28, 20]])
-
-export const light_yellow_ghost_dim_Checkbox = n348
-export const light_yellow_ghost_dim_Switch = n348
-export const light_yellow_ghost_dim_SliderTrack = n348
-const n349 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 12],[21, 5],[22, 12],[24, 5],[25, 22],[26, 5],[27, 5],[28, 20]])
-
-export const light_yellow_ghost_dim_SwitchThumb = n349
-const n350 = t([[15, 12],[16, 12],[17, 12],[19, 14],[20, 5],[21, 12],[22, 5],[24, 16],[25, 17],[26, 16],[27, 16],[28, 17]])
-
-export const light_yellow_ghost_dim_TextArea = n350
-const n351 = t([[15, 15],[16, 15],[17, 16],[19, 18],[20, 21],[21, 15],[22, 21],[24, 18],[25, 19],[26, 18],[27, 18],[28, 21]])
-
-export const light_yellow_ghost_dim_Separator = n351
-const n352 = t([[15, 0],[16, 23],[17, 24],[19, 23],[20, 5],[21, 0],[22, 5],[24, 23],[25, 0],[26, 23],[27, 23],[28, 23]])
-
-export const light_green_ghost_alt1_ListItem = n352
-export const light_green_ghost_alt1_TooltipContent = n352
-const n353 = t([[15, 5],[16, 5],[17, 5],[19, 25],[20, 0],[21, 5],[22, 0],[24, 25],[25, 24],[26, 25],[27, 25],[28, 0]])
-
-export const light_green_ghost_alt1_SwitchThumb = n353
-export const light_green_ghost_dim_SliderThumb = n353
-export const light_green_ghost_dim_Tooltip = n353
-export const light_green_ghost_dim_ProgressIndicator = n353
-const n354 = t([[15, 5],[16, 25],[17, 24],[19, 0],[20, 25],[21, 5],[22, 25],[24, 0],[25, 0],[26, 0],[27, 0],[28, 25]])
-
-export const light_green_ghost_alt1_SliderTrackActive = n354
-export const light_green_ghost_alt2_SliderThumb = n354
-export const light_green_ghost_alt2_Tooltip = n354
-export const light_green_ghost_alt2_ProgressIndicator = n354
-const n355 = t([[15, 0],[16, 23],[17, 24],[19, 23],[20, 5],[21, 0],[22, 5],[24, 0],[25, 23],[26, 0],[27, 0],[28, 23]])
-
-export const light_green_ghost_alt1_TextArea = n355
-const n356 = t([[15, 23],[16, 0],[17, 0],[19, 24],[20, 23],[21, 23],[22, 23],[24, 24],[25, 25],[26, 24],[27, 24],[28, 5]])
-
-export const light_green_ghost_alt1_Separator = n356
-export const light_green_ghost_alt2_Checkbox = n356
-export const light_green_ghost_alt2_Switch = n356
-export const light_green_ghost_alt2_SliderTrack = n356
-export const light_green_ghost_active_Card = n356
-export const light_green_ghost_active_Button = n356
-export const light_green_ghost_active_DrawerFrame = n356
-export const light_green_ghost_active_Progress = n356
-export const light_green_ghost_active_TooltipArrow = n356
-export const light_green_ghost_active_Input = n356
-export const light_green_ghost_active_Surface = n356
-const n357 = t([[15, 25],[16, 24],[17, 23],[19, 0],[20, 23],[21, 25],[22, 23],[24, 0],[25, 23],[26, 0],[27, 0],[28, 24]])
-
-export const light_green_ghost_alt2_SliderTrackActive = n357
-export const light_green_ghost_active_SliderThumb = n357
-export const light_green_ghost_active_Tooltip = n357
-export const light_green_ghost_active_ProgressIndicator = n357
-const n358 = t([[15, 23],[16, 24],[17, 25],[19, 0],[20, 5],[21, 23],[22, 5],[24, 23],[25, 24],[26, 23],[27, 23],[28, 24]])
-
-export const light_green_ghost_alt2_TextArea = n358
-const n359 = t([[15, 0],[16, 0],[17, 23],[19, 25],[20, 0],[21, 0],[22, 0],[24, 25],[25, 5],[26, 25],[27, 25],[28, 5]])
-
-export const light_green_ghost_alt2_Separator = n359
-export const light_green_ghost_active_Checkbox = n359
-export const light_green_ghost_active_Switch = n359
-export const light_green_ghost_active_SliderTrack = n359
-const n360 = t([[15, 24],[16, 23],[17, 0],[19, 23],[20, 0],[21, 24],[22, 0],[24, 23],[25, 25],[26, 23],[27, 23],[28, 23]])
-
-export const light_green_ghost_active_SliderTrackActive = n360
-const n361 = t([[15, 24],[16, 25],[17, 23],[19, 0],[20, 25],[21, 24],[22, 25],[24, 24],[25, 25],[26, 24],[27, 24],[28, 25]])
-
-export const light_green_ghost_active_TextArea = n361
-const n362 = t([[15, 0],[16, 23],[17, 24],[19, 5],[20, 0],[21, 0],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const light_green_ghost_active_Separator = n362
-const n363 = t([[15, 0],[16, 0],[17, 0],[19, 24],[20, 5],[21, 0],[22, 5],[24, 24],[25, 25],[26, 24],[27, 24],[28, 0]])
-
-export const light_green_ghost_dim_ListItem = n363
-export const light_green_ghost_dim_TooltipContent = n363
-const n364 = t([[15, 23],[16, 23],[17, 24],[19, 23],[20, 5],[21, 23],[22, 5],[24, 23],[25, 0],[26, 23],[27, 23],[28, 23]])
-
-export const light_green_ghost_dim_Card = n364
-export const light_green_ghost_dim_Button = n364
-export const light_green_ghost_dim_DrawerFrame = n364
-export const light_green_ghost_dim_Progress = n364
-export const light_green_ghost_dim_TooltipArrow = n364
-export const light_green_ghost_dim_Input = n364
-export const light_green_ghost_dim_Surface = n364
-const n365 = t([[15, 24],[16, 24],[17, 25],[19, 0],[20, 5],[21, 24],[22, 5],[24, 0],[25, 0],[26, 0],[27, 0],[28, 24]])
-
-export const light_green_ghost_dim_Checkbox = n365
-export const light_green_ghost_dim_Switch = n365
-export const light_green_ghost_dim_SliderTrack = n365
-const n366 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 24]])
-
-export const light_green_ghost_dim_SwitchThumb = n366
-const n367 = t([[15, 0],[16, 0],[17, 0],[19, 24],[20, 5],[21, 0],[22, 5],[24, 23],[25, 0],[26, 23],[27, 23],[28, 0]])
-
-export const light_green_ghost_dim_TextArea = n367
-const n368 = t([[15, 25],[16, 25],[17, 23],[19, 0],[20, 25],[21, 25],[22, 25],[24, 0],[25, 23],[26, 0],[27, 0],[28, 25]])
-
-export const light_green_ghost_dim_Separator = n368
-const n369 = t([[15, 26],[16, 27],[17, 28],[19, 30],[20, 5],[21, 26],[22, 5],[24, 30],[25, 31],[26, 30],[27, 30],[28, 33]])
-
-export const light_red_ghost_alt1_ListItem = n369
-export const light_red_ghost_alt1_TooltipContent = n369
-const n370 = t([[15, 5],[16, 5],[17, 5],[19, 35],[20, 26],[21, 5],[22, 26],[24, 35],[25, 34],[26, 35],[27, 35],[28, 32]])
-
-export const light_red_ghost_alt1_SwitchThumb = n370
-export const light_red_ghost_dim_SliderThumb = n370
-export const light_red_ghost_dim_Tooltip = n370
-export const light_red_ghost_dim_ProgressIndicator = n370
-const n371 = t([[15, 36],[16, 35],[17, 34],[19, 32],[20, 29],[21, 36],[22, 29],[24, 32],[25, 31],[26, 32],[27, 32],[28, 29]])
-
-export const light_red_ghost_alt1_SliderTrackActive = n371
-export const light_red_ghost_alt2_SliderThumb = n371
-export const light_red_ghost_alt2_Tooltip = n371
-export const light_red_ghost_alt2_ProgressIndicator = n371
-const n372 = t([[15, 26],[16, 27],[17, 28],[19, 30],[20, 5],[21, 26],[22, 5],[24, 32],[25, 33],[26, 32],[27, 32],[28, 33]])
-
-export const light_red_ghost_alt1_TextArea = n372
-const n373 = t([[15, 30],[16, 31],[17, 32],[19, 34],[20, 33],[21, 30],[22, 33],[24, 34],[25, 35],[26, 34],[27, 34],[28, 5]])
-
-export const light_red_ghost_alt1_Separator = n373
-export const light_red_ghost_alt2_Checkbox = n373
-export const light_red_ghost_alt2_Switch = n373
-export const light_red_ghost_alt2_SliderTrack = n373
-export const light_red_ghost_active_Card = n373
-export const light_red_ghost_active_Button = n373
-export const light_red_ghost_active_DrawerFrame = n373
-export const light_red_ghost_active_Progress = n373
-export const light_red_ghost_active_TooltipArrow = n373
-export const light_red_ghost_active_Input = n373
-export const light_red_ghost_active_Surface = n373
-const n374 = t([[15, 35],[16, 34],[17, 33],[19, 31],[20, 30],[21, 35],[22, 30],[24, 31],[25, 30],[26, 31],[27, 31],[28, 28]])
-
-export const light_red_ghost_alt2_SliderTrackActive = n374
-export const light_red_ghost_active_SliderThumb = n374
-export const light_red_ghost_active_Tooltip = n374
-export const light_red_ghost_active_ProgressIndicator = n374
-const n375 = t([[15, 27],[16, 28],[17, 29],[19, 31],[20, 36],[21, 27],[22, 36],[24, 33],[25, 34],[26, 33],[27, 33],[28, 34]])
-
-export const light_red_ghost_alt2_TextArea = n375
-const n376 = t([[15, 31],[16, 32],[17, 33],[19, 35],[20, 32],[21, 31],[22, 32],[24, 35],[25, 36],[26, 35],[27, 35],[28, 5]])
-
-export const light_red_ghost_alt2_Separator = n376
-export const light_red_ghost_active_Checkbox = n376
-export const light_red_ghost_active_Switch = n376
-export const light_red_ghost_active_SliderTrack = n376
-const n377 = t([[15, 34],[16, 33],[17, 32],[19, 30],[20, 31],[21, 34],[22, 31],[24, 30],[25, 29],[26, 30],[27, 30],[28, 27]])
-
-export const light_red_ghost_active_SliderTrackActive = n377
-const n378 = t([[15, 28],[16, 29],[17, 30],[19, 32],[20, 35],[21, 28],[22, 35],[24, 34],[25, 35],[26, 34],[27, 34],[28, 35]])
-
-export const light_red_ghost_active_TextArea = n378
-const n379 = t([[15, 32],[16, 33],[17, 34],[19, 36],[20, 31],[21, 32],[22, 31],[24, 36],[25, 5],[26, 36],[27, 36],[28, 5]])
-
-export const light_red_ghost_active_Separator = n379
-const n380 = t([[15, 26],[16, 26],[17, 26],[19, 28],[20, 5],[21, 26],[22, 5],[24, 28],[25, 29],[26, 28],[27, 28],[28, 31]])
-
-export const light_red_ghost_dim_ListItem = n380
-export const light_red_ghost_dim_TooltipContent = n380
-const n381 = t([[15, 27],[16, 27],[17, 28],[19, 30],[20, 5],[21, 27],[22, 5],[24, 30],[25, 31],[26, 30],[27, 30],[28, 33]])
-
-export const light_red_ghost_dim_Card = n381
-export const light_red_ghost_dim_Button = n381
-export const light_red_ghost_dim_DrawerFrame = n381
-export const light_red_ghost_dim_Progress = n381
-export const light_red_ghost_dim_TooltipArrow = n381
-export const light_red_ghost_dim_Input = n381
-export const light_red_ghost_dim_Surface = n381
-const n382 = t([[15, 28],[16, 28],[17, 29],[19, 31],[20, 36],[21, 28],[22, 36],[24, 31],[25, 32],[26, 31],[27, 31],[28, 34]])
-
-export const light_red_ghost_dim_Checkbox = n382
-export const light_red_ghost_dim_Switch = n382
-export const light_red_ghost_dim_SliderTrack = n382
-const n383 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 26],[21, 5],[22, 26],[24, 5],[25, 36],[26, 5],[27, 5],[28, 34]])
-
-export const light_red_ghost_dim_SwitchThumb = n383
-const n384 = t([[15, 26],[16, 26],[17, 26],[19, 28],[20, 5],[21, 26],[22, 5],[24, 30],[25, 31],[26, 30],[27, 30],[28, 31]])
-
-export const light_red_ghost_dim_TextArea = n384
-const n385 = t([[15, 29],[16, 29],[17, 30],[19, 32],[20, 35],[21, 29],[22, 35],[24, 32],[25, 33],[26, 32],[27, 32],[28, 35]])
-
-export const light_red_ghost_dim_Separator = n385
-const n386 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 37],[21, 0],[22, 37],[24, 0],[25, 43],[26, 43],[27, 43],[28, 43]])
-
-export const dark_yellow_ghost_alt1_SwitchThumb = n386
-export const dark_yellow_ghost_dim_SliderThumb = n386
-export const dark_yellow_ghost_dim_Tooltip = n386
-export const dark_yellow_ghost_dim_ProgressIndicator = n386
-const n387 = t([[15, 37],[16, 38],[17, 39],[19, 37],[20, 0],[21, 37],[22, 0],[24, 37],[25, 19],[26, 19],[27, 19],[28, 19]])
-
-export const dark_yellow_ghost_alt1_TooltipContent = n387
-const n388 = t([[15, 46],[16, 45],[17, 44],[19, 46],[20, 40],[21, 46],[22, 40],[24, 46],[25, 40],[26, 40],[27, 40],[28, 40]])
-
-export const dark_yellow_ghost_alt1_SliderTrackActive = n388
-export const dark_yellow_ghost_alt2_SliderThumb = n388
-export const dark_yellow_ghost_alt2_Tooltip = n388
-export const dark_yellow_ghost_alt2_ProgressIndicator = n388
-const n389 = t([[15, 38],[16, 39],[17, 40],[19, 38],[20, 46],[21, 38],[22, 46],[24, 39],[25, 45],[26, 45],[27, 45],[28, 44]])
-
-export const dark_yellow_ghost_alt1_TextArea = n389
-const n390 = t([[15, 41],[16, 42],[17, 43],[19, 41],[20, 19],[21, 41],[22, 19],[24, 41],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_yellow_ghost_alt1_Separator = n390
-export const dark_yellow_ghost_alt2_Checkbox = n390
-export const dark_yellow_ghost_alt2_Switch = n390
-export const dark_yellow_ghost_alt2_SliderTrack = n390
-export const dark_yellow_ghost_active_Card = n390
-export const dark_yellow_ghost_active_Button = n390
-export const dark_yellow_ghost_active_DrawerFrame = n390
-export const dark_yellow_ghost_active_Progress = n390
-export const dark_yellow_ghost_active_TooltipArrow = n390
-export const dark_yellow_ghost_active_Input = n390
-export const dark_yellow_ghost_active_Surface = n390
-const n391 = t([[15, 45],[16, 44],[17, 19],[19, 45],[20, 41],[21, 45],[22, 41],[24, 45],[25, 39],[26, 39],[27, 39],[28, 39]])
-
-export const dark_yellow_ghost_alt2_SliderTrackActive = n391
-export const dark_yellow_ghost_active_SliderThumb = n391
-export const dark_yellow_ghost_active_Tooltip = n391
-export const dark_yellow_ghost_active_ProgressIndicator = n391
-const n392 = t([[15, 39],[16, 40],[17, 41],[19, 39],[20, 45],[21, 39],[22, 45],[24, 40],[25, 46],[26, 46],[27, 46],[28, 45]])
-
-export const dark_yellow_ghost_alt2_TextArea = n392
-const n393 = t([[15, 42],[16, 43],[17, 19],[19, 42],[20, 43],[21, 42],[22, 43],[24, 42],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_yellow_ghost_alt2_Separator = n393
-export const dark_yellow_ghost_active_Checkbox = n393
-export const dark_yellow_ghost_active_Switch = n393
-export const dark_yellow_ghost_active_SliderTrack = n393
-const n394 = t([[15, 44],[16, 19],[17, 43],[19, 44],[20, 42],[21, 44],[22, 42],[24, 44],[25, 38],[26, 38],[27, 38],[28, 38]])
-
-export const dark_yellow_ghost_active_SliderTrackActive = n394
-const n395 = t([[15, 40],[16, 41],[17, 42],[19, 40],[20, 44],[21, 40],[22, 44],[24, 41],[25, 0],[26, 0],[27, 0],[28, 46]])
-
-export const dark_yellow_ghost_active_TextArea = n395
-const n396 = t([[15, 43],[16, 19],[17, 44],[19, 43],[20, 42],[21, 43],[22, 42],[24, 43],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_yellow_ghost_active_Separator = n396
-const n397 = t([[15, 38],[16, 38],[17, 39],[19, 38],[20, 0],[21, 38],[22, 0],[24, 38],[25, 19],[26, 19],[27, 19],[28, 19]])
-
-export const dark_yellow_ghost_dim_Card = n397
-export const dark_yellow_ghost_dim_Button = n397
-export const dark_yellow_ghost_dim_DrawerFrame = n397
-export const dark_yellow_ghost_dim_Progress = n397
-export const dark_yellow_ghost_dim_TooltipArrow = n397
-export const dark_yellow_ghost_dim_Input = n397
-export const dark_yellow_ghost_dim_Surface = n397
-const n398 = t([[15, 39],[16, 39],[17, 40],[19, 39],[20, 46],[21, 39],[22, 46],[24, 39],[25, 44],[26, 44],[27, 44],[28, 44]])
-
-export const dark_yellow_ghost_dim_Checkbox = n398
-export const dark_yellow_ghost_dim_Switch = n398
-export const dark_yellow_ghost_dim_SliderTrack = n398
-const n399 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 37],[21, 0],[22, 37],[24, 0],[25, 44],[26, 44],[27, 44],[28, 44]])
-
-export const dark_yellow_ghost_dim_SwitchThumb = n399
-const n400 = t([[15, 37],[16, 37],[17, 37],[19, 37],[20, 0],[21, 37],[22, 0],[24, 37],[25, 42],[26, 42],[27, 42],[28, 42]])
-
-export const dark_yellow_ghost_dim_TooltipContent = n400
-const n401 = t([[15, 37],[16, 37],[17, 38],[19, 37],[20, 0],[21, 37],[22, 0],[24, 38],[25, 19],[26, 19],[27, 19],[28, 43]])
-
-export const dark_yellow_ghost_dim_TextArea = n401
-const n402 = t([[15, 40],[16, 40],[17, 41],[19, 40],[20, 45],[21, 40],[22, 45],[24, 40],[25, 45],[26, 45],[27, 45],[28, 45]])
-
-export const dark_yellow_ghost_dim_Separator = n402
-const n403 = t([[15, 24],[16, 10],[17, 5],[19, 0],[20, 5],[21, 24],[22, 5],[24, 24],[25, 47],[26, 47],[27, 47],[28, 47]])
-
-export const dark_green_ghost_alt1_Button = n403
-const n404 = t([[15, 5],[16, 47],[17, 24],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 10],[26, 10],[27, 10],[28, 10]])
-
-export const dark_green_ghost_alt1_TooltipContent = n404
-const n405 = t([[15, 0],[16, 23],[17, 24],[19, 0],[20, 48],[21, 0],[22, 48],[24, 0],[25, 48],[26, 48],[27, 48],[28, 48]])
-
-export const dark_green_ghost_alt1_SliderTrackActive = n405
-export const dark_green_ghost_alt2_SliderThumb = n405
-export const dark_green_ghost_alt2_Tooltip = n405
-export const dark_green_ghost_alt2_ProgressIndicator = n405
-const n406 = t([[15, 47],[16, 24],[17, 48],[19, 47],[20, 0],[21, 47],[22, 0],[24, 24],[25, 23],[26, 23],[27, 23],[28, 24]])
-
-export const dark_green_ghost_alt1_TextArea = n406
-const n407 = t([[15, 23],[16, 5],[17, 5],[19, 23],[20, 10],[21, 23],[22, 10],[24, 23],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_ghost_alt1_Separator = n407
-export const dark_green_ghost_alt2_Checkbox = n407
-export const dark_green_ghost_alt2_Switch = n407
-export const dark_green_ghost_alt2_SliderTrack = n407
-export const dark_green_ghost_active_Card = n407
-export const dark_green_ghost_active_DrawerFrame = n407
-export const dark_green_ghost_active_Progress = n407
-export const dark_green_ghost_active_TooltipArrow = n407
-export const dark_green_ghost_active_Input = n407
-export const dark_green_ghost_active_Surface = n407
-const n408 = t([[15, 10],[16, 5],[17, 5],[19, 0],[20, 5],[21, 10],[22, 5],[24, 10],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_green_ghost_alt2_Button = n408
-const n409 = t([[15, 23],[16, 24],[17, 10],[19, 23],[20, 23],[21, 23],[22, 23],[24, 23],[25, 24],[26, 24],[27, 24],[28, 24]])
-
-export const dark_green_ghost_alt2_SliderTrackActive = n409
-export const dark_green_ghost_active_SliderThumb = n409
-export const dark_green_ghost_active_Tooltip = n409
-export const dark_green_ghost_active_ProgressIndicator = n409
-const n410 = t([[15, 24],[16, 48],[17, 23],[19, 24],[20, 23],[21, 24],[22, 23],[24, 48],[25, 0],[26, 0],[27, 0],[28, 23]])
-
-export const dark_green_ghost_alt2_TextArea = n410
-const n411 = t([[15, 5],[16, 5],[17, 10],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_ghost_alt2_Separator = n411
-export const dark_green_ghost_active_Checkbox = n411
-export const dark_green_ghost_active_Switch = n411
-export const dark_green_ghost_active_SliderTrack = n411
-const n412 = t([[15, 5],[16, 5],[17, 23],[19, 23],[20, 10],[21, 5],[22, 10],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
-
-export const dark_green_ghost_active_Button = n412
-const n413 = t([[15, 24],[16, 10],[17, 5],[19, 24],[20, 5],[21, 24],[22, 5],[24, 24],[25, 47],[26, 47],[27, 47],[28, 47]])
-
-export const dark_green_ghost_active_SliderTrackActive = n413
-const n414 = t([[15, 48],[16, 23],[17, 5],[19, 48],[20, 24],[21, 48],[22, 24],[24, 23],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_ghost_active_TextArea = n414
-const n415 = t([[15, 5],[16, 10],[17, 24],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_green_ghost_active_Separator = n415
-const n416 = t([[15, 47],[16, 47],[17, 24],[19, 47],[20, 0],[21, 47],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 10]])
-
-export const dark_green_ghost_dim_Card = n416
-export const dark_green_ghost_dim_DrawerFrame = n416
-export const dark_green_ghost_dim_Progress = n416
-export const dark_green_ghost_dim_TooltipArrow = n416
-export const dark_green_ghost_dim_Input = n416
-export const dark_green_ghost_dim_Surface = n416
-const n417 = t([[15, 23],[16, 23],[17, 24],[19, 5],[20, 48],[21, 23],[22, 48],[24, 23],[25, 48],[26, 48],[27, 48],[28, 48]])
-
-export const dark_green_ghost_dim_Button = n417
-const n418 = t([[15, 24],[16, 24],[17, 48],[19, 24],[20, 0],[21, 24],[22, 0],[24, 24],[25, 24],[26, 24],[27, 24],[28, 24]])
-
-export const dark_green_ghost_dim_Checkbox = n418
-export const dark_green_ghost_dim_Switch = n418
-export const dark_green_ghost_dim_SliderTrack = n418
-const n419 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 5],[21, 0],[22, 5],[24, 0],[25, 24],[26, 24],[27, 24],[28, 24]])
-
-export const dark_green_ghost_dim_SwitchThumb = n419
-const n420 = t([[15, 5],[16, 5],[17, 47],[19, 5],[20, 0],[21, 5],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 5]])
-
-export const dark_green_ghost_dim_TextArea = n420
-const n421 = t([[15, 48],[16, 48],[17, 23],[19, 48],[20, 23],[21, 48],[22, 23],[24, 48],[25, 23],[26, 23],[27, 23],[28, 23]])
-
-export const dark_green_ghost_dim_Separator = n421
-const n422 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 49],[21, 0],[22, 49],[24, 0],[25, 55],[26, 55],[27, 55],[28, 55]])
-
-export const dark_red_ghost_alt1_SwitchThumb = n422
-export const dark_red_ghost_dim_SliderThumb = n422
-export const dark_red_ghost_dim_Tooltip = n422
-export const dark_red_ghost_dim_ProgressIndicator = n422
-const n423 = t([[15, 49],[16, 50],[17, 51],[19, 49],[20, 0],[21, 49],[22, 0],[24, 49],[25, 33],[26, 33],[27, 33],[28, 33]])
-
-export const dark_red_ghost_alt1_TooltipContent = n423
-const n424 = t([[15, 58],[16, 57],[17, 56],[19, 58],[20, 52],[21, 58],[22, 52],[24, 58],[25, 52],[26, 52],[27, 52],[28, 52]])
-
-export const dark_red_ghost_alt1_SliderTrackActive = n424
-export const dark_red_ghost_alt2_SliderThumb = n424
-export const dark_red_ghost_alt2_Tooltip = n424
-export const dark_red_ghost_alt2_ProgressIndicator = n424
-const n425 = t([[15, 50],[16, 51],[17, 52],[19, 50],[20, 58],[21, 50],[22, 58],[24, 51],[25, 57],[26, 57],[27, 57],[28, 56]])
-
-export const dark_red_ghost_alt1_TextArea = n425
-const n426 = t([[15, 53],[16, 54],[17, 55],[19, 53],[20, 33],[21, 53],[22, 33],[24, 53],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_red_ghost_alt1_Separator = n426
-export const dark_red_ghost_alt2_Checkbox = n426
-export const dark_red_ghost_alt2_Switch = n426
-export const dark_red_ghost_alt2_SliderTrack = n426
-export const dark_red_ghost_active_Card = n426
-export const dark_red_ghost_active_Button = n426
-export const dark_red_ghost_active_DrawerFrame = n426
-export const dark_red_ghost_active_Progress = n426
-export const dark_red_ghost_active_TooltipArrow = n426
-export const dark_red_ghost_active_Input = n426
-export const dark_red_ghost_active_Surface = n426
-const n427 = t([[15, 57],[16, 56],[17, 33],[19, 57],[20, 53],[21, 57],[22, 53],[24, 57],[25, 51],[26, 51],[27, 51],[28, 51]])
-
-export const dark_red_ghost_alt2_SliderTrackActive = n427
-export const dark_red_ghost_active_SliderThumb = n427
-export const dark_red_ghost_active_Tooltip = n427
-export const dark_red_ghost_active_ProgressIndicator = n427
-const n428 = t([[15, 51],[16, 52],[17, 53],[19, 51],[20, 57],[21, 51],[22, 57],[24, 52],[25, 58],[26, 58],[27, 58],[28, 57]])
-
-export const dark_red_ghost_alt2_TextArea = n428
-const n429 = t([[15, 54],[16, 55],[17, 33],[19, 54],[20, 55],[21, 54],[22, 55],[24, 54],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_red_ghost_alt2_Separator = n429
-export const dark_red_ghost_active_Checkbox = n429
-export const dark_red_ghost_active_Switch = n429
-export const dark_red_ghost_active_SliderTrack = n429
-const n430 = t([[15, 56],[16, 33],[17, 55],[19, 56],[20, 54],[21, 56],[22, 54],[24, 56],[25, 50],[26, 50],[27, 50],[28, 50]])
-
-export const dark_red_ghost_active_SliderTrackActive = n430
-const n431 = t([[15, 52],[16, 53],[17, 54],[19, 52],[20, 56],[21, 52],[22, 56],[24, 53],[25, 0],[26, 0],[27, 0],[28, 58]])
-
-export const dark_red_ghost_active_TextArea = n431
-const n432 = t([[15, 55],[16, 33],[17, 56],[19, 55],[20, 54],[21, 55],[22, 54],[24, 55],[25, 0],[26, 0],[27, 0],[28, 0]])
-
-export const dark_red_ghost_active_Separator = n432
-const n433 = t([[15, 50],[16, 50],[17, 51],[19, 50],[20, 0],[21, 50],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 33]])
-
-export const dark_red_ghost_dim_Card = n433
-export const dark_red_ghost_dim_Button = n433
-export const dark_red_ghost_dim_DrawerFrame = n433
-export const dark_red_ghost_dim_Progress = n433
-export const dark_red_ghost_dim_TooltipArrow = n433
-export const dark_red_ghost_dim_Input = n433
-export const dark_red_ghost_dim_Surface = n433
-const n434 = t([[15, 51],[16, 51],[17, 52],[19, 51],[20, 58],[21, 51],[22, 58],[24, 51],[25, 56],[26, 56],[27, 56],[28, 56]])
-
-export const dark_red_ghost_dim_Checkbox = n434
-export const dark_red_ghost_dim_Switch = n434
-export const dark_red_ghost_dim_SliderTrack = n434
-const n435 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 49],[21, 0],[22, 49],[24, 0],[25, 56],[26, 56],[27, 56],[28, 56]])
-
-export const dark_red_ghost_dim_SwitchThumb = n435
-const n436 = t([[15, 49],[16, 49],[17, 49],[19, 49],[20, 0],[21, 49],[22, 0],[24, 49],[25, 54],[26, 54],[27, 54],[28, 54]])
-
-export const dark_red_ghost_dim_TooltipContent = n436
-const n437 = t([[15, 49],[16, 49],[17, 50],[19, 49],[20, 0],[21, 49],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 55]])
-
-export const dark_red_ghost_dim_TextArea = n437
-const n438 = t([[15, 52],[16, 52],[17, 53],[19, 52],[20, 57],[21, 52],[22, 57],[24, 52],[25, 57],[26, 57],[27, 57],[28, 57]])
-
-export const dark_red_ghost_dim_Separator = n438
+const n276 = t([[13, 24],[14, 48],[15, 24],[16, 48],[17, 23],[19, 0],[20, 23],[21, 0],[22, 23],[24, 48],[25, 0],[26, 0],[27, 0],[28, 23]])
+
+export const dark_green_alt2_TextArea = n276
+const n277 = t([[13, 5],[14, 5],[15, 5],[16, 5],[17, 10],[19, 10],[20, 5],[21, 10],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_alt2_Separator = n277
+export const dark_green_active_Checkbox = n277
+export const dark_green_active_Switch = n277
+export const dark_green_active_SliderTrack = n277
+const n278 = t([[13, 5],[14, 5],[15, 5],[16, 5],[17, 23],[19, 5],[20, 10],[21, 5],[22, 10],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_green_active_Button = n278
+const n279 = t([[13, 48],[14, 23],[15, 48],[16, 23],[17, 5],[19, 23],[20, 24],[21, 23],[22, 24],[24, 23],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_active_TextArea = n279
+const n280 = t([[13, 5],[14, 10],[15, 5],[16, 10],[17, 24],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_active_Separator = n280
+const n281 = t([[13, 47],[14, 47],[15, 47],[16, 47],[17, 24],[19, 0],[20, 0],[21, 0],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 10]])
+
+export const dark_green_dim_Card = n281
+export const dark_green_dim_DrawerFrame = n281
+export const dark_green_dim_Progress = n281
+export const dark_green_dim_TooltipArrow = n281
+export const dark_green_dim_Input = n281
+export const dark_green_dim_Surface = n281
+const n282 = t([[13, 23],[14, 23],[15, 23],[16, 23],[17, 24],[19, 48],[20, 48],[21, 48],[22, 48],[24, 23],[25, 48],[26, 48],[27, 48],[28, 48]])
+
+export const dark_green_dim_Button = n282
+const n283 = t([[13, 24],[14, 24],[15, 24],[16, 24],[17, 48],[19, 0],[20, 0],[21, 0],[22, 0],[24, 24],[25, 24],[26, 24],[27, 24],[28, 24]])
+
+export const dark_green_dim_Checkbox = n283
+export const dark_green_dim_Switch = n283
+export const dark_green_dim_SliderTrack = n283
+const n284 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 5],[20, 5],[21, 5],[22, 5],[24, 0],[25, 24],[26, 24],[27, 24],[28, 24]])
+
+export const dark_green_dim_SwitchThumb = n284
+const n285 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 47],[20, 47],[21, 47],[22, 47],[24, 0],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_green_dim_SliderTrackActive = n285
+const n286 = t([[13, 5],[14, 5],[15, 5],[16, 5],[17, 47],[19, 0],[20, 0],[21, 0],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 5]])
+
+export const dark_green_dim_TextArea = n286
+const n287 = t([[13, 48],[14, 48],[15, 48],[16, 48],[17, 23],[19, 23],[20, 23],[21, 23],[22, 23],[24, 48],[25, 23],[26, 23],[27, 23],[28, 23]])
+
+export const dark_green_dim_Separator = n287
+const n288 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 49],[20, 49],[21, 49],[22, 49],[24, 0],[25, 55],[26, 55],[27, 55],[28, 55]])
+
+export const dark_red_alt1_SwitchThumb = n288
+export const dark_red_dim_SliderThumb = n288
+export const dark_red_dim_Tooltip = n288
+export const dark_red_dim_ProgressIndicator = n288
+const n289 = t([[13, 49],[14, 50],[15, 49],[16, 50],[17, 51],[19, 0],[20, 0],[21, 0],[22, 0],[24, 49],[25, 33],[26, 33],[27, 33],[28, 33]])
+
+export const dark_red_alt1_TooltipContent = n289
+const n290 = t([[13, 58],[14, 57],[15, 58],[16, 57],[17, 56],[19, 51],[20, 52],[21, 51],[22, 52],[24, 58],[25, 52],[26, 52],[27, 52],[28, 52]])
+
+export const dark_red_alt1_SliderTrackActive = n290
+export const dark_red_alt2_SliderThumb = n290
+export const dark_red_alt2_Tooltip = n290
+export const dark_red_alt2_ProgressIndicator = n290
+const n291 = t([[13, 50],[14, 51],[15, 50],[16, 51],[17, 52],[19, 0],[20, 58],[21, 0],[22, 58],[24, 51],[25, 57],[26, 57],[27, 57],[28, 56]])
+
+export const dark_red_alt1_TextArea = n291
+const n292 = t([[13, 53],[14, 54],[15, 53],[16, 54],[17, 55],[19, 56],[20, 33],[21, 56],[22, 33],[24, 53],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_red_alt1_Separator = n292
+export const dark_red_alt2_Checkbox = n292
+export const dark_red_alt2_Switch = n292
+export const dark_red_alt2_SliderTrack = n292
+export const dark_red_active_Card = n292
+export const dark_red_active_Button = n292
+export const dark_red_active_DrawerFrame = n292
+export const dark_red_active_Progress = n292
+export const dark_red_active_TooltipArrow = n292
+export const dark_red_active_Input = n292
+export const dark_red_active_Surface = n292
+const n293 = t([[13, 57],[14, 56],[15, 57],[16, 56],[17, 33],[19, 52],[20, 53],[21, 52],[22, 53],[24, 57],[25, 51],[26, 51],[27, 51],[28, 51]])
+
+export const dark_red_alt2_SliderTrackActive = n293
+export const dark_red_active_SliderThumb = n293
+export const dark_red_active_Tooltip = n293
+export const dark_red_active_ProgressIndicator = n293
+const n294 = t([[13, 51],[14, 52],[15, 51],[16, 52],[17, 53],[19, 58],[20, 57],[21, 58],[22, 57],[24, 52],[25, 58],[26, 58],[27, 58],[28, 57]])
+
+export const dark_red_alt2_TextArea = n294
+const n295 = t([[13, 54],[14, 55],[15, 54],[16, 55],[17, 33],[19, 33],[20, 55],[21, 33],[22, 55],[24, 54],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_red_alt2_Separator = n295
+export const dark_red_active_Checkbox = n295
+export const dark_red_active_Switch = n295
+export const dark_red_active_SliderTrack = n295
+const n296 = t([[13, 56],[14, 33],[15, 56],[16, 33],[17, 55],[19, 53],[20, 54],[21, 53],[22, 54],[24, 56],[25, 50],[26, 50],[27, 50],[28, 50]])
+
+export const dark_red_active_SliderTrackActive = n296
+const n297 = t([[13, 52],[14, 53],[15, 52],[16, 53],[17, 54],[19, 57],[20, 56],[21, 57],[22, 56],[24, 53],[25, 0],[26, 0],[27, 0],[28, 58]])
+
+export const dark_red_active_TextArea = n297
+const n298 = t([[13, 55],[14, 33],[15, 55],[16, 33],[17, 56],[19, 55],[20, 54],[21, 55],[22, 54],[24, 55],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_red_active_Separator = n298
+const n299 = t([[13, 50],[14, 50],[15, 50],[16, 50],[17, 51],[19, 0],[20, 0],[21, 0],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 33]])
+
+export const dark_red_dim_Card = n299
+export const dark_red_dim_Button = n299
+export const dark_red_dim_DrawerFrame = n299
+export const dark_red_dim_Progress = n299
+export const dark_red_dim_TooltipArrow = n299
+export const dark_red_dim_Input = n299
+export const dark_red_dim_Surface = n299
+const n300 = t([[13, 51],[14, 51],[15, 51],[16, 51],[17, 52],[19, 58],[20, 58],[21, 58],[22, 58],[24, 51],[25, 56],[26, 56],[27, 56],[28, 56]])
+
+export const dark_red_dim_Checkbox = n300
+export const dark_red_dim_Switch = n300
+export const dark_red_dim_SliderTrack = n300
+const n301 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 0],[19, 49],[20, 49],[21, 49],[22, 49],[24, 0],[25, 56],[26, 56],[27, 56],[28, 56]])
+
+export const dark_red_dim_SwitchThumb = n301
+const n302 = t([[13, 49],[14, 49],[15, 49],[16, 49],[17, 49],[19, 0],[20, 0],[21, 0],[22, 0],[24, 49],[25, 54],[26, 54],[27, 54],[28, 54]])
+
+export const dark_red_dim_TooltipContent = n302
+const n303 = t([[13, 0],[14, 0],[15, 0],[16, 0],[17, 58],[19, 50],[20, 50],[21, 50],[22, 50],[24, 0],[25, 54],[26, 54],[27, 54],[28, 54]])
+
+export const dark_red_dim_SliderTrackActive = n303
+const n304 = t([[13, 49],[14, 49],[15, 49],[16, 49],[17, 50],[19, 0],[20, 0],[21, 0],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 55]])
+
+export const dark_red_dim_TextArea = n304
+const n305 = t([[13, 52],[14, 52],[15, 52],[16, 52],[17, 53],[19, 57],[20, 57],[21, 57],[22, 57],[24, 52],[25, 57],[26, 57],[27, 57],[28, 57]])
+
+export const dark_red_dim_Separator = n305
+const n306 = t([[15, 0],[16, 1],[17, 2],[19, 0],[20, 5],[21, 0],[22, 5],[24, 0],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const light_ghost_alt1_ListItem = n306
+export const light_ghost_alt1_TooltipContent = n306
+const n307 = t([[15, 4],[16, 2],[17, 0],[19, 4],[20, 3],[21, 4],[22, 3],[24, 4],[25, 3],[26, 3],[27, 3],[28, 3]])
+
+export const light_ghost_alt1_SliderTrackActive = n307
+export const light_ghost_alt2_SliderThumb = n307
+export const light_ghost_alt2_Tooltip = n307
+export const light_ghost_alt2_ProgressIndicator = n307
+const n308 = t([[15, 0],[16, 1],[17, 2],[19, 0],[20, 5],[21, 0],[22, 5],[24, 2],[25, 2],[26, 2],[27, 2],[28, 0]])
+
+export const light_ghost_alt1_TextArea = n308
+const n309 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 0],[21, 0],[22, 0],[24, 0],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const light_ghost_alt1_Separator = n309
+export const light_ghost_alt2_Checkbox = n309
+export const light_ghost_alt2_Switch = n309
+export const light_ghost_alt2_SliderTrack = n309
+export const light_ghost_alt2_Separator = n309
+export const light_ghost_active_Card = n309
+export const light_ghost_active_Button = n309
+export const light_ghost_active_Checkbox = n309
+export const light_ghost_active_Switch = n309
+export const light_ghost_active_DrawerFrame = n309
+export const light_ghost_active_Progress = n309
+export const light_ghost_active_TooltipArrow = n309
+export const light_ghost_active_SliderTrack = n309
+export const light_ghost_active_Input = n309
+export const light_ghost_active_Separator = n309
+export const light_ghost_active_Surface = n309
+const n310 = t([[15, 2],[16, 0],[17, 0],[19, 2],[20, 0],[21, 2],[22, 0],[24, 2],[25, 2],[26, 2],[27, 2],[28, 2]])
+
+export const light_ghost_alt2_SliderTrackActive = n310
+export const light_ghost_active_SliderThumb = n310
+export const light_ghost_active_Tooltip = n310
+export const light_ghost_active_ProgressIndicator = n310
+const n311 = t([[15, 1],[16, 2],[17, 3],[19, 1],[20, 4],[21, 1],[22, 4],[24, 3],[25, 4],[26, 4],[27, 4],[28, 0]])
+
+export const light_ghost_alt2_TextArea = n311
+const n312 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 0],[21, 0],[22, 0],[24, 0],[25, 1],[26, 1],[27, 1],[28, 1]])
+
+export const light_ghost_active_SliderTrackActive = n312
+const n313 = t([[15, 2],[16, 3],[17, 0],[19, 2],[20, 2],[21, 2],[22, 2],[24, 0],[25, 5],[26, 5],[27, 5],[28, 2]])
+
+export const light_ghost_active_TextArea = n313
+const n314 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 5],[21, 0],[22, 5],[24, 0],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const light_ghost_dim_ListItem = n314
+export const light_ghost_dim_TooltipContent = n314
+const n315 = t([[15, 1],[16, 1],[17, 2],[19, 1],[20, 5],[21, 1],[22, 5],[24, 1],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const light_ghost_dim_Card = n315
+export const light_ghost_dim_Button = n315
+export const light_ghost_dim_DrawerFrame = n315
+export const light_ghost_dim_Progress = n315
+export const light_ghost_dim_TooltipArrow = n315
+export const light_ghost_dim_Input = n315
+export const light_ghost_dim_Surface = n315
+const n316 = t([[15, 2],[16, 2],[17, 3],[19, 2],[20, 4],[21, 2],[22, 4],[24, 2],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const light_ghost_dim_Checkbox = n316
+export const light_ghost_dim_Switch = n316
+export const light_ghost_dim_SliderTrack = n316
+const n317 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 5],[21, 0],[22, 5],[24, 1],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const light_ghost_dim_TextArea = n317
+const n318 = t([[15, 3],[16, 3],[17, 0],[19, 3],[20, 2],[21, 3],[22, 2],[24, 3],[25, 2],[26, 2],[27, 2],[28, 2]])
+
+export const light_ghost_dim_Separator = n318
+const n319 = t([[15, 5],[16, 9],[17, 10],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_ghost_alt1_TooltipContent = n319
+const n320 = t([[15, 3],[16, 4],[17, 5],[19, 3],[20, 11],[21, 3],[22, 11],[24, 3],[25, 11],[26, 11],[27, 11],[28, 11]])
+
+export const dark_ghost_alt1_SliderTrackActive = n320
+export const dark_ghost_alt2_SliderThumb = n320
+export const dark_ghost_alt2_Tooltip = n320
+export const dark_ghost_alt2_ProgressIndicator = n320
+const n321 = t([[15, 9],[16, 10],[17, 11],[19, 9],[20, 3],[21, 9],[22, 3],[24, 10],[25, 4],[26, 4],[27, 4],[28, 5]])
+
+export const dark_ghost_alt1_TextArea = n321
+const n322 = t([[15, 4],[16, 5],[17, 5],[19, 4],[20, 5],[21, 4],[22, 5],[24, 4],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_ghost_alt1_Separator = n322
+export const dark_ghost_alt2_Checkbox = n322
+export const dark_ghost_alt2_Switch = n322
+export const dark_ghost_alt2_SliderTrack = n322
+export const dark_ghost_active_Card = n322
+export const dark_ghost_active_Button = n322
+export const dark_ghost_active_DrawerFrame = n322
+export const dark_ghost_active_Progress = n322
+export const dark_ghost_active_TooltipArrow = n322
+export const dark_ghost_active_Input = n322
+export const dark_ghost_active_Surface = n322
+const n323 = t([[15, 4],[16, 5],[17, 5],[19, 4],[20, 4],[21, 4],[22, 4],[24, 4],[25, 10],[26, 10],[27, 10],[28, 10]])
+
+export const dark_ghost_alt2_SliderTrackActive = n323
+export const dark_ghost_active_SliderThumb = n323
+export const dark_ghost_active_Tooltip = n323
+export const dark_ghost_active_ProgressIndicator = n323
+const n324 = t([[15, 10],[16, 11],[17, 4],[19, 10],[20, 4],[21, 10],[22, 4],[24, 11],[25, 3],[26, 3],[27, 3],[28, 4]])
+
+export const dark_ghost_alt2_TextArea = n324
+const n325 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_ghost_alt2_Separator = n325
+export const dark_ghost_active_Checkbox = n325
+export const dark_ghost_active_Switch = n325
+export const dark_ghost_active_SliderTrack = n325
+export const dark_ghost_active_Separator = n325
+const n326 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 9],[26, 9],[27, 9],[28, 9]])
+
+export const dark_ghost_active_SliderTrackActive = n326
+const n327 = t([[15, 11],[16, 4],[17, 5],[19, 11],[20, 5],[21, 11],[22, 5],[24, 4],[25, 0],[26, 0],[27, 0],[28, 3]])
+
+export const dark_ghost_active_TextArea = n327
+const n328 = t([[15, 9],[16, 9],[17, 10],[19, 9],[20, 0],[21, 9],[22, 0],[24, 9],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_ghost_dim_Card = n328
+export const dark_ghost_dim_Button = n328
+export const dark_ghost_dim_DrawerFrame = n328
+export const dark_ghost_dim_Progress = n328
+export const dark_ghost_dim_TooltipArrow = n328
+export const dark_ghost_dim_Input = n328
+export const dark_ghost_dim_Surface = n328
+const n329 = t([[15, 10],[16, 10],[17, 11],[19, 10],[20, 3],[21, 10],[22, 3],[24, 10],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_ghost_dim_Checkbox = n329
+export const dark_ghost_dim_Switch = n329
+export const dark_ghost_dim_SliderTrack = n329
+const n330 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_ghost_dim_TooltipContent = n330
+export const dark_green_ghost_dim_TooltipContent = n330
+const n331 = t([[15, 5],[16, 5],[17, 9],[19, 5],[20, 0],[21, 5],[22, 0],[24, 9],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_ghost_dim_TextArea = n331
+const n332 = t([[15, 11],[16, 11],[17, 4],[19, 11],[20, 4],[21, 11],[22, 4],[24, 11],[25, 4],[26, 4],[27, 4],[28, 4]])
+
+export const dark_ghost_dim_Separator = n332
+const n333 = t([[15, 12],[16, 13],[17, 14],[19, 16],[20, 5],[21, 12],[22, 5],[24, 16],[25, 17],[26, 16],[27, 16],[28, 19]])
+
+export const light_yellow_ghost_alt1_ListItem = n333
+export const light_yellow_ghost_alt1_TooltipContent = n333
+const n334 = t([[15, 5],[16, 5],[17, 5],[19, 21],[20, 12],[21, 5],[22, 12],[24, 21],[25, 20],[26, 21],[27, 21],[28, 18]])
+
+export const light_yellow_ghost_alt1_SwitchThumb = n334
+export const light_yellow_ghost_dim_SliderThumb = n334
+export const light_yellow_ghost_dim_Tooltip = n334
+export const light_yellow_ghost_dim_ProgressIndicator = n334
+const n335 = t([[15, 22],[16, 21],[17, 20],[19, 18],[20, 15],[21, 22],[22, 15],[24, 18],[25, 17],[26, 18],[27, 18],[28, 15]])
+
+export const light_yellow_ghost_alt1_SliderTrackActive = n335
+export const light_yellow_ghost_alt2_SliderThumb = n335
+export const light_yellow_ghost_alt2_Tooltip = n335
+export const light_yellow_ghost_alt2_ProgressIndicator = n335
+const n336 = t([[15, 12],[16, 13],[17, 14],[19, 16],[20, 5],[21, 12],[22, 5],[24, 18],[25, 19],[26, 18],[27, 18],[28, 19]])
+
+export const light_yellow_ghost_alt1_TextArea = n336
+const n337 = t([[15, 16],[16, 17],[17, 18],[19, 20],[20, 19],[21, 16],[22, 19],[24, 20],[25, 21],[26, 20],[27, 20],[28, 5]])
+
+export const light_yellow_ghost_alt1_Separator = n337
+export const light_yellow_ghost_alt2_Checkbox = n337
+export const light_yellow_ghost_alt2_Switch = n337
+export const light_yellow_ghost_alt2_SliderTrack = n337
+export const light_yellow_ghost_active_Card = n337
+export const light_yellow_ghost_active_Button = n337
+export const light_yellow_ghost_active_DrawerFrame = n337
+export const light_yellow_ghost_active_Progress = n337
+export const light_yellow_ghost_active_TooltipArrow = n337
+export const light_yellow_ghost_active_Input = n337
+export const light_yellow_ghost_active_Surface = n337
+const n338 = t([[15, 21],[16, 20],[17, 19],[19, 17],[20, 16],[21, 21],[22, 16],[24, 17],[25, 16],[26, 17],[27, 17],[28, 14]])
+
+export const light_yellow_ghost_alt2_SliderTrackActive = n338
+export const light_yellow_ghost_active_SliderThumb = n338
+export const light_yellow_ghost_active_Tooltip = n338
+export const light_yellow_ghost_active_ProgressIndicator = n338
+const n339 = t([[15, 13],[16, 14],[17, 15],[19, 17],[20, 22],[21, 13],[22, 22],[24, 19],[25, 20],[26, 19],[27, 19],[28, 20]])
+
+export const light_yellow_ghost_alt2_TextArea = n339
+const n340 = t([[15, 17],[16, 18],[17, 19],[19, 21],[20, 18],[21, 17],[22, 18],[24, 21],[25, 22],[26, 21],[27, 21],[28, 5]])
+
+export const light_yellow_ghost_alt2_Separator = n340
+export const light_yellow_ghost_active_Checkbox = n340
+export const light_yellow_ghost_active_Switch = n340
+export const light_yellow_ghost_active_SliderTrack = n340
+const n341 = t([[15, 20],[16, 19],[17, 18],[19, 16],[20, 17],[21, 20],[22, 17],[24, 16],[25, 15],[26, 16],[27, 16],[28, 13]])
+
+export const light_yellow_ghost_active_SliderTrackActive = n341
+const n342 = t([[15, 14],[16, 15],[17, 16],[19, 18],[20, 21],[21, 14],[22, 21],[24, 20],[25, 21],[26, 20],[27, 20],[28, 21]])
+
+export const light_yellow_ghost_active_TextArea = n342
+const n343 = t([[15, 18],[16, 19],[17, 20],[19, 22],[20, 17],[21, 18],[22, 17],[24, 22],[25, 5],[26, 22],[27, 22],[28, 5]])
+
+export const light_yellow_ghost_active_Separator = n343
+const n344 = t([[15, 12],[16, 12],[17, 12],[19, 14],[20, 5],[21, 12],[22, 5],[24, 14],[25, 15],[26, 14],[27, 14],[28, 17]])
+
+export const light_yellow_ghost_dim_ListItem = n344
+export const light_yellow_ghost_dim_TooltipContent = n344
+const n345 = t([[15, 13],[16, 13],[17, 14],[19, 16],[20, 5],[21, 13],[22, 5],[24, 16],[25, 17],[26, 16],[27, 16],[28, 19]])
+
+export const light_yellow_ghost_dim_Card = n345
+export const light_yellow_ghost_dim_Button = n345
+export const light_yellow_ghost_dim_DrawerFrame = n345
+export const light_yellow_ghost_dim_Progress = n345
+export const light_yellow_ghost_dim_TooltipArrow = n345
+export const light_yellow_ghost_dim_Input = n345
+export const light_yellow_ghost_dim_Surface = n345
+const n346 = t([[15, 14],[16, 14],[17, 15],[19, 17],[20, 22],[21, 14],[22, 22],[24, 17],[25, 18],[26, 17],[27, 17],[28, 20]])
+
+export const light_yellow_ghost_dim_Checkbox = n346
+export const light_yellow_ghost_dim_Switch = n346
+export const light_yellow_ghost_dim_SliderTrack = n346
+const n347 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 12],[21, 5],[22, 12],[24, 5],[25, 22],[26, 5],[27, 5],[28, 20]])
+
+export const light_yellow_ghost_dim_SwitchThumb = n347
+const n348 = t([[15, 12],[16, 12],[17, 12],[19, 14],[20, 5],[21, 12],[22, 5],[24, 16],[25, 17],[26, 16],[27, 16],[28, 17]])
+
+export const light_yellow_ghost_dim_TextArea = n348
+const n349 = t([[15, 15],[16, 15],[17, 16],[19, 18],[20, 21],[21, 15],[22, 21],[24, 18],[25, 19],[26, 18],[27, 18],[28, 21]])
+
+export const light_yellow_ghost_dim_Separator = n349
+const n350 = t([[15, 0],[16, 23],[17, 24],[19, 23],[20, 5],[21, 0],[22, 5],[24, 23],[25, 0],[26, 23],[27, 23],[28, 23]])
+
+export const light_green_ghost_alt1_ListItem = n350
+export const light_green_ghost_alt1_TooltipContent = n350
+const n351 = t([[15, 5],[16, 5],[17, 5],[19, 25],[20, 0],[21, 5],[22, 0],[24, 25],[25, 24],[26, 25],[27, 25],[28, 0]])
+
+export const light_green_ghost_alt1_SwitchThumb = n351
+export const light_green_ghost_dim_SliderThumb = n351
+export const light_green_ghost_dim_Tooltip = n351
+export const light_green_ghost_dim_ProgressIndicator = n351
+const n352 = t([[15, 5],[16, 25],[17, 24],[19, 0],[20, 25],[21, 5],[22, 25],[24, 0],[25, 0],[26, 0],[27, 0],[28, 25]])
+
+export const light_green_ghost_alt1_SliderTrackActive = n352
+export const light_green_ghost_alt2_SliderThumb = n352
+export const light_green_ghost_alt2_Tooltip = n352
+export const light_green_ghost_alt2_ProgressIndicator = n352
+const n353 = t([[15, 0],[16, 23],[17, 24],[19, 23],[20, 5],[21, 0],[22, 5],[24, 0],[25, 23],[26, 0],[27, 0],[28, 23]])
+
+export const light_green_ghost_alt1_TextArea = n353
+const n354 = t([[15, 23],[16, 0],[17, 0],[19, 24],[20, 23],[21, 23],[22, 23],[24, 24],[25, 25],[26, 24],[27, 24],[28, 5]])
+
+export const light_green_ghost_alt1_Separator = n354
+export const light_green_ghost_alt2_Checkbox = n354
+export const light_green_ghost_alt2_Switch = n354
+export const light_green_ghost_alt2_SliderTrack = n354
+export const light_green_ghost_active_Card = n354
+export const light_green_ghost_active_Button = n354
+export const light_green_ghost_active_DrawerFrame = n354
+export const light_green_ghost_active_Progress = n354
+export const light_green_ghost_active_TooltipArrow = n354
+export const light_green_ghost_active_Input = n354
+export const light_green_ghost_active_Surface = n354
+const n355 = t([[15, 25],[16, 24],[17, 23],[19, 0],[20, 23],[21, 25],[22, 23],[24, 0],[25, 23],[26, 0],[27, 0],[28, 24]])
+
+export const light_green_ghost_alt2_SliderTrackActive = n355
+export const light_green_ghost_active_SliderThumb = n355
+export const light_green_ghost_active_Tooltip = n355
+export const light_green_ghost_active_ProgressIndicator = n355
+const n356 = t([[15, 23],[16, 24],[17, 25],[19, 0],[20, 5],[21, 23],[22, 5],[24, 23],[25, 24],[26, 23],[27, 23],[28, 24]])
+
+export const light_green_ghost_alt2_TextArea = n356
+const n357 = t([[15, 0],[16, 0],[17, 23],[19, 25],[20, 0],[21, 0],[22, 0],[24, 25],[25, 5],[26, 25],[27, 25],[28, 5]])
+
+export const light_green_ghost_alt2_Separator = n357
+export const light_green_ghost_active_Checkbox = n357
+export const light_green_ghost_active_Switch = n357
+export const light_green_ghost_active_SliderTrack = n357
+const n358 = t([[15, 24],[16, 23],[17, 0],[19, 23],[20, 0],[21, 24],[22, 0],[24, 23],[25, 25],[26, 23],[27, 23],[28, 23]])
+
+export const light_green_ghost_active_SliderTrackActive = n358
+const n359 = t([[15, 24],[16, 25],[17, 23],[19, 0],[20, 25],[21, 24],[22, 25],[24, 24],[25, 25],[26, 24],[27, 24],[28, 25]])
+
+export const light_green_ghost_active_TextArea = n359
+const n360 = t([[15, 0],[16, 23],[17, 24],[19, 5],[20, 0],[21, 0],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const light_green_ghost_active_Separator = n360
+const n361 = t([[15, 0],[16, 0],[17, 0],[19, 24],[20, 5],[21, 0],[22, 5],[24, 24],[25, 25],[26, 24],[27, 24],[28, 0]])
+
+export const light_green_ghost_dim_ListItem = n361
+export const light_green_ghost_dim_TooltipContent = n361
+const n362 = t([[15, 23],[16, 23],[17, 24],[19, 23],[20, 5],[21, 23],[22, 5],[24, 23],[25, 0],[26, 23],[27, 23],[28, 23]])
+
+export const light_green_ghost_dim_Card = n362
+export const light_green_ghost_dim_Button = n362
+export const light_green_ghost_dim_DrawerFrame = n362
+export const light_green_ghost_dim_Progress = n362
+export const light_green_ghost_dim_TooltipArrow = n362
+export const light_green_ghost_dim_Input = n362
+export const light_green_ghost_dim_Surface = n362
+const n363 = t([[15, 24],[16, 24],[17, 25],[19, 0],[20, 5],[21, 24],[22, 5],[24, 0],[25, 0],[26, 0],[27, 0],[28, 24]])
+
+export const light_green_ghost_dim_Checkbox = n363
+export const light_green_ghost_dim_Switch = n363
+export const light_green_ghost_dim_SliderTrack = n363
+const n364 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 5],[26, 5],[27, 5],[28, 24]])
+
+export const light_green_ghost_dim_SwitchThumb = n364
+const n365 = t([[15, 0],[16, 0],[17, 0],[19, 24],[20, 5],[21, 0],[22, 5],[24, 23],[25, 0],[26, 23],[27, 23],[28, 0]])
+
+export const light_green_ghost_dim_TextArea = n365
+const n366 = t([[15, 25],[16, 25],[17, 23],[19, 0],[20, 25],[21, 25],[22, 25],[24, 0],[25, 23],[26, 0],[27, 0],[28, 25]])
+
+export const light_green_ghost_dim_Separator = n366
+const n367 = t([[15, 26],[16, 27],[17, 28],[19, 30],[20, 5],[21, 26],[22, 5],[24, 30],[25, 31],[26, 30],[27, 30],[28, 33]])
+
+export const light_red_ghost_alt1_ListItem = n367
+export const light_red_ghost_alt1_TooltipContent = n367
+const n368 = t([[15, 5],[16, 5],[17, 5],[19, 35],[20, 26],[21, 5],[22, 26],[24, 35],[25, 34],[26, 35],[27, 35],[28, 32]])
+
+export const light_red_ghost_alt1_SwitchThumb = n368
+export const light_red_ghost_dim_SliderThumb = n368
+export const light_red_ghost_dim_Tooltip = n368
+export const light_red_ghost_dim_ProgressIndicator = n368
+const n369 = t([[15, 36],[16, 35],[17, 34],[19, 32],[20, 29],[21, 36],[22, 29],[24, 32],[25, 31],[26, 32],[27, 32],[28, 29]])
+
+export const light_red_ghost_alt1_SliderTrackActive = n369
+export const light_red_ghost_alt2_SliderThumb = n369
+export const light_red_ghost_alt2_Tooltip = n369
+export const light_red_ghost_alt2_ProgressIndicator = n369
+const n370 = t([[15, 26],[16, 27],[17, 28],[19, 30],[20, 5],[21, 26],[22, 5],[24, 32],[25, 33],[26, 32],[27, 32],[28, 33]])
+
+export const light_red_ghost_alt1_TextArea = n370
+const n371 = t([[15, 30],[16, 31],[17, 32],[19, 34],[20, 33],[21, 30],[22, 33],[24, 34],[25, 35],[26, 34],[27, 34],[28, 5]])
+
+export const light_red_ghost_alt1_Separator = n371
+export const light_red_ghost_alt2_Checkbox = n371
+export const light_red_ghost_alt2_Switch = n371
+export const light_red_ghost_alt2_SliderTrack = n371
+export const light_red_ghost_active_Card = n371
+export const light_red_ghost_active_Button = n371
+export const light_red_ghost_active_DrawerFrame = n371
+export const light_red_ghost_active_Progress = n371
+export const light_red_ghost_active_TooltipArrow = n371
+export const light_red_ghost_active_Input = n371
+export const light_red_ghost_active_Surface = n371
+const n372 = t([[15, 35],[16, 34],[17, 33],[19, 31],[20, 30],[21, 35],[22, 30],[24, 31],[25, 30],[26, 31],[27, 31],[28, 28]])
+
+export const light_red_ghost_alt2_SliderTrackActive = n372
+export const light_red_ghost_active_SliderThumb = n372
+export const light_red_ghost_active_Tooltip = n372
+export const light_red_ghost_active_ProgressIndicator = n372
+const n373 = t([[15, 27],[16, 28],[17, 29],[19, 31],[20, 36],[21, 27],[22, 36],[24, 33],[25, 34],[26, 33],[27, 33],[28, 34]])
+
+export const light_red_ghost_alt2_TextArea = n373
+const n374 = t([[15, 31],[16, 32],[17, 33],[19, 35],[20, 32],[21, 31],[22, 32],[24, 35],[25, 36],[26, 35],[27, 35],[28, 5]])
+
+export const light_red_ghost_alt2_Separator = n374
+export const light_red_ghost_active_Checkbox = n374
+export const light_red_ghost_active_Switch = n374
+export const light_red_ghost_active_SliderTrack = n374
+const n375 = t([[15, 34],[16, 33],[17, 32],[19, 30],[20, 31],[21, 34],[22, 31],[24, 30],[25, 29],[26, 30],[27, 30],[28, 27]])
+
+export const light_red_ghost_active_SliderTrackActive = n375
+const n376 = t([[15, 28],[16, 29],[17, 30],[19, 32],[20, 35],[21, 28],[22, 35],[24, 34],[25, 35],[26, 34],[27, 34],[28, 35]])
+
+export const light_red_ghost_active_TextArea = n376
+const n377 = t([[15, 32],[16, 33],[17, 34],[19, 36],[20, 31],[21, 32],[22, 31],[24, 36],[25, 5],[26, 36],[27, 36],[28, 5]])
+
+export const light_red_ghost_active_Separator = n377
+const n378 = t([[15, 26],[16, 26],[17, 26],[19, 28],[20, 5],[21, 26],[22, 5],[24, 28],[25, 29],[26, 28],[27, 28],[28, 31]])
+
+export const light_red_ghost_dim_ListItem = n378
+export const light_red_ghost_dim_TooltipContent = n378
+const n379 = t([[15, 27],[16, 27],[17, 28],[19, 30],[20, 5],[21, 27],[22, 5],[24, 30],[25, 31],[26, 30],[27, 30],[28, 33]])
+
+export const light_red_ghost_dim_Card = n379
+export const light_red_ghost_dim_Button = n379
+export const light_red_ghost_dim_DrawerFrame = n379
+export const light_red_ghost_dim_Progress = n379
+export const light_red_ghost_dim_TooltipArrow = n379
+export const light_red_ghost_dim_Input = n379
+export const light_red_ghost_dim_Surface = n379
+const n380 = t([[15, 28],[16, 28],[17, 29],[19, 31],[20, 36],[21, 28],[22, 36],[24, 31],[25, 32],[26, 31],[27, 31],[28, 34]])
+
+export const light_red_ghost_dim_Checkbox = n380
+export const light_red_ghost_dim_Switch = n380
+export const light_red_ghost_dim_SliderTrack = n380
+const n381 = t([[15, 5],[16, 5],[17, 5],[19, 5],[20, 26],[21, 5],[22, 26],[24, 5],[25, 36],[26, 5],[27, 5],[28, 34]])
+
+export const light_red_ghost_dim_SwitchThumb = n381
+const n382 = t([[15, 26],[16, 26],[17, 26],[19, 28],[20, 5],[21, 26],[22, 5],[24, 30],[25, 31],[26, 30],[27, 30],[28, 31]])
+
+export const light_red_ghost_dim_TextArea = n382
+const n383 = t([[15, 29],[16, 29],[17, 30],[19, 32],[20, 35],[21, 29],[22, 35],[24, 32],[25, 33],[26, 32],[27, 32],[28, 35]])
+
+export const light_red_ghost_dim_Separator = n383
+const n384 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 37],[21, 0],[22, 37],[24, 0],[25, 43],[26, 43],[27, 43],[28, 43]])
+
+export const dark_yellow_ghost_alt1_SwitchThumb = n384
+export const dark_yellow_ghost_dim_SliderThumb = n384
+export const dark_yellow_ghost_dim_Tooltip = n384
+export const dark_yellow_ghost_dim_ProgressIndicator = n384
+const n385 = t([[15, 37],[16, 38],[17, 39],[19, 37],[20, 0],[21, 37],[22, 0],[24, 37],[25, 19],[26, 19],[27, 19],[28, 19]])
+
+export const dark_yellow_ghost_alt1_TooltipContent = n385
+const n386 = t([[15, 46],[16, 45],[17, 44],[19, 46],[20, 40],[21, 46],[22, 40],[24, 46],[25, 40],[26, 40],[27, 40],[28, 40]])
+
+export const dark_yellow_ghost_alt1_SliderTrackActive = n386
+export const dark_yellow_ghost_alt2_SliderThumb = n386
+export const dark_yellow_ghost_alt2_Tooltip = n386
+export const dark_yellow_ghost_alt2_ProgressIndicator = n386
+const n387 = t([[15, 38],[16, 39],[17, 40],[19, 38],[20, 46],[21, 38],[22, 46],[24, 39],[25, 45],[26, 45],[27, 45],[28, 44]])
+
+export const dark_yellow_ghost_alt1_TextArea = n387
+const n388 = t([[15, 41],[16, 42],[17, 43],[19, 41],[20, 19],[21, 41],[22, 19],[24, 41],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_yellow_ghost_alt1_Separator = n388
+export const dark_yellow_ghost_alt2_Checkbox = n388
+export const dark_yellow_ghost_alt2_Switch = n388
+export const dark_yellow_ghost_alt2_SliderTrack = n388
+export const dark_yellow_ghost_active_Card = n388
+export const dark_yellow_ghost_active_Button = n388
+export const dark_yellow_ghost_active_DrawerFrame = n388
+export const dark_yellow_ghost_active_Progress = n388
+export const dark_yellow_ghost_active_TooltipArrow = n388
+export const dark_yellow_ghost_active_Input = n388
+export const dark_yellow_ghost_active_Surface = n388
+const n389 = t([[15, 45],[16, 44],[17, 19],[19, 45],[20, 41],[21, 45],[22, 41],[24, 45],[25, 39],[26, 39],[27, 39],[28, 39]])
+
+export const dark_yellow_ghost_alt2_SliderTrackActive = n389
+export const dark_yellow_ghost_active_SliderThumb = n389
+export const dark_yellow_ghost_active_Tooltip = n389
+export const dark_yellow_ghost_active_ProgressIndicator = n389
+const n390 = t([[15, 39],[16, 40],[17, 41],[19, 39],[20, 45],[21, 39],[22, 45],[24, 40],[25, 46],[26, 46],[27, 46],[28, 45]])
+
+export const dark_yellow_ghost_alt2_TextArea = n390
+const n391 = t([[15, 42],[16, 43],[17, 19],[19, 42],[20, 43],[21, 42],[22, 43],[24, 42],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_yellow_ghost_alt2_Separator = n391
+export const dark_yellow_ghost_active_Checkbox = n391
+export const dark_yellow_ghost_active_Switch = n391
+export const dark_yellow_ghost_active_SliderTrack = n391
+const n392 = t([[15, 44],[16, 19],[17, 43],[19, 44],[20, 42],[21, 44],[22, 42],[24, 44],[25, 38],[26, 38],[27, 38],[28, 38]])
+
+export const dark_yellow_ghost_active_SliderTrackActive = n392
+const n393 = t([[15, 40],[16, 41],[17, 42],[19, 40],[20, 44],[21, 40],[22, 44],[24, 41],[25, 0],[26, 0],[27, 0],[28, 46]])
+
+export const dark_yellow_ghost_active_TextArea = n393
+const n394 = t([[15, 43],[16, 19],[17, 44],[19, 43],[20, 42],[21, 43],[22, 42],[24, 43],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_yellow_ghost_active_Separator = n394
+const n395 = t([[15, 38],[16, 38],[17, 39],[19, 38],[20, 0],[21, 38],[22, 0],[24, 38],[25, 19],[26, 19],[27, 19],[28, 19]])
+
+export const dark_yellow_ghost_dim_Card = n395
+export const dark_yellow_ghost_dim_Button = n395
+export const dark_yellow_ghost_dim_DrawerFrame = n395
+export const dark_yellow_ghost_dim_Progress = n395
+export const dark_yellow_ghost_dim_TooltipArrow = n395
+export const dark_yellow_ghost_dim_Input = n395
+export const dark_yellow_ghost_dim_Surface = n395
+const n396 = t([[15, 39],[16, 39],[17, 40],[19, 39],[20, 46],[21, 39],[22, 46],[24, 39],[25, 44],[26, 44],[27, 44],[28, 44]])
+
+export const dark_yellow_ghost_dim_Checkbox = n396
+export const dark_yellow_ghost_dim_Switch = n396
+export const dark_yellow_ghost_dim_SliderTrack = n396
+const n397 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 37],[21, 0],[22, 37],[24, 0],[25, 44],[26, 44],[27, 44],[28, 44]])
+
+export const dark_yellow_ghost_dim_SwitchThumb = n397
+const n398 = t([[15, 37],[16, 37],[17, 37],[19, 37],[20, 0],[21, 37],[22, 0],[24, 37],[25, 42],[26, 42],[27, 42],[28, 42]])
+
+export const dark_yellow_ghost_dim_TooltipContent = n398
+const n399 = t([[15, 37],[16, 37],[17, 38],[19, 37],[20, 0],[21, 37],[22, 0],[24, 38],[25, 19],[26, 19],[27, 19],[28, 43]])
+
+export const dark_yellow_ghost_dim_TextArea = n399
+const n400 = t([[15, 40],[16, 40],[17, 41],[19, 40],[20, 45],[21, 40],[22, 45],[24, 40],[25, 45],[26, 45],[27, 45],[28, 45]])
+
+export const dark_yellow_ghost_dim_Separator = n400
+const n401 = t([[15, 24],[16, 10],[17, 5],[19, 24],[20, 5],[21, 24],[22, 5],[24, 24],[25, 47],[26, 47],[27, 47],[28, 47]])
+
+export const dark_green_ghost_alt1_Button = n401
+export const dark_green_ghost_active_SliderTrackActive = n401
+const n402 = t([[15, 5],[16, 47],[17, 24],[19, 5],[20, 0],[21, 5],[22, 0],[24, 5],[25, 10],[26, 10],[27, 10],[28, 10]])
+
+export const dark_green_ghost_alt1_TooltipContent = n402
+const n403 = t([[15, 0],[16, 23],[17, 24],[19, 0],[20, 48],[21, 0],[22, 48],[24, 0],[25, 48],[26, 48],[27, 48],[28, 48]])
+
+export const dark_green_ghost_alt1_SliderTrackActive = n403
+export const dark_green_ghost_alt2_SliderThumb = n403
+export const dark_green_ghost_alt2_Tooltip = n403
+export const dark_green_ghost_alt2_ProgressIndicator = n403
+const n404 = t([[15, 47],[16, 24],[17, 48],[19, 47],[20, 0],[21, 47],[22, 0],[24, 24],[25, 23],[26, 23],[27, 23],[28, 24]])
+
+export const dark_green_ghost_alt1_TextArea = n404
+const n405 = t([[15, 23],[16, 5],[17, 5],[19, 23],[20, 10],[21, 23],[22, 10],[24, 23],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_ghost_alt1_Separator = n405
+export const dark_green_ghost_alt2_Checkbox = n405
+export const dark_green_ghost_alt2_Switch = n405
+export const dark_green_ghost_alt2_SliderTrack = n405
+export const dark_green_ghost_active_Card = n405
+export const dark_green_ghost_active_DrawerFrame = n405
+export const dark_green_ghost_active_Progress = n405
+export const dark_green_ghost_active_TooltipArrow = n405
+export const dark_green_ghost_active_Input = n405
+export const dark_green_ghost_active_Surface = n405
+const n406 = t([[15, 10],[16, 5],[17, 5],[19, 10],[20, 5],[21, 10],[22, 5],[24, 10],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_green_ghost_alt2_Button = n406
+const n407 = t([[15, 24],[16, 48],[17, 23],[19, 24],[20, 23],[21, 24],[22, 23],[24, 48],[25, 0],[26, 0],[27, 0],[28, 23]])
+
+export const dark_green_ghost_alt2_TextArea = n407
+const n408 = t([[15, 5],[16, 5],[17, 10],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_ghost_alt2_Separator = n408
+export const dark_green_ghost_active_Checkbox = n408
+export const dark_green_ghost_active_Switch = n408
+export const dark_green_ghost_active_SliderTrack = n408
+const n409 = t([[15, 5],[16, 5],[17, 23],[19, 5],[20, 10],[21, 5],[22, 10],[24, 5],[25, 5],[26, 5],[27, 5],[28, 5]])
+
+export const dark_green_ghost_active_Button = n409
+const n410 = t([[15, 48],[16, 23],[17, 5],[19, 48],[20, 24],[21, 48],[22, 24],[24, 23],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_ghost_active_TextArea = n410
+const n411 = t([[15, 5],[16, 10],[17, 24],[19, 5],[20, 5],[21, 5],[22, 5],[24, 5],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_green_ghost_active_Separator = n411
+const n412 = t([[15, 47],[16, 47],[17, 24],[19, 47],[20, 0],[21, 47],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 10]])
+
+export const dark_green_ghost_dim_Card = n412
+export const dark_green_ghost_dim_DrawerFrame = n412
+export const dark_green_ghost_dim_Progress = n412
+export const dark_green_ghost_dim_TooltipArrow = n412
+export const dark_green_ghost_dim_Input = n412
+export const dark_green_ghost_dim_Surface = n412
+const n413 = t([[15, 23],[16, 23],[17, 24],[19, 23],[20, 48],[21, 23],[22, 48],[24, 23],[25, 48],[26, 48],[27, 48],[28, 48]])
+
+export const dark_green_ghost_dim_Button = n413
+const n414 = t([[15, 24],[16, 24],[17, 48],[19, 24],[20, 0],[21, 24],[22, 0],[24, 24],[25, 24],[26, 24],[27, 24],[28, 24]])
+
+export const dark_green_ghost_dim_Checkbox = n414
+export const dark_green_ghost_dim_Switch = n414
+export const dark_green_ghost_dim_SliderTrack = n414
+const n415 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 5],[21, 0],[22, 5],[24, 0],[25, 24],[26, 24],[27, 24],[28, 24]])
+
+export const dark_green_ghost_dim_SwitchThumb = n415
+const n416 = t([[15, 5],[16, 5],[17, 47],[19, 5],[20, 0],[21, 5],[22, 0],[24, 47],[25, 10],[26, 10],[27, 10],[28, 5]])
+
+export const dark_green_ghost_dim_TextArea = n416
+const n417 = t([[15, 48],[16, 48],[17, 23],[19, 48],[20, 23],[21, 48],[22, 23],[24, 48],[25, 23],[26, 23],[27, 23],[28, 23]])
+
+export const dark_green_ghost_dim_Separator = n417
+const n418 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 49],[21, 0],[22, 49],[24, 0],[25, 55],[26, 55],[27, 55],[28, 55]])
+
+export const dark_red_ghost_alt1_SwitchThumb = n418
+export const dark_red_ghost_dim_SliderThumb = n418
+export const dark_red_ghost_dim_Tooltip = n418
+export const dark_red_ghost_dim_ProgressIndicator = n418
+const n419 = t([[15, 49],[16, 50],[17, 51],[19, 49],[20, 0],[21, 49],[22, 0],[24, 49],[25, 33],[26, 33],[27, 33],[28, 33]])
+
+export const dark_red_ghost_alt1_TooltipContent = n419
+const n420 = t([[15, 58],[16, 57],[17, 56],[19, 58],[20, 52],[21, 58],[22, 52],[24, 58],[25, 52],[26, 52],[27, 52],[28, 52]])
+
+export const dark_red_ghost_alt1_SliderTrackActive = n420
+export const dark_red_ghost_alt2_SliderThumb = n420
+export const dark_red_ghost_alt2_Tooltip = n420
+export const dark_red_ghost_alt2_ProgressIndicator = n420
+const n421 = t([[15, 50],[16, 51],[17, 52],[19, 50],[20, 58],[21, 50],[22, 58],[24, 51],[25, 57],[26, 57],[27, 57],[28, 56]])
+
+export const dark_red_ghost_alt1_TextArea = n421
+const n422 = t([[15, 53],[16, 54],[17, 55],[19, 53],[20, 33],[21, 53],[22, 33],[24, 53],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_red_ghost_alt1_Separator = n422
+export const dark_red_ghost_alt2_Checkbox = n422
+export const dark_red_ghost_alt2_Switch = n422
+export const dark_red_ghost_alt2_SliderTrack = n422
+export const dark_red_ghost_active_Card = n422
+export const dark_red_ghost_active_Button = n422
+export const dark_red_ghost_active_DrawerFrame = n422
+export const dark_red_ghost_active_Progress = n422
+export const dark_red_ghost_active_TooltipArrow = n422
+export const dark_red_ghost_active_Input = n422
+export const dark_red_ghost_active_Surface = n422
+const n423 = t([[15, 57],[16, 56],[17, 33],[19, 57],[20, 53],[21, 57],[22, 53],[24, 57],[25, 51],[26, 51],[27, 51],[28, 51]])
+
+export const dark_red_ghost_alt2_SliderTrackActive = n423
+export const dark_red_ghost_active_SliderThumb = n423
+export const dark_red_ghost_active_Tooltip = n423
+export const dark_red_ghost_active_ProgressIndicator = n423
+const n424 = t([[15, 51],[16, 52],[17, 53],[19, 51],[20, 57],[21, 51],[22, 57],[24, 52],[25, 58],[26, 58],[27, 58],[28, 57]])
+
+export const dark_red_ghost_alt2_TextArea = n424
+const n425 = t([[15, 54],[16, 55],[17, 33],[19, 54],[20, 55],[21, 54],[22, 55],[24, 54],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_red_ghost_alt2_Separator = n425
+export const dark_red_ghost_active_Checkbox = n425
+export const dark_red_ghost_active_Switch = n425
+export const dark_red_ghost_active_SliderTrack = n425
+const n426 = t([[15, 56],[16, 33],[17, 55],[19, 56],[20, 54],[21, 56],[22, 54],[24, 56],[25, 50],[26, 50],[27, 50],[28, 50]])
+
+export const dark_red_ghost_active_SliderTrackActive = n426
+const n427 = t([[15, 52],[16, 53],[17, 54],[19, 52],[20, 56],[21, 52],[22, 56],[24, 53],[25, 0],[26, 0],[27, 0],[28, 58]])
+
+export const dark_red_ghost_active_TextArea = n427
+const n428 = t([[15, 55],[16, 33],[17, 56],[19, 55],[20, 54],[21, 55],[22, 54],[24, 55],[25, 0],[26, 0],[27, 0],[28, 0]])
+
+export const dark_red_ghost_active_Separator = n428
+const n429 = t([[15, 50],[16, 50],[17, 51],[19, 50],[20, 0],[21, 50],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 33]])
+
+export const dark_red_ghost_dim_Card = n429
+export const dark_red_ghost_dim_Button = n429
+export const dark_red_ghost_dim_DrawerFrame = n429
+export const dark_red_ghost_dim_Progress = n429
+export const dark_red_ghost_dim_TooltipArrow = n429
+export const dark_red_ghost_dim_Input = n429
+export const dark_red_ghost_dim_Surface = n429
+const n430 = t([[15, 51],[16, 51],[17, 52],[19, 51],[20, 58],[21, 51],[22, 58],[24, 51],[25, 56],[26, 56],[27, 56],[28, 56]])
+
+export const dark_red_ghost_dim_Checkbox = n430
+export const dark_red_ghost_dim_Switch = n430
+export const dark_red_ghost_dim_SliderTrack = n430
+const n431 = t([[15, 0],[16, 0],[17, 0],[19, 0],[20, 49],[21, 0],[22, 49],[24, 0],[25, 56],[26, 56],[27, 56],[28, 56]])
+
+export const dark_red_ghost_dim_SwitchThumb = n431
+const n432 = t([[15, 49],[16, 49],[17, 49],[19, 49],[20, 0],[21, 49],[22, 0],[24, 49],[25, 54],[26, 54],[27, 54],[28, 54]])
+
+export const dark_red_ghost_dim_TooltipContent = n432
+const n433 = t([[15, 49],[16, 49],[17, 50],[19, 49],[20, 0],[21, 49],[22, 0],[24, 50],[25, 33],[26, 33],[27, 33],[28, 55]])
+
+export const dark_red_ghost_dim_TextArea = n433
+const n434 = t([[15, 52],[16, 52],[17, 53],[19, 52],[20, 57],[21, 52],[22, 57],[24, 52],[25, 57],[26, 57],[27, 57],[28, 57]])
+
+export const dark_red_ghost_dim_Separator = n434

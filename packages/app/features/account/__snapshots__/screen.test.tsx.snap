@@ -322,19 +322,33 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           style={
             {
               "flexDirection": "row",
+              "marginTop": "auto",
               "paddingTop": 16,
             }
           }
         >
           <View
+            accessibilityRole="link"
             href="/account/settings/edit-profile"
             testID="MockSolitoLink"
           >
             <Text
-              cancelable={true}
+              accessibilityRole="button"
+              cancelable={[Function]}
               disabled={false}
-              focusable={true}
+              focusVisibleStyle={
+                {
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "#86AE80",
+                  "borderLeftColor": "#86AE80",
+                  "borderRightColor": "#86AE80",
+                  "borderTopColor": "#86AE80",
+                }
+              }
+              focusable={[Function]}
               minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onPress={[Function]}
@@ -342,19 +356,30 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               onPressOut={[Function]}
               style={
                 {
+                  "alignItems": "center",
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "#40FB50",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
                   "borderBottomWidth": 1,
+                  "borderLeftColor": "#40FB50",
                   "borderLeftWidth": 1,
+                  "borderRightColor": "#40FB50",
                   "borderRightWidth": 1,
                   "borderStyle": "solid",
+                  "borderTopColor": "#40FB50",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
                   "borderTopWidth": 1,
                   "color": "#40FB50",
+                  "display": "flex",
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
                   "fontFamily": "System",
                   "fontSize": 16.8,
                   "fontWeight": "400",
+                  "height": 44,
+                  "justifyContent": "center",
                   "lineHeight": 19,
                   "maxWidth": 301,
                   "paddingBottom": 16,
@@ -504,7 +529,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Sendtag
+        Sendtags
       </Text>
       <Text
         selectable={true}
@@ -520,7 +545,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Add sendtag now!
+        Add a sendtag now!
       </Text>
       <View
         style={
@@ -530,12 +555,36 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
       >
         <View
+          accessibilityRole="link"
           href="/account/sendtag"
           testID="MockSolitoLink"
         >
           <Text
+            accessibilityRole="button"
+            cancelable={[Function]}
+            disabled={false}
+            focusVisibleStyle={
+              {
+                "backgroundColor": "transparent",
+                "borderBottomColor": "#86AE80",
+                "borderLeftColor": "#86AE80",
+                "borderRightColor": "#86AE80",
+                "borderTopColor": "#86AE80",
+              }
+            }
+            focusable={[Function]}
+            minPressDuration={0}
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPress={[Function]}
+            onPressIn={[Function]}
+            onPressOut={[Function]}
             style={
               {
+                "alignItems": "center",
+                "backgroundColor": "transparent",
                 "borderBottomColor": "#40FB50",
                 "borderBottomLeftRadius": 9,
                 "borderBottomRightRadius": 9,
@@ -549,10 +598,15 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 "borderTopLeftRadius": 9,
                 "borderTopRightRadius": 9,
                 "borderTopWidth": 1,
-                "color": "#081619",
+                "color": "#40FB50",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
                 "fontFamily": "System",
                 "fontSize": 16.8,
                 "fontWeight": "400",
+                "height": 44,
+                "justifyContent": "center",
                 "lineHeight": 19,
                 "paddingBottom": 13,
                 "paddingLeft": 18,
@@ -572,12 +626,12 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               }
             >
               <RNSVGSvgView
-                bbHeight="20"
-                bbWidth="20"
+                bbHeight="24"
+                bbWidth="24"
                 color="#40FB50"
                 fill="none"
                 focusable={false}
-                height={20}
+                height={24}
                 strokeWidth="2"
                 style={
                   [
@@ -590,13 +644,13 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                     },
                     {
                       "flex": 0,
-                      "height": 20,
-                      "width": 20,
+                      "height": 24,
+                      "width": 24,
                     },
                   ]
                 }
                 tintColor="#40FB50"
-                width={20}
+                width={24}
               >
                 <RNSVGGroup
                   fill={null}
@@ -615,10 +669,10 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                         "type": 0,
                       }
                     }
-                    height="20"
+                    height="24"
                     maskContentUnits={1}
                     maskUnits={1}
-                    width="20"
+                    width="24"
                     x="0"
                     y="0"
                   >
@@ -663,10 +717,13 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 </RNSVGGroup>
               </RNSVGSvgView>
               <Text
-                selectable={true}
+                lineBreakMode="clip"
+                numberOfLines={1}
                 style={
                   {
-                    "color": "#111f22",
+                    "color": "#FFFFFF",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
                     "fontFamily": "System",
                     "fontSize": 21.599999999999998,
                     "fontWeight": "600",
@@ -675,6 +732,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   }
                 }
                 suppressHighlighting={true}
+                userSelect="none"
               >
                 Add
               </Text>
@@ -737,7 +795,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Start earning now!
+        Start earning today!
       </Text>
       <View
         style={
@@ -747,12 +805,36 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         }
       >
         <View
+          accessibilityRole="link"
           href="/account/rewards"
           testID="MockSolitoLink"
         >
           <Text
+            accessibilityRole="button"
+            cancelable={[Function]}
+            disabled={false}
+            focusVisibleStyle={
+              {
+                "backgroundColor": "transparent",
+                "borderBottomColor": "#86AE80",
+                "borderLeftColor": "#86AE80",
+                "borderRightColor": "#86AE80",
+                "borderTopColor": "#86AE80",
+              }
+            }
+            focusable={[Function]}
+            minPressDuration={0}
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPress={[Function]}
+            onPressIn={[Function]}
+            onPressOut={[Function]}
             style={
               {
+                "alignItems": "center",
+                "backgroundColor": "transparent",
                 "borderBottomColor": "#40FB50",
                 "borderBottomLeftRadius": 9,
                 "borderBottomRightRadius": 9,
@@ -766,10 +848,15 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 "borderTopLeftRadius": 9,
                 "borderTopRightRadius": 9,
                 "borderTopWidth": 1,
-                "color": "#081619",
+                "color": "#40FB50",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexWrap": "nowrap",
                 "fontFamily": "System",
                 "fontSize": 16.8,
                 "fontWeight": "400",
+                "height": 44,
+                "justifyContent": "center",
                 "lineHeight": 19,
                 "paddingBottom": 13,
                 "paddingLeft": 18,
@@ -790,12 +877,12 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             >
               <RNSVGSvgView
                 align="xMidYMid"
-                bbHeight="20"
-                bbWidth="20"
+                bbHeight="24"
+                bbWidth="24"
                 color="#40FB50"
                 fill="none"
                 focusable={false}
-                height={20}
+                height={24}
                 meetOrSlice={0}
                 minX={0}
                 minY={0}
@@ -811,15 +898,15 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                     },
                     {
                       "flex": 0,
-                      "height": 20,
-                      "width": 20,
+                      "height": 24,
+                      "width": 24,
                     },
                   ]
                 }
                 tintColor="#40FB50"
                 vbHeight={20}
                 vbWidth={20}
-                width={20}
+                width={24}
               >
                 <RNSVGGroup
                   fill={null}
@@ -847,10 +934,13 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 </RNSVGGroup>
               </RNSVGSvgView>
               <Text
-                selectable={true}
+                lineBreakMode="clip"
+                numberOfLines={1}
                 style={
                   {
-                    "color": "#111f22",
+                    "color": "#FFFFFF",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
                     "fontFamily": "System",
                     "fontSize": 21.599999999999998,
                     "fontWeight": "600",
@@ -859,6 +949,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   }
                 }
                 suppressHighlighting={true}
+                userSelect="none"
               >
                 Earn
               </Text>
@@ -939,8 +1030,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               "borderTopRightRadius": 9,
               "flexShrink": 1,
               "paddingBottom": 10,
-              "paddingLeft": 16,
-              "paddingRight": 16,
               "paddingTop": 10,
             }
           }
@@ -1029,7 +1118,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               align="xMidYMid"
               bbHeight="20"
               bbWidth="20"
-              color="#FFFFFF"
+              color="#40FB50"
               fill="none"
               focusable={false}
               height={20}
@@ -1043,7 +1132,9 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                     "backgroundColor": "transparent",
                     "borderWidth": 0,
                   },
-                  {},
+                  {
+                    "color": "#40FB50",
+                  },
                   {
                     "flex": 0,
                     "height": 20,
@@ -1051,7 +1142,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   },
                 ]
               }
-              tintColor="#FFFFFF"
+              tintColor="#40FB50"
               vbHeight={24}
               vbWidth={24}
               width={20}
@@ -1095,256 +1186,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             </RNSVGSvgView>
           </View>
         </View>
-      </View>
-    </View>
-    <View
-      style={
-        {
-          "display": "flex",
-          "flex": 1,
-          "flexDirection": "row",
-          "gap": 24,
-          "justifyContent": "center",
-        }
-      }
-    >
-      <View
-        href="/account/sendtag"
-        testID="MockSolitoLink"
-      >
-        <Text
-          style={
-            {
-              "borderBottomColor": "#40FB50",
-              "borderBottomLeftRadius": 9,
-              "borderBottomRightRadius": 9,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "#40FB50",
-              "borderLeftWidth": 1,
-              "borderRightColor": "#40FB50",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "#40FB50",
-              "borderTopLeftRadius": 9,
-              "borderTopRightRadius": 9,
-              "borderTopWidth": 1,
-              "color": "#081619",
-              "fontFamily": "System",
-              "fontSize": 16.8,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "paddingBottom": 13,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 13,
-            }
-          }
-          suppressHighlighting={true}
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 7,
-              }
-            }
-          >
-            <RNSVGSvgView
-              align="xMidYMid"
-              bbHeight="20"
-              bbWidth="20"
-              color="#40FB50"
-              fill="none"
-              focusable={false}
-              height={20}
-              meetOrSlice={0}
-              minX={0}
-              minY={0}
-              strokeWidth="2"
-              style={
-                [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {
-                    "color": "#40FB50",
-                  },
-                  {
-                    "flex": 0,
-                    "height": 20,
-                    "width": 20,
-                  },
-                ]
-              }
-              tintColor="#40FB50"
-              vbHeight={20}
-              vbWidth={20}
-              width={20}
-            >
-              <RNSVGGroup
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "strokeWidth",
-                  ]
-                }
-                strokeWidth="2"
-              >
-                <RNSVGPath
-                  d="M9.37508 10.6243H4.16675V9.37435H9.37508V4.16602H10.6251V9.37435H15.8334V10.6243H10.6251V15.8327H9.37508V10.6243Z"
-                  fill={
-                    {
-                      "type": 2,
-                    }
-                  }
-                  propList={
-                    [
-                      "fill",
-                    ]
-                  }
-                />
-              </RNSVGGroup>
-            </RNSVGSvgView>
-            <Text
-              selectable={true}
-              style={
-                {
-                  "color": "#40FB50",
-                  "fontFamily": "System",
-                  "fontSize": 21.599999999999998,
-                  "fontWeight": "600",
-                  "lineHeight": 23,
-                  "textTransform": "uppercase",
-                }
-              }
-              suppressHighlighting={true}
-            >
-              Sendtags
-            </Text>
-          </View>
-        </Text>
-      </View>
-      <View
-        href="/account/rewards"
-        testID="MockSolitoLink"
-      >
-        <Text
-          style={
-            {
-              "borderBottomColor": "#40FB50",
-              "borderBottomLeftRadius": 9,
-              "borderBottomRightRadius": 9,
-              "borderBottomWidth": 1,
-              "borderLeftColor": "#40FB50",
-              "borderLeftWidth": 1,
-              "borderRightColor": "#40FB50",
-              "borderRightWidth": 1,
-              "borderStyle": "solid",
-              "borderTopColor": "#40FB50",
-              "borderTopLeftRadius": 9,
-              "borderTopRightRadius": 9,
-              "borderTopWidth": 1,
-              "color": "#081619",
-              "fontFamily": "System",
-              "fontSize": 16.8,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "paddingBottom": 13,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 13,
-            }
-          }
-          suppressHighlighting={true}
-        >
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "gap": 7,
-              }
-            }
-          >
-            <RNSVGSvgView
-              align="xMidYMid"
-              bbHeight="20"
-              bbWidth="20"
-              color="#40FB50"
-              fill="none"
-              focusable={false}
-              height={20}
-              meetOrSlice={0}
-              minX={0}
-              minY={0}
-              strokeWidth="2"
-              style={
-                [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {
-                    "color": "#40FB50",
-                  },
-                  {
-                    "flex": 0,
-                    "height": 20,
-                    "width": 20,
-                  },
-                ]
-              }
-              tintColor="#40FB50"
-              vbHeight={20}
-              vbWidth={20}
-              width={20}
-            >
-              <RNSVGGroup
-                fill={null}
-                propList={
-                  [
-                    "fill",
-                    "strokeWidth",
-                  ]
-                }
-                strokeWidth="2"
-              >
-                <RNSVGPath
-                  d="M9.39567 17.5V15.75C8.604 15.6111 7.9547 15.309 7.44775 14.8438C6.94081 14.3785 6.57623 13.7917 6.354 13.0833L7.52067 12.6042C7.75678 13.2708 8.09706 13.7674 8.5415 14.0938C8.98595 14.4201 9.52067 14.5833 10.1457 14.5833C10.8123 14.5833 11.3609 14.4167 11.7915 14.0833C12.2221 13.75 12.4373 13.2917 12.4373 12.7083C12.4373 12.0972 12.2464 11.625 11.8644 11.2917C11.4825 10.9583 10.7637 10.6181 9.70817 10.2708C8.70817 9.95139 7.96164 9.52778 7.46859 9C6.97553 8.47222 6.729 7.8125 6.729 7.02083C6.729 6.25694 6.97553 5.61806 7.46859 5.10417C7.96164 4.59028 8.604 4.29861 9.39567 4.22917V2.5H10.6457V4.22917C11.2707 4.29861 11.8089 4.50347 12.2603 4.84375C12.7116 5.18403 13.0554 5.61806 13.2915 6.14583L12.1248 6.64583C11.9304 6.20139 11.67 5.87847 11.3436 5.67708C11.0172 5.47569 10.5901 5.375 10.0623 5.375C9.42345 5.375 8.9165 5.52083 8.5415 5.8125C8.1665 6.10417 7.979 6.5 7.979 7C7.979 7.52778 8.18734 7.95486 8.604 8.28125C9.02067 8.60764 9.7915 8.94444 10.9165 9.29167C11.8609 9.58333 12.5589 10.0035 13.0103 10.5521C13.4616 11.1007 13.6873 11.7917 13.6873 12.625C13.6873 13.5 13.4304 14.2049 12.9165 14.7396C12.4026 15.2743 11.6457 15.6181 10.6457 15.7708V17.5H9.39567Z"
-                  fill={
-                    {
-                      "type": 2,
-                    }
-                  }
-                  propList={
-                    [
-                      "fill",
-                    ]
-                  }
-                />
-              </RNSVGGroup>
-            </RNSVGSvgView>
-            <Text
-              selectable={true}
-              style={
-                {
-                  "color": "#40FB50",
-                  "fontFamily": "System",
-                  "fontSize": 21.599999999999998,
-                  "fontWeight": "600",
-                  "lineHeight": 23,
-                  "textTransform": "uppercase",
-                }
-              }
-              suppressHighlighting={true}
-            >
-              Rewards
-            </Text>
-          </View>
-        </Text>
       </View>
     </View>
   </View>

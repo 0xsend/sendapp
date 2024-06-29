@@ -188,15 +188,7 @@ export const SignInForm = () => {
 }
 
 const ForgotPhoneNumberLink = (props: AnchorProps) => (
-  <Anchor
-    $theme-dark={{
-      col: '$background',
-    }}
-    $theme-light={{ col: '$black' }}
-    href=""
-    fontSize="$3"
-    {...props}
-  >
+  <Anchor href="" fontSize="$3" {...props}>
     Forgot your phone number?
   </Anchor>
 )

@@ -83,7 +83,6 @@ export const masks = {
       backgroundHover: plain.backgroundTransparent,
       color: plain.borderColor,
       colorPress: plain.background,
-      borderColor: plain.borderColor,
     }
   }),
 }

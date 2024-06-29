@@ -46,9 +46,6 @@ export const componentThemeDefinitions = {
       parent: 'dark_green',
       mask: 'inverseSoften3',
       ...maskOptions.button,
-      override: {
-        color: 0,
-      },
     },
     {
       parent: '',

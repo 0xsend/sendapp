@@ -36,8 +36,8 @@ export function DepositWelcome(props: YStackProps) {
 
         <Fade>
           <Stack gap={'$4'} w={'100%'} $gtMd={{ flexDirection: 'row' }}>
-            <DespositWeb3Link />
-            <DespositCoinbasePay />
+            <DepositWeb3Link />
+            <DepositCoinbasePay />
           </Stack>
         </Fade>
       </YStack>
@@ -45,7 +45,7 @@ export function DepositWelcome(props: YStackProps) {
   )
 }
 
-function DespositWeb3Link() {
+function DepositWeb3Link() {
   return (
     <DepositStackButton>
       <DepositButton
@@ -60,7 +60,7 @@ function DespositWeb3Link() {
   )
 }
 
-function DespositCoinbasePay() {
+function DepositCoinbasePay() {
   const toast = useToastController()
   return (
     <DepositStackButton disabled disabledStyle={{ opacity: 0.5 }}>

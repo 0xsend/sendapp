@@ -26,7 +26,7 @@ export function DepositPopover(props: PopoverProps) {
     >
       <Theme name="green">
         <Popover.Trigger asChild>
-          <Button px={'$3.5'} h={'$4.5'} width={'100%'} borderRadius={'$4'}>
+          <Button px={'$3.5'} h={'$4.5'} borderRadius={'$4'} f={1}>
             <XStack w={'100%'} jc={'space-between'} ai={'center'}>
               <ButtonText fontWeight={'500'} textTransform={'uppercase'}>
                 Deposit
