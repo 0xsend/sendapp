@@ -43,9 +43,9 @@ services:
       - supabase_network_send
 secrets:
   SUPABASE_DB_URL:
-    file: ./var/SUPABASE_DB_URL.txt
+    environment: SUPABASE_DB_URL
   SUPABASE_SERVICE_ROLE:
-    file: ./var/SUPABASE_SERVICE_ROLE.txt
+    environment: SUPABASE_SERVICE_ROLE
 
 networks:
   supabase_network_send:
