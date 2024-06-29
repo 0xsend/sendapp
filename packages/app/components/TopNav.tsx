@@ -101,7 +101,7 @@ export function TopNav({
   const renderButton = () => {
     switch (true) {
       case button === undefined:
-        return <Button opacity={0} disabled />
+        return <Button opacity={0} disabled $gtMd={{ display: 'none' }} />
       case selectedCoin !== undefined:
         return (
           <ButtonOg
