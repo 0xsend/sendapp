@@ -1,7 +1,5 @@
 import {
   Avatar,
-  Link,
-  type LinkProps,
   Paragraph,
   Separator,
   XStack,
@@ -19,6 +17,7 @@ import {
   isWeb,
   ButtonIcon,
   ButtonText,
+  LinkButton,
 } from '@my/ui'
 import {
   IconAccount,
@@ -35,7 +34,7 @@ import * as Clipboard from 'expo-clipboard'
 import * as Sharing from 'expo-sharing'
 import { useRootScreenParams } from 'app/routers/params'
 import type React from 'react'
-import { type ElementType, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useConfirmedTags } from 'app/utils/tags'
 
 export function AccountScreen() {
@@ -78,28 +77,70 @@ export function AccountScreen() {
 
   const cards = [
     {
-      label: 'Sendtag',
-      description: 'Add sendtag now!',
+      label: 'Sendtags',
+      description: 'Add a sendtag now!',
       child: (
-        <BorderedLink href={'/account/sendtag'} Icon={IconBadgeCheck}>
-          Add
-        </BorderedLink>
+        <LinkButton
+          href={'/account/sendtag'}
+          theme={'green'}
+          variant="outlined"
+          bw={1}
+          br={'$4'}
+          p={'$3'}
+          px={'$4'}
+          $theme-light={{ color: '$color12', boc: '$color12' }}
+        >
+          <XStack gap={'$2'} ai={'center'}>
+            <Button.Icon>
+              <IconBadgeCheck size="$1.5" $theme-light={{ boc: '$color12' }} />
+            </Button.Icon>
+            <Button.Text
+              textTransform="uppercase"
+              size={'$6'}
+              color="$color12"
+              $theme-light={{ boc: '$color12' }}
+            >
+              Add
+            </Button.Text>
+          </XStack>
+        </LinkButton>
       ),
     },
     {
       label: 'Rewards',
-      description: 'Start earning now!',
+      description: 'Start earning today!',
       child: (
-        <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-          Earn
-        </BorderedLink>
+        <LinkButton
+          href="/account/rewards"
+          theme="green"
+          variant="outlined"
+          bw={1}
+          br="$4"
+          p={'$3'}
+          px={'$4'}
+          $theme-light={{ color: '$color12', boc: '$color12' }}
+        >
+          <XStack gap={'$2'} ai={'center'}>
+            <Button.Icon>
+              <IconDollar size="$1.5" $theme-light={{ color: '$color12', boc: '$color12' }} />
+            </Button.Icon>
+            <Button.Text
+              textTransform="uppercase"
+              size={'$6'}
+              color="$color12"
+              $theme-light={{ boc: '$color12' }}
+            >
+              Earn
+            </Button.Text>
+          </XStack>
+        </LinkButton>
       ),
     },
     {
       label: 'Referrals',
       description: 'Share your link',
       child: (
-        <View py={'$2.5'} px={'$size.0.9'} borderRadius={'$4'} flexShrink={1}>
+        <View py={'$2.5'} borderRadius={'$4'} flexShrink={1}>
           <TooltipSimple
             label={<Paragraph color="$white">{canShare ? 'Share' : 'Copy'}</Paragraph>}
           >
@@ -113,11 +154,15 @@ export function AccountScreen() {
               onPress={shareOrCopyOnPress}
               color="$color12"
               iconAfter={
-                <Theme name="green">
+                <Theme name="green_Button">
                   {canShare ? (
-                    <IconShare size="$1" $platform-web={{ cursor: 'pointer' }} />
+                    <IconShare
+                      size="$1"
+                      col={'$background'}
+                      $platform-web={{ cursor: 'pointer' }}
+                    />
                   ) : (
-                    <IconCopy size="$1" $platform-web={{ cursor: 'pointer' }} />
+                    <IconCopy size="$1" col={'$background'} $platform-web={{ cursor: 'pointer' }} />
                   )}
                 </Theme>
               }
@@ -135,15 +180,16 @@ export function AccountScreen() {
       <Card p={'$size.3.5'} w={'100%'}>
         <XStack gap={'$size.3.5'} w={'100%'} flexWrap="wrap">
           <View width={'100%'} $gtMd={{ width: 'auto' }}>
-            <Avatar $gtMd={{ size: 256 }} size={'$10'} borderRadius={'$3'}>
+            <Avatar $gtMd={{ size: 316 }} size={'$10'} borderRadius={'$3'}>
               <Avatar.Image
-                $gtMd={{ w: 256, h: 256 }}
+                $gtMd={{ w: 316, h: 264 }}
                 w={'$10'}
                 h="$10"
                 accessibilityLabel=""
                 src={avatar_url ?? ''}
               />
               <Avatar.Fallback
+                $gtMd={{ w: 316, h: 264 }}
                 f={1}
                 jc={'center'}
                 ai={'center'}
@@ -189,11 +235,12 @@ export function AccountScreen() {
               )}
             </YStack>
 
-            <XStack pt={'$size.0.9'}>
+            <XStack pt={'$size.0.9'} mt="auto" $gtMd={{ mb: '$size.5' }}>
               <Theme name="green">
-                <Link
+                <LinkButton
                   href="/account/settings/edit-profile"
-                  theme={'ghost_Button'}
+                  theme={'ghost'}
+                  variant="outlined"
                   borderRadius={'$4'}
                   color="$borderColor"
                   $theme-light={{ boc: '$color12' }}
@@ -222,7 +269,7 @@ export function AccountScreen() {
                       Settings
                     </Paragraph>
                   </XStack>
-                </Link>
+                </LinkButton>
               </Theme>
             </XStack>
           </YStack>
@@ -236,8 +283,29 @@ export function AccountScreen() {
           </ActionCard>
         ))}
 
-        {tags?.length === 0 ? <NoTagsMessage /> : null}
-        <BottomButtonRow />
+        {tags?.length === 0 ? (
+          <>
+            <NoTagsMessage />
+            <Stack f={1} jc="center" $md={{ display: 'none' }}>
+              <Theme name="green">
+                <LinkButton
+                  href={'/account/sendtag/checkout'}
+                  borderRadius={'$4'}
+                  p={'$3.5'}
+                  px="$6"
+                  maw={301}
+                >
+                  <XStack gap={'$1.5'} ai={'center'} jc="center">
+                    <ButtonIcon>
+                      <IconPlus size={'$1.25'} />
+                    </ButtonIcon>
+                    <ButtonText textTransform="uppercase">SENDTAGS</ButtonText>
+                  </XStack>
+                </LinkButton>
+              </Theme>
+            </Stack>
+          </>
+        ) : null}
       </XStack>
     </YStack>
   )
@@ -283,39 +351,6 @@ const ActionCard = ({
   )
 }
 
-const BorderedLink = ({
-  Icon,
-  children,
-  ...props
-}: { Icon?: ElementType; children: React.ReactNode } & LinkProps) => {
-  return (
-    <Link
-      {...props}
-      theme={'green_ghost_Button'}
-      boc={'$borderColor'}
-      bw={1}
-      br={'$4'}
-      p={'$3'}
-      px={'$4'}
-      $theme-light={{ color: '$color12', boc: '$color12' }}
-    >
-      <XStack gap={'$2'} ai={'center'}>
-        {Icon && (
-          <Icon $theme-light={{ color: '$color12', boc: '$color12' }} color="$borderColor" />
-        )}
-        <Paragraph
-          textTransform="uppercase"
-          size={'$6'}
-          color="$borderColor"
-          $theme-light={{ color: '$color12', boc: '$color12' }}
-        >
-          {children}
-        </Paragraph>
-      </XStack>
-    </Link>
-  )
-}
-
 const NoTagsMessage = () => {
   return (
     <>
@@ -343,46 +378,5 @@ const NoTagsMessage = () => {
         </Paragraph>
       </YStack>
     </>
-  )
-}
-
-const BottomButtonRow = () => {
-  const tags = useConfirmedTags()
-  const media = useMedia()
-
-  if (media.gtMd && (tags === undefined || tags.length === 0))
-    return (
-      <Stack f={1} jc="center" $md={{ display: 'none' }}>
-        <Theme name="green">
-          <Link
-            href={'/account/sendtag/checkout'}
-            theme="Button"
-            borderRadius={'$4'}
-            p={'$3.5'}
-            px="$6"
-            maw={301}
-            bc="$background"
-            hoverStyle={{ bc: '$backgroundHover' }}
-          >
-            <XStack gap={'$1.5'} ai={'center'} jc="center">
-              <ButtonIcon>
-                <IconPlus size={'$1.25'} />
-              </ButtonIcon>
-              <ButtonText textTransform="uppercase">SENDTAGS</ButtonText>
-            </XStack>
-          </Link>
-        </Theme>
-      </Stack>
-    )
-
-  return (
-    <XStack gap={'$5'} f={1} display="flex" jc="center" $gtMd={{ display: 'none' }}>
-      <BorderedLink href={'/account/sendtag'} Icon={IconPlus}>
-        Sendtags
-      </BorderedLink>
-      <BorderedLink href={'/account/rewards'} Icon={IconDollar}>
-        Rewards
-      </BorderedLink>
-    </XStack>
   )
 }
