@@ -1,6 +1,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
-import { Stack, XStack, YStack, Text, Button, ButtonText, useToastController } from '@my/ui'
+import {
+  Stack,
+  XStack,
+  YStack,
+  Text,
+  Button,
+  ButtonText,
+  useToastController,
+  Paragraph,
+} from '@my/ui'
 import type {
   ChallengeResponse,
   VerifyChallengeRequest,
@@ -101,37 +110,36 @@ export default function AccountRecovery(props: Props) {
         {error ? <IconError size={'$4'} color={'$red9Dark'} /> : <IconRefresh size={'$4'} />}
 
         {/* Heading */}
-        <Text fontWeight="bold" textAlign="center">
-          {error ? (
-            <Text testID="account-recovery-heading-error">Unable to recover account</Text>
-          ) : (
-            <Text testID="account-recovery-heading">Recover account</Text>
-          )}
-        </Text>
+        {error ? (
+          <Paragraph testID="account-recovery-heading-error">Unable to recover account</Paragraph>
+        ) : (
+          <Paragraph testID="account-recovery-heading">Recover account</Paragraph>
+        )}
 
         {/* Description */}
-        <Text textAlign="center">
-          {error?.message ? (
-            <Text testID="account-recovery-description-error">{error.message}</Text>
-          ) : (
-            <Text testID="account-recovery-description">
-              Recover with the {getRecoveryOptionsStr()} linked to your account.
-            </Text>
-          )}
-        </Text>
+
+        {error?.message ? (
+          <Paragraph testID="account-recovery-description-error">{error.message}</Paragraph>
+        ) : (
+          <Paragraph testID="account-recovery-description">
+            Recover with the {getRecoveryOptionsStr()} linked to your account.
+          </Paragraph>
+        )}
       </>
     )
   }
 
   return (
     <YStack mt={'0'} w={'100%'} h={'100%'} jc={'space-between'} maxWidth={600} mx="auto" pb="$6">
-      <Stack flex={1} jc={'center'} alignItems="center" gap="$2">
+      <Stack flex={1} jc={'center'} alignItems="center" gap="$4">
         {showHeading()}
         {!error && challengeData && showRecoveryOptions()}
       </Stack>
 
-      <Button w={'100%'} theme="green" onPress={props.onClose}>
-        <ButtonText>RETURN</ButtonText>
+      <Button w={'100%'} theme="red_active" onPress={props.onClose} br="$4">
+        <ButtonText textTransform="uppercase" theme="red">
+          Cancel
+        </ButtonText>
       </Button>
     </YStack>
   )
