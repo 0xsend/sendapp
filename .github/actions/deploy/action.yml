@@ -27,6 +27,10 @@ inputs:
     description: "The URL to use for notifying QA of a new deployment."
     required: false
     default: ""
+  skip-supabase-deploy:
+    description: "Whether to skip the Supabase deployment."
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -37,6 +41,7 @@ runs:
       env:
         YARN_ENABLE_HARDENED_MODE: "0"
     - name: Supabase Deploy
+      if: ${{ inputs.skip-supabase-deploy != 'true' }}
       id: deploy
       uses: ./.github/actions/supabase-deploy
       with:

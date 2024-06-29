@@ -14,10 +14,18 @@ export type CreateResult = {
 export type SignRequest = {
   domain: string
   challengeB64: string
+  /**
+   * The list of raw ids to use for signing. Required for Android and Chrome.
+   */
+  rawIdsB64: string[]
 }
 
 export type SignResult = {
-  passkeyName: string
+  /**
+   * The base64 encoded raw id of the credential.
+   */
+  id: string
+  passkeyName: string | null
   rawClientDataJSONB64: string
   rawAuthenticatorDataB64: string
   signatureB64: string

@@ -117,7 +117,9 @@ export function parseSignResponse(result: SignResult) {
   const derSig = base64.decode(result.signatureB64)
   const rawAuthenticatorData = base64.decode(result.rawAuthenticatorDataB64)
   const passkeyName = result.passkeyName
-  const [accountName, keySlotStr] = passkeyName.split('.') // Assumes account name does not have periods (.) in it.
+  // not ideal to handle null case but this is due to a few send accounts being opened with non-resident passkeys (which have no userHandle)
+  // still assert that the passkey name is valid since it's required for the user to be able to sign user ops
+  const [accountName, keySlotStr] = passkeyName?.split('.') ?? [] // Assumes account name does not have periods (.) in it.
   assert(!!accountName && !!keySlotStr, 'Invalid passkey name')
   const keySlot = Number.parseInt(keySlotStr, 10)
   const clientDataJSON = Buffer.from(base64.decode(result.rawClientDataJSONB64)).toString('utf-8')

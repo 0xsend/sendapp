@@ -344,6 +344,10 @@ const RemovePasskeyConfirmation = ({
     error: sendAccountError,
     isLoading: isLoadingSendAccount,
   } = useSendAccount()
+  const webauthnCreds =
+    sendAccount?.send_account_credentials
+      .filter((c) => !!c.webauthn_credentials)
+      .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const {
     data: usdcBal,
     error: usdcBalError,
@@ -440,7 +444,7 @@ const RemovePasskeyConfirmation = ({
         assert((usdcBal?.value ?? 0n) > 0n, 'No USDC balance to pay for gas fees')
         assert(!!userOp, 'User op is required')
 
-        await sendUserOp({ userOp })
+        await sendUserOp({ userOp, webauthnCreds })
       }
 
       const { error } = await supabase

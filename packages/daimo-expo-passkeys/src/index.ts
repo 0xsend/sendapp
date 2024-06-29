@@ -90,7 +90,9 @@ export async function signWithPasskey(request: SignRequest): Promise<SignResult>
     case 'ios': {
       const ret = await ExpoPasskeysModule.signWithPasskey(request.domain, request.challengeB64)
       const userIDstr = new TextDecoder('utf-8').decode(base64.decode(ret.userID))
+      // @todo: add support for rawIdsB64 and retuning the id
       return {
+        id: '',
         passkeyName: userIDstr,
         rawClientDataJSONB64: ret.rawClientDataJSON,
         rawAuthenticatorDataB64: ret.rawAuthenticatorData,
@@ -103,7 +105,9 @@ export async function signWithPasskey(request: SignRequest): Promise<SignResult>
       const userIDstr = new TextDecoder('utf-8').decode(
         base64.decode(toBase64(ret.response.userHandle))
       )
+      // @todo: add support for rawIdsB64 and retuning the id
       return {
+        id: '',
         passkeyName: userIDstr,
         rawClientDataJSONB64: toBase64(ret.response.clientDataJSON),
         rawAuthenticatorDataB64: toBase64(ret.response.authenticatorData),
@@ -113,9 +117,11 @@ export async function signWithPasskey(request: SignRequest): Promise<SignResult>
     case 'web': {
       const ret = await (ExpoPasskeysModule as typeof ExpoPasskeysModuleWeb).signWithPasskey(
         request.domain,
-        request.challengeB64
+        request.challengeB64,
+        request.rawIdsB64
       )
       return {
+        id: ret.id,
         passkeyName: ret.passkeyName,
         rawClientDataJSONB64: ret.rawClientDataJSONB64,
         rawAuthenticatorDataB64: ret.rawAuthenticatorDataB64,

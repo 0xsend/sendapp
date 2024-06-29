@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      skip-supabase-deploy:
+        description: 'Whether to skip the Supabase deployment.'
+        required: false
+        default: 'false'
   workflow_call:
     secrets:
       VERCEL_TOKEN:
@@ -50,3 +55,4 @@ jobs:
           supabase-access-token: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           supabase-db-password: ${{ secrets.PRODUCTION_SUPABASE_DB_PASSWORD }}
           qa-notification-url: ${{ secrets.CI_QA_NOTIFICATION_URL }}
+          skip-supabase-deploy: ${{ inputs.skip-supabase-deploy }}
