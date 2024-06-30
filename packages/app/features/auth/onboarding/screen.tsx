@@ -7,7 +7,7 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { Stack, YStack, Theme, useMedia } from '@my/ui'
+import { Stack, YStack, useMedia } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { OnboardingForm } from './onboarding-form'
 import { Carousel } from '../components/Carousel'

@@ -11,6 +11,7 @@ import {
   YStack,
 } from '@my/ui'
 import { base16, base64 } from '@scure/base'
+import { useAuthScreenParams } from 'app/routers/params'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
@@ -29,6 +30,8 @@ const OnboardingSchema = z.object({
 })
 
 export const OnboardingForm = () => {
+  const [queryParams] = useAuthScreenParams()
+  const { redirectUri } = queryParams
   const sendAccountCreate = api.sendAccount.create.useMutation()
   const { user } = useUser()
   const form = useForm<z.infer<typeof OnboardingSchema>>()
@@ -72,7 +75,7 @@ export const OnboardingForm = () => {
           const { data: sendAcct, error: refetchError } = await refetchSendAccount()
           if (refetchError) throw refetchError
           if (sendAcct) {
-            replace('/')
+            replace(redirectUri ?? '/')
             return
           }
           form.setError('accountName', {
