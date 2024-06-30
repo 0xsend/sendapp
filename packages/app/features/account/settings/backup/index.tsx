@@ -1,3 +1,4 @@
+import type { Tables } from '@my/supabase/database.types'
 import {
   Button,
   H1,
@@ -12,6 +13,7 @@ import {
   XStack,
   YStack,
   isWeb,
+  useToastController,
 } from '@my/ui'
 import {
   baseMainnetClient,
@@ -20,7 +22,8 @@ import {
   usdcAddress,
   useReadSendAccountGetActiveSigningKeys,
 } from '@my/wagmi'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IconDots, IconNote, IconX } from 'app/components/icons'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { assert } from 'app/utils/assert'
@@ -42,6 +45,28 @@ import { z } from 'zod'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
+  const supabase = useSupabase()
+  const {
+    data: webAuthnCreds,
+    error: webAuthnCredsError,
+    isLoading: isLoadingWebAuthnCreds,
+  } = useQuery({
+    queryKey: ['webauthn_credentials'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('webauthn_credentials')
+        .select('*, send_account_credentials(*)')
+
+      if (error) {
+        // no rows
+        if (error.code === 'PGRST116') {
+          return []
+        }
+        throw new Error(error.message)
+      }
+      return data
+    },
+  })
   const hasSendAccount = !!sendAcct
   return (
     <YStack w={'100%'} als={'center'} gap={'$size.3.5'}>
@@ -67,16 +92,17 @@ export const BackupScreen = () => {
 
       {(() => {
         switch (true) {
-          case error !== null:
+          case error !== null || webAuthnCredsError !== null:
             return (
               <YStack w={'100%'} gap={'$6'}>
                 <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-                  {error.message}
+                  {error?.message}
+                  {webAuthnCredsError?.message}
                 </Paragraph>
               </YStack>
             )
-          case isLoading:
+          case isLoading || isLoadingWebAuthnCreds || !webAuthnCreds:
             return <Spinner size="large" color="$color" />
           case !hasSendAccount:
             return (
@@ -101,7 +127,7 @@ export const BackupScreen = () => {
               </YStack>
             )
           default:
-            return <WebauthnCreds sendAcct={sendAcct} />
+            return <WebauthnCreds sendAcct={sendAcct} webAuthnCreds={webAuthnCreds} />
         }
       })()}
     </YStack>
@@ -110,11 +136,16 @@ export const BackupScreen = () => {
 
 const WebauthnCreds = ({
   sendAcct,
-}: { sendAcct: NonNullable<ReturnType<typeof useSendAccount>['data']> }) => {
+  webAuthnCreds,
+}: {
+  sendAcct: Tables<'send_accounts'>
+  webAuthnCreds: (Tables<'webauthn_credentials'> & {
+    send_account_credentials: Tables<'send_account_credentials'>[] | null
+  })[]
+}) => {
   const addPasskeyLink = useLink({
     href: '/account/settings/backup/create',
   })
-
   return (
     <YStack w={'100%'} gap={'$size.3'}>
       <XStack w={'100%'} gap={'$2'} jc="space-between" ai="center">
@@ -128,32 +159,26 @@ const WebauthnCreds = ({
       <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
 
       <XStack gap="$5" flexWrap="wrap" ai="flex-start">
-        {sendAcct.send_account_credentials.map((cred) => (
-          <SendAccountCredentials
-            key={`${sendAcct.id}-${cred.key_slot}`}
-            address={sendAcct.address}
-            cred={cred}
-          />
+        {webAuthnCreds.map((cred) => (
+          <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
       </XStack>
     </YStack>
   )
 }
 
-type SendAccountCredential = NonNullable<
-  ReturnType<typeof useSendAccount>['data']
->['send_account_credentials'][number]
-
-const SendAccountCredentials = ({
-  address,
+const WebAuthnCred = ({
+  sendAcct,
   cred,
 }: {
-  address: `0x${string}`
-  cred: SendAccountCredential
+  sendAcct: Tables<'send_accounts'>
+  cred: Tables<'webauthn_credentials'> & {
+    send_account_credentials: Tables<'send_account_credentials'>[] | null
+  }
 }) => {
+  const address = sendAcct.address
   const [cardStatus, setCardStatus] = useState<'default' | 'settings' | 'remove'>('default')
-  const webauthnCred = cred.webauthn_credentials
-  assert(!!webauthnCred, 'webauthnCred not found')
+  const keySlot = cred.send_account_credentials?.[0]?.key_slot
   const {
     data: activeSigningKeys,
     isLoading: isLoadingActiveSigningKeys,
@@ -165,14 +190,15 @@ const SendAccountCredentials = ({
       enabled: !!address,
     },
   })
-  const [x, y] = COSEECDHAtoXY(byteaToBytes(webauthnCred.public_key as `\\x${string}`))
+  const [x, y] = COSEECDHAtoXY(byteaToBytes(cred.public_key as `\\x${string}`))
   const activeIndex = activeSigningKeys?.[0].findIndex(([_x, _y]) => x === _x && y === _y) ?? -1
-  const isActive = activeIndex !== -1
+  const isActive = isLoadingActiveSigningKeys || activeIndex !== -1 // default to active if loading (strongmind check)
   const onchainSlot = activeSigningKeys?.[1][activeIndex]
   const link = useLink({
-    href: `/account/settings/backup/confirm/${webauthnCred?.id}`,
+    href: `/account/settings/backup/confirm/${cred?.id}`,
   })
-  assert(!!webauthnCred, 'webauthnCred not found')
+  const isActiveUnsynced = isActive && !onchainSlot // somehow active onchain, but send.app doesn't know about it (strongmind check)
+
   return (
     <YStack
       w={'100%'}
@@ -189,7 +215,7 @@ const SendAccountCredentials = ({
     >
       <XStack jc="space-between" ai="center">
         <H4 fontWeight={'700'} color={cardStatus === 'remove' ? '$error' : '$primary'}>
-          {cardStatus === 'remove' ? 'Remove Passkey?' : webauthnCred.display_name}
+          {cardStatus === 'remove' ? 'Remove Passkey?' : cred.display_name}
         </H4>
         {cardStatus !== 'remove' && (
           <Button
@@ -235,7 +261,11 @@ const SendAccountCredentials = ({
                   <CardTextBlock label="Created At" text={formatTimeDate(cred.created_at)} />
                 )}
 
-                <CardTextBlock label="Key Slot" text={cred.key_slot.toString().padStart(2, '0')} />
+                {keySlot ? (
+                  <CardTextBlock label="Key Slot" text={keySlot.toString().padStart(2, '0')} />
+                ) : activeIndex !== -1 ? (
+                  <CardTextBlock label="Key Slot" text={activeIndex.toString().padStart(2, '0')} />
+                ) : null}
 
                 {(() => {
                   switch (true) {
@@ -256,7 +286,7 @@ const SendAccountCredentials = ({
                             }`}
                         </Paragraph>
                       )
-                    case !isActive:
+                    case !isActive || isActiveUnsynced:
                       return (
                         <YStack gap={'$size.1.5'} ai="flex-start">
                           <CardTextBlock
@@ -269,12 +299,14 @@ const SendAccountCredentials = ({
                           </Button>
                         </YStack>
                       )
-                    case onchainSlot !== cred.key_slot:
+
+                    case !!onchainSlot && onchainSlot !== keySlot: // onchain slot is set but not the same as the key slot, ask user to update
                       return (
-                        <Paragraph fontWeight={'300'} color={'$yellowVibrant'} fontFamily={'$mono'}>
-                          Onchain Slot: {onchainSlot} does not match Webauthn Slot: {cred.key_slot}.
-                          This should never happen.
-                        </Paragraph>
+                        <UpdateKeySlotButton
+                          sendAcct={sendAcct}
+                          cred={cred}
+                          onchainSlot={onchainSlot}
+                        />
                       )
                     default:
                       return <></>
@@ -327,7 +359,9 @@ const RemovePasskeyConfirmation = ({
   onCancel,
   isActiveOnchain,
 }: {
-  cred: SendAccountCredential
+  cred: Tables<'webauthn_credentials'> & {
+    send_account_credentials: Tables<'send_account_credentials'>[] | null
+  }
   onCancel: () => void
   /**
    * Whether the credential is onchain and an active key slot
@@ -335,10 +369,8 @@ const RemovePasskeyConfirmation = ({
   isActiveOnchain: boolean
 }) => {
   const supabase = useSupabase()
-  const { key_slot: keySlot } = cred
-  const webauthnCred = cred.webauthn_credentials
-  assert(!!webauthnCred, 'No webauthn credential found') // should be impossible
-  const { display_name: displayName } = webauthnCred
+  const keySlot = cred.send_account_credentials?.[0]?.key_slot
+  const { display_name: displayName } = cred
   const {
     data: sendAccount,
     error: sendAccountError,
@@ -386,7 +418,7 @@ const RemovePasskeyConfirmation = ({
     ],
     enabled:
       !!sendAccount &&
-      !!webauthnCred &&
+      !!cred &&
       nonce !== undefined &&
       keySlot !== undefined &&
       maxFeePerGas !== undefined &&
@@ -447,15 +479,13 @@ const RemovePasskeyConfirmation = ({
         await sendUserOp({ userOp, webauthnCreds })
       }
 
-      const { error } = await supabase
-        .from('webauthn_credentials')
-        .delete()
-        .eq('id', webauthnCred.id)
+      const { error } = await supabase.from('webauthn_credentials').delete().eq('id', cred.id)
 
       throwIf(error)
 
       await queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+      await queryClient.invalidateQueries({ queryKey: ['webauthn_credentials'] })
     } catch (e) {
       console.error(e)
       const message =
@@ -572,5 +602,72 @@ const RemovePasskeyConfirmation = ({
         )}
       </SchemaForm>
     </FormProvider>
+  )
+}
+
+const UpdateKeySlotButton = ({
+  sendAcct,
+  cred,
+  onchainSlot,
+}: {
+  sendAcct: Tables<'send_accounts'>
+  cred: Tables<'webauthn_credentials'> & {
+    send_account_credentials: Tables<'send_account_credentials'>[] | null
+  }
+  onchainSlot: number
+}) => {
+  const supabase = useSupabase()
+  const queryClient = useQueryClient()
+  const sendAcctCred = cred.send_account_credentials?.[0] // should be impossible but just in case
+  const toast = useToastController()
+  const {
+    mutate: updateKeySlot,
+    isPending,
+    error,
+    isError,
+    isSuccess,
+  } = useMutation({
+    mutationFn: async (keySlot: number) => {
+      let error: PostgrestError | null = null
+      if (!sendAcctCred) {
+        // no send account credential, create one with the key slot
+        const result = await supabase.from('send_account_credentials').insert({
+          account_id: sendAcct.id,
+          credential_id: cred.id,
+          key_slot: keySlot,
+        })
+        error = result.error
+      } else {
+        const result = await supabase
+          .from('send_account_credentials')
+          .update({ key_slot: keySlot })
+          .eq('credential_id', cred.id)
+        error = result.error
+      }
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error('Key slot already in use, delete the existing key slot and try again.')
+        }
+        throw new Error(error.message)
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['webauthn_credentials'] })
+      toast.show('Updated key slot')
+    },
+  })
+  const isDisabled = isSuccess || isPending
+  return (
+    <>
+      <Paragraph fontWeight={'300'} color={'$yellowVibrant'} fontFamily={'$mono'}>
+        Onchain Slot, {onchainSlot}, does not match Webauthn Slot {sendAcctCred?.key_slot ?? 'N/A'}.
+        This should never happen. Please update the key slot below.
+      </Paragraph>
+      <Button onPress={() => updateKeySlot(onchainSlot)} disabled={isDisabled}>
+        Update Key Slot
+      </Button>
+      {isError && <Paragraph color={'$error'}>{error?.message}</Paragraph>}
+      {isSuccess && <Paragraph color={'$green'}>Updated key slot</Paragraph>}
+    </>
   )
 }
