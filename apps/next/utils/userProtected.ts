@@ -30,7 +30,7 @@ export function userProtectedGetSSP<
       log('no session')
       return {
         redirect: {
-          destination: '/auth/sign-in', // @todo add query param to redirect back to page after sign in
+          destination: `/auth/sign-in?redirectUri=${ctx.req.url}`,
           permanent: false,
         },
       }

@@ -34,7 +34,7 @@ export async function userOnboarded<
     log('no send accounts')
     return {
       redirect: {
-        destination: '/auth/onboarding', // @todo add query param to redirect back to page after onboarding
+        destination: '/auth/onboarding', //@todo: redirects don't work because this link is redirected twice. Need to investigate
         permanent: false,
       },
     }

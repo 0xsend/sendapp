@@ -14,6 +14,7 @@ import { signChallenge } from 'app/utils/userop'
 import { useState } from 'react'
 import { useRouter } from 'solito/router'
 import { bytesToHex, hexToBytes } from 'viem'
+import { useAuthScreenParams } from 'app/routers/params'
 
 const formatErrorMessage = (error: Error) => {
   if (error.message.startsWith('The operation either timed out or was not allowed')) {
@@ -23,6 +24,8 @@ const formatErrorMessage = (error: Error) => {
 }
 
 export const SignInForm = () => {
+  const [queryParams] = useAuthScreenParams()
+  const { redirectUri } = queryParams
   const [isSigningIn, setIsSigningIn] = useState(false)
   const toast = useToastController()
   const router = useRouter()
@@ -59,7 +62,7 @@ export const SignInForm = () => {
       })
 
       toast.show('Successfully signed in')
-      router.push('/')
+      router.push(redirectUri ?? '/')
     } catch (error) {
       toast.show('Failed to sign in', { preset: 'error', isUrgent: true })
       setError(error as Error)
