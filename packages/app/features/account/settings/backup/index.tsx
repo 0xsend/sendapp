@@ -102,8 +102,35 @@ export const BackupScreen = () => {
                 </Paragraph>
               </YStack>
             )
-          case isLoading || isLoadingWebAuthnCreds || !webAuthnCreds:
+          case isLoading || isLoadingWebAuthnCreds:
             return <Spinner size="large" color="$color" />
+          case !webAuthnCreds:
+            return (
+              <YStack w={'100%'} gap={'$6'}>
+                <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
+                <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                  You have no WebAuthn credentials. This should never happen. Please reach out to
+                  <Link href="/account/settings/support" target="_blank">
+                    {' '}
+                    support
+                  </Link>{' '}
+                  if you need help.
+                </Paragraph>
+                <Link
+                  href="https://info.send.it/send/mission-vision-and-values"
+                  target="_blank"
+                  display="flex"
+                  alignItems="center"
+                  gap="2"
+                  color="$color12"
+                >
+                  <IconNote size="1.5" />
+                  <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+                    Learn more about WebAuthn credentials
+                  </Paragraph>
+                </Link>
+              </YStack>
+            )
           case !hasSendAccount:
             return (
               <YStack w={'100%'} gap={'$6'}>
