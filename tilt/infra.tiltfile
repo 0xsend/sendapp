@@ -183,12 +183,25 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-token-paymaster-deposit",
+    "yarn contracts dev:anvil-token-paymaster-deposit",
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+)
+
+local_resource(
     "anvil:fixtures",
     "echo 🥳",
     labels = labels,
     resource_deps = [
         "anvil:mainnet",
         "anvil:base",
+        "anvil:anvil-token-paymaster-deposit",
     ],
 )
 

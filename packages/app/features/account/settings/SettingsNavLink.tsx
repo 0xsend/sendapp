@@ -36,6 +36,7 @@ export function SettingsNavLink({
         $md={{ fontSize: '$5' }}
         fontWeight={isActiveRoute ? 'bold' : '300'}
         color={isActiveRoute ? iconActiveColor : iconInActiveColor}
+        pl="$4"
       >
         {text}
       </Paragraph>
