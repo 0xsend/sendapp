@@ -16,7 +16,6 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
   return (
     <XStack f={1} pt={'$4'}>
       <YStack
-        backgroundColor="$color1"
         // this file is web-only so we can safely use CSS
         style={{
           transition: '200ms ease width',

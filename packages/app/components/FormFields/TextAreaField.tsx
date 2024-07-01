@@ -52,14 +52,10 @@ export const TextAreaField = (
             borderWidth={0}
             borderRadius={'$4'}
             $theme-dark={{
-              bc: '$charcoal',
-              color: '$gray12Dark',
               // placeholderTextColor fails in test env for some reason
               ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Dark' } : {}),
             }}
             $theme-light={{
-              bc: '$gray3Light',
-              color: '$gray12Light',
               // placeholderTextColor fails in test env for some reason
               ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Light' } : {}),
             }}
