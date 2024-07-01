@@ -57,11 +57,17 @@ if (argv.restore) {
         .trim()
         .split('\n')
         .map((s) => `${prjRoot}/${s}`)
+        .filter((s) => s.endsWith('.sql'))
     )
-  await $`rm -f ${migs}`.catch((e) => {
-    console.log(chalk.red('Error removing migrations:'), e)
-    process.exit(1)
-  })
+  const rmMigs = migs.length > 0
+  if (rmMigs) {
+    console.log(chalk.blue('Removing migrations...', migs))
+    await $`rm -f ${migs}`.catch((e) => {
+      console.log(chalk.red('Error removing migrations:'), e)
+      process.exit(1)
+    })
+  }
+
   // now run the snapshot restore command
   await $`bunx supabase db reset`.catch((e) => {
     console.log(chalk.red('Error resetting database:'), e)
@@ -72,16 +78,18 @@ if (argv.restore) {
     console.log(chalk.red('Error restoring database:'), e)
     process.exit(1)
   })
-  // now migrate the database with the latest migrations
-  await $`git checkout ${prjRoot}/supabase/migrations`.catch((e) => {
-    console.log(chalk.red('Error checking out migrations:'), e)
-    process.exit(1)
-  })
-  await $`bunx supabase db push --local --include-all`.catch((e) => {
-    console.log(chalk.red('Error migrating database:'), e)
-    process.exit(1)
-  })
-  process.exit(0)
+  if (rmMigs) {
+    // now migrate the database with the latest migrations
+    await $`git checkout ${prjRoot}/supabase/migrations`.catch((e) => {
+      console.log(chalk.red('Error checking out migrations:'), e)
+      process.exit(1)
+    })
+    await $`bunx supabase db push --local --include-all`.catch((e) => {
+      console.log(chalk.red('Error migrating database:'), e)
+      process.exit(1)
+    })
+    process.exit(0)
+  }
 }
 
 if (argv.onboardUsers) {

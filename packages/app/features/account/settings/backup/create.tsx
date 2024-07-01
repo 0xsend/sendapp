@@ -1,6 +1,6 @@
 import { createPasskey } from '@daimo/expo-passkeys'
 import type { Tables } from '@my/supabase/database-generated.types'
-import { H1, Paragraph, Spinner, SubmitButton, YStack } from '@my/ui'
+import { H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
 import {
   baseMainnetClient,
   useReadSendAccountGetActiveSigningKeys,
@@ -104,7 +104,12 @@ const CreatePasskeyForm = ({
           key_slot: keySlot,
         }
       )
-      throwIf(error)
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error('Key slot already in use, delete the existing key slot and try again.')
+        }
+        throw error.message
+      }
       assert(!!webauthnCred, 'Failed to save passkey')
       onPasskeySaved(webauthnCred)
     } catch (e) {
@@ -113,7 +118,7 @@ const CreatePasskeyForm = ({
         e.details?.toString().split('.').at(0) ??
         e.mesage?.split('.').at(0) ??
         e.toString().split('.').at(0)
-      form.setError('accountName', {
+      form.setError('root', {
         type: 'custom',
         message,
       })
@@ -150,15 +155,24 @@ const CreatePasskeyForm = ({
             </Paragraph>
           </YStack>
         )}
-        renderAfter={({ submit }) =>
-          isLoading ? (
-            <Spinner size="small" color={'$color'} />
-          ) : (
-            <SubmitButton mx="auto" px="$6" onPress={submit}>
-              Create Passkey
-            </SubmitButton>
-          )
-        }
+        renderAfter={({ submit }) => (
+          <>
+            {form.formState.errors?.root?.message ? (
+              <Shake>
+                <Paragraph color="red" testID="AccountSendTagScreen">
+                  {form.formState.errors?.root?.message}
+                </Paragraph>
+              </Shake>
+            ) : null}
+            {isLoading ? (
+              <Spinner size="small" color={'$color'} />
+            ) : (
+              <SubmitButton mx="auto" px="$6" onPress={submit}>
+                Create Passkey
+              </SubmitButton>
+            )}
+          </>
+        )}
       >
         {(fields) => <>{Object.values(fields)}</>}
       </SchemaForm>
