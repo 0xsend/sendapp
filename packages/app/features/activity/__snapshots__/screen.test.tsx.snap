@@ -971,19 +971,76 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
-                data-href="/profile/65244"
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
               >
-                <Text
+                <View
                   style={
                     {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "400",
-                      "lineHeight": 19,
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
                     }
                   }
-                  suppressHighlighting={true}
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
                 >
                   <View
                     style={
@@ -994,7 +1051,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         "borderTopLeftRadius": 9,
                         "borderTopRightRadius": 9,
                         "flexDirection": "column",
-                        "gap": 7,
                         "height": 48,
                         "justifyContent": "center",
                         "maxHeight": 48,
@@ -1024,6 +1080,11 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         fullscreen={true}
                         onError={[Function]}
                         onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
+                          }
+                        }
                         style={
                           {
                             "height": 48,
@@ -1032,76 +1093,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      style={
-                        {
-                          "backgroundColor": "#86AE80",
-                          "bottom": 0,
-                          "flexDirection": "column",
-                          "justifyContent": "center",
-                          "left": 0,
-                          "position": "absolute",
-                          "right": 0,
-                          "top": 0,
-                          "zIndex": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "alignItems": "center",
-                            "borderBottomLeftRadius": 9,
-                            "borderBottomRightRadius": 9,
-                            "borderTopLeftRadius": 9,
-                            "borderTopRightRadius": 9,
-                            "flexDirection": "column",
-                            "height": 48,
-                            "justifyContent": "center",
-                            "maxHeight": 48,
-                            "maxWidth": 48,
-                            "minHeight": 48,
-                            "minWidth": 48,
-                            "overflow": "hidden",
-                            "position": "relative",
-                            "width": 48,
-                          }
-                        }
-                      >
-                        <View
-                          style={
-                            {
-                              "bottom": 0,
-                              "flexDirection": "column",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                              "zIndex": 1,
-                            }
-                          }
-                        >
-                          <Image
-                            fullscreen={true}
-                            onError={[Function]}
-                            onLoad={[Function]}
-                            source={
-                              {
-                                "uri": "https://ui-avatars.com/api/?name=asdf&size=256&format=png&background=86ad7f",
-                              }
-                            }
-                            style={
-                              {
-                                "height": 48,
-                                "width": 48,
-                              }
-                            }
-                          />
-                        </View>
-                      </View>
-                    </View>
                   </View>
-                </Text>
+                </View>
               </View>
               <View
                 style={
@@ -1290,19 +1283,81 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
-                data-href="/profile/12530"
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
               >
-                <Text
+                <View
                   style={
                     {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "400",
-                      "lineHeight": 19,
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
                     }
                   }
-                  suppressHighlighting={true}
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    source={
+                      {
+                        "uri": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                      }
+                    }
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
                 >
                   <View
                     style={
@@ -1313,7 +1368,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         "borderTopLeftRadius": 9,
                         "borderTopRightRadius": 9,
                         "flexDirection": "column",
-                        "gap": 7,
                         "height": 48,
                         "justifyContent": "center",
                         "maxHeight": 48,
@@ -1345,7 +1399,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         onLoad={[Function]}
                         source={
                           {
-                            "uri": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                            "uri": "https://ui-avatars.com/api/?name=Mr. Dan Conn&size=256&format=png&background=86ad7f",
                           }
                         }
                         style={
@@ -1356,76 +1410,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      style={
-                        {
-                          "backgroundColor": "#86AE80",
-                          "bottom": 0,
-                          "flexDirection": "column",
-                          "justifyContent": "center",
-                          "left": 0,
-                          "position": "absolute",
-                          "right": 0,
-                          "top": 0,
-                          "zIndex": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "alignItems": "center",
-                            "borderBottomLeftRadius": 9,
-                            "borderBottomRightRadius": 9,
-                            "borderTopLeftRadius": 9,
-                            "borderTopRightRadius": 9,
-                            "flexDirection": "column",
-                            "height": 48,
-                            "justifyContent": "center",
-                            "maxHeight": 48,
-                            "maxWidth": 48,
-                            "minHeight": 48,
-                            "minWidth": 48,
-                            "overflow": "hidden",
-                            "position": "relative",
-                            "width": 48,
-                          }
-                        }
-                      >
-                        <View
-                          style={
-                            {
-                              "bottom": 0,
-                              "flexDirection": "column",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                              "zIndex": 1,
-                            }
-                          }
-                        >
-                          <Image
-                            fullscreen={true}
-                            onError={[Function]}
-                            onLoad={[Function]}
-                            source={
-                              {
-                                "uri": "https://ui-avatars.com/api/?name=Mr. Dan Conn&size=256&format=png&background=86ad7f",
-                              }
-                            }
-                            style={
-                              {
-                                "height": 48,
-                                "width": 48,
-                              }
-                            }
-                          />
-                        </View>
-                      </View>
-                    </View>
                   </View>
-                </Text>
+                </View>
               </View>
               <View
                 style={
@@ -2258,19 +2244,81 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
-                data-href="/profile/12530"
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
               >
-                <Text
+                <View
                   style={
                     {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "400",
-                      "lineHeight": 19,
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
                     }
                   }
-                  suppressHighlighting={true}
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    source={
+                      {
+                        "uri": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                      }
+                    }
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
                 >
                   <View
                     style={
@@ -2281,7 +2329,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         "borderTopLeftRadius": 9,
                         "borderTopRightRadius": 9,
                         "flexDirection": "column",
-                        "gap": 7,
                         "height": 48,
                         "justifyContent": "center",
                         "maxHeight": 48,
@@ -2313,7 +2360,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         onLoad={[Function]}
                         source={
                           {
-                            "uri": "https://i.pravatar.cc/500?u=Hortense Ratke",
+                            "uri": "https://ui-avatars.com/api/?name=Mr. Dan Conn&size=256&format=png&background=86ad7f",
                           }
                         }
                         style={
@@ -2324,76 +2371,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      style={
-                        {
-                          "backgroundColor": "#86AE80",
-                          "bottom": 0,
-                          "flexDirection": "column",
-                          "justifyContent": "center",
-                          "left": 0,
-                          "position": "absolute",
-                          "right": 0,
-                          "top": 0,
-                          "zIndex": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "alignItems": "center",
-                            "borderBottomLeftRadius": 9,
-                            "borderBottomRightRadius": 9,
-                            "borderTopLeftRadius": 9,
-                            "borderTopRightRadius": 9,
-                            "flexDirection": "column",
-                            "height": 48,
-                            "justifyContent": "center",
-                            "maxHeight": 48,
-                            "maxWidth": 48,
-                            "minHeight": 48,
-                            "minWidth": 48,
-                            "overflow": "hidden",
-                            "position": "relative",
-                            "width": 48,
-                          }
-                        }
-                      >
-                        <View
-                          style={
-                            {
-                              "bottom": 0,
-                              "flexDirection": "column",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                              "zIndex": 1,
-                            }
-                          }
-                        >
-                          <Image
-                            fullscreen={true}
-                            onError={[Function]}
-                            onLoad={[Function]}
-                            source={
-                              {
-                                "uri": "https://ui-avatars.com/api/?name=Mr. Dan Conn&size=256&format=png&background=86ad7f",
-                              }
-                            }
-                            style={
-                              {
-                                "height": 48,
-                                "width": 48,
-                              }
-                            }
-                          />
-                        </View>
-                      </View>
-                    </View>
                   </View>
-                </Text>
+                </View>
               </View>
               <View
                 style={
@@ -2603,19 +2582,76 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
-                data-href="/profile/65244"
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
               >
-                <Text
+                <View
                   style={
                     {
-                      "color": "#FFFFFF",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "400",
-                      "lineHeight": 19,
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
                     }
                   }
-                  suppressHighlighting={true}
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
                 >
                   <View
                     style={
@@ -2626,7 +2662,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         "borderTopLeftRadius": 9,
                         "borderTopRightRadius": 9,
                         "flexDirection": "column",
-                        "gap": 7,
                         "height": 48,
                         "justifyContent": "center",
                         "maxHeight": 48,
@@ -2656,6 +2691,11 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         fullscreen={true}
                         onError={[Function]}
                         onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=65244&size=256&format=png&background=86ad7f",
+                          }
+                        }
                         style={
                           {
                             "height": 48,
@@ -2664,76 +2704,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         }
                       />
                     </View>
-                    <View
-                      style={
-                        {
-                          "backgroundColor": "#86AE80",
-                          "bottom": 0,
-                          "flexDirection": "column",
-                          "justifyContent": "center",
-                          "left": 0,
-                          "position": "absolute",
-                          "right": 0,
-                          "top": 0,
-                          "zIndex": 0,
-                        }
-                      }
-                    >
-                      <View
-                        style={
-                          {
-                            "alignItems": "center",
-                            "borderBottomLeftRadius": 9,
-                            "borderBottomRightRadius": 9,
-                            "borderTopLeftRadius": 9,
-                            "borderTopRightRadius": 9,
-                            "flexDirection": "column",
-                            "height": 48,
-                            "justifyContent": "center",
-                            "maxHeight": 48,
-                            "maxWidth": 48,
-                            "minHeight": 48,
-                            "minWidth": 48,
-                            "overflow": "hidden",
-                            "position": "relative",
-                            "width": 48,
-                          }
-                        }
-                      >
-                        <View
-                          style={
-                            {
-                              "bottom": 0,
-                              "flexDirection": "column",
-                              "left": 0,
-                              "position": "absolute",
-                              "right": 0,
-                              "top": 0,
-                              "zIndex": 1,
-                            }
-                          }
-                        >
-                          <Image
-                            fullscreen={true}
-                            onError={[Function]}
-                            onLoad={[Function]}
-                            source={
-                              {
-                                "uri": "https://ui-avatars.com/api/?name=65244&size=256&format=png&background=86ad7f",
-                              }
-                            }
-                            style={
-                              {
-                                "height": 48,
-                                "width": 48,
-                              }
-                            }
-                          />
-                        </View>
-                      </View>
-                    </View>
                   </View>
-                </Text>
+                </View>
               </View>
               <View
                 style={

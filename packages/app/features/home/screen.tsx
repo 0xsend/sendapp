@@ -9,7 +9,7 @@ import {
   Link,
   H3,
   Card,
-  LinkButton,
+  LinkableButton,
 } from '@my/ui'
 import { IconArrowRight, IconPlus } from 'app/components/icons'
 import { coins } from 'app/data/coins'
@@ -150,7 +150,7 @@ export function HomeScreen() {
 }
 
 const SendButton = () => (
-  <LinkButton href={'/send'} theme="green" br="$4" px={'$3.5'} h={'$4.5'} w="100%">
+  <LinkableButton href={'/send'} theme="green" br="$4" px={'$3.5'} h={'$4.5'} w="100%">
     <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
       <Button.Text fontWeight={'500'} textTransform={'uppercase'}>
         Send
@@ -159,7 +159,7 @@ const SendButton = () => (
         <IconArrowRight size={'$2.5'} />
       </Button.Icon>
     </XStack>
-  </LinkButton>
+  </LinkableButton>
 )
 
 const NoSendAccountMessage = () => {

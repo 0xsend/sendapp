@@ -1,12 +1,13 @@
-import { styled, ButtonText, ButtonIcon, ButtonContext } from 'tamagui'
+import { styled, ButtonText, ButtonIcon, ButtonContext, Button, type ButtonProps } from 'tamagui'
 import { withStaticProperties } from '@tamagui/helpers'
-import { Link } from './Link'
+import { useLink } from 'solito/link'
 
 import { getButtonSized } from '@tamagui/get-button-sized'
+import type { LinkProps } from './Link'
 
 const BUTTON_NAME = 'Button'
 
-const LinkButtonFrame = styled(Link, {
+const LinkableButtonFrame = styled(Button, {
   name: BUTTON_NAME,
   tag: 'a',
   context: ButtonContext,
@@ -85,9 +86,14 @@ const LinkButtonFrame = styled(Link, {
   },
 })
 
-export const LinkButton = withStaticProperties(LinkButtonFrame, {
+const LinkableButton_ = ({ href, ...props }: LinkableButtonProps) => {
+  const linkProps = useLink({ href })
+  return <LinkableButtonFrame {...props} {...linkProps} />
+}
+
+export const LinkableButton = withStaticProperties(LinkableButton_, {
   Text: ButtonText,
   Icon: ButtonIcon,
 })
 
-export type LinkButtonProps = React.ComponentProps<typeof LinkButtonFrame>
+export type LinkableButtonProps = ButtonProps & LinkProps

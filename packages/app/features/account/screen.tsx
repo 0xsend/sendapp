@@ -18,7 +18,7 @@ import {
   ButtonIcon,
   ButtonText,
   LinkableAvatar,
-  LinkButton,
+  LinkableButton,
 } from '@my/ui'
 import {
   IconAccount,
@@ -81,7 +81,7 @@ export function AccountScreen() {
       label: 'Sendtags',
       description: 'Add a sendtag now!',
       child: (
-        <LinkButton
+        <LinkableButton
           href={'/account/sendtag'}
           theme={'green'}
           variant="outlined"
@@ -104,14 +104,14 @@ export function AccountScreen() {
               Add
             </Button.Text>
           </XStack>
-        </LinkButton>
+        </LinkableButton>
       ),
     },
     {
       label: 'Rewards',
       description: 'Start earning today!',
       child: (
-        <LinkButton
+        <LinkableButton
           href="/account/rewards"
           theme="green"
           variant="outlined"
@@ -134,7 +134,7 @@ export function AccountScreen() {
               Earn
             </Button.Text>
           </XStack>
-        </LinkButton>
+        </LinkableButton>
       ),
     },
     {
@@ -181,11 +181,11 @@ export function AccountScreen() {
       <Card p={'$size.3.5'} w={'100%'}>
         <XStack gap={'$size.3.5'} w={'100%'} flexWrap="wrap">
           <View width={'100%'} $gtMd={{ width: 'auto' }}>
-            <LinkableAvatar
-              $gtMd={{ size: 316 }}
+            <Avatar
+              $gtMd={{ miw: 316, mih: 264 }}
               size={'$10'}
               borderRadius={'$3'}
-              href={`/profile/${profile.send_id}`}
+              href={`/profile/${profile?.send_id}`}
             >
               <Avatar.Image
                 $gtMd={{ w: 316, h: 264 }}
@@ -204,7 +204,7 @@ export function AccountScreen() {
               >
                 <IconAccount size={256} color="$olive" />
               </Avatar.Fallback>
-            </LinkableAvatar>
+            </Avatar>
           </View>
           <YStack gap="$size.1.5" flex={1}>
             <YStack gap={'$size.0.75'}>
@@ -241,9 +241,9 @@ export function AccountScreen() {
               )}
             </YStack>
 
-            <XStack pt={'$size.0.9'} mt="auto" $gtMd={{ mb: '$size.5' }}>
+            <XStack pt={'$size.0.9'} mt="auto">
               <Theme name="green">
-                <LinkButton
+                <LinkableButton
                   href="/account/settings/edit-profile"
                   theme={'ghost'}
                   variant="outlined"
@@ -275,7 +275,7 @@ export function AccountScreen() {
                       Settings
                     </Paragraph>
                   </XStack>
-                </LinkButton>
+                </LinkableButton>
               </Theme>
             </XStack>
           </YStack>
@@ -294,7 +294,7 @@ export function AccountScreen() {
             <NoTagsMessage />
             <Stack f={1} jc="center" $md={{ display: 'none' }}>
               <Theme name="green">
-                <LinkButton
+                <LinkableButton
                   href={'/account/sendtag/checkout'}
                   borderRadius={'$4'}
                   p={'$3.5'}
@@ -307,7 +307,7 @@ export function AccountScreen() {
                     </ButtonIcon>
                     <ButtonText textTransform="uppercase">SENDTAGS</ButtonText>
                   </XStack>
-                </LinkButton>
+                </LinkableButton>
               </Theme>
             </Stack>
           </>
