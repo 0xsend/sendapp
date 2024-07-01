@@ -107,7 +107,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     data: feesPerGas,
     isLoading: isFeesPerGasLoading,
     error: feesPerGasError,
-  } = useEstimateFeesPerGas()
+  } = useEstimateFeesPerGas({ chainId: baseMainnet.id })
   const {
     mutateAsync: sendUserOp,
     isPending: isTransferPending,
