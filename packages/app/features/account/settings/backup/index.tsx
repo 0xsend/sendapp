@@ -224,7 +224,6 @@ const WebAuthnCred = ({
   const link = useLink({
     href: `/account/settings/backup/confirm/${cred?.id}`,
   })
-  const isActiveUnsynced = isActive && !onchainSlot // somehow active onchain, but send.app doesn't know about it (strongmind check)
 
   return (
     <YStack
@@ -313,7 +312,7 @@ const WebAuthnCred = ({
                             }`}
                         </Paragraph>
                       )
-                    case !isActive || isActiveUnsynced:
+                    case !isActive:
                       return (
                         <YStack gap={'$size.1.5'} ai="flex-start">
                           <CardTextBlock
@@ -673,7 +672,11 @@ const UpdateKeySlotButton = ({
       }
       if (error) {
         if (error.code === '23505') {
-          throw new Error('Key slot already in use, delete the existing key slot and try again.')
+          throw new Error(
+            `Key slot ${keySlot
+              .toString()
+              .padStart(2, '0')} already in use, delete the existing key slot and try again.`
+          )
         }
         throw new Error(error.message)
       }

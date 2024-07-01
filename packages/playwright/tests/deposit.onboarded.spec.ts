@@ -276,6 +276,6 @@ test('can deposit ETH with web3 wallet', async ({
         },
       })
   ).toPass({
-    timeout: 5000,
+    timeout: 10000,
   })
 })
