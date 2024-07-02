@@ -17,10 +17,10 @@ import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { FormProvider } from 'react-hook-form'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconX } from 'app/components/icons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
+import { useRootScreenParams } from 'app/routers/params'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -249,6 +249,21 @@ function SearchResultRow({
 
 function Search() {
   const { form } = useTagSearch()
+  const [queryParams, setRootParams] = useRootScreenParams()
+  const { search } = queryParams
+
+  useEffect(() => {
+    const subscription = form.watch(({ query }) => {
+      setRootParams(
+        {
+          ...queryParams,
+          search: query,
+        },
+        { webBehavior: 'replace' }
+      )
+    })
+    return () => subscription.unsubscribe()
+  }, [form, setRootParams, queryParams])
 
   return (
     <>
@@ -259,7 +274,7 @@ function Search() {
         <FormProvider {...form}>
           <SchemaForm
             form={form}
-            defaultValues={{ query: '' }}
+            defaultValues={{ query: search }}
             onSubmit={() => {
               // noop
             }}
@@ -283,27 +298,6 @@ function Search() {
             {({ query }) => query}
           </SchemaForm>
         </FormProvider>
-        <Button
-          position="absolute"
-          top="0"
-          right="0"
-          py={0}
-          px="$1.5"
-          br={0}
-          borderBottomRightRadius="$4"
-          borderTopRightRadius="$4"
-          bc="transparent"
-          hoverStyle={{
-            backgroundColor: 'transparent',
-            borderColor: '$transparent',
-          }}
-          pressStyle={{ backgroundColor: 'transparent' }}
-          focusStyle={{ backgroundColor: 'transparent' }}
-          onPress={() => form.setValue('query', '')}
-          aria-label="Clear input."
-        >
-          <IconX width="$size.1.5" height="$size.1.5" />
-        </Button>
       </View>
     </>
   )
