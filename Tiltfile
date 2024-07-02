@@ -184,11 +184,8 @@ local_resource(
     "caddy:web",
     auto_init = not CI,
     labels = labels,
-    serve_cmd = "caddy run --watch --config Caddyfile.dev",
+    serve_cmd = "caddy run --watch --config dev.Caddyfile",
     trigger_mode = TRIGGER_MODE_MANUAL,
-    deps = [
-        "Caddyfile.dev",
-    ],
 )
 
 # TESTS

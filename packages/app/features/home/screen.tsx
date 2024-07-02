@@ -81,18 +81,16 @@ export function HomeScreen() {
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />
             </XStack>
-            {usdcBalance && usdcBalance > 0n ? (
-              <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
-                <Stack f={1} w="50%">
-                  <DepositPopover />
-                </Stack>
+            <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
+              <Stack f={1} w="50%">
+                <DepositPopover />
+              </Stack>
+              {usdcBalance && usdcBalance > 0n ? (
                 <Stack f={1} w="50%">
                   <SendButton />
                 </Stack>
-              </XStack>
-            ) : (
-              <DepositPopover />
-            )}
+              ) : null}
+            </XStack>
           </Card>
           <Separator $gtLg={{ display: 'none' }} w={'100%'} />
           <YStack w={'100%'} ai={'center'}>

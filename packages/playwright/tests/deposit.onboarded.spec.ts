@@ -199,7 +199,9 @@ test('can deposit ETH with web3 wallet', async ({
 
   const depositButton = page.getByRole('button', { name: 'Deposit' })
   await depositButton.click()
-  await page.getByRole('link', { name: 'Deposit with Web3 Wallet' }).click()
+  const depositWeb3Button = page.getByRole('link', { name: 'Deposit with Web3 Wallet' })
+  await expect(depositWeb3Button).toBeVisible()
+  await depositWeb3Button.click()
   await page.waitForURL('/deposit/web3')
   await expect(page.locator('w3m-modal')).toBeVisible()
 
