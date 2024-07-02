@@ -11,8 +11,10 @@ import {
   YStack,
   type ParagraphProps,
   type YStackProps,
+  LinkableAvatar,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
+import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { coins } from 'app/data/coins'
@@ -21,6 +23,7 @@ import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { throwIf } from 'app/utils/throwIf'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import {
   useGenerateTransferUserOp,
@@ -36,7 +39,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { isAddress, parseUnits, type Hex } from 'viem'
-import { useBalance } from 'wagmi'
+import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 
 type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
@@ -64,6 +67,7 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm({ profile }: { profile: ProfileProp }) {
+  const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -99,7 +103,16 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   })
 
   const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
-  const { mutateAsync: sendUserOp, isPending: isTransferPending } = useUserOpTransferMutation()
+  const {
+    data: feesPerGas,
+    isLoading: isFeesPerGasLoading,
+    error: feesPerGasError,
+  } = useEstimateFeesPerGas({ chainId: baseMainnet.id })
+  const {
+    mutateAsync: sendUserOp,
+    isPending: isTransferPending,
+    isError: isTransferError,
+  } = useUserOpTransferMutation()
   const [error, setError] = useState<Error>()
 
   const {
@@ -113,13 +126,9 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   })
   const [dataFirstFetch, setDataFirstFetch] = useState<number>()
 
-  console.log('gasEstimate', gasEstimate)
-  console.log('userOp', userOp)
-
-  // need balance to check if user has enough to send
-
   const canSubmit =
     !nonceIsLoading &&
+    !isFeesPerGasLoading &&
     Number(queryParams.amount) > 0 &&
     coins.some((coin) => coin.token === sendToken) &&
     (balance?.value ?? BigInt(0) >= amount) &&
@@ -131,13 +140,23 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
       assert(!!balance, 'Balance is not available')
       assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
       assert(nonce !== undefined, 'Nonce is not available')
+      throwIf(feesPerGasError)
+      assert(!!feesPerGas, 'Fees per gas is not available')
 
       assert(balance.value >= amount, 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
+      const _userOp = {
+        ...userOp,
+        maxFeePerGas: feesPerGas.maxFeePerGas,
+        maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
+      }
 
+      console.log('gasEstimate', gasEstimate)
+      console.log('feesPerGas', feesPerGas)
+      console.log('userOp', _userOp)
       const receipt = await sendUserOp({
-        userOp,
+        userOp: _userOp,
         webauthnCreds,
       })
       assert(receipt.success, 'Failed to send user op')
@@ -145,6 +164,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     } catch (e) {
       console.error(e)
       setError(e)
+      await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }
   }
 
@@ -308,7 +328,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
         >
           {(() => {
             switch (true) {
-              case isTransferPending:
+              case isTransferPending && !isTransferError:
                 return (
                   <>
                     <Button.Icon>
@@ -390,12 +410,12 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
         $theme-light={{ bc: '$gray3Light' }}
         f={1}
       >
-        <Avatar size="$4.5" br="$3">
+        <LinkableAvatar size="$4.5" br="$3" href={`/profile/${profile.sendid}`}>
           <Avatar.Image src={profile?.avatar_url ?? ''} />
           <Avatar.Fallback jc="center">
             <IconAccount size="$4.5" color="$olive" />
           </Avatar.Fallback>
-        </Avatar>
+        </LinkableAvatar>
         <YStack gap="$1.5">
           <Paragraph fontSize="$4" fontWeight="500" color="$color12">
             {profile?.name}

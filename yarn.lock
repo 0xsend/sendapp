@@ -5724,6 +5724,7 @@ __metadata:
     expo-linear-gradient: "npm:~12.7.1"
     moti: "npm:^0.25.3"
     react-hook-form: "npm:^7.48.2"
+    solito: "npm:^4.0.1"
     tamagui: "npm:^1.93.2"
     typescript: "npm:^5.3.3"
     zod: "npm:^3.22.4"

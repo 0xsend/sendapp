@@ -14,9 +14,8 @@ export type SettingsLayoutProps = {
 
 export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
   return (
-    <XStack f={1} pt={'$4'} pb={'$6'}>
+    <XStack f={1} pt={'$4'}>
       <YStack
-        backgroundColor="$color1"
         // this file is web-only so we can safely use CSS
         style={{
           transition: '200ms ease width',
@@ -24,6 +23,7 @@ export const SettingsLayout = ({ children }: SettingsLayoutProps) => {
         width="$14"
         display="none"
         $gtLg={{ display: 'flex' }}
+        py={'$4'}
       >
         <YStack width={'100%'} gap={'$4'}>
           <YStack jc={'space-between'} zIndex={4} flex={1} width={'100%'}>

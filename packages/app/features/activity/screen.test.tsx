@@ -39,6 +39,7 @@ jest.mock('solito/link', () => ({
   Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <MockView dataSet={{ href }}>{children}</MockView>
   ),
+  useLink: jest.fn().mockReturnValue({ href: '/profile/123', onPress: jest.fn() }),
 }))
 
 describe('ActivityScreen', () => {

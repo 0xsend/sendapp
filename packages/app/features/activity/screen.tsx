@@ -11,8 +11,6 @@ import {
   Text,
   XStack,
   YStack,
-  Stack,
-  Card,
 } from '@my/ui'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
@@ -31,11 +29,10 @@ const suggestions = [
 export function ActivityScreen() {
   return (
     <TagSearchProvider>
-      <YStack f={1} width={'100%'} pb="$4">
+      <YStack f={1} width={'100%'} py="$6">
         <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
           <Search />
         </YStack>
-
         <ActivityBody />
       </YStack>
     </TagSearchProvider>
