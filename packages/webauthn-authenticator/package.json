@@ -17,7 +17,7 @@
   "dependencies": {
     "@scure/base": "^1.1.5",
     "cbor": "^9.0.1",
-    "debug": "^4.3.4"
+    "debug": "^4.3.5"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
