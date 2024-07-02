@@ -971,6 +971,16 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
                 style={
                   {
                     "alignItems": "center",
@@ -1273,6 +1283,16 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
                 style={
                   {
                     "alignItems": "center",
@@ -2224,6 +2244,16 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
                 style={
                   {
                     "alignItems": "center",
@@ -2552,6 +2582,16 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               }
             >
               <View
+                cancelable={[Function]}
+                disabled={false}
+                focusable={[Function]}
+                href="/profile/123"
+                minPressDuration={0}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
                 style={
                   {
                     "alignItems": "center",

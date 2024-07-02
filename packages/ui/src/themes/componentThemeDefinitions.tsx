@@ -59,7 +59,7 @@ export const componentThemeDefinitions = {
   },
 
   Switch: {
-    mask: 'soften2',
+    mask: 'soften',
     ...maskOptions.component,
   },
 
@@ -122,12 +122,12 @@ export const componentThemeDefinitions = {
   TextArea: [
     {
       parent: 'light',
-      mask: 'strengthenButSoftenBorder',
+      mask: 'soften',
       ...maskOptions.component,
     },
     {
       parent: 'dark',
-      mask: 'softenBorder',
+      mask: 'soften',
       ...maskOptions.component,
     },
   ],
