@@ -10,13 +10,15 @@ on:
 jobs:
   build-docker:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-#    needs: [cache-deps]
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Build & Push Docker Image for next-app
+        env:
+            SUPABASE_SERVICE_ROLE: ${{ github.ref == 'refs/heads/main' && secrets.PRODUCTION_SUPABASE_SERVICE_ROLE || secrets.DEV_SUPABASE_SERVICE_ROLE}}
+            SUPABASE_DB_URL: ${{ github.ref == 'refs/heads/main' && secrets.PRODUCTION_SUPABASE_DB_URL || secrets.DEV_SUPABASE_DB_URL}}
         uses: ./.github/actions/docker-build
         with:
           build-nextjs-docker: true
