@@ -103,7 +103,7 @@ next_app_resource_deps = [
 
 # Next
 if CFG.dockerize:
-    GIT_BRANCH = str(local("git symbolic-ref --short HEAD")).strip()
+    GIT_BRANCH = str(local("git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD")).strip()
     GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
 
     # FIXME: when we support dev mode and dockerize.
