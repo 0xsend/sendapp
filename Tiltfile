@@ -103,14 +103,9 @@ next_app_resource_deps = [
 
 # Next
 if CFG.dockerize:
-    # GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
-    # os.putenv("GIT_HASH", GIT_HASH)
+    GIT_BRANCH = str(local("git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD")).strip()
+    GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
 
-    # figure out how to do this in a more elegant way
-    local("""
-    grep SUPABASE_DB_URL .env.development.docker | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_DB_URL.txt
-    grep SUPABASE_SERVICE_ROLE .env.local | cut -d'=' -f2 | tr -d '\n' > ./var/SUPABASE_SERVICE_ROLE.txt
-""", echo_off = True, quiet = True)
     # FIXME: when we support dev mode and dockerize.
     # docker_build(
     #     "0xsend/sendapp/next-app",
