@@ -123,3 +123,27 @@ export const useSendScreenParams = () => {
 }
 
 export type ProfileScreenParams = undefined
+
+export type AuthScreenParams = {
+  redirectUri?: string
+}
+
+const { useParam: useAuthParam, useParams: useAuthParams } = createParam<AuthScreenParams>()
+
+export const useRedirectUri = () => {
+  const [redirectUri, setRedirectUriParam] = useAuthParam('redirectUri')
+
+  return [redirectUri, setRedirectUriParam] as const
+}
+
+export const useAuthScreenParams = () => {
+  const { setParams } = useAuthParams()
+  const [redirectUri] = useRedirectUri()
+
+  return [
+    {
+      redirectUri,
+    },
+    setParams,
+  ] as const
+}

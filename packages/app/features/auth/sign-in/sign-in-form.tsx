@@ -17,12 +17,15 @@ import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { z } from 'zod'
 import { useState } from 'react'
 import AccountRecovery from 'app/features/auth/account-recovery/account-recovery'
+import { useAuthScreenParams } from 'app/routers/params'
 
 const SignInSchema = z.object({
   countrycode: formFields.countrycode,
   phone: formFields.text.min(1).max(20),
 })
 export const SignInForm = () => {
+  const [queryParams] = useAuthScreenParams()
+  const { redirectUri } = queryParams
   const [showRecoveryForm, setShowRecoveryForm] = useState<boolean>(false)
   const form = useForm<z.infer<typeof SignInSchema>>()
   const signInWithOtp = api.auth.signInWithOtp.useMutation()
@@ -57,8 +60,17 @@ export const SignInForm = () => {
             return (
               <VerifyCode
                 phone={`${form.getValues().countrycode}${form.getValues().phone}`}
-                onSuccess={() => {
+                onSuccess={(data) => {
+                  if (data?.session) {
+                    router.push(
+                      redirectUri
+                        ? `auth/onboarding?redirectUri=${redirectUri}`
+                        : '/auth/onboarding'
+                    )
+                    return
+                  }
                   router.push('/')
+                  return
                 }}
               />
             )
