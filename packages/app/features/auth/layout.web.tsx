@@ -1,4 +1,14 @@
-import { Container, YStack, LinearGradient, useMedia, Stack, isWeb } from '@my/ui'
+import {
+  Container,
+  YStack,
+  LinearGradient,
+  useMedia,
+  Stack,
+  isWeb,
+  Theme,
+  Anchor,
+  ScrollView,
+} from '@my/ui'
 import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
 import { useMemo, useState } from 'react'
 import { AuthCarouselContext } from './AuthCarouselContext'
@@ -7,15 +17,25 @@ import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { usePathname } from 'app/utils/usePathname'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { carouselImagePositions } from './components/Carousel'
+import { IconSendLogo } from 'app/components/icons'
+import { useLink } from 'solito/link'
 
-// Simple Auth layout for now,. no carousel,no header, no footer
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Container>
-      <YStack w="100%" h={'100%'} jc="center" ai="center" pt="$7">
-        {children}
-      </YStack>
-    </Container>
+    <ScrollView f={1}>
+      <Container>
+        <YStack f={1}>
+          <Anchor {...useLink({ href: '/' })} mx="auto" pt="$7">
+            <Theme inverse={true}>
+              <IconSendLogo size={'$6'} color={'$background'} />
+            </Theme>
+          </Anchor>
+          <YStack h={'100%'} jc="space-between" pb="$10">
+            {children}
+          </YStack>
+        </YStack>
+      </Container>
+    </ScrollView>
   )
 }
 

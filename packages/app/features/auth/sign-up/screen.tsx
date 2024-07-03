@@ -1,4 +1,4 @@
-import { Stack, YStack, useMedia, Theme, isWeb, Anchor, Paragraph, XStack } from '@my/ui'
+import { Stack, YStack, Theme, Anchor, Paragraph, XStack } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useContext, useEffect, useState } from 'react'
 import { SignUpForm } from 'app/features/auth/sign-up/sign-up-form'
@@ -11,24 +11,17 @@ import { useLink } from 'solito/link'
 
 export const SignUpScreen = () => {
   return (
-    <>
-      <Theme inverse={true}>
-        <IconSendLogo size={'$6'} color={'$background'} />
-      </Theme>
-      <YStack h="100%" jc="center" ai="center" f={1}>
-        <YStack gap="$2">
-          <SignUpForm />
-          <XStack jc="center" ai="center" mt="$4">
-            <Paragraph size="$2" color="$color11">
-              Already have an account?{' '}
-              <Anchor color="$color12" {...useLink({ href: '/auth/sign-in' })}>
-                Sign in
-              </Anchor>
-            </Paragraph>
-          </XStack>
-        </YStack>
-      </YStack>
-    </>
+    <YStack h="100%" jc="center" ai="center" f={1}>
+      <SignUpForm />
+      <XStack jc="center" ai="center" mt="$4">
+        <Paragraph size="$2" color="$color11">
+          Already have an account?{' '}
+          <Anchor color="$color12" {...useLink({ href: '/auth/sign-in' })}>
+            Sign in
+          </Anchor>
+        </Paragraph>
+      </XStack>
+    </YStack>
   )
 }
 
