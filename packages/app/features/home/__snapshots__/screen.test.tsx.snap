@@ -421,7 +421,7 @@ exports[`HomeScreen 1`] = `
                     numberOfLines={1}
                     style={
                       {
-                        "color": "#12643F",
+                        "color": "#081619",
                         "flexGrow": 0,
                         "flexShrink": 1,
                         "fontFamily": "System",
@@ -450,7 +450,7 @@ exports[`HomeScreen 1`] = `
                       align="xMidYMid"
                       bbHeight="32"
                       bbWidth="32"
-                      color="#12643F"
+                      color="#081619"
                       fill="none"
                       focusable={false}
                       height={32}
@@ -464,7 +464,9 @@ exports[`HomeScreen 1`] = `
                             "backgroundColor": "transparent",
                             "borderWidth": 0,
                           },
-                          {},
+                          {
+                            "color": "#081619",
+                          },
                           {
                             "flex": 0,
                             "height": 32,
@@ -472,7 +474,7 @@ exports[`HomeScreen 1`] = `
                           },
                         ]
                       }
-                      tintColor="#12643F"
+                      tintColor="#081619"
                       vbHeight={24}
                       vbWidth={24}
                       width={32}

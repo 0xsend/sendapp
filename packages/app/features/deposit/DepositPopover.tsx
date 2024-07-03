@@ -18,11 +18,15 @@ export function DepositPopover(props: PopoverProps) {
         <Popover.Trigger asChild>
           <Button px={'$3.5'} h={'$4.5'} borderRadius={'$4'} f={1}>
             <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-              <Button.Text fontWeight={'500'} textTransform={'uppercase'}>
+              <Button.Text
+                fontWeight={'500'}
+                textTransform={'uppercase'}
+                $theme-dark={{ col: '$color0' }}
+              >
                 Deposit
               </Button.Text>
               <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                <IconDeposit size={'$2.5'} />
+                <IconDeposit size={'$2.5'} $theme-dark={{ color: '$color0' }} />
               </XStack>
             </XStack>
           </Button>
