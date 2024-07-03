@@ -1,4 +1,4 @@
-import { SignInScreen } from 'app/features/auth/sign-in/screen'
+import { SignUpScreen } from 'app/features/auth/sign-up/screen'
 import Head from 'next/head'
 import { guestOnlyGetSSP } from 'utils/guestOnly'
 import type { NextPageWithLayout } from '../_app'
@@ -20,10 +20,10 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   return (
     <>
       <Head>
-        <title>Send | Sign In</title>
-        <meta name="description" content="Future Cash. Sign in to Send." key="desc" />
+        <title>Send | Sign Up</title>
+        <meta name="description" content="Future Cash. Sign up for Send." key="desc" />
       </Head>
-      <SignInScreen />
+      <SignUpScreen />
     </>
   )
 }

@@ -1,5 +1,5 @@
 import { Container, YStack, LinearGradient, useMedia, Stack, isWeb } from '@my/ui'
-import { AuthSideBarWrapper } from 'app/components/sidebar/AuthSideBar'
+import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
 import { useMemo, useState } from 'react'
 import { AuthCarouselContext } from './AuthCarouselContext'
 import { SolitoImage } from 'solito/image'
@@ -8,7 +8,18 @@ import { usePathname } from 'app/utils/usePathname'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { carouselImagePositions } from './components/Carousel'
 
-export function AuthLayout({
+// Simple Auth layout for now,. no carousel,no header, no footer
+export function AuthLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Container>
+      <YStack w="100%" h={'100%'} jc="center" ai="center" pt="$7">
+        {children}
+      </YStack>
+    </Container>
+  )
+}
+
+export function AuthLayoutOG({
   children,
 }: {
   children: React.ReactNode
