@@ -29,9 +29,9 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
 
 export const getServerSideProps = userProtectedGetSSP(async () => {
   const paths = [
+    'app_images/auth_image_3.jpg?raw=true',
     'app_images/auth_image_1.jpg?raw=true',
     'app_images/auth_image_2.jpg?raw=true',
-    'app_images/auth_image_3.jpg?raw=true',
   ]
   const images = await getRemoteAssets(paths)
   return { props: { images } }
