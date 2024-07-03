@@ -1,21 +1,10 @@
-import {
-  ButtonText,
-  BigHeading,
-  Paragraph,
-  SubmitButton,
-  XStack,
-  YStack,
-  H3,
-  Anchor,
-  type AnchorProps,
-} from '@my/ui'
+import { ButtonText, BigHeading, Paragraph, SubmitButton, XStack, YStack, H3 } from '@my/ui'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { api } from 'app/utils/api'
 import { useRouter } from 'solito/router'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { z } from 'zod'
-import { useState } from 'react'
 
 const SignUpSchema = z.object({
   countrycode: formFields.countrycode,
