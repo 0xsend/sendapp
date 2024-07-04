@@ -97,7 +97,7 @@ export const Carousel = (props: { currentKey: string | undefined; fullscreen: bo
           {item?.description}
         </Paragraph>
       </Stack>
-      {gtMd && <CarouselProgress />}
+      <CarouselProgress />
     </AnimationLayout>
   )
 }

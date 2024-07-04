@@ -64,10 +64,7 @@ function MyApp({
         <meta name="msapplication-TileColor" content="#122023" />
         <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#122023" media="(prefers-color-scheme: dark)" />
-        <meta
-          property="og:image"
-          content="https://0xsend.github.io/assets/2024/04/send-og-image.png"
-        />
+        <meta property="og:image" content="https://ghassets.send.app/2024/04/send-og-image.png" />
       </Head>
       <NextThemeProvider
         onChangeTheme={(next) => {
