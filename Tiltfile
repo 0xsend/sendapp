@@ -258,7 +258,7 @@ local_resource(
     "playwright:test",
     "yarn playwright test",
     allow_parallel = True,
-    auto_init = CI == True,
+    auto_init = CI,
     labels = labels,
     resource_deps = [
         "next:web",
