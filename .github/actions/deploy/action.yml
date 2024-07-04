@@ -73,8 +73,8 @@ runs:
         sha=$(git rev-parse HEAD | cut -c1-7)
         summary=$(git log -1 --pretty=%B | head -n 1)
         if [ "${{ inputs.production }}" = "true" ]; then
-          data=$(printf "New production deployment is available. Summary: %s %s\n\nUnique URL: %s\n\nPublic Hostname: %s" "$summary" "$sha" "${{ steps.vercel-deploy.outputs.deployment-url }}" "https://${{ steps.public-hostname.outputs.public-hostname }}")
+          data=$(printf "New production deployment is available. Summary: %s %s\n\nUnique URL: <%s>\n\nPublic Hostname: <%s>" "$summary" "$sha" "${{ steps.vercel-deploy.outputs.deployment-url }}" <"https://${{ steps.public-hostname.outputs.public-hostname }}")
         else
-          data=$(printf "New staging deployment is available. Summary: %s %s\n\nUnique URL: %s\n\nPublic Hostname: %s" "$summary" "$sha" "${{ steps.vercel-deploy.outputs.deployment-url }}" "https://${{ steps.public-hostname.outputs.public-hostname }}")
+          data=$(printf "New staging deployment is available. Summary: %s %s\n\nUnique URL: <%s>\n\nPublic Hostname: <%s>" "$summary" "$sha" "${{ steps.vercel-deploy.outputs.deployment-url }}" <"https://${{ steps.public-hostname.outputs.public-hostname }}")
         fi
-        curl -X POST -d "$data" "${{ inputs.qa-notification-url }}"
+        curl -X POST -d "payload={\"text\":\"$data\"}" "${{ inputs.qa-notification-url }}"
