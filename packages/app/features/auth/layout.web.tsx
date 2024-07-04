@@ -1,14 +1,33 @@
-import { Container, YStack, LinearGradient, useMedia, Stack, isWeb } from '@my/ui'
-import { AuthSideBarWrapper } from 'app/components/sidebar/AuthSideBar'
-import { useMemo, useState } from 'react'
-import { AuthCarouselContext } from './AuthCarouselContext'
-import { SolitoImage } from 'solito/image'
+import { Anchor, Container, LinearGradient, Stack, Theme, YStack, isWeb, useMedia } from '@my/ui'
+import { IconSendLogo } from 'app/components/icons'
+import { AnimationLayout } from 'app/components/layout/animation-layout'
+import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { usePathname } from 'app/utils/usePathname'
-import { AnimationLayout } from '../../components/layout/animation-layout'
+import { useMemo, useState } from 'react'
+import { SolitoImage } from 'solito/image'
+import { useLink } from 'solito/link'
+import { AuthCarouselContext } from './AuthCarouselContext'
 import { carouselImagePositions } from './components/Carousel'
 
-export function AuthLayout({
+export function AuthLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Container height={'100%'} f={1}>
+      <YStack ai="center" f={1} pt="$7" pb="$10">
+        <Anchor {...useLink({ href: '/' })} mx="auto" position="absolute" top={'$6'}>
+          <Theme inverse={true}>
+            <IconSendLogo size={'$6'} color={'$background'} />
+          </Theme>
+        </Anchor>
+        <YStack pb="$10" pt="$14" mt="$10">
+          {children}
+        </YStack>
+      </YStack>
+    </Container>
+  )
+}
+
+export function AuthLayoutOG({
   children,
 }: {
   children: React.ReactNode

@@ -1,9 +1,9 @@
+import { TopNav } from 'app/components/TopNav'
+import { AccountScreen } from 'app/features/account/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../_app'
-import { AccountScreen } from 'app/features/account/screen'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (

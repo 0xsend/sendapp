@@ -69,3 +69,9 @@ tmp
 **/.tamagui
 .watchman**
 **/vitest.config.ts.timestamp**
+
+# ignore test files
+**/*.spec.ts
+**/*.test.ts
+**/*.test.tsx
+packages/playwright/**

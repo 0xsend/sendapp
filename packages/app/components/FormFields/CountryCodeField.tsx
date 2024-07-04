@@ -19,18 +19,10 @@ import {
   isWeb,
 } from '@my/ui'
 
-type SelectItem = {
-  value: string
-  name: string
-}
-
 export const CountryCodeField = ({
-  options,
   native = false,
   ...props
-}: {
-  options: SelectItem[]
-} & Pick<SelectProps, 'size' | 'native'>) => {
+}: Pick<SelectProps, 'size' | 'native'>) => {
   const [country, setCountry] = useState<(typeof countries)[number] | undefined>(undefined)
   const [isOpen, setIsOpen] = useState(false)
   const { data: geoData, isLoading } = useGeoIp()

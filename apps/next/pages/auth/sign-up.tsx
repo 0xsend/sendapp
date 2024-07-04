@@ -1,12 +1,12 @@
-import { OnboardingScreen } from 'app/features/auth/onboarding/screen'
+import { SignUpScreen } from 'app/features/auth/sign-up/screen'
 import Head from 'next/head'
-import { userProtectedGetSSP } from 'utils/userProtected'
+import { guestOnlyGetSSP } from 'utils/guestOnly'
 import type { NextPageWithLayout } from '../_app'
 import { AuthLayout } from 'app/features/auth/layout.web'
+import type { InferGetServerSidePropsType } from 'next'
+import { getRemoteAssets } from 'utils/getRemoteAssets'
 import { useContext, useEffect } from 'react'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-import { getRemoteAssets } from 'utils/getRemoteAssets'
-import type { InferGetServerSidePropsType } from 'next'
 
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
   images,
@@ -20,14 +20,15 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   return (
     <>
       <Head>
-        <title>Send | Onboarding</title>
+        <title>Send | Sign Up</title>
+        <meta name="description" content="Future Cash. Sign up for Send." key="desc" />
       </Head>
-      <OnboardingScreen />
+      <SignUpScreen />
     </>
   )
 }
 
-export const getServerSideProps = userProtectedGetSSP(async () => {
+export const getServerSideProps = guestOnlyGetSSP(async () => {
   const paths = [
     'app_images/auth_image_3.jpg',
     'app_images/auth_image_1.jpg',
