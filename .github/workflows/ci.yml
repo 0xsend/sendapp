@@ -147,7 +147,10 @@ jobs:
       #   run: git diff --exit-code
       # this is on purpose so we get github annotations
       - name: Build Next.js
-        run: tilt ci next:web
+        shell: bash
+        run: |
+          tilt ci yarn:install # install and setup env
+          yarn web:docker:build # build nextjs docker image
       - name: Playwright Tests
         id: playwright
         shell: bash
