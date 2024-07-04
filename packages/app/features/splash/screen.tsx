@@ -139,14 +139,14 @@ function Hero() {
           </XStack>
 
           <YStack w="100%">
-            <Stack w="100%">
-              <Carousel fullscreen={false} currentKey={carouselProgress.toString()} />
-            </Stack>
+            <YStack jc="flex-end" f={1} gap="$2" $gtMd={{ pb: '$8' }} ml="auto" w="100%" maw={738}>
+              <Carousel currentKey={carouselProgress.toString()} fullscreen={false} />
+            </YStack>
             <XStack space="$4" my="$4" ai="center" jc="center">
               <SignInButton display={media.gtMd ? 'none' : 'flex'} />
-              <Anchor href="/about">About</Anchor>
-              <Anchor href="/privacy">Privacy</Anchor>
-              <Anchor href="/terms">Terms</Anchor>
+              <Anchor href="https://info.send.it">About</Anchor>
+              <Anchor href="https://info.send.it/legal/privacy-policy">Privacy</Anchor>
+              <Anchor href="https://info.send.it/legal/terms-of-service">Terms</Anchor>
             </XStack>
           </YStack>
         </YStack>

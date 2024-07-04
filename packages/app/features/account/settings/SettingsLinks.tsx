@@ -24,8 +24,7 @@ export function SettingsLinks(): JSX.Element {
     },
     {
       text: 'Privacy',
-      href: '/account/settings/privacy',
-      disabled: true,
+      href: 'https://info.send.it/legal/privacy-policy',
     },
     {
       text: 'Backup',
