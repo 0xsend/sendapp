@@ -1,25 +1,14 @@
-import {
-  Container,
-  YStack,
-  LinearGradient,
-  useMedia,
-  Stack,
-  isWeb,
-  Theme,
-  Anchor,
-  ScrollView,
-  Spacer,
-} from '@my/ui'
+import { Anchor, Container, LinearGradient, Stack, Theme, YStack, isWeb, useMedia } from '@my/ui'
+import { IconSendLogo } from 'app/components/icons'
 import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
-import { useMemo, useState } from 'react'
-import { AuthCarouselContext } from './AuthCarouselContext'
-import { SolitoImage } from 'solito/image'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { usePathname } from 'app/utils/usePathname'
-import { AnimationLayout } from '../../components/layout/animation-layout'
-import { carouselImagePositions } from './components/Carousel'
-import { IconSendLogo } from 'app/components/icons'
+import { useMemo, useState } from 'react'
+import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
+import { AnimationLayout } from 'app/components/layout/animation-layout'
+import { AuthCarouselContext } from './AuthCarouselContext'
+import { carouselImagePositions } from './components/Carousel'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

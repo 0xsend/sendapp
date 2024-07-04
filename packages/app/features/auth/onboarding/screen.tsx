@@ -7,12 +7,8 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { Stack, YStack, useMedia } from '@my/ui'
-import { IconSendLogo } from 'app/components/icons'
+import { YStack } from '@my/ui'
 import { OnboardingForm } from './onboarding-form'
-import { Carousel } from '../components/Carousel'
-import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-import { useEffect, useState } from 'react'
 
 export function OnboardingScreen() {
   return (
