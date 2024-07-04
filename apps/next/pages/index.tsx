@@ -1,21 +1,34 @@
 import type { Database } from '@my/supabase/database.types'
-import { Text } from '@my/ui'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { HomeScreen } from 'app/features/home/screen'
+import { SplashScreen } from 'app/features/splash/screen'
 import { useUser } from 'app/utils/useUser'
 import debug from 'debug'
-import type { GetServerSidePropsContext } from 'next'
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import { logRequest } from 'utils/logRequest'
 import { userOnboarded } from 'utils/userOnboarded'
 import type { NextPageWithLayout } from './_app'
+import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
+import { useContext, useEffect, useState } from 'react'
+import { getRemoteAssets } from 'utils/getRemoteAssets'
+import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 
 const log = debug('app:pages:index')
 
-export const Page: NextPageWithLayout = () => {
+export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  images,
+}) => {
   const { session } = useUser()
+  const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
+  const [carouselProgress, setCarouselProgress] = useState(0)
+
+  useEffect(() => {
+    if (carouselImages.length === 0) setCarouselImages(images)
+  }, [carouselImages, images])
+
   return (
     <>
       <Head>
@@ -26,7 +39,16 @@ export const Page: NextPageWithLayout = () => {
           <HomeScreen />
         </HomeLayout>
       ) : (
-        <Text>Welcome Anon</Text>
+        <AuthCarouselContext.Provider
+          value={{
+            carouselImages,
+            setCarouselImages,
+            carouselProgress,
+            setCarouselProgress,
+          }}
+        >
+          <SplashScreen />
+        </AuthCarouselContext.Provider>
       )}
     </>
   )
@@ -44,8 +66,17 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   if (!session) {
     log('no session')
+    const paths = [
+      'app_images/auth_image_3.jpg?raw=true',
+      'app_images/auth_image_1.jpg?raw=true',
+      'app_images/auth_image_2.jpg?raw=true',
+    ]
+    const images = await getRemoteAssets(paths)
+    console.log('images', images)
     return {
-      props: {},
+      props: {
+        images,
+      },
     }
   }
 
@@ -55,6 +86,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   return {
     props: {
       initialSession: session,
+      images: [],
     },
   }
 }
