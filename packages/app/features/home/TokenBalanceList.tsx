@@ -1,24 +1,23 @@
 import {
-  Paragraph,
-  Spinner,
-  Tooltip,
-  type TooltipProps,
-  XStack,
   Link,
-  type LinkProps,
+  Paragraph,
   Separator,
+  Spinner,
   Theme,
-  Stack,
+  Tooltip,
+  XStack,
+  type LinkProps,
+  type TooltipProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { IconArrowRight, IconError } from 'app/components/icons'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import type { coin, coins } from 'app/data/coins'
+import { useRootScreenParams } from 'app/routers/params'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { type UseBalanceReturnType, useBalance } from 'wagmi'
-import type { coins, coin } from 'app/data/coins'
-import { useRootScreenParams } from 'app/routers/params'
-import { IconCoin } from 'app/components/icons/IconCoin'
 import { Fragment } from 'react'
+import { useBalance, type UseBalanceReturnType } from 'wagmi'
 
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
   const [{ token: tokenParam }] = useRootScreenParams()
