@@ -17,6 +17,23 @@ test.beforeEach(async ({ page }) => {
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
+const signUp = async (page, phone, expect) => {
+  await page.getByLabel('Phone number').fill(phone)
+  const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+  await expect(signUpButton).toBeVisible()
+  await signUpButton.click()
+  const otpInput = page.getByLabel('One-time Password')
+  await expect(otpInput).toBeVisible()
+  await otpInput.fill('123456')
+  const verifyAccountButton = page.getByRole('button', { name: 'VERIFY ACCOUNT' })
+  await expect(verifyAccountButton).toBeVisible()
+  await verifyAccountButton.click()
+  await page.waitForLoadState()
+  await expect(page).toHaveURL('/auth/onboarding')
+  const onboardinPage = new OnboardingPage(page)
+  await onboardinPage.completeOnboarding(expect)
+}
+
 test('can sign up', async ({ page, pg }) => {
   const phone = `${Math.floor(Math.random() * 1e9)}`
   // naive but go to home page to see if user is logged in
@@ -29,26 +46,13 @@ test('can sign up', async ({ page, pg }) => {
   await expect(signUpLink).toBeVisible()
   await signUpLink.click()
   await expect(page).toHaveURL('/auth/sign-up')
-  await page.getByLabel('Phone number').fill(phone)
+
   try {
-    const signUpButton = page.getByRole('button', { name: 'Sign Up' })
-    await expect(signUpButton).toBeVisible()
-    await signUpButton.click()
-    const otpInput = page.getByLabel('One-time Password')
-    await expect(otpInput).toBeVisible()
-    await otpInput.fill('123456')
-    const verifyAccountButton = page.getByRole('button', { name: 'VERIFY ACCOUNT' })
-    await expect(verifyAccountButton).toBeVisible()
-    await verifyAccountButton.click()
-    await page.waitForLoadState()
-    await expect(page).toHaveURL('/auth/onboarding')
-    const onboardinPage = new OnboardingPage(page)
-    await onboardinPage.completeOnboarding(expect)
+    await signUp(page, phone, expect)
 
     // ensure use can log in with passkey
     page.context().clearCookies()
     await page.goto('/')
-
     await expect(page).toHaveURL('/')
     await expect(signInLink).toBeVisible()
     await signInLink.click()
@@ -76,12 +80,11 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
   })
 
   const ipPromise = page.waitForRequest('https://ipapi.co/json/')
-  await page.goto('/')
-  await expect(page).toHaveURL('/auth/sign-in')
+  await page.goto('/auth/sign-up')
+  await expect(page).toHaveURL('/auth/sign-up')
   await ipPromise
 
   await expect(page.getByText(`${country.flag} +${country.dialCode}`)).toBeVisible()
-  await page.getByLabel('Phone number').fill(phone)
 
   // ensure that auth api receives the correct country code
   await context.route(`${SUPABASE_URL}/auth/v1/verify*`, async (route) => {
@@ -92,12 +95,9 @@ test('country code is selected based on geoip', async ({ page, context, pg }) =>
       json: await route.fetch().then((res) => res.json()),
     })
   })
+
   try {
-    await page.getByRole('button', { name: '/SEND IT' }).click()
-    await page.getByLabel('One-time Password').fill('123456')
-    await page.getByRole('button', { name: 'VERIFY ACCOUNT' }).click()
-    await page.waitForLoadState()
-    await expect(page).toHaveURL('/auth/onboarding')
+    await signUp(page, phone, expect)
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone])
   }
