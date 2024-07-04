@@ -32,6 +32,7 @@ import { Adapt, Dialog, Sheet } from 'tamagui'
 import { type Address, isAddress } from 'viem'
 import { IconAccount } from './icons'
 import { baseMainnet } from '@my/wagmi'
+import { useEnsName } from 'wagmi'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -64,22 +65,31 @@ function SearchResults() {
 
   if (isAddress(query ?? '')) {
     return (
-      <ScrollView
+      <View
         testID="searchResults"
         key="searchResults"
         animation="quick"
         gap="$size.2.5"
-        mt="$size.3.5"
         width="100%"
         enterStyle={{
           opacity: 0,
           y: -10,
         }}
       >
-        <XStack gap="$5" flexWrap="wrap">
+        <YStack key={'results-eoa'} gap="$3.5">
+          <H4
+            $theme-dark={{ color: '$lightGrayTextField' }}
+            $theme-light={{ color: '$darkGrayTextField' }}
+            fontFamily={'$mono'}
+            fontWeight={'500'}
+            size={'$5'}
+            textTransform="uppercase"
+          >
+            EOA
+          </H4>
           <AddressSearchResultRow address={query as Address} />
-        </XStack>
-      </ScrollView>
+        </YStack>
+      </View>
     )
   }
 
@@ -210,6 +220,10 @@ function SearchFilterButton({
 
 const AddressSearchResultRow = ({ address }: { address: Address }) => {
   const href = useSearchResultHref()
+  const { data: ensFromAddress, isLoading: isLoadingEns } = useEnsName({
+    address,
+  })
+
   const router = useRouter()
   const { gtMd } = useMedia()
   const [sendConfirmDialogIsOpen, setSendConfirmDialogIsOpen] = useState(false)
@@ -237,19 +251,22 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
               backgroundColor={'$decay'}
               $theme-light={{ backgroundColor: '$white' }}
             >
-              <IconAccount color="$olive" />
+              <IconAccount color="$olive" size={'$4'} />
             </Avatar.Fallback>
           </Avatar>
           <YStack gap="$1">
-            <Paragraph
-              fontWeight={'300'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-              $theme-dark={{ color: '$lightGrayTextField' }}
-              fontSize="$7"
-              $gtSm={{ fontSize: '$5' }}
-            >
-              External Address
-            </Paragraph>
+            <XStack gap="$3" ai={'center'}>
+              <Paragraph
+                fontWeight={'300'}
+                $theme-light={{ color: '$darkGrayTextField' }}
+                $theme-dark={{ color: '$lightGrayTextField' }}
+                fontSize="$7"
+                $gtSm={{ fontSize: '$5' }}
+              >
+                {ensFromAddress ?? 'External Address'}
+              </Paragraph>
+              {isLoadingEns && <Spinner size="small" color={'$color11'} />}
+            </XStack>
             <Text
               fontSize="$4"
               ff={'$mono'}
