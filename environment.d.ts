@@ -35,6 +35,10 @@ declare global {
        * Enables the query dev tool in the browser
        */
       NEXT_PUBLIC_ENABLE_QUERY_DEV_TOOLS: string
+      /**
+       * Cloudflare Turnstile site key
+       */
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: string
     }
   }
   /**

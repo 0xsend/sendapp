@@ -19,6 +19,10 @@ const randomCountry = () =>
 
 const signUp = async (page, phone, expect) => {
   await page.getByLabel('Phone number').fill(phone)
+  const captcha = page
+    .frameLocator('iframe[title="Widget containing a Cloudflare security challenge"]')
+    .locator('#success')
+  await expect(captcha).toBeVisible()
   const signUpButton = page.getByRole('button', { name: 'Sign Up' })
   await expect(signUpButton).toBeVisible()
   await signUpButton.click()
