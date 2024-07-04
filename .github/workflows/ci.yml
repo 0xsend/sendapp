@@ -149,8 +149,9 @@ jobs:
       - name: Build Next.js
         shell: bash
         run: |
+          direnv export
           tilt ci yarn:install # install and setup env
-          yarn web:docker:build # build nextjs docker image
+          direnv exec . yarn web:docker:build # build nextjs docker image
       - name: Playwright Tests
         id: playwright
         shell: bash
