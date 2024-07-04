@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@daimo/expo-passkeys": "workspace:*",
+    "@marsidev/react-turnstile": "^0.7.1",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
     "@my/wagmi": "workspace:*",

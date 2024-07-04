@@ -8,9 +8,11 @@ const log = debug('api:auth')
 
 export const authRouter = createTRPCRouter({
   signInWithOtp: publicProcedure
-    .input(z.object({ phone: z.string(), countrycode: z.string() }))
+    .input(
+      z.object({ phone: z.string(), countrycode: z.string(), captchaToken: z.string().optional() })
+    )
     .mutation(async ({ input }) => {
-      const { phone, countrycode } = input
+      const { phone, countrycode, captchaToken } = input
       if (!phone) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -23,9 +25,15 @@ export const authRouter = createTRPCRouter({
           message: 'Country Code is required',
         })
       }
+      if (!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Captcha token is required',
+        })
+      }
       try {
         const result = await supabaseAdmin.auth
-          .signInWithOtp({ phone: `${countrycode}${phone}` })
+          .signInWithOtp({ phone: `${countrycode}${phone}`, options: { captchaToken } })
           .then(async (r) => {
             // TODO: potentially add a fake numbers list for app store reviewers
             if (__DEV__ || process.env.CI) {
