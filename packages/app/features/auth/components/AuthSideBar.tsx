@@ -1,8 +1,8 @@
 import { SideBar, Stack, Theme, YStack, useMedia, type YStackProps, XStack } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
-import { SignInForm } from 'app/features/auth/sign-in/sign-in-form'
 import { OnboardingForm } from 'app/features/auth/onboarding/onboarding-form'
 import { usePathname } from 'app/utils/usePathname'
+import { SignInScreen } from '../sign-in/screen'
 
 const AuthSideBar = ({ ...props }: YStackProps) => {
   const pathName = usePathname()
@@ -16,7 +16,7 @@ const AuthSideBar = ({ ...props }: YStackProps) => {
       </Stack>
       <YStack f={1} gap="$4" ai="center" jc="center">
         {pathName.includes('/auth/sign-in') ? (
-          <SignInForm />
+          <SignInScreen />
         ) : pathName.includes('auth/onboarding') ? (
           <OnboardingForm />
         ) : null}

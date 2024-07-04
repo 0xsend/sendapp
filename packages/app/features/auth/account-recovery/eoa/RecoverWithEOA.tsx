@@ -1,15 +1,15 @@
-import { useAccount, useSignMessage } from 'wagmi'
-import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
-import { Button, ButtonText } from '@my/ui'
-import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
 import {
+  RecoveryEOAPreamble,
+  RecoveryOptions,
   type ChallengeResponse,
   type VerifyChallengeRequest,
-  RecoveryOptions,
 } from '@my/api/src/routers/account-recovery/types'
-import type { SignState } from 'app/features/auth/account-recovery/account-recovery'
-import { RecoveryEOAPreamble } from '@my/api/src/routers/account-recovery/types'
+import { Button, ButtonText } from '@my/ui'
 import type { SignMessageErrorType } from '@wagmi/core'
+import type { SignState } from 'app/features/auth/account-recovery/account-recovery'
+import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
+import { useAccount, useSignMessage } from 'wagmi'
+import type { SignMessageData, SignMessageVariables } from 'wagmi/query'
 
 interface Props {
   challengeData: ChallengeResponse
@@ -23,11 +23,7 @@ export default function RecoverWithEOA(props: Props) {
   const { signMessage } = useSignMessage()
   const { address, isConnected } = useAccount()
 
-  const onSuccess = async (
-    data: SignMessageData,
-    variables: SignMessageVariables,
-    context: unknown
-  ) => {
+  const onSuccess = async (data: SignMessageData, variables: SignMessageVariables) => {
     await props.onSignSuccess({
       recoveryType: RecoveryOptions.EOA,
       signature: data,

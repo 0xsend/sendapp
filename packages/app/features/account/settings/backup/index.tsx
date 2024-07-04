@@ -117,7 +117,7 @@ export const BackupScreen = () => {
                   if you need help.
                 </Paragraph>
                 <Link
-                  href="https://info.send.it/send/mission-vision-and-values"
+                  href="https://help.send.app/what-are-passkeys/"
                   target="_blank"
                   display="flex"
                   alignItems="center"
@@ -139,7 +139,7 @@ export const BackupScreen = () => {
                   You have no Send Account.
                 </Paragraph>
                 <Link
-                  href="https://info.send.it/send/mission-vision-and-values"
+                  href="https://help.send.app/what-are-passkeys/"
                   target="_blank"
                   display="flex"
                   alignItems="center"

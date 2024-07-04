@@ -30,9 +30,9 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
 
 export const getServerSideProps = guestOnlyGetSSP(async () => {
   const paths = [
-    'app_images/auth_image_1.jpg?raw=true',
-    'app_images/auth_image_2.jpg?raw=true',
-    'app_images/auth_image_3.jpg?raw=true',
+    'app_images/auth_image_3.jpg',
+    'app_images/auth_image_1.jpg',
+    'app_images/auth_image_2.jpg',
   ]
   const images = await getRemoteAssets(paths)
   return { props: { images } }

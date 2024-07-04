@@ -64,6 +64,10 @@ export default () => {
           hostname: 'github.com',
           pathname: '/0xsend/assets/**',
         },
+        {
+          protocol: 'https',
+          hostname: 'ghassets.send.app',
+        },
       ],
     },
     typescript: {

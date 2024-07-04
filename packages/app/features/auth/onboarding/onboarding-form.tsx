@@ -135,7 +135,7 @@ export const OnboardingForm = () => {
                 col: '$background',
               }}
               $theme-light={{ col: '$black' }}
-              href="https://info.send.it/send/mission-vision-and-values"
+              href="https://help.send.app/what-are-passkeys/"
               target="_blank"
               dsp="none"
               $gtMd={{ dsp: 'block' }}
@@ -171,7 +171,7 @@ export const OnboardingForm = () => {
         {(fields) => (
           <YStack gap="$5" jc="center" $sm={{ f: 1 }}>
             <Theme inverse={true}>
-              <BigHeading col="$background">SETUP PASSKEY</BigHeading>
+              <BigHeading col="$background">OPEN ACCOUNT</BigHeading>
             </Theme>
             <H3
               lineHeight={28}
@@ -181,7 +181,8 @@ export const OnboardingForm = () => {
               fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
-              Start by creating a Passkey below. Send uses passkeys to secure your account
+              Open your Send Account by creating a Passkey below. Send uses passkeys to secure your
+              account
             </H3>
             <YStack gap="$4">
               <Theme inverse={true}>

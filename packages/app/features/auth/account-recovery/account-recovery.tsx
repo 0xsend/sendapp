@@ -1,26 +1,17 @@
-import { useEffect, useState, useCallback } from 'react'
-import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
-import {
-  Stack,
-  XStack,
-  YStack,
-  Text,
-  Button,
-  ButtonText,
-  useToastController,
-  Paragraph,
-} from '@my/ui'
 import type {
   ChallengeResponse,
-  VerifyChallengeRequest,
   ErrorWithMessage,
+  VerifyChallengeRequest,
 } from '@my/api/src/routers/account-recovery/types'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
-import { api } from 'app/utils/api'
-import { IconError, IconRefresh } from 'app/components/icons'
-import { useRouter } from 'solito/router'
-import RecoverWithPasskey from 'app/features/auth/account-recovery/passkey/RecoverWithPasskey'
+import { Button, ButtonText, Paragraph, Stack, XStack, YStack, useToastController } from '@my/ui'
 import type { SignMessageErrorType } from '@wagmi/core'
+import { IconError, IconRefresh } from 'app/components/icons'
+import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
+import RecoverWithPasskey from 'app/features/auth/account-recovery/passkey/RecoverWithPasskey'
+import { api } from 'app/utils/api'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'solito/router'
 
 interface Props {
   onClose?: () => void
@@ -35,8 +26,7 @@ export enum SignState {
 export default function AccountRecovery(props: Props) {
   const toast = useToastController()
   const [error, setError] = useState<ErrorWithMessage>()
-  // TODO: frontend: implement signing loading state
-  const [signState, setSignState] = useState<SignState>(SignState.NOT_COMPLETE)
+  const [signState] = useState<SignState>(SignState.NOT_COMPLETE)
   const [challengeData, setChallengeData] = useState<ChallengeResponse>()
   const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
     retry: false,

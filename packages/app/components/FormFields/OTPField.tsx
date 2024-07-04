@@ -1,28 +1,22 @@
-import { useStringFieldInfo, useTsController } from '@ts-react/form'
-import { useEffect, useId, useRef, useState } from 'react'
 import {
+  FieldError,
   Fieldset,
   Input,
-  type InputProps,
   Label,
-  TamaguiElement,
+  Shake,
   Theme,
   XStack,
   useThemeName,
-  FieldError,
-  Shake,
+  type InputProps,
 } from '@my/ui'
+import { useStringFieldInfo, useTsController } from '@ts-react/form'
+import { useId, useState } from 'react'
 
 export const OTPField = (props: InputProps) => {
-  const {
-    field,
-    error,
-    formState: { isSubmitting },
-  } = useTsController<string>()
+  const { field, error } = useTsController<string>()
   const { label, placeholder, isOptional } = useStringFieldInfo()
   const themeName = useThemeName()
   const id = useId()
-  const disabled = isSubmitting
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
 
   const onChangeText = (text, index) => {
