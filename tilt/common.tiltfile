@@ -7,10 +7,10 @@ contract_files = files_matching(
 
 DEBUG = os.getenv("DEBUG", "").find("tilt") != -1
 
-CI = os.getenv(
+CI = bool(os.getenv(
     "CI",
     config.tilt_subcommand == "ci",
-)
+))
 
 config.define_string_list(
     "args",
