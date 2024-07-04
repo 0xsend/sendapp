@@ -70,7 +70,7 @@ function Hero() {
   const mobileImagePosition = carouselImagePositions[carouselProgress]
 
   return (
-    <YStack h={isWeb ? '100svh' : '100%'} bc="$black">
+    <YStack h={isWeb ? '100svh' : '100%'} bc="$black" overflow="hidden">
       {carouselImage && (
         <Stack
           pos="absolute"
