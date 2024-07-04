@@ -22,9 +22,9 @@ const carouselItems = [
 ] as const
 
 export const carouselImagePositions = [
-  { bottom: '0%', left: '75%' },
-  { bottom: '0%', left: '35%' },
   { bottom: '0%', left: '50%' },
+  { bottom: '0%', left: '35%' },
+  { bottom: '0%', left: '75%' },
 ] as const
 
 const CarouselProgress = () => {

@@ -68,11 +68,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     log('no session')
     const paths = [
       'app_images/auth_image_3.jpg',
-      'app_images/auth_image_1.jpg',
       'app_images/auth_image_2.jpg',
+      'app_images/auth_image_1.jpg',
     ]
     const images = await getRemoteAssets(paths)
-    console.log('images', images)
     return {
       props: {
         images,
