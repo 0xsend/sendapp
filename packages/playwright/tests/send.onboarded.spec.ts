@@ -12,6 +12,7 @@ import { erc20Abi, formatUnits, parseUnits, zeroAddress } from 'viem'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
 import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
+import { shorten } from 'app/utils/strings'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -40,7 +41,9 @@ const tokens = [
   },
 ] as { symbol: string; address: `0x${string}`; decimals: number }[]
 
-const idTypes = ['tag', 'sendid'] as const
+const idTypes = ['tag', 'sendid', 'address'] as const
+
+const testEOA = zeroAddress.replace('0x0', '0x1')
 
 for (const token of tokens) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
@@ -91,7 +94,17 @@ for (const token of tokens) {
       assert(!!recvAccount, 'send account not found')
       const tag = plan.tags[0]
 
-      const query = isSendId ? profile?.sendId.toString() : tag?.name
+      const query = (() => {
+        switch (idType) {
+          case 'sendid':
+            return profile?.sendId.toString()
+          case 'address':
+            return testEOA
+          default:
+            return tag?.name
+        }
+      })()
+
       assert(!!query, 'query not found')
 
       // goto send page
@@ -105,7 +118,7 @@ for (const token of tokens) {
       await expect(page).toHaveURL(/\/send/)
 
       // fill search input
-      const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID')
+      const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
       await expect(searchInput).toBeVisible()
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
@@ -128,10 +141,31 @@ for (const token of tokens) {
         timeout: 5000,
       })
 
-      const counterparty = isSendId ? profile.name : `/${tag?.name}`
       await expect(page.getByTestId('SendForm')).toHaveText(
-        new RegExp(isSendId ? `#${profile.sendId}` : `/${tag?.name}`)
+        new RegExp(
+          (() => {
+            switch (idType) {
+              case 'address':
+                return shorten(testEOA, 6, 6)
+              case 'sendid':
+                return `#${profile.sendId}`
+              default:
+                return `/${tag?.name}`
+            }
+          })()
+        )
       )
+
+      const counterparty = (() => {
+        switch (idType) {
+          case 'address':
+            return testEOA
+          case 'sendid':
+            return `#${profile.sendId}`
+          default:
+            return `/${tag?.name}`
+        }
+      })()
       await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
     })
   }

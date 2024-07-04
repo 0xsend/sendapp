@@ -1,6 +1,7 @@
 import type { Enums } from '@my/supabase/database.types'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { createParam } from 'solito'
+import type { Address } from 'viem'
 
 export type RootParams = { nav?: 'home' | 'settings'; token?: string; search?: string }
 
@@ -66,7 +67,7 @@ export const useRewardsScreenParams = () => {
 }
 
 export type SendScreenParams = {
-  idType?: Enums<'lookup_type_enum'>
+  idType?: Enums<'lookup_type_enum'> | Address
   recipient?: string
   amount?: string
   sendToken?: `0x${string}` | 'eth'

@@ -1,10 +1,27 @@
-import { useSendScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { usePathname } from 'app/utils/usePathname'
 import type { SearchResultCommonType } from 'app/components/SearchBar'
+import { isAddress } from 'viem'
+import { baseMainnet } from '@my/wagmi'
 
-export const useSearchResultHref = (profile: SearchResultCommonType) => {
+export const useSearchResultHref = (profile?: SearchResultCommonType) => {
+  const [queryParams] = useRootScreenParams()
+  const { search: query } = queryParams
   const path = usePathname()
   const [sendParams] = useSendScreenParams()
+  if (!profile) {
+    switch (true) {
+      case !query || !isAddress(query):
+        return ''
+      case path === '/activity':
+        return `${baseMainnet.blockExplorers.default.url}/address/${query}`
+      case path === '/send':
+        return `/send?recipient=${query}&idType=address`
+      default: {
+        throw new Error(`Unhandled path: ${path}`)
+      }
+    }
+  }
 
   switch (path) {
     case '/activity':

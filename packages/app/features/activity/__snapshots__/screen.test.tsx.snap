@@ -99,7 +99,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               control={
                 {
                   "_defaultValues": {
-                    "query": "",
+                    "query": "test",
                   },
                   "_disableForm": [Function],
                   "_executeSchema": [Function],
@@ -111,7 +111,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         "ref": {
                           "name": "query",
                         },
-                        "value": "",
+                        "value": "test",
                       },
                     },
                   },
@@ -130,7 +130,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     "touchedFields": {},
                   },
                   "_formValues": {
-                    "query": "",
+                    "query": "test",
                   },
                   "_getDirty": [Function],
                   "_getFieldArray": [Function],
@@ -222,7 +222,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              placeholder="Sendtag, Phone, Send ID"
+              placeholder="Sendtag, Phone, Send ID, Address"
               placeholderTextColor="#081619"
               readOnly={false}
               style={
@@ -244,8 +244,8 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 19.2,
-                  "fontStyle": "italic",
-                  "fontWeight": "normal",
+                  "fontStyle": "normal",
+                  "fontWeight": "bold",
                   "height": 44,
                   "minWidth": 0,
                   "paddingLeft": 16,
@@ -253,7 +253,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                   "position": "relative",
                 }
               }
-              value=""
+              value="test"
             />
           </View>
           <View
@@ -270,50 +270,325 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
       </View>
     </View>
   </View>
+  <RCTScrollView
+    scrollEnabled={true}
+    style={
+      [
+        {
+          "gap": 32,
+          "marginTop": 40,
+        },
+        {
+          "initial": {
+            "updater": [Function],
+            "value": {
+              "opacity": 0,
+              "transform": [
+                {
+                  "translateY": -10,
+                },
+              ],
+              "width": "100%",
+            },
+          },
+          "jestAnimatedStyle": {
+            "current": {},
+          },
+          "viewDescriptors": {
+            "add": [Function],
+            "remove": [Function],
+            "shareableViewDescriptors": {
+              "_isReanimatedSharedValue": true,
+              "_value": [],
+              "addListener": [Function],
+              "modify": [Function],
+              "removeListener": [Function],
+              "value": [],
+            },
+          },
+          "viewsRef": {
+            "add": [Function],
+            "items": Set {},
+            "remove": [Function],
+          },
+        },
+      ]
+    }
+    testID="searchResults"
+  >
+    <View>
+      <View
+        style={
+          {
+            "flexDirection": "column",
+            "gap": 16,
+          }
+        }
+      >
+        <Text
+          accessibilityRole="header"
+          style={
+            {
+              "color": "#B3B3B3",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textTransform": "uppercase",
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          tag
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "gap": 24,
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "borderBottomLeftRadius": 10,
+                "borderBottomRightRadius": 10,
+                "borderTopLeftRadius": 10,
+                "borderTopRightRadius": 10,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              data-href="/profile/3665"
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "gap": 18,
+                  }
+                }
+                testID="tag-search-3665"
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 48,
+                      "justifyContent": "center",
+                      "maxHeight": 48,
+                      "maxWidth": 48,
+                      "minHeight": 48,
+                      "minWidth": 48,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 48,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://avatars.githubusercontent.com/u/123",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 48,
+                          "width": 48,
+                        }
+                      }
+                      testID="avatar"
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "alignItems": "center",
+                          "borderBottomLeftRadius": 7,
+                          "borderBottomRightRadius": 7,
+                          "borderTopLeftRadius": 7,
+                          "borderTopRightRadius": 7,
+                          "flexDirection": "column",
+                          "height": 48,
+                          "justifyContent": "center",
+                          "maxHeight": 48,
+                          "maxWidth": 48,
+                          "minHeight": 48,
+                          "minWidth": 48,
+                          "overflow": "hidden",
+                          "position": "relative",
+                          "width": 48,
+                        }
+                      }
+                    >
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 1,
+                          }
+                        }
+                      >
+                        <Image
+                          fullscreen={true}
+                          onError={[Function]}
+                          onLoad={[Function]}
+                          source={
+                            {
+                              "uri": "https://ui-avatars.com/api.jpg?name=test&size=256",
+                            }
+                          }
+                          style={
+                            {
+                              "height": 48,
+                              "width": 48,
+                            }
+                          }
+                        />
+                      </View>
+                      <View
+                        style={
+                          {
+                            "bottom": 0,
+                            "flexDirection": "column",
+                            "left": 0,
+                            "position": "absolute",
+                            "right": 0,
+                            "top": 0,
+                            "zIndex": 0,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            {
+                              "color": "#FFFFFF",
+                              "fontFamily": "System",
+                              "fontSize": 16.8,
+                              "fontWeight": "400",
+                              "lineHeight": 19,
+                              "userSelect": "auto",
+                            }
+                          }
+                          suppressHighlighting={true}
+                        >
+                          ??
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={
+                    {
+                      "flexDirection": "column",
+                      "gap": 2,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#B3B3B3",
+                        "fontFamily": "System",
+                        "fontSize": 24,
+                        "fontWeight": "300",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontWeight": "500",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      test
+                    </Text>
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 16.8,
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    /test
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
   <View
     collapsable={false}
     forwardedRef={[Function]}
     jestAnimatedStyle={
       {
         "value": {
-          "opacity": {
-            "callStart": null,
-            "callback": [Function],
-            "current": 1,
-            "finished": true,
-            "lastTimestamp": 0,
-            "omega0": 14.433756729740644,
-            "omega1": 11.785113019775793,
-            "onFrame": [Function],
-            "onStart": [Function],
-            "reduceMotion": false,
-            "startTimestamp": 0,
-            "startValue": 1,
-            "timestamp": 0,
-            "toValue": 1,
-            "velocity": 0,
-            "zeta": 0.5773502691896257,
-          },
+          "opacity": 1,
           "transform": [
             {
-              "translateY": {
-                "callStart": null,
-                "callback": [Function],
-                "current": 0,
-                "finished": true,
-                "lastTimestamp": 0,
-                "omega0": 14.433756729740644,
-                "omega1": 11.785113019775793,
-                "onFrame": [Function],
-                "onStart": [Function],
-                "reduceMotion": false,
-                "startTimestamp": 0,
-                "startValue": 0,
-                "timestamp": 0,
-                "toValue": 0,
-                "velocity": 0,
-                "zeta": 0.5773502691896257,
-              },
+              "translateY": 0,
             },
           ],
         },

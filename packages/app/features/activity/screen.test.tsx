@@ -13,7 +13,7 @@ jest.mock('expo-router', () => ({
 }))
 
 jest.mock('app/routers/params', () => ({
-  useRootScreenParams: jest.fn().mockReturnValue([{ search: '' }, jest.fn()]),
+  useRootScreenParams: jest.fn().mockReturnValue([{ search: 'test' }, jest.fn()]),
 }))
 
 jest.mock('app/utils/supabase/useSupabase', () => ({
@@ -31,6 +31,7 @@ jest.mock('app/utils/supabase/useSupabase', () => ({
               },
             ],
             phone_matches: [],
+            address_matches: [],
           },
         ],
         error: null,
@@ -75,7 +76,7 @@ describe('ActivityScreen', () => {
         <ActivityScreen />
       </TamaguiProvider>
     )
-    const searchInput = screen.getByPlaceholderText('Sendtag, Phone, Send ID')
+    const searchInput = screen.getByPlaceholderText('Sendtag, Phone, Send ID, Address')
     fireEvent.changeText(searchInput, 'test')
     await act(async () => {
       jest.advanceTimersByTime(2000)
