@@ -2,17 +2,13 @@ import { YStack, XStack, Text, Button, Anchor, useMedia, Stack, LinearGradient }
 import { IconSendLogo } from 'app/components/icons'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { SolitoImage } from 'solito/image'
-import { usePathname } from 'app/utils/usePathname'
-import { useState, useMemo, useContext } from 'react'
-import { AuthCarouselContext, useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
+import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel, carouselImagePositions } from 'app/features/auth/components/Carousel'
 import { useLink } from 'solito/link'
 import { isWeb } from '@my/ui'
-import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 
 export function SplashScreen() {
   const media = useMedia()
-  const pathname = usePathname()
   const { carouselImages, carouselProgress } = useAuthCarouselContext()
   const carouselImage = carouselImages[carouselProgress]
   const mobileImagePosition = carouselImagePositions[carouselProgress]

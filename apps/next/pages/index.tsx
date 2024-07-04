@@ -12,7 +12,7 @@ import { logRequest } from 'utils/logRequest'
 import { userOnboarded } from 'utils/userOnboarded'
 import type { NextPageWithLayout } from './_app'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 
@@ -67,9 +67,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   if (!session) {
     log('no session')
     const paths = [
-      'app_images/auth_image_3.jpg?raw=true',
-      'app_images/auth_image_1.jpg?raw=true',
-      'app_images/auth_image_2.jpg?raw=true',
+      'app_images/auth_image_3.jpg',
+      'app_images/auth_image_1.jpg',
+      'app_images/auth_image_2.jpg',
     ]
     const images = await getRemoteAssets(paths)
     console.log('images', images)
