@@ -1,7 +1,5 @@
 import {
-  Anchor,
   BigHeading,
-  Button,
   ButtonText,
   FormWrapper,
   H3,

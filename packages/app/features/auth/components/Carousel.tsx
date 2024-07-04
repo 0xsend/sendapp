@@ -1,7 +1,7 @@
+import { H1, Paragraph, Progress, Stack, XStack } from '@my/ui'
+import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { useContext, useEffect, useState } from 'react'
 import { AuthCarouselContext } from '../AuthCarouselContext'
-import { H1, Paragraph, Progress, Stack, XStack, useMedia } from '@my/ui'
-import { AnimationLayout } from 'app/components/layout/animation-layout'
 
 const carouselItems = [
   {
@@ -72,7 +72,6 @@ const CarouselProgress = () => {
 }
 export const Carousel = (props: { currentKey: string | undefined; fullscreen: boolean }) => {
   const { carouselProgress } = useContext(AuthCarouselContext)
-  const { gtMd } = useMedia()
 
   const item = carouselItems?.at(carouselProgress)
 
