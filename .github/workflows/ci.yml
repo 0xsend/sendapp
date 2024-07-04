@@ -147,7 +147,7 @@ jobs:
       #   run: git diff --exit-code
       # this is on purpose so we get github annotations
       - name: Build Next.js
-        run: yarn web:docker:build
+        run: tilt ci next:web
       - name: Playwright Tests
         id: playwright
         shell: bash
