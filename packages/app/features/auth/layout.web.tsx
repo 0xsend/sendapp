@@ -1,12 +1,12 @@
 import { Anchor, Container, LinearGradient, Stack, Theme, YStack, isWeb, useMedia } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
+import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { usePathname } from 'app/utils/usePathname'
 import { useMemo, useState } from 'react'
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
-import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { AuthCarouselContext } from './AuthCarouselContext'
 import { carouselImagePositions } from './components/Carousel'
 
