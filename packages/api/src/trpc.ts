@@ -5,17 +5,18 @@ import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import superJson from 'superjson'
 
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  console.log(
-    `${opts.req.url} - ${opts.req.headers['user-agent']}${
-      opts.req.headers['x-forwarded-for'] ? ` - ${opts.req.headers['x-forwarded-for']}` : ''
-    }`
-  )
+  const ip =
+    (opts.req.headers['cf-connecting-ip'] ||
+      opts.req.headers['x-forwarded-for'] ||
+      opts.req.socket.remoteAddress) ??
+    ''
+  console.log(`${opts.req.url} - ${opts.req.headers['user-agent']} - ${ip}`)
 
   // if there's auth cookie it'll be authenticated by this helper
   const supabase = createPagesServerClient<Database>(opts)
 
-  // native sends these instead of cookie auth
   if (opts.req.headers.authorization && opts.req.headers['refresh-token']) {
+    // native sends these instead of cookie auth
     const accessToken = opts.req.headers.authorization.split('Bearer ').pop()
     const refreshToken = opts.req.headers['refresh-token']
     if (accessToken && typeof refreshToken === 'string') {
