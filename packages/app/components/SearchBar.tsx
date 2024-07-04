@@ -2,6 +2,7 @@ import {
   Avatar,
   Button,
   ButtonText,
+  Card,
   H4,
   Paragraph,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   XStack,
   YStack,
   isWeb,
+  useMedia,
 } from '@my/ui'
 import { Link } from 'solito/link'
 import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
@@ -20,7 +22,10 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useEffect, useState } from 'react'
 import type { Functions } from '@my/supabase/database.types'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
+import { type Address, isAddress } from 'viem'
 import { useRootScreenParams } from 'app/routers/params'
+import { IconAccount } from './icons'
+import { shorten } from 'app/utils/strings'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -35,9 +40,11 @@ const formatResultsKey = (str: string): string => {
 }
 
 function SearchResults() {
-  const { form, results, isLoading, error } = useTagSearch()
+  const { results, isLoading, error } = useTagSearch()
+  const [queryParams] = useRootScreenParams()
+  const { search: query } = queryParams
+
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
-  const query = form.watch('query', '')
   if (isLoading) {
     return (
       <YStack key="loading" gap="$4" mt="$4">
@@ -48,6 +55,28 @@ function SearchResults() {
   if (!results || error) {
     return null
   }
+
+  if (isAddress(query ?? '')) {
+    return (
+      <ScrollView
+        testID="searchResults"
+        key="searchResults"
+        animation="quick"
+        gap="$size.2.5"
+        mt="$size.3.5"
+        width="100%"
+        enterStyle={{
+          opacity: 0,
+          y: -10,
+        }}
+      >
+        <XStack gap="$5" flexWrap="wrap">
+          <AddressSearchResultRow address={query as Address} />
+        </XStack>
+      </ScrollView>
+    )
+  }
+
   const matchesCount = Object.values(results).filter(
     (value) => Array.isArray(value) && value.length
   ).length
@@ -107,7 +136,6 @@ function SearchResults() {
                   key={`${key}-${item.tag_name}-${item.send_id}`}
                   keyField={key as SearchResultsKeysType}
                   profile={item}
-                  query={query}
                 />
               ))}
             </XStack>
@@ -174,18 +202,72 @@ function SearchFilterButton({
   )
 }
 
+const AddressSearchResultRow = ({ address }: { address: Address }) => {
+  const href = useSearchResultHref()
+  const { gtMd } = useMedia()
+
+  return (
+    <View br="$5" key={`SearchResultRow-${address}`} width="100%">
+      <Link href={href}>
+        <Card
+          testID={`tag-search-${address}`}
+          ai="center"
+          gap="$4"
+          display="flex"
+          fd={'row'}
+          p="$3"
+        >
+          <Avatar size="$4.5" br="$3">
+            <Avatar.Fallback
+              f={1}
+              jc={'center'}
+              ai={'center'}
+              backgroundColor={'$decay'}
+              $theme-light={{ backgroundColor: '$white' }}
+            >
+              <IconAccount color="$olive" />
+            </Avatar.Fallback>
+          </Avatar>
+          <YStack gap="$1">
+            <Paragraph
+              fontWeight={'300'}
+              $theme-light={{ color: '$darkGrayTextField' }}
+              $theme-dark={{ color: '$lightGrayTextField' }}
+              fontSize="$7"
+              $gtSm={{ fontSize: '$5' }}
+            >
+              External Address
+            </Paragraph>
+            <Text
+              fontSize="$4"
+              ff={'$mono'}
+              $theme-light={{ color: '$darkGrayTextField' }}
+              $gtSm={{ fontSize: '$2' }}
+            >
+              {gtMd ? address : shorten(address, 6, 6)}
+            </Text>
+          </YStack>
+        </Card>
+      </Link>
+    </View>
+  )
+}
+
 function SearchResultRow({
   keyField,
   profile,
-  query,
 }: {
   keyField: SearchResultsKeysType
   profile: SearchResultCommonType
-  query: string
 }) {
+  const [queryParams] = useRootScreenParams()
+  const { search: query } = queryParams
   const href = useSearchResultHref(profile)
+
   const { resolvedTheme } = useThemeSetting()
   const rowBC = resolvedTheme?.startsWith('dark') ? '$metalTouch' : '$gray2Light'
+
+  if (!query) return null
 
   return (
     <View
@@ -250,7 +332,7 @@ function SearchResultRow({
 function Search() {
   const { form } = useTagSearch()
   const [queryParams, setRootParams] = useRootScreenParams()
-  const { search } = queryParams
+  const { search: query } = queryParams
 
   useEffect(() => {
     const subscription = form.watch(({ query }) => {
@@ -274,7 +356,7 @@ function Search() {
         <FormProvider {...form}>
           <SchemaForm
             form={form}
-            defaultValues={{ query: search }}
+            defaultValues={{ query }}
             onSubmit={() => {
               // noop
             }}
@@ -282,7 +364,7 @@ function Search() {
             props={{
               query: {
                 accessibilityRole: 'search',
-                placeholder: 'Sendtag, Phone, Send ID',
+                placeholder: 'Sendtag, Phone, Send ID, Address',
                 pr: '$size.3.5',
               },
             }}

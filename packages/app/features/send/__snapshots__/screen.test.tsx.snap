@@ -679,7 +679,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              placeholder="Sendtag, Phone, Send ID"
+              placeholder="Sendtag, Phone, Send ID, Address"
               placeholderTextColor="#081619"
               readOnly={false}
               style={
@@ -957,7 +957,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              placeholder="Sendtag, Phone, Send ID"
+              placeholder="Sendtag, Phone, Send ID, Address"
               placeholderTextColor="#081619"
               readOnly={false}
               style={
@@ -1312,7 +1312,18 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                     }
                     suppressHighlighting={true}
                   >
-                    test
+                    <Text
+                      style={
+                        {
+                          "color": "#FFFFFF",
+                          "fontFamily": "System",
+                          "fontWeight": "500",
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      test
+                    </Text>
                   </Text>
                   <Text
                     style={

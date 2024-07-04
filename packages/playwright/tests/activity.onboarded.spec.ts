@@ -111,7 +111,7 @@ test('can search on activity page', async ({ page, context }) => {
   })
   await expect(activityHeading(page)).toBeVisible()
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })
-  const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID')
+  const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
   await searchInput.fill('test')
   await expect(searchInput).toHaveValue('test')
   await page.waitForResponse(`${SUPABASE_URL}/rest/v1/rpc/tag_search*`)
