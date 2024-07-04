@@ -1,12 +1,14 @@
 import { expect, test as baseTest, mergeTests } from '@playwright/test'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
+import { test as webauthnTest } from '@my/playwright/fixtures/webauthn'
 import { countries } from 'app/utils/country'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 import debug from 'debug'
+import { OnboardingPage } from './fixtures/send-accounts'
 
 let log: debug.Debugger
 
-const test = mergeTests(snapletTest, baseTest)
+const test = mergeTests(snapletTest, webauthnTest)
 
 test.beforeEach(async ({ page }) => {
   log = debug(`test:sign-in:${test.info().parallelIndex}`)
@@ -15,18 +17,49 @@ test.beforeEach(async ({ page }) => {
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
-test('can login', async ({ page, pg }) => {
+test('can sign up', async ({ page, pg }) => {
   const phone = `${Math.floor(Math.random() * 1e9)}`
   // naive but go to home page to see if user is logged in
   await page.goto('/')
+  const signInLink = page.getByRole('link', { name: 'Sign In' })
+  await expect(signInLink).toBeVisible()
+  await signInLink.click()
   await expect(page).toHaveURL('/auth/sign-in')
+  const signUpLink = page.getByRole('link', { name: 'Sign Up' })
+  await expect(signUpLink).toBeVisible()
+  await signUpLink.click()
+  await expect(page).toHaveURL('/auth/sign-up')
   await page.getByLabel('Phone number').fill(phone)
   try {
-    await page.getByRole('button', { name: '/SEND IT' }).click()
-    await page.getByLabel('One-time Password').fill('123456')
-    await page.getByRole('button', { name: 'VERIFY ACCOUNT' }).click()
+    const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+    await expect(signUpButton).toBeVisible()
+    await signUpButton.click()
+    const otpInput = page.getByLabel('One-time Password')
+    await expect(otpInput).toBeVisible()
+    await otpInput.fill('123456')
+    const verifyAccountButton = page.getByRole('button', { name: 'VERIFY ACCOUNT' })
+    await expect(verifyAccountButton).toBeVisible()
+    await verifyAccountButton.click()
     await page.waitForLoadState()
     await expect(page).toHaveURL('/auth/onboarding')
+    const onboardinPage = new OnboardingPage(page)
+    await onboardinPage.completeOnboarding(expect)
+
+    // ensure use can log in with passkey
+    page.context().clearCookies()
+    await page.goto('/')
+
+    await expect(page).toHaveURL('/')
+    await expect(signInLink).toBeVisible()
+    await signInLink.click()
+    await expect(page).toHaveURL('/auth/sign-in')
+    const signInButton = page.getByRole('button', { name: 'Sign In' })
+    await expect(signInButton).toBeVisible()
+    await signInButton.click()
+    const homeHeader = page
+      .getByRole('heading', { name: 'Home', exact: true })
+      .and(page.getByText('Home'))
+    await expect(homeHeader).toBeVisible()
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone])
   }

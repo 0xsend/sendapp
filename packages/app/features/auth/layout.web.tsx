@@ -8,6 +8,7 @@ import {
   Theme,
   Anchor,
   ScrollView,
+  Spacer,
 } from '@my/ui'
 import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
 import { useMemo, useState } from 'react'
@@ -22,20 +23,18 @@ import { useLink } from 'solito/link'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ScrollView f={1}>
-      <Container>
-        <YStack f={1}>
-          <Anchor {...useLink({ href: '/' })} mx="auto" pt="$7">
-            <Theme inverse={true}>
-              <IconSendLogo size={'$6'} color={'$background'} />
-            </Theme>
-          </Anchor>
-          <YStack h={'100%'} jc="space-between" pb="$10">
-            {children}
-          </YStack>
+    <Container height={'100%'} f={1}>
+      <YStack ai="center" f={1} pt="$7" pb="$10">
+        <Anchor {...useLink({ href: '/' })} mx="auto" position="absolute" top={'$6'}>
+          <Theme inverse={true}>
+            <IconSendLogo size={'$6'} color={'$background'} />
+          </Theme>
+        </Anchor>
+        <YStack pb="$10" pt="$14" mt="$10">
+          {children}
         </YStack>
-      </Container>
-    </ScrollView>
+      </YStack>
+    </Container>
   )
 }
 

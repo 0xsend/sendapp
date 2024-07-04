@@ -11,7 +11,7 @@ import { useLink } from 'solito/link'
 
 export const SignInScreen = () => {
   return (
-    <YStack h="100%" jc="center" ai="center" f={1}>
+    <YStack h="100%" jc="center" ai="center">
       <SignInForm />
       <XStack jc="center" ai="center" mt="$4">
         <Paragraph size="$2" color="$color11">

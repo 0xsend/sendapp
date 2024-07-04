@@ -156,7 +156,7 @@ function Hero() {
 }
 
 function SignInButton(props: ButtonProps) {
-  const signInLink = useLink({ href: '/auth/signin' })
+  const signInLink = useLink({ href: '/auth/sign-in' })
   return (
     <Button {...signInLink} size="$4" theme="green" w="$12" {...props}>
       Sign In
