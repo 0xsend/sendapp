@@ -150,6 +150,7 @@ jobs:
         shell: bash
         run: |
           tilt ci yarn:install # install and setup env
+          source <(direnv stdlib)
           direnv allow .
           direnv exec . yarn web:docker:build # build nextjs docker image
       - name: Playwright Tests
