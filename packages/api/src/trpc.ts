@@ -5,6 +5,12 @@ import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import superJson from 'superjson'
 
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+  console.log(
+    `${opts.req.url} - ${opts.req.headers['user-agent']}${
+      opts.req.headers['x-forwarded-for'] ? ` - ${opts.req.headers['x-forwarded-for']}` : ''
+    }`
+  )
+
   // if there's auth cookie it'll be authenticated by this helper
   const supabase = createPagesServerClient<Database>(opts)
 

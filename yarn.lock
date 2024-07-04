@@ -5226,6 +5226,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@marsidev/react-turnstile@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "@marsidev/react-turnstile@npm:0.7.1"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 6622ea1ad641dca1769160cf7785b4fbf59390e0dad81774aff1725504090e725e5eb69a1f71953eb555ecab075099328e07d16a1f9c86ad385ced97cb559306
+  languageName: node
+  linkType: hard
+
 "@metamask/abi-utils@npm:^1.2.0":
   version: 1.2.0
   resolution: "@metamask/abi-utils@npm:1.2.0"
@@ -12411,6 +12421,7 @@ __metadata:
   dependencies:
     "@daimo/expo-passkeys": "workspace:*"
     "@jest/globals": "npm:^29.7.0"
+    "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
     "@my/wagmi": "workspace:*"
@@ -28249,6 +28260,7 @@ __metadata:
     "@manypkg/cli": "npm:^0.19.1"
     "@nderscore/tamagui-typescript-plugin": "npm:^0.6.0"
     check-dependency-version-consistency: "npm:^3.0.3"
+    dotenv-cli: "npm:^7.3.0"
     eslint: "npm:^8.46.0"
     jest: "npm:^29.7.0"
     jest-expo: "npm:^50.0.0"
