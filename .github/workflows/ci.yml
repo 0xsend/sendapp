@@ -146,6 +146,12 @@ jobs:
       #   shell: bash
       #   run: git diff --exit-code
       # this is on purpose so we get github annotations
+      - name: Build Next.js
+        shell: bash
+        run: |
+          tilt ci yarn:install # install and setup env
+          direnv allow .
+          direnv exec . yarn web:docker:build # build nextjs docker image
       - name: Playwright Tests
         id: playwright
         shell: bash
