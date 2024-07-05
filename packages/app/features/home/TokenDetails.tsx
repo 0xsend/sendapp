@@ -150,12 +150,14 @@ const TokenDetailsBalance = ({
   }
 
   const balanceWithDecimals = Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)
+  const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
+
   return (
     <Tooltip placement="bottom">
       <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
         <BigHeading
           $platform-web={{ width: 'fit-content' }}
-          $sm={{ fontSize: balanceWithDecimals.toString().length > 8 ? '$10' : 68 }}
+          $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68 }}
           color={'$color12'}
         >
           {formatAmount(balanceWithDecimals.toString(), 10, 5)}
