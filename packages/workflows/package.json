@@ -1,0 +1,16 @@
+{
+  "name": "@my/workflows",
+  "module": "src/all-activities.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.5.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "@temporalio/activity": "^1.10.1",
+    "@temporalio/workflow": "^1.10.1"
+  }
+}
