@@ -313,7 +313,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
           }
           suppressHighlighting={true}
         >
-          @test
+          /test
         </Text>
       </View>
     </View>
@@ -374,7 +374,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
       }
       suppressHighlighting={true}
     >
-      @test
+      /test
     </Text>
     <Text
       style={
@@ -1517,7 +1517,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                     }
                     suppressHighlighting={true}
                   >
-                    @test
+                    /test
                   </Text>
                 </View>
               </View>

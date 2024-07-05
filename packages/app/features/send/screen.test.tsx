@@ -90,7 +90,7 @@ describe('SendScreen', () => {
     })
 
     expect(screen.toJSON()).toMatchSnapshot('search')
-    expect(screen.getByTestId('tag-search-3665')).toHaveTextContent('??test@test')
+    expect(screen.getByTestId('tag-search-3665')).toHaveTextContent('??test/test')
     const avatar = screen.getByTestId('avatar')
     expect(avatar).toBeOnTheScreen()
     expect(avatar.props.source.uri).toBe('https://avatars.githubusercontent.com/u/123')
@@ -139,7 +139,7 @@ describe('SendScreen', () => {
 
     // screen.debug('amount form')
     expect(screen.getByTestId('NoSendAccountLink')).toHaveTextContent(
-      '@test has no send account! Ask them to create one or write a /send Check.'
+      '/test has no send account! Ask them to create one or write a /send Check.'
     )
   })
 })

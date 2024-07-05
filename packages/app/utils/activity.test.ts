@@ -73,17 +73,17 @@ describe('test subtextFromActivity', () => {
   })
   it('should return the to user tags when transfer and from user ID is present', () => {
     expect(subtextFromActivity(EventSchema.parse(mockSentTransfer))).toEqual(
-      `@${mockSentTransfer.to_user.tags[0]}`
+      `/${mockSentTransfer.to_user.tags[0]}`
     )
   })
   it('should return the tags when tag receipts event', () => {
     expect(subtextFromActivity(EventSchema.parse(mockTagReceipt))).toEqual(
-      `@${mockTagReceipt.data.tags[0]}`
+      `/${mockTagReceipt.data.tags[0]}`
     )
   })
   it('should return the referrals when referrals event', () => {
     const activity = mockReferral
-    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('@disconnect_whorl7351')
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('/disconnect_whorl7351')
   })
   it('should return Paymaster when sent to paymaster', () => {
     const activity = mockSentTransfer

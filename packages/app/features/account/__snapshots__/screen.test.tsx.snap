@@ -8,8 +8,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         "alignItems": "center",
         "flexDirection": "column",
         "gap": 24,
-        "paddingBottom": 32,
-        "paddingTop": 32,
         "width": "100%",
       }
     }
@@ -231,7 +229,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              @
+              /
               test
             </Text>
           </View>

@@ -81,6 +81,6 @@ describe('ActivityScreen', () => {
 
     expect(searchInput.props.value).toBe('test')
     const searchResults = await screen.findByTestId('tag-search-3665')
-    expect(searchResults).toHaveTextContent('??test@test')
+    expect(searchResults).toHaveTextContent('??test/test')
   })
 })

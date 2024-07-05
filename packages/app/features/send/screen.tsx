@@ -86,7 +86,7 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
       >
         <Text fontWeight="bold" display="flex" color="$color12">
           {(() => {
-            if (profile.tag) return `@${profile.tag}`
+            if (profile.tag) return `/${profile.tag}`
             if (profile.name) return profile.name
             return `#${profile.sendid}`
           })()}

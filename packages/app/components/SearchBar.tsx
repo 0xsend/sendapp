@@ -238,7 +238,7 @@ function SearchResultRow({
               $theme-light={{ color: '$darkGrayTextField' }}
               $gtSm={{ fontSize: '$2' }}
             >
-              {profile.tag_name ? `@${profile.tag_name}` : `#${profile.send_id}`}
+              {profile.tag_name ? `/${profile.tag_name}` : `#${profile.send_id}`}
             </Text>
           </YStack>
         </XStack>

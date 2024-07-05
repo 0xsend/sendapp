@@ -154,7 +154,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       }
       suppressHighlighting={true}
     >
-      @pip_test44677
+      /pip_test44677
     </Text>
     <Text
       selectable={true}

@@ -13,6 +13,7 @@ exports[`TokenDetails 1`] = `
     style={
       {
         "flexDirection": "column",
+        "marginTop": 18,
       }
     }
   >
@@ -54,7 +55,7 @@ exports[`TokenDetails 1`] = `
         {
           "color": "#FFFFFF",
           "fontFamily": "System",
-          "fontSize": 64,
+          "fontSize": 68,
           "fontWeight": "700",
           "lineHeight": 57,
           "marginBottom": 0,
@@ -72,8 +73,8 @@ exports[`TokenDetails 1`] = `
   <View
     style={
       {
-        "paddingBottom": 32,
-        "paddingTop": 32,
+        "paddingBottom": 18,
+        "paddingTop": 18,
         "width": "100%",
       }
     }
@@ -905,7 +906,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  @alice
+                  /alice
                 </Text>
                 <Text
                   style={

@@ -53,7 +53,7 @@ describe('ActivityRow', () => {
     // expect(getByText('Alice')).toBeOnTheScreen() // should we show the user's name?
     expect(getByText('Sent')).toBeOnTheScreen()
     expect(getByText('0.019032 USDC')).toBeOnTheScreen()
-    expect(getByText('@alice')).toBeOnTheScreen() // shows receivers first tag
+    expect(getByText('/alice')).toBeOnTheScreen() // shows receivers first tag
   })
 
   it('should render send account transfers event when received and sender is a send app user', () => {
@@ -67,7 +67,7 @@ describe('ActivityRow', () => {
     )
     expect(getByText('Received')).toBeOnTheScreen()
     expect(getByText('0.019032 USDC')).toBeOnTheScreen() // show senders address if not a send app user
-    expect(getByText('@alice')).toBeOnTheScreen() // shows senders first tag
+    expect(getByText('/alice')).toBeOnTheScreen() // shows senders first tag
   })
 
   it('should render tag receipts event', () => {
@@ -78,7 +78,7 @@ describe('ActivityRow', () => {
       </TamaguiProvider>
     )
     expect(getByText('Sendtag Registered')).toBeOnTheScreen()
-    expect(getByText('@yuw')).toBeOnTheScreen()
+    expect(getByText('/yuw')).toBeOnTheScreen()
     expect(getByText('0.02 ETH')).toBeOnTheScreen()
   })
 
@@ -90,7 +90,7 @@ describe('ActivityRow', () => {
       </TamaguiProvider>
     )
     expect(getByText('Referral')).toBeOnTheScreen()
-    expect(getByText('@disconnect_whorl7351')).toBeOnTheScreen()
+    expect(getByText('/disconnect_whorl7351')).toBeOnTheScreen()
     expect(getByTestId('ActivityRowAmount')).toHaveTextContent('1 Referrals')
   })
 
@@ -104,7 +104,7 @@ describe('ActivityRow', () => {
       </TamaguiProvider>
     )
     expect(getByText('Referred By')).toBeOnTheScreen()
-    expect(getByText('@disconnect_whorl7351')).toBeOnTheScreen()
+    expect(getByText('/disconnect_whorl7351')).toBeOnTheScreen()
     expect(getByTestId('ActivityRowAmount')).toBeEmptyElement()
   })
 })
