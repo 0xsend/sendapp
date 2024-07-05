@@ -1165,7 +1165,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    @yuw
+                    /yuw
                   </Text>
                   <Text
                     style={
@@ -1482,7 +1482,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    @disconnect_whorl7351
+                    /disconnect_whorl7351
                   </Text>
                   <Text
                     style={
@@ -2443,7 +2443,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    @dan
+                    /dan
                   </Text>
                   <Text
                     style={

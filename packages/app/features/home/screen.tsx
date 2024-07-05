@@ -150,11 +150,11 @@ export function HomeScreen() {
 const SendButton = () => (
   <LinkableButton href={'/send'} theme="green" br="$4" px={'$3.5'} h={'$4.5'} w="100%">
     <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
-      <Button.Text fontWeight={'500'} textTransform={'uppercase'}>
+      <Button.Text fontWeight={'500'} textTransform={'uppercase'} $theme-dark={{ col: '$color0' }}>
         Send
       </Button.Text>
       <Button.Icon>
-        <IconArrowRight size={'$2.5'} />
+        <IconArrowRight size={'$2.5'} $theme-dark={{ col: '$color0' }} />
       </Button.Icon>
     </XStack>
   </LinkableButton>

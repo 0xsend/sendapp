@@ -128,7 +128,7 @@ export function subtextFromActivity(activity: Activity): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user } = activity
   if (isTagReceiptsEvent(activity)) {
-    return activity.data.tags.map((t) => `@${t}`).join(', ')
+    return activity.data.tags.map((t) => `/${t}`).join(', ')
   }
   if (isReferralsEvent(activity)) {
     if (from_user?.id) {
@@ -168,7 +168,7 @@ export function userNameFromActivityUser(
 ): string {
   switch (true) {
     case !!user?.tags?.[0]:
-      return `@${user.tags[0]}`
+      return `/${user.tags[0]}`
     case !!user?.name:
       return user.name
     case !!user?.send_id:

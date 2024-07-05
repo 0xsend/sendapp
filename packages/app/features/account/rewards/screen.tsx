@@ -16,6 +16,7 @@ import {
   View,
   XStack,
   YStack,
+  useThemeName,
 } from '@my/ui'
 import {
   type UseDistributionsResultData,
@@ -206,7 +207,7 @@ const DistributionRewardsSection = ({
           </Stack>
         </XStack>
       </Stack>
-      {confirmedTags?.length === 0 ? (
+      {confirmedTags?.length === -1 ? (
         <Card
           w="100%"
           jc={'space-around'}
@@ -333,14 +334,20 @@ const SendBalanceCard = ({
     <Card
       bw={1}
       br={12}
-      theme="ghost_dim"
+      theme="ghost_alt1"
       p="$4"
       $xs={{ p: '$2.5' }}
       $gtLg={{ p: '$4' }}
       jc="center"
     >
       <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-        <Label fontFamily={'$mono'} fontSize={'$5'} color="$color9">
+        <Label
+          fontFamily={'$mono'}
+          fontSize={'$5'}
+          theme="green"
+          col={'$color2'}
+          $theme-light={{ col: '$color12' }}
+        >
           Snapshot Send Balance
         </Label>
         {isLoadingSnapshotBalance || isLoadingChainAddresses ? (
@@ -366,7 +373,7 @@ const SendBalanceCard = ({
 const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) => (
   <Card
     f={2}
-    theme="ghost_dim"
+    theme="ghost_alt1"
     bw={1}
     br={12}
     $xs={{ p: '$2.5' }}
@@ -375,7 +382,13 @@ const MinBalanceCard = ({ hodler_min_balance }: { hodler_min_balance: number }) 
     jc="center"
   >
     <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-      <Label fontFamily={'$mono'} fontSize={'$5'} color="$color9">
+      <Label
+        fontFamily={'$mono'}
+        fontSize={'$5'}
+        theme="green"
+        col={'$color2'}
+        $theme-light={{ col: '$color12' }}
+      >
         Min Balance required
       </Label>
       <Paragraph fontFamily={'$mono'} fontSize={'$7'} fontWeight={'500'} color={'$color12'}>
@@ -390,14 +403,20 @@ const ReferralsCard = ({ referrals }: { referrals: number | null }) => (
     f={1}
     borderWidth={1}
     br={12}
-    theme="ghost_dim"
+    theme="ghost_alt1"
     $xs={{ p: '$2.5' }}
     p="$4"
     $gtLg={{ p: '$4' }}
     jc="center"
   >
     <YStack gap="$2" $gtLg={{ gap: '$4' }}>
-      <Label fontFamily={'$mono'} fontSize={'$5'} col={'$color9'}>
+      <Label
+        fontFamily={'$mono'}
+        fontSize={'$5'}
+        theme="green"
+        col={'$color2'}
+        $theme-light={{ col: '$color12' }}
+      >
         Referrals
       </Label>
 
@@ -467,6 +486,8 @@ const DistributionRewardsList = ({
   const { isLoading, error } = useDistributions()
   const [queryParams, setParams] = useRewardsScreenParams()
 
+  const isDark = useThemeName().includes('dark')
+
   const mock = (len: number, start = 0) =>
     new Array(len).fill(undefined).map((_, i) => ({ number: start + i + 1 }))
 
@@ -504,7 +525,13 @@ const DistributionRewardsList = ({
                 jc="center"
                 opacity={0.5}
               >
-                <Paragraph size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="$color9">
+                <Paragraph
+                  size={'$1'}
+                  padding={'unset'}
+                  ta="center"
+                  margin={'unset'}
+                  col="$color12"
+                >
                   {`# ${i + 1}`}
                 </Paragraph>
               </Card>
@@ -557,12 +584,19 @@ const DistributionRewardsList = ({
                 miw="$7"
                 h="$2"
                 br={6}
-                theme="green_alt2"
+                theme={isDark ? 'green_alt2' : undefined}
+                $theme-light={{ bc: '$color2' }}
                 onPress={() =>
                   setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
                 }
               >
-                <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="white">
+                <ButtonText
+                  size={'$1'}
+                  padding={'unset'}
+                  ta="center"
+                  margin={'unset'}
+                  col="$color12"
+                >
                   {`# ${distribution?.number}  `}
                 </ButtonText>
               </Button>

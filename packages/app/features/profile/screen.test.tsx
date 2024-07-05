@@ -87,7 +87,7 @@ test('ProfileScreen', async () => {
 
   const h1 = screen.getByText(PROFILE.name)
   expect(h1).toBeOnTheScreen()
-  const h2 = screen.getByText(`@${PROFILE.tag_name}`)
+  const h2 = screen.getByText(`/${PROFILE.tag_name}`)
   expect(h2).toBeOnTheScreen()
   const paragraph = screen.getByText(PROFILE.about)
   expect(paragraph).toBeOnTheScreen()

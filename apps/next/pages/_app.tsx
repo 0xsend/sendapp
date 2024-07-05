@@ -48,7 +48,7 @@ function MyApp({
         <title>Send</title>
         <meta
           name="description"
-          content="Send App harnesses Ethereum's latest advancements, notably account abstraction, to simplify cryptocurrency entry. By integrating this into Ethereum, we streamline transactions and contracts, complemented by Send App's user-friendly design."
+          content="With a primary focus on enabling seamless USDC (USD Coin) transfers, Send offers scalability, global accessibility, and cost-effectiveness for both merchants and consumers."
         />
         <meta
           name="viewport"

@@ -17,7 +17,7 @@ test('TokenDetails', () => {
 
   expect(screen.getByText('Sent')).toBeOnTheScreen()
   expect(screen.getAllByText('Received')).toHaveLength(2)
-  expect(screen.getByText('@alice')).toBeOnTheScreen()
+  expect(screen.getByText('/alice')).toBeOnTheScreen()
   expect(screen.getByText('0xa71CE00000000000000000000000000000000000')).toBeOnTheScreen()
   expect(screen.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeOnTheScreen()
   expect(screen.getByText('10 USDC')).toBeOnTheScreen()
