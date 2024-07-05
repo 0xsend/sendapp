@@ -97,6 +97,7 @@ next_app_resource_deps = [
     "daimo-expo-passkeys:build",
     "anvil:fixtures",
     "shovel",
+    "temporal",
 ] + ([
     "aa_bundler:base",
 ] if not CI else [])

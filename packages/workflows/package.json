@@ -1,9 +1,32 @@
 {
   "name": "@my/workflows",
-  "module": "src/all-activities.ts",
+  "files": [
+    "package.json",
+    "src"
+  ],
+  "exports": {
+    "./src/all-activities": {
+      "types": "./src/all-activities.ts",
+      "default": "./src/all-activities.ts"
+    },
+    "./src/all-activities.js": {
+      "types": "./src/all-activities.ts",
+      "default": "./src/all-activities.ts"
+    },
+    "./src/all-workflows": {
+      "types": "./src/all-workflows.ts",
+      "default": "./src/all-workflows.ts"
+    },
+    "./src/all-workflows.js": {
+      "types": "./src/all-workflows.ts",
+      "default": "./src/all-workflows.ts"
+    }
+  },
   "type": "module",
+  "scripts": {
+    "lint": "tsc"
+  },
   "devDependencies": {
-    "@types/bun": "latest",
     "typescript": "^5.5.3"
   },
   "peerDependencies": {

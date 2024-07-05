@@ -2,13 +2,15 @@
   "name": "workers",
   "module": "src/worker.ts",
   "type": "module",
+  "files": [
+    "package.json",
+    "src"
+  ],
   "scripts": {
-    "build": "tsc --build",
-    "build.watch": "tsc --build --watch",
-    "lint": "eslint .",
-    "start": "node --loader ts-node/esm src/worker.ts",
+    "lint": "tsc",
+    "start": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/worker.ts",
     "start.watch": "nodemon src/worker.ts",
-    "workflow": "node --loader ts-node/esm src/client.ts"
+    "workflow": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/client.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -25,7 +27,7 @@
   },
   "nodemonConfig": {
     "execMap": {
-      "ts": "node --loader ts-node/esm"
+      "ts": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));'"
     },
     "ext": "ts",
     "watch": [

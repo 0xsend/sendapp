@@ -5838,7 +5838,6 @@ __metadata:
   dependencies:
     "@temporalio/activity": "npm:^1.10.1"
     "@temporalio/workflow": "npm:^1.10.1"
-    "@types/bun": "npm:latest"
     typescript: "npm:^5.5.3"
   peerDependencies:
     typescript: ^5.5.3
