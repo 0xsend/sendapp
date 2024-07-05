@@ -1,7 +1,7 @@
 import { proxyActivities, sleep, log } from '@temporalio/workflow'
 // Only import the activity types
-import type * as activitiesA from './activities/activitiesA'
-import type * as activitiesB from './activities/activitiesB'
+import type * as activitiesA from './activities/activitiesA.js'
+import type * as activitiesB from './activities/activitiesB.js'
 
 const { activityA } = proxyActivities<typeof activitiesA>({
   startToCloseTimeout: '1 minute',

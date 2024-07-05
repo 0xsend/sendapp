@@ -1,2 +1,2 @@
-export * from './workflowA/workflow'
-export * from './workflowB/workflow'
+export * from './workflowA/workflow.js'
+export * from './workflowB/workflow.js'

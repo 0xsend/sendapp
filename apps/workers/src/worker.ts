@@ -1,11 +1,18 @@
 import { Worker } from '@temporalio/worker'
-import * as activities from '@my/workflows/src/all-activities'
+import * as activities from '@my/workflows/src/all-activities.js'
+import { URL, fileURLToPath } from 'node:url'
+import path from 'node:path'
 
 async function run() {
+  const workflowsPathUrl = new URL(
+    `../../../packages/workflows/src/all-workflows${path.extname(import.meta.url)}`,
+    import.meta.url
+  )
+
   // Step 1: Register Workflows and Activities with the Worker and connect to
   // the Temporal server.
   const worker = await Worker.create({
-    workflowsPath: require.resolve('../../packages/workflows/lib/all-workflows.js'),
+    workflowsPath: fileURLToPath(workflowsPathUrl),
     activities,
     taskQueue: 'monorepo',
   })

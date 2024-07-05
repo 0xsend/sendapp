@@ -2,8 +2,19 @@
   "name": "workers",
   "module": "src/worker.ts",
   "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "build.watch": "tsc --build --watch",
+    "lint": "eslint .",
+    "start": "node --loader ts-node/esm src/worker.ts",
+    "start.watch": "nodemon src/worker.ts",
+    "workflow": "node --loader ts-node/esm src/client.ts"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
   },
   "peerDependencies": {
     "typescript": "^5.5.3"
@@ -11,5 +22,14 @@
   "dependencies": {
     "@my/workflows": "workspace:*",
     "@temporalio/worker": "^1.10.1"
+  },
+  "nodemonConfig": {
+    "execMap": {
+      "ts": "node --loader ts-node/esm"
+    },
+    "ext": "ts",
+    "watch": [
+      "src"
+    ]
   }
 }
