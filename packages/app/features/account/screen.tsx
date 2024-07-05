@@ -233,7 +233,7 @@ export function AccountScreen() {
                   <InfoLabel text="SENDTAGS" />
                   <XStack gap={'$3.5'} flexWrap="wrap" flex={1}>
                     {tags.map((tag) => (
-                      <InfoItem text={`@${tag.name}`} key={tag.name} />
+                      <InfoItem text={`/${tag.name}`} key={tag.name} />
                     ))}
                   </XStack>
                 </XStack>
