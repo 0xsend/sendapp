@@ -224,16 +224,7 @@ export function TopNav({
             top={0}
             justifyContent="center"
           >
-            <View
-              bw={1}
-              br={'$2'}
-              $theme-dark={{ boc: '$decay' }}
-              $theme-light={{ boc: '$gray4Light' }}
-              py={'$1.5'}
-              px={'$2'}
-              miw="$18"
-              bc="$background"
-            >
+            <View bw={1} br={'$2'} boc="$decay" py={'$1.5'} px={'$2'} miw="$18" bc="$background">
               <TokenDetailsMarketData coin={selectedCoin} />
             </View>
           </View>

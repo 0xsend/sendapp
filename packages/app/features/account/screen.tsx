@@ -176,7 +176,7 @@ export function AccountScreen() {
   ]
 
   return (
-    <YStack w={'100%'} ai={'center'} gap={'$size.1.5'} py="$6">
+    <YStack w={'100%'} ai={'center'} gap={'$size.1.5'}>
       <Card p={'$size.3.5'} w={'100%'}>
         <XStack gap={'$size.3.5'} w={'100%'} flexWrap="wrap">
           <View width={'100%'} $gtMd={{ width: 'auto' }}>
@@ -213,7 +213,7 @@ export function AccountScreen() {
 
               {tags?.[0] ? (
                 <Paragraph fontSize={'$7'} fontWeight={'600'} theme={'alt2'}>
-                  @{tags[0].name}
+                  /{tags[0].name}
                 </Paragraph>
               ) : null}
             </YStack>

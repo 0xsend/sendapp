@@ -55,33 +55,21 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
     <YStack f={1}>
       {media.gtLg && (
         <XStack w={'100%'} ai={'center'} jc={'space-between'} $gtLg={{ mt: '$4.5' }} mt={'$6'}>
-          <Separator
-            $theme-dark={{ boc: '$decay' }}
-            $theme-light={{ boc: '$gray4Light' }}
-            my={coin.label === 'USDC' ? '$3.5' : '$0'}
-          />
+          <Separator boc="$decay" my={coin.label === 'USDC' ? '$3.5' : '$0'} />
           {coin.label !== 'USDC' && (
-            <Stack
-              bw={1}
-              br={'$2'}
-              $theme-dark={{ boc: '$decay' }}
-              $theme-light={{ boc: '$gray4Light' }}
-              p={'$1.5'}
-              jc="center"
-              miw="$18"
-            >
+            <Stack bw={1} br={'$2'} boc="$decay" p={'$1.5'} jc="center" miw="$18">
               <TokenDetailsMarketData coin={coin} />
             </Stack>
           )}
         </XStack>
       )}
-      <YStack>
+      <YStack mt={'$4'}>
         <Label fontSize={'$5'} fontWeight={'500'} textTransform={'uppercase'}>
           {`${coin.label} BALANCE`}
         </Label>
         <TokenDetailsBalance balance={balance} symbol={coin.symbol} />
       </YStack>
-      <Stack w={'100%'} py={'$6'}>
+      <Stack w={'100%'} py={'$4'}>
         <Separator />
       </Stack>
       <YStack>
@@ -167,7 +155,7 @@ const TokenDetailsBalance = ({
       <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
         <BigHeading
           $platform-web={{ width: 'fit-content' }}
-          $sm={{ fontSize: balanceWithDecimals.toString().length > 8 ? '$10' : 64 }}
+          $sm={{ fontSize: balanceWithDecimals.toString().length > 8 ? '$10' : 68 }}
           color={'$color12'}
         >
           {formatAmount(balanceWithDecimals.toString(), 10, 5)}

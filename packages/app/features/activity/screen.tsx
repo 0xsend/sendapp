@@ -117,7 +117,7 @@ function Suggestions() {
               </Avatar.Fallback>
             </Avatar>
             <Paragraph color="$color12" fontFamily="$mono" fontSize="$2">
-              @{user.username}
+              /{user.username}
             </Paragraph>
           </XStack>
         ))}

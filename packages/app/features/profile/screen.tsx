@@ -27,7 +27,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const router = useRouter()
   const toast = useToastController()
 
-  const formatTags = (tags: string[]) => tags?.map((tag) => `@${tag}`).join(' ')
+  const formatTags = (tags: string[]) => tags?.map((tag) => `/${tag}`).join(' ')
 
   return (
     <YStack f={1} gap="$6" pt="$6" $gtMd={{ pt: '$0' }}>

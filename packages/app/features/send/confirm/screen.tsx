@@ -427,7 +427,7 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
             lineHeight="$1"
             color="$color11"
           >
-            {profile?.tag ? `@${profile?.tag}` : `#${profile?.sendid}`}
+            {profile?.tag ? `/${profile?.tag}` : `#${profile?.sendid}`}
           </Paragraph>
         </YStack>
       </XStack>
