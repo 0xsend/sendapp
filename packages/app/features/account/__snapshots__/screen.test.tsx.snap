@@ -313,7 +313,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  @test
+                  /test
                 </Text>
               </View>
             </View>
