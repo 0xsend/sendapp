@@ -37,7 +37,7 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@my/workflows/*": ["../../packages/workflows/*"]
+      "@my/workflows/*": ["../../packages/workflows/src/*"]
     }
   },
   "include": ["./src", "../../packages/workflows/src"]

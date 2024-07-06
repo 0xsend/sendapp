@@ -1,5 +1,5 @@
 import { Worker } from '@temporalio/worker'
-import * as activities from '@my/workflows/src/all-activities.js'
+import * as activities from '@my/workflows/all-activities'
 import { URL, fileURLToPath } from 'node:url'
 import path from 'node:path'
 

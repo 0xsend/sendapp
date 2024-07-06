@@ -1,6 +1,6 @@
 load("ext://uibutton", "cmd_button", "location")
-load("./tilt/common.tiltfile", "CI", "contract_files")
-load("./tilt/utils.tiltfile", "files_matching")
+load("./common.tiltfile", "CI", "contract_files")
+load("./utils.tiltfile", "files_matching")
 
 labels = ["test"]
 
@@ -191,6 +191,20 @@ local_resource(
     deps = files_matching(
         os.path.join("packages", "shovel", "etc"),
         lambda f: f.endswith(".json"),
+    ),
+)
+
+local_resource(
+    "workers:test",
+    allow_parallel = True,
+    cmd = "yarn workspace @my/workflows test",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+    deps = files_matching(
+        os.path.join("packages", "workflows"),
+        lambda f: f.endswith(".ts"),
     ),
 )
 

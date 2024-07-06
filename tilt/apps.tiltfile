@@ -1,4 +1,4 @@
-load("./tilt/common.tiltfile", "CFG", "CI")
+load("./common.tiltfile", "CFG", "CI")
 
 labels = ["apps"]
 
@@ -95,7 +95,24 @@ local_resource(
     "caddy:web",
     auto_init = not CI,
     labels = labels,
-    serve_cmd = "caddy run --watch --config dev.Caddyfile",
+    serve_cmd = "caddy run --watch --config ../dev.Caddyfile",
     trigger_mode = TRIGGER_MODE_MANUAL,
+)
+
+local_resource(
+    "workers",
+    allow_parallel = True,
+    labels = labels,
+    links = [
+        link("http://localhost:8233", "Temporal Web UI"),
+    ],
+    resource_deps = [
+        "yarn:install",
+        "supabase",
+        "supabase:generate",
+        "wagmi:generate",
+        "temporal",
+    ],
+    serve_cmd = "yarn workspace workers start.watch",
 )
 
