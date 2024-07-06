@@ -1,4 +1,4 @@
-# ~*~ mode: Python ~*~
+# -*- mode: python -*-
 
 load("ext://color", "color")
 

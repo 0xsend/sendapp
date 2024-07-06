@@ -1,4 +1,4 @@
-# ~*~ mode: Python ~*~
+# -*- mode: python -*-
 
 load("./common.Tiltfile", "CFG", "CI")
 

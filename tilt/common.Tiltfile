@@ -1,4 +1,4 @@
-# ~*~ mode: Python ~*~
+# -*- mode: python -*-
 
 load("./utils.Tiltfile", "files_matching")
 

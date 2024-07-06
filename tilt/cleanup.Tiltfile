@@ -1,4 +1,4 @@
-# ~*~ mode: Python ~*~
+# -*- mode: python -*-
 
 local("""
 bun run ../bin/reset-supabase.ts || true
