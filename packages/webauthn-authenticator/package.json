@@ -27,7 +27,7 @@
     "@vitest/coverage-v8": "^0.34.6",
     "rollup": "^4.6.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
-    "typescript": "^5.3.3",
+    "typescript": "^5.5.3",
     "vitest": "^0.34.6"
   }
 }

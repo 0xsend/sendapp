@@ -1,6 +1,8 @@
+# -*- mode: python -*-
+
 load("ext://uibutton", "cmd_button", "location")
-load("./common.tiltfile", "CI", "contract_files")
-load("./utils.tiltfile", "files_matching")
+load("./common.Tiltfile", "CI", "contract_files")
+load("./utils.Tiltfile", "files_matching")
 
 labels = ["deps"]
 
@@ -37,8 +39,6 @@ cmd_button(
     resource = "lint",
     text = "yarn lint:fix",
 )
-
-load("common.tiltfile", "contract_files")
 
 local_resource(
     name = "contracts:build",

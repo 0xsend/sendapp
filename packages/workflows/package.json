@@ -1,0 +1,41 @@
+{
+  "name": "@my/workflows",
+  "files": [
+    "package.json",
+    "src"
+  ],
+  "exports": {
+    "./all-activities": {
+      "types": "./src/all-activities.ts",
+      "default": "./src/all-activities.ts"
+    },
+    "./all-workflows": {
+      "types": "./src/all-workflows.ts",
+      "default": "./src/all-workflows.ts"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "lint": "tsc",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@temporalio/nyc-test-coverage": "^1.10.1",
+    "@temporalio/testing": "^1.10.1",
+    "@types/source-map-support": "^0",
+    "jest": "^29.7.0",
+    "nyc": "^17.0.0",
+    "source-map-support": "^0.5.21",
+    "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "@temporalio/activity": "^1.10.1",
+    "@temporalio/workflow": "^1.10.1"
+  }
+}
