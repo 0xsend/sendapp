@@ -43,7 +43,10 @@
     "react-native-svg": "14.1.0",
     "react-native-web": "~0.19.10",
     "@babel/core": "^7.20.2",
-    "babel-loader": "^8.3.0"
+    "babel-loader": "^8.3.0",
+    "istanbul-lib-coverage@npm:^3.2.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
+    "istanbul-lib-coverage@npm:^3.0.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
+    "istanbul-lib-coverage@npm:^3.2.2": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch"
   },
   "dependencies": {
     "@babel/runtime": "^7.18.9",

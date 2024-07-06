@@ -6,7 +6,7 @@
 import type { Config } from 'jest'
 
 const config: Config = {
-  projects: ['<rootDir>/packages/app'],
+  projects: ['<rootDir>/packages/app', '<rootDir>/packages/workflows'],
 }
 
 export default config

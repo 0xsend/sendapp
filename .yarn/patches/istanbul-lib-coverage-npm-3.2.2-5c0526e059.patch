@@ -1,0 +1,13 @@
+diff --git a/lib/file-coverage.js b/lib/file-coverage.js
+index 4ed4c096185addd9960d023c5982bc36c98c58b5..08e272ceb980a8d91d530a2fd8c58fec0ba0bc51 100644
+--- a/lib/file-coverage.js
++++ b/lib/file-coverage.js
+@@ -206,6 +206,8 @@ class FileCoverage {
+             this.data = emptyCoverage(pathOrObj, reportLogic);
+         } else if (pathOrObj instanceof FileCoverage) {
+             this.data = pathOrObj.data;
++        } else if (typeof pathOrObj === 'object' && pathOrObj.data) {
++            this.data = pathOrObj.data;
+         } else if (typeof pathOrObj === 'object') {
+             this.data = pathOrObj;
+         } else {
