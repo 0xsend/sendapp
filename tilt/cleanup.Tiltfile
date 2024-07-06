@@ -1,3 +1,5 @@
+# ~*~ mode: Python ~*~
+
 local("""
 bun run ../bin/reset-supabase.ts || true
 docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f

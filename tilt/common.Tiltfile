@@ -1,3 +1,5 @@
+# ~*~ mode: Python ~*~
+
 load("./utils.Tiltfile", "files_matching")
 
 contract_files = files_matching(

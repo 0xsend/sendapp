@@ -1,3 +1,5 @@
+# ~*~ mode: Python ~*~
+
 load("./common.Tiltfile", "CFG", "CI")
 
 labels = ["apps"]

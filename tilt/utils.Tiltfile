@@ -1,3 +1,5 @@
+# ~*~ mode: Python ~*~
+
 load("ext://color", "color")
 
 def require_tools(*tools):

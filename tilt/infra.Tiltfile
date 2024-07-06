@@ -1,3 +1,5 @@
+# ~*~ mode: Python ~*~
+
 load("ext://uibutton", "cmd_button", "location")
 load("./common.Tiltfile", "CI")
 
