@@ -222,6 +222,7 @@ local_resource(
         "supabase:test",
         "contracts:test",
         "distributor:test",
+        "workers:test",
     ],
 )
 
