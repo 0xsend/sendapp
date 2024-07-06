@@ -1,5 +1,5 @@
 load("ext://uibutton", "cmd_button", "location")
-load("./common.tiltfile", "CI")
+load("./common.Tiltfile", "CI")
 
 _prj_root = os.path.join(
     os.getcwd(),

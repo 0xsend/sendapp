@@ -1,21 +1,22 @@
-load("./common.tiltfile", "CFG", "CI")
+load("./common.Tiltfile", "CFG", "CI")
 
 labels = ["apps"]
 
 next_app_resource_deps = [
     "yarn:install",
     "supabase",
+    "anvil:fixtures",
+    "shovel",
+    "temporal",
+    "aa_bundler:base",
+    "workers",
+] + ([
     "supabase:generate",
     "wagmi:generate",
     "ui:build",
     "ui:generate-theme",
     "daimo-expo-passkeys:build",
-    "anvil:fixtures",
-    "shovel",
-    "temporal",
-] + ([
-    "aa_bundler:base",
-] if not CI else [])
+] if not CFG.dockerize else [])
 
 # Next
 if CFG.dockerize:
@@ -37,7 +38,7 @@ if CFG.dockerize:
 
     #     ]
     # )
-    docker_compose("./docker-compose.yml")
+    docker_compose("../docker-compose.yml")
     dc_resource(
         "next-app",
         labels = ["apps"],
