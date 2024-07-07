@@ -21,7 +21,7 @@
     "@my/supabase": "workspace:*",
     "@my/wagmi": "workspace:*",
     "@openzeppelin/merkle-tree": "1.0.5",
-    "@supabase/supabase-js": "^2.44.2",
+    "@supabase/supabase-js": "2.44.2",
     "@wagmi/core": "^2.10.5",
     "app": "workspace:*",
     "express": "^4.18.2",
