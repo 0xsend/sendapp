@@ -1,4 +1,9 @@
 {
   "extends": "../tsconfig.base",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": "."
+  },
   "include": ["database*.ts"]
 }

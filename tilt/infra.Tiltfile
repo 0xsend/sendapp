@@ -1,5 +1,7 @@
+# -*- mode: python -*-
+
 load("ext://uibutton", "cmd_button", "location")
-load("./common.tiltfile", "CI")
+load("./common.Tiltfile", "CI")
 
 _prj_root = os.path.join(
     os.getcwd(),
@@ -304,6 +306,16 @@ local_resource(
         --env ERIGON_URL="http://host.docker.internal:8546" \
         otterscan/otterscan:v2.3.0
     """,
+    serve_dir = _prj_root,
+)
+
+local_resource(
+    name = "temporal",
+    allow_parallel = True,
+    labels = labels,
+    links = [link("http://localhost:8233", "Temporal Web UI")],
+    resource_deps = [],
+    serve_cmd = "temporal server start-dev --db-filename ./var/temporal.db",
     serve_dir = _prj_root,
 )
 

@@ -41,16 +41,15 @@ exports[`TokenDetails 1`] = `
           "fontWeight": "500",
           "lineHeight": 44,
           "textTransform": "uppercase",
+          "userSelect": "none",
         }
       }
       suppressHighlighting={true}
-      userSelect="none"
     >
       USDC BALANCE
     </Text>
     <Text
       accessibilityRole="header"
-      selectable={true}
       style={
         {
           "color": "#FFFFFF",
@@ -63,6 +62,7 @@ exports[`TokenDetails 1`] = `
           "marginRight": 0,
           "marginTop": 0,
           "textTransform": "none",
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -122,7 +122,6 @@ exports[`TokenDetails 1`] = `
     >
       <Text
         accessibilityRole="header"
-        selectable={true}
         style={
           {
             "color": "hsl(0, 0%, 42.5%)",
@@ -135,6 +134,7 @@ exports[`TokenDetails 1`] = `
             "marginLeft": 0,
             "marginRight": 0,
             "marginTop": 13,
+            "userSelect": "auto",
           }
         }
         suppressHighlighting={true}
@@ -142,20 +142,20 @@ exports[`TokenDetails 1`] = `
         6/2/2024
       </Text>
       <View
-        animatedStyle={
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
           {
             "value": {
-              "opacity": 0,
+              "opacity": 1,
               "transform": [
                 {
-                  "scale": 0.9,
+                  "scale": 1,
                 },
               ],
             },
           }
         }
-        collapsable={false}
-        forwardedRef={[Function]}
         style={
           {
             "opacity": 0,
@@ -403,20 +403,20 @@ exports[`TokenDetails 1`] = `
         </View>
       </View>
       <View
-        animatedStyle={
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
           {
             "value": {
-              "opacity": 0,
+              "opacity": 1,
               "transform": [
                 {
-                  "scale": 0.9,
+                  "scale": 1,
                 },
               ],
             },
           }
         }
-        collapsable={false}
-        forwardedRef={[Function]}
         style={
           {
             "opacity": 0,
@@ -664,20 +664,20 @@ exports[`TokenDetails 1`] = `
         </View>
       </View>
       <View
-        animatedStyle={
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
           {
             "value": {
-              "opacity": 0,
+              "opacity": 1,
               "transform": [
                 {
-                  "scale": 0.9,
+                  "scale": 1,
                 },
               ],
             },
           }
         }
-        collapsable={false}
-        forwardedRef={[Function]}
         style={
           {
             "opacity": 0,
@@ -925,20 +925,20 @@ exports[`TokenDetails 1`] = `
         </View>
       </View>
       <View
-        animatedStyle={
+        collapsable={false}
+        forwardedRef={[Function]}
+        jestAnimatedStyle={
           {
             "value": {
-              "opacity": 0,
+              "opacity": 1,
               "transform": [
                 {
-                  "scale": 0.9,
+                  "scale": 1,
                 },
               ],
             },
           }
         }
-        collapsable={false}
-        forwardedRef={[Function]}
         style={
           {
             "opacity": 0,

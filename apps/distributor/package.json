@@ -21,7 +21,7 @@
     "@my/supabase": "workspace:*",
     "@my/wagmi": "workspace:*",
     "@openzeppelin/merkle-tree": "1.0.5",
-    "@supabase/supabase-js": "2.41.1",
+    "@supabase/supabase-js": "2.44.2",
     "@wagmi/core": "^2.10.5",
     "app": "workspace:*",
     "express": "^4.18.2",
@@ -35,6 +35,6 @@
     "debug": "^4.3.4",
     "dotenv-cli": "^7.3.0",
     "supertest": "^6.3.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.3"
   }
 }

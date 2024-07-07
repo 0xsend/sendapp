@@ -399,7 +399,7 @@ function ReferredBy() {
                   {(() => {
                     switch (true) {
                       case !!profile.tag:
-                        return `@${profile.tag}`
+                        return `/${profile.tag}`
                       case !!profile.name:
                         return profile.name
                       default:

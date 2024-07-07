@@ -18,7 +18,6 @@ exports[`HomeScreen 1`] = `
       }
     >
       <View
-        accessibilityRole="button"
         cancelable={true}
         disabled={false}
         focusVisibleStyle={{}}
@@ -31,6 +30,7 @@ exports[`HomeScreen 1`] = `
         onPress={[Function]}
         onPressIn={[Function]}
         onPressOut={[Function]}
+        role="button"
         style={
           {
             "alignItems": "center",
@@ -70,8 +70,8 @@ exports[`HomeScreen 1`] = `
       >
         <RNSVGSvgView
           align="xMidYMid"
-          bbHeight="32"
-          bbWidth="32"
+          bbHeight={32}
+          bbWidth={32}
           fill="none"
           focusable={false}
           height={32}
@@ -279,11 +279,11 @@ exports[`HomeScreen 1`] = `
                         "fontWeight": "500",
                         "lineHeight": 0,
                         "textTransform": "uppercase",
+                        "userSelect": "none",
                         "zIndex": 1,
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     Total Balance
                   </Text>
@@ -300,7 +300,6 @@ exports[`HomeScreen 1`] = `
                 >
                   <Text
                     accessibilityRole="header"
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -313,6 +312,7 @@ exports[`HomeScreen 1`] = `
                         "marginRight": 0,
                         "marginTop": 0,
                         "textTransform": "none",
+                        "userSelect": "auto",
                         "zIndex": 1,
                       }
                     }
@@ -321,7 +321,6 @@ exports[`HomeScreen 1`] = `
                     0
                   </Text>
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -329,6 +328,7 @@ exports[`HomeScreen 1`] = `
                         "fontSize": 21.599999999999998,
                         "fontWeight": "500",
                         "lineHeight": 19,
+                        "userSelect": "auto",
                         "zIndex": 1,
                       }
                     }
@@ -361,12 +361,8 @@ exports[`HomeScreen 1`] = `
               }
             >
               <View
-                accessibilityRole="button"
-                accessibilityState={
-                  {
-                    "expanded": false,
-                  }
-                }
+                aria-expanded={false}
+                aria-haspopup="dialog"
                 cancelable={true}
                 disabled={false}
                 focusVisibleStyle={{}}
@@ -379,6 +375,7 @@ exports[`HomeScreen 1`] = `
                 onPress={[Function]}
                 onPressIn={[Function]}
                 onPressOut={[Function]}
+                role="button"
                 style={
                   {
                     "alignItems": "center",
@@ -429,10 +426,10 @@ exports[`HomeScreen 1`] = `
                         "fontWeight": "500",
                         "lineHeight": 19,
                         "textTransform": "uppercase",
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     Deposit
                   </Text>
@@ -448,8 +445,8 @@ exports[`HomeScreen 1`] = `
                   >
                     <RNSVGSvgView
                       align="xMidYMid"
-                      bbHeight="32"
-                      bbWidth="32"
+                      bbHeight={32}
+                      bbWidth={32}
                       color="#081619"
                       fill="none"
                       focusable={false}
@@ -624,7 +621,7 @@ exports[`HomeScreen 1`] = `
             }
           >
             <View
-              accessibilityRole="link"
+              role="link"
               style={
                 {
                   "color": "inherit",
@@ -662,8 +659,8 @@ exports[`HomeScreen 1`] = `
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
-                    bbHeight="32"
-                    bbWidth="32"
+                    bbHeight={32}
+                    bbWidth={32}
                     color="#FFFFFF"
                     focusable={false}
                     height={32}
@@ -774,15 +771,14 @@ exports[`HomeScreen 1`] = `
                               ]
                             }
                             width="32"
-                            x="0"
-                            y="0"
+                            x={0}
+                            y={0}
                           />
                         </clipPath>
                       </RNSVGDefs>
                     </RNSVGGroup>
                   </RNSVGSvgView>
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -791,6 +787,7 @@ exports[`HomeScreen 1`] = `
                         "fontWeight": "500",
                         "lineHeight": 19,
                         "textTransform": "uppercase",
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -808,7 +805,6 @@ exports[`HomeScreen 1`] = `
                   }
                 >
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -816,6 +812,7 @@ exports[`HomeScreen 1`] = `
                         "fontSize": 36,
                         "fontWeight": "500",
                         "lineHeight": 19,
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -832,8 +829,8 @@ exports[`HomeScreen 1`] = `
                   >
                     <RNSVGSvgView
                       align="xMidYMid"
-                      bbHeight="20"
-                      bbWidth="20"
+                      bbHeight={20}
+                      bbWidth={20}
                       color="#081619"
                       fill="none"
                       focusable={false}
@@ -917,7 +914,7 @@ exports[`HomeScreen 1`] = `
               }
             />
             <View
-              accessibilityRole="link"
+              role="link"
               style={
                 {
                   "color": "inherit",
@@ -955,8 +952,8 @@ exports[`HomeScreen 1`] = `
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
-                    bbHeight="32"
-                    bbWidth="32"
+                    bbHeight={32}
+                    bbWidth={32}
                     color="#FFFFFF"
                     fill="none"
                     focusable={false}
@@ -1137,15 +1134,14 @@ exports[`HomeScreen 1`] = `
                               ]
                             }
                             width="14.3158"
-                            x="0"
-                            y="0"
+                            x={0}
+                            y={0}
                           />
                         </RNSVGClipPath>
                       </RNSVGDefs>
                     </RNSVGGroup>
                   </RNSVGSvgView>
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -1154,6 +1150,7 @@ exports[`HomeScreen 1`] = `
                         "fontWeight": "500",
                         "lineHeight": 19,
                         "textTransform": "uppercase",
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -1171,7 +1168,6 @@ exports[`HomeScreen 1`] = `
                   }
                 >
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -1179,6 +1175,7 @@ exports[`HomeScreen 1`] = `
                         "fontSize": 36,
                         "fontWeight": "500",
                         "lineHeight": 19,
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -1195,8 +1192,8 @@ exports[`HomeScreen 1`] = `
                   >
                     <RNSVGSvgView
                       align="xMidYMid"
-                      bbHeight="20"
-                      bbWidth="20"
+                      bbHeight={20}
+                      bbWidth={20}
                       color="#081619"
                       fill="none"
                       focusable={false}
@@ -1280,7 +1277,7 @@ exports[`HomeScreen 1`] = `
               }
             />
             <View
-              accessibilityRole="link"
+              role="link"
               style={
                 {
                   "color": "inherit",
@@ -1318,8 +1315,8 @@ exports[`HomeScreen 1`] = `
                 >
                   <RNSVGSvgView
                     align="xMidYMid"
-                    bbHeight="32"
-                    bbWidth="32"
+                    bbHeight={32}
+                    bbWidth={32}
                     color="#FFFFFF"
                     fill="none"
                     focusable={false}
@@ -1433,15 +1430,14 @@ exports[`HomeScreen 1`] = `
                               ]
                             }
                             width="32"
-                            x="0"
-                            y="0"
+                            x={0}
+                            y={0}
                           />
                         </RNSVGClipPath>
                       </RNSVGDefs>
                     </RNSVGGroup>
                   </RNSVGSvgView>
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -1450,6 +1446,7 @@ exports[`HomeScreen 1`] = `
                         "fontWeight": "500",
                         "lineHeight": 19,
                         "textTransform": "uppercase",
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -1467,7 +1464,6 @@ exports[`HomeScreen 1`] = `
                   }
                 >
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -1475,6 +1471,7 @@ exports[`HomeScreen 1`] = `
                         "fontSize": 36,
                         "fontWeight": "500",
                         "lineHeight": 19,
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -1491,8 +1488,8 @@ exports[`HomeScreen 1`] = `
                   >
                     <RNSVGSvgView
                       align="xMidYMid"
-                      bbHeight="20"
-                      bbWidth="20"
+                      bbHeight={20}
+                      bbWidth={20}
                       color="#081619"
                       fill="none"
                       focusable={false}
@@ -1572,7 +1569,6 @@ exports[`HomeScreen 1`] = `
       >
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -1586,6 +1582,7 @@ exports[`HomeScreen 1`] = `
               "marginTop": 0,
               "textAlign": "center",
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -1602,7 +1599,6 @@ exports[`HomeScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1610,6 +1606,7 @@ exports[`HomeScreen 1`] = `
                 "fontSize": 16.8,
                 "fontWeight": "400",
                 "lineHeight": 19,
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -1624,7 +1621,6 @@ exports[`HomeScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -1632,6 +1628,7 @@ exports[`HomeScreen 1`] = `
                   "fontSize": 16.8,
                   "fontWeight": "400",
                   "lineHeight": 19,
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -1639,7 +1636,6 @@ exports[`HomeScreen 1`] = `
               1. Send and receive funds using your personalized identifier
             </Text>
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -1647,6 +1643,7 @@ exports[`HomeScreen 1`] = `
                   "fontSize": 16.8,
                   "fontWeight": "400",
                   "lineHeight": 19,
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -1655,7 +1652,6 @@ exports[`HomeScreen 1`] = `
             </Text>
           </View>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1663,6 +1659,7 @@ exports[`HomeScreen 1`] = `
                 "fontSize": 16.8,
                 "fontWeight": "400",
                 "lineHeight": 19,
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -1683,7 +1680,7 @@ exports[`HomeScreen 1`] = `
           }
         >
           <View
-            accessibilityRole="link"
+            role="link"
             style={
               {
                 "color": "inherit",
@@ -1724,8 +1721,8 @@ exports[`HomeScreen 1`] = `
               >
                 <RNSVGSvgView
                   align="xMidYMid"
-                  bbHeight="20"
-                  bbWidth="20"
+                  bbHeight={20}
+                  bbWidth={20}
                   color="#122023"
                   fill="none"
                   focusable={false}
@@ -1781,7 +1778,6 @@ exports[`HomeScreen 1`] = `
                   </RNSVGGroup>
                 </RNSVGSvgView>
                 <Text
-                  selectable={true}
                   style={
                     {
                       "color": "#122023",
@@ -1790,6 +1786,7 @@ exports[`HomeScreen 1`] = `
                       "fontWeight": "400",
                       "lineHeight": 19,
                       "textTransform": "uppercase",
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
@@ -1819,7 +1816,10 @@ exports[`HomeScreen 1`] = `
     }
   >
     <View
-      animatedStyle={
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
         {
           "value": {
             "transform": [
@@ -1830,16 +1830,13 @@ exports[`HomeScreen 1`] = `
           },
         }
       }
-      collapsable={false}
-      disableClassName={true}
-      forwardedRef={[Function]}
       onLayout={[Function]}
-      pointerEvents="none"
       style={
         {
           "height": "80%",
           "minHeight": "80%",
           "opacity": 0,
+          "pointerEvents": "none",
           "position": "absolute",
           "transform": [
             {
@@ -1852,6 +1849,7 @@ exports[`HomeScreen 1`] = `
       }
     >
       <View
+        pointerEvents="none"
         style={
           {
             "backgroundColor": "#111f22",
@@ -1896,7 +1894,13 @@ exports[`HomeScreen 1`] = `
             "paddingTop": 18,
             "position": "absolute",
             "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
             "shadowOpacity": 0,
+            "shadowRadius": 0,
             "width": "100%",
             "zIndex": -1,
           }

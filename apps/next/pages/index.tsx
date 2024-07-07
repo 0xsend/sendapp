@@ -8,7 +8,6 @@ import { useUser } from 'app/utils/useUser'
 import debug from 'debug'
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
-import { logRequest } from 'utils/logRequest'
 import { userOnboarded } from 'utils/userOnboarded'
 import type { NextPageWithLayout } from './_app'
 import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -61,8 +60,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const {
     data: { session },
   } = await supabase.auth.getSession()
-
-  logRequest(ctx)
 
   if (!session) {
     log('no session')

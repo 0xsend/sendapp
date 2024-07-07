@@ -3,17 +3,22 @@ import '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { usdcCoin } from 'app/data/coins'
 import { TokenDetails } from './TokenDetails'
-import { render, screen } from '@testing-library/react-native'
+import { act, render, screen } from '@testing-library/react-native'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
-test('TokenDetails', () => {
-  const tree = render(
+test('TokenDetails', async () => {
+  jest.useFakeTimers()
+  render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <TokenDetails coin={usdcCoin} />
     </TamaguiProvider>
-  ).toJSON()
-  expect(tree).toMatchSnapshot()
+  )
+  await act(async () => {
+    jest.advanceTimersByTime(2000)
+    jest.runAllTimers()
+  })
+  expect(screen.toJSON()).toMatchSnapshot()
 
   expect(screen.getByText('Sent')).toBeOnTheScreen()
   expect(screen.getAllByText('Received')).toHaveLength(2)

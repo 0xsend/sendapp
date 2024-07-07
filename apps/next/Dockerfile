@@ -18,10 +18,11 @@ FROM base AS installer
 COPY yarn.lock yarn.lock
 COPY .yarnrc.yml .yarnrc.yml
 COPY .yarn .yarn
-# git ls-files | grep 'package\.json$' | sort | sed 's#\(.*\)#COPY \1 \1#'     
+# git ls-files | grep 'package\.json$' | sort | sed 's#\(.*\)#COPY \1 \1#'
 COPY apps/distributor/package.json apps/distributor/package.json
 COPY apps/expo/package.json apps/expo/package.json
 COPY apps/next/package.json apps/next/package.json
+COPY apps/workers/package.json apps/workers/package.json
 COPY package.json package.json
 COPY packages/api/package.json packages/api/package.json
 COPY packages/app/package.json packages/app/package.json
@@ -34,6 +35,7 @@ COPY packages/snaplet/package.json packages/snaplet/package.json
 COPY packages/ui/package.json packages/ui/package.json
 COPY packages/wagmi/package.json packages/wagmi/package.json
 COPY packages/webauthn-authenticator/package.json packages/webauthn-authenticator/package.json
+COPY packages/workflows/package.json packages/workflows/package.json
 COPY supabase/package.json supabase/package.json
 
 RUN --mount=type=cache,target=/root/.yarn/berry \

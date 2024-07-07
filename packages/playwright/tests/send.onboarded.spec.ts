@@ -67,7 +67,7 @@ for (const token of tokens) {
       idType: 'tag',
     })
 
-    const counterparty = `@${tag.name}`
+    const counterparty = `/${tag.name}`
     await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
   })
 
@@ -128,9 +128,9 @@ for (const token of tokens) {
         timeout: 5000,
       })
 
-      const counterparty = isSendId ? profile.name : `@${tag?.name}`
+      const counterparty = isSendId ? profile.name : `/${tag?.name}`
       await expect(page.getByTestId('SendForm')).toHaveText(
-        new RegExp(isSendId ? `#${profile.sendId}` : `@${tag?.name}`)
+        new RegExp(isSendId ? `#${profile.sendId}` : `/${tag?.name}`)
       )
       await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
     })

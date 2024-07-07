@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@my/supabase/*": ["../../supabase/*"],
+      "app/*": ["../app/*"],
+      "@my/wagmi": ["../wagmi/src"],
+      "@my/wagmi/*": ["../wagmi/src/*"],
+      "@my/api/*": ["../api/src/*"]
+    }
+  },
+  "include": [
+    "./src",
+    "./jest.config.ts",
+    "../../supabase",
+    "../app",
+    "../wagmi/src",
+    "../api/src"
+  ],
+  "references": []
+}

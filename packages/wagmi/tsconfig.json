@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "es2022",
-    "resolveJsonModule": true
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": "./src"
   },
-  "include": ["src", "wagmi.config.ts", "../../globals.d.ts"]
+  "include": ["src", "wagmi.config.ts", "../../globals.d.ts", "../../environment.d.ts"]
 }

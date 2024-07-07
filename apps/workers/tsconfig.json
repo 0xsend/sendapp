@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
+    "files": true
+  },
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@my/workflows": ["../../packages/workflows/src/*"],
+      "@my/workflows/*": ["../../packages/workflows/src/*"]
+    }
+  },
+  "references": [],
+  "include": [
+    "./src",
+    "../../packages/workflows/src",
+    "../../globals.d.ts",
+    "../../environment.d.ts"
+  ]
+}

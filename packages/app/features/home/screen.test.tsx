@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
-import { render } from '@testing-library/react-native'
+import { render, act, screen } from '@testing-library/react-native'
 import { HomeScreen } from './screen'
 
 jest.mock('@my/wagmi')
@@ -83,11 +83,17 @@ jest.mock('app/routers/params', () => ({
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
-test('HomeScreen', () => {
-  const tree = render(
+test('HomeScreen', async () => {
+  jest.useFakeTimers()
+  render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <HomeScreen />
     </TamaguiProvider>
-  ).toJSON()
-  expect(tree).toMatchSnapshot()
+  )
+  await act(async () => {
+    jest.advanceTimersByTime(2000)
+    jest.runAllTimers()
+  })
+
+  expect(screen.toJSON()).toMatchSnapshot()
 })

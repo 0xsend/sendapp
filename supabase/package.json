@@ -1,10 +1,21 @@
 {
   "name": "@my/supabase",
   "version": "0.0.0",
+  "type": "module",
   "files": [
     "./database.types.ts",
     "./database-generated.types.ts"
   ],
+  "exports": {
+    "./database.types": {
+      "types": "./database.types.ts",
+      "default": "./database.types.ts"
+    },
+    "./database-generated.types": {
+      "types": "./database-generated.types.ts",
+      "default": "./database-generated.types.ts"
+    }
+  },
   "scripts": {
     "_with-env": "dotenv -e ../.env -c -- ",
     "_link-project": "npx supabase link --project-ref $NEXT_PUBLIC_SUPABASE_PROJECT_ID --workdir ../",

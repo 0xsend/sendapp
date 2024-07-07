@@ -63,10 +63,10 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               "fontSize": 19.2,
               "fontWeight": "400",
               "lineHeight": 19,
+              "userSelect": "none",
             }
           }
           suppressHighlighting={true}
-          userSelect="none"
         >
           ROUND
         </Text>
@@ -84,7 +84,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
           <View>
             <Text
               accessibilityRole="header"
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -96,6 +95,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "marginLeft": 0,
                   "marginRight": 0,
                   "marginTop": 0,
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -143,7 +143,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
               }
             >
               <Text
-                selectable={true}
                 style={
                   {
                     "color": "#FFFFFF",
@@ -151,6 +150,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     "fontSize": 19.2,
                     "fontWeight": "400",
                     "lineHeight": 19,
+                    "userSelect": "auto",
                   }
                 }
                 suppressHighlighting={true}
@@ -188,16 +188,15 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     "fontSize": 16.8,
                     "fontWeight": "400",
                     "lineHeight": 19,
+                    "userSelect": "none",
                   }
                 }
                 suppressHighlighting={true}
-                userSelect="none"
               >
                 Status
               </Text>
               <Text
                 accessibilityRole="header"
-                selectable={true}
                 style={
                   {
                     "color": "#FFFFFF",
@@ -210,6 +209,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     "marginRight": 0,
                     "marginTop": 0,
                     "textTransform": "none",
+                    "userSelect": "auto",
                   }
                 }
                 suppressHighlighting={true}
@@ -301,15 +301,14 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
+                      "userSelect": "none",
                     }
                   }
                   suppressHighlighting={true}
-                  userSelect="none"
                 >
                   Snapshot Send Balance
                 </Text>
                 <Text
-                  selectable={true}
                   style={
                     {
                       "color": "#FFFFFF",
@@ -317,6 +316,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontSize": 24,
                       "fontWeight": "500",
                       "lineHeight": 19,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
@@ -390,15 +390,14 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
+                      "userSelect": "none",
                     }
                   }
                   suppressHighlighting={true}
-                  userSelect="none"
                 >
                   Min Balance required
                 </Text>
                 <Text
-                  selectable={true}
                   style={
                     {
                       "color": "#FFFFFF",
@@ -406,6 +405,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontSize": 24,
                       "fontWeight": "500",
                       "lineHeight": 19,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
@@ -469,15 +469,14 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontSize": 19.2,
                       "fontWeight": "400",
                       "lineHeight": 19,
+                      "userSelect": "none",
                     }
                   }
                   suppressHighlighting={true}
-                  userSelect="none"
                 >
                   Referrals
                 </Text>
                 <Text
-                  selectable={true}
                   style={
                     {
                       "color": "#FFFFFF",
@@ -485,6 +484,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontSize": 24,
                       "fontWeight": "500",
                       "lineHeight": 19,
+                      "userSelect": "auto",
                     }
                   }
                   suppressHighlighting={true}
@@ -565,16 +565,15 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                       "fontWeight": "400",
                       "lineHeight": 19,
                       "textAlign": "left",
+                      "userSelect": "none",
                     }
                   }
                   suppressHighlighting={true}
-                  userSelect="none"
                 >
                   Rewards
                 </Text>
                 <View>
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#111f22",
@@ -582,6 +581,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                         "fontSize": 55.199999999999996,
                         "fontWeight": "500",
                         "lineHeight": 40,
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -589,7 +589,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                     1 SEND
                   </Text>
                   <Text
-                    selectable={true}
                     style={
                       {
                         "color": "#081619",
@@ -598,6 +597,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                         "fontWeight": "400",
                         "lineHeight": 19,
                         "opacity": 0.6,
+                        "userSelect": "auto",
                       }
                     }
                     suppressHighlighting={true}
@@ -668,7 +668,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -677,6 +676,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -705,7 +705,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -714,6 +713,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -742,7 +742,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -751,6 +750,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -779,7 +779,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -788,6 +787,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -816,7 +816,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -825,6 +824,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -853,7 +853,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -862,6 +861,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -890,7 +890,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -899,6 +898,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -927,7 +927,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -936,6 +935,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -964,7 +964,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -973,6 +972,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -1001,7 +1001,6 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
             }
           >
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -1010,6 +1009,7 @@ exports[`EarnTokensScreen renders: EarnTokensScreen 1`] = `
                   "fontWeight": "300",
                   "lineHeight": 16,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}

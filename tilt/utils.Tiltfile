@@ -1,3 +1,5 @@
+# -*- mode: python -*-
+
 load("ext://color", "color")
 
 def require_tools(*tools):

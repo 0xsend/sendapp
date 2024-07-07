@@ -19,6 +19,8 @@
     { "path": "packages/shovel" },
     { "path": "packages/playwright" },
     { "path": "packages/daimo-expo-passkeys" },
-    { "path": "packages/wagmi" }
+    { "path": "packages/wagmi" },
+    { "path": "packages/workflows" },
+    { "path": "supabase" }
   ]
 }

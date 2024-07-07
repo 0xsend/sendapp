@@ -19,8 +19,8 @@
     "fix": "manypkg fix",
     "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && yarn build)",
     "build": "yarn workspaces foreach --all --exclude next-app run build",
-    "biome:check": "biome check .",
-    "biome:check:fix": "biome check . --apply",
+    "biome:check": "yarn run biome check .",
+    "biome:check:fix": "yarn run biome check . --apply",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
     "upgrade:tamagui": "yarn up '*tamagui*'@latest '@tamagui/*'@latest",
@@ -40,10 +40,13 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-refresh": "^0.14.0",
-    "react-native-svg": "14.1.0",
+    "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.10",
-    "@babel/core": "^7.20.2",
-    "babel-loader": "^8.3.0"
+    "@babel/core": "^7.24.0",
+    "babel-loader": "^8.3.0",
+    "istanbul-lib-coverage@npm:^3.2.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
+    "istanbul-lib-coverage@npm:^3.0.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
+    "istanbul-lib-coverage@npm:^3.2.2": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch"
   },
   "dependencies": {
     "@babel/runtime": "^7.18.9",
@@ -52,16 +55,13 @@
     "check-dependency-version-consistency": "^3.0.3",
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
-    "pierre": "^2.0.0-alpha.8",
     "turbo": "^2.0.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.3"
   },
   "packageManager": "yarn@4.0.2",
   "devDependencies": {
     "@biomejs/biome": "^1.6.3",
     "dotenv-cli": "^7.3.0",
-    "jest": "^29.7.0",
-    "jest-expo": "^50.0.0",
     "lefthook": "^1.5.5",
     "zx": "^8.1.2"
   }

@@ -86,7 +86,7 @@ export const OTPField = (props: InputProps) => {
                 $gtSm={{ width: '$4', height: '$3' }}
                 $md={{ width: '$4', height: '$5' }}
                 $gtLg={{ width: '$6', height: '$5' }}
-                tabIndex={index}
+                tabIndex={0}
                 onChangeText={(text) => onChangeText(text, index)}
                 onChange={(event) => onChange(event, index)}
                 onKeyPress={(event) => onKeyPress(event, index)}

@@ -4,7 +4,9 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "baseUrl": ".",
     "paths": {
-      "react-native": ["react-native-web"]
+      "react-native": ["react-native-web"],
+      "@my/wagmi": ["../../packages/wagmi/src"],
+      "@my/wagmi/*": ["../../packages/wagmi/src/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,
@@ -27,8 +29,16 @@
         "name": "@nderscore/tamagui-typescript-plugin",
         "pathToApp": "."
       }
-    ]
+    ],
+    "types": ["node"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next.config.js",
+    "./types.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

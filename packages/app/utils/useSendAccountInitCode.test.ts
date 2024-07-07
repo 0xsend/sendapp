@@ -1,7 +1,7 @@
 import { useBytecode } from 'wagmi'
 import { test } from '@jest/globals'
 import type { useSendAccount } from './send-accounts/useSendAccounts'
-import { act, renderHook, waitFor } from '@testing-library/react-native'
+import { renderHook, waitFor } from '@testing-library/react-native'
 import { useSendAccountInitCode } from './useSendAccountInitCode'
 import { assert } from './assert'
 import { Wrapper } from './__mocks__/Wrapper'
@@ -23,9 +23,7 @@ describe('useSendAccountInitCode', () => {
     const { result, unmount } = renderHook(() => useSendAccountInitCode({ sendAccount }), {
       wrapper: Wrapper,
     })
-    await act(async () => {
-      await waitFor(() => expect(result.current.isPending).toBe(true))
-    })
+    await waitFor(() => expect(result.current.isPending).toBe(true))
     expect(result.current).toMatchObject({
       data: undefined,
       isPending: true,
@@ -112,9 +110,7 @@ describe('useSendAccountInitCode', () => {
     const { result, unmount } = renderHook(() => useSendAccountInitCode({}), {
       wrapper: Wrapper,
     })
-    await act(async () => {
-      await waitFor(() => expect(result.current.isPending).toBe(true))
-    })
+    await waitFor(() => expect(result.current.isPending).toBe(true))
     expect(result.current).toMatchObject({
       data: undefined,
       isPending: true,
