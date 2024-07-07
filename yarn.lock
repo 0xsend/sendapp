@@ -40,7 +40,7 @@ __metadata:
     "@types/debug": "npm:^4"
     "@vitest/coverage-v8": "npm:^0.34.6"
     cbor: "npm:^9.0.1"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     rollup: "npm:^4.6.1"
     rollup-plugin-polyfill-node: "npm:^0.13.0"
     typescript: "npm:^5.5.3"
@@ -6001,11 +6001,11 @@ __metadata:
     "@trpc/server": "npm:11.0.0-next-beta.264"
     "@wagmi/core": "npm:^2.10.5"
     app: "workspace:*"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     p-queue: "npm:^8.0.1"
     superjson: "npm:^1.13.1"
     viem: "npm:^2.13.7"
-    zod: "npm:^3.22.4"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -6018,7 +6018,7 @@ __metadata:
     "@supabase/supabase-js": "npm:2.44.2"
     "@types/bun": "npm:latest"
     "@uniswap/v3-periphery": "npm:^1.4.4"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     solhint: "npm:^3.6.2"
     zx: "npm:^8.1.2"
   languageName: unknown
@@ -6041,7 +6041,7 @@ __metadata:
     "@wagmi/core": "npm:^2.10.5"
     app: "workspace:*"
     cbor: "npm:^9.0.1"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     dotenv-cli: "npm:^7.3.0"
     extract-zip: "npm:^2.0.1"
     jsonwebtoken: "npm:^9.0.2"
@@ -6115,7 +6115,7 @@ __metadata:
     solito: "npm:^4.0.1"
     tamagui: "npm:^1.101.7"
     typescript: "npm:^5.5.3"
-    zod: "npm:^3.22.4"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -6127,7 +6127,7 @@ __metadata:
     "@wagmi/cli": "npm:^2.1.8"
     "@wagmi/core": "npm:^2.10.5"
     change-case: "npm:^5.4.2"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     globby: "npm:^14.0.0"
     permissionless: "npm:^0.1.14"
     typescript: "npm:^5.5.3"
@@ -13725,7 +13725,7 @@ __metadata:
     base64-arraybuffer: "npm:^1.0.2"
     burnt: "npm:^0.12.1"
     cbor: "npm:^9.0.1"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     dnum: "npm:^2.9.0"
     eslint: "npm:^8.46.0"
     eslint-config-custom: "workspace:*"
@@ -13753,7 +13753,7 @@ __metadata:
     typescript: "npm:^5.5.3"
     viem: "npm:^2.13.7"
     wagmi: "npm:^2.9.10"
-    zod: "npm:^3.22.4"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -16636,7 +16636,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:^4":
+"debug@npm:^4, debug@npm:^4.3.5":
   version: 4.3.5
   resolution: "debug@npm:4.3.5"
   dependencies:
@@ -17099,7 +17099,7 @@ __metadata:
     "@types/supertest": "npm:^2.0.16"
     "@wagmi/core": "npm:^2.10.5"
     app: "workspace:*"
-    debug: "npm:^4.3.4"
+    debug: "npm:^4.3.5"
     dotenv-cli: "npm:^7.3.0"
     express: "npm:^4.18.2"
     pino: "npm:^8.16.1"
@@ -25718,7 +25718,7 @@ __metadata:
     react-native-web: "npm:~0.19.10"
     sharp: "npm:0.32.6"
     vercel: "npm:^33.5.2"
-    zod: "npm:^3.22.4"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -27664,7 +27664,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.31, postcss@npm:^8.4.31":
+"postcss@npm:8.4.31":
   version: 8.4.31
   resolution: "postcss@npm:8.4.31"
   dependencies:
@@ -27675,18 +27675,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.21":
-  version: 8.4.23
-  resolution: "postcss@npm:8.4.23"
-  dependencies:
-    nanoid: "npm:^3.3.6"
-    picocolors: "npm:^1.0.0"
-    source-map-js: "npm:^1.0.2"
-  checksum: 4171086e54a90b5d9e7e043b3ea4acf5dce808f3501ebf7bf10caaff73f69a5c8d0dff7036752a648beb6317777d144af5b5b8b3ef9a84428630308735df07c2
-  languageName: node
-  linkType: hard
-
-"postcss@npm:^8.4.38":
+"postcss@npm:^8.4.21, postcss@npm:^8.4.31, postcss@npm:^8.4.38, postcss@npm:~8.4.32":
   version: 8.4.39
   resolution: "postcss@npm:8.4.39"
   dependencies:
@@ -27694,17 +27683,6 @@ __metadata:
     picocolors: "npm:^1.0.1"
     source-map-js: "npm:^1.2.0"
   checksum: ad9c1add892c96433b9a5502878201ede4a20c4ce02d056251f61f8d9a3e5426dab3683fe5a086edfa78a1a19f2b4988c8cea02c5122136d29758cb5a17e2621
-  languageName: node
-  linkType: hard
-
-"postcss@npm:~8.4.32":
-  version: 8.4.38
-  resolution: "postcss@npm:8.4.38"
-  dependencies:
-    nanoid: "npm:^3.3.7"
-    picocolors: "npm:^1.0.0"
-    source-map-js: "npm:^1.2.0"
-  checksum: 6e44a7ed835ffa9a2b096e8d3e5dfc6bcf331a25c48aeb862dd54e3aaecadf814fa22be224fd308f87d08adf2299164f88c5fd5ab1c4ef6cbd693ceb295377f4
   languageName: node
   linkType: hard
 
@@ -29981,7 +29959,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.3.0":
+"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.3.0, semver@npm:^5.5.0, semver@npm:^5.6.0":
   version: 5.7.2
   resolution: "semver@npm:5.7.2"
   bin:
@@ -29990,7 +29968,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:6.3.1, semver@npm:^6.1.0, semver@npm:^6.3.1":
+"semver@npm:6.3.1, semver@npm:^6.0.0, semver@npm:^6.1.0, semver@npm:^6.1.1, semver@npm:^6.1.2, semver@npm:^6.2.0, semver@npm:^6.3.0, semver@npm:^6.3.1":
   version: 6.3.1
   resolution: "semver@npm:6.3.1"
   bin:
@@ -30041,74 +30019,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:7.x, semver@npm:^7.5.2, semver@npm:^7.5.3, semver@npm:^7.5.4":
-  version: 7.5.4
-  resolution: "semver@npm:7.5.4"
-  dependencies:
-    lru-cache: "npm:^6.0.0"
-  bin:
-    semver: bin/semver.js
-  checksum: 985dec0d372370229a262c737063860fabd4a1c730662c1ea3200a2f649117761a42184c96df62a0e885e76fbd5dace41087d6c1ac0351b13c0df5d6bcb1b5ac
-  languageName: node
-  linkType: hard
-
-"semver@npm:^5.5.0, semver@npm:^5.6.0":
-  version: 5.7.1
-  resolution: "semver@npm:5.7.1"
-  bin:
-    semver: ./bin/semver
-  checksum: fbc71cf00736480ca0dd67f2527cda6e0fde5447af00bd2ce06cb522d510216603a63ed0c6c87d8904507c1a4e8113e628a71424ebd9e0fd7d345ee8ed249690
-  languageName: node
-  linkType: hard
-
-"semver@npm:^6.0.0, semver@npm:^6.1.1, semver@npm:^6.1.2, semver@npm:^6.2.0, semver@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "semver@npm:6.3.0"
-  bin:
-    semver: ./bin/semver.js
-  checksum: 8dd72e7c7cdbd8cff66b5530eeff9eec2342b127eef2c956259cdf66b85addf4829e6e4a045ca30d974d075595b0b03faa6318a597307eb3984649516b98b501
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.3.4":
+"semver@npm:7.x, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.3.8, semver@npm:^7.5.1, semver@npm:^7.5.2, semver@npm:^7.5.3, semver@npm:^7.5.4":
   version: 7.6.2
   resolution: "semver@npm:7.6.2"
   bin:
     semver: bin/semver.js
   checksum: 296b17d027f57a87ef645e9c725bff4865a38dfc9caf29b26aa084b85820972fbe7372caea1ba6857162fa990702c6d9c1d82297cecb72d56c78ab29070d2ca2
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.3.5, semver@npm:^7.3.7":
-  version: 7.5.0
-  resolution: "semver@npm:7.5.0"
-  dependencies:
-    lru-cache: "npm:^6.0.0"
-  bin:
-    semver: bin/semver.js
-  checksum: 5aaa7675f8439b845db0a383f1420217a206fa084f2bc4ebc4bb31c0a50b02e9c922be3da274214ba7d9870d77f63085ac163f84f6ac910346675e9ac8681bf8
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.3.8":
-  version: 7.5.1
-  resolution: "semver@npm:7.5.1"
-  dependencies:
-    lru-cache: "npm:^6.0.0"
-  bin:
-    semver: bin/semver.js
-  checksum: 01fcb5ff66fb8cb9ff54e898ac9786fbafec65f93d0df910ea9300451719b204b1c5e8007c99c1abb410eb60f84497a1f8c02b1a0e97880842b7f6075e1d82b6
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.5.1":
-  version: 7.6.0
-  resolution: "semver@npm:7.6.0"
-  dependencies:
-    lru-cache: "npm:^6.0.0"
-  bin:
-    semver: bin/semver.js
-  checksum: 1b41018df2d8aca5a1db4729985e8e20428c650daea60fcd16e926e9383217d00f574fab92d79612771884a98d2ee2a1973f49d630829a8d54d6570defe62535
   languageName: node
   linkType: hard
 
@@ -34813,10 +34729,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.22.4, zod@npm:^3.22.2, zod@npm:^3.22.4":
+"zod@npm:3.22.4, zod@npm:^3.22.2":
   version: 3.22.4
   resolution: "zod@npm:3.22.4"
   checksum: 73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.8":
+  version: 3.23.8
+  resolution: "zod@npm:3.23.8"
+  checksum: 846fd73e1af0def79c19d510ea9e4a795544a67d5b34b7e1c4d0425bf6bfd1c719446d94cdfa1721c1987d891321d61f779e8236fde517dc0e524aa851a6eff1
   languageName: node
   linkType: hard
 
