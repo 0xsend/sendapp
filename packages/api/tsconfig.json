@@ -3,7 +3,11 @@
   "include": ["src", "../app", "../wagmi/src", "../ui/src"],
   "compilerOptions": {
     "noEmit": true,
-    "composite": true
+    "composite": true,
+    "paths": {
+      "@my/wagmi": ["../wagmi/src"],
+      "@my/wagmi/*": ["../wagmi/src/*"]
+    }
   },
   "references": []
 }

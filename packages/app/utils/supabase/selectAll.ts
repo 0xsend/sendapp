@@ -1,6 +1,6 @@
 import type { Database } from '@my/supabase/database.types'
 import type { PostgrestError, PostgrestTransformBuilder } from '@supabase/postgrest-js'
-import { assert } from '../assert.js'
+import { assert } from '../assert'
 
 /**
  * Given a postgrest query builder, fetch all rows by paginating through the results.

@@ -11,6 +11,7 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
+      "@my/workflows": ["../../packages/workflows/src/*"],
       "@my/workflows/*": ["../../packages/workflows/src/*"]
     }
   },

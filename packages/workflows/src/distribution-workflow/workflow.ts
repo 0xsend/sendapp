@@ -1,6 +1,6 @@
 // workflows.ts
 import { proxyActivities, log } from '@temporalio/workflow'
-import type { createActivities } from './activities.js'
+import type { createActivities } from './activities'
 
 const { calculateDistributionSharesActivity, fetchDistributionActivity } = proxyActivities<
   ReturnType<typeof createActivities>

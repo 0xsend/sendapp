@@ -6,9 +6,9 @@ import {
   fetchAllHodlers,
   fetchAllVerifications,
   fetchDistribution,
-} from './supabase.js'
-import { fetchAllBalances, isMerkleDropActive } from './wagmi.js'
-import { calculatePercentageWithBips, calculateWeights, PERC_DENOM } from './weights.js'
+} from './supabase'
+import { fetchAllBalances, isMerkleDropActive } from './wagmi'
+import { calculatePercentageWithBips, calculateWeights, PERC_DENOM } from './weights'
 
 const cpuCount = cpus().length
 

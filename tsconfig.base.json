@@ -10,6 +10,7 @@
       "@my/snaplet/*": ["./packages/snaplet/*"],
       "@my/supabase/*": ["./supabase/*"],
       "@my/ui/*": ["./packages/ui/src/*"],
+      "@my/wagmi": ["./packages/wagmi/src"],
       "@my/wagmi/*": ["./packages/wagmi/src/*"],
       "@my/workflows/*": ["./packages/workflows/src/*"],
       "app/*": ["packages/app/*"]

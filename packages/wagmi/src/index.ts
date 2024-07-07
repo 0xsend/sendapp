@@ -1,11 +1,11 @@
-export * from './generated.js'
+export * from './generated'
 export {
   entryPointSimulationsBytecode,
   SEND_SNAPSHOT_1,
-} from './constants.js'
+} from './constants'
 export {
   mainnet,
   baseMainnet,
-} from './chains.js'
-export { config, chains, client } from './config.js'
-export { mainnetClient, baseMainnetClient, baseMainnetBundlerClient } from './client.js'
+} from './chains'
+export { config, chains, client } from './config'
+export { mainnetClient, baseMainnetClient, baseMainnetBundlerClient } from './client'

@@ -1,6 +1,6 @@
 import type { Database, Tables } from '@my/supabase/database.types'
-import { supabaseAdmin } from 'app/utils/supabase/admin.js'
-import { selectAll } from 'app/utils/supabase/selectAll.js'
+import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { selectAll } from 'app/utils/supabase/selectAll'
 
 export async function fetchDistribution(id: string) {
   return supabaseAdmin
