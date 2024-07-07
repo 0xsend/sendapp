@@ -20,7 +20,7 @@
     "@plaiceholder/next": "^3.0.0",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/ssr": "^0.0.9",
-    "@supabase/supabase-js": "2.41.1",
+    "@supabase/supabase-js": "^2.44.2",
     "@tamagui/next-theme": "^1.93.2",
     "@tanstack/react-query": "^5.18.1",
     "@tanstack/react-query-devtools": "^5.18.1",

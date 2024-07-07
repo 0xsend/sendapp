@@ -40,5 +40,5 @@
       "@my/workflows/*": ["../../packages/workflows/src/*"]
     }
   },
-  "include": ["./src", "../../packages/workflows/src"]
+  "include": ["./src", "../../packages/workflows/src", "../../globals.d.ts"]
 }

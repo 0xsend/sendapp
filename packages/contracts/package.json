@@ -29,7 +29,7 @@
   "devDependencies": {
     "@my/supabase": "workspace:*",
     "@openzeppelin/merkle-tree": "1.0.5",
-    "@supabase/supabase-js": "2.41.1",
+    "@supabase/supabase-js": "^2.44.2",
     "@types/bun": "latest",
     "@uniswap/v3-periphery": "^1.4.4",
     "debug": "^4.3.4",

@@ -14,7 +14,10 @@ async function run() {
   const worker = await Worker.create({
     workflowsPath: fileURLToPath(workflowsPathUrl),
     activities,
-    taskQueue: 'monorepo',
+    taskQueue: 'dev',
+    bundlerOptions: {
+      ignoreModules: ['@supabase/supabase-js'],
+    },
   })
   // Worker connects to localhost by default and uses console.error for logging.
   // Customize the Worker by passing more options to create():
