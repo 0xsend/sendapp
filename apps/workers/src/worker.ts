@@ -1,5 +1,5 @@
 import { Worker } from '@temporalio/worker'
-import * as activities from '@my/workflows/all-activities'
+import { createActivities } from '@my/workflows/all-activities'
 import { URL, fileURLToPath } from 'node:url'
 import path from 'node:path'
 
@@ -13,7 +13,10 @@ async function run() {
   // the Temporal server.
   const worker = await Worker.create({
     workflowsPath: fileURLToPath(workflowsPathUrl),
-    activities,
+    activities: createActivities(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE
+    ),
     taskQueue: 'dev',
     bundlerOptions: {
       ignoreModules: ['@supabase/supabase-js'],

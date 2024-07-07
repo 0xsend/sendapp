@@ -1,6 +1,6 @@
-import { baseMainnet, mainnet } from './chains'
+import { baseMainnet, mainnet } from './chains.js'
 import { base as baseMainnetOg, mainnet as mainnetOg } from 'viem/chains'
-import { mainnetClient, baseMainnetClient } from './client'
+import { mainnetClient, baseMainnetClient } from './client.js'
 import { createConfig } from 'wagmi'
 
 export const chains = [

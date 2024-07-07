@@ -1,28 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    // Enable latest features
-    "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleDetection": "force",
-    "jsx": "react-jsx",
-
-    // Bundler mode
-    "moduleResolution": "bundler",
     "noEmit": true,
-
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
     "composite": true,
     "baseUrl": ".",
-    "outDir": "./dist",
     "paths": {
-      "@my/supabase": ["../../supabase"],
+      "@my/supabase/*": ["../../supabase/*"],
       "app/*": ["../app/*"],
-      "@my/wagmi/*": ["../../wagmi/src/*"]
+      "@my/wagmi/*": ["../wagmi/src/*"],
+      "@my/*": ["../*"]
     }
   },
-  "include": ["./src", "./jest.config.ts", "../../supabase", "../app", "../../wagmi/src"]
+  "include": ["./src", "./jest.config.ts", "../../supabase", "../app", "../wagmi/src"],
+  "references": []
 }

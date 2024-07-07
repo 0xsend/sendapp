@@ -1,9 +1,14 @@
 import type { Database, Tables } from '@my/supabase/database.types'
-import { log } from '@temporalio/workflow'
+import { log, ApplicationFailure } from '@temporalio/workflow'
 import { cpus } from 'node:os'
-import { createDistributionShares, fetchAllHodlers, fetchAllVerifications } from './supabase'
-import { fetchAllBalances, isMerkleDropActive } from './wagmi'
-import { calculatePercentageWithBips, calculateWeights, PERC_DENOM } from './weights'
+import {
+  createDistributionShares,
+  fetchAllHodlers,
+  fetchAllVerifications,
+  fetchDistribution,
+} from './supabase.js'
+import { fetchAllBalances, isMerkleDropActive } from './wagmi.js'
+import { calculatePercentageWithBips, calculateWeights, PERC_DENOM } from './weights.js'
 
 const cpuCount = cpus().length
 
@@ -13,17 +18,38 @@ const inBatches = <T>(array: T[], batchSize = Math.max(8, cpuCount - 1)) => {
   )
 }
 
+export function createActivities(supabaseUrl: string, supabaseKey: string) {
+  globalThis.process = globalThis.process || {}
+  globalThis.process.env.SUPABASE_URL = supabaseUrl // HACK: set the supabase url in the environment
+  globalThis.process.env.SUPABASE_SERVICE_ROLE = supabaseKey // HACK: set the supabase key in the environment
+
+  return {
+    calculateDistributionSharesActivity: calculateDistributionSharesActivity,
+    fetchDistributionActivity: fetchDistributionActivity,
+  }
+}
+
+async function fetchDistributionActivity(distributionId: string) {
+  const { data: distribution, error } = await fetchDistribution(distributionId)
+  if (error) {
+    throw ApplicationFailure.nonRetryable('Error fetching distribution.', error.code, error)
+  }
+  return distribution
+}
+
 /**
  * Calculates distribution shares for a single distribution.
  */
-export async function calculateDistributionShares(
+async function calculateDistributionSharesActivity(
   distribution: Tables<'distributions'> & {
     distribution_verification_values: Tables<'distribution_verification_values'>[]
   }
 ): Promise<void> {
   // verify tranche is not created when in production
   if (await isMerkleDropActive(distribution)) {
-    throw new Error('Tranche is active. Cannot calculate distribution shares.')
+    throw ApplicationFailure.nonRetryable(
+      'Tranche is active. Cannot calculate distribution shares.'
+    )
   }
 
   log.info('Calculating distribution shares')

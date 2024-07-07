@@ -5802,7 +5802,6 @@ __metadata:
   resolution: "@my/wagmi@workspace:packages/wagmi"
   dependencies:
     "@my/contracts": "workspace:*"
-    "@safe-global/safe-deployments": "npm:^1.26.0"
     "@wagmi/cli": "npm:^2.1.8"
     "@wagmi/core": "npm:^2.10.5"
     change-case: "npm:^5.4.2"
@@ -5821,6 +5820,7 @@ __metadata:
   dependencies:
     "@jest/globals": "npm:^29.7.0"
     "@my/supabase": "workspace:*"
+    "@my/wagmi": "workspace:*"
     "@supabase/supabase-js": "npm:2.44.2"
     "@temporalio/activity": "npm:^1.10.1"
     "@temporalio/nyc-test-coverage": "npm:^1.10.1"
@@ -7307,15 +7307,6 @@ __metadata:
     "@safe-global/safe-gateway-typescript-sdk": "npm:^3.5.3"
     viem: "npm:^1.0.0"
   checksum: e9bb8b351698d940dcd317f7d5cea62e23f933a06cfad19a79dcbd49e94f04d95f55fa46c93b99ba687980166e98aa2d091cc4853db0eac18363d8524ff846dd
-  languageName: node
-  linkType: hard
-
-"@safe-global/safe-deployments@npm:^1.26.0":
-  version: 1.28.0
-  resolution: "@safe-global/safe-deployments@npm:1.28.0"
-  dependencies:
-    semver: "npm:^7.3.7"
-  checksum: 5950f8c864a84461a204827b673da15d58a80af64d1db45760c0a2d70648815fd23af282f84c33486b3f3d51c32568edc36b1cd77b55a5cc423e3a1720cffbc6
   languageName: node
   linkType: hard
 

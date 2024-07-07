@@ -3,6 +3,7 @@
   "name": "app",
   "main": "index.ts",
   "private": true,
+  "type": "module",
   "sideEffects": [
     "*.css"
   ],
