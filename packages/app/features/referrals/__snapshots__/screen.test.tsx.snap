@@ -38,7 +38,6 @@ exports[`ReferralScreen 1`] = `
     >
       <Text
         accessibilityRole="header"
-        selectable={true}
         style={
           {
             "color": "#FFFFFF",
@@ -51,6 +50,7 @@ exports[`ReferralScreen 1`] = `
             "marginRight": 0,
             "marginTop": 0,
             "textTransform": "none",
+            "userSelect": "auto",
           }
         }
         suppressHighlighting={true}
@@ -59,7 +59,6 @@ exports[`ReferralScreen 1`] = `
       </Text>
       <Text
         accessibilityRole="header"
-        selectable={true}
         style={
           {
             "color": "#FFFFFF",
@@ -72,6 +71,7 @@ exports[`ReferralScreen 1`] = `
             "marginRight": 0,
             "marginTop": 0,
             "textTransform": "none",
+            "userSelect": "auto",
           }
         }
         suppressHighlighting={true}
@@ -80,7 +80,6 @@ exports[`ReferralScreen 1`] = `
       </Text>
     </View>
     <Text
-      selectable={true}
       style={
         {
           "color": "#FFFFFF",
@@ -90,6 +89,7 @@ exports[`ReferralScreen 1`] = `
           "lineHeight": 19,
           "paddingBottom": 7,
           "paddingTop": 7,
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -138,7 +138,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -146,6 +145,7 @@ exports[`ReferralScreen 1`] = `
                 "fontSize": 16.8,
                 "fontWeight": "400",
                 "lineHeight": 19,
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -155,7 +155,6 @@ exports[`ReferralScreen 1`] = `
         </View>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -170,6 +169,7 @@ exports[`ReferralScreen 1`] = `
               "paddingBottom": 13,
               "paddingLeft": 18,
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -207,7 +207,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -215,6 +214,7 @@ exports[`ReferralScreen 1`] = `
                 "fontSize": 16.8,
                 "fontWeight": "400",
                 "lineHeight": 19,
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -224,7 +224,6 @@ exports[`ReferralScreen 1`] = `
         </View>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -239,6 +238,7 @@ exports[`ReferralScreen 1`] = `
               "paddingBottom": 13,
               "paddingLeft": 18,
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -276,7 +276,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -284,6 +283,7 @@ exports[`ReferralScreen 1`] = `
                 "fontSize": 16.8,
                 "fontWeight": "400",
                 "lineHeight": 19,
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -293,7 +293,6 @@ exports[`ReferralScreen 1`] = `
         </View>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -308,6 +307,7 @@ exports[`ReferralScreen 1`] = `
               "paddingBottom": 13,
               "paddingLeft": 18,
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -345,7 +345,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -353,6 +352,7 @@ exports[`ReferralScreen 1`] = `
                 "fontSize": 16.8,
                 "fontWeight": "400",
                 "lineHeight": 19,
+                "userSelect": "auto",
               }
             }
             suppressHighlighting={true}
@@ -362,7 +362,6 @@ exports[`ReferralScreen 1`] = `
         </View>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -377,6 +376,7 @@ exports[`ReferralScreen 1`] = `
               "paddingBottom": 13,
               "paddingLeft": 18,
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -407,7 +407,6 @@ exports[`ReferralScreen 1`] = `
       >
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -420,6 +419,7 @@ exports[`ReferralScreen 1`] = `
               "marginRight": 0,
               "marginTop": 0,
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -428,7 +428,6 @@ exports[`ReferralScreen 1`] = `
         </Text>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -441,6 +440,7 @@ exports[`ReferralScreen 1`] = `
               "marginRight": 0,
               "marginTop": 0,
               "textTransform": "none",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -488,7 +488,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -497,6 +496,7 @@ exports[`ReferralScreen 1`] = `
                 "fontWeight": "400",
                 "lineHeight": 19,
                 "marginBottom": "0",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -505,7 +505,6 @@ exports[`ReferralScreen 1`] = `
             #
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -516,6 +515,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -524,7 +524,6 @@ exports[`ReferralScreen 1`] = `
             Date
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -535,6 +534,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -543,7 +543,6 @@ exports[`ReferralScreen 1`] = `
             Wallet
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -554,6 +553,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -562,7 +562,6 @@ exports[`ReferralScreen 1`] = `
             Referral rewards
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -573,6 +572,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -581,7 +581,6 @@ exports[`ReferralScreen 1`] = `
             Status
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -592,6 +591,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "right",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -622,7 +622,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -631,6 +630,7 @@ exports[`ReferralScreen 1`] = `
                 "fontWeight": "400",
                 "lineHeight": 19,
                 "marginBottom": "0",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -639,7 +639,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -650,6 +649,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -658,7 +658,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -669,6 +668,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -691,8 +691,8 @@ exports[`ReferralScreen 1`] = `
           >
             <RNSVGSvgView
               align="xMidYMid"
-              bbHeight="20"
-              bbWidth="20"
+              bbHeight={20}
+              bbWidth={20}
               color="#FFFFFF"
               fill="none"
               focusable={false}
@@ -745,8 +745,8 @@ exports[`ReferralScreen 1`] = `
                   }
                 />
                 <RNSVGCircle
-                  cx="10"
-                  cy="10"
+                  cx={10}
+                  cy={10}
                   fill={
                     {
                       "payload": 4278190080,
@@ -759,19 +759,18 @@ exports[`ReferralScreen 1`] = `
                       "strokeWidth",
                     ]
                   }
-                  r="9"
+                  r={9}
                   stroke={
                     {
                       "payload": 4294967295,
                       "type": 0,
                     }
                   }
-                  strokeWidth="2"
+                  strokeWidth={2}
                 />
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -780,6 +779,7 @@ exports[`ReferralScreen 1`] = `
                   "fontWeight": "400",
                   "lineHeight": 19,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -788,7 +788,6 @@ exports[`ReferralScreen 1`] = `
             </Text>
           </View>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -799,6 +798,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -807,7 +807,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -818,6 +817,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "right",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -837,7 +837,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -846,6 +845,7 @@ exports[`ReferralScreen 1`] = `
                 "fontWeight": "400",
                 "lineHeight": 19,
                 "marginBottom": "0",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -854,7 +854,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -865,6 +864,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -873,7 +873,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -884,6 +883,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -906,8 +906,8 @@ exports[`ReferralScreen 1`] = `
           >
             <RNSVGSvgView
               align="xMidYMid"
-              bbHeight="20"
-              bbWidth="20"
+              bbHeight={20}
+              bbWidth={20}
               color="#FFFFFF"
               fill="none"
               focusable={false}
@@ -960,8 +960,8 @@ exports[`ReferralScreen 1`] = `
                   }
                 />
                 <RNSVGCircle
-                  cx="10"
-                  cy="10"
+                  cx={10}
+                  cy={10}
                   fill={
                     {
                       "payload": 4278190080,
@@ -974,19 +974,18 @@ exports[`ReferralScreen 1`] = `
                       "strokeWidth",
                     ]
                   }
-                  r="9"
+                  r={9}
                   stroke={
                     {
                       "payload": 4294967295,
                       "type": 0,
                     }
                   }
-                  strokeWidth="2"
+                  strokeWidth={2}
                 />
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -995,6 +994,7 @@ exports[`ReferralScreen 1`] = `
                   "fontWeight": "400",
                   "lineHeight": 19,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -1003,7 +1003,6 @@ exports[`ReferralScreen 1`] = `
             </Text>
           </View>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1014,6 +1013,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -1022,7 +1022,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1033,6 +1032,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "right",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -1052,7 +1052,6 @@ exports[`ReferralScreen 1`] = `
           }
         >
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1061,6 +1060,7 @@ exports[`ReferralScreen 1`] = `
                 "fontWeight": "400",
                 "lineHeight": 19,
                 "marginBottom": "0",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -1069,7 +1069,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1080,6 +1079,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -1088,7 +1088,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1099,6 +1098,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -1121,8 +1121,8 @@ exports[`ReferralScreen 1`] = `
           >
             <RNSVGSvgView
               align="xMidYMid"
-              bbHeight="20"
-              bbWidth="20"
+              bbHeight={20}
+              bbWidth={20}
               color="#FFFFFF"
               fill="none"
               focusable={false}
@@ -1175,8 +1175,8 @@ exports[`ReferralScreen 1`] = `
                   }
                 />
                 <RNSVGCircle
-                  cx="10"
-                  cy="10"
+                  cx={10}
+                  cy={10}
                   fill={
                     {
                       "payload": 4278190080,
@@ -1189,19 +1189,18 @@ exports[`ReferralScreen 1`] = `
                       "strokeWidth",
                     ]
                   }
-                  r="9"
+                  r={9}
                   stroke={
                     {
                       "payload": 4294967295,
                       "type": 0,
                     }
                   }
-                  strokeWidth="2"
+                  strokeWidth={2}
                 />
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -1210,6 +1209,7 @@ exports[`ReferralScreen 1`] = `
                   "fontWeight": "400",
                   "lineHeight": 19,
                   "textAlign": "center",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -1218,7 +1218,6 @@ exports[`ReferralScreen 1`] = `
             </Text>
           </View>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1229,6 +1228,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "center",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }
@@ -1237,7 +1237,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
           <Text
-            selectable={true}
             style={
               {
                 "color": "#FFFFFF",
@@ -1248,6 +1247,7 @@ exports[`ReferralScreen 1`] = `
                 "lineHeight": 19,
                 "marginBottom": "0",
                 "textAlign": "right",
+                "userSelect": "auto",
                 "width": "12%",
               }
             }

@@ -17,7 +17,8 @@
     "jest.setup.ts",
     "jest.setup-after-env.ts",
     "__mocks__",
-    "tamagui.config.ts"
+    "tamagui.config.ts",
+    "./.eslintrc.cjs"
   ],
   "exclude": ["coverage"],
   "compilerOptions": {

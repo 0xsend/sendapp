@@ -57,7 +57,7 @@
     "@expo/metro-config": "~0.17.1",
     "@tamagui/babel-plugin": "^1.101.7",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
-    "babel-preset-expo": "^10.0.1",
+    "babel-preset-expo": "~11.0.0",
     "cross-env": "^7.0.3",
     "metro-minify-terser": "^0.74.1",
     "react-native-clean-project": "^4.0.3",

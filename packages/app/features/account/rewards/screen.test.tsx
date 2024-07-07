@@ -1,6 +1,6 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
 import { RewardsScreen } from './screen'
-import { render } from '@testing-library/react-native'
+import { act, render, screen } from '@testing-library/react-native'
 
 jest.mock('app/utils/useUser')
 jest.mock('app/utils/distributions', () => ({
@@ -79,15 +79,18 @@ jest.mock('app/utils/tags', () => ({
   useConfirmedTags: jest.fn().mockReturnValue({ data: [{ name: 'tag1' }, { name: 'tag2' }] }),
 }))
 describe('EarnTokensScreen', () => {
-  it('renders', () => {
+  it('renders', async () => {
     jest.useFakeTimers()
     jest.setSystemTime(Date.UTC(2024, 6, 12))
-    const tree = render(
+    render(
       <Wrapper>
         <RewardsScreen />
       </Wrapper>
     )
 
-    expect(tree.toJSON()).toMatchSnapshot('EarnTokensScreen')
+    await act(async () => {
+      jest.advanceTimersByTime(2000)
+    })
+    expect(screen.toJSON()).toMatchSnapshot('EarnTokensScreen')
   })
 })

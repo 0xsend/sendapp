@@ -116,7 +116,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
     <Text
       accessibilityRole="header"
       nativeID="profileName"
-      selectable={true}
       style={
         {
           "color": "#FFFFFF",
@@ -129,6 +128,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           "marginRight": 0,
           "marginTop": 0,
           "textTransform": "none",
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -137,7 +137,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
     </Text>
     <Text
       accessibilityRole="header"
-      selectable={true}
       style={
         {
           "color": "#FFFFFF",
@@ -150,6 +149,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           "marginRight": 0,
           "marginTop": 0,
           "textTransform": "none",
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -157,7 +157,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       /pip_test44677
     </Text>
     <Text
-      selectable={true}
       style={
         {
           "color": "#FFFFFF",
@@ -166,6 +165,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           "fontWeight": "400",
           "lineHeight": 19,
           "marginBottom": 18,
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -183,7 +183,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       }
     >
       <View
-        accessibilityRole="button"
         cancelable={true}
         disabled={false}
         focusVisibleStyle={{}}
@@ -196,6 +195,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         onPress={[Function]}
         onPressIn={[Function]}
         onPressOut={[Function]}
+        role="button"
         style={
           {
             "alignItems": "center",
@@ -237,16 +237,15 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
               "fontSize": 16.8,
               "fontWeight": "400",
               "lineHeight": 19,
+              "userSelect": "none",
             }
           }
           suppressHighlighting={true}
-          userSelect="none"
         >
           Send
         </Text>
       </View>
       <View
-        accessibilityRole="button"
         cancelable={true}
         disabled={false}
         focusVisibleStyle={{}}
@@ -259,6 +258,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
         onPress={[Function]}
         onPressIn={[Function]}
         onPressOut={[Function]}
+        role="button"
         style={
           {
             "alignItems": "center",
@@ -299,10 +299,10 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
               "fontSize": 16.8,
               "fontWeight": "400",
               "lineHeight": 19,
+              "userSelect": "none",
             }
           }
           suppressHighlighting={true}
-          userSelect="none"
         >
           Request
         </Text>

@@ -83,7 +83,10 @@ test('ProfileScreen', async () => {
     </QueryClientProvider>
   )
 
-  await act(() => jest.runAllTimers())
+  await act(() => {
+    jest.advanceTimersByTime(2000)
+    jest.runAllTimers()
+  })
 
   const h1 = screen.getByText(PROFILE.name)
   expect(h1).toBeOnTheScreen()

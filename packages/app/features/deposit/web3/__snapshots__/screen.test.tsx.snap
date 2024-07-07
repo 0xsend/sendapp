@@ -15,7 +15,6 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
 >
   <Text
     accessibilityRole="header"
-    selectable={true}
     style={
       {
         "color": "#FFFFFF",
@@ -28,6 +27,7 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
         "marginRight": 0,
         "marginTop": 0,
         "textTransform": "none",
+        "userSelect": "auto",
       }
     }
     suppressHighlighting={true}
@@ -35,7 +35,6 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
     Connect to Deposit
   </Text>
   <Text
-    selectable={true}
     style={
       {
         "color": "#FFFFFF",
@@ -43,6 +42,7 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
         "fontSize": 21.599999999999998,
         "fontWeight": "300",
         "lineHeight": 23,
+        "userSelect": "auto",
       }
     }
     suppressHighlighting={true}
@@ -50,7 +50,6 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
     You need to connect to a wallet to deposit funds.
   </Text>
   <View
-    accessibilityRole="button"
     accessible={true}
     cancelable={true}
     disabled={false}
@@ -64,6 +63,7 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
     onPress={[Function]}
     onPressIn={[Function]}
     onPressOut={[Function]}
+    role="button"
     style={
       {
         "alignItems": "center",
@@ -93,8 +93,8 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
   >
     <RNSVGSvgView
       align="xMidYMid"
-      bbHeight="20"
-      bbWidth="20"
+      bbHeight={20}
+      bbWidth={20}
       color="#FFFFFF"
       fill="none"
       focusable={false}
@@ -277,8 +277,8 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
                 ]
               }
               width="14.3158"
-              x="0"
-              y="0"
+              x={0}
+              y={0}
             />
           </RNSVGClipPath>
         </RNSVGDefs>
@@ -307,10 +307,10 @@ exports[`DepositWeb3Screen renders the connect to deposit when wallet is not con
           "fontSize": 16.8,
           "fontWeight": "400",
           "lineHeight": 19,
+          "userSelect": "none",
         }
       }
       suppressHighlighting={true}
-      userSelect="none"
     >
       Connect to Deposit
     </Text>
@@ -356,7 +356,6 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
           >
             <Text
               accessibilityRole="header"
-              selectable={true}
               style={
                 {
                   "color": "#FFFFFF",
@@ -369,6 +368,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   "marginRight": 0,
                   "marginTop": 0,
                   "textTransform": "uppercase",
+                  "userSelect": "auto",
                 }
               }
               suppressHighlighting={true}
@@ -439,16 +439,17 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     "fontWeight": "400",
                     "lineHeight": 60,
                     "textTransform": "uppercase",
+                    "userSelect": "none",
                   }
                 }
                 suppressHighlighting={true}
-                userSelect="none"
               >
                 Token
                  
               </Text>
               <View
-                animatedStyle={
+                collapsable={false}
+                jestAnimatedStyle={
                   {
                     "value": {
                       "transform": [
@@ -459,7 +460,6 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     },
                   }
                 }
-                collapsable={false}
                 style={
                   {
                     "transform": [
@@ -471,11 +471,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                 }
               >
                 <View
-                  accessibilityState={
-                    {
-                      "expanded": false,
-                    }
-                  }
+                  aria-autocomplete="none"
+                  aria-expanded={false}
                   cancelable={true}
                   disabled={false}
                   focusVisibleStyle={
@@ -526,12 +523,12 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     }
                   }
                   testID="TokenSelectTrigger"
+                  type="button"
                 >
                   <Text
                     lineBreakMode="clip"
                     numberOfLines={1}
                     pointerEvents="none"
-                    selectable={false}
                     style={
                       {
                         "color": "#FFFFFF",
@@ -539,6 +536,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                         "fontSize": 16.8,
                         "fontWeight": "400",
                         "lineHeight": 19,
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
@@ -557,8 +555,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   />
                   <RNSVGSvgView
                     align="xMidYMid"
-                    bbHeight="16.8"
-                    bbWidth="16.8"
+                    bbHeight={16.8}
+                    bbWidth={16.8}
                     fill="none"
                     focusable={false}
                     height={16.8}
@@ -675,16 +673,17 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                       "fontWeight": "400",
                       "lineHeight": 60,
                       "textTransform": "uppercase",
+                      "userSelect": "none",
                     }
                   }
                   suppressHighlighting={true}
-                  userSelect="none"
                 >
                   Amount
                    
                 </Text>
                 <View
-                  animatedStyle={
+                  collapsable={false}
+                  jestAnimatedStyle={
                     {
                       "value": {
                         "transform": [
@@ -695,7 +694,6 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                       },
                     }
                   }
-                  collapsable={false}
                   style={
                     {
                       "transform": [
@@ -899,7 +897,6 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                 />
               </View>
               <Text
-                selectable={true}
                 style={
                   {
                     "color": "#FFFFFF",
@@ -907,6 +904,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     "fontSize": 15.6,
                     "fontWeight": "300",
                     "lineHeight": 18,
+                    "userSelect": "auto",
                   }
                 }
                 suppressHighlighting={true}
@@ -967,13 +965,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                 }
               >
                 <View
-                  accessibilityRole="button"
-                  accessibilityState={
-                    {
-                      "busy": false,
-                    }
-                  }
                   accessible={true}
+                  aria-busy={false}
                   cancelable={true}
                   disabled={false}
                   focusVisibleStyle={{}}
@@ -986,6 +979,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   onPress={[Function]}
                   onPressIn={[Function]}
                   onPressOut={[Function]}
+                  role="button"
                   style={
                     {
                       "alignItems": "center",
@@ -1025,10 +1019,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                         "fontSize": 16.8,
                         "fontWeight": "400",
                         "lineHeight": 19,
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     <Text
                       lineBreakMode="clip"
@@ -1042,10 +1036,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                           "fontSize": 16.8,
                           "fontWeight": "400",
                           "lineHeight": 19,
+                          "userSelect": "none",
                         }
                       }
                       suppressHighlighting={true}
-                      userSelect="none"
                     >
                       Deposit
                     </Text>
@@ -1068,10 +1062,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                         "fontSize": 16.8,
                         "fontWeight": "400",
                         "lineHeight": 19,
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     View 
                     0x123
@@ -1103,7 +1097,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
     }
   >
     <View
-      animatedStyle={
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
         {
           "value": {
             "transform": [
@@ -1114,16 +1111,13 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
           },
         }
       }
-      collapsable={false}
-      disableClassName={true}
-      forwardedRef={[Function]}
       onLayout={[Function]}
-      pointerEvents="none"
       style={
         {
           "height": "80%",
           "minHeight": "80%",
           "opacity": 0,
+          "pointerEvents": "none",
           "position": "absolute",
           "transform": [
             {
@@ -1136,6 +1130,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
       }
     >
       <View
+        pointerEvents="none"
         style={
           {
             "backgroundColor": "#081619",
@@ -1173,9 +1168,9 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
               }
             >
               <View
-                accessibilityLabelledBy=":r7:"
-                accessibilityRole="none"
+                aria-labelledby=":r7:"
                 disabled={false}
+                role="group"
                 style={
                   {
                     "flexDirection": "column",
@@ -1184,13 +1179,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                 }
               >
                 <View
-                  accessibilityLabelledBy=":r8:"
-                  accessibilityState={
-                    {
-                      "disabled": undefined,
-                      "selected": false,
-                    }
-                  }
+                  aria-labelledby=":r8:"
+                  aria-selected={false}
                   cancelable={true}
                   disabled={false}
                   focusVisibleStyle={
@@ -1243,10 +1233,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                         "fontSize": 16.8,
                         "fontWeight": "400",
                         "lineHeight": 19,
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     USDC
                   </Text>
@@ -1263,13 +1253,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   }
                 />
                 <View
-                  accessibilityLabelledBy=":r9:"
-                  accessibilityState={
-                    {
-                      "disabled": undefined,
-                      "selected": false,
-                    }
-                  }
+                  aria-labelledby=":r9:"
+                  aria-selected={false}
                   cancelable={true}
                   disabled={false}
                   focusVisibleStyle={
@@ -1322,10 +1307,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                         "fontSize": 16.8,
                         "fontWeight": "400",
                         "lineHeight": 19,
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     ETH
                   </Text>
@@ -1342,13 +1327,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   }
                 />
                 <View
-                  accessibilityLabelledBy=":ra:"
-                  accessibilityState={
-                    {
-                      "disabled": undefined,
-                      "selected": false,
-                    }
-                  }
+                  aria-labelledby=":ra:"
+                  aria-selected={false}
                   cancelable={true}
                   disabled={false}
                   focusVisibleStyle={
@@ -1401,10 +1381,10 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                         "fontSize": 16.8,
                         "fontWeight": "400",
                         "lineHeight": 19,
+                        "userSelect": "none",
                       }
                     }
                     suppressHighlighting={true}
-                    userSelect="none"
                   >
                     SEND
                   </Text>
@@ -1436,7 +1416,13 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
             "overflow": "hidden",
             "position": "absolute",
             "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
             "shadowOpacity": 0,
+            "shadowRadius": 0,
             "width": "100%",
             "zIndex": -1,
           }
@@ -1462,7 +1448,6 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
 >
   <Text
     accessibilityRole="header"
-    selectable={true}
     style={
       {
         "color": "#FFFFFF",
@@ -1475,6 +1460,7 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
         "marginRight": 0,
         "marginTop": 0,
         "textTransform": "none",
+        "userSelect": "auto",
       }
     }
     suppressHighlighting={true}
@@ -1483,7 +1469,6 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
     Base
   </Text>
   <Text
-    selectable={true}
     style={
       {
         "color": "#FFFFFF",
@@ -1491,6 +1476,7 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
         "fontSize": 21.599999999999998,
         "fontWeight": "300",
         "lineHeight": 23,
+        "userSelect": "auto",
       }
     }
     suppressHighlighting={true}
@@ -1502,7 +1488,6 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
      to deposit funds.
   </Text>
   <View
-    accessibilityRole="button"
     accessible={true}
     cancelable={true}
     disabled={false}
@@ -1516,6 +1501,7 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
     onPress={[Function]}
     onPressIn={[Function]}
     onPressOut={[Function]}
+    role="button"
     style={
       {
         "alignItems": "center",
@@ -1545,8 +1531,8 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
   >
     <RNSVGSvgView
       align="xMidYMid"
-      bbHeight="20"
-      bbWidth="20"
+      bbHeight={20}
+      bbWidth={20}
       color="#FFFFFF"
       fill="none"
       focusable={false}
@@ -1625,10 +1611,10 @@ exports[`DepositWeb3Screen renders the switch network screen when base network i
           "fontSize": 16.8,
           "fontWeight": "400",
           "lineHeight": 19,
+          "userSelect": "none",
         }
       }
       suppressHighlighting={true}
-      userSelect="none"
     >
       Switch
     </Text>

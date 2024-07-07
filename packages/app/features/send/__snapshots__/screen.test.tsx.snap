@@ -58,15 +58,14 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
             "fontWeight": "500",
             "lineHeight": 44,
             "textTransform": "uppercase",
+            "userSelect": "none",
           }
         }
         suppressHighlighting={true}
-        userSelect="none"
       >
         TO
       </Text>
       <View
-        accessibilityRole="button"
         cancelable={true}
         disabled={false}
         focusVisibleStyle={{}}
@@ -79,6 +78,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
         onPress={[Function]}
         onPressIn={[Function]}
         onPressOut={[Function]}
+        role="button"
         style={
           {
             "alignItems": "center",
@@ -124,10 +124,10 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
               "fontSize": 16.8,
               "fontWeight": "400",
               "lineHeight": 19,
+              "userSelect": "none",
             }
           }
           suppressHighlighting={true}
-          userSelect="none"
         >
           edit
         </Text>
@@ -219,8 +219,8 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
         >
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight="48"
-            bbWidth="48"
+            bbHeight={48}
+            bbWidth={48}
             color="#86AE80"
             fill="none"
             focusable={false}
@@ -286,7 +286,6 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
         }
       >
         <Text
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -294,6 +293,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
               "fontSize": 16.8,
               "fontWeight": "500",
               "lineHeight": 19,
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -301,7 +301,6 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
           test
         </Text>
         <Text
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -309,6 +308,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
               "fontSize": 16.8,
               "fontWeight": "400",
               "lineHeight": 16,
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -320,7 +320,6 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
   </View>
   <Text
     accessibilityRole="header"
-    selectable={true}
     style={
       {
         "color": "#86AE80",
@@ -333,6 +332,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
         "marginRight": 0,
         "marginTop": 0,
         "textTransform": "none",
+        "userSelect": "auto",
       }
     }
     suppressHighlighting={true}
@@ -391,7 +391,6 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
     </Text>
   </Text>
   <View
-    accessibilityRole="button"
     cancelable={true}
     disabled={false}
     focusVisibleStyle={{}}
@@ -404,6 +403,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
     onPress={[Function]}
     onPressIn={[Function]}
     onPressOut={[Function]}
+    role="button"
     style={
       {
         "alignItems": "center",
@@ -446,10 +446,10 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
           "fontSize": 16.8,
           "fontWeight": "400",
           "lineHeight": 19,
+          "userSelect": "none",
         }
       }
       suppressHighlighting={true}
-      userSelect="none"
     >
       Write /send Check
     </Text>
@@ -480,7 +480,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
   >
     <Text
       accessibilityRole="header"
-      selectable={true}
       style={
         {
           "color": "hsl(0, 0%, 43.5%)",
@@ -492,6 +491,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           "marginLeft": 0,
           "marginRight": 0,
           "marginTop": 0,
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -528,7 +528,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           }
         >
           <View
-            animatedStyle={
+            collapsable={false}
+            jestAnimatedStyle={
               {
                 "value": {
                   "transform": [
@@ -539,7 +540,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 },
               }
             }
-            collapsable={false}
             style={
               {
                 "transform": [
@@ -723,8 +723,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
         </View>
       </View>
       <View
-        accessibilityLabel="Clear input."
-        accessibilityRole="button"
+        aria-label="Clear input."
         cancelable={true}
         disabled={false}
         focusVisibleStyle={{}}
@@ -737,6 +736,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
         onPress={[Function]}
         onPressIn={[Function]}
         onPressOut={[Function]}
+        role="button"
         style={
           {
             "alignItems": "center",
@@ -770,8 +770,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
       >
         <RNSVGSvgView
           align="xMidYMid"
-          bbHeight="32"
-          bbWidth="32"
+          bbHeight={32}
+          bbWidth={32}
           color="#FFFFFF"
           focusable={false}
           height={32}
@@ -859,7 +859,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
   >
     <Text
       accessibilityRole="header"
-      selectable={true}
       style={
         {
           "color": "hsl(0, 0%, 43.5%)",
@@ -871,6 +870,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           "marginLeft": 0,
           "marginRight": 0,
           "marginTop": 0,
+          "userSelect": "auto",
         }
       }
       suppressHighlighting={true}
@@ -907,7 +907,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           }
         >
           <View
-            animatedStyle={
+            collapsable={false}
+            jestAnimatedStyle={
               {
                 "value": {
                   "transform": [
@@ -918,7 +919,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 },
               }
             }
-            collapsable={false}
             style={
               {
                 "transform": [
@@ -1107,8 +1107,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
         </View>
       </View>
       <View
-        accessibilityLabel="Clear input."
-        accessibilityRole="button"
+        aria-label="Clear input."
         cancelable={true}
         disabled={false}
         focusVisibleStyle={{}}
@@ -1121,6 +1120,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
         onPress={[Function]}
         onPressIn={[Function]}
         onPressOut={[Function]}
+        role="button"
         style={
           {
             "alignItems": "center",
@@ -1154,8 +1154,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
       >
         <RNSVGSvgView
           align="xMidYMid"
-          bbHeight="32"
-          bbWidth="32"
+          bbHeight={32}
+          bbWidth={32}
           color="#FFFFFF"
           focusable={false}
           height={32}
@@ -1226,9 +1226,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
           "marginTop": 40,
         },
         {
-          "animatedStyle": {
-            "current": {},
-          },
           "initial": {
             "updater": [Function],
             "value": {
@@ -1239,6 +1236,39 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                 },
               ],
               "width": "100%",
+            },
+          },
+          "jestAnimatedStyle": {
+            "current": {
+              "value": {
+                "opacity": 0.5498890994849505,
+                "transform": [
+                  {
+                    "translateY": -4.501109005150486,
+                  },
+                ],
+                "width": {
+                  "__prefix": "",
+                  "__suffix": "%",
+                  "callStart": null,
+                  "callback": [Function],
+                  "current": "100%",
+                  "finished": true,
+                  "lastTimestamp": 0,
+                  "omega0": 14.433756729740644,
+                  "omega1": 11.785113019775793,
+                  "onFrame": [Function],
+                  "onStart": [Function],
+                  "reduceMotion": false,
+                  "startTimestamp": 2000,
+                  "startValue": 100,
+                  "strippedCurrent": 100,
+                  "timestamp": 2000,
+                  "toValue": 100,
+                  "velocity": 0,
+                  "zeta": 0.5773502691896257,
+                },
+              },
             },
           },
           "viewDescriptors": {
@@ -1274,7 +1304,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
       >
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#B3B3B3",
@@ -1287,6 +1316,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               "marginRight": 0,
               "marginTop": 0,
               "textTransform": "uppercase",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -1457,7 +1487,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         }
                       >
                         <Text
-                          selectable={true}
                           style={
                             {
                               "color": "#FFFFFF",
@@ -1465,6 +1494,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                               "fontSize": 16.8,
                               "fontWeight": "400",
                               "lineHeight": 19,
+                              "userSelect": "auto",
                             }
                           }
                           suppressHighlighting={true}
