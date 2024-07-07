@@ -20,9 +20,8 @@
     "@my/wagmi": "workspace:*",
     "@plaiceholder/next": "^3.0.0",
     "@supabase/auth-helpers-react": "0.5.0",
-    "@supabase/ssr": "^0.0.9",
     "@supabase/supabase-js": "2.44.2",
-    "@tamagui/next-theme": "^1.93.2",
+    "@tamagui/next-theme": "^1.101.7",
     "@tanstack/react-query": "^5.18.1",
     "@tanstack/react-query-devtools": "^5.18.1",
     "@trpc/client": "11.0.0-next-beta.264",
@@ -36,10 +35,9 @@
     "raf": "^3.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-native": "0.73.6",
-    "react-native-reanimated": "~3.6.2",
+    "react-native": "0.74.1",
+    "react-native-reanimated": "~3.10.1",
     "react-native-web": "~0.19.10",
-    "react-native-web-lite": "^1.74.8",
     "sharp": "0.32.6",
     "vercel": "^33.5.2",
     "zod": "^3.22.4"
@@ -47,7 +45,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",
     "@next/eslint-plugin-next": "^14.0.4",
-    "@tamagui/next-plugin": "^1.93.2",
+    "@tamagui/next-plugin": "^1.101.7",
     "@types/node": "^20.11.0",
     "dotenv-cli": "^7.3.0",
     "eslint-config-next": "^14.0.4"
