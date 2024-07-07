@@ -162,7 +162,6 @@ const config: Config = {
   moduleNameMapper: {
     '@tamagui/core': '@tamagui/core/native-test',
     '@tamagui/web': '@tamagui/core/native-test',
-    '(.+)\\.js$': '$1', // compat fix for ESM imports using .js extension https://stackoverflow.com/q/73735202
   },
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
