@@ -8,9 +8,17 @@
       "@my/supabase/*": ["../../supabase/*"],
       "app/*": ["../app/*"],
       "@my/wagmi/*": ["../wagmi/src/*"],
+      "@my/api/*": ["../api/src/*"],
       "@my/*": ["../*"]
     }
   },
-  "include": ["./src", "./jest.config.ts", "../../supabase", "../app", "../wagmi/src"],
+  "include": [
+    "./src",
+    "./jest.config.ts",
+    "../../supabase",
+    "../app",
+    "../wagmi/src",
+    "../api/src"
+  ],
   "references": []
 }

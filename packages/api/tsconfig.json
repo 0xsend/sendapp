@@ -3,8 +3,7 @@
   "include": ["src", "../app", "../wagmi/src", "../ui/src"],
   "compilerOptions": {
     "noEmit": true,
-    "composite": true,
-    "jsx": "react-jsx"
+    "composite": true
   },
   "references": []
 }
