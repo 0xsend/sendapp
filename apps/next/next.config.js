@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
-import tamaguiPlugin from '@tamagui/next-plugin'
 import { join } from 'node:path'
 import withPlaiceholder from '@plaiceholder/next'
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
+const withBundleAnalyzer = require('@next/bundle-analyzer')
+const { withTamagui } = require('@tamagui/next-plugin')
 
 const boolVals = {
   true: true,
@@ -12,13 +15,17 @@ const disableExtraction =
   boolVals[process.env.DISABLE_EXTRACTION] ?? process.env.NODE_ENV === 'development'
 
 const plugins = [
+  withBundleAnalyzer({
+    enabled: process.env.ANALYZE === 'true',
+    openAnalyzer: process.env.ANALYZE === 'true',
+  }),
   withPlaiceholder,
-  tamaguiPlugin.withTamagui({
+  withTamagui({
     themeBuilder: {
       input: '../../packages/ui/src/themes/theme.ts',
       output: '../../packages/ui/src/themes/theme-generated.ts',
     },
-    config: './tamagui.config.ts',
+    config: '../../packages/ui/src/tamagui.config.ts',
     components: ['tamagui', '@my/ui'],
     importsWhitelist: ['constants.js', 'colors.js'],
     outputCSS: process.env.NODE_ENV === 'production' ? './public/tamagui.css' : null,
@@ -31,6 +38,20 @@ const plugins = [
     },
     excludeReactNativeWebExports: ['Switch', 'ProgressBar', 'Picker', 'CheckBox', 'Touchable'],
   }),
+  (nextConfig) => {
+    return {
+      webpack: (webpackConfig, options) => {
+        webpackConfig.resolve.alias = {
+          ...webpackConfig.resolve.alias,
+          'react-native-svg': '@tamagui/react-native-svg',
+        }
+        if (typeof nextConfig.webpack === 'function') {
+          return nextConfig.webpack(webpackConfig, options)
+        }
+        return webpackConfig
+      },
+    }
+  },
 ]
 
 export default () => {

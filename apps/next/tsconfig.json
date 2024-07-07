@@ -29,8 +29,16 @@
         "name": "@nderscore/tamagui-typescript-plugin",
         "pathToApp": "."
       }
-    ]
+    ],
+    "types": ["node"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next.config.js",
+    "./types.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -8,7 +8,6 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
-import { logRequest } from 'utils/logRequest'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -31,9 +30,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
       notFound: true,
     }
   }
-
-  // log user activity
-  logRequest(ctx)
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {

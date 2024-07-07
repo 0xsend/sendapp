@@ -1,4 +1,7 @@
 {
   "presets": ["babel-preset-expo"],
-  "plugins": ["@babel/plugin-syntax-import-attributes"]
+  "plugins": ["@babel/plugin-syntax-import-attributes"],
+  "generatorOpts": {
+    "importAttributesKeyword": "with"
+  }
 }

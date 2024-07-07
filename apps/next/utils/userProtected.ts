@@ -1,11 +1,9 @@
-import type { ParsedUrlQuery } from 'node:querystring'
 import type { Database } from '@my/supabase/database.types'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
-import type { GetServerSideProps, PreviewData } from 'next'
-
 import debug from 'debug'
+import type { GetServerSideProps, PreviewData } from 'next'
+import type { ParsedUrlQuery } from 'node:querystring'
 import { userOnboarded } from './userOnboarded'
-import { logRequest } from './logRequest'
 
 const log = debug('api:utils:userProtected')
 
@@ -27,8 +25,6 @@ export function userProtectedGetSSP<
     const {
       data: { session },
     } = await supabase.auth.getSession()
-
-    logRequest(ctx)
 
     if (!session) {
       log('no session')
