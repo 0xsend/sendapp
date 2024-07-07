@@ -38,7 +38,7 @@
     "react-hook-form": "^7.48.2",
     "solito": "^4.0.1",
     "tamagui": "^1.101.7",
-    "zod": "^3.22.4"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@tamagui/build": "^1.101.7",
