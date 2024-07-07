@@ -17,7 +17,8 @@
     "jest.setup.ts",
     "jest.setup-after-env.ts",
     "__mocks__",
-    "tamagui.config.ts"
+    "tamagui.config.ts",
+    "./.eslintrc.cjs"
   ],
   "exclude": ["coverage"],
   "compilerOptions": {
@@ -26,11 +27,12 @@
     "baseUrl": ".",
     "paths": {
       "app/*": ["./*"],
+      "@my/ui": ["../ui/src"],
       "@my/ui/*": ["../ui/src/*"],
+      "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/contracts/out/*": ["../contracts/out/*"],
-      "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"],
-      "@my/*": ["../*"]
+      "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"]
     }
   },
   "references": []

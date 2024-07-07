@@ -1,6 +1,6 @@
 # may be redundant but last thing we want is large dockerfiles. from here on out, it mostly mirrors the .gitignore
 **/Tiltfile
-**/**.tiltfile
+**/**.Tiltfile
 **/**.Tiltfile
 **/*.tsbuildinfo
 **/dist

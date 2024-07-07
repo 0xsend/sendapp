@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`calculateWeights should calculate exponential weights using exponential mode: exponential 1`] = `
+{
+  "poolWeights": {
+    "0x1": 9975n,
+    "0x2": 9950n,
+    "0x3": 9925n,
+  },
+  "totalWeight": 29850n,
+  "weightPerSend": 2985n,
+  "weightedShares": {
+    "0x1": {
+      "address": "0x1",
+      "amount": 33417n,
+    },
+    "0x2": {
+      "address": "0x2",
+      "amount": 33333n,
+    },
+    "0x3": {
+      "address": "0x3",
+      "amount": 33249n,
+    },
+  },
+}
+`;
+
+exports[`calculateWeights should calculate linear weights using linear mode: linear 1`] = `
+{
+  "poolWeights": {
+    "0x1": 1000n,
+    "0x2": 2000n,
+    "0x3": 3000n,
+  },
+  "totalWeight": 6000n,
+  "weightPerSend": 600n,
+  "weightedShares": {
+    "0x1": {
+      "address": "0x1",
+      "amount": 16666n,
+    },
+    "0x2": {
+      "address": "0x2",
+      "amount": 33333n,
+    },
+    "0x3": {
+      "address": "0x3",
+      "amount": 50000n,
+    },
+  },
+}
+`;
+
+exports[`calculateWeights should calculate logarithmic weights using logarithmic mode: logarithmic 1`] = `
+{
+  "poolWeights": {
+    "0x1": 1541n,
+    "0x2": 2876n,
+    "0x3": 4054n,
+  },
+  "totalWeight": 8471n,
+  "weightPerSend": 847n,
+  "weightedShares": {
+    "0x1": {
+      "address": "0x1",
+      "amount": 18193n,
+    },
+    "0x2": {
+      "address": "0x2",
+      "amount": 33955n,
+    },
+    "0x3": {
+      "address": "0x3",
+      "amount": 47863n,
+    },
+  },
+}
+`;
+
+exports[`calculateWeights should calculate square_root weights using square_root mode: square_root 1`] = `
+{
+  "poolWeights": {
+    "0x1": 9128n,
+    "0x2": 8164n,
+    "0x3": 7071n,
+  },
+  "totalWeight": 24363n,
+  "weightPerSend": 2436n,
+  "weightedShares": {
+    "0x1": {
+      "address": "0x1",
+      "amount": 37471n,
+    },
+    "0x2": {
+      "address": "0x2",
+      "amount": 33513n,
+    },
+    "0x3": {
+      "address": "0x3",
+      "amount": 29027n,
+    },
+  },
+}
+`;

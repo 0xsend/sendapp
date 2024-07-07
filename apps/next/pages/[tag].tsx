@@ -10,7 +10,6 @@ import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/Checkou
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { TopNav } from 'app/components/TopNav'
-import { logRequest } from 'utils/logRequest'
 
 export const Page: NextPageWithLayout<{ sendid: string }> = ({ sendid }) => {
   return (
@@ -42,8 +41,6 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   assert(!!tag, 'tag is required')
   assert(typeof tag === 'string', 'Identifier tag must be a string')
-
-  logRequest(ctx)
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {

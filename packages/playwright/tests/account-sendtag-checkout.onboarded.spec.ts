@@ -126,7 +126,7 @@ test('can refer a tag', async ({
 
   // check referral code and referrer are visible
   const refcode = checkoutPage.page.getByLabel('Referral Code:')
-  const referredBy = checkoutPage.page.getByText(`@${referrerTags[0]}`)
+  const referredBy = checkoutPage.page.getByText(`/${referrerTags[0]}`)
   await expect(refcode).toBeVisible()
   await expect(refcode).toHaveValue(referrer.referralCode)
   await expect(referredBy).toBeVisible() // show the referred

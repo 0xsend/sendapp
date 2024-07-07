@@ -11,7 +11,7 @@ test.beforeAll(async () => {
   log = debug(`test:profile:anon:${test.info().parallelIndex}`)
 })
 
-const visitProfile = async ({ page, tag }: { page: Page; tag: string }) => page.goto(`@${tag}`)
+const visitProfile = async ({ page, tag }: { page: Page; tag: string }) => page.goto(`/${tag}`)
 
 test('anon user can visit public profile', async ({ page, seed }) => {
   const plan = await seed.users([userOnboarded])

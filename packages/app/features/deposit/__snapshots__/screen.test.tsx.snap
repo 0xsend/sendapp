@@ -32,7 +32,6 @@ exports[`DepositScreen renders the deposit screen 1`] = `
     >
       <Text
         accessibilityRole="header"
-        selectable={true}
         style={
           {
             "color": "#FFFFFF",
@@ -45,6 +44,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
             "marginRight": 0,
             "marginTop": 0,
             "textTransform": "none",
+            "userSelect": "auto",
           }
         }
         suppressHighlighting={true}
@@ -74,7 +74,6 @@ exports[`DepositScreen renders the deposit screen 1`] = `
       >
         <View
           accessibilityLabel="Deposit with Web3 Wallet"
-          accessibilityRole="button"
           cancelable={true}
           disabled={false}
           focusVisibleStyle={{}}
@@ -87,6 +86,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
           onPress={[Function]}
           onPressIn={[Function]}
           onPressOut={[Function]}
+          role="button"
           style={
             {
               "alignItems": "center",
@@ -124,8 +124,8 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         >
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight="32"
-            bbWidth="32"
+            bbHeight={32}
+            bbWidth={32}
             color="#FFFFFF"
             fill="none"
             focusable={false}
@@ -308,8 +308,8 @@ exports[`DepositScreen renders the deposit screen 1`] = `
                       ]
                     }
                     width="14.3158"
-                    x="0"
-                    y="0"
+                    x={0}
+                    y={0}
                   />
                 </RNSVGClipPath>
               </RNSVGDefs>
@@ -318,7 +318,6 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         </View>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -332,6 +331,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
               "marginTop": 0,
               "textAlign": "center",
               "textTransform": "uppercase",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}
@@ -354,7 +354,6 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         }
       >
         <View
-          accessibilityRole="button"
           cancelable={true}
           disabled={false}
           focusVisibleStyle={{}}
@@ -367,6 +366,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
           onPress={[Function]}
           onPressIn={[Function]}
           onPressOut={[Function]}
+          role="button"
           style={
             {
               "alignItems": "center",
@@ -404,8 +404,8 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         >
           <RNSVGSvgView
             align="xMidYMid"
-            bbHeight="32"
-            bbWidth="144"
+            bbHeight={32}
+            bbWidth={144}
             color="#FFFFFF"
             fill="none"
             focusable={false}
@@ -464,7 +464,6 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         </View>
         <Text
           accessibilityRole="header"
-          selectable={true}
           style={
             {
               "color": "#FFFFFF",
@@ -478,6 +477,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
               "marginTop": 0,
               "textAlign": "center",
               "textTransform": "uppercase",
+              "userSelect": "auto",
             }
           }
           suppressHighlighting={true}

@@ -7,38 +7,19 @@
     "files": true
   },
   "compilerOptions": {
-    // Enable latest features
-    "lib": ["ESNext"],
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleDetection": "force",
-    "jsx": "react-jsx",
-    "allowJs": true,
-
-    // Bundler mode
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
     "noEmit": true,
-
-    // Best practices
-    "strict": true,
-    "skipLibCheck": true,
-    "noFallthroughCasesInSwitch": true,
-
-    // Some stricter flags (disabled by default)
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false,
-
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./dist",
+    "composite": true,
     "baseUrl": ".",
     "paths": {
+      "@my/workflows": ["../../packages/workflows/src/*"],
       "@my/workflows/*": ["../../packages/workflows/src/*"]
     }
   },
-  "include": ["./src", "../../packages/workflows/src"]
+  "references": [],
+  "include": [
+    "./src",
+    "../../packages/workflows/src",
+    "../../globals.d.ts",
+    "../../environment.d.ts"
+  ]
 }

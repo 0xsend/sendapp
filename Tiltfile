@@ -1,7 +1,7 @@
 load("ext://color", "color")
 load("ext://dotenv", "dotenv")
-load("./tilt/common.tiltfile", "CFG", "CI", "DEBUG")
-load("./tilt/utils.tiltfile", "require_env", "require_tools")
+load("./tilt/common.Tiltfile", "CFG", "CI", "DEBUG")
+load("./tilt/utils.Tiltfile", "require_env", "require_tools")
 
 print(color.green("███████╗███████╗███╗   ██╗██████╗     ██╗████████╗"))
 
@@ -79,14 +79,14 @@ Add the following to your /etc/hosts file:
         print(color.red("NEXT_PUBLIC_SUPABASE_URL is not pointing to host.docker.internal. Please update your environment to point to a local supabase instance."))
         fail(color.red("NEXT_PUBLIC_SUPABASE_URL is not pointing to host.docker.internal"))
 
-include("tilt/infra.tiltfile")
+include("tilt/infra.Tiltfile")
 
-include("tilt/deps.tiltfile")
+include("tilt/deps.Tiltfile")
 
-include("./tilt/apps.tiltfile")
+include("./tilt/apps.Tiltfile")
 
-include("./tilt/tests.tiltfile")
+include("./tilt/tests.Tiltfile")
 
 if config.tilt_subcommand == "down":
-    include("./tilt/cleanup.tiltfile")
+    include("./tilt/cleanup.Tiltfile")
 

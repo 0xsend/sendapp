@@ -35,6 +35,7 @@ import {
   type WalletClient,
 } from 'viem'
 
+// eslint-disable-next-line testing-library/no-debugging-utils
 const log = debug('app:features:onboarding:screen')
 
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'

@@ -86,8 +86,8 @@ describe('SendScreen', () => {
       await user.type(searchBy, 'test')
       jest.advanceTimersByTime(2000)
       jest.runAllTimers()
-      await waitFor(() => screen.findByTestId('searchResults'))
     })
+    await waitFor(() => screen.findByTestId('searchResults'))
 
     expect(screen.toJSON()).toMatchSnapshot('search')
     expect(screen.getByTestId('tag-search-3665')).toHaveTextContent('??test/test')
@@ -132,8 +132,8 @@ describe('SendScreen', () => {
 
     await act(async () => {
       jest.runAllTimers()
-      await waitFor(() => screen.getByText('Write /send Check'))
     })
+    await waitFor(() => screen.findByText('Write /send Check'))
 
     expect(screen.toJSON()).toMatchSnapshot('render')
 

@@ -37,7 +37,7 @@ test('can visit token detail page', async ({ context, page }) => {
   await expect(page.getByText('10 USDC')).toBeVisible()
 
   await expect(page.getByText('Received')).toHaveCount(2)
-  await expect(page.getByText('@alice')).toBeVisible()
+  await expect(page.getByText('/alice')).toBeVisible()
   await expect(page.getByText('20 USDC')).toBeVisible()
   await expect(page.getByText('0xa71CE00000000000000000000000000000000000')).toBeVisible()
   await expect(page.getByText('30 USDC')).toBeVisible()

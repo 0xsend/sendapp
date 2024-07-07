@@ -1,4 +1,6 @@
-import BaseEntrypointSimulations from '@my/contracts/out/EntryPointSimulations.sol/EntryPointSimulations.json'
+import BaseEntrypointSimulations from '@my/contracts/out/EntryPointSimulations.sol/EntryPointSimulations.json' with {
+  type: 'json',
+}
 
 /**
  * The first Send snapshot block

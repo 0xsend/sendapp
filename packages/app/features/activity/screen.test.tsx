@@ -72,12 +72,12 @@ describe('ActivityScreen', () => {
       </TamaguiProvider>
     )
     const searchInput = screen.getByPlaceholderText('Sendtag, Phone, Send ID')
+    fireEvent.changeText(searchInput, 'test')
     await act(async () => {
-      fireEvent.changeText(searchInput, 'test')
       jest.advanceTimersByTime(2000)
       jest.runAllTimers()
-      await waitFor(() => screen.findByTestId('tag-search-3665'))
     })
+    await waitFor(() => screen.findByTestId('tag-search-3665'))
 
     expect(searchInput.props.value).toBe('test')
     const searchResults = await screen.findByTestId('tag-search-3665')
