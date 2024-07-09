@@ -183,3 +183,8 @@ export function userNameFromActivityUser(
       return ''
   }
 }
+
+export const isPaymasterEvent = (event: Activity) =>
+  labelAddress(event.data.t) === 'Paymaster' ||
+  labelAddress(event.data.f) === 'Paymaster' ||
+  labelAddress(event.data.sender) === 'Paymaster'
