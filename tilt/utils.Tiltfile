@@ -35,3 +35,12 @@ def require_env(*envs):
 def files_matching(dir, lambda_):
     return [f for f in listdir(dir, recursive = True) if lambda_(f)]
 
+def ts_files(*paths):
+    """Returns a list of all TypeScript files in the given paths, excluding spec and test files."""
+    files = []
+    for path in paths:
+        files = (files +
+                 str(local("find %s -name '*.ts' -not \\( -name '*spec.ts' -o -name '*test.ts' \\)" % path, echo_off = True, quiet = True)).strip().splitlines() +
+                 str(local("find %s -name '*.tsx' -not \\( -name '*spec.tsx' -o -name '*test.tsx' \\)" % path, echo_off = True, quiet = True)).strip().splitlines())
+    return files
+

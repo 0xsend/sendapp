@@ -32,8 +32,13 @@ export function createActivities(supabaseUrl: string, supabaseKey: string) {
 async function fetchDistributionActivity(distributionId: string) {
   const { data: distribution, error } = await fetchDistribution(distributionId)
   if (error) {
+    if (error.code === 'PGRST116') {
+      log.info('fetchDistributionActivity', { distributionId, error })
+      return null
+    }
     throw ApplicationFailure.nonRetryable('Error fetching distribution.', error.code, error)
   }
+  log.info('fetchDistributionActivity', { distribution })
   return distribution
 }
 
@@ -45,6 +50,7 @@ async function calculateDistributionSharesActivity(
     distribution_verification_values: Tables<'distribution_verification_values'>[]
   }
 ): Promise<void> {
+  log.info('calculateDistributionSharesActivity', { distribution })
   // verify tranche is not created when in production
   if (await isMerkleDropActive(distribution)) {
     throw ApplicationFailure.nonRetryable(
