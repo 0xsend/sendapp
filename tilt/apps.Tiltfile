@@ -116,6 +116,6 @@ local_resource(
         "wagmi:generate",
         "temporal",
     ],
-    serve_cmd = "yarn workspace workers start.watch",
+    serve_cmd = "yarn workspace workers start",
 )
 
