@@ -50,7 +50,7 @@ export function SendConfirmScreen() {
   const router = useRouter()
 
   useEffect(() => {
-    if ((!profile && !recipient) || !isAddress(recipient ?? ''))
+    if (!profile && !recipient)
       router.replace({
         pathname: '/send',
         query: {
@@ -62,7 +62,7 @@ export function SendConfirmScreen() {
       })
   }, [profile, recipient, idType, router, sendToken, amount])
   if (error) throw new Error(error.message)
-  if ((isLoading && !profile) || !isAddress(recipient ?? '')) return <Spinner size="large" />
+  if (isLoading && !profile) return <Spinner size="large" />
   return <SendConfirm />
 }
 
