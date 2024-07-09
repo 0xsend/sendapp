@@ -1,4 +1,4 @@
-import { expect, test as baseTest, mergeTests } from '@playwright/test'
+import { expect, test as baseTest, mergeTests, type Expect, type Page } from '@playwright/test'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { test as webauthnTest } from '@my/playwright/fixtures/webauthn'
 import { countries } from 'app/utils/country'
@@ -17,14 +17,11 @@ test.beforeEach(async ({ page }) => {
 const randomCountry = () =>
   countries[Math.floor(Math.random() * countries.length)] as (typeof countries)[number]
 
-const signUp = async (page, phone, expect) => {
+const signUp = async (page: Page, phone: string, expect: Expect) => {
   await page.getByLabel('Phone number').fill(phone)
-  const captcha = page
-    .frameLocator('iframe[title="Widget containing a Cloudflare security challenge"]')
-    .locator('#success')
-  await expect(captcha).toBeVisible()
   const signUpButton = page.getByRole('button', { name: 'Sign Up' })
   await expect(signUpButton).toBeVisible()
+  await expect(signUpButton).toBeEnabled()
   await signUpButton.click()
   const otpInput = page.getByLabel('One-time Password')
   await expect(otpInput).toBeVisible()

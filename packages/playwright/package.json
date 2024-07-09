@@ -7,7 +7,7 @@
     "@faker-js/faker": "^8.1.0",
     "@my/snaplet": "workspace:*",
     "@my/supabase": "workspace:*",
-    "@playwright/test": "^1.41.1",
+    "@playwright/test": "^1.45.1",
     "@supabase/supabase-js": "2.44.2",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/pg": "^8",
