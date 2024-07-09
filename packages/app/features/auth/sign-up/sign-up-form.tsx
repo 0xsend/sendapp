@@ -103,6 +103,7 @@ export const SignUpForm = () => {
                 ai={'center'}
               >
                 <SubmitButton
+                  disabled={!captchaToken}
                   onPress={() => submit()}
                   br="$3"
                   bc={'$green9Light'}
