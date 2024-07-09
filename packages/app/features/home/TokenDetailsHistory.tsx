@@ -5,6 +5,8 @@ import { Fragment } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { RowLabel, AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
+import { baseMainnet, tokenPaymasterAddress } from '@my/wagmi'
+import { isPaymasterEvent } from 'app/utils/activity'
 
 export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
   const result = useTokenActivityFeed({
@@ -42,23 +44,25 @@ export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
           default: {
             let lastDate: string | undefined
             return pages?.map((activities) => {
-              return activities?.map((activity) => {
-                const date = activity.created_at.toLocaleDateString()
-                const isNewDate = !lastDate || date !== lastDate
-                if (isNewDate) {
-                  lastDate = date
-                }
-                return (
-                  <Fragment
-                    key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
-                  >
-                    {isNewDate ? <RowLabel>{lastDate}</RowLabel> : null}
-                    <AnimateEnter>
-                      <TokenActivityRow activity={activity} />
-                    </AnimateEnter>
-                  </Fragment>
-                )
-              })
+              return activities
+                ?.filter((activity) => !isPaymasterEvent(activity))
+                .map((activity) => {
+                  const date = activity.created_at.toLocaleDateString()
+                  const isNewDate = !lastDate || date !== lastDate
+                  if (isNewDate) {
+                    lastDate = date
+                  }
+                  return (
+                    <Fragment
+                      key={`${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`}
+                    >
+                      {isNewDate ? <RowLabel>{lastDate}</RowLabel> : null}
+                      <AnimateEnter>
+                        <TokenActivityRow activity={activity} />
+                      </AnimateEnter>
+                    </Fragment>
+                  )
+                })
             })
           }
         }
