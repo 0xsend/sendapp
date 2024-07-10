@@ -31,6 +31,7 @@ import { useRouter } from 'solito/router'
 import { Adapt, Dialog, Sheet } from 'tamagui'
 import { type Address, isAddress } from 'viem'
 import { IconAccount } from './icons'
+import { baseMainnet } from '@my/wagmi'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -301,12 +302,12 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
                 onPress={() => {
                   if (isWeb) {
                     window.open(
-                      `https://basescan.org/address/${address}`,
+                      `${baseMainnet.blockExplorers.default.url}/address/${address}`,
                       '_blank',
                       'noopener,noreferrer'
                     )
                   } else {
-                    Linking.openURL(`https://basescan.org/address/${address}`)
+                    Linking.openURL(`${baseMainnet.blockExplorers.default.url}/address/${address}`)
                   }
                 }}
                 fontFamily={'$mono'}
