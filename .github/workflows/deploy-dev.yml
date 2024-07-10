@@ -1,21 +1,27 @@
 name: Deploy Dev
+
 on:
-  push:
+  workflow_run:
+    workflows: ["Docker Build"]
     branches: [dev]
+    types:
+      - completed
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build-docker
+  deploy-docker-dev:
+    runs-on: self-hosted
     steps:
-      - name: Configure SSH
+      - name: Configure ssh & Deploy
+        shell: bash
         run: |
           mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/deployer.key
-          chmod 600 ~/.ssh/deployer.key
+          echo "$SSH_KEY" | base64 -d  > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "$DEPLOYMENT_TARGETS"
           for h in $DEPLOYMENT_TARGETS; do echo Deploying to $h && \
-          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no $SSH_USER@$h \
+          timeout 30 ssh $SSH_FLAGS $SSH_USER@$h \
           'cd /opt/next-app-dev && docker compose pull && docker compose up -d' ; done
         env:
           SSH_USER: ${{ secrets.DEPLOYER_SSH_USER }}
           SSH_KEY: ${{ secrets.DEPLOYER_SSH_KEY }}
+          SSH_FLAGS: ${{ secrets.DEPLOYER_SSH_FLAGS }}
           DEPLOYMENT_TARGETS: ${{ secrets.DEV_DOCKER_DEPLOYMENT_TARGETS }}
