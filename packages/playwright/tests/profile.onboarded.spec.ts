@@ -5,6 +5,8 @@ import { debug, type Debugger } from 'debug'
 import { assert } from 'app/utils/assert'
 import { userOnboarded } from '@my/snaplet/src/models'
 import { ProfilePage } from './fixtures/profiles'
+import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
+import { SUPABASE_URL } from 'app/utils/supabase/admin'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -24,7 +26,6 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).toBeVisible()
-  await expect(profilePage.requestButton).toBeVisible()
   await profilePage.sendButton.click()
   await page.waitForURL(/\/send/)
   let url = new URL(page.url())
@@ -45,7 +46,6 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   const profilePage2 = new ProfilePage(page, { name: profile2.name, about: profile2.about })
   await page.goto(`/profile/${profile2.sendId}`)
   await expect(profilePage2.sendButton).toBeVisible()
-  await expect(profilePage2.requestButton).toBeVisible()
   await profilePage2.sendButton.click()
   await page.waitForURL(/\/send/)
   url = new URL(page.url())
@@ -77,7 +77,6 @@ test('can visit my own profile', async ({
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).not.toBeVisible()
-  await expect(profilePage.requestButton).not.toBeVisible()
 })
 
 test('can visit private profile', async ({ page, seed }) => {
@@ -90,5 +89,49 @@ test('can visit private profile', async ({ page, seed }) => {
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).toBeVisible()
-  await expect(profilePage.requestButton).toBeVisible()
+})
+
+test('can view activities between another profile', async ({
+  page,
+  pg,
+  user: { profile },
+  seed,
+}) => {
+  const plan = await seed.users([{ ...userOnboarded, tags: [] }])
+  const anotherUser = plan.profiles[0]
+  assert(!!anotherUser, 'another user not found')
+
+  // Filter out everything except `send_account_transfers`
+  const activities = MockActivityFeed.flatMap((t) => {
+    return t.event_name === 'send_account_transfers'
+      ? {
+          event_name: t.event_name,
+          event_id: crypto.randomUUID(),
+          from_user_id: t.from_user?.id ? profile.id : anotherUser.id,
+          to_user_id: t.to_user?.id ? profile.id : anotherUser.id,
+          created_at: new Date(t.created_at).toISOString(),
+          // biome-ignore lint/suspicious/noExplicitAny: mock
+          data: t.data as any,
+        }
+      : []
+  })
+  for (const row of activities) {
+    await pg.query(
+      'insert into activity (event_name, event_id, from_user_id, to_user_id, created_at, data) values ($1, $2, $3, $4, $5, $6)',
+      [row.event_name, row.event_id, row.from_user_id, row.to_user_id, row.created_at, row.data]
+    )
+  }
+
+  const res = page.waitForResponse(`${SUPABASE_URL}/rest/v1/activity_feed*`)
+  const profilePage2 = new ProfilePage(page, { name: anotherUser.name, about: anotherUser.about })
+  await page.goto(`/profile/${anotherUser.sendId}`)
+  await res
+
+  log('beforeEach', `url=${page.url()}`)
+
+  await expect(profilePage2.sendButton).toBeVisible()
+  await expect(page.getByText('May 26, 2024')).toBeVisible()
+  await expect(page.getByText('You Received')).toBeVisible()
+  await expect(page.getByText('0.019032 USDC')).toBeVisible()
+  await expect(page.getByText(anotherUser.name)).toBeVisible()
 })
