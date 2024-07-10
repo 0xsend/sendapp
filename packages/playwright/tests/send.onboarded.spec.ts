@@ -12,6 +12,7 @@ import { erc20Abi, formatUnits, parseUnits, zeroAddress } from 'viem'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
 import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
+import { shorten } from 'app/utils/strings'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -40,7 +41,9 @@ const tokens = [
   },
 ] as { symbol: string; address: `0x${string}`; decimals: number }[]
 
-const idTypes = ['tag', 'sendid'] as const
+const idTypes = ['tag', 'sendid', 'address'] as const
+
+const testEOA = zeroAddress.replace('0x0', '0x1') as `0x${string}`
 
 for (const token of tokens) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
@@ -84,14 +87,33 @@ for (const token of tokens) {
           : [userOnboarded]
       )
       const profile = plan.profiles[0]
+      const tag = plan.tags[0]
+
       assert(!!profile, 'profile not found')
       assert(!!profile.name, 'profile name not found')
       assert(!!profile.sendId, 'profile send id not found')
-      const recvAccount = plan.sendAccounts[0]
-      assert(!!recvAccount, 'send account not found')
-      const tag = plan.tags[0]
 
-      const query = isSendId ? profile?.sendId.toString() : tag?.name
+      const recvAccount: { address: `0x${string}` } = (() => {
+        switch (idType) {
+          case 'address':
+            return { address: testEOA }
+          default:
+            assert(!!plan.sendAccounts[0], 'send account not found')
+            return { address: plan.sendAccounts[0].address as `0x${string}` }
+        }
+      })()
+
+      const query = (() => {
+        switch (idType) {
+          case 'sendid':
+            return profile?.sendId.toString()
+          case 'address':
+            return testEOA
+          default:
+            return tag?.name
+        }
+      })()
+
       assert(!!query, 'query not found')
 
       // goto send page
@@ -105,16 +127,37 @@ for (const token of tokens) {
       await expect(page).toHaveURL(/\/send/)
 
       // fill search input
-      const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID')
+      const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
       await expect(searchInput).toBeVisible()
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
+
+      let blockExplorerPagePromise: Promise<Page> | null = null
+
+      if (idType === 'address') {
+        blockExplorerPagePromise = page.context().waitForEvent('page')
+      }
 
       // click user
       await page
         .getByTestId('searchResults')
         .getByRole('link', { name: query, exact: false })
         .click()
+
+      if (idType === 'address' && !!blockExplorerPagePromise) {
+        // confirm sending to external address
+        const dialog = page.getByRole('dialog', { name: 'Confirm External Send' })
+        await expect(dialog).toBeVisible()
+        const blockExplorerButton = dialog.getByRole('button', { name: query })
+        await expect(blockExplorerButton).toBeVisible()
+        await blockExplorerButton.click()
+        const blockExplorerPage = await blockExplorerPagePromise
+        await expect(blockExplorerPage).toHaveURL(new RegExp(`/address/${query}`))
+        await blockExplorerPage.close()
+        const confirmButton = dialog.getByRole('button', { name: 'I Agree & Continue' })
+        await expect(confirmButton).toBeVisible()
+        await confirmButton.click()
+      }
 
       await expect(page).toHaveURL(/\/send/)
 
@@ -128,112 +171,35 @@ for (const token of tokens) {
         timeout: 5000,
       })
 
-      const counterparty = isSendId ? profile.name : `/${tag?.name}`
       await expect(page.getByTestId('SendForm')).toHaveText(
-        new RegExp(isSendId ? `#${profile.sendId}` : `/${tag?.name}`)
+        new RegExp(
+          (() => {
+            switch (idType) {
+              case 'address':
+                return shorten(testEOA, 6, 6)
+              case 'sendid':
+                return `#${profile.sendId}`
+              default:
+                return `/${tag?.name}`
+            }
+          })()
+        )
       )
+
+      const counterparty = (() => {
+        switch (idType) {
+          case 'address':
+            return testEOA
+          case 'sendid':
+            return profile.name
+          default:
+            return `/${tag?.name}`
+        }
+      })()
       await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
     })
   }
 }
-
-test.skip('can send USDC to user on profile', async ({ page, seed }) => {
-  const plan = await seed.users([userOnboarded])
-  const tag = plan.tags[0]
-  const profile = plan.profiles[0]
-  assert(!!tag?.name, 'tag not found')
-  assert(!!profile?.name, 'profile name not found')
-  assert(!!profile?.about, 'profile about not found')
-  const profilePage = new ProfilePage(page, {
-    name: profile.name,
-    about: profile.about,
-  })
-  await profilePage.visit(tag.name, expect)
-  await expect(profilePage.sendButton).toBeVisible()
-  await profilePage.sendButton.click()
-
-  // @todo create send form fixture
-  const sendDialog = page.getByTestId('sendDialogContainer')
-  await expect(sendDialog).toBeVisible()
-  const amountInput = sendDialog.getByLabel('Amount')
-  await expect(amountInput).toBeVisible()
-  await amountInput.fill('5')
-  const tokenSelect = sendDialog.getByRole('combobox') // @todo when tamagui supports this , { name: 'Token' })
-  await expect(tokenSelect).toBeVisible()
-  await tokenSelect.selectOption('USDC')
-  const sendDialogButton = sendDialog.getByRole('button', { name: 'Send' })
-  expect(sendDialogButton).toBeVisible()
-  await sendDialogButton.click()
-  await expect(sendDialog.getByText(/Sent user op [0-9a-f]+/).first()).toBeVisible({
-    timeout: 20000,
-  })
-  await expect(sendDialog.getByRole('link', { name: 'View on Otterscan' })).toBeVisible()
-})
-
-test.skip('can send USDC to user on profile using paymaster', async ({
-  page,
-  seed,
-  supabase,
-  setEthBalance,
-}) => {
-  const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
-  if (error) {
-    log('error fetching send account', error)
-    throw error
-  }
-  assert(!!sendAccount, 'no send account found')
-  assert(sendAccount.address !== zeroAddress, 'send account address is zero')
-
-  await setEthBalance({ address: sendAccount.address, value: 0n }) // set balance to 0 ETH
-
-  const plan = await seed.users([userOnboarded])
-  const tag = plan.tags[0]
-  const profile = plan.profiles[0]
-  assert(!!tag?.name, 'tag not found')
-  assert(!!profile?.name, 'profile name not found')
-  assert(!!profile?.about, 'profile about not found')
-  const profilePage = new ProfilePage(page, {
-    name: profile.name,
-    about: profile.about,
-  })
-  await profilePage.visit(tag.name, expect)
-  await expect(profilePage.sendButton).toBeVisible()
-  await profilePage.sendButton.click()
-
-  // @todo create send form fixture
-  const sendDialog = page.getByTestId('sendDialogContainer')
-  await expect(sendDialog).toBeVisible()
-  const amountInput = sendDialog.getByLabel('Amount')
-  await expect(amountInput).toBeVisible()
-  await amountInput.fill('5')
-  const tokenSelect = sendDialog.getByRole('combobox') // @todo when tamagui supports this , { name: 'Token' })
-  await expect(tokenSelect).toBeVisible()
-  await tokenSelect.selectOption('USDC')
-  const sendDialogButton = sendDialog.getByRole('button', { name: 'Send' })
-  expect(sendDialogButton).toBeVisible()
-  const usdcBalBefore = await testBaseClient.readContract({
-    address: usdcAddress[testBaseClient.chain.id],
-    abi: erc20Abi,
-    functionName: 'balanceOf',
-    args: [sendAccount.address],
-  })
-  await sendDialogButton.click()
-  await expect(sendDialog.getByText(/Sent user op [0-9a-f]+/).first()).toBeVisible({
-    timeout: 20000,
-  })
-  await expect(sendDialog.getByRole('link', { name: 'View on Otterscan' })).toBeVisible()
-
-  const usdcBalAfter = await testBaseClient.readContract({
-    address: usdcAddress[testBaseClient.chain.id],
-    abi: erc20Abi,
-    functionName: 'balanceOf',
-    args: [sendAccount.address],
-  })
-  expect(Number(formatUnits(usdcBalBefore, 6)) - Number(formatUnits(usdcBalAfter, 6))).toBeCloseTo(
-    5,
-    0
-  ) // allow for ¢10 for gas
-})
 
 /**
  * Handles the transfer process for a specified token.

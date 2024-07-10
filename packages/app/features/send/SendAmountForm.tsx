@@ -24,7 +24,7 @@ const SendAmountSchema = z.object({
   token: formFields.coin,
 })
 
-export function SendAmountForm({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
+export function SendAmountForm() {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const { data: sendAccount } = useSendAccount()
   const router = useRouter()
@@ -158,7 +158,7 @@ export function SendAmountForm({ profile }: { profile: Functions<'profile_lookup
       >
         {({ amount, token }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
-            <SendRecipient profile={profile} />
+            <SendRecipient />
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack

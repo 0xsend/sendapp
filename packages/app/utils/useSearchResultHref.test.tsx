@@ -4,6 +4,9 @@ import { useSearchResultHref } from './useSearchResultHref'
 import { usePathname } from 'app/utils/usePathname.native'
 import type { SearchResultCommonType } from 'app/components/SearchBar'
 import type { SendScreenParams } from 'app/routers/params'
+import { baseMainnet } from '@my/wagmi'
+import { useRootScreenParams } from 'app/routers/params'
+import { zeroAddress } from 'viem'
 
 const sendParams: SendScreenParams = {
   idType: 'tag',
@@ -14,6 +17,7 @@ const sendParams: SendScreenParams = {
 
 jest.mock('app/routers/params', () => ({
   useSendScreenParams: jest.fn().mockReturnValue([sendParams]),
+  useRootScreenParams: jest.fn().mockReturnValue([{ search: 'alice' }]),
 }))
 
 jest.mock('expo-router', () => ({
@@ -41,6 +45,14 @@ describe('useSearchResultHref', () => {
     usePathname.mockReturnValue('/activity')
     const href = useSearchResultHref(item)
     expect(href).toBe('/profile/12530')
+  })
+  it('should return basescan link for EOA for activity screen', () => {
+    //@ts-expect-error mock
+    useRootScreenParams.mockReturnValueOnce([{ search: zeroAddress }])
+    // @ts-expect-error mock
+    usePathname.mockReturnValue('/activity')
+    const href = useSearchResultHref()
+    expect(href).toBe(`${baseMainnet.blockExplorers.default.url}/address/${zeroAddress}`)
   })
   it('should return the correct href for send screen', () => {
     // @ts-expect-error mock

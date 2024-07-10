@@ -38,7 +38,7 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
         cancelable={true}
         disabled={false}
         focusable={true}
-        id=":r3:"
+        id=":r4:"
         minPressDuration={0}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -556,7 +556,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               control={
                 {
                   "_defaultValues": {
-                    "query": "",
+                    "query": "test",
                   },
                   "_disableForm": [Function],
                   "_executeSchema": [Function],
@@ -568,7 +568,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         "ref": {
                           "name": "query",
                         },
-                        "value": "",
+                        "value": "test",
                       },
                     },
                   },
@@ -587,7 +587,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                     "touchedFields": {},
                   },
                   "_formValues": {
-                    "query": "",
+                    "query": "test",
                   },
                   "_getDirty": [Function],
                   "_getFieldArray": [Function],
@@ -653,6 +653,9 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         {
                           "next": [Function],
                         },
+                        {
+                          "next": [Function],
+                        },
                       ],
                       "subscribe": [Function],
                       "unsubscribe": [Function],
@@ -676,7 +679,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              placeholder="Sendtag, Phone, Send ID"
+              placeholder="Sendtag, Phone, Send ID, Address"
               placeholderTextColor="#081619"
               readOnly={false}
               style={
@@ -698,8 +701,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 19.2,
-                  "fontStyle": "italic",
-                  "fontWeight": "normal",
+                  "fontStyle": "normal",
+                  "fontWeight": "bold",
                   "height": 44,
                   "minWidth": 0,
                   "paddingLeft": 16,
@@ -707,7 +710,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   "position": "relative",
                 }
               }
-              value=""
+              value="test"
             />
           </View>
           <View
@@ -721,115 +724,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
             }
           />
         </View>
-      </View>
-      <View
-        aria-label="Clear input."
-        cancelable={true}
-        disabled={false}
-        focusVisibleStyle={{}}
-        focusable={[Function]}
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        role="button"
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderBottomColor": "transparent",
-            "borderBottomLeftRadius": 0,
-            "borderBottomRightRadius": 9,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "transparent",
-            "borderLeftWidth": 1,
-            "borderRightColor": "transparent",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "transparent",
-            "borderTopLeftRadius": 0,
-            "borderTopRightRadius": 9,
-            "borderTopWidth": 1,
-            "flexDirection": "row",
-            "flexWrap": "nowrap",
-            "height": 44,
-            "justifyContent": "center",
-            "paddingBottom": 0,
-            "paddingLeft": 4,
-            "paddingRight": 4,
-            "paddingTop": 0,
-            "position": "absolute",
-            "right": "0",
-            "top": "0",
-          }
-        }
-      >
-        <RNSVGSvgView
-          align="xMidYMid"
-          bbHeight={32}
-          bbWidth={32}
-          color="#FFFFFF"
-          focusable={false}
-          height={32}
-          meetOrSlice={0}
-          minX={0}
-          minY={0}
-          strokeWidth="2"
-          style={
-            [
-              {
-                "backgroundColor": "transparent",
-                "borderWidth": 0,
-              },
-              {
-                "height": 24,
-                "width": 24,
-              },
-              {
-                "flex": 0,
-                "height": 32,
-                "width": 32,
-              },
-            ]
-          }
-          tintColor="#FFFFFF"
-          vbHeight={32}
-          vbWidth={32}
-          width={32}
-        >
-          <RNSVGGroup
-            fill={
-              {
-                "payload": 4278190080,
-                "type": 0,
-              }
-            }
-            propList={
-              [
-                "strokeWidth",
-              ]
-            }
-            strokeWidth="2"
-          >
-            <RNSVGPath
-              d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
-              fill={
-                {
-                  "type": 2,
-                }
-              }
-              propList={
-                [
-                  "fill",
-                ]
-              }
-            />
-          </RNSVGGroup>
-        </RNSVGSvgView>
       </View>
     </View>
   </View>
@@ -935,7 +829,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               control={
                 {
                   "_defaultValues": {
-                    "query": "",
+                    "query": "test",
                   },
                   "_disableForm": [Function],
                   "_executeSchema": [Function],
@@ -947,7 +841,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         "ref": {
                           "name": "query",
                         },
-                        "value": "test",
+                        "value": "testtest",
                       },
                     },
                   },
@@ -971,7 +865,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                     },
                   },
                   "_formValues": {
-                    "query": "test",
+                    "query": "testtest",
                   },
                   "_getDirty": [Function],
                   "_getFieldArray": [Function],
@@ -1037,6 +931,9 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                         {
                           "next": [Function],
                         },
+                        {
+                          "next": [Function],
+                        },
                       ],
                       "subscribe": [Function],
                       "unsubscribe": [Function],
@@ -1060,7 +957,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               onBlur={[Function]}
               onChangeText={[Function]}
               onFocus={[Function]}
-              placeholder="Sendtag, Phone, Send ID"
+              placeholder="Sendtag, Phone, Send ID, Address"
               placeholderTextColor="#081619"
               readOnly={false}
               style={
@@ -1091,7 +988,7 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   "position": "relative",
                 }
               }
-              value="test"
+              value="testtest"
             />
           </View>
           <View
@@ -1105,115 +1002,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
             }
           />
         </View>
-      </View>
-      <View
-        aria-label="Clear input."
-        cancelable={true}
-        disabled={false}
-        focusVisibleStyle={{}}
-        focusable={[Function]}
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        role="button"
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderBottomColor": "transparent",
-            "borderBottomLeftRadius": 0,
-            "borderBottomRightRadius": 9,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "transparent",
-            "borderLeftWidth": 1,
-            "borderRightColor": "transparent",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "transparent",
-            "borderTopLeftRadius": 0,
-            "borderTopRightRadius": 9,
-            "borderTopWidth": 1,
-            "flexDirection": "row",
-            "flexWrap": "nowrap",
-            "height": 44,
-            "justifyContent": "center",
-            "paddingBottom": 0,
-            "paddingLeft": 4,
-            "paddingRight": 4,
-            "paddingTop": 0,
-            "position": "absolute",
-            "right": "0",
-            "top": "0",
-          }
-        }
-      >
-        <RNSVGSvgView
-          align="xMidYMid"
-          bbHeight={32}
-          bbWidth={32}
-          color="#FFFFFF"
-          focusable={false}
-          height={32}
-          meetOrSlice={0}
-          minX={0}
-          minY={0}
-          strokeWidth="2"
-          style={
-            [
-              {
-                "backgroundColor": "transparent",
-                "borderWidth": 0,
-              },
-              {
-                "height": 24,
-                "width": 24,
-              },
-              {
-                "flex": 0,
-                "height": 32,
-                "width": 32,
-              },
-            ]
-          }
-          tintColor="#FFFFFF"
-          vbHeight={32}
-          vbWidth={32}
-          width={32}
-        >
-          <RNSVGGroup
-            fill={
-              {
-                "payload": 4278190080,
-                "type": 0,
-              }
-            }
-            propList={
-              [
-                "strokeWidth",
-              ]
-            }
-            strokeWidth="2"
-          >
-            <RNSVGPath
-              d="M8.30006 25.1004L6.90005 23.7004L14.6001 16.0004L6.90005 8.30039L8.30006 6.90039L16.0001 14.6004L23.7001 6.90039L25.1001 8.30039L17.4001 16.0004L25.1001 23.7004L23.7001 25.1004L16.0001 17.4004L8.30006 25.1004Z"
-              fill={
-                {
-                  "type": 2,
-                }
-              }
-              propList={
-                [
-                  "fill",
-                ]
-              }
-            />
-          </RNSVGGroup>
-        </RNSVGSvgView>
       </View>
     </View>
   </View>
@@ -1260,10 +1048,10 @@ exports[`SendScreen should render with search when on /send and no recipient in 
                   "onFrame": [Function],
                   "onStart": [Function],
                   "reduceMotion": false,
-                  "startTimestamp": 2000,
+                  "startTimestamp": 2300,
                   "startValue": 100,
                   "strippedCurrent": 100,
-                  "timestamp": 2000,
+                  "timestamp": 2300,
                   "toValue": 100,
                   "velocity": 0,
                   "zeta": 0.5773502691896257,

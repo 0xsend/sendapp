@@ -5,6 +5,7 @@ import { Fragment } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { RowLabel, AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
+import { baseMainnet, tokenPaymasterAddress } from '@my/wagmi'
 
 export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
   const result = useTokenActivityFeed({
@@ -42,7 +43,7 @@ export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
           default: {
             let lastDate: string | undefined
             return pages?.map((activities) => {
-              return activities?.map((activity) => {
+              return activities.map((activity) => {
                 const date = activity.created_at.toLocaleDateString()
                 const isNewDate = !lastDate || date !== lastDate
                 if (isNewDate) {

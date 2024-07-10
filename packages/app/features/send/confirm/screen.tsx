@@ -23,6 +23,7 @@ import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import {
@@ -38,19 +39,18 @@ import {
 } from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { isAddress, parseUnits, type Hex } from 'viem'
+import { isAddress, parseUnits, type Hex, type Address } from 'viem'
 import { useBalance, useEstimateFeesPerGas } from 'wagmi'
-
-type ProfileProp = NonNullable<ReturnType<typeof useProfileLookup>['data']>
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
   const { recipient, idType, sendToken, amount } = queryParams
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+
   const router = useRouter()
 
   useEffect(() => {
-    if (!profile || !recipient)
+    if (!profile && !recipient)
       router.replace({
         pathname: '/send',
         query: {
@@ -62,20 +62,28 @@ export function SendConfirmScreen() {
       })
   }, [profile, recipient, idType, router, sendToken, amount])
   if (error) throw new Error(error.message)
-  if (isLoading || !profile) return <Spinner size="large" />
-  return <SendConfirm profile={profile} />
+  if (isLoading && !profile) return <Spinner size="large" />
+  return <SendConfirm />
 }
 
-export function SendConfirm({ profile }: { profile: ProfileProp }) {
+export function SendConfirm() {
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
+
+  const [queryParams] = useSendScreenParams()
+  const { sendToken, recipient, idType } = queryParams
+
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+
   const webauthnCreds =
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const [sentTxHash, setSentTxHash] = useState<Hex>()
-  const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType } = queryParams
 
   const router = useRouter()
   const { data: balance, isLoading: balanceIsLoading } = useBalance({
@@ -96,7 +104,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   const { data: userOp } = useGenerateTransferUserOp({
     sender: sendAccount?.address,
     // @ts-expect-error some work to do here
-    to: profile?.address,
+    to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(amount),
     nonce: nonce ?? 0n,
@@ -198,7 +206,8 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
     }
   }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
 
-  if (balanceIsLoading || nonceIsLoading) return <Spinner size="large" color={'$color'} />
+  if (balanceIsLoading || nonceIsLoading || isProfileLoading)
+    return <Spinner size="large" color={'$color'} />
 
   return (
     <YStack
@@ -219,7 +228,7 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
         }}
       >
         <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
-          <SendRecipient $gtLg={{ f: 1, maw: 350 }} profile={profile} />
+          <SendRecipient $gtLg={{ f: 1, maw: 350 }} />
 
           <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
             <XStack jc="space-between" ai="center" gap="$3">
@@ -369,10 +378,19 @@ export function SendConfirm({ profile }: { profile: ProfileProp }) {
   )
 }
 
-export function SendRecipient({ profile, ...props }: YStackProps & { profile: ProfileProp }) {
+export function SendRecipient({ ...props }: YStackProps) {
   const [queryParams] = useSendScreenParams()
-
+  const { recipient, idType } = queryParams
   const router = useRouter()
+  const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+
+  if (isLoading) return <Spinner size="large" />
+  if (error) throw new Error(error.message)
+
+  const href =
+    idType === 'address'
+      ? `${baseMainnet.blockExplorers.default.url}/address/${recipient}`
+      : `/profile/${recipient}`
 
   return (
     <YStack gap="$2.5" {...props}>
@@ -410,7 +428,7 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
         $theme-light={{ bc: '$gray3Light' }}
         f={1}
       >
-        <LinkableAvatar size="$4.5" br="$3" href={`/profile/${profile.sendid}`}>
+        <LinkableAvatar size="$4.5" br="$3" href={href}>
           <Avatar.Image src={profile?.avatar_url ?? ''} />
           <Avatar.Fallback jc="center">
             <IconAccount size="$4.5" color="$olive" />
@@ -427,7 +445,16 @@ export function SendRecipient({ profile, ...props }: YStackProps & { profile: Pr
             lineHeight="$1"
             color="$color11"
           >
-            {profile?.tag ? `/${profile?.tag}` : `#${profile?.sendid}`}
+            {(() => {
+              switch (true) {
+                case idType === 'address':
+                  return shorten(recipient, 6, 6)
+                case !!profile?.tag:
+                  return `/${profile?.tag}`
+                default:
+                  return `#${profile?.sendid}`
+              }
+            })()}
           </Paragraph>
         </YStack>
       </XStack>

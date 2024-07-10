@@ -62,7 +62,7 @@
     "superjson": "^1.13.1",
     "viem": "^2.13.7",
     "wagmi": "^2.9.10",
-    "zod": "^3.22.4"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@babel/plugin-syntax-import-attributes": "^7.24.7",
@@ -72,7 +72,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/react": "^18.2.15",
     "babel-preset-expo": "~11.0.0",
-    "debug": "^4.3.4",
+    "debug": "^4.3.5",
     "eslint": "^8.46.0",
     "eslint-config-custom": "workspace:*",
     "eslint-plugin-testing-library": "^6.2.2",

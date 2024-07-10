@@ -18,12 +18,17 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { SendRecipient } from './confirm/screen'
+import { type Address, isAddress } from 'viem'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
+
+  if (idType === 'address' && isAddress(recipient as Address)) {
+    return <SendAmountForm />
+  }
   if (!profile)
     return (
       <TagSearchProvider>
@@ -41,7 +46,7 @@ export const SendScreen = () => {
     return <NoSendAccount profile={profile} />
 
   return (
-    <SendAmountForm profile={profile} />
+    <SendAmountForm />
     // <Container $gtLg={{ jc: 'flex-start' }} flexDirection="column" jc="center" ai="center" f={1}>
     //   <SendAmountForm />
     // </Container>
@@ -74,7 +79,7 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
   const [clicked, setClicked] = useState(false)
   return (
     <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>
-      <SendRecipient width={'100%'} profile={profile} />
+      <SendRecipient width={'100%'} />
       <H4 theme={'alt2'} color="$olive">
         No send account
       </H4>
