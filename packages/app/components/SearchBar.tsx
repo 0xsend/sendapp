@@ -310,6 +310,7 @@ function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
                   }
                 }}
                 fontFamily={'$mono'}
+                fontWeight={'bold'}
                 iconAfter={<ExternalLink size={14} />}
                 mt="$4"
               >
