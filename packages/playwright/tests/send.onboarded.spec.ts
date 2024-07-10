@@ -43,7 +43,7 @@ const tokens = [
 
 const idTypes = ['tag', 'sendid', 'address'] as const
 
-const testEOA = zeroAddress.replace('0x0', '0x1')
+const testEOA = zeroAddress.replace('0x0', '0x1') as `0x${string}`
 
 for (const token of tokens) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
@@ -87,12 +87,21 @@ for (const token of tokens) {
           : [userOnboarded]
       )
       const profile = plan.profiles[0]
+      const tag = plan.tags[0]
+
       assert(!!profile, 'profile not found')
       assert(!!profile.name, 'profile name not found')
       assert(!!profile.sendId, 'profile send id not found')
-      const recvAccount = plan.sendAccounts[0]
-      assert(!!recvAccount, 'send account not found')
-      const tag = plan.tags[0]
+
+      const recvAccount: { address: `0x${string}` } = (() => {
+        switch (idType) {
+          case 'address':
+            return { address: testEOA }
+          default:
+            assert(!!plan.sendAccounts[0], 'send account not found')
+            return { address: plan.sendAccounts[0].address as `0x${string}` }
+        }
+      })()
 
       const query = (() => {
         switch (idType) {
@@ -123,11 +132,32 @@ for (const token of tokens) {
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 
+      let blockExplorerPagePromise: Promise<Page> | null = null
+
+      if (idType === 'address') {
+        blockExplorerPagePromise = page.context().waitForEvent('page')
+      }
+
       // click user
       await page
         .getByTestId('searchResults')
         .getByRole('link', { name: query, exact: false })
         .click()
+
+      if (idType === 'address' && !!blockExplorerPagePromise) {
+        // confirm sending to external address
+        const dialog = page.getByRole('dialog', { name: 'Confirm External Send' })
+        await expect(dialog).toBeVisible()
+        const blockExplorerButton = dialog.getByRole('button', { name: query })
+        await expect(blockExplorerButton).toBeVisible()
+        await blockExplorerButton.click()
+        const blockExplorerPage = await blockExplorerPagePromise
+        await expect(blockExplorerPage).toHaveURL(new RegExp(`/address/${query}`))
+        await blockExplorerPage.close()
+        const confirmButton = dialog.getByRole('button', { name: 'I Agree & Continue' })
+        await expect(confirmButton).toBeVisible()
+        await confirmButton.click()
+      }
 
       await expect(page).toHaveURL(/\/send/)
 

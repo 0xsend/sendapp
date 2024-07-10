@@ -215,7 +215,11 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
 
   return (
     <View br="$5" key={`SearchResultRow-${address}`} width="100%">
-      <Pressable onPress={() => setSendConfirmDialogIsOpen(true)}>
+      <Pressable
+        onPress={() => setSendConfirmDialogIsOpen(true)}
+        accessibilityRole="link"
+        accessibilityLabel={address}
+      >
         <Card
           testID={`tag-search-${address}`}
           ai="center"
