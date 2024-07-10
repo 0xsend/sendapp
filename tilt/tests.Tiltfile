@@ -71,6 +71,7 @@ local_resource(
         "next:web",
         "supabase",
         "shovel",
+        "otterscan:base",
     ],
 )
 

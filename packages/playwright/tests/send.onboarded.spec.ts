@@ -6,13 +6,13 @@ import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { shorten } from 'app/utils/strings'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { debug, type Debugger } from 'debug'
-import { erc20Abi, formatUnits, parseUnits, zeroAddress } from 'viem'
+import { parseUnits, zeroAddress } from 'viem'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
 import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
-import { shorten } from 'app/utils/strings'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
