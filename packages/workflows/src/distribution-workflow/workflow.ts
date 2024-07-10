@@ -1,5 +1,5 @@
 // workflows.ts
-import { proxyActivities, log } from '@temporalio/workflow'
+import { proxyActivities, log, ApplicationFailure } from '@temporalio/workflow'
 import type { createActivities } from './activities'
 
 const { calculateDistributionSharesActivity, fetchDistributionActivity } = proxyActivities<
@@ -10,5 +10,6 @@ const { calculateDistributionSharesActivity, fetchDistributionActivity } = proxy
 
 export async function DistributionWorkflow(distributionId: number): Promise<void> {
   const distribution = await fetchDistributionActivity(distributionId.toString())
+  if (!distribution) throw new ApplicationFailure('Distribution not found')
   await calculateDistributionSharesActivity(distribution)
 }

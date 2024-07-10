@@ -1,5 +1,5 @@
 import type { Database, Tables } from '@my/supabase/database.types'
-import { log, ApplicationFailure } from '@temporalio/workflow'
+import { log, ApplicationFailure } from '@temporalio/activity'
 import { cpus } from 'node:os'
 import {
   createDistributionShares,

@@ -19,7 +19,7 @@ export async function runWorkflow(): Promise<void> {
   await client.workflow.execute(DistributionWorkflow, {
     taskQueue: 'dev',
     workflowId: `distribution-workflow-${Date.now()}`, // TODO: remember to replace this with a meaningful business ID
-    args: [11], // type inference works! args: [name: string]
+    args: [15], // type inference works! args: [name: string]
   })
   // // Invoke the `WorkflowA` Workflow, only resolved when the workflow completes
   // const result = await client.workflow.execute(WorkflowA, {
