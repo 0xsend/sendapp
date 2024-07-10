@@ -1,3 +1,4 @@
+import type { Functions } from '@my/supabase/database.types'
 import {
   Avatar,
   Button,
@@ -14,18 +15,22 @@ import {
   isWeb,
   useMedia,
 } from '@my/ui'
-import { Link } from 'solito/link'
-import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
-import { FormProvider } from 'react-hook-form'
-import { SchemaForm } from 'app/utils/SchemaForm'
+import { ExternalLink } from '@tamagui/lucide-icons'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { useEffect, useState } from 'react'
-import type { Functions } from '@my/supabase/database.types'
-import { useSearchResultHref } from 'app/utils/useSearchResultHref'
-import { type Address, isAddress } from 'viem'
+import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
-import { IconAccount } from './icons'
+import { SchemaForm } from 'app/utils/SchemaForm'
 import { shorten } from 'app/utils/strings'
+import { useSearchResultHref } from 'app/utils/useSearchResultHref'
+import * as Linking from 'expo-linking'
+import { useEffect, useState } from 'react'
+import { FormProvider } from 'react-hook-form'
+import { Pressable } from 'react-native'
+import { Link } from 'solito/link'
+import { useRouter } from 'solito/router'
+import { Adapt, Dialog, Sheet } from 'tamagui'
+import { type Address, isAddress } from 'viem'
+import { IconAccount } from './icons'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -204,11 +209,17 @@ function SearchFilterButton({
 
 const AddressSearchResultRow = ({ address }: { address: Address }) => {
   const href = useSearchResultHref()
+  const router = useRouter()
   const { gtMd } = useMedia()
+  const [sendConfirmDialogIsOpen, setSendConfirmDialogIsOpen] = useState(false)
 
   return (
     <View br="$5" key={`SearchResultRow-${address}`} width="100%">
-      <Link href={href}>
+      <Pressable
+        onPress={() => setSendConfirmDialogIsOpen(true)}
+        accessibilityRole="link"
+        accessibilityLabel={address}
+      >
         <Card
           testID={`tag-search-${address}`}
           ai="center"
@@ -248,8 +259,80 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
             </Text>
           </YStack>
         </Card>
-      </Link>
+      </Pressable>
+      <ConfirmSendDialog
+        isOpen={sendConfirmDialogIsOpen}
+        onClose={() => setSendConfirmDialogIsOpen(false)}
+        onConfirm={() => router.push(href)}
+        address={address}
+      />
     </View>
+  )
+}
+
+function ConfirmSendDialog({ isOpen, onClose, onConfirm, address }) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <Adapt when="sm" platform="touch">
+        <Sheet modal dismissOnSnapToBottom open={isOpen} onOpenChange={onClose}>
+          <Sheet.Frame padding="$4">
+            <Adapt.Contents />
+          </Sheet.Frame>
+          <Sheet.Overlay />
+        </Sheet>
+      </Adapt>
+
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content gap="$4">
+          <YStack gap="$4">
+            <Dialog.Title>Confirm External Send</Dialog.Title>
+            <Dialog.Description>
+              Please confirm you agree to the following before sending:
+            </Dialog.Description>
+            <Paragraph>1. The external address is on Base Network.</Paragraph>
+
+            <Paragraph>
+              2. I have double checked the address:
+              <Button
+                size="$2"
+                py="$4"
+                theme="green"
+                onPress={() => {
+                  if (isWeb) {
+                    window.open(
+                      `https://basescan.org/address/${address}`,
+                      '_blank',
+                      'noopener,noreferrer'
+                    )
+                  } else {
+                    Linking.openURL(`https://basescan.org/address/${address}`)
+                  }
+                }}
+                fontFamily={'$mono'}
+                iconAfter={<ExternalLink size={14} />}
+                mt="$4"
+              >
+                {address}
+              </Button>
+            </Paragraph>
+
+            <Paragraph>
+              3. I understand that if I make any mistakes, there is no way to recover the funds.
+            </Paragraph>
+
+            <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
+              <Dialog.Close asChild>
+                <Button br={'$2'}>Cancel</Button>
+              </Dialog.Close>
+              <Button theme="yellow_active" onPress={onConfirm} br={'$2'}>
+                I Agree & Continue
+              </Button>
+            </XStack>
+          </YStack>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   )
 }
 
