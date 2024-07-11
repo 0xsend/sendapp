@@ -18,6 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - run: corepack enable
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         with:

@@ -6,9 +6,10 @@ on:
     branches: [dev]
     types:
       - completed
+  workflow_dispatch:
 jobs:
   deploy-docker-dev:
-    runs-on: self-hosted
+    runs-on: sendapp-kube-runners
     steps:
       - name: Configure ssh & Deploy
         shell: bash
