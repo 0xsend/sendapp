@@ -15,7 +15,8 @@ contract DeploySendVerifierScript is Script, Helper {
         vm.startBroadcast();
 
         // use send verifier implementation for now
-        address verifier = address(new SendVerifier{salt: 0}());
+        bytes32 salt = keccak256("fjord");
+        address verifier = address(new SendVerifier{salt: salt}());
         address owner = msg.sender;
 
         // solhint-disable-next-line no-console
