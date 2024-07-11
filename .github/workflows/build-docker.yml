@@ -10,8 +10,7 @@ on:
 jobs:
   build-docker:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-#    needs: [cache-deps]
+    runs-on: sendapp-kube-runners
     steps:
       - uses: actions/checkout@v4
         with:
