@@ -24,6 +24,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Enable Corepack
+      if: ${{ inputs.install-node == 'true' }}
+      run: corepack enable
     - name: Use Node.js
       if: ${{ inputs.install-node == 'true' }}
       uses: actions/setup-node@v4
