@@ -33,18 +33,6 @@ void (async function main() {
     throw error2
   }
 
-  console.log(chalk.blue('Sending 10 ether to the airdrop multisig...'))
-  await $`cast send --rpc-url http://localhost:8546 \
-            --unlocked \
-            --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-            ${AIRDROP_MULTISIG_SAFE} \
-            --value 10ether`
-
-  console.log(chalk.blue('Impersonating the airdrop multisig...'))
-  await $`cast rpc --rpc-url http://localhost:8546 \
-    anvil_impersonateAccount \
-    ${AIRDROP_MULTISIG_SAFE}`
-
   // parse merkle drop address from broadcast folder
   const broadcast = JSON.parse(
     await Bun.file(
@@ -70,6 +58,11 @@ void (async function main() {
     throw distributionError
   }
 
+  console.log(chalk.red('TODO(@0xBigBoss) move this to the trpc API'))
+  process.exit(1)
+  return
+
+  // biome-ignore lint/correctness/noUnreachable: still cooking
   console.log(chalk.blue('Geting distribution merkle root from API'))
   const { root, total } = await fetch('http://localhost:3050/distributor/merkle', {
     method: 'POST',
@@ -77,12 +70,24 @@ void (async function main() {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`,
     },
-    body: JSON.stringify({ id: distribution.id }),
+    body: JSON.stringify({ id: distribution?.id }),
   }).then(async (res) => (res.ok ? res.json() : Promise.reject(await res.text())))
 
   $.env.MERKLE_ROOT = root
   $.env.AMOUNT = total
   $.env.SEND_MERKLE_DROP_ADDRESS = merkleDropAddress
+
+  console.log(chalk.blue('Sending 10 ether to the airdrop multisig...'))
+  await $`cast send --rpc-url http://localhost:8546 \
+            --unlocked \
+            --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+            ${AIRDROP_MULTISIG_SAFE} \
+            --value 10ether`
+
+  console.log(chalk.blue('Impersonating the airdrop multisig...'))
+  await $`cast rpc --rpc-url http://localhost:8546 \
+    anvil_impersonateAccount \
+    ${AIRDROP_MULTISIG_SAFE}`
 
   console.log(chalk.blue('Adding a tranche to the airdrop...'))
   await $`forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
