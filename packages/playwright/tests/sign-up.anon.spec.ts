@@ -52,7 +52,7 @@ test('can sign up', async ({ page, pg }) => {
     await signUp(page, phone, expect)
 
     // ensure use can log in with passkey
-    page.context().clearCookies()
+    await page.context().clearCookies()
     await page.goto('/')
     await expect(page).toHaveURL('/')
     await expect(signInLink).toBeVisible()
@@ -66,7 +66,9 @@ test('can sign up', async ({ page, pg }) => {
       .and(page.getByText('Home'))
     await expect(homeHeader).toBeVisible()
   } finally {
-    await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone])
+    await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone]).catch((e) => {
+      log('delete failed', e)
+    })
   }
 })
 
