@@ -13,6 +13,7 @@ import { parseUnits, zeroAddress } from 'viem'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
 import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -42,8 +43,6 @@ const tokens = [
 ] as { symbol: string; address: `0x${string}`; decimals: number }[]
 
 const idTypes = ['tag', 'sendid', 'address'] as const
-
-const testEOA = zeroAddress.replace('0x0', '0x1') as `0x${string}`
 
 for (const token of tokens) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
@@ -96,7 +95,7 @@ for (const token of tokens) {
       const recvAccount: { address: `0x${string}` } = (() => {
         switch (idType) {
           case 'address':
-            return { address: testEOA }
+            return { address: privateKeyToAccount(generatePrivateKey()).address }
           default:
             assert(!!plan.sendAccounts[0], 'send account not found')
             return { address: plan.sendAccounts[0].address as `0x${string}` }
@@ -108,7 +107,7 @@ for (const token of tokens) {
           case 'sendid':
             return profile?.sendId.toString()
           case 'address':
-            return testEOA
+            return recvAccount.address
           default:
             return tag?.name
         }
@@ -176,7 +175,7 @@ for (const token of tokens) {
           (() => {
             switch (idType) {
               case 'address':
-                return shorten(testEOA, 6, 6)
+                return shorten(recvAccount.address, 6, 6)
               case 'sendid':
                 return `#${profile.sendId}`
               default:
@@ -189,7 +188,7 @@ for (const token of tokens) {
       const counterparty = (() => {
         switch (idType) {
           case 'address':
-            return testEOA
+            return recvAccount.address
           case 'sendid':
             return profile.name
           default:

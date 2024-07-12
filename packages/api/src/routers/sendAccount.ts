@@ -252,6 +252,8 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
+        log('createAccount', `hash=${hash}`)
+
         await withRetry(
           async function waitForTransactionReceipt() {
             const { count, error } = await supabaseAdmin
@@ -261,7 +263,7 @@ export const sendAccountRouter = createTRPCRouter({
               .eq('account', hexToBytea(senderAddress))
               .single()
             throwIf(error)
-            log('waitForTransactionReceipt', `count=${count}`)
+            log('waitForTransactionReceipt', `hash=${hash}`, `count=${count}`)
             return count
           },
           {
@@ -273,7 +275,7 @@ export const sendAccountRouter = createTRPCRouter({
             },
             shouldRetry({ count, error }) {
               // @todo handle other errors like balance not enough, invalid nonce, etc
-              console.error('waitForTransactionReceipt failed', count, error)
+              console.error('waitForTransactionReceipt failed', { count, error, hash })
               if (error.message.includes('Failed to create send account')) {
                 return false
               }
