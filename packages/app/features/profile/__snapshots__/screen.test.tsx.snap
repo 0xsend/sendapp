@@ -7,7 +7,6 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
       "flex": 1,
       "flexDirection": "column",
       "gap": 32,
-      "paddingTop": 32,
     }
   }
 >
@@ -15,79 +14,521 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
     style={
       {
         "flexDirection": "column",
-        "gap": 7,
-        "width": "100%",
+        "height": "88%",
       }
     }
   >
-    <View
+    <RCTScrollView
+      scrollEnabled={true}
+      showsVerticalScrollIndicator={false}
       style={
         {
-          "alignItems": "center",
-          "borderBottomLeftRadius": 9,
-          "borderBottomRightRadius": 9,
-          "borderTopLeftRadius": 9,
-          "borderTopRightRadius": 9,
-          "flexDirection": "column",
-          "gap": 7,
-          "height": 84,
-          "justifyContent": "center",
-          "marginLeft": "auto",
-          "marginRight": "auto",
-          "maxHeight": 84,
-          "maxWidth": 84,
-          "minHeight": 84,
-          "minWidth": 84,
-          "overflow": "hidden",
-          "position": "relative",
-          "width": 84,
+          "paddingBottom": 40,
+          "paddingTop": 40,
         }
       }
-      testID="avatar"
     >
-      <View
-        style={
-          {
-            "bottom": 0,
-            "flexDirection": "column",
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-            "top": 0,
-            "zIndex": 1,
-          }
-        }
-      >
-        <Image
-          accessibilityLabel="Mabel Bechtelar"
-          accessibilityRole="image"
-          accessible={true}
-          fullscreen={true}
-          onError={[Function]}
-          onLoad={[Function]}
-          source={
-            {
-              "uri": "https://fjswgwdweohwejbrmiil.supabase.co/storage/v1/object/public/avatars/db59dfd6-16e6-4c30-8337-4bb33905828f/1697315518383.jpeg",
-            }
-          }
+      <View>
+        <View
           style={
             {
-              "height": 84,
-              "width": 84,
+              "flexDirection": "column",
+              "gap": 7,
+              "width": "100%",
             }
           }
-          testID="avatarImage"
-        />
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "gap": 24,
+                "justifyContent": "space-between",
+                "marginBottom": 40,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "gap": 24,
+                  "justifyContent": "center",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 84,
+                    "justifyContent": "center",
+                    "marginLeft": "auto",
+                    "marginRight": "auto",
+                    "maxHeight": 84,
+                    "maxWidth": 84,
+                    "minHeight": 84,
+                    "minWidth": 84,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 84,
+                  }
+                }
+                testID="avatar"
+              >
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
+                    }
+                  }
+                >
+                  <Image
+                    accessibilityLabel="Mabel Bechtelar"
+                    accessibilityRole="image"
+                    accessible={true}
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    source={
+                      {
+                        "uri": "https://fjswgwdweohwejbrmiil.supabase.co/storage/v1/object/public/avatars/db59dfd6-16e6-4c30-8337-4bb33905828f/1697315518383.jpeg",
+                      }
+                    }
+                    style={
+                      {
+                        "height": 84,
+                        "width": 84,
+                      }
+                    }
+                    testID="avatarImage"
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "backgroundColor": "#111f22",
+                      "bottom": 0,
+                      "flex": 1,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 74.39999999999999,
+                        "fontWeight": "600",
+                        "lineHeight": 67,
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    ??
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                  }
+                }
+              >
+                <Text
+                  accessibilityRole="header"
+                  nativeID="profileName"
+                  style={
+                    {
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontSize": 30,
+                      "fontWeight": "700",
+                      "lineHeight": 34,
+                      "marginBottom": 0,
+                      "marginLeft": 0,
+                      "marginRight": 0,
+                      "marginTop": 0,
+                      "textTransform": "none",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Mabel Bechtelar
+                </Text>
+                <Text
+                  accessibilityRole="header"
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16,
+                      "fontWeight": "600",
+                      "lineHeight": 20,
+                      "marginBottom": 0,
+                      "marginLeft": 0,
+                      "marginRight": 0,
+                      "marginTop": 0,
+                      "textTransform": "uppercase",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /pip_test44677
+                </Text>
+                <Text
+                  style={
+                    {
+                      "color": "#B2B2B2",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginTop": 2,
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  Doctissimae poster est quibus solut quae concuriosum quod, disputatur sit voluptate ea interror pugnantium est conspecta.
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "display": "none",
+                  "flexDirection": "row",
+                  "gap": 24,
+                }
+              }
+            >
+              <View
+                cancelable={true}
+                disabled={false}
+                focusVisibleStyle={{}}
+                focusable={[Function]}
+                minPressDuration={0}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onPress={[Function]}
+                onPressIn={[Function]}
+                onPressOut={[Function]}
+                role="button"
+                style={
+                  {
+                    "alignItems": "center",
+                    "backgroundColor": "#40FB50",
+                    "borderBottomColor": "transparent",
+                    "borderBottomLeftRadius": 16,
+                    "borderBottomRightRadius": 16,
+                    "borderBottomWidth": 1,
+                    "borderLeftColor": "transparent",
+                    "borderLeftWidth": 1,
+                    "borderRightColor": "transparent",
+                    "borderRightWidth": 1,
+                    "borderStyle": "solid",
+                    "borderTopColor": "transparent",
+                    "borderTopLeftRadius": 16,
+                    "borderTopRightRadius": 16,
+                    "borderTopWidth": 1,
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "flexWrap": "nowrap",
+                    "height": 44,
+                    "justifyContent": "center",
+                    "paddingLeft": 44,
+                    "paddingRight": 44,
+                    "width": "100%",
+                  }
+                }
+                testID="openSendDialogButton"
+              >
+                <Text
+                  lineBreakMode="clip"
+                  numberOfLines={1}
+                  style={
+                    {
+                      "color": "#12643F",
+                      "flexGrow": 0,
+                      "flexShrink": 1,
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "userSelect": "none",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /SEND
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              {
+                "borderBottomColor": "#343434",
+                "borderBottomWidth": 1,
+                "borderLeftColor": "#343434",
+                "borderLeftWidth": 0,
+                "borderRightColor": "#343434",
+                "borderRightWidth": 0,
+                "borderStyle": "solid",
+                "borderTopColor": "#343434",
+                "borderTopWidth": 0,
+                "flex": 1,
+                "flexShrink": 0,
+                "height": 0,
+                "maxHeight": 0,
+                "transform": [
+                  {
+                    "translateY": -0.5,
+                  },
+                ],
+              }
+            }
+          />
+          <View
+            style={
+              {
+                "flexDirection": "column",
+                "gap": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "paddingBottom": 16,
+                  "paddingTop": 16,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "backgroundColor": "#111f22",
+                    "borderBottomLeftRadius": 5,
+                    "borderBottomRightRadius": 5,
+                    "borderTopLeftRadius": 5,
+                    "borderTopRightRadius": 5,
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "paddingBottom": 2,
+                    "paddingLeft": 16,
+                    "paddingRight": 16,
+                    "paddingTop": 2,
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                May 19, 2024
+              </Text>
+            </View>
+            <View
+              collapsable={false}
+              forwardedRef={[Function]}
+              jestAnimatedStyle={
+                {
+                  "value": {
+                    "opacity": 1,
+                    "transform": [
+                      {
+                        "scale": 1,
+                      },
+                    ],
+                  },
+                }
+              }
+              style={
+                {
+                  "opacity": 0,
+                  "transform": [
+                    {
+                      "scale": 0.9,
+                    },
+                  ],
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  }
+                }
+                testID="activityTest"
+              >
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#111f22",
+                      "borderBottomLeftRadius": 9,
+                      "borderBottomRightRadius": 0,
+                      "borderTopLeftRadius": 9,
+                      "borderTopRightRadius": 9,
+                      "flexDirection": "column",
+                      "paddingBottom": 24,
+                      "paddingLeft": 24,
+                      "paddingRight": 24,
+                      "paddingTop": 24,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "hsl(358, 85.3%, 64.0%)",
+                        "fontFamily": "System",
+                        "fontSize": 19.2,
+                        "fontWeight": "400",
+                        "lineHeight": 21,
+                        "userSelect": "auto",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    You 
+                    Sent
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 55.199999999999996,
+                        "fontWeight": "600",
+                        "lineHeight": 51,
+                        "textAlign": "right",
+                        "userSelect": "auto",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    10,000
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#666666",
+                        "fontFamily": "System",
+                        "fontSize": 14.399999999999999,
+                        "fontWeight": "300",
+                        "lineHeight": 17,
+                        "textAlign": "right",
+                        "userSelect": "auto",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    12:00 AM
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View
+              collapsable={false}
+              forwardedRef={[Function]}
+              jestAnimatedStyle={
+                {
+                  "value": {
+                    "opacity": 1,
+                    "transform": [
+                      {
+                        "scale": 1,
+                      },
+                    ],
+                  },
+                }
+              }
+              style={
+                {
+                  "opacity": 0,
+                  "transform": [
+                    {
+                      "scale": 0.9,
+                    },
+                  ],
+                }
+              }
+            />
+          </View>
+        </View>
       </View>
-      <View
+    </RCTScrollView>
+    <View
+      pointerEvents="none"
+      style={
+        {
+          "bottom": 24,
+          "flexDirection": "column",
+          "height": 64,
+          "overflow": "hidden",
+          "position": "absolute",
+          "width": "100%",
+        }
+      }
+    >
+      <ViewManagerAdapter_ExpoLinearGradient
+        colors={
+          [
+            4278720025,
+            0,
+          ]
+        }
+        endPoint={
+          [
+            0,
+            0,
+          ]
+        }
+        startPoint={
+          [
+            0,
+            1,
+          ]
+        }
         style={
           {
-            "alignItems": "center",
-            "backgroundColor": "#111f22",
             "bottom": 0,
-            "flex": 1,
-            "flexDirection": "column",
-            "justifyContent": "center",
             "left": 0,
             "position": "absolute",
             "right": 0,
@@ -95,90 +536,12 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             "zIndex": 0,
           }
         }
-      >
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "System",
-              "fontSize": 74.39999999999999,
-              "fontWeight": "600",
-              "lineHeight": 67,
-            }
-          }
-          suppressHighlighting={true}
-        >
-          ??
-        </Text>
-      </View>
+      />
     </View>
-     
-    <Text
-      accessibilityRole="header"
-      nativeID="profileName"
-      style={
-        {
-          "color": "#FFFFFF",
-          "fontFamily": "System",
-          "fontSize": 46,
-          "fontWeight": "700",
-          "lineHeight": 50,
-          "marginBottom": 0,
-          "marginLeft": 0,
-          "marginRight": 0,
-          "marginTop": 0,
-          "textTransform": "none",
-          "userSelect": "auto",
-        }
-      }
-      suppressHighlighting={true}
-    >
-      Mabel Bechtelar
-    </Text>
-    <Text
-      accessibilityRole="header"
-      style={
-        {
-          "color": "#FFFFFF",
-          "fontFamily": "System",
-          "fontSize": 30,
-          "fontWeight": "700",
-          "lineHeight": 34,
-          "marginBottom": 0,
-          "marginLeft": 0,
-          "marginRight": 0,
-          "marginTop": 0,
-          "textTransform": "none",
-          "userSelect": "auto",
-        }
-      }
-      suppressHighlighting={true}
-    >
-      /pip_test44677
-    </Text>
-    <Text
-      style={
-        {
-          "color": "#FFFFFF",
-          "fontFamily": "System",
-          "fontSize": 16.8,
-          "fontWeight": "400",
-          "lineHeight": 19,
-          "marginBottom": 18,
-          "userSelect": "auto",
-        }
-      }
-      suppressHighlighting={true}
-    >
-      Doctissimae poster est quibus solut quae concuriosum quod, disputatur sit voluptate ea interror pugnantium est conspecta.
-    </Text>
     <View
       style={
         {
-          "flexDirection": "row",
-          "gap": 32,
-          "justifyContent": "space-around",
-          "maxWidth": 600,
+          "flexDirection": "column",
         }
       }
     >
@@ -218,12 +581,11 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
             "flexWrap": "nowrap",
             "height": 44,
             "justifyContent": "center",
-            "paddingLeft": 18,
-            "paddingRight": 18,
+            "paddingLeft": 44,
+            "paddingRight": 44,
             "width": "100%",
           }
         }
-        testID="openSendDialogButton"
       >
         <Text
           lineBreakMode="clip"
@@ -242,69 +604,7 @@ exports[`ProfileScreen: ProfileScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Send
-        </Text>
-      </View>
-      <View
-        cancelable={true}
-        disabled={false}
-        focusVisibleStyle={{}}
-        focusable={[Function]}
-        minPressDuration={0}
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onPress={[Function]}
-        onPressIn={[Function]}
-        onPressOut={[Function]}
-        role="button"
-        style={
-          {
-            "alignItems": "center",
-            "backgroundColor": "#111f22",
-            "borderBottomColor": "transparent",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderBottomWidth": 1,
-            "borderLeftColor": "transparent",
-            "borderLeftWidth": 1,
-            "borderRightColor": "transparent",
-            "borderRightWidth": 1,
-            "borderStyle": "solid",
-            "borderTopColor": "transparent",
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "borderTopWidth": 1,
-            "flex": 1,
-            "flexDirection": "row",
-            "flexWrap": "nowrap",
-            "height": 44,
-            "justifyContent": "center",
-            "paddingLeft": 18,
-            "paddingRight": 18,
-            "width": "100%",
-          }
-        }
-      >
-        <Text
-          lineBreakMode="clip"
-          numberOfLines={1}
-          style={
-            {
-              "color": "#FFFFFF",
-              "flexGrow": 0,
-              "flexShrink": 1,
-              "fontFamily": "System",
-              "fontSize": 16.8,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "userSelect": "none",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Request
+          /SEND
         </Text>
       </View>
     </View>

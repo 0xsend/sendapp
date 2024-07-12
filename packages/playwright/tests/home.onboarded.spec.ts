@@ -7,6 +7,7 @@ import { expect, test } from './fixtures/send-accounts'
 import debug from 'debug'
 import type { Page } from '@playwright/test'
 import { mockUsdcTransfers } from 'app/features/home/utils/__mocks__/mock-usdc-transfers'
+import { assert } from 'app/utils/assert'
 
 let log: debug.Debugger
 
@@ -18,17 +19,16 @@ const heading = (page: Page) =>
   page.getByRole('heading', { name: 'Home', exact: true }).and(page.getByText('Home'))
 
 test('can visit token detail page', async ({ context, page }) => {
-  const req = context.route(`${SUPABASE_URL}/rest/v1/activity_feed*`, async (route) => {
+  await context.route(`${SUPABASE_URL}/rest/v1/activity_feed*`, async (route) => {
     const url = new URL(route.request().url())
-    expect(`${url.pathname}${url.search}`).toMatchSnapshot('token-details-history-url')
     await route.fulfill({
       body: JSON.stringify(mockUsdcTransfers),
       headers: { 'content-type': 'application/json; charset=utf-8' },
       status: 200,
     })
+    expect.soft(`${url.pathname}${url.search}`).toMatchSnapshot('token-details-history-url')
   })
   await page.goto('/?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913') // usdc
-  await req
   log('beforeEach', `url=${page.url()}`)
   await expect(heading(page)).toBeVisible()
 
