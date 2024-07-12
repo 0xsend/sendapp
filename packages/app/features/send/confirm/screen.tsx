@@ -25,6 +25,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
+import { useProfileHref } from 'app/utils/useProfileHref'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import {
   useGenerateTransferUserOp,
@@ -383,14 +384,10 @@ export function SendRecipient({ ...props }: YStackProps) {
   const { recipient, idType } = queryParams
   const router = useRouter()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const href = useProfileHref(idType ?? 'tag', recipient ?? '')
 
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
-
-  const href =
-    idType === 'address'
-      ? `${baseMainnet.blockExplorers.default.url}/address/${recipient}`
-      : `/profile/${recipient}`
 
   return (
     <YStack gap="$2.5" {...props}>
