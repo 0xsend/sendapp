@@ -39,6 +39,7 @@ export function useInterUserActivityFeed(params: {
       .or(
         `and(from_user->send_id.eq.${currentUserId},to_user->send_id.eq.${otherUserId}), and(from_user->send_id.eq.${otherUserId},to_user->send_id.eq.${currentUserId})`
       )
+      .in('event_name', ['send_account_transfers', 'send_account_receives '])
       .order('created_at', { ascending: false })
       .range(from, to)
     const { data, error } = await request
