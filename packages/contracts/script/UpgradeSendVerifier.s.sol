@@ -7,31 +7,27 @@ import {Helper} from "../src/Helper.sol";
 import {SendVerifier, SendVerifierProxy} from "../src/SendVerifier.sol";
 
 /**
- * Deploys new p256 precompiled verifier implementation and upgrades the SendVerifierProxy to it.
+ * Upgrades the SendVerifierProxy to a new implementation.
  */
-contract DeployFjordSendVerifierScript is Script, Helper {
+contract UpgradeSendVerifierScript is Script, Helper {
     function setUp() public {
         this.labels();
     }
 
     function run() public {
         address svpAddr = vm.envAddress("SVP_ADDRESS"); // send verifier proxy address
-
+        address newVerifier = vm.envAddress("NEW_VERIFIER_ADDRESS"); // new verifier address
         require(svpAddr != address(0), "SVP_ADDRESS env variable not set");
+        require(newVerifier != address(0), "NEW_VERIFIER_ADDRESS env variable not set");
 
         vm.startBroadcast();
-
-        bytes32 salt = keccak256("fjord");
-        address verifier = address(new SendVerifier{salt: salt}()); // deploy new implementation with native p256
-        address owner = msg.sender;
-
         // solhint-disable-next-line no-console
-        console2.log("new verifier address:", verifier);
-        // solhint-disable-next-line no-console
-        console2.log("owner address:", owner);
+        console2.log("new verifier address:", newVerifier);
 
         SendVerifier sv = SendVerifier(svpAddr);
-        sv.upgradeTo(verifier);
+        // solhint-disable-next-line no-console
+        console2.log("SendVerifierProxy implementation before upgrade:", address(sv.implementation()));
+        sv.upgradeTo(newVerifier);
 
         // solhint-disable-next-line no-console
         console2.log("Upgraded SendVerifierProxy address:", address(sv));
