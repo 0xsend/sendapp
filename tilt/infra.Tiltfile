@@ -273,10 +273,19 @@ local_resource(
         "shovel:generate-config",
     ],
     serve_cmd = "yarn run shovel:tilt",
-    serve_dir = os.path.join("..", "packages/shovel"),
+    serve_dir = os.path.join(
+        config.main_dir,
+        "packages/shovel",
+    ),
     deps = [
-        "packages/shovel/bin/shovel.tilt.ts",
-        "packages/shovel/etc/config.json",
+        os.path.join(
+            config.main_dir,
+            "packages/shovel/bin/shovel.tilt.ts",
+        ),
+        os.path.join(
+            config.main_dir,
+            "packages/shovel/etc/config.json",
+        ),
     ],
 )
 
