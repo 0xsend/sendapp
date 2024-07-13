@@ -75,6 +75,7 @@ else:
 local_resource(
     "distributor:web",
     allow_parallel = True,
+    auto_init = False,  # TODO(@0xBigBoss) eventually we will want to remove this
     labels = labels,
     links = ["http://localhost:3050"],
     readiness_probe = probe(
