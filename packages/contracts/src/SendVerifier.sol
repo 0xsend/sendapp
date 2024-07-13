@@ -63,8 +63,6 @@ contract SendVerifier is OwnableUpgradeable, UUPSUpgradeable {
             authenticatorData: sig.authenticatorData,
             requireUserVerification: false,
             clientDataJSON: sig.clientDataJSON,
-            challengeLocation: sig.challengeLocation,
-            responseTypeLocation: sig.responseTypeLocation,
             r: sig.r,
             s: sig.s,
             x: x,

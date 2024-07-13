@@ -2,6 +2,22 @@ import type { Database, Tables } from '@my/supabase/database.types'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { selectAll } from 'app/utils/supabase/selectAll'
 
+export async function fetchAllOpenDistributions() {
+  return selectAll(
+    supabaseAdmin
+      .from('distributions')
+      .select(
+        `*,
+        distribution_verification_values (*)`,
+        {
+          count: 'exact',
+        }
+      )
+      .lte('qualification_start', new Date().toISOString())
+      .gte('qualification_end', new Date().toISOString())
+  )
+}
+
 export async function fetchDistribution(id: string) {
   return supabaseAdmin
     .from('distributions')

@@ -57,7 +57,8 @@ export class DistributorWorker {
       .from('distributions')
       .select(
         `*,
-        distribution_verification_values (*)`
+        distribution_verification_values (*)`,
+        { count: 'exact' }
       )
       .lte('qualification_start', new Date().toISOString())
       .gte('qualification_end', new Date().toISOString())

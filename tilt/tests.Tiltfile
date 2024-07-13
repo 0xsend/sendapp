@@ -124,6 +124,7 @@ local_resource(
     "distributor:test",
     "yarn workspace distributor test --run",
     allow_parallel = True,
+    auto_init = False,  # TODO(@0xBigBoss) eventually we will want to remove this
     labels = labels,
     resource_deps = [
         "yarn:install",

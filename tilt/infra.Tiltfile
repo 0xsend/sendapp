@@ -185,6 +185,18 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-deploy-fjord-send-verifier-fixtures",
+    "yarn contracts dev:anvil-deploy-fjord-send-verifier-fixtures",
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+)
+
+local_resource(
     "anvil:anvil-token-paymaster-deposit",
     "yarn contracts dev:anvil-token-paymaster-deposit",
     dir = _prj_root,
@@ -204,6 +216,7 @@ local_resource(
         "anvil:mainnet",
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
+        "anvil:anvil-deploy-fjord-send-verifier-fixtures",
     ],
 )
 
@@ -260,10 +273,19 @@ local_resource(
         "shovel:generate-config",
     ],
     serve_cmd = "yarn run shovel:tilt",
-    serve_dir = os.path.join("..", "packages/shovel"),
+    serve_dir = os.path.join(
+        config.main_dir,
+        "packages/shovel",
+    ),
     deps = [
-        "packages/shovel/bin/shovel.tilt.ts",
-        "packages/shovel/etc/config.json",
+        os.path.join(
+            config.main_dir,
+            "packages/shovel/bin/shovel.tilt.ts",
+        ),
+        os.path.join(
+            config.main_dir,
+            "packages/shovel/etc/config.json",
+        ),
     ],
 )
 

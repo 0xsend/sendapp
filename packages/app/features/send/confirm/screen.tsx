@@ -472,7 +472,7 @@ function ErrorMessage({ error, ...props }: ParagraphProps & { error?: string }) 
         size="$2"
         maw="$20"
         width="100%"
-        col={'$red500'}
+        col={'$error'}
         {...props}
       >
         {error.split('.').at(0)}
