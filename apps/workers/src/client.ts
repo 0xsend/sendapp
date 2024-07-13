@@ -2,7 +2,7 @@ import { Connection, Client } from '@temporalio/client'
 import {
   // WorkflowA, WorkflowB,
 
-  DistributionWorkflow,
+  DistributionsWorkflow,
 } from '@my/workflows/all-workflows'
 
 export async function runWorkflow(): Promise<void> {
@@ -16,11 +16,12 @@ export async function runWorkflow(): Promise<void> {
   })
 
   // Invoke the `DistributionWorkflow` Workflow, only resolved when the workflow completes
-  await client.workflow.execute(DistributionWorkflow, {
+  const handle = await client.workflow.start(DistributionsWorkflow, {
     taskQueue: 'dev',
-    workflowId: `distribution-workflow-${Date.now()}`, // TODO: remember to replace this with a meaningful business ID
-    args: [11], // type inference works! args: [name: string]
+    workflowId: 'distributions-workflow', // TODO: remember to replace this with a meaningful business ID
+    args: [], // type inference works! args: [name: string]
   })
+  console.log('Started handle', handle)
   // // Invoke the `WorkflowA` Workflow, only resolved when the workflow completes
   // const result = await client.workflow.execute(WorkflowA, {
   //   taskQueue: 'monorepo',

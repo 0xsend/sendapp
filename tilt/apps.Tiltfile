@@ -1,6 +1,7 @@
 # -*- mode: python -*-
 
 load("./common.Tiltfile", "CFG", "CI")
+load("./utils.Tiltfile", "ts_files")
 
 labels = ["apps"]
 
@@ -116,6 +117,10 @@ local_resource(
         "wagmi:generate",
         "temporal",
     ],
-    serve_cmd = "yarn workspace workers start.watch",
+    serve_cmd = "yarn workspace workers start",
+    deps = ts_files(
+        config.main_dir + "/packages/workflows/src",
+        config.main_dir + "/apps/workers",
+    ),
 )
 

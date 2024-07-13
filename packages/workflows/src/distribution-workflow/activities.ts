@@ -1,9 +1,10 @@
 import type { Database, Tables } from '@my/supabase/database.types'
-import { log, ApplicationFailure } from '@temporalio/workflow'
+import { log, ApplicationFailure } from '@temporalio/activity'
 import { cpus } from 'node:os'
 import {
   createDistributionShares,
   fetchAllHodlers,
+  fetchAllOpenDistributions,
   fetchAllVerifications,
   fetchDistribution,
 } from './supabase'
@@ -24,16 +25,35 @@ export function createActivities(supabaseUrl: string, supabaseKey: string) {
   globalThis.process.env.SUPABASE_SERVICE_ROLE = supabaseKey // HACK: set the supabase key in the environment
 
   return {
-    calculateDistributionSharesActivity: calculateDistributionSharesActivity,
-    fetchDistributionActivity: fetchDistributionActivity,
+    calculateDistributionSharesActivity,
+    fetchDistributionActivity,
+    fetchAllOpenDistributionsActivity,
   }
+}
+
+async function fetchAllOpenDistributionsActivity() {
+  const { data: distributions, error } = await fetchAllOpenDistributions()
+  if (error) {
+    if (error.code === 'PGRST116') {
+      log.info('fetchAllOpenDistributionsActivity', { error })
+      return null
+    }
+    throw ApplicationFailure.nonRetryable('Error fetching distributions.', error.code, error)
+  }
+  log.info('fetchAllOpenDistributionsActivity', { distributions })
+  return distributions
 }
 
 async function fetchDistributionActivity(distributionId: string) {
   const { data: distribution, error } = await fetchDistribution(distributionId)
   if (error) {
+    if (error.code === 'PGRST116') {
+      log.info('fetchDistributionActivity', { distributionId, error })
+      return null
+    }
     throw ApplicationFailure.nonRetryable('Error fetching distribution.', error.code, error)
   }
+  log.info('fetchDistributionActivity', { distribution })
   return distribution
 }
 
@@ -45,6 +65,7 @@ async function calculateDistributionSharesActivity(
     distribution_verification_values: Tables<'distribution_verification_values'>[]
   }
 ): Promise<void> {
+  log.info('calculateDistributionSharesActivity', { distribution })
   // verify tranche is not created when in production
   if (await isMerkleDropActive(distribution)) {
     throw ApplicationFailure.nonRetryable(
