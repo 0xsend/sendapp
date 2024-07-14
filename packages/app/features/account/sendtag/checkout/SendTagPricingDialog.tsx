@@ -17,12 +17,12 @@ import {
 } from '@my/ui'
 import { Info, X, XCircle } from '@tamagui/lucide-icons'
 import { IconInfoGreenCircle } from 'app/components/icons'
+import { total, pricing } from 'app/data/sendtags'
 import React, { useMemo, useState } from 'react'
-import { formatEther } from 'viem'
-import { getPrice } from './checkout-utils'
+import { formatUnits } from 'viem'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
-  const price = useMemo(() => getPrice([{ name }]), [name])
+  const price = useMemo(() => total([{ name }]), [name])
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Dialog modal onOpenChange={setIsOpen}>
@@ -84,89 +84,28 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
             Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.
           </Dialog.Description>
           <YStack gap="$4" jc="center">
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                6+ characters
-              </SizableText>
-
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.002).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                5 characters
-              </SizableText>
-
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.005).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                4 characters
-              </SizableText>
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.01).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                1-3 characters
-              </SizableText>
-
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.02).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
+            {pricing.map((item) => (
+              <XStack key={item.length}>
+                <SizableText
+                  fontWeight="900"
+                  $theme-dark={{ col: '$white' }}
+                  $theme-light={{ col: '$black' }}
+                  w="50%"
+                  fontFamily={'$mono'}
+                >
+                  {item.length}
+                </SizableText>
+                <SizableText
+                  f={1}
+                  ta="left"
+                  $theme-dark={{ col: '$primary' }}
+                  $theme-light={{ col: '$color12' }}
+                  fontFamily={'$mono'}
+                >
+                  {item.price} USDC
+                </SizableText>
+              </XStack>
+            ))}
           </YStack>
 
           <XStack alignSelf="flex-end" gap="$4">
@@ -193,7 +132,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
 }
 
 export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['name'] }) {
-  const price = useMemo(() => getPrice([{ name }]), [name])
+  const price = useMemo(() => total([{ name }]), [name])
   const [isOpen, setIsOpen] = React.useState(false)
   return (
     <Tooltip placement="right" delay={0} allowFlip={false} offset={84} onOpenChange={setIsOpen}>
@@ -250,89 +189,28 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
           </Paragraph>
 
           <YStack gap="$4" jc="center">
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                6+ characters
-              </SizableText>
-
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.002).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                5 characters
-              </SizableText>
-
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.005).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                4 characters
-              </SizableText>
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.01).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
-            <XStack>
-              <SizableText
-                fontWeight="900"
-                $theme-dark={{ col: '$white' }}
-                $theme-light={{ col: '$black' }}
-                w="50%"
-                fontFamily={'$mono'}
-              >
-                1-3 characters
-              </SizableText>
-
-              <SizableText
-                f={1}
-                ta="left"
-                $theme-dark={{ col: '$primary' }}
-                $theme-light={{ col: '$color12' }}
-                fontFamily={'$mono'}
-              >
-                {(0.02).toLocaleString()} ETH
-              </SizableText>
-            </XStack>
+            {pricing.map((item) => (
+              <XStack key={item.length}>
+                <SizableText
+                  fontWeight="900"
+                  $theme-dark={{ col: '$white' }}
+                  $theme-light={{ col: '$black' }}
+                  w="50%"
+                  fontFamily={'$mono'}
+                >
+                  {item.length}
+                </SizableText>
+                <SizableText
+                  f={1}
+                  ta="left"
+                  $theme-dark={{ col: '$primary' }}
+                  $theme-light={{ col: '$color12' }}
+                  fontFamily={'$mono'}
+                >
+                  {item.price} USDC
+                </SizableText>
+              </XStack>
+            ))}
           </YStack>
         </YStack>
       </Tooltip.Content>
@@ -373,7 +251,7 @@ const SendTagPricingButton = ({
             case name.length > 0 && price === BigInt(0):
               return 'Free'
             default:
-              return `${formatEther(price)} ETH`
+              return `${formatUnits(price, 6)} USDC`
           }
         })()}
       </ButtonText>

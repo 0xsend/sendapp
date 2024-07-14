@@ -8,6 +8,7 @@ import debug from 'debug'
 import { parseEther } from 'viem'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { test as checkoutTest, expect } from './fixtures/checkout'
+import { pricing } from 'app/data/sendtags'
 
 let log: debug.Debugger
 
@@ -18,16 +19,7 @@ const debugAuthSession = async (page: Page) => {
   log('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
-const pricingText = [
-  '6+ characters',
-  '0.002 ETH',
-  '5 characters',
-  '0.005 ETH',
-  '4 characters',
-  '0.01 ETH',
-  '1-3 characters',
-  '0.02 ETH',
-]
+const pricingText = pricing.flatMap((p) => [p.length, p.price])
 
 test.beforeEach(async ({ checkoutPage }) => {
   log = debug(`test:account-sendtag-checkout:logged-in:${test.info().parallelIndex}`)
