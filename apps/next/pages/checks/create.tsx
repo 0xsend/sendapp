@@ -7,7 +7,7 @@ export const CreateSendCheckPage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>/send Checks</title>
+        <title>Send | Checks</title>
       </Head>
       <CreateSendCheck />
     </>

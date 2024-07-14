@@ -1,9 +1,10 @@
 import { generateEphemeralKeypair } from 'app/features/checks/utils/checkUtils'
 import { createSendCheck } from 'app/features/checks/utils/useCreateSendCheck'
-import { getCreateSendCheckUserOp } from 'app/features/checks/utils/getCreateSendCheckUserOp'
-import type { CreateSendCheckUserOpProps } from 'app/features/checks/types'
+import type { ClaimSendCheckUserOpProps } from 'app/features/checks/types'
 import type { UserOperation } from 'permissionless'
 import * as mockMyWagmi from 'app/__mocks__/@my/wagmi'
+import { getClaimSendCheckUserOp } from 'app/features/checks/utils/getClaimSendCheckUserOp'
+import { claimSendCheck } from 'app/features/checks/utils/useClaimSendCheck'
 
 const userOpReceiptStub = {
   receipt: {
@@ -35,24 +36,22 @@ beforeEach(() => {
   }
 })
 
-describe('/send check creation', () => {
-  let createSendCheckUserOp: UserOperation<'v0.7'>
+describe('claim /send check', () => {
+  let userOp: UserOperation<'v0.7'>
 
   beforeEach(async () => {
-    const props: CreateSendCheckUserOpProps = {
+    const props: ClaimSendCheckUserOpProps = {
       senderAddress: '0xb0b0000000000000000000000000000000000000',
       nonce: 0n,
-      // /send token address
-      tokenAddress: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
       ephemeralKeypair: generateEphemeralKeypair(),
-      amount: 1n,
+      signature: '0x',
     }
 
-    createSendCheckUserOp = getCreateSendCheckUserOp(props)
+    userOp = getClaimSendCheckUserOp(props)
   })
 
   it('can create /send check', async () => {
-    const receipt = await createSendCheck(createSendCheckUserOp)
+    const receipt = await claimSendCheck(userOp)
     expect(receipt).not.toBeNull()
   })
 

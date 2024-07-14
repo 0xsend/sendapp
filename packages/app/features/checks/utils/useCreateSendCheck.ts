@@ -1,15 +1,17 @@
-import { useCallback } from 'react'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useAccountNonce } from 'app/utils/userop'
-import { useCreateSendCheckUserOp } from 'app/features/checks/utils/useCreateSendCheckUserOp'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import {
   type CreateSendCheckProps,
   CreateSendCheckReturnType,
   type useCreateSendCheckReturnType,
+  type CreateSendCheckUserOpProps,
 } from 'app/features/checks/types'
 import debug from 'debug'
 import type { GetUserOperationReceiptReturnType, UserOperation } from 'permissionless'
+import { getCreateSendCheckUserOp } from 'app/features/checks/utils/getCreateSendCheckUserOp'
+import { useEstimateFeesPerGas } from 'wagmi'
+import { baseMainnetClient } from '@my/wagmi'
 
 const logger = debug.log
 
@@ -19,45 +21,31 @@ const logger = debug.log
  * @returns {CreateSendCheckReturnType} - An object containing the success of the /send checks creation userOp. See {@link CreateSendCheckReturnType} for more details.
  */
 export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCheckReturnType => {
-  const { data: sendAccount, error: sendAccountError } = useSendAccount()
-  const { data: nonce, error: nonceError } = useAccountNonce({ sender: sendAccount?.address })
-
-  // get /send check creation user op
-  const createSendCheckUserOpQuery = useCreateSendCheckUserOp({
-    senderAddress: sendAccount?.address,
-    nonce: nonce,
-    ...props,
+  const { data: sendAccount } = useSendAccount()
+  const { data: nonce } = useAccountNonce({ sender: sendAccount?.address })
+  const { data: feesPerGas } = useEstimateFeesPerGas({
+    chainId: baseMainnetClient.chain.id,
   })
 
-  return useCallback(async () => {
-    if (!sendAccount || sendAccountError) {
-      throw new Error(
-        `Unable to create /send check. Invalid /send account. Received: [${sendAccount}]. Error: [${sendAccountError}]`
-      )
+  // get /send check creation user op
+  return async () => {
+    const userOpProps: CreateSendCheckUserOpProps = {
+      senderAddress: sendAccount?.address as `0x${string}`,
+      nonce: nonce as bigint,
+      maxFeesPerGas: feesPerGas?.maxFeePerGas as bigint,
+      ...props,
     }
 
-    if (nonce === undefined || nonceError) {
-      throw new Error(
-        `Unable to create /send check. Invalid nonce. Received: [${nonce}]. Error: [${nonceError}]`
-      )
-    }
+    const userOp = getCreateSendCheckUserOp(userOpProps)
+    const receipt = await createSendCheck(userOp)
+    const senderAccountUuid = sendAccount?.user_id
 
-    const senderAccountId = sendAccount.id
-
-    const receipt = await createSendCheck(createSendCheckUserOpQuery.data)
     return {
       receipt,
-      senderAccountId,
+      senderAccountUuid,
       ephemeralKeypair: props.ephemeralKeypair,
     }
-  }, [
-    sendAccount,
-    sendAccountError,
-    nonce,
-    nonceError,
-    createSendCheckUserOpQuery.data,
-    props.ephemeralKeypair,
-  ])
+  }
 }
 
 /**
@@ -66,7 +54,7 @@ export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCh
  * @returns {Promise<GetUserOperationReceiptReturnType>} - userOp receipt
  */
 export const createSendCheck = async (
-  createSendCheckUserOp?: UserOperation<'v0.7'>
+  createSendCheckUserOp?: UserOperation<'v0.7'>[]
 ): Promise<GetUserOperationReceiptReturnType> => {
   if (!createSendCheckUserOp) {
     throw new Error(
@@ -74,12 +62,11 @@ export const createSendCheck = async (
     )
   }
 
-  logger(`created /send check creation userOp: [${createSendCheckUserOp}]`)
-
   // send /send check creation user op
+  logger(`/send check creation userOp sent: [${createSendCheckUserOp}]`)
   const receipt = await sendUserOpTransfer({ userOp: createSendCheckUserOp })
 
-  logger(`/send check creation userOp sent: [${receipt}]`)
-  logger(`/send check created: [${receipt.receipt.transactionHash}]`)
+  logger(`/send check created: [${receipt}]`)
+  logger(`/send check creation trn hash: [${receipt.receipt.transactionHash}]`)
   return receipt
 }
