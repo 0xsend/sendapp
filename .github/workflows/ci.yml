@@ -93,16 +93,16 @@ jobs:
       - name: Tilt CI
         id: tilt-ci
         shell: bash
-        run: tilt ci unit-tests
+        run: tilt ci unit-tests --timeout=10m
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.tilt-ci.outcome != 'skipped'
         shell: bash
         run: tilt down
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
-      # - name: All Changes Committed
-      #   shell: bash
-      #   run: git diff --exit-code
+      - name: All Changes Committed
+        shell: bash
+        run: git diff # --exit-code
 
   playwright-tests:
     name: Playwright Tests

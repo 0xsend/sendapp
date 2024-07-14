@@ -7,7 +7,12 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { getRequiredPrefund, getUserOperationHash, type UserOperation } from 'permissionless'
+import {
+  getRequiredPrefund,
+  getUserOperationHash,
+  SendUserOperationError,
+  type UserOperation,
+} from 'permissionless'
 import {
   encodeFunctionData,
   erc20Abi,
@@ -118,12 +123,22 @@ export async function sendUserOpTransfer({
       })) ?? [],
   })
 
-  const hash = await baseMainnetBundlerClient.sendUserOperation({
-    userOperation: userOp,
-  })
-  const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
-  assert(receipt.success === true, 'Failed to send userOp')
-  return receipt
+  try {
+    const hash = await baseMainnetBundlerClient.sendUserOperation({
+      userOperation: userOp,
+    })
+    const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
+    assert(receipt.success === true, 'Failed to send userOp')
+    return receipt
+  } catch (e) {
+    if (
+      e instanceof SendUserOperationError &&
+      e.details === 'Invalid UserOp signature or paymaster signature'
+    ) {
+      e.details = 'Invalid Passkey Authorization'
+    }
+    throw e
+  }
 }
 
 export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'> }) {

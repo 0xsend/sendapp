@@ -15,6 +15,13 @@ import { useState } from 'react'
 import { useRouter } from 'solito/router'
 import { bytesToHex, hexToBytes } from 'viem'
 
+const formatErrorMessage = (error: Error) => {
+  if (error.message.startsWith('The operation either timed out or was not allowed')) {
+    return 'Passkey Authentication Failed'
+  }
+  return error.message
+}
+
 export const SignInForm = () => {
   const [isSigningIn, setIsSigningIn] = useState(false)
   const toast = useToastController()
@@ -87,7 +94,7 @@ export const SignInForm = () => {
             {isSigningIn ? 'SIGNING IN...' : '/SIGN IN'}
           </ButtonText>
         </SubmitButton>
-        {error && <Paragraph color="$error">{error.message}</Paragraph>}
+        {error && <Paragraph color="$error">{formatErrorMessage(error)}</Paragraph>}
       </YStack>
     </YStack>
   )

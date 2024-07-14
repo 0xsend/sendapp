@@ -1,19 +1,9 @@
 load("ext://color", "color")
 load("ext://dotenv", "dotenv")
 load("./tilt/common.Tiltfile", "CFG", "CI", "DEBUG")
-load("./tilt/utils.Tiltfile", "require_env", "require_tools")
+load("./tilt/utils.Tiltfile", "replace_in_file", "require_env", "require_tools")
 
-print(color.green("███████╗███████╗███╗   ██╗██████╗     ██╗████████╗"))
-
-print(color.green("██╔════╝██╔════╝████╗  ██║██╔══██╗    ██║╚══██╔══╝"))
-
-print(color.green("███████╗█████╗  ██╔██╗ ██║██║  ██║    ██║   ██║"))
-
-print(color.green("╚════██║██╔══╝  ██║╚██╗██║██║  ██║    ██║   ██║"))
-
-print(color.green("███████║███████╗██║ ╚████║██████╔╝    ██║   ██║"))
-
-print(color.green("╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝     ╚═╝   ╚═╝"))
+include("./tilt/preamble.tiltfile")
 
 require_tools("yarn", "docker", "jq", "yj", "forge", "anvil", "caddy", "node", "bun")
 
@@ -29,16 +19,12 @@ if not os.path.exists(".env.local"):
 
 if CFG.dockerize:
     print(color.green("📝 Dockerizing .env.local"))
-    sed = str(local("which gsed || which sed")).strip()
-    if sed == "":
-        print(color.red("Could not find sed. Please install it and try again."))
-        exit(1)
 
     # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
-    local(sed + " -i 's/localhost/host.docker.internal/' .env.local")
+    replace_in_file(".env.local", "localhost", "host.docker.internal")
 
     # except NEXT_PUBLIC_URL
-    local(sed + " -i 's/NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal/NEXT_PUBLIC_URL=http:\\/\\/localhost/' .env.local")
+    replace_in_file(".env.local", "NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal", "NEXT_PUBLIC_URL=http:\\/\\/localhost")
 
 for dotfile in [
     ".env",
@@ -61,6 +47,8 @@ for line in str(read_file(".env.local.template")).split("\n"):
     key, _ = line.split("=", 1)
     print(color.blue("checking for " + key)) if DEBUG else None
     require_env(key)
+    if not CFG.dockerize and os.getenv(key).startswith("http://host.docker.internal"):  # warn if hosts are set to dockerized mode
+        print(color.yellow("WARNING: {} is pointing to host.docker.internal, but you are not using dockerized mode.".format(key)))
 
 # dockerize checks
 if CFG.dockerize:

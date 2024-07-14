@@ -35,3 +35,20 @@ def require_env(*envs):
 def files_matching(dir, lambda_):
     return [f for f in listdir(dir, recursive = True) if lambda_(f)]
 
+def ts_files(*paths):
+    """Returns a list of all TypeScript files in the given paths, excluding spec and test files."""
+    files = []
+    for path in paths:
+        files = (files +
+                 str(local("find %s -name '*.ts' -not \\( -name '*spec.ts' -o -name '*test.ts' \\)" % path, echo_off = True, quiet = True)).strip().splitlines() +
+                 str(local("find %s -name '*.tsx' -not \\( -name '*spec.tsx' -o -name '*test.tsx' \\)" % path, echo_off = True, quiet = True)).strip().splitlines())
+    return files
+
+def replace_in_file(file, pattern, replacement, echo_off = True, quiet = True):
+    """Replaces a pattern in a file with a replacement."""
+    sed = str(local("which gsed || which sed", echo_off = echo_off, quiet = quiet)).strip()
+    if sed == "":
+        print(color.red("Could not find sed. Please install it and try again."))
+        exit(1)
+    local("{} -i 's/{}/{}/g' {}".format(sed, pattern, replacement, file), echo_off = echo_off, quiet = quiet)
+
