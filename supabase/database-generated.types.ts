@@ -540,6 +540,108 @@ export type Database = {
         }
         Relationships: []
       }
+      send_account_referral_bonuses: {
+        Row: {
+          abi_idx: number
+          amount: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          referred: string
+          referrer: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          amount: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          referred: string
+          referrer: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          amount?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          referred?: string
+          referrer?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
+      send_account_referral_rewards: {
+        Row: {
+          abi_idx: number | null
+          amount: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          referred: string | null
+          referrer: string | null
+          src_name: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          amount?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          referred?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          amount?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          referred?: string | null
+          referrer?: string | null
+          src_name?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
       send_account_signing_key_added: {
         Row: {
           abi_idx: number

@@ -7,6 +7,9 @@
     {
       "name": "base_block_headers",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL"
+      ],
       "chain_id": "$BASE_CHAIN_ID",
       "batch_size": 100,
       "concurrency": 1
@@ -14,6 +17,9 @@
     {
       "name": "base_logs",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL"
+      ],
       "chain_id": "$BASE_CHAIN_ID",
       "batch_size": 2000,
       "concurrency": 2
@@ -648,6 +654,123 @@
           }
         ],
         "name": "Received"
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START"
+        }
+      ]
+    },
+    {
+      "name": "send_account_referral_rewards",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_num",
+          "column": "block_num"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "tx_idx",
+          "column": "tx_idx"
+        },
+        {
+          "name": "log_idx",
+          "column": "log_idx"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0x3f14f917fB2DF7e0f3c6b06BB0Fa0522FBEA4Eec"
+          ]
+        }
+      ],
+      "table": {
+        "name": "send_account_referral_rewards",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "block_num",
+            "type": "numeric"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric"
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "referrer",
+            "type": "bytea"
+          },
+          {
+            "name": "referred",
+            "type": "bytea"
+          },
+          {
+            "name": "amount",
+            "type": "numeric"
+          }
+        ]
+      },
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "referrer",
+            "column": "referrer",
+            "internalType": "address",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "name": "referred",
+            "column": "referred",
+            "internalType": "address",
+            "type": "address",
+            "indexed": false
+          },
+          {
+            "name": "amount",
+            "column": "amount",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          }
+        ],
+        "name": "ReferralReward"
       },
       "sources": [
         {

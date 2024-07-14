@@ -9,7 +9,7 @@
     "empty": "bun run ./bin/empty-shovel.dev.ts"
   },
   "devDependencies": {
-    "@indexsupply/shovel-config": "^0.0.16",
+    "@indexsupply/shovel-config": "^0.0.17",
     "@my/wagmi": "workspace:*",
     "@types/bun": "latest",
     "permissionless": "^0.1.14",
