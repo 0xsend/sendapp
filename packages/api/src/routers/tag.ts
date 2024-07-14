@@ -1,6 +1,6 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
-import { getPrice } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { total } from 'app/data/sendtags'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { byteaTxHash } from 'app/utils/zod'
@@ -8,6 +8,9 @@ import debug from 'debug'
 import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { fetchSendtagCheckoutTransfers } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
+import { throwIf } from 'app/utils/throwIf'
+import { assert } from 'app/utils/assert'
 
 const log = debug('api:routers:tag')
 
@@ -39,7 +42,7 @@ export const tagRouter = createTRPCRouter({
       }
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
-      const ethAmount = getPrice(pendingTags)
+      const amountDue = total(pendingTags)
       const txBytea = byteaTxHash.safeParse(hexToBytea(txHash as `0x${string}`))
 
       if (!txBytea.success) {
@@ -52,16 +55,11 @@ export const tagRouter = createTRPCRouter({
 
       const data = await withRetry(
         async () => {
-          const { data, error } = await supabase
-            .from('send_revenues_safe_receives')
-            .select('*')
+          const { data, error } = await fetchSendtagCheckoutTransfers(supabase)
             .eq('tx_hash', txBytea.data)
             .single()
-
-          if (error) {
-            throw error
-          }
-
+          throwIf(error)
+          assert(!!data, 'No checkout receipt found')
           return data
         },
         {
@@ -91,7 +89,7 @@ export const tagRouter = createTRPCRouter({
         })
       })
 
-      const { event_id, sender: senderPgB16, v } = data
+      const { event_id, f: senderPgB16, v } = data
 
       if (!senderPgB16 || !v) {
         log('no sender or v found', `txHash=${txHash}`)
@@ -101,13 +99,15 @@ export const tagRouter = createTRPCRouter({
         })
       }
 
-      if (!v || BigInt(v) !== ethAmount) {
+      if (!v || BigInt(v) !== amountDue) {
         log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`)
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Transaction is not a payment for tags or incorrect amount.',
         })
       }
+
+      log('confirming tags', `event_id=${event_id}`)
 
       // confirm all pending tags and save the transaction receipt
       const { error: confirmTagsErr } = await supabaseAdmin.rpc('confirm_tags', {
