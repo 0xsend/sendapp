@@ -1,5 +1,5 @@
 name: "Setup Docker Build Environment"
-description: "Set up Node.js, install Foundry, and set up Bun. Runs Yarn install run docker build"
+description: "Set Node and package caches "
 inputs:
   build-nextjs-docker:
     description: "Whether to build Next.js docker image"
@@ -24,14 +24,6 @@ runs:
       with:
         node-version-file: .node-version
         cache: "yarn"
-    - name: Setup Bun
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      uses: oven-sh/setup-bun@v1
-    - name: Install Foundry
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      uses: foundry-rs/foundry-toolchain@v1
-      with:
-        version: nightly
     - name: Yarn Install
       if: ${{ inputs.build-nextjs-docker == 'true' }}
       shell: bash
