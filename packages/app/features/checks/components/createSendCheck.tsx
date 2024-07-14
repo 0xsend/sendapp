@@ -2,7 +2,9 @@ import { CreateSendCheckBtn } from 'app/features/checks/components/createSendChe
 import type { CreateSendCheckBtnProps, EphemeralKeyPair } from 'app/features/checks/types'
 import { useEffect, useState } from 'react'
 import type { Hex } from 'viem'
-import { generateCheckUrl } from 'app/features/checks/utils/checkUtils'
+import { encodeClaimCheckUrl } from 'app/features/checks/utils/checkUtils'
+import type { GetUserOperationReceiptReturnType } from 'permissionless'
+import { baseMainnetClient, sendTokenAddress } from '@my/wagmi'
 
 export const CreateSendCheck = () => {
   const [createCheckProps, setCreateCheckProps] = useState<CreateSendCheckBtnProps>()
@@ -11,16 +13,19 @@ export const CreateSendCheck = () => {
     // set defaults for /send check creation
     setCreateCheckProps({
       // TODO: pass dynamic args from parent
-      tokenAddress: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A' as Hex,
-      amount: 1n,
+      tokenAddress: sendTokenAddress[baseMainnetClient.chain.id] as Hex,
+      amount: BigInt(100000),
       onSuccess,
       onError,
     })
   }, [])
 
-  const onSuccess = (senderAccountId: string, ephemeralKeypair: EphemeralKeyPair) => {
-    const checkUrl: string = generateCheckUrl(senderAccountId, ephemeralKeypair)
-    // TODO: show checkUrl to sender
+  const onSuccess = (
+    receipt: GetUserOperationReceiptReturnType,
+    senderAccountId: string,
+    ephemeralKeypair: EphemeralKeyPair
+  ) => {
+    const checkUrl: string = encodeClaimCheckUrl(senderAccountId, ephemeralKeypair)
     console.log(checkUrl)
   }
 

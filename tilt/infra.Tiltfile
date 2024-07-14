@@ -230,6 +230,7 @@ local_resource(
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
         "anvil:anvil-deploy-fjord-send-verifier-fixtures",
+        "anvil:anvil-add-send-check-fixtures"
     ],
 )
 

@@ -1,7 +1,14 @@
-import { sendAccountAbi, sendCheckAddress, sendCheckAbi, tokenPaymasterAddress } from '@my/wagmi'
+import {
+  sendAccountAbi,
+  sendCheckAddress,
+  sendCheckAbi,
+  tokenPaymasterAddress,
+  sendTokenAddress,
+  baseMainnetClient,
+} from '@my/wagmi'
 import { generateEphemeralKeypair } from 'app/features/checks/utils/checkUtils'
 import type { CreateSendCheckUserOpProps } from 'app/features/checks/types'
-import { getCreateSendCheckUserOp } from 'app/features/checks/utils/useCreateSendCheckUserOp'
+import { getCreateSendCheckUserOp } from 'app/features/checks/utils/getCreateSendCheckUserOp'
 import type { UserOperation } from 'permissionless'
 import { type Hex, decodeFunctionData, erc20Abi, isAddress, maxUint256 } from 'viem'
 import * as mockMyWagmi from 'app/__mocks__/@my/wagmi'
@@ -12,12 +19,12 @@ jest.mock('@my/wagmi', () => ({
   ...mockMyWagmi,
 }))
 
-describe('/send check userOps', () => {
+describe('create /send check userOp', () => {
   const ephemeralKeypair = generateEphemeralKeypair()
   let createSendCheckUserOpsProps: CreateSendCheckUserOpProps
-  let createSendCheckUserOp: UserOperation<'v0.7'>
+  let userOp: UserOperation<'v0.7'>
 
-  beforeEach(() => {
+  beforeEach(async () => {
     createSendCheckUserOpsProps = {
       senderAddress: '0xb0b0000000000000000000000000000000000000',
       // /send token address
@@ -27,16 +34,16 @@ describe('/send check userOps', () => {
       nonce: 0n,
     }
 
-    createSendCheckUserOp = getCreateSendCheckUserOp(createSendCheckUserOpsProps)
+    userOp = getCreateSendCheckUserOp(createSendCheckUserOpsProps)
   })
 
   it('userOp properties are as expected', () => {
-    expect(createSendCheckUserOp.sender).toEqual(createSendCheckUserOpsProps.senderAddress)
-    expect(createSendCheckUserOp.nonce).toEqual(createSendCheckUserOpsProps.nonce)
-    expect(createSendCheckUserOp.paymaster).toEqual(tokenPaymasterAddress[845337])
-    expect(createSendCheckUserOp.paymasterData).toEqual('0x')
-    expect(createSendCheckUserOp.paymasterAndData).toEqual('0x')
-    expect(createSendCheckUserOp.signature).toEqual('0x')
+    expect(userOp.sender).toEqual(createSendCheckUserOpsProps.senderAddress)
+    expect(userOp.nonce).toEqual(createSendCheckUserOpsProps.nonce)
+    expect(userOp.paymaster).toEqual(tokenPaymasterAddress[845337])
+    expect(userOp.paymasterData).toEqual('0x')
+    expect(userOp.paymasterAndData).toEqual('0x')
+    expect(userOp.signature).toEqual('0x')
 
     // TODO: assert on gas limits
   })
@@ -44,7 +51,7 @@ describe('/send check userOps', () => {
   it('callData is as expected', () => {
     const { functionName, args } = decodeFunctionData({
       abi: sendAccountAbi,
-      data: createSendCheckUserOp.callData,
+      data: userOp.callData,
     })
 
     expect(functionName).toEqual('executeBatch')
@@ -59,12 +66,13 @@ describe('/send check userOps', () => {
       abi: erc20Abi,
       data: approvalTrn.data,
     })
-    expect(approvalTrn.dest).toEqual('0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A')
+
+    expect(approvalTrn.dest).toEqual(sendTokenAddress[baseMainnetClient.chain.id])
     expect(approvalTrn.value).toEqual(0n)
 
     // should approve send check contract to spend token
     expect(approvalTrnData.functionName).toEqual('approve')
-    expect(approvalTrnData.args[0]).toEqual(sendCheckAddress[845337])
+    expect(approvalTrnData.args[0]).toEqual(sendCheckAddress[baseMainnetClient.chain.id])
     expect(approvalTrnData.args[1]).toEqual(maxUint256)
 
     // second trn should be /create check trn
@@ -73,7 +81,7 @@ describe('/send check userOps', () => {
       abi: sendCheckAbi,
       data: createSendCheckTrn.data,
     })
-    expect(createSendCheckTrn.dest).toEqual(sendCheckAddress[845337])
+    expect(createSendCheckTrn.dest).toEqual(sendCheckAddress[baseMainnetClient.chain.id])
     expect(createSendCheckTrn.value).toEqual(0n)
 
     // should contain send check creation payload
@@ -91,7 +99,7 @@ describe('/send check userOps', () => {
     createSendCheckUserOpsProps.senderAddress = invalidSenderAddress
     expect(isAddress(invalidSenderAddress)).toEqual(false)
     expect(() => getCreateSendCheckUserOp(createSendCheckUserOpsProps)).toThrow(
-      'Invalid send account address'
+      'Invalid sender address'
     )
   })
 
