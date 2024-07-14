@@ -16,25 +16,24 @@ import {
   useMedia,
   useToastController,
 } from '@my/ui'
-
 import { Check, X } from '@tamagui/lucide-icons'
 import { IconAccount, IconPlus } from 'app/components/icons'
+import { maxNumSendTags, price, total } from 'app/data/sendtags'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
 import { useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
-import { formatEther } from 'viem'
+import { formatUnits } from 'viem'
 import type { z } from 'zod'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
-import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
-import { getPrice, maxNumSendTags, tagLengthPrice } from './checkout-utils'
 import { ConfirmButton } from './components/checkout-confirm-button'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { Link } from 'solito/link'
+import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -198,7 +197,6 @@ export const CheckoutForm = () => {
                         f={2}
                         maw="35%"
                         fontFamily={'$mono'}
-                        accessibilityLabel={`Pending Sendtag ${tag.name}`}
                         aria-label={`Pending Sendtag ${tag.name}`}
                         testID={`Pending Sendtag ${tag.name}`}
                       >
@@ -317,11 +315,9 @@ export const CheckoutForm = () => {
                   jc={'center'}
                   ai={'center'}
                   gap="$4"
-                  py="$4"
+                  my="$4"
                 >
-                  <YStack maw={200} width="100%">
-                    <ConfirmButton onConfirmed={onConfirmed} />
-                  </YStack>
+                  <ConfirmButton onConfirmed={onConfirmed} />
                 </Stack>
                 <TotalPrice />
               </Stack>
@@ -442,15 +438,14 @@ function HoldingTime({ created }: { created: Date }) {
 }
 
 function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
-  const price = useMemo(() => tagLengthPrice(tag?.name.length), [tag])
-
-  return `${formatEther(price).toLocaleString()} ETH`
+  const _price = useMemo(() => price(tag.name.length), [tag])
+  return `${formatUnits(_price, 6)} USDC`
 }
 
 function TotalPrice() {
   const pendingTags = usePendingTags()
 
-  const weiAmount = useMemo(() => getPrice(pendingTags ?? []), [pendingTags])
+  const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
 
   return (
     <YStack ai="center" $gtMd={{ ai: 'flex-end' }}>
@@ -470,7 +465,7 @@ function TotalPrice() {
         $theme-dark={{ col: '$white' }}
         $theme-light={{ col: '$black' }}
       >
-        {formatEther(weiAmount).toLocaleString()} ETH
+        {formatUnits(_total, 6)} USDC
       </Paragraph>
     </YStack>
   )
