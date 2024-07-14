@@ -223,7 +223,6 @@ local_resource(
         "webauthn-authenticator:test",
         "supabase:test",
         "contracts:test",
-        "distributor:test",
         "workers:test",
     ],
 )
