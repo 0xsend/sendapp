@@ -642,6 +642,123 @@ exports[`shovel config 1`] = `
         "name": "send_account_receives",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x3936f906910C0f74b6d1536614068368B94CDa85",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "referrer",
+            "indexed": true,
+            "internalType": "address",
+            "name": "referrer",
+            "type": "address",
+          },
+          {
+            "column": "referred",
+            "indexed": false,
+            "internalType": "address",
+            "name": "referred",
+            "type": "address",
+          },
+          {
+            "column": "amount",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256",
+          },
+        ],
+        "name": "ReferralReward",
+        "type": "event",
+      },
+      "name": "send_account_referral_rewards",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "referrer",
+            "type": "bytea",
+          },
+          {
+            "name": "referred",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_account_referral_rewards",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
@@ -651,6 +768,9 @@ exports[`shovel config 1`] = `
       "concurrency": 1,
       "name": "base_block_headers",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL",
+      ],
     },
     {
       "batch_size": 2000,
@@ -658,6 +778,9 @@ exports[`shovel config 1`] = `
       "concurrency": 2,
       "name": "base_logs",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL",
+      ],
     },
   ],
 }

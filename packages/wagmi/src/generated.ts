@@ -3327,7 +3327,7 @@ export const sendtagCheckoutAbi = [
  *
  */
 export const sendtagCheckoutAddress = {
-  845337: '0x3f14f917fB2DF7e0f3c6b06BB0Fa0522FBEA4Eec',
+  845337: '0x3936f906910C0f74b6d1536614068368B94CDa85',
 } as const
 
 /**

@@ -344,6 +344,22 @@ interface Table_public_send_account_receives {
   src_name: string;
   abi_idx: number;
 }
+interface Table_public_send_account_referral_rewards {
+  id: number;
+  chain_id: number;
+  block_num: number;
+  block_time: number;
+  tx_hash: string;
+  tx_idx: number;
+  log_idx: number;
+  log_addr: string;
+  referrer: string;
+  referred: string;
+  amount: number;
+  ig_name: string;
+  src_name: string;
+  abi_idx: number;
+}
 interface Table_public_send_account_signing_key_added {
   chain_id: number;
   log_addr: string;
@@ -619,6 +635,7 @@ interface Schema_public {
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
   send_account_receives: Table_public_send_account_receives;
+  send_account_referral_rewards: Table_public_send_account_referral_rewards;
   send_account_signing_key_added: Table_public_send_account_signing_key_added;
   send_account_signing_key_removed: Table_public_send_account_signing_key_removed;
   send_account_transfers: Table_public_send_account_transfers;
