@@ -36,7 +36,6 @@ jobs:
     needs: [cache-deps]
     env:
       YARN_ENABLE_HARDENED_MODE: 0
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,17 +64,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      # No idea how homebrew bundle broke with tilt depending on python so installing manually
-      - name: Install Tilt
-        uses: ./.github/actions/install-tilt
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - name: Brew Bundle
-        id: brew-bundle
-        run: |
-          brew bundle
-          brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
@@ -121,16 +109,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install Tilt
-        uses: ./.github/actions/install-tilt
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - name: Brew Bundle
-        id: brew-bundle
-        run: |
-          brew bundle
-          brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
