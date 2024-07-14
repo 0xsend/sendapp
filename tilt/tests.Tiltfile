@@ -25,7 +25,11 @@ local_resource(
     ],
     deps =
         files_matching(
-            os.path.join("packages", "app"),
+            os.path.join(
+                config.main_dir,
+                "packages",
+                "app",
+            ),
             lambda f: f.endswith(".ts") or f.endswith(".tsx"),
         ),
 )
@@ -53,7 +57,11 @@ local_resource(
     resource_deps = ["yarn:install"],
     deps =
         files_matching(
-            os.path.join("packages", "webauthn-authenticator"),
+            os.path.join(
+                config.main_dir,
+                "packages",
+                "webauthn-authenticator",
+            ),
             lambda f: f.endswith(".ts"),
         ),
 )
@@ -87,7 +95,11 @@ local_resource(
     ],
     trigger_mode = CI and TRIGGER_MODE_AUTO or TRIGGER_MODE_MANUAL,
     deps = files_matching(
-        os.path.join("packages", "playwright"),
+        os.path.join(
+            config.main_dir,
+            "packages",
+            "playwright",
+        ),
         lambda f: f.endswith(".ts"),
     ),
 )
@@ -135,7 +147,12 @@ local_resource(
     ],
     deps =
         files_matching(
-            os.path.join("apps", "distributor", "test"),
+            os.path.join(
+                config.main_dir,
+                "apps",
+                "distributor",
+                "test",
+            ),
             lambda f: f.endswith(".ts"),
         ),
 )
@@ -150,7 +167,11 @@ local_resource(
         "snaplet:generate",  # hack to ensure snaplet doesn't include test pg_tap schema
     ],
     deps = files_matching(
-        os.path.join("supabase", "tests"),
+        os.path.join(
+            config.main_dir,
+            "supabase",
+            "tests",
+        ),
         lambda f: f.endswith(".sql"),
     ),
 )
@@ -193,7 +214,12 @@ local_resource(
     ],
     trigger_mode = CI and TRIGGER_MODE_MANUAL or TRIGGER_MODE_AUTO,
     deps = files_matching(
-        os.path.join("packages", "shovel", "etc"),
+        os.path.join(
+            config.main_dir,
+            "packages",
+            "shovel",
+            "etc",
+        ),
         lambda f: f.endswith(".json"),
     ),
 )
@@ -207,7 +233,11 @@ local_resource(
         "yarn:install",
     ],
     deps = files_matching(
-        os.path.join("packages", "workflows"),
+        os.path.join(
+            config.main_dir,
+            "packages",
+            "workflows",
+        ),
         lambda f: f.endswith(".ts"),
     ),
 )

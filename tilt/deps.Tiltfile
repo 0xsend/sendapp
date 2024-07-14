@@ -60,12 +60,27 @@ local_resource(
         "anvil:fixtures",
     ],
     deps =
-        [os.path.join("packages", "wagmi", "wagmi.config.ts")] +
+        [os.path.join(
+            config.main_dir,
+            "packages",
+            "wagmi",
+            "wagmi.config.ts",
+        )] +
         files_matching(
-            os.path.join("packages", "wagmi", "src"),
+            os.path.join(
+                config.main_dir,
+                "packages",
+                "wagmi",
+                "src",
+            ),
             lambda f: f.endswith(".ts") and f.find("generated.ts") == -1,
         ) + files_matching(
-            os.path.join("packages", "contracts", "broadcast"),
+            os.path.join(
+                config.main_dir,
+                "packages",
+                "contracts",
+                "broadcast",
+            ),
             lambda f: f.endswith("run-latest.json"),
         ),
 )
@@ -80,7 +95,11 @@ local_resource(
         "supabase",
     ],
     deps = files_matching(
-        os.path.join("supabase", "migrations"),
+        os.path.join(
+            config.main_dir,
+            "supabase",
+            "migrations",
+        ),
         lambda f: f.endswith(".sql"),
     ),
 )
@@ -95,12 +114,22 @@ local_resource(
         "supabase",
     ],
     deps = files_matching(
-        os.path.join("supabase", "migrations"),
+        os.path.join(
+            config.main_dir,
+            "supabase",
+            "migrations",
+        ),
         lambda f: f.endswith(".sql"),
     ),
 )
 
-ui_theme_dir = os.path.join("packages", "ui", "src", "themes")
+ui_theme_dir = os.path.join(
+    config.main_dir,
+    "packages",
+    "ui",
+    "src",
+    "themes",
+)
 
 ui_theme_files = files_matching(
     ui_theme_dir,
@@ -108,7 +137,12 @@ ui_theme_files = files_matching(
 )
 
 ui_files = files_matching(
-    os.path.join("packages", "ui", "src"),
+    os.path.join(
+        config.main_dir,
+        "packages",
+        "ui",
+        "src",
+    ),
     lambda f: (f.endswith(".tsx") or f.endswith(".ts")) and (f.endswith("theme-generated.ts") or f.find(ui_theme_dir) == -1),
 )
 
@@ -143,15 +177,30 @@ local_resource(
         "yarn:install",
     ],
     deps = files_matching(
-               os.path.join("packages", "daimo-expo-passkeys", "src"),
+               os.path.join(
+                   config.main_dir,
+                   "packages",
+                   "daimo-expo-passkeys",
+                   "src",
+               ),
                lambda f: (f.endswith(".tsx") or f.endswith(".ts")),
            ) +
            files_matching(
-               os.path.join("packages", "daimo-expo-passkeys", "ios"),
+               os.path.join(
+                   config.main_dir,
+                   "packages",
+                   "daimo-expo-passkeys",
+                   "ios",
+               ),
                lambda f: f.endswith(".swift"),
            ) +
            files_matching(
-               os.path.join("packages", "daimo-expo-passkeys", "android"),
+               os.path.join(
+                   config.main_dir,
+                   "packages",
+                   "daimo-expo-passkeys",
+                   "android",
+               ),
                lambda f: f.endswith(".kt"),
            ),
 )
@@ -164,7 +213,12 @@ local_resource(
     resource_deps = ["yarn:install"],
     deps =
         files_matching(
-            os.path.join("packages", "webauthn-authenticator", "src"),
+            os.path.join(
+                config.main_dir,
+                "packages",
+                "webauthn-authenticator",
+                "src",
+            ),
             lambda f: f.endswith(".ts"),
         ),
 )
@@ -179,7 +233,11 @@ local_resource(
         "wagmi:generate",
     ],
     deps = files_matching(
-        os.path.join("packages", "shovel"),
+        os.path.join(
+            config.main_dir,
+            "packages",
+            "shovel",
+        ),
         lambda f: f.endswith(".ts"),
     ),
 )
