@@ -1,12 +1,15 @@
 {
   "extends": "../../tsconfig.base",
-  "include": ["src", "../app", "../wagmi/src", "../ui/src"],
+  "include": ["src", "../app", "../wagmi/src", "../ui/src", "../../supabase"],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,
+    "baseUrl": ".",
     "paths": {
+      "app/*": ["../app/*"],
       "@my/wagmi": ["../wagmi/src"],
-      "@my/wagmi/*": ["../wagmi/src/*"]
+      "@my/wagmi/*": ["../wagmi/src/*"],
+      "@my/supabase/*": ["../../supabase/*"]
     }
   },
   "references": []
