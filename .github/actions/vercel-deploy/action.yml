@@ -37,6 +37,8 @@ runs:
       shell: bash
       run: |
         echo "::add-mask::${{ inputs.vercel-token }}"
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
     - name: Switch to Vercel team
       shell: bash
       run: bunx vercel --token=${{ inputs.vercel-token }} team switch ${{ inputs.vercel-scope }}
