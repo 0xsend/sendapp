@@ -33,8 +33,9 @@ export async function userOnboarded<
   ) {
     log('no send accounts')
     return {
+      //@todo: redirect param isn't working because this link is redirected twice. Need to investigate
       redirect: {
-        destination: '/auth/onboarding', //@todo: redirects don't work because this link is redirected twice. Need to investigate
+        destination: '/auth/onboarding',
         permanent: false,
       },
     }
