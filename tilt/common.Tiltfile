@@ -3,7 +3,11 @@
 load("./utils.Tiltfile", "files_matching")
 
 contract_files = files_matching(
-    os.path.join("packages", "contracts"),
+    os.path.join(
+        config.main_dir,
+        "packages",
+        "contracts",
+    ),
     lambda f: f.endswith(".sol") and f.find("cache") == -1 and f.find("lib") == -1,
 )
 
