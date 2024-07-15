@@ -984,7 +984,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    Received
+                    Deposit
                   </Text>
                   <Text
                     style={
