@@ -22,7 +22,7 @@ const baseURL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
 export default defineConfig({
   /* Useful for debugging */
   // timeout: 0,
-  // globalTimeout: 0,
+  globalTimeout: 10 * 60_000, // 10 minutes
   // timeout: 60_000, // 60 seconds
   // globalTimeout: 30 * 60_000, // 30 minutes
 
