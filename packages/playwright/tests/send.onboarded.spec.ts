@@ -9,11 +9,11 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { debug, type Debugger } from 'debug'
-import { parseUnits, zeroAddress } from 'viem'
+import { parseUnits } from 'viem'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
 import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
