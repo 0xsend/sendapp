@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test'
+import type { Page, Expect } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import type { testClient } from 'app/utils/userop'
@@ -10,6 +10,24 @@ import { testBaseClient } from '../viem/base'
 import { OnboardingPage } from './page'
 
 let log: debug.Debugger
+
+export const signUp = async (page: Page, phone: string, expect: Expect) => {
+  await page.getByLabel('Phone number').fill(phone)
+  const signUpButton = page.getByRole('button', { name: 'Sign Up' })
+  await expect(signUpButton).toBeVisible()
+  await expect(signUpButton).toBeEnabled()
+  await signUpButton.click()
+  const otpInput = page.getByLabel('One-time Password')
+  await expect(otpInput).toBeVisible()
+  await otpInput.fill('123456')
+  const verifyAccountButton = page.getByRole('button', { name: 'VERIFY ACCOUNT' })
+  await expect(verifyAccountButton).toBeVisible()
+  await verifyAccountButton.click()
+  await page.waitForLoadState()
+  await expect(page).toHaveURL('/auth/onboarding')
+  const onboardingPage = new OnboardingPage(page)
+  await onboardingPage.completeOnboarding(expect)
+}
 
 const sendAccountTest = base.extend<{
   page: Page
