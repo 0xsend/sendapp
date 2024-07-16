@@ -184,12 +184,39 @@ jobs:
               echo "Tilt process (PID: $tilt_pid) is no longer running, exiting"
               exit 1
             fi
+
+            # Check if any targets are in error
+            has_errors=$(tilt dump engine | jq '
+              .ManifestTargets 
+              | to_entries 
+              | map(select(.value.State.RuntimeState.Status == "error")) 
+              | length > 0
+            ')
+
+            if [ "$has_errors" = "true" ]; then
+              echo "There are targets in error status:"
+              tilt dump engine | jq '
+                .ManifestTargets 
+                | to_entries 
+                | map(select(.value.State.RuntimeState.Status == "error")) 
+                | map(.key)
+              '
+              exit 1
+            fi
             
             if tilt wait --timeout "${wait_timeout}s" --for=condition=Ready "uiresource/playwright:deps"; then
               echo "Tilt is ready"
               break
             else
               echo "Tilt not ready, retrying..."
+              tilt dump engine | jq '
+                .ManifestTargets 
+                | to_entries 
+                | map({key: (.value.State.RuntimeState.Status // "in_progress"), value: .key}) 
+                | group_by(.key) 
+                | map({key: .[0].key, value: map(.value)}) 
+                | from_entries
+              '
             fi
             if ((i == max_attempts)); then
               echo "Reached maximum attempts, exiting"
