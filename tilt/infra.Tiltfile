@@ -207,6 +207,17 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-add-sendtag-checkout-fixtures",
+    "yarn contracts dev:anvil-add-sendtag-checkout-fixtures",
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:base",
+        "contracts:build",
+    ],
+)
+
+local_resource(
     "anvil:fixtures",
     "echo 🥳",
     labels = labels,
@@ -214,6 +225,7 @@ local_resource(
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
         "anvil:anvil-deploy-fjord-send-verifier-fixtures",
+        "anvil:anvil-add-sendtag-checkout-fixtures",
     ],
 )
 
