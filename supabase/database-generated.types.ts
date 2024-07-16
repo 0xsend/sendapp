@@ -866,6 +866,87 @@ export type Database = {
         }
         Relationships: []
       }
+      sendtag_checkout_contracts: {
+        Row: {
+          address: string
+          chain_id: number
+          created_at: string | null
+          id: number
+          updated_at: string | null
+        }
+        Insert: {
+          address: string
+          chain_id: number
+          created_at?: string | null
+          id?: number
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string
+          chain_id?: number
+          created_at?: string | null
+          id?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sendtag_checkout_receipts: {
+        Row: {
+          abi_idx: number
+          amount: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id: string
+          id: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          referrer: string
+          reward: number
+          sender: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Insert: {
+          abi_idx: number
+          amount: number
+          block_num: number
+          block_time: number
+          chain_id: number
+          event_id?: string
+          id?: number
+          ig_name: string
+          log_addr: string
+          log_idx: number
+          referrer: string
+          reward: number
+          sender: string
+          src_name: string
+          tx_hash: string
+          tx_idx: number
+        }
+        Update: {
+          abi_idx?: number
+          amount?: number
+          block_num?: number
+          block_time?: number
+          chain_id?: number
+          event_id?: string
+          id?: number
+          ig_name?: string
+          log_addr?: string
+          log_idx?: number
+          referrer?: string
+          reward?: number
+          sender?: string
+          src_name?: string
+          tx_hash?: string
+          tx_idx?: number
+        }
+        Relationships: []
+      }
       tag_receipts: {
         Row: {
           created_at: string | null

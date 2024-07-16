@@ -643,6 +643,110 @@ exports[`shovel config 1`] = `
         "name": "send_account_receives",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x3936f906910C0f74b6d1536614068368B94CDa85",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "amount",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256",
+          },
+          {
+            "column": "referrer",
+            "indexed": false,
+            "internalType": "address",
+            "name": "referrer",
+            "type": "address",
+          },
+          {
+            "column": "reward",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "reward",
+            "type": "uint256",
+          },
+        ],
+        "name": "Receipt",
+        "type": "event",
+      },
+      "name": "sendtag_checkout_receipts",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+          {
+            "name": "referrer",
+            "type": "bytea",
+          },
+          {
+            "name": "reward",
+            "type": "numeric",
+          },
+        ],
+        "name": "sendtag_checkout_receipts",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [

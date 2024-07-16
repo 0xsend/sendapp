@@ -8,6 +8,7 @@ import {
   sendRevenuesSafeReceives,
   sendAccountSigningKeyAdded,
   sendAccountSigningKeyRemoved,
+  sendtagCheckoutReceiptsIntegration,
 } from './integrations'
 
 // baseSrcBlockHeaders is to be used for integrations that require block headers
@@ -59,6 +60,10 @@ export const integrations: Integration[] = [
   },
   {
     ...sendAccountReceivesIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendtagCheckoutReceiptsIntegration,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
 ]
