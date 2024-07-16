@@ -14,7 +14,7 @@
     "web:docker:build": "GIT_BRANCH=$(git symbolic-ref --short HEAD) GIT_HASH=$(git rev-parse --short=10 HEAD) dotenv -e ./.env -c -- docker compose build --progress=plain",
     "web:docker:push": "GIT_BRANCH=$(git symbolic-ref --short HEAD) GIT_HASH=$(git rev-parse --short=10 HEAD) docker compose push",
     "web:extract": "DISABLE_EXTRACTION=false yarn workspace next-app dev",
-    "web:prod": "yarn workspace next-app build",
+    "web:prod": "yarn turbo build --filter=next-app",
     "web:prod:serve": "yarn workspace next-app serve",
     "fix": "manypkg fix",
     "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && yarn build)",
