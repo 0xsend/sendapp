@@ -150,6 +150,24 @@ jobs:
         run: |
           tilt ci yarn:install # install and setup env
           yarn web:docker:build # build nextjs docker image
+      - name: Ensure host.docker.internal is in /etc/hosts
+        shell: bash
+        run: |
+          HOSTNAME="host.docker.internal"
+          IP="127.0.0.1"
+
+          # Check if the entry exists in /etc/hosts
+          if grep -q "$HOSTNAME" /etc/hosts; then
+              echo "$HOSTNAME already exists in /etc/hosts"
+          else
+              # Add the entry to /etc/hosts
+              sudo echo "$IP $HOSTNAME" | sudo tee -a /etc/hosts > /dev/null
+              echo "Added $HOSTNAME to /etc/hosts"
+          fi
+
+          # Verify the entry
+          echo "Current entry in /etc/hosts:"
+          grep "$HOSTNAME" /etc/hosts
       - name: Playwright Tests
         id: playwright
         shell: bash
