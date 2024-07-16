@@ -606,7 +606,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  Received
+                  Deposit
                 </Text>
                 <Text
                   style={

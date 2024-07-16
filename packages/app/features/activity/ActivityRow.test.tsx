@@ -36,7 +36,7 @@ describe('ActivityRow', () => {
         <ActivityRow activity={activity} />
       </TamaguiProvider>
     )
-    expect(screen.getByText('Received')).toBeOnTheScreen()
+    expect(screen.getByText('Deposit')).toBeOnTheScreen()
     expect(screen.getByText('0.019032 USDC')).toBeOnTheScreen()
     expect(screen.getByText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')).toBeOnTheScreen() // show senders address if not a send app user
   })
