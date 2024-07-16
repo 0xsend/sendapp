@@ -103,6 +103,8 @@ export function eventNameFromActivity(activity: Activity) {
   const isTransferOrReceive =
     isSendAccountTransfersEvent(activity) || isSendAccountReceiveEvent(activity)
   switch (true) {
+    case isTransferOrReceive && from_user === null:
+      return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
       return 'Received'
     case isTransferOrReceive && !!from_user?.id:

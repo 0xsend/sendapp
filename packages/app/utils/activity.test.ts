@@ -31,7 +31,7 @@ describe('test amountFromActivity', () => {
 describe('test eventNameFromActivity', () => {
   it('should return the received when transfer and to user ID is present', () => {
     const activity = mockReceivedTransfer
-    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Received')
+    expect(eventNameFromActivity(EventSchema.parse(activity))).toBe('Deposit')
   })
   it('should return the received when received eth and to user ID is present', () => {
     const activity = mockSendAccountReceive

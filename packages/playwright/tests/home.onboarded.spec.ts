@@ -36,8 +36,11 @@ test('can visit token detail page', async ({ context, page }) => {
   await expect(page.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()
   await expect(page.getByText('10 USDC')).toBeVisible()
 
-  await expect(page.getByText('Received')).toHaveCount(2)
+  // Button and label
+  await expect(page.getByText('Deposit')).toHaveCount(2)
+
   await expect(page.getByText('/alice')).toBeVisible()
+  await expect(page.getByText('Received')).toBeVisible()
   await expect(page.getByText('20 USDC')).toBeVisible()
   await expect(page.getByText('0xa71CE00000000000000000000000000000000000')).toBeVisible()
   await expect(page.getByText('30 USDC')).toBeVisible()
