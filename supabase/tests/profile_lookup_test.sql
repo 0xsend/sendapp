@@ -21,7 +21,7 @@ BEGIN
       sendid
     FROM
       public.profile_lookup('tag', 'valid_tag'));
-  RAISE NOTICE '%', send_id;
+  -- RAISE NOTICE '%', send_id;
   EXECUTE format('SET SESSION "vars.send_id" TO %L', send_id);
 END;
 $$
