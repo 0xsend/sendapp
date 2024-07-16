@@ -206,11 +206,6 @@ local_resource(
     ],
 )
 
-        "anvil:base",
-        "contracts:build",
-    ],
-)
-
 local_resource(
     "anvil:fixtures",
     "echo 🥳",
