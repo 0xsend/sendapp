@@ -7,6 +7,7 @@ on:
       - 'releases/**'
       - 'dev'
       - 'main'
+env:
 jobs:
   build-docker:
     if: github.event.pull_request.merged == true
@@ -22,3 +23,4 @@ jobs:
           push-nextjs-docker-image: true
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerhub_password: ${{ secrets.DOCKERHUB_TOKEN }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}

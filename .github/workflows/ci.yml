@@ -6,7 +6,8 @@ on:
   push:
     branches: [main, dev]
   workflow_dispatch:
-
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
