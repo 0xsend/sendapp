@@ -19,12 +19,14 @@ if not os.path.exists(".env.local"):
 
 if CFG.dockerize:
     print(color.green("📝 Dockerizing .env.local"))
-
-    # replace NEXT_PUBLIC_SUPABASE_URL with the dockerized supabase url
     replace_in_file(".env.local", "localhost", "host.docker.internal")
 
     # except NEXT_PUBLIC_URL
     replace_in_file(".env.local", "NEXT_PUBLIC_URL=http:\\/\\/host.docker.internal", "NEXT_PUBLIC_URL=http:\\/\\/localhost")
+else:
+    # use localhost
+    needs_update = str(local("grep 'host.docker.internal' .env.local || true", echo_off = True, quiet = True)).strip() != ""
+    replace_in_file(".env.local", "host.docker.internal", "localhost") if needs_update else None
 
 for dotfile in [
     ".env",
@@ -34,6 +36,7 @@ for dotfile in [
     if os.path.exists(dotfile):
         print(color.green("Loading environment from " + dotfile))
         dotenv(fn = dotfile)
+        watch_file(dotfile)
 
 require_env(
     "ANVIL_BASE_FORK_URL",
