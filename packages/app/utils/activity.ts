@@ -1,6 +1,11 @@
 import { formatUnits } from 'viem'
 import formatAmount from './formatAmount'
-import { isTagReceiptsEvent, isReferralsEvent, isSendAccountTransfersEvent } from './zod/activity'
+import {
+  isTagReceiptsEvent,
+  isReferralsEvent,
+  isSendAccountTransfersEvent,
+  isTagReceiptUSDCEvent,
+} from './zod/activity'
 import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
 import { tokenPaymasterAddress } from '@my/wagmi'
@@ -67,7 +72,7 @@ export function amountFromActivity(activity: Activity): string {
       }
       return formatAmount(`${activity.data.value}`, 5, 0)
     }
-    case isTagReceiptsEvent(activity): {
+    case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity): {
       const data = activity.data
       const amount = formatUnits(data.value, data.coin.decimals)
       return `${amount} ${data.coin.symbol}`
@@ -109,7 +114,7 @@ export function eventNameFromActivity(activity: Activity) {
       return 'Received'
     case isTransferOrReceive && !!from_user?.id:
       return 'Sent'
-    case isTagReceiptsEvent(activity):
+    case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
       return 'Sendtag Registered'
     case isReferralsEvent(activity) && !!from_user?.id:
       return 'Referral'
@@ -129,7 +134,7 @@ export function eventNameFromActivity(activity: Activity) {
 export function subtextFromActivity(activity: Activity): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user } = activity
-  if (isTagReceiptsEvent(activity)) {
+  if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
   }
   if (isReferralsEvent(activity)) {

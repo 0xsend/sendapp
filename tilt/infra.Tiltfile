@@ -303,7 +303,7 @@ cmd_button(
 local_resource(
     "otterscan:base",
     allow_parallel = True,
-    auto_init = False,
+    auto_init = not CI,
     labels = labels,
     links = [link("http://localhost:5101/", "Otterscan Base")],
     readiness_probe = probe(
