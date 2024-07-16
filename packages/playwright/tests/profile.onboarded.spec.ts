@@ -100,6 +100,8 @@ test('can view activities between another profile', async ({
   const plan = await seed.users([{ ...userOnboarded, tags: [] }])
   const anotherUser = plan.profiles[0]
   assert(!!anotherUser, 'another user not found')
+  assert(!!anotherUser.name, 'another user name not found')
+  assert(!!anotherUser.about, 'another user about not found')
 
   // Filter out everything except `send_account_transfers`
   const activities = MockActivityFeed.flatMap((t) => {

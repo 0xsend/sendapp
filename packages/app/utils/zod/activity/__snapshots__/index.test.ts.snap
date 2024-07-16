@@ -227,5 +227,38 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       ],
     },
   },
+  {
+    "created_at": 2024-05-26T19:41:05.370Z,
+    "data": {
+      "block_num": 15164541n,
+      "coin": {
+        "coingeckoTokenId": "usd-coin",
+        "decimals": 6,
+        "label": "USDC",
+        "symbol": "USDC",
+        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      },
+      "log_addr": "0x71fa02bb11e4b119bEDbeeD2f119F62048245301",
+      "log_idx": 2n,
+      "tags": [
+        "tag_receipt_usdc",
+      ],
+      "tx_hash": "0x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c",
+      "tx_idx": 0n,
+      "value": 2000000n,
+    },
+    "event_name": "tag_receipt_usdc",
+    "from_user": {
+      "avatar_url": null,
+      "id": "97476407-bf7f-4ebe-86aa-c9d18a0b388a",
+      "name": null,
+      "send_id": 65244,
+      "tags": [
+        "asdf",
+        "teq",
+      ],
+    },
+    "to_user": null,
+  },
 ]
 `;

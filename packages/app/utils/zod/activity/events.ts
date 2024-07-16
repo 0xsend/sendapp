@@ -7,9 +7,14 @@ export enum Events {
    */
   SendAccountTransfers = 'send_account_transfers',
   /**
-   * Sendtag receipt for a send account
+   * Sendtag receipt for a send account in ETH.
+   * @notice use TagReceiptUSDC instead, we do not accept ETH for sendtags anymore
    */
   TagReceipts = 'tag_receipts',
+  /**
+   * Sendtag receipt for a send account in USDC
+   */
+  TagReceiptUSDC = 'tag_receipt_usdc',
   /**
    * Sendtag referrals for a send account
    */
