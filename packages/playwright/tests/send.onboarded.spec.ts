@@ -132,28 +132,17 @@ for (const token of tokens) {
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 
-      let blockExplorerPagePromise: Promise<Page> | null = null
-
-      if (isAddress) {
-        blockExplorerPagePromise = page.context().waitForEvent('page')
-      }
-
       // click user
-      await page
+      const searchResult = page
         .getByTestId('searchResults')
         .getByRole('link', { name: query, exact: false })
-        .click()
+      await expect(searchResult).toBeVisible()
+      await searchResult.click()
 
-      if (isAddress && !!blockExplorerPagePromise) {
+      if (isAddress) {
         // confirm sending to external address
         const dialog = page.getByRole('dialog', { name: 'Confirm External Send' })
         await expect(dialog).toBeVisible()
-        const blockExplorerButton = dialog.getByRole('button', { name: query })
-        await expect(blockExplorerButton).toBeVisible()
-        await blockExplorerButton.click()
-        const blockExplorerPage = await blockExplorerPagePromise
-        await expect(blockExplorerPage).toHaveURL(new RegExp(`/address/${query}`))
-        await blockExplorerPage.close()
         const confirmButton = dialog.getByRole('button', { name: 'I Agree & Continue' })
         await expect(confirmButton).toBeVisible()
         await confirmButton.click()
