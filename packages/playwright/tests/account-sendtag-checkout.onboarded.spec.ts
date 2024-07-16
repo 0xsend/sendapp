@@ -8,7 +8,7 @@ import debug from 'debug'
 import { parseEther } from 'viem'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { test as checkoutTest, expect } from './fixtures/checkout'
-import { pricing } from 'app/data/sendtags'
+import { pricing, price } from 'app/data/sendtags'
 
 let log: debug.Debugger
 
@@ -44,7 +44,9 @@ test('can visit checkout page', async ({ page, checkoutPage }) => {
 })
 
 test('can add a pending tag', async ({ checkoutPage }) => {
-  const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
+  const tagName = `${faker.lorem.word({
+    length: { min: 1, max: 16 },
+  })}_${test.info().parallelIndex}`
   await checkoutPage.addPendingTag(tagName)
   await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
 })
@@ -58,7 +60,7 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
 
 test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myProfile } }) => {
   // test.setTimeout(60_000) // 60 seconds
-  const tagName = `012345_${test.info().parallelIndex}` // ensure price is .002 ETH
+  const tagName = faker.string.alphanumeric({ length: { min: 1, max: 20 } })
   await checkoutPage.addPendingTag(tagName)
   await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
   await checkoutPage.confirmTags(expect)
@@ -74,20 +76,20 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   const { data, error: activityError } = await supabase
     .from('activity_feed')
     .select('*')
-    .eq('event_name', 'tag_receipts')
+    .eq('event_name', 'tag_receipt_usdc')
   expect(activityError).toBeFalsy()
   expect(data).toHaveLength(1)
   expect((data?.[0]?.data as { tags: string[] })?.tags).toEqual([tagName])
 
   const receiptEvent = {
-    event_name: 'tag_receipts',
+    event_name: 'tag_receipt_usdc',
     from_user: {
       id: myProfile.id,
       send_id: myProfile.send_id,
     },
     data: {
       tags: [tagName],
-      value: parseEther('0.002').toString(),
+      value: price(tagName.length).toString(),
     },
   }
   await expect(supabase).toHaveEventInActivityFeed(receiptEvent)
