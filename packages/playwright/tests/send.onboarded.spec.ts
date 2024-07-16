@@ -165,7 +165,7 @@ for (const token of tokens) {
           (() => {
             switch (idType) {
               case 'address':
-                return shorten(recvAccount.address, 6, 6)
+                return shorten(recvAccount.address, 5, 4)
               case 'sendid':
                 return `#${profile.sendId}`
               default:
