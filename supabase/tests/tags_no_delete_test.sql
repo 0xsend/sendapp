@@ -15,33 +15,35 @@ VALUES (
     '\\x00112233445566778899AABBCCDDEEFF'
 );
 
-INSERT INTO send_revenues_safe_receives (
+INSERT INTO send_account_transfers (
     chain_id,
     log_addr,
     tx_hash,
-    sender,
-    v,
     ig_name,
     src_name,
     block_num,
     tx_idx,
     log_idx,
     abi_idx,
-    block_time
+    block_time,
+    f,
+    t,
+    v
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
+    'send_account_transfers',
+    'send_account_transfers',
+    1,
+    0,
+    0,
+    0,
+    1234567890,
     '\xb0b0000000000000000000000000000000000000',
-    1,
-    'send_revenues_safe_receives',
-    'send_revenues_safe_receives',
-    1,
-    0,
-    0,
-    0,
-    1234567890
+    '\x3F14F917FB2DF7E0F3C6B06BB0FA0522FBEA4EEC',
+    1
 );
 SELECT tests.authenticate_as('bob');
 
@@ -56,8 +58,8 @@ SELECT confirm_tags(
     '{bob}',
     (
         SELECT event_id
-        FROM send_revenues_safe_receives
-        WHERE sender = '\xb0b0000000000000000000000000000000000000'
+        FROM send_account_transfers
+        WHERE f = '\xb0b0000000000000000000000000000000000000'
     ),
     null
 );
