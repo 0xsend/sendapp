@@ -184,6 +184,31 @@ jobs:
               break
             else
               echo "Tilt not ready, retrying..."
+              # Check if any targets are in error
+              has_errors=$(tilt dump engine | jq '
+                .ManifestTargets
+                | to_entries
+                | map(select(.value.State.RuntimeState.Status == "error"))
+                | length > 0
+              ')
+
+              if [ "$has_errors" = "true" ]; then
+                echo "There are targets in error status:"
+                tilt dump engine | jq '
+                  .ManifestTargets
+                  | to_entries
+                  | map({key: .value.State.RuntimeState.Status, value: .key})
+                  | group_by(.key)
+                  | map({key: .[0].key, value: map(.value)})
+                  | from_entries
+                '
+                exit 1
+              else
+                echo "All targets are OK"
+              fi
+             fi
+             if ((i == max_attempts)); then
+               echo "Reached maximum attempts, exiting"
             fi
             if ((i == max_attempts)); then
               echo "Reached maximum attempts, exiting"
