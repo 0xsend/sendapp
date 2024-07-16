@@ -25,7 +25,6 @@ import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import * as Linking from 'expo-linking'
 import { useEffect, useState } from 'react'
 import { FormProvider } from 'react-hook-form'
-import { Pressable } from 'react-native'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { Adapt, Dialog, Sheet } from 'tamagui'
@@ -229,55 +228,52 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
   const [sendConfirmDialogIsOpen, setSendConfirmDialogIsOpen] = useState(false)
 
   return (
-    <View br="$5" key={`SearchResultRow-${address}`} width="100%">
-      <Pressable
+    <View br="$5" key={`SearchResultRow-${address}`} width="100%" testID="searchResults">
+      <Card
+        testID={`tag-search-${address}`}
+        ai="center"
+        gap="$4"
+        display="flex"
+        fd={'row'}
+        p="$3"
         onPress={() => setSendConfirmDialogIsOpen(true)}
-        accessibilityRole="link"
-        accessibilityLabel={address}
+        role="link"
+        aria-label={address}
       >
-        <Card
-          testID={`tag-search-${address}`}
-          ai="center"
-          gap="$4"
-          display="flex"
-          fd={'row'}
-          p="$3"
-        >
-          <Avatar size="$4.5" br="$3">
-            <Avatar.Fallback
-              f={1}
-              jc={'center'}
-              ai={'center'}
-              backgroundColor={'$decay'}
-              $theme-light={{ backgroundColor: '$white' }}
-            >
-              <IconAccount color="$olive" size={'$4'} />
-            </Avatar.Fallback>
-          </Avatar>
-          <YStack gap="$1">
-            <XStack gap="$3" ai={'center'}>
-              <Paragraph
-                fontWeight={'300'}
-                $theme-light={{ color: '$darkGrayTextField' }}
-                $theme-dark={{ color: '$lightGrayTextField' }}
-                fontSize="$7"
-                $gtSm={{ fontSize: '$5' }}
-              >
-                {ensFromAddress ?? 'External Address'}
-              </Paragraph>
-              {isLoadingEns && <Spinner size="small" color={'$color11'} />}
-            </XStack>
-            <Text
-              fontSize="$4"
-              ff={'$mono'}
+        <Avatar size="$4.5" br="$3">
+          <Avatar.Fallback
+            f={1}
+            jc={'center'}
+            ai={'center'}
+            backgroundColor={'$decay'}
+            $theme-light={{ backgroundColor: '$white' }}
+          >
+            <IconAccount color="$olive" size={'$4'} />
+          </Avatar.Fallback>
+        </Avatar>
+        <YStack gap="$1">
+          <XStack gap="$3" ai={'center'}>
+            <Paragraph
+              fontWeight={'300'}
               $theme-light={{ color: '$darkGrayTextField' }}
-              $gtSm={{ fontSize: '$2' }}
+              $theme-dark={{ color: '$lightGrayTextField' }}
+              fontSize="$7"
+              $gtSm={{ fontSize: '$5' }}
             >
-              {gtMd ? address : shorten(address, 6, 6)}
-            </Text>
-          </YStack>
-        </Card>
-      </Pressable>
+              {ensFromAddress ?? 'External Address'}
+            </Paragraph>
+            {isLoadingEns && <Spinner size="small" color={'$color11'} />}
+          </XStack>
+          <Text
+            fontSize="$4"
+            ff={'$mono'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+            $gtSm={{ fontSize: '$2' }}
+          >
+            {gtMd ? address : shorten(address, 6, 6)}
+          </Text>
+        </YStack>
+      </Card>
       <ConfirmSendDialog
         isOpen={sendConfirmDialogIsOpen}
         onClose={() => setSendConfirmDialogIsOpen(false)}

@@ -31,7 +31,7 @@ import { formatEther } from 'viem'
 import type { z } from 'zod'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
-import { getPriceInWei, maxNumSendTags, tagLengthToWei } from './checkout-utils'
+import { getPrice, maxNumSendTags, tagLengthPrice } from './checkout-utils'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { Link } from 'solito/link'
@@ -442,7 +442,7 @@ function HoldingTime({ created }: { created: Date }) {
 }
 
 function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
-  const price = useMemo(() => tagLengthToWei(tag?.name.length), [tag])
+  const price = useMemo(() => tagLengthPrice(tag?.name.length), [tag])
 
   return `${formatEther(price).toLocaleString()} ETH`
 }
@@ -450,7 +450,7 @@ function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
 function TotalPrice() {
   const pendingTags = usePendingTags()
 
-  const weiAmount = useMemo(() => getPriceInWei(pendingTags ?? []), [pendingTags])
+  const weiAmount = useMemo(() => getPrice(pendingTags ?? []), [pendingTags])
 
   return (
     <YStack ai="center" $gtMd={{ ai: 'flex-end' }}>
