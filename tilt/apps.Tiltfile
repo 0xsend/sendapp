@@ -57,7 +57,7 @@ if CFG.dockerize:
 else:
     local_resource(
         "next:web",
-        "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
+        "yarn turbo build --filter=next-app" if CI else "",  # In CI, only build the web app
         labels = labels,
         links = ["http://localhost:3000"],
         readiness_probe = None if CI else probe(

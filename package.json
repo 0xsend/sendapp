@@ -11,7 +11,7 @@
     "native": "cd apps/expo && yarn start",
     "watch": "yarn workspaces foreach -pi run watch",
     "web": "yarn build && cd apps/next && yarn dev",
-    "web:docker:build": "GIT_BRANCH=$(git symbolic-ref --short HEAD) GIT_HASH=$(git rev-parse --short=10 HEAD) dotenv -e ./.env -c -- docker compose build",
+    "web:docker:build": "GIT_BRANCH=$(git symbolic-ref --short HEAD) GIT_HASH=$(git rev-parse --short=10 HEAD) dotenv -e ./.env -c -- docker compose build --progress=plain",
     "web:docker:push": "GIT_BRANCH=$(git symbolic-ref --short HEAD) GIT_HASH=$(git rev-parse --short=10 HEAD) docker compose push",
     "web:extract": "DISABLE_EXTRACTION=false yarn workspace next-app dev",
     "web:prod": "yarn workspace next-app build",

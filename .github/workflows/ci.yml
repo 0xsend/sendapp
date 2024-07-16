@@ -121,8 +121,22 @@ jobs:
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
+      - name: 🏗 Prepare Playwright env
+        shell: bash
+        run: |
+          PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: 🧰 Cache Playwright browser binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: "~/.cache/ms-playwright"
+          key: "${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}"
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
