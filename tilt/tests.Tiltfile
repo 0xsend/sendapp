@@ -71,7 +71,6 @@ local_resource(
     "echo 🥳",
     labels = labels,
     resource_deps = [
-        "anvil:mainnet",
         "anvil:base",
         "anvil:fixtures",
         "aa_bundler:base",
@@ -140,7 +139,6 @@ local_resource(
     labels = labels,
     resource_deps = [
         "yarn:install",
-        "anvil:mainnet",
         "supabase",
         "supabase:generate",
         "wagmi:generate",

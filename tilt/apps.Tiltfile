@@ -87,7 +87,6 @@ local_resource(
     ),
     resource_deps = [
         "yarn:install",
-        "anvil:mainnet",
         "supabase",
         "supabase:generate",
         "wagmi:generate",
