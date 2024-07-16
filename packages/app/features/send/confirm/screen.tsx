@@ -448,7 +448,7 @@ export function SendRecipient({ ...props }: YStackProps) {
             {(() => {
               switch (true) {
                 case idType === 'address':
-                  return shorten(recipient, 6, 6)
+                  return shorten(recipient, 5, 4)
                 case !!profile?.tag:
                   return `/${profile?.tag}`
                 default:
