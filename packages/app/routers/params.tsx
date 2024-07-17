@@ -145,7 +145,7 @@ export const useRedirectUri = () => {
     parse: (value) => {
       if (value === undefined) return undefined
       if (value.includes('/auth/')) return undefined
-      return Array.isArray(value) ? value[0] : value
+      return Array.isArray(value) ? decodeURIComponent(value[0] ?? '') : decodeURIComponent(value)
     },
   })
 

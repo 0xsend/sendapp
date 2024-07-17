@@ -1,5 +1,6 @@
 import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
+  baseMainnetBundlerClient,
   entryPointAddress,
   sendAccountAbi,
   sendTokenAbi,
@@ -279,6 +280,7 @@ function userOpQueryOptions({
         functionName: 'executeBatch',
         args: [calls],
       })
+
       const paymaster = tokenPaymasterAddress[chainId]
       const userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
@@ -291,7 +293,13 @@ function userOpQueryOptions({
         paymasterData: '0x',
         signature: '0x',
       }
-      return userOp
+
+      // only estimate the gas for the call
+      const { callGasLimit } = await baseMainnetBundlerClient.estimateUserOperationGas({
+        userOperation: userOp,
+      })
+
+      return { ...userOp, callGasLimit }
     },
   })
 }
