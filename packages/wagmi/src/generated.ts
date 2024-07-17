@@ -3190,6 +3190,155 @@ export const senderCreatorAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SendtagCheckout
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ *
+ */
+export const sendtagCheckoutAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: '_sendRevenuesMultisig', internalType: 'address', type: 'address' },
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'referrer', internalType: 'address', type: 'address' },
+      { name: 'bonus', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'checkout',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'multisig',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'open',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'toggle', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'token',
+    outputs: [{ name: '', internalType: 'contract IERC20', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'function', inputs: [], name: 'withdrawETH', outputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdrawToken',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', internalType: 'address', type: 'address', indexed: true },
+      { name: 'newOwner', internalType: 'address', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'referrer', internalType: 'address', type: 'address', indexed: true },
+      { name: 'referred', internalType: 'address', type: 'address', indexed: false },
+      { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'ReferralBonus',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'open', internalType: 'bool', type: 'bool', indexed: false }],
+    name: 'Toggled',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
+    name: 'AddressEmptyCode',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'AddressInsufficientBalance',
+  },
+  { type: 'error', inputs: [], name: 'FailedInnerCall' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+  },
+] as const
+
+/**
+ *
+ */
+export const sendtagCheckoutAddress = {
+  845337: '0x3f14f917fB2DF7e0f3c6b06BB0Fa0522FBEA4Eec',
+} as const
+
+/**
+ *
+ */
+export const sendtagCheckoutConfig = {
+  address: sendtagCheckoutAddress,
+  abi: sendtagCheckoutAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TokenPaymaster
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -7294,6 +7443,253 @@ export const prepareWriteSenderCreator = /*#__PURE__*/ createSimulateContract({
 export const prepareWriteSenderCreatorCreateSender = /*#__PURE__*/ createSimulateContract({
   abi: senderCreatorAbi,
   functionName: 'createSender',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const readSendtagCheckout = /*#__PURE__*/ createReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"multisig"`
+ *
+ *
+ */
+export const readSendtagCheckoutMultisig = /*#__PURE__*/ createReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'multisig',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"open"`
+ *
+ *
+ */
+export const readSendtagCheckoutOpen = /*#__PURE__*/ createReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'open',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"owner"`
+ *
+ *
+ */
+export const readSendtagCheckoutOwner = /*#__PURE__*/ createReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"token"`
+ *
+ *
+ */
+export const readSendtagCheckoutToken = /*#__PURE__*/ createReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const writeSendtagCheckout = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
+ *
+ *
+ */
+export const writeSendtagCheckoutCheckout = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'checkout',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const writeSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
+ *
+ *
+ */
+export const writeSendtagCheckoutToggle = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'toggle',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const writeSendtagCheckoutTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
+ *
+ *
+ */
+export const writeSendtagCheckoutWithdrawEth = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawETH',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const writeSendtagCheckoutWithdrawToken = /*#__PURE__*/ createWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const prepareWriteSendtagCheckout = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
+ *
+ *
+ */
+export const prepareWriteSendtagCheckoutCheckout = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'checkout',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const prepareWriteSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
+ *
+ *
+ */
+export const prepareWriteSendtagCheckoutToggle = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'toggle',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const prepareWriteSendtagCheckoutTransferOwnership = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
+ *
+ *
+ */
+export const prepareWriteSendtagCheckoutWithdrawEth = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawETH',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const prepareWriteSendtagCheckoutWithdrawToken = /*#__PURE__*/ createSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const watchSendtagCheckoutEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ *
+ */
+export const watchSendtagCheckoutOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent(
+  { abi: sendtagCheckoutAbi, address: sendtagCheckoutAddress, eventName: 'OwnershipTransferred' }
+)
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralBonus"`
+ *
+ *
+ */
+export const watchSendtagCheckoutReferralBonusEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  eventName: 'ReferralBonus',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Toggled"`
+ *
+ *
+ */
+export const watchSendtagCheckoutToggledEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  eventName: 'Toggled',
 })
 
 /**
@@ -11720,6 +12116,256 @@ export const useSimulateSenderCreator = /*#__PURE__*/ createUseSimulateContract(
 export const useSimulateSenderCreatorCreateSender = /*#__PURE__*/ createUseSimulateContract({
   abi: senderCreatorAbi,
   functionName: 'createSender',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const useReadSendtagCheckout = /*#__PURE__*/ createUseReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"multisig"`
+ *
+ *
+ */
+export const useReadSendtagCheckoutMultisig = /*#__PURE__*/ createUseReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'multisig',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"open"`
+ *
+ *
+ */
+export const useReadSendtagCheckoutOpen = /*#__PURE__*/ createUseReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'open',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"owner"`
+ *
+ *
+ */
+export const useReadSendtagCheckoutOwner = /*#__PURE__*/ createUseReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"token"`
+ *
+ *
+ */
+export const useReadSendtagCheckoutToken = /*#__PURE__*/ createUseReadContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'token',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const useWriteSendtagCheckout = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
+ *
+ *
+ */
+export const useWriteSendtagCheckoutCheckout = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'checkout',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const useWriteSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
+ *
+ *
+ */
+export const useWriteSendtagCheckoutToggle = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'toggle',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const useWriteSendtagCheckoutTransferOwnership = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
+ *
+ *
+ */
+export const useWriteSendtagCheckoutWithdrawEth = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawETH',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const useWriteSendtagCheckoutWithdrawToken = /*#__PURE__*/ createUseWriteContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const useSimulateSendtagCheckout = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
+ *
+ *
+ */
+export const useSimulateSendtagCheckoutCheckout = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'checkout',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
+ *
+ *
+ */
+export const useSimulateSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
+ *
+ *
+ */
+export const useSimulateSendtagCheckoutToggle = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'toggle',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
+ *
+ *
+ */
+export const useSimulateSendtagCheckoutTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
+ *
+ *
+ */
+export const useSimulateSendtagCheckoutWithdrawEth = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawETH',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
+ *
+ *
+ */
+export const useSimulateSendtagCheckoutWithdrawToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  functionName: 'withdrawToken',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__
+ *
+ *
+ */
+export const useWatchSendtagCheckoutEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ *
+ *
+ */
+export const useWatchSendtagCheckoutOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: sendtagCheckoutAbi,
+    address: sendtagCheckoutAddress,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralBonus"`
+ *
+ *
+ */
+export const useWatchSendtagCheckoutReferralBonusEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  eventName: 'ReferralBonus',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Toggled"`
+ *
+ *
+ */
+export const useWatchSendtagCheckoutToggledEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  eventName: 'Toggled',
 })
 
 /**
