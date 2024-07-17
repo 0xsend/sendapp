@@ -25,7 +25,8 @@
     "dev:anvil-add-token-paymaster-fixtures": "bun run ./script/anvil-add-token-paymaster-fixtures.ts",
     "dev:anvil-add-send-check-fixtures": "bun run ./script/anvil-add-send-check-fixtures.ts",
     "dev:anvil-token-paymaster-deposit": "bun run ./script/anvil-token-paymaster-deposit.ts",
-    "dev:anvil-deploy-fjord-send-verifier-fixtures": "bun run ./script/anvil-deploy-fjord-send-verifier-fixtures.ts"
+    "dev:anvil-deploy-fjord-send-verifier-fixtures": "bun run ./script/anvil-deploy-fjord-send-verifier-fixtures.ts",
+    "dev:anvil-add-sendtag-checkout-fixtures": "bun run ./script/anvil-add-sendtag-checkout-fixtures.ts"
   },
   "devDependencies": {
     "@my/supabase": "workspace:*",

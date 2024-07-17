@@ -184,12 +184,39 @@ jobs:
               echo "Tilt process (PID: $tilt_pid) is no longer running, exiting"
               exit 1
             fi
+
+            # Check if any targets are in error
+            has_errors=$(tilt dump engine | jq '
+              .ManifestTargets 
+              | to_entries 
+              | map(select(.value.State.RuntimeState.Status == "error")) 
+              | length > 0
+            ')
+
+            if [ "$has_errors" = "true" ]; then
+              echo "There are targets in error status:"
+              tilt dump engine | jq '
+                .ManifestTargets 
+                | to_entries 
+                | map(select(.value.State.RuntimeState.Status == "error")) 
+                | map(.key)
+              '
+              exit 1
+            fi
             
             if tilt wait --timeout "${wait_timeout}s" --for=condition=Ready "uiresource/playwright:deps"; then
               echo "Tilt is ready"
               break
             else
               echo "Tilt not ready, retrying..."
+              tilt dump engine | jq '
+                .ManifestTargets 
+                | to_entries 
+                | map({key: (.value.State.RuntimeState.Status // "in_progress"), value: .key}) 
+                | group_by(.key) 
+                | map({key: .[0].key, value: map(.value)}) 
+                | from_entries
+              '
             fi
             if ((i == max_attempts)); then
               echo "Reached maximum attempts, exiting"
@@ -263,47 +290,47 @@ jobs:
         with:
           name: nextjs-build
           path: ${{ github.workspace }}/apps/next/.next
-      - name: Get Supabase Database Branch
-        if: github.base_ref == 'dev'
-        uses: 0xbigboss/supabase-branch-gh-action@v1
-        id: supabase-branch
-        with:
-          supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
-          supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
-          wait-for-migrations: false # Optional. Default is false.
-          timeout: 60 # Optional. Default is 60.
-      - name: Add SMS provider to Supabase branch
-        if: github.base_ref == 'dev'
-        uses: 0xbigboss/supabase-manager-script-gh-action@v1
-        id: add-sms-provider
-        with:
-          supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
-          script: |
-            const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
-              ref: process.env.SUPABASE_PARENT_PROJECT_ID,
-            });
+      # - name: Get Supabase Database Branch
+      #   if: github.base_ref == 'dev'
+      #   uses: 0xbigboss/supabase-branch-gh-action@v1
+      #   id: supabase-branch
+      #   with:
+      #     supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
+      #     supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
+      #     wait-for-migrations: false # Optional. Default is false.
+      #     timeout: 60 # Optional. Default is 60.
+      # - name: Add SMS provider to Supabase branch
+      #   if: github.base_ref == 'dev'
+      #   uses: 0xbigboss/supabase-manager-script-gh-action@v1
+      #   id: add-sms-provider
+      #   with:
+      #     supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
+      #     script: |
+      #       const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
+      #         ref: process.env.SUPABASE_PARENT_PROJECT_ID,
+      #       });
 
-            core.info('Enabling Twilio verify external phone auth provider');
+      #       core.info('Enabling Twilio verify external phone auth provider');
 
-            await supabaseManager.projectsConfig.updateV1AuthConfig({
-              ref: process.env.SUPABASE_PROJECT_ID,
-              requestBody: {
-                external_phone_enabled: true,
-                sms_provider: parentAuthConfig.sms_provider,
-                sms_twilio_verify_account_sid:
-                  parentAuthConfig.sms_twilio_verify_account_sid,
-                sms_twilio_verify_auth_token: parentAuthConfig.sms_twilio_verify_auth_token,
-                sms_twilio_verify_message_service_sid:
-                  parentAuthConfig.sms_twilio_verify_message_service_sid,
-              },
-            });
+      #       await supabaseManager.projectsConfig.updateV1AuthConfig({
+      #         ref: process.env.SUPABASE_PROJECT_ID,
+      #         requestBody: {
+      #           external_phone_enabled: true,
+      #           sms_provider: parentAuthConfig.sms_provider,
+      #           sms_twilio_verify_account_sid:
+      #             parentAuthConfig.sms_twilio_verify_account_sid,
+      #           sms_twilio_verify_auth_token: parentAuthConfig.sms_twilio_verify_auth_token,
+      #           sms_twilio_verify_message_service_sid:
+      #             parentAuthConfig.sms_twilio_verify_message_service_sid,
+      #         },
+      #       });
 
-            core.info('Done');
+      #       core.info('Done');
 
-            return "success";
-        env:
-          SUPABASE_PROJECT_ID: ${{ steps.supabase-branch.outputs.project_ref }}
-          SUPABASE_PARENT_PROJECT_ID: ${{ steps.supabase-branch.outputs.parent_project_ref }}
+      #       return "success";
+      #   env:
+      #     SUPABASE_PROJECT_ID: ${{ steps.supabase-branch.outputs.project_ref }}
+      #     SUPABASE_PARENT_PROJECT_ID: ${{ steps.supabase-branch.outputs.parent_project_ref }}
       - name: Extract branch name
         id: extract-branch
         uses: ./.github/actions/extract-branch

@@ -3,6 +3,7 @@ import {
   Button,
   ButtonText,
   Label,
+  LinkableAvatar,
   Paragraph,
   ScrollView,
   Spinner,
@@ -11,7 +12,6 @@ import {
   YStack,
   type ParagraphProps,
   type YStackProps,
-  LinkableAvatar,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
@@ -39,7 +39,7 @@ import {
 } from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { isAddress, parseUnits, type Hex, type Address } from 'viem'
+import { isAddress, parseUnits, type Hex } from 'viem'
 import { useBalance, useEstimateFeesPerGas } from 'wagmi'
 
 export function SendConfirmScreen() {
@@ -73,11 +73,10 @@ export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType } = queryParams
 
-  const {
-    data: profile,
-    isLoading: isProfileLoading,
-    error: profileError,
-  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
+    idType ?? 'tag',
+    recipient ?? ''
+  )
 
   const webauthnCreds =
     sendAccount?.send_account_credentials

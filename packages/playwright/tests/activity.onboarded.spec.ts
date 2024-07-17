@@ -51,13 +51,17 @@ test('can visit activity page', async ({ page, pg, user: { profile }, seed }) =>
   log('beforeEach', `url=${page.url()}`)
   await expect.soft(activityHeading(page)).toBeVisible()
 
-  await expect.soft(page.getByText('Received').first()).toBeVisible()
+  await expect.soft(page.getByText('Deposit').first()).toBeVisible()
   await expect.soft(page.getByText('0.019032 USDC').nth(1)).toBeVisible()
   await expect.soft(page.getByText('0xB2c21F54653531aa4AffA80F63593913f0C70628')).toBeVisible()
 
-  await expect.soft(page.getByText('Sendtag Registered')).toBeVisible()
+  await expect.soft(page.getByText('Sendtag Registered').nth(0)).toBeVisible()
   await expect.soft(page.getByText('/yuw')).toBeVisible()
   await expect.soft(page.getByText('0.02 ETH').nth(1)).toBeVisible()
+
+  await expect.soft(page.getByText('Sendtag Registered').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('/tag_receipt_usdc')).toBeVisible()
+  await expect.soft(page.getByText('2 USDC', { exact: true }).nth(1)).toBeVisible()
 
   await expect.soft(page.getByText('Referral', { exact: true })).toBeVisible()
   // await expect.soft(page.getByText('/disconnect_whorl7351')).toBeVisible()
@@ -70,7 +74,7 @@ test('can visit activity page', async ({ page, pg, user: { profile }, seed }) =>
   // await expect.soft(page.getByText('0.077777 USDC').nth(1)).toBeVisible()
   // await expect.soft(page.getByText('dan')).toBeVisible()
 
-  await expect.soft(page.getByText('Received').nth(1)).toBeVisible()
+  await expect.soft(page.getByText('Deposit').nth(1)).toBeVisible()
   await expect.soft(page.getByText('0.01 ETH').nth(1)).toBeVisible()
   // await expect.soft(page.getByText(`#${anotherUser.sendId}`)).toBeVisible()
   await expect.soft(page.getByText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')).toBeVisible()

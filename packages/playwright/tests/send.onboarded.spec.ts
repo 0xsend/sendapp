@@ -9,11 +9,11 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { debug, type Debugger } from 'debug'
-import { parseUnits, zeroAddress } from 'viem'
+import { parseUnits } from 'viem'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
 import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -80,6 +80,7 @@ for (const token of tokens) {
       supabase,
     }) => {
       const isSendId = idType === 'sendid'
+      const isAddress = idType === 'address'
       const plan = await seed.users(
         isSendId
           ? [{ ...userOnboarded, tags: [] }] // no tags for send id
@@ -91,7 +92,7 @@ for (const token of tokens) {
       assert(!!profile, 'profile not found')
       assert(!!profile.name, 'profile name not found')
       assert(!!profile.sendId, 'profile send id not found')
-
+      assert(!!plan.sendAccounts[0], 'send account not found')
       const recvAccount: { address: `0x${string}` } = (() => {
         switch (idType) {
           case 'address':
@@ -131,28 +132,17 @@ for (const token of tokens) {
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 
-      let blockExplorerPagePromise: Promise<Page> | null = null
-
-      if (idType === 'address') {
-        blockExplorerPagePromise = page.context().waitForEvent('page')
-      }
-
       // click user
-      await page
+      const searchResult = page
         .getByTestId('searchResults')
         .getByRole('link', { name: query, exact: false })
-        .click()
+      await expect(searchResult).toBeVisible()
+      await searchResult.click()
 
-      if (idType === 'address' && !!blockExplorerPagePromise) {
+      if (isAddress) {
         // confirm sending to external address
         const dialog = page.getByRole('dialog', { name: 'Confirm External Send' })
         await expect(dialog).toBeVisible()
-        const blockExplorerButton = dialog.getByRole('button', { name: query })
-        await expect(blockExplorerButton).toBeVisible()
-        await blockExplorerButton.click()
-        const blockExplorerPage = await blockExplorerPagePromise
-        await expect(blockExplorerPage).toHaveURL(new RegExp(`/address/${query}`))
-        await blockExplorerPage.close()
         const confirmButton = dialog.getByRole('button', { name: 'I Agree & Continue' })
         await expect(confirmButton).toBeVisible()
         await confirmButton.click()
@@ -195,7 +185,14 @@ for (const token of tokens) {
             return `/${tag?.name}`
         }
       })()
-      await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
+      await handleTokenTransfer({
+        token,
+        supabase,
+        page,
+        counterparty,
+        recvAccount,
+        profile: isAddress ? undefined : profile,
+      })
     })
   }
 }
@@ -232,7 +229,7 @@ async function handleTokenTransfer({
   page: Page
   counterparty: string
   recvAccount: { address: string }
-  profile: { id: string; sendId?: number }
+  profile?: { id: string; sendId?: number }
 }): Promise<void> {
   const isETH = token.symbol === 'ETH'
   const decimalAmount = (Math.random() * 1000).toFixed(token.decimals).toString()
@@ -274,10 +271,7 @@ async function handleTokenTransfer({
         ).toBe(transferAmount)
       : await expect(supabase).toHaveEventInActivityFeed({
           event_name: 'send_account_transfers',
-          to_user: {
-            id: profile.id,
-            send_id: profile.sendId,
-          },
+          ...(profile ? { to_user: { id: profile.id, send_id: profile.sendId } } : {}),
           data: {
             t: hexToBytea(recvAccount.address as `0x${string}`),
             v: transferAmount.toString(),

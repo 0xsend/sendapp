@@ -73,6 +73,28 @@ export const mockTagReceipt = {
   },
 }
 
+export const mockTagReceiptUSDC = {
+  created_at: '2024-05-26T19:41:05.370+00:00',
+  event_name: 'tag_receipt_usdc',
+  from_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 65244,
+    tags: ['asdf', 'teq'],
+  },
+  to_user: null,
+  data: {
+    tags: ['tag_receipt_usdc'],
+    value: '2000000',
+    log_addr: '\\x71fa02bb11e4b119bEDbeeD2f119F62048245301',
+    block_num: 15164541,
+    tx_idx: 0,
+    log_idx: 2,
+    tx_hash: '\\x37c4281422413a3a78e765452c47abb5c3a95c102282bdd3632ced0b640d861c',
+  },
+}
+
 export const mockReferral = {
   created_at: '2024-05-26T19:41:05.370062+00:00',
   event_name: 'referrals',
@@ -180,6 +202,7 @@ export const MockActivityFeed = [
   },
   mockSentTransfer,
   mockSendAccountReceive,
+  mockTagReceiptUSDC,
 ] as const
 
 // you can use this to mock the activity feed by overriding the network request in the developer console

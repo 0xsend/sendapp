@@ -14,12 +14,14 @@ import {
   tokenPaymasterAbi,
   tokenPaymasterAddress,
   usdcAddress,
+  type baseMainnet,
 } from '@my/wagmi'
 import debug from 'debug'
 import crypto from 'node:crypto'
 import {
   bytesToHex,
   concat,
+  createTestClient,
   createWalletClient,
   encodeAbiParameters,
   encodeFunctionData,
@@ -30,8 +32,12 @@ import {
   hexToBytes,
   http,
   maxUint256,
+  publicActions,
   type Account,
   type Hex,
+  type HttpTransport,
+  type PublicActions,
+  type TestClient,
   type WalletClient,
 } from 'viem'
 
@@ -43,12 +49,7 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { sendAccountAbi } from '@my/wagmi'
 import { base64urlnopad } from '@scure/base'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import {
-  USEROP_VERSION,
-  generateChallenge,
-  getSendAccountCreateArgs,
-  testClient,
-} from 'app/utils/userop'
+import { USEROP_VERSION, generateChallenge, getSendAccountCreateArgs } from 'app/utils/userop'
 import nock from 'nock'
 import {
   getRequiredPrefund,
@@ -83,6 +84,13 @@ const signatureStruct = getAbiItem({
   abi: sendAccountAbi,
   name: 'signatureStruct',
 }).inputs
+
+const testClient = createTestClient({
+  chain: baseMainnetClient.chain,
+  transport: http(baseMainnetClient.transport.url),
+  mode: 'anvil',
+}).extend(publicActions) as unknown as TestClient<'anvil', HttpTransport, typeof baseMainnet> &
+  PublicActions
 
 async function createAccountAndVerifySignature() {
   // Generate keypair

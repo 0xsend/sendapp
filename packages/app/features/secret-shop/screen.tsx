@@ -11,12 +11,26 @@ import {
   Anchor,
 } from '@my/ui'
 import { useSendAccounts } from 'app/utils/send-accounts'
-import { testClient } from 'app/utils/userop'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import { baseMainnet, baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { api } from 'app/utils/api'
-import { parseEther } from 'viem'
+import {
+  createTestClient,
+  http,
+  parseEther,
+  publicActions,
+  type HttpTransport,
+  type PublicActions,
+  type TestClient,
+} from 'viem'
 import { shorten } from 'app/utils/strings'
+
+const testClient = createTestClient({
+  chain: baseMainnetClient.chain,
+  transport: http(baseMainnetClient.transport.url),
+  mode: 'anvil',
+}).extend(publicActions) as unknown as TestClient<'anvil', HttpTransport, typeof baseMainnet> &
+  PublicActions
 
 export function SecretShopScreen() {
   const toast = useToastController()

@@ -25,13 +25,13 @@ import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import * as Linking from 'expo-linking'
 import { useEffect, useState } from 'react'
 import { FormProvider } from 'react-hook-form'
-import { Pressable } from 'react-native'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { Adapt, Dialog, Sheet } from 'tamagui'
 import { type Address, isAddress } from 'viem'
 import { IconAccount } from './icons'
 import { baseMainnet } from '@my/wagmi'
+import { useEnsName } from 'wagmi'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -64,22 +64,31 @@ function SearchResults() {
 
   if (isAddress(query ?? '')) {
     return (
-      <ScrollView
+      <View
         testID="searchResults"
         key="searchResults"
         animation="quick"
         gap="$size.2.5"
-        mt="$size.3.5"
         width="100%"
         enterStyle={{
           opacity: 0,
           y: -10,
         }}
       >
-        <XStack gap="$5" flexWrap="wrap">
+        <YStack key={'results-eoa'} gap="$3.5">
+          <H4
+            $theme-dark={{ color: '$lightGrayTextField' }}
+            $theme-light={{ color: '$darkGrayTextField' }}
+            fontFamily={'$mono'}
+            fontWeight={'500'}
+            size={'$5'}
+            textTransform="uppercase"
+          >
+            EOA
+          </H4>
           <AddressSearchResultRow address={query as Address} />
-        </XStack>
-      </ScrollView>
+        </YStack>
+      </View>
     )
   }
 
@@ -210,37 +219,40 @@ function SearchFilterButton({
 
 const AddressSearchResultRow = ({ address }: { address: Address }) => {
   const href = useSearchResultHref()
+  const { data: ensFromAddress, isLoading: isLoadingEns } = useEnsName({
+    address,
+  })
+
   const router = useRouter()
   const { gtMd } = useMedia()
   const [sendConfirmDialogIsOpen, setSendConfirmDialogIsOpen] = useState(false)
 
   return (
-    <View br="$5" key={`SearchResultRow-${address}`} width="100%">
-      <Pressable
+    <View br="$5" key={`SearchResultRow-${address}`} width="100%" testID="searchResults">
+      <Card
+        testID={`tag-search-${address}`}
+        ai="center"
+        gap="$4"
+        display="flex"
+        fd={'row'}
+        p="$3"
         onPress={() => setSendConfirmDialogIsOpen(true)}
-        accessibilityRole="link"
-        accessibilityLabel={address}
+        role="link"
+        aria-label={address}
       >
-        <Card
-          testID={`tag-search-${address}`}
-          ai="center"
-          gap="$4"
-          display="flex"
-          fd={'row'}
-          p="$3"
-        >
-          <Avatar size="$4.5" br="$3">
-            <Avatar.Fallback
-              f={1}
-              jc={'center'}
-              ai={'center'}
-              backgroundColor={'$decay'}
-              $theme-light={{ backgroundColor: '$white' }}
-            >
-              <IconAccount color="$olive" />
-            </Avatar.Fallback>
-          </Avatar>
-          <YStack gap="$1">
+        <Avatar size="$4.5" br="$3">
+          <Avatar.Fallback
+            f={1}
+            jc={'center'}
+            ai={'center'}
+            backgroundColor={'$decay'}
+            $theme-light={{ backgroundColor: '$white' }}
+          >
+            <IconAccount color="$olive" size={'$4'} />
+          </Avatar.Fallback>
+        </Avatar>
+        <YStack gap="$1">
+          <XStack gap="$3" ai={'center'}>
             <Paragraph
               fontWeight={'300'}
               $theme-light={{ color: '$darkGrayTextField' }}
@@ -248,19 +260,20 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
               fontSize="$7"
               $gtSm={{ fontSize: '$5' }}
             >
-              External Address
+              {ensFromAddress ?? 'External Address'}
             </Paragraph>
-            <Text
-              fontSize="$4"
-              ff={'$mono'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-              $gtSm={{ fontSize: '$2' }}
-            >
-              {gtMd ? address : shorten(address, 6, 6)}
-            </Text>
-          </YStack>
-        </Card>
-      </Pressable>
+            {isLoadingEns && <Spinner size="small" color={'$color11'} />}
+          </XStack>
+          <Text
+            fontSize="$4"
+            ff={'$mono'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+            $gtSm={{ fontSize: '$2' }}
+          >
+            {gtMd ? address : shorten(address, 6, 6)}
+          </Text>
+        </YStack>
+      </Card>
       <ConfirmSendDialog
         isOpen={sendConfirmDialogIsOpen}
         onClose={() => setSendConfirmDialogIsOpen(false)}

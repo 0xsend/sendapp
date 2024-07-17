@@ -19,10 +19,10 @@ import { Info, X, XCircle } from '@tamagui/lucide-icons'
 import { IconInfoGreenCircle } from 'app/components/icons'
 import React, { useMemo, useState } from 'react'
 import { formatEther } from 'viem'
-import { getPriceInWei } from './checkout-utils'
+import { getPrice } from './checkout-utils'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
-  const price = useMemo(() => getPriceInWei([{ name }]), [name])
+  const price = useMemo(() => getPrice([{ name }]), [name])
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Dialog modal onOpenChange={setIsOpen}>
@@ -193,7 +193,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
 }
 
 export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['name'] }) {
-  const price = useMemo(() => getPriceInWei([{ name }]), [name])
+  const price = useMemo(() => getPrice([{ name }]), [name])
   const [isOpen, setIsOpen] = React.useState(false)
   return (
     <Tooltip placement="right" delay={0} allowFlip={false} offset={84} onOpenChange={setIsOpen}>

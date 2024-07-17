@@ -8,7 +8,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import type { MobileOtpType } from '@supabase/supabase-js'
+import type { MobileOtpType, Session, User } from '@supabase/supabase-js'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useForm } from 'react-hook-form'
@@ -20,7 +20,10 @@ const ConfirmSchema = z.object({
 
 export type VerifyCodeProps = {
   phone: string
-  onSuccess: () => void
+  onSuccess: (data?: {
+    user: User | null
+    session: Session | null
+  }) => void
   type?: MobileOtpType
 }
 
@@ -28,7 +31,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
   const supabase = useSupabase()
   const form = useForm<z.infer<typeof ConfirmSchema>>()
   async function confirmCode({ token }: z.infer<typeof ConfirmSchema>) {
-    const { error } = await supabase.auth.verifyOtp({
+    const { error, data } = await supabase.auth.verifyOtp({
       phone,
       token,
       type,
@@ -38,7 +41,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
       const errorMessage = error?.message.toLowerCase()
       form.setError('token', { type: 'custom', message: errorMessage })
     } else {
-      onSuccess()
+      onSuccess(data)
     }
   }
 

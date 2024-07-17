@@ -181,8 +181,8 @@ export const OnboardingForm = () => {
               fontWeight={'300'}
               $sm={{ size: '$5' }}
             >
-              Open your Send Account by creating a Passkey below. Send uses passkeys to secure your
-              account
+              Send will securely save your key on this device. Name it so you can recognize it next
+              time
             </H3>
             <YStack gap="$4">
               <Theme inverse={true}>
