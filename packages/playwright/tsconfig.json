@@ -7,7 +7,8 @@
     "../app",
     "../wagmi",
     "../contracts",
-    "../webauthn-authenticator"
+    "../webauthn-authenticator",
+    "../../supabase"
   ],
   "compilerOptions": {
     "noEmit": true,
@@ -22,7 +23,9 @@
       "@my/playwright/*": ["./tests/*"],
       "@my/snaplet/*": ["../snaplet/src/*"],
       "@0xsend/webauthn-authenticator": ["../webauthn-authenticator/src"],
-      "@0xsend/webauthn-authenticator/*": ["../webauthn-authenticator/src/*"]
+      "@0xsend/webauthn-authenticator/*": ["../webauthn-authenticator/src/*"],
+      "@my/supabase": ["../../supabase"],
+      "@my/supabase/*": ["../../supabase/*"]
     }
   },
   "references": []
