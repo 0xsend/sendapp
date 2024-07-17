@@ -60,6 +60,7 @@ export const tagRouter = createTRPCRouter({
             .single()
           throwIf(error)
           assert(!!data, 'No checkout receipt found')
+          log('fetched checkout receipt', data)
           return data
         },
         {

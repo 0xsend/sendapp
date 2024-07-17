@@ -20,7 +20,7 @@ import {
 } from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
@@ -34,30 +34,11 @@ import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
-import { useUserOp } from 'app/utils/userop'
+import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { checksumAddress, encodeFunctionData, formatUnits, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
-
-function useReferrer() {
-  // TODO: use referrer from cookie
-  return useQuery({
-    queryKey: ['referrer'],
-    queryFn: () => {
-      return zeroAddress
-    },
-  })
-}
-
-function useReferralBonus() {
-  // TODO: use referrer from cookie
-  return useQuery({
-    queryKey: ['bonus'],
-    queryFn: () => {
-      return 0n
-    },
-  })
-}
+import { useReferralBonus, useReferrer } from '../checkout-utils'
 
 export function fetchSendtagCheckoutTransfers(supabase: SupabaseClient<Database>) {
   return supabase
@@ -103,12 +84,13 @@ export function ConfirmButton({
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const chainId = baseMainnetClient.chain.id
-  const pendingTags = usePendingTags()
+  const pendingTags = usePendingTags() ?? []
   const hasPendingTags = !!pendingTags?.length
   const {
     data: balance,
     isLoading: isLoadingBalance,
     error: balanceError,
+    queryKey: [balanceQueryKey],
   } = useBalance({
     address: sender,
     chainId: baseMainnetClient.chain.id,
@@ -116,7 +98,7 @@ export function ConfirmButton({
   })
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { data: referrer } = useReferrer()
-  const { data: bonus } = useReferralBonus()
+  const { data: bonus } = useReferralBonus({ tags: pendingTags })
   const canAffordTags = balance && balance.value >= amountDue
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
@@ -129,7 +111,6 @@ export function ConfirmButton({
     dataUpdatedAt: transfersUpdatedAt,
   } = useSendtagCheckoutTransfers()
   const [transfersLastFectched, setTransfersLastFectched] = useState(transfersUpdatedAt)
-  console.log('transfers', transfers)
   const lookupSendtagCheckout = useCallback(async () => {
     if (!sender) return
     if (isLoadingReceipts) return
@@ -151,14 +132,6 @@ export function ConfirmButton({
           !receiptEventIds.includes(e.event_id) && // don't double submit
           (!sentTx || sentTx === hash) // use the most recent tx if available
 
-        console.log('isPurchase', isPurchase)
-        console.log('from', from)
-        console.log('to', to)
-        console.log('hash', hash)
-        console.log('v', e.v)
-        console.log('amountDue', amountDue)
-        console.log('receiptEventIds', receiptEventIds)
-        console.log('sentTx', sentTx)
         return isPurchase
       })
       .shift()
@@ -200,6 +173,10 @@ export function ConfirmButton({
   const [error, setError] = useState<string>()
   const [confirmed, setConfirmed] = useState(false)
   const [attempts, setAttempts] = useState(0)
+  const checkoutArgs = useMemo(
+    () => [amountDue, referrer?.address ?? zeroAddress, bonus ?? 0n] as const,
+    [amountDue, referrer, bonus]
+  )
   const calls = useMemo(
     () => [
       {
@@ -217,11 +194,11 @@ export function ConfirmButton({
         data: encodeFunctionData({
           abi: sendtagCheckoutAbi,
           functionName: 'checkout',
-          args: [amountDue, referrer ?? zeroAddress, bonus ?? 0n],
+          args: checkoutArgs,
         }),
       },
     ],
-    [amountDue, chainId, referrer, bonus]
+    [amountDue, chainId, checkoutArgs]
   )
   const {
     data: userOp,
@@ -231,10 +208,12 @@ export function ConfirmButton({
     sender,
     calls,
   })
-
+  const queryClient = useQueryClient()
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
     mutationFn: sendUserOpTransfer,
     onSuccess: (userOpReceipt) => {
+      queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+      queryClient.invalidateQueries({ queryKey: [balanceQueryKey] })
       if (userOpReceipt.success) {
         setSentTx(userOpReceipt.receipt.transactionHash)
       } else {
@@ -268,6 +247,8 @@ export function ConfirmButton({
         onConfirmed()
       })
       .catch((err) => {
+        console.error('Error confirming', err)
+        console.error(err)
         if (err instanceof TRPCClientError) {
           // handle transaction too new error
           if (
@@ -284,10 +265,7 @@ export function ConfirmButton({
             }, 1000)
             return
           }
-
-          return
         }
-        console.error(err)
         setError(err?.message?.split('.').at(0) ?? 'Something went wrong')
       })
       .finally(() => {

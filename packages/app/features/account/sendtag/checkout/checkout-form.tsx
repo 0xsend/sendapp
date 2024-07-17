@@ -17,20 +17,27 @@ import {
   useToastController,
 } from '@my/ui'
 import { Check, X } from '@tamagui/lucide-icons'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconAccount, IconPlus } from 'app/components/icons'
 import { maxNumSendTags, price, total } from 'app/data/sendtags'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useTimeRemaining } from 'app/utils/useTimeRemaining'
 import { useUser } from 'app/utils/useUser'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import type { z } from 'zod'
+import {
+  REFERRAL_COOKIE_MAX_AGE,
+  REFERRAL_COOKIE_NAME,
+  setCookie,
+  useReferralCode,
+  useReferrer,
+} from './checkout-utils'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
@@ -333,21 +340,18 @@ export const CheckoutForm = () => {
  * Shows the referral code and the user's profile if they have one
  */
 function ReferredBy() {
-  const referralFromCookie = () => {
-    if (typeof document === 'undefined') return ''
-    const referral = document.cookie
-      .split(';')
-      .map((c) => c.trim())
-      .find((c) => c.startsWith('referral='))
-    return referral?.split('=')[1] ?? ''
-  }
-  const [refcode, setRefcode] = useState<string>(referralFromCookie())
-  const { data: profile, error } = useProfileLookup('refcode', refcode)
-
-  // set the referral cookie
-  useEffect(() => {
-    document.cookie = `referral=${refcode}; Max-Age=${30 * 24 * 60 * 60 * 1000}; Path=/;` // 30 days
-  }, [refcode])
+  const { data: referralCode } = useReferralCode()
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async (newReferralCode: string) => {
+      setCookie(REFERRAL_COOKIE_NAME, newReferralCode, REFERRAL_COOKIE_MAX_AGE)
+      return Promise.resolve(newReferralCode)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['referralCode'] })
+    },
+  })
+  const { data: referrer, error: referrerError } = useReferrer()
 
   return (
     <YStack w="100%" mt="$4" gap="$2" borderBottomWidth={1} pb="$6" borderColor="$decay">
@@ -370,23 +374,23 @@ function ReferredBy() {
           <XStack gap="$2" jc="flex-start" ai="flex-start">
             <Input
               id={'refcode'}
-              defaultValue={referralFromCookie()}
-              onChangeText={(text) => setRefcode(text)}
+              defaultValue={referralCode}
+              onChangeText={(text) => mutation.mutate(text)}
               col={'$color12'}
             />
-            {profile && (
+            {referrer && (
               <Fade>
                 <Check color="$green10Dark" size="1" position="absolute" right="$3" top="$3" />
               </Fade>
             )}
           </XStack>
         </YStack>
-        {profile && (
+        {referrer && (
           <Fade jc="flex-end" ai="flex-start" h="100%">
             <YStack gap="$2" jc="flex-end">
-              <Link href={`/profile/${profile.sendid}`}>
+              <Link href={`/profile/${referrer.sendid}`}>
                 <Avatar size="$2" br="$3" mx="auto">
-                  <Avatar.Image src={profile.avatar_url ?? ''} />
+                  <Avatar.Image src={referrer.avatar_url ?? ''} />
                   <Avatar.Fallback jc="center">
                     <IconAccount size="$2" color="$olive" />
                   </Avatar.Fallback>
@@ -394,12 +398,12 @@ function ReferredBy() {
                 <Paragraph fontSize="$2" fontWeight="500" color="$color12">
                   {(() => {
                     switch (true) {
-                      case !!profile.tag:
-                        return `/${profile.tag}`
-                      case !!profile.name:
-                        return profile.name
+                      case !!referrer.tag:
+                        return `/${referrer.tag}`
+                      case !!referrer.name:
+                        return referrer.name
                       default:
-                        return `#${profile.sendid}`
+                        return `#${referrer.sendid}`
                     }
                   })()}
                 </Paragraph>
@@ -407,7 +411,7 @@ function ReferredBy() {
             </YStack>
           </Fade>
         )}
-        {error && (
+        {referrerError && (
           <Paragraph
             fontFamily={'$mono'}
             fontWeight={'400'}
@@ -418,7 +422,7 @@ function ReferredBy() {
             pb="$0"
             width={'100%'}
           >
-            {error}
+            {referrerError.message}
           </Paragraph>
         )}
       </XStack>
