@@ -2,19 +2,21 @@ import { useMutation } from '@tanstack/react-query'
 import {
   type Address,
   BaseError,
+  type Chain,
   encodeAbiParameters,
+  erc20Abi,
   getAbiItem,
   keccak256,
   pad,
   parseAbiParameters,
+  type PublicActions,
+  type TestClient,
   toHex,
-  erc20Abi,
+  type Transport,
 } from 'viem'
 
-import type { testClient } from './userop'
-
-type SetErcBalanceParameters = {
-  client: typeof testClient
+type SetErcBalanceParameters<TChain extends Chain | undefined> = {
+  client: TestClient<'anvil', Transport, TChain> & PublicActions
   address: Address
   tokenAddress: Address
   value: bigint
@@ -33,18 +35,18 @@ const SLOT_VALUE_TO_CHECK = 1337_1337_1337_1337_1337_1337_1337_1337_1337n
  * by looping from 0. so check slot 0, calculate the slot via keccak
  * and verify that the value of the storage slot is the same as the balanceOf call
  */
-export function useSetErc20Balance() {
+export function useSetErc20Balance<TChain extends Chain | undefined>() {
   return useMutation({
-    mutationFn: setERC20Balance,
+    mutationFn: setERC20Balance<TChain>,
   })
 }
 
-export async function setERC20Balance({
+export async function setERC20Balance<TChain extends Chain | undefined>({
   client,
   tokenAddress,
   address,
   value,
-}: SetErcBalanceParameters) {
+}: SetErcBalanceParameters<TChain>) {
   // TODO: Compose storage slot manipulation into an action.
   // See https://github.com/paradigmxyz/rivet/pull/50#discussion_r1322267280
   let slotFound = false

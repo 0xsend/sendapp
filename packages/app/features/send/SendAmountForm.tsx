@@ -1,4 +1,3 @@
-import type { Functions } from '@my/supabase/database.types'
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { coins, type coin } from 'app/data/coins'

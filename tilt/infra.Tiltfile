@@ -94,6 +94,7 @@ cmd_button(
 local_resource(
     "anvil:mainnet",
     allow_parallel = True,
+    auto_init = False,
     labels = labels,
     readiness_probe = probe(
         exec = exec_action(
@@ -177,7 +178,6 @@ local_resource(
     dir = _prj_root,
     labels = labels,
     resource_deps = _infra_resource_deps + [
-        "anvil:mainnet",
         "anvil:base",
         "contracts:build",
     ],
@@ -190,7 +190,6 @@ local_resource(
     dir = _prj_root,
     labels = labels,
     resource_deps = _infra_resource_deps + [
-        "anvil:mainnet",
         "anvil:base",
         "contracts:build",
     ],
@@ -202,7 +201,17 @@ local_resource(
     dir = _prj_root,
     labels = labels,
     resource_deps = _infra_resource_deps + [
-        "anvil:mainnet",
+        "anvil:base",
+        "contracts:build",
+    ],
+)
+
+local_resource(
+    "anvil:anvil-add-sendtag-checkout-fixtures",
+    "yarn contracts dev:anvil-add-sendtag-checkout-fixtures",
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
         "anvil:base",
         "contracts:build",
     ],
@@ -213,10 +222,10 @@ local_resource(
     "echo 🥳",
     labels = labels,
     resource_deps = [
-        "anvil:mainnet",
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
         "anvil:anvil-deploy-fjord-send-verifier-fixtures",
+        "anvil:anvil-add-sendtag-checkout-fixtures",
     ],
 )
 
@@ -306,6 +315,7 @@ cmd_button(
 local_resource(
     "otterscan:base",
     allow_parallel = True,
+    auto_init = not CI,
     labels = labels,
     links = [link("http://localhost:5101/", "Otterscan Base")],
     readiness_probe = probe(

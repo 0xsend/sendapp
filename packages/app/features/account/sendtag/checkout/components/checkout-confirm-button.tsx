@@ -38,7 +38,7 @@ import {
   usePublicClient,
   useWaitForTransactionReceipt,
 } from 'wagmi'
-import { getPriceInWei, useSenderSafeReceivedEvents } from '../checkout-utils'
+import { getPrice, useSenderSafeReceivedEvents } from '../checkout-utils'
 
 export function ConfirmButton({
   onConfirmed,
@@ -60,7 +60,7 @@ export function ConfirmButton({
     address: sendAccount?.address,
     chainId: baseMainnetClient.chain.id,
   })
-  const weiAmount = useMemo(() => getPriceInWei(pendingTags ?? []), [pendingTags])
+  const weiAmount = useMemo(() => getPrice(pendingTags ?? []), [pendingTags])
   const canAffordTags = ethBalance && ethBalance.value >= weiAmount
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()

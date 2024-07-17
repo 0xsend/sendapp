@@ -3012,6 +3012,334 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
             </View>
           </View>
         </View>
+        <Text
+          accessibilityRole="header"
+          style={
+            {
+              "color": "hsl(0, 0%, 42.5%)",
+              "display": "none",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 21,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 13,
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          5/26/2024
+        </Text>
+        <View
+          collapsable={false}
+          forwardedRef={[Function]}
+          jestAnimatedStyle={
+            {
+              "value": {
+                "opacity": 1,
+                "transform": [
+                  {
+                    "scale": 1,
+                  },
+                ],
+              },
+            }
+          }
+          style={
+            {
+              "opacity": 0,
+              "transform": [
+                {
+                  "scale": 0.9,
+                },
+              ],
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#3E4A3C",
+                "borderBottomWidth": 1,
+                "borderStyle": "solid",
+                "flexDirection": "row",
+                "gap": 18,
+                "justifyContent": "space-between",
+                "paddingBottom": 24,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "gap": 21,
+                  "width": "100%",
+                }
+              }
+            >
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "borderBottomLeftRadius": 9,
+                    "borderBottomRightRadius": 9,
+                    "borderTopLeftRadius": 9,
+                    "borderTopRightRadius": 9,
+                    "flexDirection": "column",
+                    "gap": 7,
+                    "height": 48,
+                    "justifyContent": "center",
+                    "maxHeight": 48,
+                    "maxWidth": 48,
+                    "minHeight": 48,
+                    "minWidth": 48,
+                    "overflow": "hidden",
+                    "position": "relative",
+                    "width": 48,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 1,
+                    }
+                  }
+                >
+                  <Image
+                    fullscreen={true}
+                    onError={[Function]}
+                    onLoad={[Function]}
+                    source={
+                      {
+                        "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                      }
+                    }
+                    style={
+                      {
+                        "height": 48,
+                        "width": 48,
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={
+                    {
+                      "backgroundColor": "#86AE80",
+                      "bottom": 0,
+                      "flexDirection": "column",
+                      "justifyContent": "center",
+                      "left": 0,
+                      "position": "absolute",
+                      "right": 0,
+                      "top": 0,
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "borderBottomLeftRadius": 9,
+                        "borderBottomRightRadius": 9,
+                        "borderTopLeftRadius": 9,
+                        "borderTopRightRadius": 9,
+                        "flexDirection": "column",
+                        "height": 48,
+                        "justifyContent": "center",
+                        "maxHeight": 48,
+                        "maxWidth": 48,
+                        "minHeight": 48,
+                        "minWidth": 48,
+                        "overflow": "hidden",
+                        "position": "relative",
+                        "width": 48,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "bottom": 0,
+                          "flexDirection": "column",
+                          "left": 0,
+                          "position": "absolute",
+                          "right": 0,
+                          "top": 0,
+                          "zIndex": 1,
+                        }
+                      }
+                    >
+                      <Image
+                        fullscreen={true}
+                        onError={[Function]}
+                        onLoad={[Function]}
+                        source={
+                          {
+                            "uri": "https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f",
+                          }
+                        }
+                        style={
+                          {
+                            "height": 48,
+                            "width": 48,
+                          }
+                        }
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  {
+                    "flex": 1,
+                    "flexDirection": "column",
+                    "gap": 4,
+                    "width": "100%",
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "gap": 4,
+                      "justifyContent": "space-between",
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 24,
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    Sendtag Registered
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                        "fontSize": 24,
+                      }
+                    }
+                    suppressHighlighting={true}
+                    testID="ActivityRowAmount"
+                  >
+                    2 USDC
+                  </Text>
+                </View>
+                <View
+                  style={
+                    {
+                      "alignItems": "flex-start",
+                      "flex": 1,
+                      "flexDirection": "column",
+                      "gap": 4,
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      {
+                        "color": "#86AE80",
+                        "fontFamily": "System",
+                        "maxWidth": "100%",
+                        "overflow": "hidden",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    /tag_receipt_usdc
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "display": "none",
+                        "fontFamily": "System",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    •
+                  </Text>
+                  <Text
+                    style={
+                      {
+                        "color": "#FFFFFF",
+                        "fontFamily": "System",
+                      }
+                    }
+                    suppressHighlighting={true}
+                  >
+                    5/26/2024, 7:41:05 PM
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                {
+                  "display": "none",
+                  "flexDirection": "row",
+                  "gap": 18,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "justifyContent": "flex-end",
+                    "minWidth": 184,
+                    "textAlign": "right",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                5/26/2024, 7:41:05 PM
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 24,
+                    "textAlign": "right",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                2 USDC
+              </Text>
+            </View>
+          </View>
+        </View>
         <View
           collapsable={false}
           forwardedRef={[Function]}

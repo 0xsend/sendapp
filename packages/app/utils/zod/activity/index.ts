@@ -3,6 +3,7 @@ import { BaseEventSchema } from './BaseEventSchema'
 import { ReferralsEventSchema } from './ReferralsEventSchema'
 import { SendAccountTransfersEventSchema } from './SendAccountTransfersEventSchema'
 import { TagReceiptsEventSchema } from './TagReceiptsEventSchema'
+import { TagReceiptUSDCEventSchema } from './TagReceiptUSDCEventSchema'
 import { SendAccountReceiveEventSchema } from './SendAccountReceiveEventSchema'
 
 export type { BaseEvent } from './BaseEventSchema'
@@ -13,6 +14,7 @@ export {
   type SendAccountTransfersEvent,
 } from './SendAccountTransfersEventSchema'
 export { TagReceiptsEventSchema, isTagReceiptsEvent } from './TagReceiptsEventSchema'
+export { TagReceiptUSDCEventSchema, isTagReceiptUSDCEvent } from './TagReceiptUSDCEventSchema'
 export {
   SendAccountReceiveEventSchema,
   isSendAccountReceiveEvent,
@@ -23,6 +25,7 @@ export const EventSchema = z
   .discriminatedUnion('event_name', [
     SendAccountTransfersEventSchema,
     TagReceiptsEventSchema,
+    TagReceiptUSDCEventSchema,
     ReferralsEventSchema,
     SendAccountReceiveEventSchema,
   ])

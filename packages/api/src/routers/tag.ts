@@ -1,13 +1,13 @@
+import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
-import { getPriceInWei } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { getPrice } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
 import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { hexToBytea } from 'app/utils/hexToBytea'
-import type { PostgrestError } from '@supabase/supabase-js'
-import { byteaTxHash } from 'app/utils/zod'
 
 const log = debug('api:routers:tag')
 
@@ -39,7 +39,7 @@ export const tagRouter = createTRPCRouter({
       }
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
-      const ethAmount = getPriceInWei(pendingTags)
+      const ethAmount = getPrice(pendingTags)
       const txBytea = byteaTxHash.safeParse(hexToBytea(txHash as `0x${string}`))
 
       if (!txBytea.success) {

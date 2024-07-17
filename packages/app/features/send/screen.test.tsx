@@ -1,4 +1,3 @@
-import * as solito from 'solito'
 import * as params from 'app/routers/params'
 import { describe, expect, it } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'

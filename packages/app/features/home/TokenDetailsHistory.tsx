@@ -5,7 +5,6 @@ import { Fragment } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { RowLabel, AnimateEnter } from './TokenDetails'
 import { TokenActivityRow } from './TokenActivityRow'
-import { baseMainnet, tokenPaymasterAddress } from '@my/wagmi'
 
 export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
   const result = useTokenActivityFeed({
