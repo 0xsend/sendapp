@@ -1,4 +1,14 @@
-import { Anchor, Container, LinearGradient, Stack, Theme, YStack, isWeb, useMedia } from '@my/ui'
+import {
+  Anchor,
+  Container,
+  LinearGradient,
+  Stack,
+  Theme,
+  YStack,
+  isWeb,
+  useMedia,
+  usePwa,
+} from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
@@ -11,8 +21,10 @@ import { AuthCarouselContext } from './AuthCarouselContext'
 import { carouselImagePositions } from './components/Carousel'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
+  const isPwa = usePwa()
+
   return (
-    <Container height={'100%'} f={1}>
+    <Container height={'100%'} f={1} safeAreaPadding={isPwa && 'vertical'}>
       <YStack ai="center" f={1} pt="$7" pb="$10">
         <Anchor {...useLink({ href: '/' })} mx="auto" position="absolute" top={'$6'}>
           <Theme inverse={true}>
