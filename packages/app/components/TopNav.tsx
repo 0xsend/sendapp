@@ -13,6 +13,7 @@ import {
   type ButtonProps,
   ButtonText,
   View,
+  usePwa,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
@@ -24,7 +25,6 @@ import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBotto
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
-import { usePwa } from 'app/utils/usePwa'
 import { IconCoin } from './icons/IconCoin'
 import { Link } from 'solito/link'
 
@@ -153,7 +153,8 @@ export function TopNav({
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        $lg={{ pt: isPwa ? '$0' : '$5', pb: '$5' }}
+        safeAreaPadding={isPwa && 't'}
+        $lg={{ pt: !isPwa && '$5', pb: '$5' }}
       >
         <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
           {isSubRoute || hasSelectedCoin ? (
