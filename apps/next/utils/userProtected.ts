@@ -28,9 +28,12 @@ export function userProtectedGetSSP<
 
     if (!session) {
       log('no session')
+      const destination = ctx.req.url
+        ? `/auth/sign-in?redirectUri=${encodeURIComponent(ctx.req.url)}`
+        : '/auth/sign-in'
       return {
         redirect: {
-          destination: `/auth/sign-in?redirectUri=${ctx.req.url}`,
+          destination,
           permanent: false,
         },
       }
