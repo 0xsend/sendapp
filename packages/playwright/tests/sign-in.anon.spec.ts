@@ -27,8 +27,9 @@ test('redirect on sign-in', async ({ page, pg }) => {
     // ensure use can log in with passkey
     await page.context().clearCookies()
     await page.goto('/send')
+    await page.waitForURL(/auth\/sign-in/)
     // redirect to send after user is logged in
-    await expect(page).toHaveURL('/auth/sign-in?redirectUri=/send')
+    await expect(page).toHaveURL(`/auth/sign-in?redirectUri=${encodeURIComponent('/send')}`)
     const signInButton = page.getByRole('button', { name: 'Sign In' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
@@ -56,6 +57,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
 
   // naive but go to home page to see if user is logged in
   await page.goto('/auth/sign-up')
+  await page.waitForURL(/auth\/sign-up/)
   await expect(page).toHaveURL('/auth/sign-up')
 
   try {
@@ -66,6 +68,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
     await page.goto(
       `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendToken.address}`
     )
+    await page.waitForURL(/auth\/sign-in/)
     const beforeRedirectUrl = new URL(page.url())
     expect(Object.fromEntries(beforeRedirectUrl.searchParams.entries())).toMatchObject({
       redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendToken.address}`,
@@ -74,6 +77,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
     const signInButton = page.getByRole('button', { name: 'Sign In' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
+    await page.waitForURL(/send\/confirm/)
     //@todo: find a way to wait for the new url and check query params like above
     //       Checking the url strimg is not sturdy because it cares about the query params order
     await expect(page).toHaveURL(
