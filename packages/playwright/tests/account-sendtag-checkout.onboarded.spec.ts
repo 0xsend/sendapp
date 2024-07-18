@@ -8,7 +8,8 @@ import debug from 'debug'
 import { parseEther } from 'viem'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { test as checkoutTest, expect } from './fixtures/checkout'
-import { pricing, price } from 'app/data/sendtags'
+import { pricing, price, bonus } from 'app/data/sendtags'
+import { lookupBalance, testBaseClient, usdcAddress } from './fixtures/viem'
 
 let log: debug.Debugger
 
@@ -107,8 +108,10 @@ test('can refer a tag', async ({
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referralCode, 'referral code not found')
-  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
-  await checkoutPage.goto()
+  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`) // visit referral
+  await checkoutPage.goto() // goto checkout
+
+  // register some sendtags
   const tagsCount = Math.floor(Math.random() * 5) + 1
   const tagsToRegister: string[] = []
   for (let i = 0; i < tagsCount; i++) {
@@ -133,7 +136,13 @@ test('can refer a tag', async ({
   await expect(referredBy).toBeVisible() // show the referred
 
   await checkoutPage.confirmTags(expect)
-  const { data: tags, error } = await supabase.from('tags').select('*').in('name', tagsToRegister)
+
+  // ensure sendtags are confirmed
+  const { data: tags, error } = await supabase
+    .from('tags')
+    .select('*')
+    .in('name', tagsToRegister)
+    .eq('status', 'confirmed')
   expect(error).toBeFalsy()
   expect(tags).toHaveLength(tagsCount)
 
@@ -143,6 +152,7 @@ test('can refer a tag', async ({
     await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
   }
 
+  // ensure referrer has received a referral
   await expect(supabase).toHaveEventInActivityFeed({
     event_name: 'referrals',
     from_user: {
@@ -157,6 +167,16 @@ test('can refer a tag', async ({
       tags: tagsToRegister,
     },
   })
+
+  // ensure referrer received the referral bonus
+  const referrerAddress = plan.sendAccounts[0]?.address as `0x${string}`
+  assert(!!referrerAddress, 'Referrer address is not found')
+  const referrerBalance = await lookupBalance({
+    address: referrerAddress,
+    token: usdcAddress[testBaseClient.chain.id],
+  })
+  const bonusAmount = tagsToRegister.reduce((acc, tag) => acc + bonus(tag.length), 0n)
+  expect(referrerBalance).toBe(bonusAmount)
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {

@@ -22,8 +22,8 @@ export const sendTokenAddresses = {
 
 export const lookupBalance = async ({
   address,
-  tokenAddress,
-}: { address: `0x${string}`; tokenAddress: `0x${string}` }) => {
+  token: tokenAddress,
+}: { address: `0x${string}`; token: `0x${string}` }) => {
   return await testBaseClient.readContract({
     address: tokenAddress,
     abi: [
