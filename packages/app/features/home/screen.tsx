@@ -13,54 +13,26 @@ import {
 } from '@my/ui'
 import { IconArrowRight, IconPlus } from 'app/components/icons'
 import { coins } from 'app/data/coins'
-import { useRootScreenParams } from 'app/routers/params'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { DepositPopover } from '../deposit/DepositPopover'
 import { TokenBalanceCard } from './TokenBalanceCard'
 import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
-import { X } from '@tamagui/lucide-icons'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { DepositAddress } from 'app/components/DepositAddress'
 
-export function HomeScreen() {
-  const [queryParams, setParams] = useRootScreenParams()
+function HomeBody() {
+  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
+  const selectedCoin = useCoinFromTokenParam()
+
   const { balances } = useSendAccountBalances()
   const usdcBalance = balances?.[0]?.result
-
-  const selectedCoin = useCoinFromTokenParam()
-  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
-
   const hasSendAccount = !!sendAccount
+  const canSend = !!sendAccount && usdcBalance && usdcBalance > 0n
 
   return (
-    <YStack f={1}>
-      <Stack display="none" $gtLg={{ display: hasSendAccount && selectedCoin ? 'flex' : 'none' }}>
-        <Button
-          top={'$-8'}
-          right={0}
-          position="absolute"
-          bc="transparent"
-          circular
-          jc={'center'}
-          ai={'center'}
-          $lg={{ display: 'none' }}
-          hoverStyle={{
-            backgroundColor: 'transparent',
-            borderColor: '$color11',
-          }}
-          pressStyle={{
-            backgroundColor: 'transparent',
-          }}
-          focusStyle={{
-            backgroundColor: 'transparent',
-          }}
-          icon={<X size={'$2.5'} />}
-          onPress={() => {
-            setParams({ ...queryParams, token: undefined })
-          }}
-        />
-      </Stack>
+    <>
       <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }}>
         <YStack
           $gtLg={{ width: 455, display: 'flex' }}
@@ -68,35 +40,58 @@ export function HomeScreen() {
           width="100%"
           ai={'center'}
         >
-          <Card
-            $gtLg={{ p: 36 }}
-            $lg={{ bc: 'transparent' }}
-            py={'$9'}
-            px={'$2'}
-            w={'100%'}
-            jc="space-between"
-            br={12}
-            gap="$6"
-          >
-            <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
-              <TokenBalanceCard />
-            </XStack>
-            <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
-              <Stack f={1} w="50%">
-                <DepositPopover />
-              </Stack>
-              {usdcBalance && usdcBalance > 0n ? (
+          {canSend ? (
+            <Card
+              $gtLg={{ p: 36 }}
+              $lg={{ bc: 'transparent' }}
+              py={'$6'}
+              px={'$2'}
+              w={'100%'}
+              jc="space-between"
+              br={12}
+              gap="$6"
+            >
+              <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
+                <TokenBalanceCard />
+              </XStack>
+              <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
+                <Stack f={1} w="50%">
+                  <DepositPopover />
+                </Stack>
                 <Stack f={1} w="50%">
                   <SendButton />
                 </Stack>
-              ) : null}
-            </XStack>
-          </Card>
+              </XStack>
+            </Card>
+          ) : (
+            <Card
+              $lg={{ fd: 'column', bc: 'transparent' }}
+              $gtLg={{ p: 36 }}
+              py={'$6'}
+              px={'$2'}
+              ai={'center'}
+              gap="$5"
+              jc="space-around"
+              w={'100%'}
+            >
+              <XStack w="100%">
+                <DepositPopover />
+              </XStack>
+              <XStack ai="center">
+                <Paragraph>Or direct deposit on base</Paragraph>
+                <DepositAddress address={sendAccount?.address} />
+              </XStack>
+            </Card>
+          )}
           <Separator $gtLg={{ display: 'none' }} w={'100%'} />
           <YStack w={'100%'} ai={'center'}>
-            <YStack width="100%" $gtLg={{ pt: '$3' }} display={hasSendAccount ? 'flex' : 'none'}>
-              <TokenBalanceList coins={coins} />
-            </YStack>
+            {canSend ? (
+              <YStack width="100%" $gtLg={{ pt: '$3' }} display={hasSendAccount ? 'flex' : 'none'}>
+                <TokenBalanceList coins={coins} />
+              </YStack>
+            ) : (
+              <NoSendAccountMessage />
+            )}
           </YStack>
         </YStack>
 
@@ -143,6 +138,26 @@ export function HomeScreen() {
           }
         })()}
       </XStack>
+    </>
+  )
+}
+export function HomeScreen() {
+  const { isLoading: sendAccountLoading } = useSendAccount()
+
+  return (
+    <YStack f={1} pt="$2">
+      {(() => {
+        switch (true) {
+          case sendAccountLoading:
+            return (
+              <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
+                <Spinner size="large" />
+              </Stack>
+            )
+          default:
+            return <HomeBody />
+        }
+      })()}
     </YStack>
   )
 }
@@ -162,27 +177,54 @@ const SendButton = () => (
 
 const NoSendAccountMessage = () => {
   return (
-    <>
-      <H3 fontSize={'$9'} fontWeight={'700'} color={'$color12'} ta="center">
+    <YStack
+      w="100%"
+      ai="center"
+      f={1}
+      gap="$5"
+      p="$6"
+      $lg={{ bc: 'transparent' }}
+      $gtLg={{ br: '$6' }}
+    >
+      <H3
+        fontSize={'$9'}
+        fontWeight={'700'}
+        color={'$color12'}
+        ta="center"
+        textTransform="uppercase"
+      >
         Register Your Sendtag Today!
       </H3>
 
       <YStack w="100%" gap="$3">
-        <Paragraph fontSize={'$6'} fontWeight={'700'} color={'$color12'} fontFamily={'$mono'}>
-          By registering a Sendtag, you can:
-        </Paragraph>
-        <YStack>
-          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-            1. Send and receive funds using your personalized identifier
-          </Paragraph>
-          <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-            2. Earn Send It Rewards based on your token balance and referrals
-          </Paragraph>
-        </YStack>
-        <Paragraph fontSize={'$4'} fontWeight={'500'} color={'$color12'} fontFamily={'$mono'}>
-          Join us in shaping the Future of Finance.
+        <Paragraph
+          fontSize={'$6'}
+          fontWeight={'700'}
+          color={'$color12'}
+          fontFamily={'$mono'}
+          ta="center"
+        >
+          Earn rewards, transfer funds, and claim your unique Sendtag before it's gone.
         </Paragraph>
       </YStack>
-    </>
+      <Stack jc="center" ai="center" $gtLg={{ mt: 'auto' }} $lg={{ m: 'auto' }}>
+        <Link
+          href={'/account/sendtag/checkout'}
+          theme="green"
+          borderRadius={'$4'}
+          p={'$3.5'}
+          $xs={{ p: '$2.5', px: '$4' }}
+          px="$6"
+          bg="$primary"
+        >
+          <XStack gap={'$1.5'} ai={'center'} jc="center">
+            <IconPlus col={'$black'} />
+            <Paragraph textTransform="uppercase" col={'$black'}>
+              SENDTAG
+            </Paragraph>
+          </XStack>
+        </Link>
+      </Stack>
+    </YStack>
   )
 }
