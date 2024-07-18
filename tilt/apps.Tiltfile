@@ -29,7 +29,7 @@ next_app_resource_deps = [
 if CFG.dockerize:
     GIT_BRANCH = str(local("git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD")).strip()
     GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
-    NEXT_COMPOSE_IMAGE = str("sendapp/next-app:{}-{}".format(GIT_BRANCH, GIT_HASH))
+    NEXT_COMPOSE_IMAGE = str("sendapp/next-app-{}:{}".format(GIT_BRANCH, GIT_HASH))
     print(color.blue("Checking if {} exists locally".format(NEXT_COMPOSE_IMAGE)))
     inspect_output = str(local("docker image inspect {NEXT_COMPOSE_IMAGE} --format='FYSI' 2>/dev/null || echo 'Nope'".format(NEXT_COMPOSE_IMAGE=NEXT_COMPOSE_IMAGE), quiet=True, echo_off=True)).strip()
     if inspect_output != "FYSI":

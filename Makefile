@@ -44,11 +44,11 @@ SECRETS = \
 # Targets
 .PHONY: docker-web docker-web-push
 docker-web:
-	@docker buildx build  --progress=plain --platform linux/amd64 -t $(IMAGE_NAME):$(GIT_BRANCH)-$(GIT_HASH) -t $(IMAGE_NAME):$(GIT_BRANCH)-latest $(BUILD_ARGS) $(SECRETS) -f $(DOCKERFILE_PATH) $(BUILD_CONTEXT) --progress=plain
+	@docker buildx build  --progress=plain --platform linux/amd64 -t $(IMAGE_NAME)-$(GIT_BRANCH):$(GIT_HASH) -t $(IMAGE_NAME)-$(GIT_BRANCH):latest $(BUILD_ARGS) $(SECRETS) -f $(DOCKERFILE_PATH) $(BUILD_CONTEXT) --progress=plain
 
 docker-web-push: docker-web
-	docker push $(IMAGE_NAME):$(GIT_BRANCH)-$(GIT_HASH)
-	docker push $(IMAGE_NAME):$(GIT_BRANCH)-latest
+	docker push $(IMAGE_NAME)-$(GIT_BRANCH):$(GIT_HASH)
+	docker push $(IMAGE_NAME)-$(GIT_BRANCH):latest
 
 # Prune docker system images and containers older than 7 days != otterscan
 docker-clean:
