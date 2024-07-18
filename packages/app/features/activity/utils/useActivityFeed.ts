@@ -1,4 +1,4 @@
-import { tokenPaymasterAddress } from '@my/wagmi'
+import { sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import {
   useInfiniteQuery,
@@ -12,6 +12,17 @@ import { EventArraySchema, type Activity } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
 
 /**
+ * Returns a string of values to be used in a postgrest WHERE IN clause.
+ */
+export function pgAddrCondValues(values: `0x${string}`[]) {
+  return values.map((a) => `${hexToBytea(a)}`).join(',')
+}
+
+function squish(s: string) {
+  return s.replace(/\s+/g, ' ').trim()
+}
+
+/**
  * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
  * @param pageSize - number of items to fetch per page
  */
@@ -23,9 +34,14 @@ export function useActivityFeed({
 > {
   const supabase = useSupabase()
   async function fetchActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
-    const pgPaymasterCondValues = Object.values(tokenPaymasterAddress)
-      .map((a) => `${hexToBytea(a)}`)
-      .join(',')
+    const paymasterAddresses = Object.values(tokenPaymasterAddress)
+    const sendtagCheckoutAddresses = Object.values(sendtagCheckoutAddress)
+    // ignore certain addresses in the activity feed
+    const fromTransferIgnoreValues = pgAddrCondValues(Object.values(tokenPaymasterAddress)) // show fees on send screen instead
+    const toTransferIgnoreValues = pgAddrCondValues([
+      ...paymasterAddresses, // show fees on send screen instead
+      ...sendtagCheckoutAddresses, // shows as Sendtag Registered using a different activity row
+    ])
 
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
@@ -35,7 +51,13 @@ export function useActivityFeed({
       .or('from_user.not.is.null, to_user.not.is.null') // only show activities with a send app user
       .or(
         // filter out paymaster fees for gas
-        `data->t.is.null, data->f.is.null, and(data->>t.not.in.(${pgPaymasterCondValues}), data->>f.not.in.(${pgPaymasterCondValues}))`
+        squish(`
+          data->t.is.null,
+          data->f.is.null,
+          and(
+            data->>t.not.in.(${toTransferIgnoreValues}),
+            data->>f.not.in.(${fromTransferIgnoreValues})
+          )`)
       )
       .order('created_at', { ascending: false })
       .range(from, to)

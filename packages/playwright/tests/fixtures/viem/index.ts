@@ -18,7 +18,11 @@ export const sendTokenAddresses = {
   8453: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
   84532: '0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680',
   845337: '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A',
-}
+} as const
+
+export const sendtagCheckoutAddress = {
+  845337: '0x3936f906910C0f74b6d1536614068368B94CDa85',
+} as const
 
 export const lookupBalance = async ({
   address,

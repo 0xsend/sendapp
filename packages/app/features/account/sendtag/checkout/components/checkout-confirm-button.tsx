@@ -38,7 +38,7 @@ import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { checksumAddress, encodeFunctionData, formatUnits, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
-import { useReferralBonus, useReferrer } from '../checkout-utils'
+import { useReferralReward, useReferrer } from '../checkout-utils'
 
 export function fetchSendtagCheckoutTransfers(supabase: SupabaseClient<Database>) {
   return supabase
@@ -98,7 +98,7 @@ export function ConfirmButton({
   })
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { data: referrer } = useReferrer()
-  const { data: bonus } = useReferralBonus({ tags: pendingTags })
+  const { data: reward } = useReferralReward({ tags: pendingTags })
   const canAffordTags = balance && balance.value >= amountDue
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
@@ -174,8 +174,8 @@ export function ConfirmButton({
   const [confirmed, setConfirmed] = useState(false)
   const [attempts, setAttempts] = useState(0)
   const checkoutArgs = useMemo(
-    () => [amountDue, referrer?.address ?? zeroAddress, bonus ?? 0n] as const,
-    [amountDue, referrer, bonus]
+    () => [amountDue, referrer?.address ?? zeroAddress, reward ?? 0n] as const,
+    [amountDue, referrer, reward]
   )
   const calls = useMemo(
     () => [

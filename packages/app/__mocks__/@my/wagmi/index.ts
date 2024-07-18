@@ -40,6 +40,9 @@ const mockMyWagmi = {
   entryPointAddress: {
     845337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
   },
+  sendtagCheckoutAddress: {
+    845337: '0x3936f906910C0f74b6d1536614068368B94CDa85',
+  },
   sendVerifierAbi: [
     {
       type: 'function',
@@ -73,5 +76,6 @@ export const sendTokenAddress = mockMyWagmi.sendTokenAddress
 export const tokenPaymasterAddress = mockMyWagmi.tokenPaymasterAddress
 export const entryPointAddress = mockMyWagmi.entryPointAddress
 export const sendVerifierAbi = mockMyWagmi.sendVerifierAbi
+export const sendtagCheckoutAddress = mockMyWagmi.sendtagCheckoutAddress
 export const sendVerifierProxyAddress = mockMyWagmi.sendVerifierProxyAddress
 export default mockMyWagmi

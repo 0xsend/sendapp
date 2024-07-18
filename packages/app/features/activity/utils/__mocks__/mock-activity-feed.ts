@@ -230,6 +230,7 @@ export const MockActivityFeed = [
   mockSentTransfer,
   mockSendAccountReceive,
   mockTagReceiptUSDC,
+  mockSendtagReferralRewardUSDC,
 ] as const
 
 // you can use this to mock the activity feed by overriding the network request in the developer console

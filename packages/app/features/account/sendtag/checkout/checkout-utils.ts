@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { bonus } from 'app/data/sendtags'
+import { reward } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { fetchProfile } from 'app/utils/useProfileLookup'
@@ -57,13 +57,13 @@ export function useReferrer() {
   })
 }
 
-export function useReferralBonus({ tags }: { tags: { name: string }[] }) {
+export function useReferralReward({ tags }: { tags: { name: string }[] }) {
   const { data: referrer } = useReferrer()
   return useQuery({
-    queryKey: ['bonus', { referrer, tags }] as const,
+    queryKey: ['reward', { referrer, tags }] as const,
     queryFn: async ({ queryKey: [, { referrer, tags }] }) => {
       if (!referrer) return 0n
-      return tags.reduce((acc, tag) => acc + bonus(tag.name.length), 0n)
+      return tags.reduce((acc, tag) => acc + reward(tag.name.length), 0n)
     },
     enabled: !!referrer,
   })

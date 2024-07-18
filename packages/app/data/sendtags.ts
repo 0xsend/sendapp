@@ -32,11 +32,11 @@ export function price(length: number) {
 }
 
 /**
- * Returns the referral bonus for a Sendtag of the given length.
+ * Returns the referral reward for a Sendtag of the given length.
  * @param length The length of the Sendtag.
- * @returns The referral bonus for the Sendtag.
+ * @returns The referral reward for the Sendtag.
  */
-export function bonus(length: number) {
+export function reward(length: number) {
   switch (length) {
     case 5:
       return parseUnits('4', 6) // 4 USDC
