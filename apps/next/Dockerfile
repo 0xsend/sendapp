@@ -7,7 +7,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt update && apt install -y curl git cargo build-essential
 RUN curl -Lo- https://foundry.paradigm.xyz | /bin/bash
 RUN source /root/.bashrc && foundryup
-ENV PATH "$PATH:/root/.foundry/bin"
+ENV PATH="$PATH:/root/.foundry/bin"
 ENV DO_NOT_TRACK=1
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV YARN_CACHE_FOLDER=/tmp/yarn-cache
@@ -96,4 +96,4 @@ USER nextjs
 COPY --from=builder --chown=nextjs:nodejs /sendapp/apps/next/.next/standalone /sendapp/
 COPY --from=builder --chown=nextjs:nodejs /sendapp/apps/next/.next/static /sendapp/apps/next/.next/static
 COPY --from=builder --chown=nextjs:nodejs /sendapp/apps/next/public /sendapp/apps/next/public
-CMD node apps/next/server.js
+CMD ["node", "apps/next/server.js"]

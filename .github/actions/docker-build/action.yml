@@ -1,5 +1,5 @@
 name: "Setup Docker Build Environment"
-description: "Set Node and package caches "
+description: "Build and Push docker image to dockerhub"
 inputs:
   build-nextjs-docker:
     description: "Whether to build Next.js docker image"
@@ -8,7 +8,7 @@ inputs:
   push-nextjs-docker-image:
     description: "Whether to push build to dockerhub"
     required: false
-    default: "false"
+    default: "true"
   dockerhub_username:
     description: "Username to login to dockerhub"
     required: false
@@ -18,29 +18,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Use Node.js
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: .node-version
-        cache: "yarn"
-    - name: Yarn Install
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      shell: bash
-      run: yarn install --immutable
-    - name: Build Next.js
-      if: ${{ inputs.build-nextjs-docker == 'true' }}
-      shell: bash
-      run: |
-        cp .env.local.template .env.local
-        yarn web:docker:build
-        rm .env.local
-    - uses: docker/login-action@v3
+    - name: Login to dockerhub
+      uses: docker/login-action@v3
       if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
       with:
         username: ${{ inputs.dockerhub_username }}
         password: ${{ inputs.dockerhub_password }}
-    - name: Push to dockerhub
+    - name: Build and Push image to dockerhub
       shell: bash
       if: ${{ inputs.build-nextjs-docker == 'true' }} && ${{ inputs.push-nextjs-docker-image == 'true' }}
-      run: yarn web:docker:push
+      run: |
+        make docker-web-push
+        test -f .env.local && rm .env.local
+    - name: Cleanup old docker images for sendapp
+      run: make docker-clean

@@ -1,7 +1,10 @@
 # -*- mode: python -*-
 
 load("./common.Tiltfile", "CFG", "CI")
-load("./utils.Tiltfile", "ts_files")
+load("./utils.Tiltfile", "ts_files", "require_tools")
+load("ext://color", "color")
+
+
 
 labels = ["apps"]
 
@@ -21,26 +24,33 @@ next_app_resource_deps = [
     "daimo-expo-passkeys:build",
 ] if not CFG.dockerize else [])
 
+
 # Next
 if CFG.dockerize:
     GIT_BRANCH = str(local("git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD")).strip()
     GIT_HASH = str(local("git rev-parse --short=10 HEAD")).strip()
+    NEXT_COMPOSE_IMAGE = str("sendapp/next-app:{}-{}".format(GIT_BRANCH, GIT_HASH))
+    print(color.blue("Checking if {} exists locally".format(NEXT_COMPOSE_IMAGE)))
+    inspect_output = str(local("docker image inspect {NEXT_COMPOSE_IMAGE} --format='FYSI' 2>/dev/null || echo 'Nope'".format(NEXT_COMPOSE_IMAGE=NEXT_COMPOSE_IMAGE), quiet=True, echo_off=True)).strip()
+    if inspect_output != "FYSI":
+        print(color.yellow("{} does not exist locally, Building docker image".format(NEXT_COMPOSE_IMAGE)))
+        local_resource(
+            "next-docker-build",
+            cmd="make docker-web",
+            trigger_mode=TRIGGER_MODE_MANUAL or TRIGGER_MODE_AUTO,
+            auto_init=False,
+            labels=["apps"],
+            deps = require_tools(
+                "make",
+            ),
+            resource_deps = [
+                "next-docker-build:update",
+            ],
+            )
+    else:
+        print(color.green("{} exists locally".format(NEXT_COMPOSE_IMAGE)))
+    os.putenv("NEXT_COMPOSE_IMAGE", NEXT_COMPOSE_IMAGE)
 
-    # FIXME: when we support dev mode and dockerize.
-    # docker_build(
-    #     "0xsend/sendapp/next-app",
-    #     ".",
-    #     dockerfile = "apps/next/Dockerfile",
-    #     extra_tag = ["latest", GIT_HASH],
-    #     platform = "linux/amd64",
-    #     secret = [
-    #         "id=SUPABASE_DB_URL,src=./var/SUPABASE_DB_URL.txt",
-    #         "id=SUPABASE_SERVICE_ROLE,src=./var/SUPABASE_SERVICE_ROLE.txt",
-    #     ],
-    #     build_args=[
-
-    #     ]
-    # )
     docker_compose("../docker-compose.yml")
     dc_resource(
         "next-app",
