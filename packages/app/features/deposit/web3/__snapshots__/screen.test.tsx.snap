@@ -377,6 +377,175 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
               0x123
             </Text>
           </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "width": "100%",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 15.6,
+                  "fontWeight": "300",
+                  "lineHeight": 18,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Or direct deposit on base
+            </Text>
+            <View
+              cancelable={true}
+              disabled={false}
+              focusVisibleStyle={{}}
+              focusable={[Function]}
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              role="button"
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "transparent",
+                  "borderBottomColor": "transparent",
+                  "borderBottomLeftRadius": 16,
+                  "borderBottomRightRadius": 16,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "transparent",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "transparent",
+                  "borderRightWidth": 1,
+                  "borderStyle": "solid",
+                  "borderTopColor": "transparent",
+                  "borderTopLeftRadius": 16,
+                  "borderTopRightRadius": 16,
+                  "borderTopWidth": 1,
+                  "flexDirection": "row",
+                  "flexWrap": "nowrap",
+                  "height": 44,
+                  "justifyContent": "center",
+                  "paddingLeft": 18,
+                  "paddingRight": 18,
+                  "shadowColor": "rgb(0,0,0)",
+                  "shadowOffset": {
+                    "height": 0,
+                    "width": 0,
+                  },
+                  "shadowOpacity": 0,
+                  "shadowRadius": 0,
+                }
+              }
+            >
+              <Text
+                lineBreakMode="clip"
+                numberOfLines={1}
+                style={
+                  {
+                    "backgroundColor": "#40FB50",
+                    "color": "#12643F",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "paddingLeft": 7,
+                    "paddingRight": 7,
+                    "userSelect": "none",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                0xb0b...0000
+              </Text>
+              <View
+                pointerEvents="none"
+                style={
+                  {
+                    "height": 0,
+                    "minHeight": 0,
+                    "minWidth": 11.088000000000001,
+                    "width": 11.088000000000001,
+                  }
+                }
+              />
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={16}
+                bbWidth={16}
+                color="#40FB50"
+                fill="none"
+                focusable={false}
+                height={16}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#40FB50",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 16,
+                      "width": 16,
+                    },
+                  ]
+                }
+                tintColor="#40FB50"
+                vbHeight={16}
+                vbWidth={16}
+                width={16}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
+                    fill={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                        "strokeWidth",
+                        "strokeLinecap",
+                      ]
+                    }
+                    strokeLinecap={1}
+                    strokeWidth="2"
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+            </View>
+          </View>
         </View>
       </View>
     </RCTScrollView>
@@ -418,8 +587,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                 cancelable={true}
                 disabled={false}
                 focusable={true}
-                htmlFor=":r0:"
-                id=":r1:"
+                htmlFor=":r3:"
+                id=":r4:"
                 minPressDuration={0}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -483,7 +652,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     }
                   }
                   focusable={[Function]}
-                  id=":r0:"
+                  id=":r3:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -652,8 +821,8 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   cancelable={true}
                   disabled={false}
                   focusable={true}
-                  htmlFor=":r5:"
-                  id=":r6:"
+                  htmlFor=":r8:"
+                  id=":r9:"
                   minPressDuration={0}
                   onBlur={[Function]}
                   onFocus={[Function]}
@@ -847,7 +1016,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                     }
                     focusVisibleStyle={{}}
                     focusable={true}
-                    id=":r5:"
+                    id=":r8:"
                     name="amount"
                     onBlur={[Function]}
                     onChangeText={[Function]}
@@ -1141,6 +1310,114 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
             "height": 0,
             "maxHeight": "100%",
             "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "width": "100%",
+          }
+        }
+      />
+      <View
+        style={
+          {
+            "backgroundColor": "#081619",
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderBottomWidth": 0,
+            "borderLeftWidth": 0,
+            "borderRightWidth": 0,
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "borderTopWidth": 0,
+            "bottom": "-100%",
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "left": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "position": "absolute",
+            "right": 0,
+            "shadowColor": undefined,
+            "shadowOffset": {
+              "height": 0,
+              "width": 0,
+            },
+            "shadowOpacity": 0,
+            "shadowRadius": 0,
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+    </View>
+  </View>,
+  <View
+    pointerEvents="box-none"
+    style={
+      {
+        "bottom": 0,
+        "flexDirection": "column",
+        "left": 0,
+        "maxWidth": "100%",
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 100001,
+      }
+    }
+  >
+    <View
+      collapsable={false}
+      disableClassName={true}
+      forwardedRef={[Function]}
+      jestAnimatedStyle={
+        {
+          "value": {
+            "transform": [
+              {
+                "translateY": 10000.1,
+              },
+            ],
+          },
+        }
+      }
+      onLayout={[Function]}
+      style={
+        {
+          "height": "80%",
+          "minHeight": "80%",
+          "opacity": 0,
+          "pointerEvents": "none",
+          "position": "absolute",
+          "transform": [
+            {
+              "translateY": 10000.1,
+            },
+          ],
+          "width": "100%",
+          "zIndex": 100001,
+        }
+      }
+    >
+      <View
+        pointerEvents="none"
+        style={
+          {
+            "backgroundColor": "#081619",
+            "borderTopLeftRadius": 16,
+            "borderTopRightRadius": 16,
+            "flex": 1,
+            "flexDirection": "column",
+            "height": 0,
+            "maxHeight": "100%",
+            "overflow": "hidden",
             "width": "100%",
           }
         }
@@ -1168,7 +1445,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
               }
             >
               <View
-                aria-labelledby=":r7:"
+                aria-labelledby=":ra:"
                 disabled={false}
                 role="group"
                 style={
@@ -1179,7 +1456,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                 }
               >
                 <View
-                  aria-labelledby=":r8:"
+                  aria-labelledby=":rb:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -1223,7 +1500,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   tabIndex={-1}
                 >
                   <Text
-                    id=":r8:"
+                    id=":rb:"
                     lineBreakMode="clip"
                     numberOfLines={1}
                     style={
@@ -1253,7 +1530,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   }
                 />
                 <View
-                  aria-labelledby=":r9:"
+                  aria-labelledby=":rc:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -1297,7 +1574,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   tabIndex={-1}
                 >
                   <Text
-                    id=":r9:"
+                    id=":rc:"
                     lineBreakMode="clip"
                     numberOfLines={1}
                     style={
@@ -1327,7 +1604,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   }
                 />
                 <View
-                  aria-labelledby=":ra:"
+                  aria-labelledby=":rd:"
                   aria-selected={false}
                   cancelable={true}
                   disabled={false}
@@ -1371,7 +1648,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   tabIndex={-1}
                 >
                   <Text
-                    id=":ra:"
+                    id=":rd:"
                     lineBreakMode="clip"
                     numberOfLines={1}
                     style={
