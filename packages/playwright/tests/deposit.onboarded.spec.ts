@@ -35,7 +35,7 @@ test('can deposit USDC with web3 wallet', async ({
   assert(!!account, 'no web3 accounts found')
   log('account', account)
 
-  const balance = await lookupBalance({ address: sendAccount.address, tokenAddress })
+  const balance = await lookupBalance({ address: sendAccount.address, token: tokenAddress })
 
   // fund account
   await setERC20Balance({
