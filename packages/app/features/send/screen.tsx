@@ -34,7 +34,7 @@ export const SendScreen = () => {
       <TagSearchProvider>
         <YStack f={1} width={'100%'} pb="$4" gap="$6">
           <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-            <Search />
+            <Search label="SEARCH BY" />
           </YStack>
           <SendSearchBody />
         </YStack>

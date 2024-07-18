@@ -31,7 +31,7 @@ export function ActivityScreen() {
     <TagSearchProvider>
       <YStack f={1} width={'100%'} py="$6">
         <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-          <Search />
+          <Search label="SEARCH BY" />
         </YStack>
         <ActivityBody />
       </YStack>

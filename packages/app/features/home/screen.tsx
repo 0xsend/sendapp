@@ -10,6 +10,10 @@ import {
   H3,
   Card,
   LinkableButton,
+  AnimatePresence,
+  H4,
+  useMedia,
+  type XStackProps,
 } from '@my/ui'
 import { IconArrowRight, IconPlus } from 'app/components/icons'
 import { coins } from 'app/data/coins'
@@ -20,160 +24,201 @@ import { TokenBalanceCard } from './TokenBalanceCard'
 import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import Search from 'app/components/SearchBar'
+import { useTagSearch } from 'app/provider/tag-search'
 import { DepositAddress } from 'app/components/DepositAddress'
+import { useRootScreenParams } from 'app/routers/params'
 
-function HomeBody() {
+function SendSearchBody() {
+  const { isLoading, error } = useTagSearch()
+
+  return (
+    <AnimatePresence>
+      {isLoading && (
+        <YStack key="loading" gap="$4" mb="$4">
+          <Spinner size="large" color="$send1" />
+        </YStack>
+      )}
+      {error && (
+        <YStack key="red" gap="$4" mb="$4">
+          <H4 theme={'alt2'}>Error</H4>
+          <Paragraph>{error.message}</Paragraph>
+        </YStack>
+      )}
+      <Search.Results />
+    </AnimatePresence>
+  )
+}
+
+function HomeBody(props: XStackProps) {
   const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
   const selectedCoin = useCoinFromTokenParam()
 
   const { balances } = useSendAccountBalances()
   const usdcBalance = balances?.[0]?.result
+
   const hasSendAccount = !!sendAccount
   const canSend = !!sendAccount && usdcBalance && usdcBalance > 0n
 
   return (
-    <>
-      <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }}>
-        <YStack
-          $gtLg={{ width: 455, display: 'flex' }}
-          display={hasSendAccount && !selectedCoin ? 'flex' : 'none'}
-          width="100%"
-          ai={'center'}
-        >
-          {canSend ? (
-            <Card
-              $gtLg={{ p: 36 }}
-              $lg={{ bc: 'transparent' }}
-              py={'$6'}
-              px={'$2'}
-              w={'100%'}
-              jc="space-between"
-              br={12}
-              gap="$6"
-            >
-              <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
-                <TokenBalanceCard />
-              </XStack>
-              <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
-                <Stack f={1} w="50%">
-                  <DepositPopover />
-                </Stack>
-                <Stack f={1} w="50%">
-                  <SendButton />
-                </Stack>
-              </XStack>
-            </Card>
-          ) : (
-            <Card
-              $lg={{ fd: 'column', bc: 'transparent' }}
-              $gtLg={{ p: 36 }}
-              py={'$6'}
-              px={'$2'}
-              ai={'center'}
-              gap="$5"
-              jc="space-around"
-              w={'100%'}
-            >
-              <XStack w="100%">
+    <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
+      <YStack
+        $gtLg={{ width: 455, display: 'flex' }}
+        display={hasSendAccount && !selectedCoin ? 'flex' : 'none'}
+        width="100%"
+        ai={'center'}
+      >
+        {canSend ? (
+          <Card
+            $gtLg={{ p: 36 }}
+            $lg={{ bc: 'transparent' }}
+            py={'$6'}
+            px={'$2'}
+            w={'100%'}
+            jc="space-between"
+            br={12}
+            gap="$6"
+          >
+            <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
+              <TokenBalanceCard />
+            </XStack>
+            <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
+              <Stack f={1} w="50%">
                 <DepositPopover />
-              </XStack>
-              <XStack ai="center">
-                <Paragraph>Or direct deposit on base</Paragraph>
-                <DepositAddress address={sendAccount?.address} />
-              </XStack>
-            </Card>
+              </Stack>
+              <Stack f={1} w="50%">
+                <SendButton />
+              </Stack>
+            </XStack>
+          </Card>
+        ) : (
+          <Card
+            $lg={{ fd: 'column', bc: 'transparent' }}
+            $gtLg={{ p: 36 }}
+            py={'$6'}
+            px={'$2'}
+            ai={'center'}
+            gap="$5"
+            jc="space-around"
+            w={'100%'}
+          >
+            <XStack w="100%">
+              <DepositPopover />
+            </XStack>
+            <XStack ai="center">
+              <Paragraph>Or direct deposit on Base</Paragraph>
+              <DepositAddress address={sendAccount?.address} />
+            </XStack>
+          </Card>
+        )}
+        <Separator $gtLg={{ display: 'none' }} w={'100%'} />
+        <YStack w={'100%'} ai={'center'}>
+          {canSend ? (
+            <YStack width="100%" display={hasSendAccount ? 'flex' : 'none'}>
+              <TokenBalanceList coins={coins} />
+            </YStack>
+          ) : (
+            <NoSendAccountMessage />
           )}
-          <Separator $gtLg={{ display: 'none' }} w={'100%'} />
-          <YStack w={'100%'} ai={'center'}>
-            {canSend ? (
-              <YStack width="100%" $gtLg={{ pt: '$3' }} display={hasSendAccount ? 'flex' : 'none'}>
-                <TokenBalanceList coins={coins} />
-              </YStack>
-            ) : (
-              <NoSendAccountMessage />
-            )}
-          </YStack>
         </YStack>
-
-        {(() => {
-          switch (true) {
-            case sendAccountLoading:
-              return <Spinner size="large" />
-            case !hasSendAccount:
-              return (
-                <YStack
-                  w="100%"
-                  ai="center"
-                  f={1}
-                  gap="$5"
-                  p="$6"
-                  $lg={{ bc: 'transparent' }}
-                  $gtLg={{ br: '$6' }}
-                >
-                  <NoSendAccountMessage />
-                  <Stack jc="center" ai="center" $gtLg={{ mt: 'auto' }} $lg={{ m: 'auto' }}>
-                    <Link
-                      href={'/account/sendtag/checkout'}
-                      theme="green"
-                      borderRadius={'$4'}
-                      p={'$3.5'}
-                      $xs={{ p: '$2.5', px: '$4' }}
-                      px="$6"
-                      bg="$primary"
-                    >
-                      <XStack gap={'$1.5'} ai={'center'} jc="center">
-                        <IconPlus col={'$black'} />
-                        <Paragraph textTransform="uppercase" col={'$black'}>
-                          SENDTAGS
-                        </Paragraph>
-                      </XStack>
-                    </Link>
-                  </Stack>
-                </YStack>
-              )
-            case selectedCoin !== undefined:
-              return <TokenDetails coin={selectedCoin} />
-            default:
-              return <> </>
-          }
-        })()}
-      </XStack>
-    </>
+      </YStack>
+      {(() => {
+        switch (true) {
+          case sendAccountLoading:
+            return <Spinner size="large" />
+          case selectedCoin !== undefined:
+            return <TokenDetails coin={selectedCoin} />
+          default:
+            return <> </>
+        }
+      })()}
+    </XStack>
   )
 }
+
+function HomeSearchBar() {
+  return (
+    <Stack $gtLg={{ pb: 36, pt: 0 }} pt={'$4'}>
+      <Search label={undefined} placeholder="Search..." />
+    </Stack>
+  )
+}
+
 export function HomeScreen() {
-  const { isLoading: sendAccountLoading } = useSendAccount()
+  const media = useMedia()
+  const [queryParams] = useRootScreenParams()
+  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
+  const { search } = queryParams
+  const { balances } = useSendAccountBalances()
+  const usdcBalance = balances?.[0]?.result
+  const canSend = !!sendAccount && usdcBalance && usdcBalance > 0n
 
   return (
     <YStack f={1} pt="$2">
       {(() => {
         switch (true) {
-          case sendAccountLoading:
-            return (
-              <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
-                <Spinner size="large" />
-              </Stack>
-            )
+          case media.lg && queryParams.token !== undefined:
+            return null
+          case canSend:
+            return <HomeSearchBar />
           default:
-            return <HomeBody />
+            return null
         }
       })()}
+
+      <AnimatePresence>
+        {(() => {
+          switch (true) {
+            case sendAccountLoading:
+              return (
+                <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
+                  <Spinner size="large" />
+                </Stack>
+              )
+            case search !== undefined:
+              return <SendSearchBody />
+            default:
+              return (
+                <HomeBody
+                  key="home-body"
+                  animation="200ms"
+                  enterStyle={{
+                    opacity: 0,
+                    y: media.gtLg ? 0 : 300,
+                  }}
+                  exitStyle={{
+                    opacity: 0,
+                    y: media.gtLg ? 0 : 300,
+                  }}
+                />
+              )
+          }
+        })()}
+      </AnimatePresence>
     </YStack>
   )
 }
 
-const SendButton = () => (
-  <LinkableButton href={'/send'} theme="green" br="$4" px={'$3.5'} h={'$4.5'} w="100%">
-    <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
-      <Button.Text fontWeight={'500'} textTransform={'uppercase'} $theme-dark={{ col: '$color0' }}>
-        Send
-      </Button.Text>
-      <Button.Icon>
-        <IconArrowRight size={'$2.5'} $theme-dark={{ col: '$color0' }} />
-      </Button.Icon>
-    </XStack>
-  </LinkableButton>
-)
+const SendButton = () => {
+  const [{ token }] = useRootScreenParams()
+  const href = token ? `/send?sendToken=${token}` : '/send'
+  return (
+    <LinkableButton href={href} theme="green" br="$4" px={'$3.5'} h={'$4.5'} w="100%">
+      <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
+        <Button.Text
+          fontWeight={'500'}
+          textTransform={'uppercase'}
+          $theme-dark={{ col: '$color0' }}
+        >
+          Send
+        </Button.Text>
+        <Button.Icon>
+          <IconArrowRight size={'$2.5'} $theme-dark={{ col: '$color0' }} />
+        </Button.Icon>
+      </XStack>
+    </LinkableButton>
+  )
+}
 
 const NoSendAccountMessage = () => {
   return (
