@@ -3210,7 +3210,7 @@ export const sendtagCheckoutAbi = [
     inputs: [
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
       { name: 'referrer', internalType: 'address', type: 'address' },
-      { name: 'bonus', internalType: 'uint256', type: 'uint256' },
+      { name: 'reward', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'checkout',
     outputs: [],
@@ -3287,7 +3287,7 @@ export const sendtagCheckoutAbi = [
       { name: 'referred', internalType: 'address', type: 'address', indexed: false },
       { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
-    name: 'ReferralBonus',
+    name: 'ReferralReward',
   },
   {
     type: 'event',
@@ -7671,14 +7671,14 @@ export const watchSendtagCheckoutOwnershipTransferredEvent = /*#__PURE__*/ creat
 )
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralBonus"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralReward"`
  *
  *
  */
-export const watchSendtagCheckoutReferralBonusEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchSendtagCheckoutReferralRewardEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendtagCheckoutAbi,
   address: sendtagCheckoutAddress,
-  eventName: 'ReferralBonus',
+  eventName: 'ReferralReward',
 })
 
 /**
@@ -12347,15 +12347,13 @@ export const useWatchSendtagCheckoutOwnershipTransferredEvent =
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralBonus"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralReward"`
  *
  *
  */
-export const useWatchSendtagCheckoutReferralBonusEvent = /*#__PURE__*/ createUseWatchContractEvent({
-  abi: sendtagCheckoutAbi,
-  address: sendtagCheckoutAddress,
-  eventName: 'ReferralBonus',
-})
+export const useWatchSendtagCheckoutReferralRewardEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: sendtagCheckoutAbi, address: sendtagCheckoutAddress, eventName: 'ReferralReward' }
+)
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Toggled"`
