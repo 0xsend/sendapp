@@ -22,7 +22,7 @@ describe('EventArraySchema', () => {
 
   it('should parse a valid event array', () => {
     expect(parsedData).toMatchSnapshot()
-    expect(parsedData).toHaveLength(8)
+    expect(parsedData).toHaveLength(9)
   })
 
   describe('SendAccountTransfersEvent', () => {

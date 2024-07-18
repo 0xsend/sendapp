@@ -260,5 +260,34 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
     },
     "to_user": null,
   },
+  {
+    "created_at": 2024-07-18T19:32:08.000Z,
+    "data": {
+      "block_num": 17270890n,
+      "coin": {
+        "coingeckoTokenId": "usd-coin",
+        "decimals": 6,
+        "label": "USDC",
+        "symbol": "USDC",
+        "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      },
+      "f": "0x3936f906910C0f74b6d1536614068368B94CDa85",
+      "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "log_idx": 4n,
+      "t": "0x29369A06d3c17897E819C43202A7f4A1004B20cF",
+      "tx_hash": "0x797a6a0fdd1c849e4e6e58bdc02966d19cff1eb8ef257216914288e715e460b8",
+      "tx_idx": 0n,
+      "v": 8000000n,
+    },
+    "event_name": "send_account_transfers",
+    "from_user": null,
+    "to_user": {
+      "avatar_url": null,
+      "id": "5def5ec4-7f0e-4509-990f-d52e85e95187",
+      "name": null,
+      "send_id": 64705,
+      "tags": null,
+    },
+  },
 ]
 `;
