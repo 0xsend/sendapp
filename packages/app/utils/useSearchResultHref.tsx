@@ -15,18 +15,18 @@ export const useSearchResultHref = (profile?: SearchResultCommonType) => {
         return ''
       case path === '/activity':
         return `${baseMainnet.blockExplorers.default.url}/address/${query}`
-      case path === '/send':
+      case path === '/send' || path === '/':
         return `/send?recipient=${query}&idType=address`
-      default: {
+
+      default:
         throw new Error(`Unhandled path: ${path}`)
-      }
     }
   }
 
-  switch (path) {
-    case '/activity':
+  switch (true) {
+    case path === '/activity':
       return `/profile/${profile.send_id}`
-    case '/send': {
+    case path === '/send' || path === '/': {
       const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
       if (profile.tag_name) {
         return `/send?${new URLSearchParams({

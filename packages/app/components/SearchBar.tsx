@@ -427,7 +427,12 @@ function SearchResultRow({
   )
 }
 
-function Search() {
+type SearchProps = {
+  label?: string
+  placeholder?: string
+}
+
+function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: SearchProps) {
   const { form } = useTagSearch()
   const [queryParams, setRootParams] = useRootScreenParams()
   const { search: query } = queryParams
@@ -437,7 +442,7 @@ function Search() {
       setRootParams(
         {
           ...queryParams,
-          search: query,
+          search: query === '' ? undefined : query,
         },
         { webBehavior: 'replace' }
       )
@@ -447,9 +452,11 @@ function Search() {
 
   return (
     <>
-      <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
-        SEARCH BY
-      </H4>
+      {label !== undefined && (
+        <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
+          {label}
+        </H4>
+      )}
       <View position="relative" testID="sendSearchContainer">
         <FormProvider {...form}>
           <SchemaForm
@@ -462,8 +469,17 @@ function Search() {
             props={{
               query: {
                 accessibilityRole: 'search',
-                placeholder: 'Sendtag, Phone, Send ID, Address',
+                placeholder,
                 pr: '$size.3.5',
+                hoverStyle: {
+                  boc: '$color12',
+                },
+                bw: 1,
+                br: '$4',
+                boc: '$color3',
+                $gtLg: {
+                  w: 455,
+                },
               },
             }}
             formProps={{

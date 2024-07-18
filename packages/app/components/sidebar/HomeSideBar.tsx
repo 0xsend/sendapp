@@ -14,13 +14,7 @@ import {
   type YStackProps,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi/chains'
-import {
-  IconAccount,
-  IconActivity,
-  IconHome,
-  IconSendLogo,
-  IconDeviceReset,
-} from 'app/components/icons'
+import { IconAccount, IconHome, IconSendLogo, IconDeviceReset } from 'app/components/icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -34,11 +28,6 @@ const links = [
     icon: <IconHome size={'$1.75'} color={'inherit'} />,
     text: 'Home',
     href: '/',
-  },
-  {
-    icon: <IconActivity size={'$1'} color={'inherit'} />,
-    text: 'Send',
-    href: '/send',
   },
   {
     icon: <IconDeviceReset size={'$1'} color={'inherit'} />,

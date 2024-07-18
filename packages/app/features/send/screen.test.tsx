@@ -97,6 +97,7 @@ describe('SendScreen', () => {
       jest.advanceTimersByTime(2000)
       jest.runAllTimers()
     })
+
     await waitFor(() => screen.findByTestId('searchResults'))
 
     expect(screen.toJSON()).toMatchSnapshot('search')
