@@ -197,7 +197,7 @@ export const OnboardingForm = () => {
                     col: '$greenBackground',
                   }}
                   $theme-light={{ col: '$black' }}
-                  href="https://info.send.it/send/mission-vision-and-values"
+                  href="https://help.send.app/what-are-passkeys/"
                   target="_blank"
                   dsp="flex"
                   jc="flex-end"
