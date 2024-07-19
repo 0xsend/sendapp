@@ -25,13 +25,13 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <Container height={'100%'} f={1} safeAreaPadding={isPwa && 'vertical'}>
-      <YStack ai="center" f={1} pt="$7" pb="$10">
+      <YStack ai="center" f={1} pt="$7">
         <Anchor {...useLink({ href: '/' })} mx="auto" position="absolute" top={'$6'}>
           <Theme inverse={true}>
             <IconSendLogo size={'$6'} color={'$background'} />
           </Theme>
         </Anchor>
-        <YStack pb="$10" pt="$14" mt="$10">
+        <YStack pt="$14" mt="$10">
           {children}
         </YStack>
       </YStack>
