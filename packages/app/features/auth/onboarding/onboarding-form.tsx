@@ -5,6 +5,7 @@ import {
   ButtonText,
   H3,
   Paragraph,
+  Stack,
   SubmitButton,
   Theme,
   XStack,
@@ -39,7 +40,7 @@ export const OnboardingForm = () => {
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
 
-  const [attempts, setAttempts] = useState(0)
+  const [errorMessage, setErrorMessage] = useState<string>()
 
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     try {
@@ -78,12 +79,13 @@ export const OnboardingForm = () => {
             replace('/')
             return
           }
-          setAttempts((a) => a + 1)
+          setErrorMessage('Account not created. Please try again.')
           form.setError('accountName', { type: 'custom' })
         })
     } catch (error) {
       console.error('Error creating account', error)
-      setAttempts((a) => a + 1)
+      const message = error?.message.split('.')[0] ?? 'Unknown error'
+      setErrorMessage(message)
       form.setError('accountName', { type: 'custom' })
     }
   }
@@ -124,56 +126,58 @@ export const OnboardingForm = () => {
           },
         }}
         renderAfter={({ submit }) => (
-          <XStack
-            jc="space-between"
-            ai="center"
-            w="100%"
-            px="$2"
-            $sm={{ jc: 'center', height: '100%' }}
-          >
-            <Anchor
-              $theme-dark={{
-                col: '$background',
-              }}
-              $theme-light={{ col: '$black' }}
-              href="https://help.send.app/what-are-passkeys/"
-              target="_blank"
-              dsp="none"
-              $gtMd={{ dsp: 'block' }}
-            >
-              Why Passkey?
-            </Anchor>
-
-            <SubmitButton
-              onPress={submit}
-              theme={attempts > 0 ? 'yellow_active' : 'green'}
-              mb="auto"
-              als="auto"
-              r
-              br="$4"
-              mx="auto"
+          <>
+            <XStack
+              jc="space-between"
+              ai="center"
               w="100%"
-              $gtMd={{
-                mt: '0',
-                als: 'flex-end',
-                mx: 0,
-                ml: 'auto',
-                maw: '$12',
-                h: '$3.5',
-              }}
+              px="$2"
+              $sm={{ jc: 'center', height: '100%' }}
             >
-              <ButtonText
-                size={'$2'}
-                padding={'unset'}
-                textTransform="uppercase"
-                ta="center"
-                margin={'unset'}
-                col="black"
+              <Anchor
+                $theme-dark={{
+                  col: '$background',
+                }}
+                $theme-light={{ col: '$black' }}
+                href="https://help.send.app/what-are-passkeys/"
+                target="_blank"
+                dsp="none"
+                $gtMd={{ dsp: 'block' }}
               >
-                {attempts > 0 ? 'Try again' : 'CREATE PASSKEY'}
-              </ButtonText>
-            </SubmitButton>
-          </XStack>
+                Why Passkey?
+              </Anchor>
+
+              <SubmitButton
+                onPress={submit}
+                theme={errorMessage ? 'yellow_active' : 'green'}
+                mb="auto"
+                als="auto"
+                r
+                br="$4"
+                mx="auto"
+                w="100%"
+                $gtMd={{
+                  mt: '0',
+                  als: 'flex-end',
+                  mx: 0,
+                  ml: 'auto',
+                  maw: '$12',
+                  h: '$3.5',
+                }}
+              >
+                <ButtonText
+                  size={'$2'}
+                  padding={'unset'}
+                  textTransform="uppercase"
+                  ta="center"
+                  margin={'unset'}
+                  col="black"
+                >
+                  {errorMessage ? 'Try again' : 'CREATE PASSKEY'}
+                </ButtonText>
+              </SubmitButton>
+            </XStack>
+          </>
         )}
       >
         {(fields) => (
@@ -193,11 +197,6 @@ export const OnboardingForm = () => {
               time
             </H3>
             <YStack gap="$4">
-              <Theme inverse={true}>
-                <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
-                  Passkey Name
-                </Paragraph>
-              </Theme>
               <YStack gap="$4" f={1}>
                 {Object.values(fields)}
                 <Anchor
@@ -213,6 +212,11 @@ export const OnboardingForm = () => {
                 >
                   Why Passkey?
                 </Anchor>
+                <Stack maw={382}>
+                  <Paragraph theme="red" color="$color9" flexWrap="wrap">
+                    {errorMessage}
+                  </Paragraph>
+                </Stack>
               </YStack>
             </YStack>
           </YStack>
