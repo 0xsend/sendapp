@@ -477,10 +477,11 @@ exports[`OnboardingScreen 1`] = `
                     "flexGrow": 0,
                     "flexShrink": 1,
                     "fontFamily": "System",
-                    "fontSize": 13.2,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "300",
-                    "lineHeight": 16,
+                    "lineHeight": 17,
                     "textAlign": "center",
+                    "textTransform": "uppercase",
                     "userSelect": "none",
                   }
                 }

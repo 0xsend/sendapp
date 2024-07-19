@@ -4,7 +4,7 @@ import type {
   VerifyChallengeRequest,
 } from '@my/api/src/routers/account-recovery/types'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
-import { Button, ButtonText, Paragraph, Stack, XStack, YStack, useToastController } from '@my/ui'
+import { Button, ButtonText, Paragraph, Stack, XStack, YStack } from '@my/ui'
 import type { SignMessageErrorType } from '@wagmi/core'
 import { IconError, IconRefresh } from 'app/components/icons'
 import RecoverWithEOA from 'app/features/auth/account-recovery/eoa/RecoverWithEOA'
@@ -24,7 +24,6 @@ export enum SignState {
 }
 
 export default function AccountRecovery(props: Props) {
-  const toast = useToastController()
   const [error, setError] = useState<ErrorWithMessage>()
   const [signState] = useState<SignState>(SignState.NOT_COMPLETE)
   const [challengeData, setChallengeData] = useState<ChallengeResponse>()
@@ -55,7 +54,6 @@ export default function AccountRecovery(props: Props) {
         ...verifyChallengeRequest,
       })
         .then(() => {
-          toast.show('Successfully recovered your account')
           // JWT is set via Set-Cookie header
           router.push('/')
         })
@@ -63,7 +61,7 @@ export default function AccountRecovery(props: Props) {
           setError(err)
         })
     },
-    [validateSignatureMutateAsync, router, toast]
+    [validateSignatureMutateAsync, router]
   )
 
   const onSignError = (e: SignMessageErrorType) => {

@@ -61,7 +61,6 @@ export const SignInForm = () => {
         identifier: `${accountName}.${keySlot}`,
       })
 
-      toast.show('Successfully signed in')
       router.push(redirectUri ?? '/')
     } catch (error) {
       toast.show('Failed to sign in', { preset: 'error', isUrgent: true })
