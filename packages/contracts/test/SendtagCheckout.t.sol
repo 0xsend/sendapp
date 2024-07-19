@@ -46,36 +46,36 @@ contract SendtagCheckoutTest is Test {
 
     /// @notice Test the checkout function with a referrer.
     /// Bob wants a sendtag, he just found send.app because of his friend Alice and uses her referral code
-    function testFuzzCheckoutReferrer(uint256 amount, uint256 bonus) public {
+    function testFuzzCheckoutReferrer(uint256 amount, uint256 rewards) public {
         vm.assume(amount > 0);
-        vm.assume(bonus <= amount);
+        vm.assume(rewards <= amount);
         address sender = address(0xb0b);
         address referrer = address(0xa71ce);
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
-        if (bonus > 0) {
+        if (rewards > 0) {
             vm.expectEmit(true, true, true, true);
-            emit SendtagCheckout.ReferralBonus(referrer, sender, bonus);
+            emit SendtagCheckout.ReferralReward(referrer, sender, rewards);
         }
-        checkout.checkout(amount, referrer, bonus);
+        checkout.checkout(amount, referrer, rewards);
         vm.stopPrank();
-        assertEq(token.balanceOf(multisig), amount - bonus);
+        assertEq(token.balanceOf(multisig), amount - rewards);
         assertEq(token.balanceOf(sender), 0);
-        assertEq(token.balanceOf(referrer), bonus);
+        assertEq(token.balanceOf(referrer), rewards);
     }
 
-    /// @notice Test the checkout function with a bonus and invalid referrer.
-    function testCheckoutInvalidReferrer(uint256 amount, uint256 bonus) public {
+    /// @notice Test the checkout function with a rewards and invalid referrer.
+    function testCheckoutInvalidReferrer(uint256 amount, uint256 rewards) public {
         vm.assume(amount > 0);
-        vm.assume(bonus > 0);
-        vm.assume(bonus <= amount);
+        vm.assume(rewards > 0);
+        vm.assume(rewards <= amount);
         address sender = address(0xb0b);
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
         vm.expectRevert("Invalid referrer address");
-        checkout.checkout(amount, address(0), bonus);
+        checkout.checkout(amount, address(0), rewards);
         vm.stopPrank();
     }
 
@@ -93,7 +93,7 @@ contract SendtagCheckoutTest is Test {
         uint256 amount = 100;
         token.mint(amount);
         token.approve(address(checkout), amount);
-        vm.expectRevert("Not open");
+        vm.expectRevert("Closed");
         checkout.checkout(amount, address(0), 0);
         vm.stopPrank();
 
