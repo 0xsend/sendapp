@@ -20,6 +20,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
+import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -37,6 +38,8 @@ export const OnboardingForm = () => {
   const deviceName = Device.deviceName
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
+
+  const [attempts, setAttempts] = useState(0)
 
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     try {
@@ -75,15 +78,13 @@ export const OnboardingForm = () => {
             replace('/')
             return
           }
-          form.setError('accountName', {
-            type: 'custom',
-            message: 'Account not created. Please try again.',
-          })
+          setAttempts((a) => a + 1)
+          form.setError('accountName', { type: 'custom' })
         })
     } catch (error) {
       console.error('Error creating account', error)
-      const message = error?.message.split('.')[0] ?? 'Unknown error'
-      form.setError('accountName', { type: 'custom', message: message })
+      setAttempts((a) => a + 1)
+      form.setError('accountName', { type: 'custom' })
     }
   }
   const isClient = useIsClient()
@@ -145,7 +146,7 @@ export const OnboardingForm = () => {
 
             <SubmitButton
               onPress={submit}
-              theme={'green'}
+              theme={attempts > 0 ? 'yellow_active' : 'green'}
               mb="auto"
               als="auto"
               r
@@ -161,8 +162,15 @@ export const OnboardingForm = () => {
                 h: '$3.5',
               }}
             >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                CREATE PASSKEY
+              <ButtonText
+                size={'$2'}
+                padding={'unset'}
+                textTransform="uppercase"
+                ta="center"
+                margin={'unset'}
+                col="black"
+              >
+                {attempts > 0 ? 'Try again' : 'CREATE PASSKEY'}
               </ButtonText>
             </SubmitButton>
           </XStack>

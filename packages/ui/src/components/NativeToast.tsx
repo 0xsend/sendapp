@@ -20,6 +20,9 @@ export const NativeToast = () => {
         opacity={1}
         scale={1}
         animation="quick"
+        bw={1}
+        boc="color12"
+        $theme-dark={{ boc: '$primary' }}
       >
         <YStack py="$1.5" px="$2">
           <Toast.Title>{currentToast.title}</Toast.Title>
