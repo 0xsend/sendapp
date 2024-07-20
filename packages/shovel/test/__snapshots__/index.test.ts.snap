@@ -652,6 +652,9 @@ exports[`shovel config 1`] = `
       "concurrency": 1,
       "name": "base_block_headers",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL",
+      ],
     },
     {
       "batch_size": 2000,
@@ -659,6 +662,9 @@ exports[`shovel config 1`] = `
       "concurrency": 2,
       "name": "base_logs",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL",
+      ],
     },
   ],
 }

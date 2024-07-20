@@ -37,6 +37,8 @@ contract SendtagCheckoutTest is Test {
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
+        vm.expectEmit(true, true, true, true);
+        emit SendtagCheckout.Receipt(sender, amount, address(0), 0);
         checkout.checkout(amount, address(0), 0);
         vm.stopPrank();
         assertEq(token.balanceOf(multisig), amount);
@@ -54,10 +56,8 @@ contract SendtagCheckoutTest is Test {
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
-        if (rewards > 0) {
-            vm.expectEmit(true, true, true, true);
-            emit SendtagCheckout.ReferralReward(referrer, sender, rewards);
-        }
+        vm.expectEmit(true, true, true, true);
+        emit SendtagCheckout.Receipt(sender, amount, referrer, rewards);
         checkout.checkout(amount, referrer, rewards);
         vm.stopPrank();
         assertEq(token.balanceOf(multisig), amount - rewards);

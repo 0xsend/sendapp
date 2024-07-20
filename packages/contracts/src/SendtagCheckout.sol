@@ -19,8 +19,8 @@ contract SendtagCheckout is Ownable {
     /// @notice When false, the contract is paused and checkouts are not allowed.
     bool public open;
 
-    /// @notice The event emitted when a referrer is paid a reward.
-    event ReferralReward(address indexed referrer, address referred, uint256 amount);
+    /// @notice The event emitted when a checkout is made.
+    event Receipt(address indexed sender, uint256 amount, address referrer, uint256 reward);
 
     /// @notice The event emitted when the contract is toggled.
     event Toggled(bool open);
@@ -51,11 +51,11 @@ contract SendtagCheckout is Ownable {
             require(referrer != address(0), "Invalid referrer address");
             require(reward <= amount, "Invalid referrer reward");
             SafeERC20.safeTransfer(token, referrer, reward);
-            emit ReferralReward(referrer, msg.sender, reward);
         }
 
         // Finally, send the funds to the Send Multisig
         SafeERC20.safeTransfer(token, multisig, amount - reward);
+        emit Receipt(msg.sender, amount, referrer, reward);
     }
 
     /// @notice Toggle the contract.
