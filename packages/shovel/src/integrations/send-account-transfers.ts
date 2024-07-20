@@ -36,11 +36,6 @@ export const integration: Omit<Integration, 'sources'> = {
     {
       name: 'log_addr',
       column: 'log_addr',
-      filter_op: 'contains',
-      filter_arg: [
-        ...new Set(Object.values(sendTokenAddress)),
-        ...new Set(Object.values(usdcAddress)),
-      ].sort(),
     },
   ] as BlockData[],
   event: {
@@ -53,18 +48,16 @@ export const integration: Omit<Integration, 'sources'> = {
         name: 'from',
         type: 'address',
         column: 'f',
-        // wait for this https://github.com/indexsupply/code/issues/262
-        // filter_op: 'contains',
-        // filter_ref: sendAccountFactorySenderFilterRef,
+        filter_op: 'contains',
+        filter_ref: sendAccountFactorySenderFilterRef,
       },
       {
         indexed: true,
         name: 'to',
         type: 'address',
         column: 't',
-        // wait for this https://github.com/indexsupply/code/issues/262
-        // filter_op: 'contains',
-        // filter_ref: sendAccountFactorySenderFilterRef,
+        filter_op: 'contains',
+        filter_ref: sendAccountFactorySenderFilterRef,
       },
       {
         indexed: false,
