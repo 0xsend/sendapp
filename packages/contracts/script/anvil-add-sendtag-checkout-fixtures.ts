@@ -43,21 +43,19 @@ MULTISIG=${$.env.MULTISIG}\t\thttps://basescan.org/address/${$.env.MULTISIG}
 TOKEN=${$.env.TOKEN}\t\thttps://basescan.org/address/${$.env.TOKEN}
 `
   )
-  const contractAddress: string | undefined = await $`forge script ./script/DeploySendtagCheckout.s.sol:DeploySendtagCheckoutScript \
+  await $`forge script ./script/DeploySendtagCheckout.s.sol:DeploySendtagCheckoutScript \
               -vvvv \
               --rpc-url ${RPC_URL} \
               --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
               --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-              --broadcast`.then(
-    ({ stdout }) => stdout.match(/contract SendtagCheckout (0x[a-fA-F0-9]{40})/)?.[1]
-  )
-
-  if (!contractAddress) {
-    console.error(chalk.red('Failed to deploy SendtagCheckout contract'))
-    process.exit(1)
-  }
-
-  console.log(chalk.blue(`SendtagCheckout contract deployed to ${contractAddress}`))
+              --broadcast`
+    .then(({ stdout }) => stdout.match(/contract SendtagCheckout (0x[a-fA-F0-9]{40})/)?.[1])
+    .catch((e) => {
+      if (e.toString().includes('EvmError: CreateCollision')) {
+        console.log(chalk.yellow('SendtagCheckout already deployed'))
+        return
+      }
+    })
 
   console.log(chalk.blue('Disable auto-mining...'))
   await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine false`
