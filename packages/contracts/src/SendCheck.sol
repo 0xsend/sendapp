@@ -56,4 +56,8 @@ contract SendCheck {
         delete checks[ephemeralAddress];
         check.token.safeTransfer(msg.sender, check.amount);
     }
+
+    function getCheck(address ephemeralAddress) external view returns (Check memory) {
+        return checks[ephemeralAddress];
+    }
 }

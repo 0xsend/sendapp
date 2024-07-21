@@ -9,16 +9,17 @@ import { defaultUserOp } from 'app/utils/useUserOpTransferMutation'
  * Generates a URL for claiming a /send check.
  *
  * The URL encodes information required for /send check retrieval. See {@see ClaimSendCheckPayload } for more information
- * @param {string} senderId - The sender's /send account id.
+ * @param {string} senderSendId - The sender's send ID {@see profiles table}.
  * @param {EphemeralKeyPair} ephemeralKeyPair - An object containing the ephemeral private key and address.
  * @returns {string} The generated URL for claiming the check.
  */
 export const encodeClaimCheckUrl = (
-  senderId: string,
+  senderSendId: string,
   ephemeralKeyPair: EphemeralKeyPair
 ): string => {
+  // TODO: /send check notes: add note field in encoded payload
   const encodedPayload = encodeURIComponent(
-    `${senderId}:${ephemeralKeyPair.ephemeralPrivateKey}:${ephemeralKeyPair.ephemeralAddress}`
+    `${senderSendId}:${ephemeralKeyPair.ephemeralPrivateKey}:${ephemeralKeyPair.ephemeralAddress}`
   )
   return `/checks/claim#${encodedPayload}`
 }
@@ -47,14 +48,14 @@ const validateDecodedPayload = (decodedPayload: string): ClaimSendCheckPayload =
     }
   })
 
-  const senderAccountId = payloadParts[0] as string
+  const senderSendId = payloadParts[0] as string
   const ephemeralKeypair = {
     ephemeralPrivateKey: payloadParts[1] as Hex,
     ephemeralAddress: payloadParts[2] as Hex,
   }
 
   return {
-    senderAccountUuid: senderAccountId,
+    senderSendId,
     ephemeralKeypair,
   }
 }

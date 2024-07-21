@@ -17,7 +17,9 @@ import { defaultSendCheckUserOp } from 'app/features/checks/utils/checkUtils'
  * @param {CreateSendCheckUserOpProps} props - properties for generating a create /send check userop
  * @returns {UserOperation<'v0.7'>}
  */
-export const getCreateSendCheckUserOp = (props: CreateSendCheckUserOpProps) => {
+export const getCreateSendCheckUserOp = (
+  props: CreateSendCheckUserOpProps
+): UserOperation<'v0.7'> => {
   validateCreateSendCheckUserOpProps(props)
 
   const callData = getCallData(props)
