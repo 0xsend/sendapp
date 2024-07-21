@@ -1,19 +1,5 @@
 set check_function_bodies = off;
 
-create table sendtag_checkout_contracts (
-    id serial primary key,
-    address bytea not null,
-    chain_id integer not null,
-    created_at timestamp with time zone default now(),
-    updated_at timestamp with time zone default now()
-);
-
-insert into sendtag_checkout_contracts (address, chain_id) values (
-    '\x3936f906910C0f74b6d1536614068368B94CDa85', 8453
-);
-
-alter table sendtag_checkout_contracts enable row level security;
-
 CREATE OR REPLACE FUNCTION public.confirm_tags(tag_names citext[], event_id text, referral_code_input text)
     RETURNS void
     LANGUAGE plpgsql
@@ -29,8 +15,6 @@ declare tag_owner_ids uuid [];
         referrer_id uuid;
 
         _event_id alias for $2;
-
-        checkout_contracts bytea [];
 begin
     -- Check if the tags exist and fetch their owners.
     select array_agg(user_id) into tag_owner_ids
@@ -60,22 +44,13 @@ begin
 
     end if;
 
-    -- Ensure we have sendtag_checkout_contracts
-    select array_agg(address) into checkout_contracts
-    from sendtag_checkout_contracts
-    limit 1;
-    if (checkout_contracts is null)
-    then raise exception 'Sendtag checkout contract not found.';
-    end if;
-
     -- Ensure event_id matches the sender
     if (
-           select count(distinct sat.f)
-           from public.send_account_transfers sat
-                    join send_accounts sa on decode(substring(sa.address, 3), 'hex') = sat.f
-           where sat.event_id = _event_id
+           select count(distinct scr.sender)
+           from public.sendtag_checkout_receipts scr
+                    join send_accounts sa on decode(substring(sa.address, 3), 'hex') = scr.sender
+           where scr.event_id = _event_id
              and sa.user_id = tag_owner_id
-             and sat.t = any(checkout_contracts)
        ) <> 1 then raise exception 'Receipt event ID does not match the sender';
     end if;
 

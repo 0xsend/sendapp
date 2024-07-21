@@ -18,26 +18,26 @@ begin
         null,
         json_build_object(
                 'log_addr',
-                sat.log_addr,
+                scr.log_addr,
                 'block_num',
-                sat.block_num,
+                scr.block_num,
                 'tx_idx',
-                sat.tx_idx,
+                scr.tx_idx,
                 'log_idx',
-                sat.log_idx,
+                scr.log_idx,
                 'tx_hash',
-                sat.tx_hash,
+                scr.tx_hash,
                 'tags',
                 array_agg(t.name),
                 'value',
             -- cast v to text to avoid losing precision when converting to json when sending to clients
-                sat.v::text
+                scr.v::text
         ),
         current_timestamp
     from NEW_TABLE
              join tags t on t.name = NEW_TABLE.tag_name
-             join send_account_transfers sat ON NEW_TABLE.event_id = sat.event_id
-    group by t.user_id, NEW_TABLE.event_id, sat.event_id, sat.log_addr, sat.block_num, sat.tx_idx, sat.log_idx,  sat.tx_hash, sat.v;
+             join sendtag_checkout_receipts scr ON NEW_TABLE.event_id = scr.event_id
+    group by t.user_id, NEW_TABLE.event_id, scr.event_id, scr.log_addr, scr.block_num, scr.tx_idx, scr.log_idx,  scr.tx_hash, scr.v;
 
     return NULL;
 end;

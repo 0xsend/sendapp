@@ -866,30 +866,6 @@ export type Database = {
         }
         Relationships: []
       }
-      sendtag_checkout_contracts: {
-        Row: {
-          address: string
-          chain_id: number
-          created_at: string | null
-          id: number
-          updated_at: string | null
-        }
-        Insert: {
-          address: string
-          chain_id: number
-          created_at?: string | null
-          id?: number
-          updated_at?: string | null
-        }
-        Update: {
-          address?: string
-          chain_id?: number
-          created_at?: string | null
-          id?: number
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       sendtag_checkout_receipts: {
         Row: {
           abi_idx: number

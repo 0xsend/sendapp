@@ -73,6 +73,13 @@ export type Database = MergeDeep<
             init_code: PgBytea
           }
         }
+        sendtag_checkout_receipts: {
+          Row: {
+            tx_hash: PgBytea
+            sender: PgBytea
+            referrer: PgBytea
+          }
+        }
       }
       Functions: {
         distribution_hodler_addresses: {

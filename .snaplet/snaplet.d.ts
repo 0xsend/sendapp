@@ -438,13 +438,6 @@ interface Table_public_send_token_transfers {
   log_idx: number;
   abi_idx: number;
 }
-interface Table_public_sendtag_checkout_contracts {
-  id: number;
-  address: string;
-  chain_id: number;
-  created_at: string | null;
-  updated_at: string | null;
-}
 interface Table_public_sendtag_checkout_receipts {
   id: number;
   chain_id: number;
@@ -643,7 +636,6 @@ interface Schema_public {
   send_liquidity_pools: Table_public_send_liquidity_pools;
   send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_token_transfers: Table_public_send_token_transfers;
-  sendtag_checkout_contracts: Table_public_sendtag_checkout_contracts;
   sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;

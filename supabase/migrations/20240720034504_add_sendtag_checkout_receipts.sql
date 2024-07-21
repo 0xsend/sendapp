@@ -21,6 +21,26 @@ create table "public"."sendtag_checkout_receipts" (
 
 alter table "public"."sendtag_checkout_receipts" enable row level security;
 
+create policy
+"users can see their own sendtag_checkout_receipts" -- noqa: RF05
+on "public"."sendtag_checkout_receipts" as permissive for
+select
+to public using (
+    (
+        (lower(concat('0x', encode(sender, 'hex'::text))))::citext in (
+            select send_accounts.address
+            from
+                send_accounts
+            where
+                (
+                    send_accounts.user_id = (
+                        select auth.uid()
+                    )
+                )
+        )
+    )
+);
+
 CREATE UNIQUE INDEX u_sendtag_checkout_receipts ON public.sendtag_checkout_receipts USING btree (ig_name, src_name, block_num, tx_idx, log_idx, abi_idx);
 
 create index sendtag_checkout_receipts_sender_idx on public.sendtag_checkout_receipts using btree (sender);

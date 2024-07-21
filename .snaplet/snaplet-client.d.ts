@@ -394,16 +394,6 @@ type Override = {
       event_id?: string;
     };
   }
-  sendtag_checkout_contracts?: {
-    name?: string;
-    fields?: {
-      id?: string;
-      address?: string;
-      chain_id?: string;
-      created_at?: string;
-      updated_at?: string;
-    };
-  }
   sendtag_checkout_receipts?: {
     name?: string;
     fields?: {
@@ -745,12 +735,6 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
-  }
-  sendtagCheckoutContracts?: {
-    id?: FingerprintNumberField;
-    chainId?: FingerprintNumberField;
-    createdAt?: FingerprintDateField;
-    updatedAt?: FingerprintDateField;
   }
   sendtagCheckoutReceipts?: {
     id?: FingerprintNumberField;
