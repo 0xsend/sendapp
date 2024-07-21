@@ -12,6 +12,7 @@ import type { GetUserOperationReceiptReturnType, UserOperation } from 'permissio
 import { getCreateSendCheckUserOp } from 'app/features/checks/utils/getCreateSendCheckUserOp'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnetClient } from '@my/wagmi'
+import { useUser } from 'app/utils/useUser'
 
 const logger = debug.log
 
@@ -22,6 +23,7 @@ const logger = debug.log
  */
 export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCheckReturnType => {
   const { data: sendAccount } = useSendAccount()
+  const { profile } = useUser()
   const { data: nonce } = useAccountNonce({ sender: sendAccount?.address })
   const { data: feesPerGas } = useEstimateFeesPerGas({
     chainId: baseMainnetClient.chain.id,
@@ -29,6 +31,9 @@ export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCh
 
   // get /send check creation user op
   return async () => {
+    if (!profile?.send_id || !nonce || !sendAccount?.address || !feesPerGas) {
+      return
+    }
     const userOpProps: CreateSendCheckUserOpProps = {
       senderAddress: sendAccount?.address as `0x${string}`,
       nonce: nonce as bigint,
@@ -38,11 +43,10 @@ export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCh
 
     const userOp = getCreateSendCheckUserOp(userOpProps)
     const receipt = await createSendCheck(userOp)
-    const senderAccountUuid = sendAccount?.user_id
-
+    const senderSendId = profile.send_id
     return {
       receipt,
-      senderAccountUuid,
+      senderSendId,
       ephemeralKeypair: props.ephemeralKeypair,
     }
   }
@@ -54,7 +58,7 @@ export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCh
  * @returns {Promise<GetUserOperationReceiptReturnType>} - userOp receipt
  */
 export const createSendCheck = async (
-  createSendCheckUserOp?: UserOperation<'v0.7'>[]
+  createSendCheckUserOp: UserOperation<'v0.7'>
 ): Promise<GetUserOperationReceiptReturnType> => {
   if (!createSendCheckUserOp) {
     throw new Error(

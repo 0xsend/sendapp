@@ -1,4 +1,4 @@
-import { CreateSendCheckBtn } from 'app/features/checks/components/createSendCheckBtn'
+import { CreateSendCheckBtn } from 'app/features/checks/components/create/btn/CreateSendCheckBtn'
 import type { CreateSendCheckBtnProps, EphemeralKeyPair } from 'app/features/checks/types'
 import { useEffect, useState } from 'react'
 import type { Hex } from 'viem'
@@ -22,10 +22,10 @@ export const CreateSendCheck = () => {
 
   const onSuccess = (
     receipt: GetUserOperationReceiptReturnType,
-    senderAccountId: string,
+    senderSendId: string,
     ephemeralKeypair: EphemeralKeyPair
   ) => {
-    const checkUrl: string = encodeClaimCheckUrl(senderAccountId, ephemeralKeypair)
+    const checkUrl: string = encodeClaimCheckUrl(senderSendId, ephemeralKeypair)
     console.log(checkUrl)
   }
 

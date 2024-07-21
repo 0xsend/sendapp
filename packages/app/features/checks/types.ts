@@ -2,12 +2,24 @@ import type { GetUserOperationReceiptReturnType } from 'permissionless'
 import type { Hex } from 'viem'
 
 /**
+ * Represents the data that a /send check holds.
+ */
+export interface SendCheckData {
+  ephemeralAddress: Hex
+  amount: bigint
+  token: Hex
+
+  // Optional, off-chain data below
+  note?: string
+}
+
+/**
  * Properties for the CreateSendCheck button component.
  *
  * @interface CreateSendCheckBtnProps
  * @property {bigint} amount - The amount of the token to be sent.
  * @property {Hex} tokenAddress - The address of the token.
- * @property {(receipt: GetUserOperationReceiptReturnType, senderAccountId: string, EphemeralKeyPair: Hex) => void} onSuccess - Callback function to be called upon successful check creation and sending. Receives the sender's account ID and the ephemeral private key used in the operation.
+ * @property {(receipt: GetUserOperationReceiptReturnType, senderSendId: string, EphemeralKeyPair: Hex) => void} onSuccess - Callback function to be called upon successful check creation and sending. Receives the sender's account ID and the ephemeral private key used in the operation.
  * @property {(error: Error) => void} onError - Callback function to be called in case of an error during the check creation or sending process.
  */
 export interface CreateSendCheckBtnProps {
@@ -15,7 +27,7 @@ export interface CreateSendCheckBtnProps {
   tokenAddress: Hex
   onSuccess: (
     receipt: GetUserOperationReceiptReturnType,
-    senderAccountId: string,
+    senderSendId: string,
     ephemeralKeypair: EphemeralKeyPair
   ) => void
   onError: (error: Error) => void
@@ -40,11 +52,11 @@ export interface CreateSendCheckProps {
  * See {@link generateCheckUrl} and {@link decodeClaimCheckUrl} for more information on how the payload is encoded for sharing.
  *
  * @interface ClaimSendCheckPayload
- * @property {string} senderAccountId - The account ID of the sender.
+ * @property {string} senderSendId - The send ID of the sender's profile {@see profiles table`}.
  * @property {EphemeralKeyPair} ephemeralKeypair - The ephemeral key pair associated with the transaction.
  */
 export interface ClaimSendCheckPayload {
-  senderAccountUuid: string
+  senderSendId: string
   ephemeralKeypair: EphemeralKeyPair
 }
 
@@ -83,16 +95,16 @@ export interface ClaimSendCheckUserOpProps extends SendCheckUserOp {
  * Represents the return type of a function that creates and sends a check.
  * @typedef {Object} CreateSendCheckReturnType
  * @property {GetUserOperationReceiptReturnType} receipt - The receipt of the user operation.
- * @property {string} senderAccountUuid - The account ID of the sender.
+ * @property {string} senderSendId - The send ID of the sender's profile {@see profiles table}.
  * @property {Hex} ephemeralKeypair - The ephemeral keypair used in the operation.
  */
 export type CreateSendCheckReturnType = {
   receipt: GetUserOperationReceiptReturnType
-  senderAccountUuid: string
+  senderSendId: number
   ephemeralKeypair: EphemeralKeyPair
 }
 
-export type useCreateSendCheckReturnType = () => Promise<CreateSendCheckReturnType>
+export type useCreateSendCheckReturnType = () => Promise<CreateSendCheckReturnType | undefined>
 
 export type useClaimSendCheckReturnType = () => Promise<GetUserOperationReceiptReturnType>
 

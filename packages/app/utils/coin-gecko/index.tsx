@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import type { coins } from 'app/data/coins'
+import type { Hex } from 'viem'
 import { z } from 'zod'
 
 export const MarketDataSchema = z
@@ -79,5 +80,28 @@ export const useTokenMarketData = <T extends coins[number]['coingeckoTokenId']>(
       return MarketDataSchema.parse(data)
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+/**
+ * Fetch token metadata (from contract address)
+ * @param {Hex} contractAddress - token contract address
+ */
+export const useTokenMetadata = (contractAddress: Hex, queryParams?): UseQueryResult<object> => {
+  return useQuery({
+    queryKey: ['token-thumbnail', contractAddress],
+    queryFn: async (): Promise<object> => {
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/ethereum?contract_address=${contractAddress}&vs_currency=usd`
+      )
+
+      if (!response.ok)
+        throw new Error(`Failed to fetch token metadata ${contractAddress} ${response.status}`)
+      const data = await response.json()
+
+      return data
+    },
+    enabled: !!contractAddress,
+    ...queryParams,
   })
 }

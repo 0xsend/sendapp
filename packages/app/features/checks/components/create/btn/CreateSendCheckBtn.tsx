@@ -14,13 +14,13 @@ export const CreateSendCheckBtn = (props: CreateSendCheckBtnProps) => {
   const onPress = async () => {
     try {
       const createSendCheckData = await createSendCheck()
-      const { senderAccountUuid, ephemeralKeypair, receipt } = createSendCheckData
+      const { senderSendId, ephemeralKeypair, receipt } = createSendCheckData
 
       if (!receipt.success) {
         props.onError(new Error('Error creating send check'))
         return
       }
-      props.onSuccess(receipt, senderAccountUuid, ephemeralKeypair)
+      props.onSuccess(receipt, senderSendId, ephemeralKeypair)
     } catch (e) {
       props.onError(e)
     }
