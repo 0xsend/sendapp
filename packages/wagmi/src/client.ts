@@ -12,7 +12,7 @@ log(
   `hostname=${new URL(mainnet.rpcUrls.default.http[0]).hostname}`
 )
 
-export const mainnetClient = createPublicClient({
+export const mainnetClient: PublicClient<HttpTransport, typeof mainnet> = createPublicClient({
   chain: mainnet,
   transport: http(mainnet.rpcUrls.default.http[0]),
 })
@@ -23,10 +23,11 @@ log(
   `hostname=${new URL(baseMainnet.rpcUrls.default.http[0]).hostname}`
 )
 
-export const baseMainnetClient = createPublicClient({
-  chain: baseMainnet,
-  transport: http(baseMainnet.rpcUrls.default.http[0]),
-})
+export const baseMainnetClient: PublicClient<HttpTransport, typeof baseMainnet> =
+  createPublicClient({
+    chain: baseMainnet,
+    transport: http(baseMainnet.rpcUrls.default.http[0]),
+  })
 
 const BUNDLER_RPC_URL =
   process.env.BUNDLER_RPC_URL ??
