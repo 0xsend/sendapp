@@ -157,7 +157,7 @@ export const mockSendtagReferralRewardUSDC = {
     tags: null,
   },
   data: {
-    f: '\\x3936f906910C0f74b6d1536614068368B94CDa85',
+    f: '\\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
     t: '\\x29369a06d3c17897e819c43202a7f4a1004b20cf',
     v: '8000000',
     tx_idx: '0',

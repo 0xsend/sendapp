@@ -271,7 +271,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
         "symbol": "USDC",
         "token": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       },
-      "f": "0x3936f906910C0f74b6d1536614068368B94CDa85",
+      "f": "0xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6",
       "log_addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       "log_idx": 4n,
       "t": "0x29369A06d3c17897E819C43202A7f4A1004B20cF",

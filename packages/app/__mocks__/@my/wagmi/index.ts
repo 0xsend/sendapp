@@ -41,7 +41,7 @@ const mockMyWagmi = {
     845337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
   },
   sendtagCheckoutAddress: {
-    845337: '0x3936f906910C0f74b6d1536614068368B94CDa85',
+    845337: '0xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
   },
   sendVerifierAbi: [
     {

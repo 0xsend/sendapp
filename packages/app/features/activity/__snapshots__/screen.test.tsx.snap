@@ -3452,7 +3452,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     onLoad={[Function]}
                     source={
                       {
-                        "uri": "https://ui-avatars.com/api/?name=0x3936f906910C0f74b6d1536614068368B94CDa85&size=256&format=png&background=86ad7f",
+                        "uri": "https://ui-avatars.com/api/?name=0xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6&size=256&format=png&background=86ad7f",
                       }
                     }
                     style={
@@ -3518,7 +3518,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                         onLoad={[Function]}
                         source={
                           {
-                            "uri": "https://ui-avatars.com/api/?name=0x3936f906910C0f74b6d1536614068368B94CDa85&size=256&format=png&background=86ad7f",
+                            "uri": "https://ui-avatars.com/api/?name=0xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6&size=256&format=png&background=86ad7f",
                           }
                         }
                         style={

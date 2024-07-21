@@ -26,7 +26,6 @@ import { total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePendingTags } from 'app/utils/tags'
@@ -36,21 +35,18 @@ import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { checksumAddress, encodeFunctionData, formatUnits, zeroAddress } from 'viem'
+import { encodeFunctionData, formatUnits, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 import { useReferralReward, useReferrer } from '../checkout-utils'
 
 export function fetchSendtagCheckoutTransfers(supabase: SupabaseClient<Database>) {
-  return supabase
-    .from('send_account_transfers')
-    .select(`
+  return supabase.from('sendtag_checkout_receipts').select(`
       event_id,
-      f,
-      t,
-      v::text,
+      amount::text,
+      referrer,
+      reward::text,
       tx_hash
     `)
-    .eq('t', hexToBytea(sendtagCheckoutAddress[baseMainnetClient.chain.id]))
 }
 
 function sendtagCheckoutTransfersQueryOptions(supabase: SupabaseClient<Database>) {
@@ -120,15 +116,12 @@ export function ConfirmButton({
     if (error) return
     const event = transfers
       ?.filter((e) => {
-        const _sender = checksumAddress(sender)
-        const from = byteaToHex(e.f as `\\x${string}`)
-        const to = byteaToHex(e.t as `\\x${string}`)
         const hash = byteaToHex(e.tx_hash as `\\x${string}`)
-        const v = BigInt(e.v)
+        const amount = BigInt(e.amount)
+        const rewardSent = BigInt(e.reward)
         const isPurchase =
-          checksumAddress(from) === _sender && // check the correct sender
-          checksumAddress(to) === sendtagCheckoutAddress[chainId] && // check the correct receiver
-          v === amountDue && // check the correct amount
+          amount === amountDue && // check the correct amount
+          rewardSent === reward && // check the correct reward
           !receiptEventIds.includes(e.event_id) && // don't double submit
           (!sentTx || sentTx === hash) // use the most recent tx if available
 
@@ -148,9 +141,9 @@ export function ConfirmButton({
     confirm,
     amountDue,
     sentTx,
-    chainId,
     receiptEventIds,
     submitting,
+    reward,
   ])
 
   useEffect(() => {
@@ -249,7 +242,6 @@ export function ConfirmButton({
       })
       .catch((err) => {
         console.error('Error confirming', err)
-        console.error(err)
         if (err instanceof TRPCClientError) {
           // handle transaction too new error
           if (
@@ -267,7 +259,7 @@ export function ConfirmButton({
             return
           }
         }
-        setError(err?.message?.split('.').at(0) ?? 'Something went wrong')
+        setError((err?.details ?? err?.message)?.split('.').at(0) ?? 'Something went wrong')
       })
       .finally(() => {
         setSubmitting(false)

@@ -1,16 +1,17 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
-import { total } from 'app/data/sendtags'
+import { reward, total } from 'app/data/sendtags'
+import { fetchSendtagCheckoutTransfers } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
+import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
+import { throwIf } from 'app/utils/throwIf'
+import { fetchProfile } from 'app/utils/useProfileLookup'
 import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
 import { withRetry } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { fetchSendtagCheckoutTransfers } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
-import { throwIf } from 'app/utils/throwIf'
-import { assert } from 'app/utils/assert'
 
 const log = debug('api:routers:tag')
 
@@ -27,6 +28,7 @@ export const tagRouter = createTRPCRouter({
     .mutation(async ({ ctx: { supabase, referralCode }, input: { transaction: txHash } }) => {
       const { data: tags, error: tagsError } = await supabase.from('tags').select('*')
 
+      // if tags error, return early
       if (tagsError) {
         if (tagsError.code === 'PGRST116') {
           log('no tags to confirm')
@@ -41,9 +43,27 @@ export const tagRouter = createTRPCRouter({
         })
       }
 
+      // if referral code is present, fetch the referrer profile
+      const { data: referrerProfile, error: referrerProfileError } = referralCode
+        ? await fetchProfile({
+            supabase,
+            lookup_type: 'refcode',
+            identifier: referralCode,
+          })
+        : { data: null, error: null }
+      if (!!referralCode && !!referrerProfileError) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: referrerProfileError.message,
+        })
+      }
+
       const pendingTags = tags.filter((t) => t.status === 'pending')
       const amountDue = total(pendingTags)
       const txBytea = byteaTxHash.safeParse(hexToBytea(txHash as `0x${string}`))
+      const rewardDue = referrerProfile
+        ? pendingTags.reduce((acc, t) => acc + reward(t.name.length), 0n)
+        : 0n
 
       if (!txBytea.success) {
         log('transaction hash required')
@@ -90,18 +110,17 @@ export const tagRouter = createTRPCRouter({
         })
       })
 
-      const { event_id, f: senderPgB16, v } = data
+      const { event_id, amount, referrer, reward: rewardSentStr } = data
+      const rewardSent = rewardSentStr ? BigInt(rewardSentStr) : 0n
 
-      if (!senderPgB16 || !v) {
-        log('no sender or v found', `txHash=${txHash}`)
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'No sender or v found. Please try again.',
-        })
-      }
+      const invalidAmount = !amount || BigInt(amount) !== amountDue
+      const invalidReferrer =
+        (!referrer && rewardSent !== 0n) || // no referrer and reward is sent
+        (referrer && !reward) ||
+        BigInt(rewardSent.toString()) !== rewardDue // referrer and invalid reward
 
-      if (!v || BigInt(v) !== amountDue) {
-        log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`)
+      if (invalidAmount || invalidReferrer) {
+        log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`, data)
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Transaction is not a payment for tags or incorrect amount.',
@@ -118,7 +137,7 @@ export const tagRouter = createTRPCRouter({
       })
 
       if (confirmTagsErr) {
-        log('confirm tags error', confirmTagsErr)
+        console.error('confirm tags error', confirmTagsErr)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: confirmTagsErr.message,
