@@ -1,7 +1,11 @@
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { assert } from 'app/utils/assert'
-import type { EphemeralKeyPair, ClaimSendCheckPayload } from 'app/features/checks/types'
-import { type Hex, isHex, keccak256, isAddress } from 'viem'
+import type {
+  EphemeralKeyPair,
+  ClaimSendCheckPayload,
+  SendCheckData,
+} from 'app/features/checks/types'
+import { type Hex, isHex, keccak256, isAddress, zeroAddress } from 'viem'
 import type { UserOperation } from 'permissionless'
 import { defaultUserOp } from 'app/utils/useUserOpTransferMutation'
 
@@ -114,6 +118,19 @@ export const canCreateClaimCheckSignature = (
   } catch (e) {
     return false
   }
+}
+
+/**
+ * Helper function determining whether a /send check exists given a /send check claim payload.
+ * @param {SendCheckData} checkData
+ * @returns {boolean}
+ */
+export const checkExists = (checkData: SendCheckData): boolean => {
+  return (
+    checkData.amount !== 0n &&
+    checkData.ephemeralAddress !== zeroAddress &&
+    checkData.token !== zeroAddress
+  )
 }
 
 /**

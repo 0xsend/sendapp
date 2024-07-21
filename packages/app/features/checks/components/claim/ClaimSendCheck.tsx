@@ -4,11 +4,12 @@ import { ClaimButtonUser } from 'app/features/checks/components/claim/btn/ClaimB
 import { ShowCheckData } from 'app/features/checks/components/claim/check/check-data/ShowCheckData'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { Spinner, YStack, Text, Button, ButtonText, XStack } from '@my/ui'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSendCheckData } from 'app/features/checks/utils/useSendCheckData'
 import { IconError } from 'app/components/icons'
 import { useRouter } from 'next/navigation'
 import { useTokenMetadata } from 'app/utils/coin-gecko'
+import { checkExists } from 'app/features/checks/utils/checkUtils'
 
 interface Props {
   payload: ClaimSendCheckPayload
@@ -19,15 +20,27 @@ interface Props {
 export const ClaimSendCheck = (props: Props) => {
   const [error, setError] = useState<Error>()
 
-  const { data: sendCheckData, isLoading: sendCheckDataLoading } = useSendCheckData(
-    props.payload.ephemeralKeypair.ephemeralAddress
-  )
-  const { data: tokenData } = useTokenMetadata(sendCheckData?.token as `0x${string}`)
+  const {
+    data: sendCheckData,
+    isLoading: sendCheckDataLoading,
+    isSuccess,
+  } = useSendCheckData(props.payload.ephemeralKeypair.ephemeralAddress, {
+    retry: 3,
+  })
+  const { data: tokenData } = useTokenMetadata(sendCheckData?.token as `0x${string}`, {
+    retry: false,
+  })
   const { data: profileData } = useProfileLookup('sendid', props.payload.senderSendId)
 
   const router = useRouter()
   const isError = !!error
   const signedIn = !!profileData
+
+  useMemo(() => {
+    if (isSuccess && !checkExists(sendCheckData)) {
+      setError(new Error("Check doesn't exist or has been claimed already."))
+    }
+  }, [isSuccess, sendCheckData])
 
   const showSpinner = () => {
     return (
@@ -50,8 +63,8 @@ export const ClaimSendCheck = (props: Props) => {
             Unable to claim check
           </Text>
         </XStack>
-        <Text fontSize="$5" color="$darkGrayTextField" textAlign="center">
-          {error.message}
+        <Text fontSize="$7" color="$darkGrayTextField" textAlign="center">
+          {error.message ?? 'Please try again'}
         </Text>
         <Button backgroundColor="$primary" onPress={() => router.refresh()}>
           <ButtonText fontSize="$6">Try again</ButtonText>
