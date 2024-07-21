@@ -258,8 +258,9 @@ cmd_button(
 cmd_button(
     name = "next:web:docker-build",
     argv = [
-        "make",
-        "docker-web",
+        "/bin/bash",
+        "-c",
+        "cd {} && make docker-web".format(config.main_dir),
     ],
     icon_name = "handyman",
     location = location.RESOURCE,
