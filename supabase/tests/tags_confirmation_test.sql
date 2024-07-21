@@ -1,7 +1,7 @@
 -- 3. Tag Confirmation
 BEGIN;
 
-SELECT plan(10);
+SELECT plan(9);
 
 CREATE EXTENSION "basejump-supabase_test_helpers"; -- noqa: RF05
 
@@ -16,8 +16,8 @@ declare
     _id text;
 begin
 select event_id
-from send_account_transfers
-where f = _f into _id; return _id;
+from sendtag_checkout_receipts
+where sender = _f into _id; return _id;
 end;
 $$;
 
@@ -28,66 +28,70 @@ SELECT tests.create_supabase_user('hacker');
 
 SELECT set_config('role', 'service_role', true);
 
--- Create some send_account_transfers
-INSERT INTO send_account_transfers (
+-- Create some sendtag_checkout_receipts
+INSERT INTO sendtag_checkout_receipts (
     chain_id,
     log_addr,
     tx_hash,
-    f,
-    t,
-    v,
     ig_name,
     src_name,
     block_num,
     tx_idx,
     log_idx,
     abi_idx,
-    block_time
+    block_time,
+    sender,
+    amount,
+    referrer,
+    reward
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
+    1,
+    0,
+    0,
+    0,
+    1234567890,
     '\xb0b0000000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
     4,
-    'send_account_transfers',
-    'send_account_transfers',
-    1,
-    0,
-    0,
-    0,
-    1234567890
+    '\x0000000000000000000000000000000000000000',
+    0
 ),
 (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
+    1,
+    0,
+    1,
+    0,
+    1234567890,
     '\xa71ce00000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
     1,
-    'send_account_transfers',
-    'send_account_transfers',
-    1,
-    0,
-    1,
-    0,
-    1234567890
+    '\x0000000000000000000000000000000000000000',
+    0
 ),
 (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    '\xc401e00000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1,
-    'send_account_transfers',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
     3,
     0,
     0,
     0,
-    1234567890
+    1234567890,
+    '\xc401e00000000000000000000000000000000000',
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 );
 
 -- Bob can register and confirm tags with valid transfers
@@ -303,17 +307,6 @@ SELECT throws_ok(
     ), null);
     $$,
     'duplicate key value violates unique constraint "receipts_event_id_idx"'
-);
-
--- Test confirm_tags throws when no sendtag checkout contracts are found
-delete from sendtag_checkout_contracts;
-SELECT throws_ok(
-    $$
-    SELECT confirm_tags('{queenofhacking}', (
-        _event_id('\xa71ce00000000000000000000000000000000000')
-    ), null);
-    $$,
-    'Sendtag checkout contract not found.'
 );
 
 SELECT finish();

@@ -28,7 +28,7 @@ VALUES (
     '\\x00112233445566778899AABBCCDDEEFF'
 );
 
-INSERT INTO send_account_transfers (
+INSERT INTO sendtag_checkout_receipts (
     chain_id,
     log_addr,
     tx_hash,
@@ -39,30 +39,32 @@ INSERT INTO send_account_transfers (
     log_idx,
     abi_idx,
     block_time,
-    f,
-    t,
-    v
+    sender,
+    amount,
+    referrer,
+    reward
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    'send_account_transfers',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
     1,
     0,
     0,
     0,
     1234567890,
     '\xb0b0000000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 ),
 ( -- confirm for sendtag @alice
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
     'alice',
     2,
     0,
@@ -70,14 +72,15 @@ VALUES (
     0,
     1234567890,
     '\xa71ce00000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 ),
 ( -- confirm for sendtag @wonderland
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
     'wonderland',
     3,
     0,
@@ -85,13 +88,14 @@ VALUES (
     0,
     1234567890,
     '\xa71ce00000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 ), ( -- confirm for sendtag @whiterabbit
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
     'whiterabbit',
     4,
     0,
@@ -99,8 +103,9 @@ VALUES (
     0,
     1234567890,
     '\xa71ce00000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 );
 
 -- Inserting a tag for test user
@@ -119,8 +124,8 @@ SELECT confirm_tags(
     '{alice}',
     (
         SELECT event_id
-        FROM send_account_transfers
-        WHERE f = '\xa71ce00000000000000000000000000000000000' AND src_name = 'alice'
+        FROM sendtag_checkout_receipts
+        WHERE sender = '\xa71ce00000000000000000000000000000000000' AND src_name = 'alice'
     ),
     (
         SELECT referral_code
@@ -203,8 +208,8 @@ SELECT confirm_tags(
     '{wonderland}',
     (
         SELECT event_id
-        FROM send_account_transfers
-        WHERE f = '\xa71ce00000000000000000000000000000000000' AND src_name = 'wonderland'
+        FROM sendtag_checkout_receipts
+        WHERE sender = '\xa71ce00000000000000000000000000000000000' AND src_name = 'wonderland'
     ),
     'invalid'
 );
@@ -238,8 +243,8 @@ SELECT confirm_tags(
     '{whiterabbit}',
     (
         SELECT event_id
-        FROM send_account_transfers
-        WHERE f = '\xa71ce00000000000000000000000000000000000' AND src_name = 'whiterabbit'
+        FROM sendtag_checkout_receipts
+        WHERE sender = '\xa71ce00000000000000000000000000000000000' AND src_name = 'whiterabbit'
     ),
     (
         SELECT referral_code

@@ -30,14 +30,14 @@ begin
                 'tags',
                 array_agg(t.name),
                 'value',
-            -- cast v to text to avoid losing precision when converting to json when sending to clients
-                scr.v::text
+            -- cast amount to text to avoid losing precision when converting to json when sending to clients
+                scr.amount::text
         ),
         current_timestamp
     from NEW_TABLE
              join tags t on t.name = NEW_TABLE.tag_name
              join sendtag_checkout_receipts scr ON NEW_TABLE.event_id = scr.event_id
-    group by t.user_id, NEW_TABLE.event_id, scr.event_id, scr.log_addr, scr.block_num, scr.tx_idx, scr.log_idx,  scr.tx_hash, scr.v;
+    group by t.user_id, NEW_TABLE.event_id, scr.event_id, scr.log_addr, scr.block_num, scr.tx_idx, scr.log_idx,  scr.tx_hash, scr.amount;
 
     return NULL;
 end;

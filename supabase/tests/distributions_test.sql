@@ -485,7 +485,7 @@ SELECT tests.clear_authentication();
 
 SELECT set_config('role', 'service_role', true);
 
-INSERT INTO send_account_transfers (
+INSERT INTO sendtag_checkout_receipts (
     chain_id,
     log_addr,
     tx_hash,
@@ -496,32 +496,34 @@ INSERT INTO send_account_transfers (
     log_idx,
     block_time,
     abi_idx,
-    f,
-    t,
-    v
+    sender,
+    amount,
+    referrer,
+    reward
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    'send_account_transfers',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
     1,
     0,
     0,
     1234567890,
     0,
     '\xb0b0000000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 );
 
 SELECT confirm_tags( -- bob confirms tags
     '{bob}',
     (
         SELECT event_id
-        FROM send_account_transfers
-        WHERE f = '\xb0b0000000000000000000000000000000000000'
+        FROM sendtag_checkout_receipts
+        WHERE sender = '\xb0b0000000000000000000000000000000000000'
     ),
     null
 );
@@ -560,7 +562,7 @@ SELECT tests.clear_authentication();
 
 SELECT set_config('role', 'service_role', true);
 
-INSERT INTO send_account_transfers (
+INSERT INTO sendtag_checkout_receipts (
     chain_id,
     log_addr,
     tx_hash,
@@ -571,32 +573,34 @@ INSERT INTO send_account_transfers (
     log_idx,
     block_time,
     abi_idx,
-    f,
-    t,
-    v
+    sender,
+    amount,
+    referrer,
+    reward
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    'send_account_transfers',
-    'send_account_transfers',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
     2,
     0,
     0,
     1234567890,
     0,
     '\xa71ce00000000000000000000000000000000000',
-    '\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
-    1
+    1,
+    '\x0000000000000000000000000000000000000000',
+    0
 );
 
 SELECT confirm_tags(
     '{alice}',
     (
         SELECT event_id
-        FROM send_account_transfers
-        WHERE f = '\xa71ce00000000000000000000000000000000000'
+        FROM sendtag_checkout_receipts
+        WHERE sender = '\xa71ce00000000000000000000000000000000000'
     ),
     (
         SELECT referral_code
