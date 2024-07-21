@@ -58,17 +58,6 @@ TOKEN=${$.env.TOKEN}\t\thttps://basescan.org/address/${$.env.TOKEN}
   }
 
   console.log(chalk.blue(`SendtagCheckout contract deployed to ${contractAddress}`))
-  // add sendtag checkout contract to supabase
-  const { error } = await supabaseAdmin.from('sendtag_checkout_contracts').insert({
-    address: contractAddress.replace('0x', '\\x'),
-    chain_id: 845337,
-  })
-
-  if (error) {
-    console.error(chalk.red('Failed to add SendtagCheckout contract to supabase'))
-    console.error(error)
-    process.exit(1)
-  }
 
   console.log(chalk.blue('Disable auto-mining...'))
   await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine false`
