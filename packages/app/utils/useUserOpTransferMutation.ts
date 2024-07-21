@@ -131,11 +131,17 @@ export async function sendUserOpTransfer({
     assert(receipt.success === true, 'Failed to send userOp')
     return receipt
   } catch (e) {
-    if (
-      e instanceof SendUserOperationError &&
-      e.details === 'Invalid UserOp signature or paymaster signature'
-    ) {
-      e.details = 'Invalid Passkey Authorization'
+    if (e instanceof SendUserOperationError) {
+      switch (e.details) {
+        case 'Invalid UserOp signature or paymaster signature':
+          e.details = 'Invalid Passkey Authorization'
+          break
+        case 'already expired':
+          e.details = 'User operation or paymaster has expired'
+          break
+        default:
+          break
+      }
     }
     throw e
   }

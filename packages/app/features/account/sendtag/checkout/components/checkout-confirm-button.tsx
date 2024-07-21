@@ -199,7 +199,9 @@ export function ConfirmButton({
       assert(!!userOp, 'User op is required')
       await sendUserOp({ userOp, webauthnCreds })
     } catch (e) {
-      setError(e.message.split('.').at(0))
+      const msg = (e.details ?? e.message)?.split('.').at(0)
+      console.error(msg, e)
+      setError(msg)
     }
   }
 
