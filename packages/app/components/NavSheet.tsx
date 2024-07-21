@@ -1,4 +1,13 @@
-import { Sheet, type SheetProps, isWeb, Button, Stack, Separator } from '@my/ui'
+import {
+  Sheet,
+  type SheetProps,
+  isWeb,
+  Button,
+  Stack,
+  Separator,
+  usePwa,
+  useSafeAreaInsets,
+} from '@my/ui'
 import { IconX } from './icons'
 import { type RootParams, useRootScreenParams } from 'app/routers/params'
 
@@ -9,6 +18,8 @@ export function NavSheet({
   ...props
 }: SheetProps & { navId: RootParams['nav'] }) {
   const [queryParams, setRootParams] = useRootScreenParams()
+  const isPwa = usePwa()
+  const { sat } = useSafeAreaInsets()
   const onOpenChange = () => {
     if (open) setRootParams({ ...queryParams, nav: navId }, { webBehavior: 'replace' })
     else setRootParams({ ...queryParams, nav: undefined }, { webBehavior: 'replace' })
@@ -25,7 +36,7 @@ export function NavSheet({
       {...props}
     >
       <Sheet.Overlay />
-      <Sheet.Frame zIndex={1} height={isWeb ? '100vh' : '100%'}>
+      <Sheet.Frame zIndex={1} height={isWeb ? '100vh' : '100%'} pt={isPwa && sat}>
         <Stack w="100%" ai="flex-end" jc="flex-end" px="$6" pt="$6" pb="$2">
           <Button
             size="$4"

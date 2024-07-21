@@ -54,7 +54,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   return (
     <YStack f={1}>
       {media.gtLg && (
-        <XStack w={'100%'} ai={'center'} jc={'space-between'} $gtLg={{ mt: '$4.5' }} mt={'$6'}>
+        <XStack w={'100%'} ai={'center'} jc={'space-between'}>
           <Separator boc="$decay" my={coin.label === 'USDC' ? '$3.5' : '$0'} />
           {coin.label !== 'USDC' && (
             <Stack bw={1} br={'$2'} boc="$decay" p={'$1.5'} jc="center" miw="$18">

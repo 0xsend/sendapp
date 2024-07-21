@@ -5,6 +5,7 @@ import {
   ButtonText,
   H3,
   Paragraph,
+  Stack,
   SubmitButton,
   Theme,
   XStack,
@@ -20,6 +21,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useIsClient } from 'app/utils/useIsClient'
 import { useUser } from 'app/utils/useUser'
 import * as Device from 'expo-device'
+import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -37,6 +39,8 @@ export const OnboardingForm = () => {
   const deviceName = Device.deviceName
     ? Device.deviceName
     : `My ${Device.modelName ?? 'Send Account'}`
+
+  const [errorMessage, setErrorMessage] = useState<string>()
 
   async function createAccount({ accountName }: z.infer<typeof OnboardingSchema>) {
     try {
@@ -75,15 +79,14 @@ export const OnboardingForm = () => {
             replace('/')
             return
           }
-          form.setError('accountName', {
-            type: 'custom',
-            message: 'Account not created. Please try again.',
-          })
+          setErrorMessage('Account not created. Please try again.')
+          form.setError('accountName', { type: 'custom' })
         })
     } catch (error) {
       console.error('Error creating account', error)
       const message = error?.message.split('.')[0] ?? 'Unknown error'
-      form.setError('accountName', { type: 'custom', message: message })
+      setErrorMessage(message)
+      form.setError('accountName', { type: 'custom' })
     }
   }
   const isClient = useIsClient()
@@ -123,49 +126,58 @@ export const OnboardingForm = () => {
           },
         }}
         renderAfter={({ submit }) => (
-          <XStack
-            jc="space-between"
-            ai="center"
-            w="100%"
-            px="$2"
-            $sm={{ jc: 'center', height: '100%' }}
-          >
-            <Anchor
-              $theme-dark={{
-                col: '$background',
-              }}
-              $theme-light={{ col: '$black' }}
-              href="https://help.send.app/what-are-passkeys/"
-              target="_blank"
-              dsp="none"
-              $gtMd={{ dsp: 'block' }}
-            >
-              Why Passkey?
-            </Anchor>
-
-            <SubmitButton
-              onPress={submit}
-              theme={'green'}
-              mb="auto"
-              als="auto"
-              r
-              br="$4"
-              mx="auto"
+          <>
+            <XStack
+              jc="space-between"
+              ai="center"
               w="100%"
-              $gtMd={{
-                mt: '0',
-                als: 'flex-end',
-                mx: 0,
-                ml: 'auto',
-                maw: '$12',
-                h: '$3.5',
-              }}
+              px="$2"
+              $sm={{ jc: 'center', height: '100%' }}
             >
-              <ButtonText size={'$1'} padding={'unset'} ta="center" margin={'unset'} col="black">
-                CREATE PASSKEY
-              </ButtonText>
-            </SubmitButton>
-          </XStack>
+              <Anchor
+                $theme-dark={{
+                  col: '$background',
+                }}
+                $theme-light={{ col: '$black' }}
+                href="https://help.send.app/what-are-passkeys/"
+                target="_blank"
+                dsp="none"
+                $gtMd={{ dsp: 'block' }}
+              >
+                Why Passkey?
+              </Anchor>
+
+              <SubmitButton
+                onPress={submit}
+                theme={errorMessage ? 'yellow_active' : 'green'}
+                mb="auto"
+                als="auto"
+                r
+                br="$4"
+                mx="auto"
+                w="100%"
+                $gtMd={{
+                  mt: '0',
+                  als: 'flex-end',
+                  mx: 0,
+                  ml: 'auto',
+                  maw: '$12',
+                  h: '$3.5',
+                }}
+              >
+                <ButtonText
+                  size={'$2'}
+                  padding={'unset'}
+                  textTransform="uppercase"
+                  ta="center"
+                  margin={'unset'}
+                  col="black"
+                >
+                  {errorMessage ? 'Try again' : 'CREATE PASSKEY'}
+                </ButtonText>
+              </SubmitButton>
+            </XStack>
+          </>
         )}
       >
         {(fields) => (
@@ -185,11 +197,6 @@ export const OnboardingForm = () => {
               time
             </H3>
             <YStack gap="$4">
-              <Theme inverse={true}>
-                <Paragraph col="$background" size={'$1'} fontWeight={'500'}>
-                  Passkey Name
-                </Paragraph>
-              </Theme>
               <YStack gap="$4" f={1}>
                 {Object.values(fields)}
                 <Anchor
@@ -197,7 +204,7 @@ export const OnboardingForm = () => {
                     col: '$greenBackground',
                   }}
                   $theme-light={{ col: '$black' }}
-                  href="https://info.send.it/send/mission-vision-and-values"
+                  href="https://help.send.app/what-are-passkeys/"
                   target="_blank"
                   dsp="flex"
                   jc="flex-end"
@@ -205,6 +212,11 @@ export const OnboardingForm = () => {
                 >
                   Why Passkey?
                 </Anchor>
+                <Stack maw={382}>
+                  <Paragraph theme="red" color="$color9" flexWrap="wrap">
+                    {errorMessage}
+                  </Paragraph>
+                </Stack>
               </YStack>
             </YStack>
           </YStack>

@@ -19,8 +19,8 @@ contract SendtagCheckout is Ownable {
     /// @notice When false, the contract is paused and checkouts are not allowed.
     bool public open;
 
-    /// @notice The event emitted when a referrer is paid.
-    event ReferralBonus(address indexed referrer, address referred, uint256 amount);
+    /// @notice The event emitted when a referrer is paid a reward.
+    event ReferralReward(address indexed referrer, address referred, uint256 amount);
 
     /// @notice The event emitted when the contract is toggled.
     event Toggled(bool open);
@@ -37,25 +37,25 @@ contract SendtagCheckout is Ownable {
     /// @notice Sends the funds to the Send Multisig and remits funds to a referrer.
     /// @param amount The amount of tokens to pay.
     /// @param referrer The address of the referrer.
-    /// @param bonus The amount to pay to the referrer.
+    /// @param reward The amount to pay to the referrer.
     /// @dev Does not check if amount is valid or not. That is done offchain.
-    function checkout(uint256 amount, address referrer, uint256 bonus) external {
-        require(open, "Not open");
+    function checkout(uint256 amount, address referrer, uint256 reward) external {
+        require(open, "Closed");
         require(amount > 0, "Invalid amount");
 
         // First, collect the amount to this contract
         SafeERC20.safeTransferFrom(token, msg.sender, address(this), amount);
 
         // Then, pay the referrer...
-        if (bonus > 0) {
+        if (reward > 0) {
             require(referrer != address(0), "Invalid referrer address");
-            require(bonus <= amount, "Invalid referrer bonus");
-            SafeERC20.safeTransfer(token, referrer, bonus);
-            emit ReferralBonus(referrer, msg.sender, bonus);
+            require(reward <= amount, "Invalid referrer reward");
+            SafeERC20.safeTransfer(token, referrer, reward);
+            emit ReferralReward(referrer, msg.sender, reward);
         }
 
         // Finally, send the funds to the Send Multisig
-        SafeERC20.safeTransfer(token, multisig, amount - bonus);
+        SafeERC20.safeTransfer(token, multisig, amount - reward);
     }
 
     /// @notice Toggle the contract.

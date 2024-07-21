@@ -74,7 +74,7 @@ for (const token of tokens) {
   })
 
   for (const idType of idTypes) {
-    test(`can send ${token.symbol} using ${idType} starting from send page`, async ({
+    test(`can send ${token.symbol} using ${idType} starting from home page`, async ({
       page,
       seed,
       supabase,
@@ -93,6 +93,7 @@ for (const token of tokens) {
       assert(!!profile.name, 'profile name not found')
       assert(!!profile.sendId, 'profile send id not found')
       assert(!!plan.sendAccounts[0], 'send account not found')
+
       const recvAccount: { address: `0x${string}` } = (() => {
         switch (idType) {
           case 'address':
@@ -118,16 +119,9 @@ for (const token of tokens) {
 
       // goto send page
       await page.goto('/')
-      const navSendLink = page
-        .locator('[id="__next"]')
-        .getByRole('navigation')
-        .getByRole('link', { name: 'Send' })
-      await expect(navSendLink).toBeVisible()
-      await navSendLink.click()
-      await expect(page).toHaveURL(/\/send/)
 
       // fill search input
-      const searchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
+      const searchInput = page.getByRole('search', { name: 'query' })
       await expect(searchInput).toBeVisible()
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
@@ -165,7 +159,7 @@ for (const token of tokens) {
           (() => {
             switch (idType) {
               case 'address':
-                return shorten(recvAccount.address, 6, 6)
+                return shorten(recvAccount.address, 5, 4)
               case 'sendid':
                 return `#${profile.sendId}`
               default:
