@@ -2,16 +2,17 @@
  * Deposit page is primarly used for logged in users to initiate deposits.
  */
 
-import { expect, test as sendAccountTest } from './fixtures/send-accounts'
-import { test as ethereumTest } from './fixtures/ethereum'
-import debug from 'debug'
-import { mergeTests } from '@playwright/test'
 import HeadlessWeb3Provider from '@0xbigboss/headless-web3-provider'
+import { usdcAddress } from '@my/wagmi'
+import { mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'
-import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { testBaseClient, usdcAddress, lookupBalance } from './fixtures/viem'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { setERC20Balance } from 'app/utils/useSetErc20Balance'
+import debug from 'debug'
 import { parseEther } from 'viem'
+import { test as ethereumTest } from './fixtures/ethereum'
+import { expect, test as sendAccountTest } from './fixtures/send-accounts'
+import { lookupBalance, testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, ethereumTest)
 

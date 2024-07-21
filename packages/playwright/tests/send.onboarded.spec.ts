@@ -4,6 +4,7 @@ import { userOnboarded } from '@my/snaplet/models'
 import type { Database } from '@my/supabase/database.types'
 import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { coins, type coin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
@@ -13,7 +14,7 @@ import { parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
-import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem'
+import { testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
@@ -23,28 +24,9 @@ test.beforeEach(async ({ user: { profile }, supabase }) => {
   log = debug(`test:send:${profile.id}:${test.info().parallelIndex}`)
 })
 
-// this wouldn't be necessary if playwright supported ESM or we transpiled the tests, or @my/wagmi
-const tokens = [
-  {
-    symbol: 'USDC',
-    address: usdcAddress[testBaseClient.chain.id],
-    decimals: 6,
-  },
-  {
-    symbol: 'ETH',
-    address: 'eth',
-    decimals: 18,
-  },
-  {
-    symbol: 'SEND',
-    address: sendTokenAddresses[testBaseClient.chain.id],
-    decimals: 0,
-  },
-] as { symbol: string; address: `0x${string}`; decimals: number }[]
-
 const idTypes = ['tag', 'sendid', 'address'] as const
 
-for (const token of tokens) {
+for (const token of coins) {
   test(`can send ${token.symbol} starting from profile page`, async ({ page, seed, supabase }) => {
     const plan = await seed.users([userOnboarded])
     const tag = plan.tags[0]
@@ -218,7 +200,7 @@ async function handleTokenTransfer({
   recvAccount,
   profile,
 }: {
-  token: { symbol: string; address: string; decimals: number }
+  token: coin
   supabase: SupabaseClient<Database>
   page: Page
   counterparty: string
@@ -244,7 +226,7 @@ async function handleTokenTransfer({
     await setERC20Balance({
       client: testBaseClient,
       address: sendAccount.address as `0x${string}`,
-      tokenAddress: token.address as `0x${string}`,
+      tokenAddress: token.token as `0x${string}`,
       value: balanceBefore, // padding
     })
   }
@@ -275,7 +257,7 @@ async function handleTokenTransfer({
     timeout: isETH ? 10000 : 5000, // eth needs more time since no send_account_receives event is emitted
   })
 
-  await expect(page).toHaveURL(`/?token=${token.address}`, { timeout: isETH ? 10_000 : undefined }) // sometimes ETH needs more time
+  await expect(page).toHaveURL(`/?token=${token.token}`, { timeout: isETH ? 10_000 : undefined }) // sometimes ETH needs more time
 
   if (!isETH) {
     // no history for eth since no send_account_receives event is emitted

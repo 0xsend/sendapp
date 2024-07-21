@@ -1,14 +1,24 @@
-import { SUPABASE_URL } from 'app/utils/supabase/admin'
-import { expect, test } from './fixtures/send-accounts'
-import debug from 'debug'
-import type { Page } from '@playwright/test'
-import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { userOnboarded } from '@my/snaplet'
+import { sendtagCheckoutAddress, usdcAddress } from '@my/wagmi'
+import type { Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
-import { sendtagCheckoutAddress, testBaseClient, usdcAddress } from './fixtures/viem'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import { SUPABASE_URL } from 'app/utils/supabase/admin'
+import debug from 'debug'
+import crypto from 'node:crypto'
 import { zeroAddress } from 'viem'
+import { expect, test } from './fixtures/send-accounts'
+import { testBaseClient } from './fixtures/viem'
 
 let log: debug.Debugger
+
+const fakeOnchainEventData = (data) => ({
+  tx_hash: hexToBytea(`0x${crypto.randomBytes(32).toString('hex')}`),
+  block_num: BigInt(Math.floor(Math.random() * 10000)).toString(),
+  tx_idx: BigInt(Math.floor(Math.random() * 10000)).toString(),
+  log_idx: BigInt(Math.floor(Math.random() * 10000)).toString(),
+  ...data,
+})
 
 test.beforeEach(() => {
   log = debug(`test:activity:logged-in:${test.info().parallelIndex}`)
@@ -21,43 +31,158 @@ test('can visit activity page and see correct activity feed', async ({
   page,
   pg,
   user: { profile },
+  sendAccount,
   seed,
 }) => {
-  log('visiting activity page')
-  const plan = await seed.users([{ ...userOnboarded, tags: [] }]) // no tags
+  const plan = await seed.users([
+    { ...userOnboarded, tags: [] }, // no tags
+    userOnboarded,
+  ])
   const anotherUser = plan.profiles[0]
+  const anotherSendAccount = plan.sendAccounts[0]
+  const thirdUser = plan.profiles[1]
+  const thirdSendAccount = plan.sendAccounts[1]
+  const thirdTag = plan.tags[0]
+
   assert(!!anotherUser, 'another user not found')
-
-  const activities = MockActivityFeed.map((t) => ({
-    event_name: t.event_name,
-    event_id: crypto.randomUUID(),
-    from_user_id: t.from_user?.id ? profile.id : null,
-    to_user_id: t.to_user?.id ? profile.id : null,
-    created_at: new Date(t.created_at).toISOString(),
-    // biome-ignore lint/suspicious/noExplicitAny: mock
-    data: t.data as any,
-  }))
-
-  // Add a sendtag referral reward USDC
-  activities.push({
-    event_name: 'send_account_transfers',
-    event_id: crypto.randomUUID(),
-    from_user_id: null,
-    to_user_id: profile.id,
-    created_at: new Date().toISOString(),
-    data: {
-      log_addr: usdcAddress[testBaseClient.chain.id],
-      f: sendtagCheckoutAddress[testBaseClient.chain.id],
-      t: zeroAddress,
-      v: 1000000n,
+  assert(!!anotherSendAccount, 'another send account not found')
+  assert(!!thirdUser, 'third user not found')
+  assert(!!thirdSendAccount, 'third send account not found')
+  assert(!!thirdTag, 'third tag not found')
+  const now = new Date()
+  const dateFromNow = (secs: number) => new Date(now.getTime() + secs * 1000)
+  const activities = [
+    // Deposit (receive from unknown)
+    {
+      event_name: 'send_account_transfers',
+      event_id: crypto.randomUUID(),
+      from_user_id: null,
+      to_user_id: profile.id,
+      created_at: dateFromNow(1).toISOString(),
+      data: fakeOnchainEventData({
+        log_addr: hexToBytea(usdcAddress[testBaseClient.chain.id]),
+        f: hexToBytea(anotherSendAccount.address as `0x${string}`),
+        t: hexToBytea(sendAccount.address as `0x${string}`),
+        v: '19032',
+      }),
     },
-  })
-
-  // Set the last send_account_transfers to be received from another user
-  const lastRow =
-    activities[activities.findLastIndex((a) => a.event_name === 'send_account_transfers')]
-  assert(!!lastRow, 'last row not found')
-  lastRow.from_user_id = anotherUser.id
+    // Send to another user
+    {
+      event_name: 'send_account_transfers',
+      event_id: crypto.randomUUID(),
+      from_user_id: profile.id,
+      to_user_id: anotherUser.id,
+      created_at: dateFromNow(2).toISOString(),
+      data: fakeOnchainEventData({
+        log_addr: hexToBytea(usdcAddress[testBaseClient.chain.id]),
+        f: hexToBytea(sendAccount.address as `0x${string}`),
+        t: hexToBytea(anotherSendAccount.address as `0x${string}`),
+        v: '77777',
+      }),
+    },
+    // Receive from another user
+    {
+      event_name: 'send_account_transfers',
+      event_id: crypto.randomUUID(),
+      from_user_id: thirdUser.id,
+      to_user_id: profile.id,
+      created_at: dateFromNow(3).toISOString(),
+      data: fakeOnchainEventData({
+        log_addr: hexToBytea(usdcAddress[testBaseClient.chain.id]),
+        f: hexToBytea(thirdSendAccount.address as `0x${string}`),
+        t: hexToBytea(sendAccount.address as `0x${string}`),
+        v: '50000',
+      }),
+    },
+    // Tag receipt (ETH)
+    {
+      event_name: 'tag_receipts',
+      event_id: crypto.randomUUID(),
+      from_user_id: profile.id,
+      to_user_id: null,
+      created_at: dateFromNow(4).toISOString(),
+      data: {
+        tags: ['newtag'],
+        value: '20000000000000000',
+        log_addr: hexToBytea(zeroAddress),
+      },
+    },
+    // Tag receipt (USDC)
+    {
+      event_name: 'tag_receipt_usdc',
+      event_id: crypto.randomUUID(),
+      from_user_id: profile.id,
+      to_user_id: null,
+      created_at: dateFromNow(5).toISOString(),
+      data: fakeOnchainEventData({
+        tags: ['usdctag'],
+        value: '2000000',
+        log_addr: hexToBytea(usdcAddress[testBaseClient.chain.id]),
+      }),
+    },
+    // Referral (as referrer)
+    {
+      event_name: 'referrals',
+      event_id: crypto.randomUUID(),
+      from_user_id: profile.id,
+      to_user_id: anotherUser.id,
+      created_at: dateFromNow(6).toISOString(),
+      data: {
+        tags: [thirdTag.name],
+      },
+    },
+    // Referral (as referred)
+    {
+      event_name: 'referrals',
+      event_id: crypto.randomUUID(),
+      from_user_id: thirdUser.id,
+      to_user_id: profile.id,
+      created_at: dateFromNow(7).toISOString(),
+      data: {
+        tags: [thirdTag.name],
+      },
+    },
+    // Signing key added
+    {
+      event_name: 'send_account_signing_key_added',
+      event_id: crypto.randomUUID(),
+      from_user_id: profile.id,
+      to_user_id: null,
+      created_at: dateFromNow(8).toISOString(),
+      data: fakeOnchainEventData({
+        key: ['0x1234', '0x5678'],
+        account: hexToBytea(sendAccount.address as `0x${string}`),
+        key_slot: 0,
+      }),
+    },
+    // Signing key removed
+    {
+      event_name: 'send_account_signing_key_removed',
+      event_id: crypto.randomUUID(),
+      from_user_id: profile.id,
+      to_user_id: null,
+      created_at: dateFromNow(9).toISOString(),
+      data: fakeOnchainEventData({
+        key: ['0x1234', '0x5678'],
+        account: hexToBytea(sendAccount.address as `0x${string}`),
+        key_slot: 0,
+      }),
+    },
+    // Referral reward
+    {
+      event_name: 'send_account_transfers',
+      event_id: crypto.randomUUID(),
+      from_user_id: null,
+      to_user_id: profile.id,
+      created_at: dateFromNow(10).toISOString(),
+      data: fakeOnchainEventData({
+        log_addr: hexToBytea(usdcAddress[testBaseClient.chain.id]),
+        f: hexToBytea(sendtagCheckoutAddress[testBaseClient.chain.id] as `0x${string}`),
+        t: hexToBytea(sendAccount.address as `0x${string}`),
+        v: '1000000',
+      }),
+    },
+  ]
 
   // Insert activities into the database
   for (const row of activities) {
@@ -71,8 +196,8 @@ test('can visit activity page and see correct activity feed', async ({
   const res = page.waitForResponse(async (res) => {
     if (res.url().match(`${SUPABASE_URL}/rest/v1/activity_feed*`)) {
       expect(res.status()).toBe(200)
-      const json = await res.json()
-      log('activity feed', json)
+      const data = await res.json()
+      log('activity feed response', data)
       return true
     }
     return false
@@ -80,50 +205,61 @@ test('can visit activity page and see correct activity feed', async ({
 
   await page.goto('/activity')
   await res
-  log('beforeEach', `url=${page.url()}`)
 
   // Verify the activity heading
   await expect(activityHeading(page)).toBeVisible()
 
-  // Verify each row of the activity feed
-  const activityRows = page.getByTestId('ActivityRow')
-
-  // Row 1: Deposit
-  await expect(activityRows.nth(0)).toContainText('Deposit')
-  await expect(activityRows.nth(0)).toContainText('0.019032 USDC')
-  await expect(activityRows.nth(0)).toContainText('0xB2c21F54653531aa4AffA80F63593913f0C70628')
-
-  // Row 2: Sendtag Registered (ETH)
-  await expect(activityRows.nth(1)).toContainText('Sendtag Registered')
-  await expect(activityRows.nth(1)).toContainText('/yuw')
-  await expect(activityRows.nth(1)).toContainText('0.02 ETH')
-
-  // Row 3: Sendtag Registered (USDC)
-  await expect(activityRows.nth(2)).toContainText('Sendtag Registered')
-  await expect(activityRows.nth(2)).toContainText('/tag_receipt_usdc')
-  await expect(activityRows.nth(2)).toContainText('2 USDC')
-
-  // Row 4: Referral
-  await expect(activityRows.nth(3)).toContainText('Referral')
-  await expect(activityRows.nth(3)).toContainText('1 Referrals')
-
-  // Row 5: Send Account Signing Key Added
-  await expect(activityRows.nth(4)).toContainText('Send Account Signing Key Added')
-
-  // Row 6: Send Account Signing Key Removed
-  await expect(activityRows.nth(5)).toContainText('Send Account Signing Key Removed')
-
-  // Row 7: Deposit (ETH)
-  await expect(activityRows.nth(6)).toContainText('Deposit')
-  await expect(activityRows.nth(6)).toContainText('0.01 ETH')
-  await expect(activityRows.nth(6)).toContainText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')
-
-  // Row 8: Referral Reward
-  await expect(activityRows.nth(7)).toContainText('Referral Reward')
-  await expect(activityRows.nth(7)).toContainText('1 USDC')
-
   // Verify the entire Recent Activity component is visible
   await expect(page.getByTestId('RecentActivity')).toBeVisible()
+
+  // Verify each row of the activity feed
+  const activityRows = page.getByTestId('ActivityRow')
+  await expect.soft(activityRows).toHaveCount(10)
+
+  // Deposit
+  await expect.soft(activityRows.nth(0)).toContainText('Deposit')
+  await expect.soft(activityRows.nth(0)).toContainText('0.019032 USDC')
+  await expect.soft(activityRows.nth(0)).toContainText(anotherSendAccount.address)
+
+  // Send
+  await expect.soft(activityRows.nth(1)).toContainText('Sent')
+  await expect.soft(activityRows.nth(1)).toContainText('0.077777 USDC')
+  await expect.soft(activityRows.nth(1)).toContainText('/otheruser')
+
+  // Receive
+  await expect.soft(activityRows.nth(2)).toContainText('Received')
+  await expect.soft(activityRows.nth(2)).toContainText('0.05 USDC')
+  await expect.soft(activityRows.nth(2)).toContainText('/otheruser')
+
+  // Tag receipt (ETH)
+  await expect.soft(activityRows.nth(3)).toContainText('Sendtag Registered')
+  await expect.soft(activityRows.nth(3)).toContainText('/newtag')
+  await expect.soft(activityRows.nth(3)).toContainText('0.02 ETH')
+
+  // Tag receipt (USDC)
+  await expect.soft(activityRows.nth(4)).toContainText('Sendtag Registered')
+  await expect.soft(activityRows.nth(4)).toContainText('/usdctag')
+  await expect.soft(activityRows.nth(4)).toContainText('2 USDC')
+
+  // Referral (as referrer)
+  await expect.soft(activityRows.nth(5)).toContainText('Referral')
+  await expect.soft(activityRows.nth(5)).toContainText('1 Referrals')
+  await expect.soft(activityRows.nth(5)).toContainText('/otheruser')
+
+  // Referral (as referred)
+  await expect.soft(activityRows.nth(6)).toContainText('Referred By')
+  await expect.soft(activityRows.nth(6)).toContainText('/otheruser')
+
+  // Signing key added
+  await expect.soft(activityRows.nth(7)).toContainText('Send Account Signing Key Added')
+
+  // Signing key removed
+  await expect.soft(activityRows.nth(8)).toContainText('Send Account Signing Key Removed')
+
+  // Referral reward
+  await expect.soft(activityRows.nth(9)).toContainText('Referral Reward')
+  await expect.soft(activityRows.nth(9)).toContainText('1 USDC')
+  await expect.soft(activityRows.nth(9)).toContainText('Sendtag Checkout')
 })
 
 test('can search on activity page', async ({ page, context }) => {

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { userOnboarded } from '@my/snaplet'
+import { usdcAddress } from '@my/wagmi'
 import type { Page } from '@playwright/test'
 import { devices, mergeTests } from '@playwright/test'
 import { price, pricing, reward } from 'app/data/sendtags'
@@ -8,7 +9,7 @@ import { assert } from 'app/utils/assert'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { test as checkoutTest, expect } from './fixtures/checkout'
-import { lookupBalance, testBaseClient, usdcAddress } from './fixtures/viem'
+import { lookupBalance, testBaseClient } from './fixtures/viem'
 
 let log: debug.Debugger
 

@@ -1,11 +1,11 @@
 import type { Tables } from '@my/supabase/database-generated.types'
+import { usdcAddress } from '@my/wagmi'
 import type { Expect, Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
 import debug from 'debug'
 import { parseEther, zeroAddress } from 'viem'
 import { test as base } from '../auth'
-import { usdcAddress } from '../viem'
 import { testBaseClient } from '../viem/base'
 import { OnboardingPage } from './page'
 
