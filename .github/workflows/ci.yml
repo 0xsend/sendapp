@@ -134,6 +134,7 @@ jobs:
         with:
           path: '~/.cache/ms-playwright'
           key: '${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}'
+          save-always: true
           restore-keys: |
             ${{ runner.os }}-playwright-
       - name: Install Playwright Dependencies
