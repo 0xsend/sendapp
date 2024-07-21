@@ -1,16 +1,16 @@
 import { mergeTests } from '@playwright/test'
 import { test as sendAccountTest, expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { debug, type Debugger } from 'debug'
+import debug from 'debug'
 import { assert } from 'app/utils/assert'
-import { userOnboarded } from '@my/snaplet/src/models'
+import { userOnboarded } from '@my/snaplet/models'
 import { ProfilePage } from './fixtures/profiles'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
-let log: Debugger
+let log: debug.Debugger
 
 test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)

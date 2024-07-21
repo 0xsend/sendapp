@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/models'
+import { userOnboarded } from '@my/snaplet'
 import type { Page } from '@playwright/test'
 import { devices, mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'

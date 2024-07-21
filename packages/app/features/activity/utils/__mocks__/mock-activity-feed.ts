@@ -145,61 +145,88 @@ export const mockSendAccountReceive = {
   },
 } as const
 
+export const mockSendtagReferralRewardUSDC = {
+  created_at: '2024-07-18T19:32:08+00:00',
+  event_name: 'send_account_transfers',
+  from_user: null,
+  to_user: {
+    id: '5def5ec4-7f0e-4509-990f-d52e85e95187',
+    name: null,
+    avatar_url: null,
+    send_id: 64705,
+    tags: null,
+  },
+  data: {
+    f: '\\x3936f906910C0f74b6d1536614068368B94CDa85',
+    t: '\\x29369a06d3c17897e819c43202a7f4a1004b20cf',
+    v: '8000000',
+    tx_idx: '0',
+    log_idx: '4',
+    tx_hash: '\\x797a6a0fdd1c849e4e6e58bdc02966d19cff1eb8ef257216914288e715e460b8',
+    log_addr: '\\x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+    block_num: '17270890',
+  },
+}
+
+const mockSigningKeyAdded = {
+  created_at: '2024-05-29T13:34:26+00:00',
+  event_name: 'send_account_signing_key_added',
+  from_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 55617,
+    tags: null,
+  },
+  to_user: null,
+  data: {
+    key: [
+      '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
+      '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
+    ],
+    account: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+    tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
+    key_slot: 0,
+    log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+    block_num: '15164541',
+    tx_idx: '0',
+    log_idx: '2',
+  },
+}
+
+const mockSigningKeyRemoved = {
+  created_at: '2024-05-29T13:34:26+00:00',
+  event_name: 'send_account_signing_key_removed',
+  from_user: {
+    id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
+    name: null,
+    avatar_url: null,
+    send_id: 55617,
+    tags: null,
+  },
+  to_user: null,
+  data: {
+    key: [
+      '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
+      '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
+    ],
+    account: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+    tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
+    key_slot: 0,
+    log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
+    block_num: '15164542',
+    tx_idx: '0',
+    log_idx: '2',
+  },
+}
+
 // make it easier on yourself and add the events to the end of the array
 export const MockActivityFeed = [
   mockReceivedTransfer,
   mockTagReceipt,
   mockReferral,
-  {
-    created_at: '2024-05-29T13:34:26+00:00',
-    event_name: 'send_account_signing_key_added',
-    from_user: {
-      id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
-      name: null,
-      avatar_url: null,
-      send_id: 55617,
-      tags: null,
-    },
-    to_user: null,
-    data: {
-      key: [
-        '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
-        '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
-      ],
-      account: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
-      tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
-      key_slot: 0,
-      log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
-      block_num: '15164541',
-      tx_idx: '0',
-      log_idx: '2',
-    },
-  },
-  {
-    created_at: '2024-05-29T13:34:26+00:00',
-    event_name: 'send_account_signing_key_removed',
-    from_user: {
-      id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
-      name: null,
-      avatar_url: null,
-      send_id: 55617,
-      tags: null,
-    },
-    to_user: null,
-    data: {
-      key: [
-        '\\x351631d94d8cfc12f6adfc2586111990681f216c7d6d8531e669471293f32f07',
-        '\\x83577aa62079c3bb5b813017df43832562d133feb3a7447d28849dac74c8aa43',
-      ],
-      account: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
-      tx_hash: '\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85',
-      key_slot: 0,
-      log_addr: '\\xa7ded3f6316c7d3b5ae2ed711cf535395db921b1',
-      block_num: '15164542',
-      tx_idx: '0',
-      log_idx: '2',
-    },
-  },
+  mockSigningKeyAdded,
+  mockSigningKeyRemoved,
   mockSentTransfer,
   mockSendAccountReceive,
   mockTagReceiptUSDC,

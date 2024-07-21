@@ -11,7 +11,7 @@
   "devDependencies": {
     "@indexsupply/shovel-config": "^0.0.16",
     "@my/wagmi": "workspace:*",
-    "@types/bun": "latest",
+    "@types/bun": "^1.1.6",
     "permissionless": "^0.1.14",
     "viem": "^2.13.7",
     "zx": "^8.1.2"

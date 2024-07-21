@@ -1,15 +1,15 @@
 import { expect, test as authTest } from './fixtures/auth'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { debug, type Debugger } from 'debug'
+import debug from 'debug'
 import { OnboardingPage } from './fixtures/send-accounts'
 import { mergeTests } from '@playwright/test'
 import { assert } from 'app/utils/assert'
-import { userOnboarded } from '@my/snaplet/src/models'
+import { userOnboarded } from '@my/snaplet/models'
 import { ProfilePage } from './fixtures/profiles'
 
 const test = mergeTests(snapletTest, authTest)
 
-let log: Debugger
+let log: debug.Debugger
 
 test.beforeAll(async () => {
   log = debug(`test:profile:anon:${test.info().parallelIndex}`)

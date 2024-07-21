@@ -7,7 +7,7 @@ import { expect, test } from './fixtures/send-accounts'
 import debug from 'debug'
 import type { Page } from '@playwright/test'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
-import { userOnboarded } from '@my/snaplet/models'
+import { userOnboarded } from '@my/snaplet'
 import { assert } from 'app/utils/assert'
 
 let log: debug.Debugger

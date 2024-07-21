@@ -1,6 +1,6 @@
 import { expect, test as sendAccountTest } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/src/models'
+import { userOnboarded } from '@my/snaplet/models'
 import type { Database } from '@my/supabase/database.types'
 import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -8,7 +8,7 @@ import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { debug, type Debugger } from 'debug'
+import debug from 'debug'
 import { parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
@@ -17,7 +17,7 @@ import { sendTokenAddresses, testBaseClient, usdcAddress } from './fixtures/viem
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
-let log: Debugger
+let log: debug.Debugger
 
 test.beforeEach(async ({ user: { profile }, supabase }) => {
   log = debug(`test:send:${profile.id}:${test.info().parallelIndex}`)

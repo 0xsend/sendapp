@@ -2,10 +2,8 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { testBaseClient } from '../viem'
 
 import { test as base } from '@playwright/test'
-import {
-  type Web3ProviderBackend,
-  injectHeadlessWeb3Provider,
-} from '@0xbigboss/headless-web3-provider'
+import type { Web3ProviderBackend } from '@0xbigboss/headless-web3-provider'
+import HeadlessWeb3Provider from '@0xbigboss/headless-web3-provider'
 import { type Account, parseEther } from 'viem'
 import { assert } from 'app/utils/assert'
 
@@ -45,7 +43,12 @@ export const test = base.extend<{
     const rpcUrl = testBaseClient.transport.url
     assert(rpcUrl !== undefined, 'testBaseClient.transport.url is not set')
     await use((privateKeys = signers) =>
-      injectHeadlessWeb3Provider(page, privateKeys, NEXT_PUBLIC_BASE_CHAIN_ID, rpcUrl)
+      HeadlessWeb3Provider.injectHeadlessWeb3Provider(
+        page,
+        privateKeys,
+        NEXT_PUBLIC_BASE_CHAIN_ID,
+        rpcUrl
+      )
     )
   },
 })

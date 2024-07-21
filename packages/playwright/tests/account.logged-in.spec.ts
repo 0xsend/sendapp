@@ -1,6 +1,6 @@
 import { assert } from 'app/utils/assert'
+import debug from 'debug'
 import { expect, test } from './fixtures/send-accounts'
-import { debug } from 'debug'
 
 let log: debug.Debugger
 

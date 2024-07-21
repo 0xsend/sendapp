@@ -3,7 +3,7 @@ import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { test as webauthnTest } from '@my/playwright/fixtures/webauthn'
 import debug from 'debug'
 import { signUp } from './fixtures/send-accounts'
-import { userOnboarded } from '@my/snaplet/src/models'
+import { userOnboarded } from '@my/snaplet'
 import { sendTokenAddresses, testBaseClient } from './fixtures/viem'
 import { assert } from 'app/utils/assert'
 

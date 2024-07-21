@@ -6,13 +6,15 @@
     "../snaplet/src",
     "../app",
     "../wagmi",
-    "../contracts",
+    "../contracts/out",
     "../webauthn-authenticator",
     "../../supabase"
   ],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,
+    "target": "ESNext",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
       "app/*": ["./*"],
@@ -21,6 +23,7 @@
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/contracts/out/*": ["../contracts/out/*"],
       "@my/playwright/*": ["./tests/*"],
+      "@my/snaplet": ["../snaplet/src/"],
       "@my/snaplet/*": ["../snaplet/src/*"],
       "@0xsend/webauthn-authenticator": ["../webauthn-authenticator/src"],
       "@0xsend/webauthn-authenticator/*": ["../webauthn-authenticator/src/*"],

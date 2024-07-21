@@ -1,7 +1,8 @@
 import debug from 'debug'
-import { bundlerActions, ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
-import { http, createClient, createPublicClient } from 'viem'
-import { mainnet, baseMainnet } from './chains'
+import { bundlerActions } from 'permissionless'
+import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
+import { createClient, createPublicClient, http, type HttpTransport, type PublicClient } from 'viem'
+import { baseMainnet, mainnet } from './chains'
 
 const log = debug('app:utils:viem:client')
 
