@@ -121,10 +121,9 @@ export function ConfirmButton({
         const rewardSent = BigInt(e.reward)
         const isPurchase =
           amount === amountDue && // check the correct amount
-          rewardSent === reward && // check the correct reward
+          (!reward || rewardSent === reward) && // check the correct reward
           !receiptEventIds.includes(e.event_id) && // don't double submit
           (!sentTx || sentTx === hash) // use the most recent tx if available
-
         return isPurchase
       })
       .shift()
@@ -280,7 +279,9 @@ export function ConfirmButton({
 
   if (possibleErrors.some((e) => e?.message)) {
     if (__DEV__) {
-      console.error('possibleErrors', possibleErrors)
+      for (const err of possibleErrors) {
+        if (err) console.error('encountered error', err)
+      }
     }
     return (
       <ConfirmButtonStack>

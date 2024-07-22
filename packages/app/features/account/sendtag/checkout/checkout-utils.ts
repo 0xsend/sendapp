@@ -3,6 +3,7 @@ import { reward } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { fetchProfile } from 'app/utils/useProfileLookup'
+import { useUser } from 'app/utils/useUser'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -32,11 +33,13 @@ export function useReferralCode() {
 
 export function useReferrer() {
   const supabase = useSupabase()
+  const { profile } = useUser()
   const { data: referralCode } = useReferralCode()
   return useQuery({
-    queryKey: ['referrer', { referralCode, supabase }] as const,
-    queryFn: async ({ queryKey: [, { referralCode, supabase }], signal }) => {
+    queryKey: ['referrer', { referralCode, supabase, profile }] as const,
+    queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
       assert(!!referralCode, 'referralCode is required')
+      if (profile?.referral_code === referralCode) return null // no self referrals
       const { data, error } = await fetchProfile({
         supabase,
         lookup_type: 'refcode',
@@ -51,9 +54,17 @@ export function useReferrer() {
         }
         throw error
       }
+      if (!data?.address) {
+        // need a send account
+        return null
+      }
+      if (!data?.tag) {
+        // need a sendtag
+        return null
+      }
       return data
     },
-    enabled: !!referralCode,
+    enabled: !!referralCode && !!profile,
   })
 }
 

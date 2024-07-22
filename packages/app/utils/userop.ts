@@ -10,7 +10,12 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import { queryOptions } from '@tanstack/react-query'
-import { getAccountNonce, type UserOperation } from 'permissionless'
+import {
+  EstimateUserOperationGasError,
+  getAccountNonce,
+  PaymasterValidationRevertedError,
+  type UserOperation,
+} from 'permissionless'
 import {
   bytesToHex,
   concat,
@@ -295,9 +300,24 @@ function userOpQueryOptions({
       }
 
       // only estimate the gas for the call
-      const { callGasLimit } = await baseMainnetBundlerClient.estimateUserOperationGas({
-        userOperation: userOp,
-      })
+      const { callGasLimit } = await baseMainnetBundlerClient
+        .estimateUserOperationGas({
+          userOperation: userOp,
+        })
+        .catch((e) => {
+          if (e instanceof EstimateUserOperationGasError) {
+            const cause = e.cause
+            if (e.cause instanceof PaymasterValidationRevertedError) {
+              switch (cause.details) {
+                case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
+                  throw new Error('Not enough USDC to cover transaction fees')
+                default:
+                  throw e
+              }
+            }
+          }
+          throw e
+        })
 
       return { ...userOp, callGasLimit }
     },

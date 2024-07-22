@@ -27,7 +27,17 @@ export const tagRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx: { supabase, referralCode }, input: { transaction: txHash } }) => {
       const { data: tags, error: tagsError } = await supabase.from('tags').select('*')
-
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .single()
+      // if profile error, return early
+      if (profileError || !profile) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: profileError.message || 'Profile not found',
+        })
+      }
       // if tags error, return early
       if (tagsError) {
         if (tagsError.code === 'PGRST116') {
@@ -43,14 +53,15 @@ export const tagRouter = createTRPCRouter({
         })
       }
 
-      // if referral code is present, fetch the referrer profile
-      const { data: referrerProfile, error: referrerProfileError } = referralCode
-        ? await fetchProfile({
-            supabase,
-            lookup_type: 'refcode',
-            identifier: referralCode,
-          })
-        : { data: null, error: null }
+      // if referral code is present and not the same as the profile, fetch the referrer profile
+      const { data: referrerProfile, error: referrerProfileError } =
+        referralCode && profile.referral_code !== referralCode
+          ? await fetchProfile({
+              supabase,
+              lookup_type: 'refcode',
+              identifier: referralCode,
+            }).maybeSingle()
+          : { data: null, error: null }
       if (!!referralCode && !!referrerProfileError) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
@@ -61,9 +72,10 @@ export const tagRouter = createTRPCRouter({
       const pendingTags = tags.filter((t) => t.status === 'pending')
       const amountDue = total(pendingTags)
       const txBytea = byteaTxHash.safeParse(hexToBytea(txHash as `0x${string}`))
-      const rewardDue = referrerProfile
-        ? pendingTags.reduce((acc, t) => acc + reward(t.name.length), 0n)
-        : 0n
+      const rewardDue =
+        referrerProfile?.address && referrerProfile.tag // ensure referrer exists and has a tag
+          ? pendingTags.reduce((acc, t) => acc + reward(t.name.length), 0n)
+          : 0n
 
       if (!txBytea.success) {
         log('transaction hash required')
