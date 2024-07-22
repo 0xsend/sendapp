@@ -27,6 +27,7 @@ import {
   isHex,
   maxUint256,
   numberToBytes,
+  RpcRequestError,
   type Address,
   type Hex,
 } from 'viem'
@@ -307,13 +308,25 @@ function userOpQueryOptions({
         .catch((e) => {
           if (e instanceof EstimateUserOperationGasError) {
             const cause = e.cause
-            if (e.cause instanceof PaymasterValidationRevertedError) {
-              switch (cause.details) {
-                case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
-                  throw new Error('Not enough USDC to cover transaction fees')
-                default:
-                  throw e
+            switch (true) {
+              case cause instanceof PaymasterValidationRevertedError: {
+                switch (cause.details) {
+                  case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
+                    throw new Error('Not enough USDC to cover transaction fees')
+                  default:
+                    throw e
+                }
               }
+              case cause instanceof RpcRequestError: {
+                switch (cause.details) {
+                  case 'execution reverted: revert: ERC20: transfer amount exceeds balance':
+                    throw new Error('Not enough funds')
+                  default:
+                    throw e
+                }
+              }
+              default:
+                throw e
             }
           }
           throw e
