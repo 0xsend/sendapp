@@ -49,7 +49,7 @@ export function fetchSendtagCheckoutReceipts(supabase: SupabaseClient<Database>)
     `)
 }
 
-function sendtagCheckoutTransfersQueryOptions(supabase: SupabaseClient<Database>) {
+function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>) {
   return queryOptions({
     queryKey: ['sendtag_checkout_transfers', supabase] as const,
     queryFn: async ({ queryKey: [, supabase] }) => {
@@ -61,9 +61,9 @@ function sendtagCheckoutTransfersQueryOptions(supabase: SupabaseClient<Database>
   })
 }
 
-function useSendtagCheckoutTransfers() {
+function useSendtagCheckoutReceipts() {
   const supabase = useSupabase()
-  return useQuery(sendtagCheckoutTransfersQueryOptions(supabase))
+  return useQuery(sendtagCheckoutReceiptsQueryOptions(supabase))
 }
 
 export function ConfirmButton({
@@ -102,19 +102,19 @@ export function ConfirmButton({
   const receiptEventIds = useMemo(() => receipts?.map((r) => r.event_id) ?? [], [receipts])
   const [sentTx, setSentTx] = useState<`0x${string}`>()
   const {
-    data: transfers,
-    error: transfersError,
-    dataUpdatedAt: transfersUpdatedAt,
-  } = useSendtagCheckoutTransfers()
-  const [transfersLastFectched, setTransfersLastFectched] = useState(transfersUpdatedAt)
+    data: checkoutReceipts,
+    error: checkoutErrors,
+    dataUpdatedAt: checkoutReceiptUpdatedAt,
+  } = useSendtagCheckoutReceipts()
+  const [transfersLastFectched, setTransfersLastFectched] = useState(checkoutReceiptUpdatedAt)
   const lookupSendtagCheckout = useCallback(async () => {
     if (!sender) return
     if (isLoadingReceipts) return
     if (receipts === undefined) return
-    if (!transfers) return
+    if (!checkoutReceipts) return
     if (submitting) return
     if (error) return
-    const event = transfers
+    const event = checkoutReceipts
       ?.filter((e) => {
         const hash = byteaToHex(e.tx_hash as `\\x${string}`)
         const amount = BigInt(e.amount)
@@ -136,7 +136,7 @@ export function ConfirmButton({
     sender,
     isLoadingReceipts,
     receipts,
-    transfers,
+    checkoutReceipts,
     confirm,
     amountDue,
     sentTx,
@@ -146,13 +146,13 @@ export function ConfirmButton({
   ])
 
   useEffect(() => {
-    if (transfers?.length && transfersUpdatedAt !== transfersLastFectched) {
+    if (checkoutReceipts?.length && checkoutReceiptUpdatedAt !== transfersLastFectched) {
       lookupSendtagCheckout().catch((e) => {
         console.error('Error looking up safe received events', e)
       })
-      setTransfersLastFectched(transfersUpdatedAt)
+      setTransfersLastFectched(checkoutReceiptUpdatedAt)
     }
-  }, [transfers, lookupSendtagCheckout, transfersUpdatedAt, transfersLastFectched])
+  }, [checkoutReceipts, lookupSendtagCheckout, checkoutReceiptUpdatedAt, transfersLastFectched])
 
   const {
     data: txReceipt,
@@ -275,7 +275,7 @@ export function ConfirmButton({
     }
   }, [txWaitError])
 
-  const possibleErrors = [transfersError, userOpError]
+  const possibleErrors = [checkoutErrors, userOpError]
 
   if (possibleErrors.some((e) => e?.message)) {
     if (__DEV__) {
