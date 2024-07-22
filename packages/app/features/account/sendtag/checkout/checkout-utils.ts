@@ -1,9 +1,10 @@
-import type { Tables } from '@my/supabase/database.types'
+import type { Database, Tables } from '@my/supabase/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { reward } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { throwIf } from 'app/utils/throwIf'
 import { fetchProfile } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
 
@@ -127,4 +128,37 @@ export function useReferralReward({ tags }: { tags: { name: string }[] }) {
     },
     enabled: !!referrer,
   })
+}
+
+/**
+ * Fetches the sendtag checkout receipts.
+ * Returns an array of receipts with numerics converted to strings to avoid overflows.
+ * @param supabase
+ * @returns The sendtag checkout receipts.
+ */
+export function fetchSendtagCheckoutReceipts(supabase: SupabaseClient<Database>) {
+  return supabase.from('sendtag_checkout_receipts').select(`
+      event_id,
+      amount::text,
+      referrer,
+      reward::text,
+      tx_hash
+    `)
+}
+
+function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>) {
+  return queryOptions({
+    queryKey: ['sendtag_checkout_transfers', supabase] as const,
+    queryFn: async ({ queryKey: [, supabase] }) => {
+      const { data, error } = await fetchSendtagCheckoutReceipts(supabase)
+      throwIf(error)
+      return data
+    },
+    refetchInterval: 1000 * 10,
+  })
+}
+
+export function useSendtagCheckoutReceipts() {
+  const supabase = useSupabase()
+  return useQuery(sendtagCheckoutReceiptsQueryOptions(supabase))
 }

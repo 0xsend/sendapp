@@ -1,8 +1,10 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
 import { reward, total } from 'app/data/sendtags'
-import { fetchReferrer } from 'app/features/account/sendtag/checkout/checkout-utils'
-import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
+import {
+  fetchReferrer,
+  fetchSendtagCheckoutReceipts,
+} from 'app/features/account/sendtag/checkout/checkout-utils'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
@@ -33,6 +35,7 @@ export const tagRouter = createTRPCRouter({
         .single()
       // if profile error, return early
       if (profileError || !profile) {
+        log('profile not found', profileError)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: profileError.message || 'Profile not found',
@@ -47,6 +50,7 @@ export const tagRouter = createTRPCRouter({
             message: 'No tags to confirm.',
           })
         }
+        log('tags error', tagsError)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: tagsError.message,

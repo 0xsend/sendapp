@@ -4,12 +4,14 @@ import { userOnboarded } from '@my/snaplet'
 import { usdcAddress } from '@my/wagmi'
 import type { Page } from '@playwright/test'
 import { devices, mergeTests } from '@playwright/test'
-import { price, pricing, reward } from 'app/data/sendtags'
+import { price, pricing, reward, total } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { test as checkoutTest, expect } from './fixtures/checkout'
 import { lookupBalance, testBaseClient } from './fixtures/viem'
+import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { hexToBytea } from 'app/utils/hexToBytea'
 
 let log: debug.Debugger
 
@@ -105,9 +107,11 @@ test('can refer a tag', async ({
 }) => {
   const plan = await seed.users([userOnboarded])
   const referrer = plan.profiles[0]
+  const referrerSendAccount = plan.sendAccounts[0]
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referralCode, 'referral code not found')
+  assert(!!referrerSendAccount, 'referrer send account not found')
   await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`) // visit referral
   await checkoutPage.goto() // goto checkout
 
@@ -145,12 +149,31 @@ test('can refer a tag', async ({
     .eq('status', 'confirmed')
   expect(error).toBeFalsy()
   expect(tags).toHaveLength(tagsCount)
-
+  assert(!!tags, 'tags not found')
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
 
   for (const tag of tagsToRegister) {
     await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
   }
+
+  // ensure receipts are created
+  const { data: checkoutReceipt, error: checkoutReceiptError } =
+    await fetchSendtagCheckoutReceipts(supabase).single()
+  expect(checkoutReceipt).toBeTruthy()
+  assert(!!checkoutReceipt?.event_id, 'checkout receipt event id not found')
+  expect(BigInt(checkoutReceipt?.amount)).toBe(total(tags))
+  expect(checkoutReceipt?.referrer).toBe(hexToBytea(referrerSendAccount.address as `0x${string}`))
+  expect(BigInt(checkoutReceipt?.reward)).toBe(
+    tagsToRegister.reduce((acc, tag) => acc + reward(tag.length), 0n)
+  )
+  const { data: receipts, error: receiptError } = await supabase
+    .from('receipts')
+    .select('*')
+    .eq('event_id', checkoutReceipt.event_id)
+    .single()
+
+  expect(receiptError).toBeFalsy()
+  expect(receipts).toBeTruthy()
 
   // ensure referrer has received a referral
   await expect(supabase).toHaveEventInActivityFeed({

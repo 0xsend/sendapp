@@ -37,34 +37,7 @@ import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { encodeFunctionData, formatUnits, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
-import { useReferralReward, useReferrer } from '../checkout-utils'
-
-export function fetchSendtagCheckoutReceipts(supabase: SupabaseClient<Database>) {
-  return supabase.from('sendtag_checkout_receipts').select(`
-      event_id,
-      amount::text,
-      referrer,
-      reward::text,
-      tx_hash
-    `)
-}
-
-function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>) {
-  return queryOptions({
-    queryKey: ['sendtag_checkout_transfers', supabase] as const,
-    queryFn: async ({ queryKey: [, supabase] }) => {
-      const { data, error } = await fetchSendtagCheckoutReceipts(supabase)
-      throwIf(error)
-      return data
-    },
-    refetchInterval: 1000 * 10,
-  })
-}
-
-function useSendtagCheckoutReceipts() {
-  const supabase = useSupabase()
-  return useQuery(sendtagCheckoutReceiptsQueryOptions(supabase))
-}
+import { useReferralReward, useReferrer, useSendtagCheckoutReceipts } from '../checkout-utils'
 
 export function ConfirmButton({
   onConfirmed,
