@@ -1,0 +1,3411 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LeaderboardScreen renders leaderboard screen: LeaderboardScreen 1`] = `
+<View
+  style={
+    {
+      "flexDirection": "column",
+      "gap": 40,
+      "paddingBottom": 28,
+      "paddingTop": 40,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 16,
+      }
+    }
+  >
+    <Text
+      accessibilityRole="header"
+      style={
+        {
+          "color": "#FFFFFF",
+          "fontFamily": "System",
+          "fontSize": 30,
+          "fontWeight": "900",
+          "lineHeight": 34,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "uppercase",
+          "userSelect": "auto",
+        }
+      }
+      suppressHighlighting={true}
+      testID="mainTitle"
+    >
+      Best in Class
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#B2B2B2",
+          "fontFamily": "System",
+          "fontSize": 19.2,
+          "fontWeight": "400",
+          "lineHeight": 21,
+          "userSelect": "auto",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Register a Sendtag, maintain the minimum balance, and refer others to rise in the ranks.
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "column",
+        "gap": 24,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flex": 1,
+          "flexDirection": "column",
+          "paddingBottom": 0,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "borderBottomLeftRadius": 22,
+            "borderBottomRightRadius": 22,
+            "borderTopLeftRadius": 22,
+            "borderTopRightRadius": 22,
+            "flexDirection": "column",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "borderBottomLeftRadius": 22,
+              "borderBottomRightRadius": 22,
+              "borderTopLeftRadius": 22,
+              "borderTopRightRadius": 22,
+              "flexDirection": "column",
+              "gap": 16,
+              "paddingBottom": 16,
+              "paddingLeft": 24,
+              "paddingRight": 24,
+              "paddingTop": 24,
+            }
+          }
+        >
+          <Text
+            accessibilityRole="header"
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 20,
+                "fontWeight": "700",
+                "lineHeight": 24,
+                "marginBottom": 0,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "marginTop": 0,
+                "paddingBottom": 16,
+                "textTransform": "none",
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+            testID="titleReferrals"
+          >
+            Referrals
+          </Text>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#666666",
+                "borderBottomWidth": 2,
+                "borderStyle": "solid",
+                "flexDirection": "row",
+                "gap": 13,
+                "justifyContent": "space-between",
+                "paddingBottom": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                #
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Sendtag
+              </Text>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#B2B2B2",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "textTransform": "uppercase",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Referrals
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                1
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              100
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                2
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser1
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              90
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                3
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser2
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              80
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                4
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser3
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              70
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                5
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser4
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              60
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                6
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser5
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              50
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                7
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser6
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              40
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                8
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser7
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              30
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                9
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser8
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              20
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                10
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser9
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              10
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "borderBottomLeftRadius": 22,
+              "borderBottomRightRadius": 22,
+              "bottom": 0,
+              "flexDirection": "column",
+              "height": 94,
+              "overflow": "hidden",
+              "position": "absolute",
+              "width": "100%",
+            }
+          }
+        >
+          <ViewManagerAdapter_ExpoLinearGradient
+            colors={
+              [
+                0,
+                4279377955,
+              ]
+            }
+            locations={
+              [
+                0,
+                1,
+              ]
+            }
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "zIndex": 0,
+              }
+            }
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flex": 1,
+          "flexDirection": "column",
+          "paddingBottom": 0,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "borderBottomLeftRadius": 22,
+            "borderBottomRightRadius": 22,
+            "borderTopLeftRadius": 22,
+            "borderTopRightRadius": 22,
+            "flexDirection": "column",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "borderBottomLeftRadius": 22,
+              "borderBottomRightRadius": 22,
+              "borderTopLeftRadius": 22,
+              "borderTopRightRadius": 22,
+              "flexDirection": "column",
+              "gap": 16,
+              "paddingBottom": 16,
+              "paddingLeft": 24,
+              "paddingRight": 24,
+              "paddingTop": 24,
+            }
+          }
+        >
+          <Text
+            accessibilityRole="header"
+            style={
+              {
+                "color": "#FFFFFF",
+                "fontFamily": "System",
+                "fontSize": 20,
+                "fontWeight": "700",
+                "lineHeight": 24,
+                "marginBottom": 0,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "marginTop": 0,
+                "paddingBottom": 16,
+                "textTransform": "none",
+                "userSelect": "auto",
+              }
+            }
+            suppressHighlighting={true}
+            testID="titleTransactions"
+          >
+            Transactions
+          </Text>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "borderBottomColor": "#666666",
+                "borderBottomWidth": 2,
+                "borderStyle": "solid",
+                "flexDirection": "row",
+                "gap": 13,
+                "justifyContent": "space-between",
+                "paddingBottom": 16,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                #
+              </Text>
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Sendtag
+              </Text>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#B2B2B2",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "textTransform": "uppercase",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Total transactions
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                1
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                2
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser1
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                3
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser2
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                4
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser3
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                5
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser4
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                6
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser5
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                7
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser6
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                8
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser7
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                9
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser8
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 16,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "flexShrink": 1,
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#B2B2B2",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "marginBottom": "0",
+                    "userSelect": "auto",
+                    "width": 36,
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                10
+              </Text>
+              <View
+                style={
+                  {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "gap": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    {
+                      "alignItems": "center",
+                      "borderBottomLeftRadius": 7,
+                      "borderBottomRightRadius": 7,
+                      "borderTopLeftRadius": 7,
+                      "borderTopRightRadius": 7,
+                      "flexDirection": "column",
+                      "height": 28,
+                      "justifyContent": "center",
+                      "maxHeight": 28,
+                      "maxWidth": 28,
+                      "minHeight": 28,
+                      "minWidth": 28,
+                      "overflow": "hidden",
+                      "position": "relative",
+                      "width": 28,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      {
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 1,
+                      }
+                    }
+                  >
+                    <Image
+                      fullscreen={true}
+                      onError={[Function]}
+                      onLoad={[Function]}
+                      source={
+                        {
+                          "uri": "https://images.unsplash.com/photo-1548142813-c348350df52b?&w=150&h=150&dpr=2&q=80",
+                        }
+                      }
+                      style={
+                        {
+                          "height": 28,
+                          "width": 28,
+                        }
+                      }
+                    />
+                  </View>
+                  <View
+                    style={
+                      {
+                        "backgroundColor": "#3E4A3C",
+                        "bottom": 0,
+                        "flexDirection": "column",
+                        "left": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "zIndex": 0,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  style={
+                    {
+                      "color": "#40FB50",
+                      "fontFamily": "System",
+                      "fontSize": 16.8,
+                      "fontWeight": "400",
+                      "lineHeight": 19,
+                      "marginBottom": "0",
+                      "userSelect": "auto",
+                    }
+                  }
+                  suppressHighlighting={true}
+                >
+                  /
+                  0xUser9
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "flexShrink": 0,
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "textAlign": "right",
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1500 USDC
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            {
+              "borderBottomLeftRadius": 22,
+              "borderBottomRightRadius": 22,
+              "bottom": 0,
+              "flexDirection": "column",
+              "height": 94,
+              "overflow": "hidden",
+              "position": "absolute",
+              "width": "100%",
+            }
+          }
+        >
+          <ViewManagerAdapter_ExpoLinearGradient
+            colors={
+              [
+                0,
+                4279377955,
+              ]
+            }
+            locations={
+              [
+                0,
+                1,
+              ]
+            }
+            style={
+              {
+                "bottom": 0,
+                "left": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "zIndex": 0,
+              }
+            }
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

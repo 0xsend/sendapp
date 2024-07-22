@@ -87,7 +87,7 @@ export function LeaderboardScreen() {
   return (
     <YStack w={'100%'} gap={'$size.3.5'} pb={'$size.2'} $gtMd={{ pt: 0 }} pt={'$size.3.5'}>
       <YStack gap={'$size.0.9'}>
-        <H2 tt={'uppercase'} fontWeight={'900'}>
+        <H2 tt={'uppercase'} fontWeight={'900'} testID="mainTitle">
           Best in Class
         </H2>
         <Paragraph color={'$color10'} size={'$5'}>
@@ -108,7 +108,7 @@ function Leaderboard({ title, list }) {
     <Card f={1} pb={0}>
       <YStack br="$8">
         <YStack gap="$size.0.9" p="$5" $gtMd={{ p: '$8', pb: '$size.0.9' }} pb="$size.0.9" br="$8">
-          <H3 pb={'$size.0.9'} fontWeight={'600'} size={'$7'}>
+          <H3 pb={'$size.0.9'} fontWeight={'600'} size={'$7'} testID={`title${title}`}>
             {title}
           </H3>
           <LeaderBoardHeader isReferrals={isReferrals} />
