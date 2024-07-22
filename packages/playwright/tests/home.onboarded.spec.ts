@@ -2,12 +2,11 @@
  * Home page is primarly used for onboarded users to see their balances and initiate deposits.
  */
 
-import { SUPABASE_URL } from 'app/utils/supabase/admin'
-import { expect, test } from './fixtures/send-accounts'
-import debug from 'debug'
 import type { Page } from '@playwright/test'
 import { mockUsdcTransfers } from 'app/features/home/utils/__mocks__/mock-usdc-transfers'
-import { assert } from 'app/utils/assert'
+import { SUPABASE_URL } from 'app/utils/supabase/admin'
+import debug from 'debug'
+import { expect, test } from './fixtures/send-accounts'
 
 let log: debug.Debugger
 
