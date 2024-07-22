@@ -2,7 +2,7 @@ import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
 import { reward, total } from 'app/data/sendtags'
 import { fetchReferrer } from 'app/features/account/sendtag/checkout/checkout-utils'
-import { fetchSendtagCheckoutTransfers } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
+import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
@@ -89,7 +89,7 @@ export const tagRouter = createTRPCRouter({
 
       const data = await withRetry(
         async () => {
-          const { data, error } = await fetchSendtagCheckoutTransfers(supabase)
+          const { data, error } = await fetchSendtagCheckoutReceipts(supabase)
             .eq('tx_hash', txBytea.data)
             .single()
           throwIf(error)

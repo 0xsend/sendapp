@@ -39,7 +39,7 @@ import { encodeFunctionData, formatUnits, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 import { useReferralReward, useReferrer } from '../checkout-utils'
 
-export function fetchSendtagCheckoutTransfers(supabase: SupabaseClient<Database>) {
+export function fetchSendtagCheckoutReceipts(supabase: SupabaseClient<Database>) {
   return supabase.from('sendtag_checkout_receipts').select(`
       event_id,
       amount::text,
@@ -53,7 +53,7 @@ function sendtagCheckoutTransfersQueryOptions(supabase: SupabaseClient<Database>
   return queryOptions({
     queryKey: ['sendtag_checkout_transfers', supabase] as const,
     queryFn: async ({ queryKey: [, supabase] }) => {
-      const { data, error } = await fetchSendtagCheckoutTransfers(supabase)
+      const { data, error } = await fetchSendtagCheckoutReceipts(supabase)
       throwIf(error)
       return data
     },
