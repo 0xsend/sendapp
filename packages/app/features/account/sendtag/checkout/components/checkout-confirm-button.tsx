@@ -79,7 +79,8 @@ export function ConfirmButton({
     error: checkoutErrors,
     dataUpdatedAt: checkoutReceiptUpdatedAt,
   } = useSendtagCheckoutReceipts()
-  const [transfersLastFectched, setTransfersLastFectched] = useState(checkoutReceiptUpdatedAt)
+  const [checkoutReceiptsLastFectched, setCheckoutReceiptsLastFectched] =
+    useState(checkoutReceiptUpdatedAt)
   const lookupSendtagCheckout = useCallback(async () => {
     if (!sender) return
     if (isLoadingReceipts) return
@@ -119,13 +120,18 @@ export function ConfirmButton({
   ])
 
   useEffect(() => {
-    if (checkoutReceipts?.length && checkoutReceiptUpdatedAt !== transfersLastFectched) {
+    if (checkoutReceipts?.length && checkoutReceiptUpdatedAt !== checkoutReceiptsLastFectched) {
       lookupSendtagCheckout().catch((e) => {
         console.error('Error looking up safe received events', e)
       })
-      setTransfersLastFectched(checkoutReceiptUpdatedAt)
+      setCheckoutReceiptsLastFectched(checkoutReceiptUpdatedAt)
     }
-  }, [checkoutReceipts, lookupSendtagCheckout, checkoutReceiptUpdatedAt, transfersLastFectched])
+  }, [
+    checkoutReceipts,
+    lookupSendtagCheckout,
+    checkoutReceiptUpdatedAt,
+    checkoutReceiptsLastFectched,
+  ])
 
   const {
     data: txReceipt,
