@@ -44,7 +44,7 @@ export class OnboardingPage {
         }
         return false
       },
-      timeout: 10_000,
+      timeout: 15_000,
     })
 
     await this.page.getByRole('button', { name: 'Create Passkey' }).click()

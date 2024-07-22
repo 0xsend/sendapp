@@ -50,7 +50,7 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     /* Configure the video recording. */
-    ...(process.env.PLAYWRIGHT_RECORD
+    ...(Boolean(process.env.PLAYWRIGHT_RECORD) === true
       ? {
           video: {
             size: { width: 1366, height: 768 },
