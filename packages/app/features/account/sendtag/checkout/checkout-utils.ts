@@ -1,3 +1,5 @@
+import type { Tables } from '@my/supabase/database.types'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 import { reward } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
@@ -31,6 +33,65 @@ export function useReferralCode() {
   })
 }
 
+export async function fetchReferrer({
+  supabase,
+  profile,
+  referralCode,
+  signal,
+}: {
+  supabase: SupabaseClient
+  profile: Tables<'profiles'>
+  referralCode: string
+  signal?: AbortSignal
+}) {
+  if (profile?.referral_code === referralCode) return null // no self referrals
+  const signalToUse = signal ?? new AbortController().signal
+  const [
+    { data: profileByReferralCode, error: errorByReferralCode },
+    { data: profileByTag, error: errorByTag },
+  ] = await Promise.all([
+    fetchProfile({
+      supabase,
+      lookup_type: 'refcode',
+      identifier: referralCode,
+    })
+      .abortSignal(signalToUse)
+      .maybeSingle(),
+    fetchProfile({
+      supabase,
+      lookup_type: 'tag',
+      identifier: referralCode,
+    })
+      .abortSignal(signalToUse)
+      .maybeSingle(),
+  ])
+
+  const referrer = [profileByTag, profileByReferralCode].find((p) => {
+    if (!p) return false
+    if (p.id === profile.id) return false // no self referrals
+    if (!p.address) return false // need a send account
+    if (!p.tag) return false // need a sendtag
+    return true // found a valid referrer
+  })
+
+  if (referrer) {
+    return referrer
+  }
+
+  if (errorByReferralCode) {
+    if (errorByReferralCode.code !== 'PGRST116') {
+      throw errorByReferralCode
+    }
+  }
+
+  if (errorByTag) {
+    if (errorByTag.code !== 'PGRST116') {
+      throw errorByTag
+    }
+  }
+  return null
+}
+
 export function useReferrer() {
   const supabase = useSupabase()
   const { profile } = useUser()
@@ -39,30 +100,9 @@ export function useReferrer() {
     queryKey: ['referrer', { referralCode, supabase, profile }] as const,
     queryFn: async ({ queryKey: [, { referralCode, supabase, profile }], signal }) => {
       assert(!!referralCode, 'referralCode is required')
-      if (profile?.referral_code === referralCode) return null // no self referrals
-      const { data, error } = await fetchProfile({
-        supabase,
-        lookup_type: 'refcode',
-        identifier: referralCode,
-      })
-        .abortSignal(signal)
-        .maybeSingle()
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // no rows found
-          return null
-        }
-        throw error
-      }
-      if (!data?.address) {
-        // need a send account
-        return null
-      }
-      if (!data?.tag) {
-        // need a sendtag
-        return null
-      }
-      return data
+      assert(!!supabase, 'supabase is required')
+      assert(!!profile, 'profile is required')
+      return fetchReferrer({ supabase, profile, referralCode, signal })
     },
     enabled: !!referralCode && !!profile,
   })

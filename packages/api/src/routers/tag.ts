@@ -1,12 +1,12 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
 import { reward, total } from 'app/data/sendtags'
+import { fetchReferrer } from 'app/features/account/sendtag/checkout/checkout-utils'
 import { fetchSendtagCheckoutTransfers } from 'app/features/account/sendtag/checkout/components/checkout-confirm-button'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
-import { fetchProfile } from 'app/utils/useProfileLookup'
 import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
 import { withRetry } from 'viem'
@@ -54,20 +54,22 @@ export const tagRouter = createTRPCRouter({
       }
 
       // if referral code is present and not the same as the profile, fetch the referrer profile
-      const { data: referrerProfile, error: referrerProfileError } =
-        referralCode && profile.referral_code !== referralCode
-          ? await fetchProfile({
-              supabase,
-              lookup_type: 'refcode',
-              identifier: referralCode,
-            }).maybeSingle()
-          : { data: null, error: null }
-      if (!!referralCode && !!referrerProfileError) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: referrerProfileError.message,
-        })
-      }
+      const referrerProfile = referralCode
+        ? await fetchReferrer({
+            supabase,
+            profile,
+            referralCode,
+          }).catch((e) => {
+            const error = e as unknown as PostgrestError
+            if (error.code === 'PGRST116') {
+              return null
+            }
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: error.message,
+            })
+          })
+        : null
 
       const pendingTags = tags.filter((t) => t.status === 'pending')
       const amountDue = total(pendingTags)
