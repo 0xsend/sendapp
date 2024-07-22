@@ -821,6 +821,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -1128,6 +1129,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -1440,6 +1442,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -1778,6 +1781,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -2079,6 +2083,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -2401,6 +2406,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -2739,6 +2745,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -3072,6 +3079,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
@@ -3400,6 +3408,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                 "paddingBottom": 24,
               }
             }
+            testID="ActivityRow"
           >
             <View
               style={
