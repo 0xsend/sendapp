@@ -255,3 +255,16 @@ cmd_button(
     text = "shovel update-snapshot",
 )
 
+cmd_button(
+    name = "next:web:docker-build",
+    argv = [
+        "/bin/bash",
+        "-c",
+        "cd {} && make docker-web".format(config.main_dir),
+    ],
+    icon_name = "handyman",
+    location = location.RESOURCE,
+    resource = "next:web",
+    text = "Build Docker Image",
+)
+

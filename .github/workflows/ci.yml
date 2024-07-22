@@ -6,7 +6,9 @@ on:
   push:
     branches: [main, dev]
   workflow_dispatch:
-
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
@@ -14,7 +16,7 @@ concurrency:
 jobs:
   # set yarn cache
   cache-deps:
-    runs-on: self-hosted
+    runs-on: sendapp-kube-runners
 
     steps:
       - uses: actions/checkout@v4
@@ -32,11 +34,10 @@ jobs:
           echo github.head_ref=${{ github.head_ref }}
 
   lint:
-    runs-on: self-hosted
+    runs-on: sendapp-kube-runners
     needs: [cache-deps]
     env:
       YARN_ENABLE_HARDENED_MODE: 0
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,7 +54,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: self-hosted
+    runs-on: sendapp-kube-runners
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -65,17 +66,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      # No idea how homebrew bundle broke with tilt depending on python so installing manually
-      - name: Install Tilt
-        uses: ./.github/actions/install-tilt
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - name: Brew Bundle
-        id: brew-bundle
-        run: |
-          brew bundle
-          brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
@@ -106,7 +96,7 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests
-    runs-on: self-hosted
+    runs-on: sendapp-kube-runners
     needs: [cache-deps]
     env:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
@@ -121,16 +111,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install Tilt
-        uses: ./.github/actions/install-tilt
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - name: Brew Bundle
-        id: brew-bundle
-        run: |
-          brew bundle
-          brew cleanup
       - name: Setup Environment
         uses: ./.github/actions/setup-env
         env:
@@ -143,8 +123,23 @@ jobs:
       - name: Snaplet Login
         shell: bash
         run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
+      - name: 🏗 Prepare Playwright env
+        shell: bash
+        run: |
+          PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: 🧰 Cache Playwright browser binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: '~/.cache/ms-playwright'
+          key: '${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}'
+          save-always: true
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
       # - name: All Changes Committed
       #   shell: bash
@@ -154,7 +149,7 @@ jobs:
         shell: bash
         run: |
           tilt ci yarn:install # install and setup env
-          yarn web:docker:build # build nextjs docker image
+          make docker-web
       - name: Playwright Tests
         id: playwright
         shell: bash
@@ -290,47 +285,6 @@ jobs:
         with:
           name: nextjs-build
           path: ${{ github.workspace }}/apps/next/.next
-      # - name: Get Supabase Database Branch
-      #   if: github.base_ref == 'dev'
-      #   uses: 0xbigboss/supabase-branch-gh-action@v1
-      #   id: supabase-branch
-      #   with:
-      #     supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
-      #     supabase-project-id: ${{ secrets.STAGING_SUPABASE_PROJECT_ID }}
-      #     wait-for-migrations: false # Optional. Default is false.
-      #     timeout: 60 # Optional. Default is 60.
-      # - name: Add SMS provider to Supabase branch
-      #   if: github.base_ref == 'dev'
-      #   uses: 0xbigboss/supabase-manager-script-gh-action@v1
-      #   id: add-sms-provider
-      #   with:
-      #     supabase-access-token: ${{ secrets.SUPABASE_EXPERIMENTAL_ACCESS_TOKEN }}
-      #     script: |
-      #       const parentAuthConfig = await supabaseManager.projectsConfig.getV1AuthConfig({
-      #         ref: process.env.SUPABASE_PARENT_PROJECT_ID,
-      #       });
-
-      #       core.info('Enabling Twilio verify external phone auth provider');
-
-      #       await supabaseManager.projectsConfig.updateV1AuthConfig({
-      #         ref: process.env.SUPABASE_PROJECT_ID,
-      #         requestBody: {
-      #           external_phone_enabled: true,
-      #           sms_provider: parentAuthConfig.sms_provider,
-      #           sms_twilio_verify_account_sid:
-      #             parentAuthConfig.sms_twilio_verify_account_sid,
-      #           sms_twilio_verify_auth_token: parentAuthConfig.sms_twilio_verify_auth_token,
-      #           sms_twilio_verify_message_service_sid:
-      #             parentAuthConfig.sms_twilio_verify_message_service_sid,
-      #         },
-      #       });
-
-      #       core.info('Done');
-
-      #       return "success";
-      #   env:
-      #     SUPABASE_PROJECT_ID: ${{ steps.supabase-branch.outputs.project_ref }}
-      #     SUPABASE_PARENT_PROJECT_ID: ${{ steps.supabase-branch.outputs.parent_project_ref }}
       - name: Extract branch name
         id: extract-branch
         uses: ./.github/actions/extract-branch

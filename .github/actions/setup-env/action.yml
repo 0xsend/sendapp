@@ -1,18 +1,6 @@
 name: "Setup Environment"
-description: "Set up Node.js, install Foundry, and set up Bun. Runs Yarn install."
+description: "Set up Node.js, cache Yarn."
 inputs:
-  install-foundry:
-    description: "Whether to install Foundry."
-    required: false
-    default: "true"
-  install-bun:
-    description: "Whether to install Bun."
-    required: false
-    default: "true"
-  install-node:
-    description: "Whether to install Node.js."
-    required: false
-    default: "true"
   yarn-install:
     description: "Whether to run Yarn install."
     required: false
@@ -30,18 +18,21 @@ runs:
       with:
         node-version-file: .node-version
         cache: "yarn"
-    - name: Setup Bun
-      if: ${{ inputs.install-bun == 'true' }}
-      uses: oven-sh/setup-bun@v1
-    - name: Install Foundry
-      if: ${{ inputs.install-foundry == 'true' }}
-      uses: foundry-rs/foundry-toolchain@v1
-      with:
-        version: nightly
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
       run: yarn install --immutable
+
+    - name: Restore next cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          .next/cache
+        # Generate a new cache whenever packages or source files change.
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+        # If source files changed but packages didn't, rebuild from a prior cache.
+        restore-keys: |
+          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
     - name: Build Next.js
       if: ${{ inputs.build-nextjs == 'true' }}
       shell: bash

@@ -7,7 +7,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt update && apt install -y curl git cargo build-essential
 RUN curl -Lo- https://foundry.paradigm.xyz | /bin/bash
 RUN source /root/.bashrc && foundryup
-ENV PATH "$PATH:/root/.foundry/bin"
+ENV PATH="$PATH:/root/.foundry/bin"
 ENV DO_NOT_TRACK=1
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV YARN_CACHE_FOLDER=/tmp/yarn-cache
@@ -78,12 +78,15 @@ ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
 ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 ENV TAMAGUI_TARGET=web
 RUN --mount=type=cache,target=/tmp/yarn-cache \
-  --mount=type=cache,target=/tmp/turbo-cache \
   --mount=type=secret,id=SUPABASE_DB_URL \
   --mount=type=secret,id=SUPABASE_SERVICE_ROLE \
+  --mount=type=secret,id=TURBO_TOKEN \
+  --mount=type=secret,id=TURBO_TEAM \
   export SUPABASE_DB_URL="$(cat /run/secrets/SUPABASE_DB_URL)" \
   export SUPABASE_SERVICE_ROLE="$(cat /run/secrets/SUPABASE_SERVICE_ROLE)" \
-  && yarn turbo build --cache-dir=/tmp/turbo-cache --filter=next-app
+  export TURBO_TOKEN="$(cat /run/secrets/TURBO_TOKEN)" \
+  export TURBO_TEAM="$(cat /run/secrets/TURBO_TEAM)" \
+  && yarn turbo build --filter=next-app
 
 FROM node:20-slim AS runner
 WORKDIR /sendapp
@@ -93,4 +96,4 @@ USER nextjs
 COPY --from=builder --chown=nextjs:nodejs /sendapp/apps/next/.next/standalone /sendapp/
 COPY --from=builder --chown=nextjs:nodejs /sendapp/apps/next/.next/static /sendapp/apps/next/.next/static
 COPY --from=builder --chown=nextjs:nodejs /sendapp/apps/next/public /sendapp/apps/next/public
-CMD node apps/next/server.js
+CMD ["node", "apps/next/server.js"]
