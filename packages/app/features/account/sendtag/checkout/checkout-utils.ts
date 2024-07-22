@@ -33,6 +33,15 @@ export function useReferralCode() {
   })
 }
 
+/**
+ * Fetches the referrer profile by referral code or tag.
+ * If the referrer is the same as the profile, returns null. The referrer should also have a send account and sendtag.
+ * @param supabase
+ * @param profile
+ * @param referralCode
+ * @param signal
+ * @returns The referrer profile or null if the referrer is the same as the profile.
+ */
 export async function fetchReferrer({
   supabase,
   profile,

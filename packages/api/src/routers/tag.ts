@@ -130,8 +130,7 @@ export const tagRouter = createTRPCRouter({
       const invalidAmount = !amount || BigInt(amount) !== amountDue
       const invalidReferrer =
         (!referrer && rewardSent !== 0n) || // no referrer and reward is sent
-        (referrer && !reward) ||
-        BigInt(rewardSent.toString()) !== rewardDue // referrer and invalid reward
+        (referrer && (!reward || rewardSent !== rewardDue)) // referrer and invalid reward
 
       if (invalidAmount || invalidReferrer) {
         log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`, data)
