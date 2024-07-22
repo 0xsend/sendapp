@@ -101,11 +101,11 @@ test('can visit activity page and see correct activity feed', async ({
       from_user_id: profile.id,
       to_user_id: null,
       created_at: dateFromNow(4).toISOString(),
-      data: {
+      data: fakeOnchainEventData({
         tags: ['newtag'],
         value: '20000000000000000',
         log_addr: hexToBytea(zeroAddress),
-      },
+      }),
     },
     // Tag receipt (USDC)
     {
@@ -211,55 +211,59 @@ test('can visit activity page and see correct activity feed', async ({
 
   // Verify the entire Recent Activity component is visible
   await expect(page.getByTestId('RecentActivity')).toBeVisible()
+  const loadMoreButton = page.getByRole('button', { name: 'Load More' })
+  await expect(loadMoreButton).toBeVisible()
+  await loadMoreButton.click() // load everything
+  await expect(loadMoreButton).toBeHidden()
 
   // Verify each row of the activity feed
   const activityRows = page.getByTestId('ActivityRow')
-  await expect.soft(activityRows).toHaveCount(10)
-
-  // Deposit
-  await expect.soft(activityRows.nth(0)).toContainText('Deposit')
-  await expect.soft(activityRows.nth(0)).toContainText('0.019032 USDC')
-  await expect.soft(activityRows.nth(0)).toContainText(anotherSendAccount.address)
-
-  // Send
-  await expect.soft(activityRows.nth(1)).toContainText('Sent')
-  await expect.soft(activityRows.nth(1)).toContainText('0.077777 USDC')
-  await expect.soft(activityRows.nth(1)).toContainText('/otheruser')
-
-  // Receive
-  await expect.soft(activityRows.nth(2)).toContainText('Received')
-  await expect.soft(activityRows.nth(2)).toContainText('0.05 USDC')
-  await expect.soft(activityRows.nth(2)).toContainText('/otheruser')
-
-  // Tag receipt (ETH)
-  await expect.soft(activityRows.nth(3)).toContainText('Sendtag Registered')
-  await expect.soft(activityRows.nth(3)).toContainText('/newtag')
-  await expect.soft(activityRows.nth(3)).toContainText('0.02 ETH')
-
-  // Tag receipt (USDC)
-  await expect.soft(activityRows.nth(4)).toContainText('Sendtag Registered')
-  await expect.soft(activityRows.nth(4)).toContainText('/usdctag')
-  await expect.soft(activityRows.nth(4)).toContainText('2 USDC')
-
-  // Referral (as referrer)
-  await expect.soft(activityRows.nth(5)).toContainText('Referral')
-  await expect.soft(activityRows.nth(5)).toContainText('1 Referrals')
-  await expect.soft(activityRows.nth(5)).toContainText('/otheruser')
-
-  // Referral (as referred)
-  await expect.soft(activityRows.nth(6)).toContainText('Referred By')
-  await expect.soft(activityRows.nth(6)).toContainText('/otheruser')
-
-  // Signing key added
-  await expect.soft(activityRows.nth(7)).toContainText('Send Account Signing Key Added')
-
-  // Signing key removed
-  await expect.soft(activityRows.nth(8)).toContainText('Send Account Signing Key Removed')
+  await expect.soft(activityRows).toHaveCount(11)
 
   // Referral reward
-  await expect.soft(activityRows.nth(9)).toContainText('Referral Reward')
-  await expect.soft(activityRows.nth(9)).toContainText('1 USDC')
-  await expect.soft(activityRows.nth(9)).toContainText('Sendtag Checkout')
+  await expect.soft(activityRows.nth(0)).toContainText('Referral Reward')
+  await expect.soft(activityRows.nth(0)).toContainText('1 USDC')
+  await expect.soft(activityRows.nth(0)).toContainText('Sendtag Checkout')
+
+  // Signing key removed
+  await expect.soft(activityRows.nth(1)).toContainText('Send Account Signing Key Removed')
+
+  // Signing key added
+  await expect.soft(activityRows.nth(2)).toContainText('Send Account Signing Key Added')
+
+  // Referral (as referred)
+  await expect.soft(activityRows.nth(3)).toContainText('Referred By')
+  await expect.soft(activityRows.nth(3)).toContainText(thirdTag.name)
+
+  // Referral (as referrer)
+  await expect.soft(activityRows.nth(4)).toContainText('Referral')
+  await expect.soft(activityRows.nth(4)).toContainText('1 Referrals')
+  await expect.soft(activityRows.nth(4)).toContainText(anotherUser.name ?? '')
+
+  // Tag receipt (USDC)
+  await expect.soft(activityRows.nth(5)).toContainText('Sendtag Registered')
+  await expect.soft(activityRows.nth(5)).toContainText('/usdctag')
+  await expect.soft(activityRows.nth(5)).toContainText('2 USDC')
+
+  // Tag receipt (ETH)
+  await expect.soft(activityRows.nth(6)).toContainText('Sendtag Registered')
+  await expect.soft(activityRows.nth(6)).toContainText('/newtag')
+  await expect.soft(activityRows.nth(6)).toContainText('0.02 ETH')
+
+  // Receive
+  await expect.soft(activityRows.nth(7)).toContainText('Received')
+  await expect.soft(activityRows.nth(7)).toContainText('0.05 USDC')
+  await expect.soft(activityRows.nth(7)).toContainText(thirdTag.name)
+
+  // Send
+  await expect.soft(activityRows.nth(8)).toContainText('Sent')
+  await expect.soft(activityRows.nth(8)).toContainText('0.077777 USDC')
+  await expect.soft(activityRows.nth(8)).toContainText(anotherUser.name ?? '')
+
+  // Deposit
+  await expect.soft(activityRows.nth(9)).toContainText('Deposit')
+  await expect.soft(activityRows.nth(9)).toContainText('0.019032 USDC')
+  await expect.soft(activityRows.nth(9)).toContainText(anotherSendAccount.address)
 })
 
 test('can search on activity page', async ({ page, context }) => {
