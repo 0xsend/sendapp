@@ -7,12 +7,7 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
-import {
-  getRequiredPrefund,
-  getUserOperationHash,
-  SendUserOperationError,
-  type UserOperation,
-} from 'permissionless'
+import { getRequiredPrefund, getUserOperationHash, type UserOperation } from 'permissionless'
 import {
   encodeFunctionData,
   erc20Abi,
@@ -132,6 +127,7 @@ export async function sendUserOpTransfer({
     return receipt
   } catch (e) {
     throwNiceError(e)
+    throw e // this is for typescript also incase there's ever a bug in `throwNiceError`
   }
 }
 

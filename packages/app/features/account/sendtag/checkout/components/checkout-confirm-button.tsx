@@ -1,4 +1,3 @@
-import type { Database } from '@my/supabase/database.types'
 import {
   Button,
   ButtonIcon,
@@ -18,16 +17,14 @@ import {
   sendtagCheckoutAddress,
   usdcAddress,
 } from '@my/wagmi'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
 import { total } from 'app/data/sendtags'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
