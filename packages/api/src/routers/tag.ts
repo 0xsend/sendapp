@@ -150,7 +150,7 @@ export const tagRouter = createTRPCRouter({
       const { error: confirmTagsErr } = await supabaseAdmin.rpc('confirm_tags', {
         tag_names: pendingTags.map((t) => t.name),
         event_id,
-        referral_code_input: referralCode ?? '',
+        referral_code_input: referrerProfile?.refcode ?? '',
       })
 
       if (confirmTagsErr) {

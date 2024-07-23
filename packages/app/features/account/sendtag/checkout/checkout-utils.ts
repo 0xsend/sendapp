@@ -30,7 +30,7 @@ export function setCookie(name: string, value: string, maxAge: number): void {
 export function useReferralCode() {
   return useQuery({
     queryKey: ['referralCode'] as const,
-    queryFn: () => getCookie(REFERRAL_COOKIE_NAME),
+    queryFn: () => getCookie(REFERRAL_COOKIE_NAME) || null,
   })
 }
 
