@@ -25,7 +25,7 @@ contract SendtagCheckout is Ownable {
     /// @notice The event emitted when the contract is toggled.
     event Toggled(bool open);
 
-    constructor(address _sendRevenuesMultisig, IERC20 _token) Ownable(msg.sender) {
+    constructor(address _sendRevenuesMultisig, IERC20 _token, address _owner) Ownable(_owner) {
         require(_sendRevenuesMultisig != address(0), "Invalid Send Multisig address");
         require(address(_token) != address(0), "Invalid token address");
         token = _token;

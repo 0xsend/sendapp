@@ -25,7 +25,7 @@ contract SendtagCheckoutTest is Test {
         multisig = address(0x1337);
         owner = address(0xB055);
         vm.startPrank(owner);
-        checkout = new SendtagCheckout(multisig, token);
+        checkout = new SendtagCheckout(multisig, token, owner);
         vm.stopPrank();
     }
 
