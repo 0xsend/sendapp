@@ -1,21 +1,20 @@
 import {
-  Button,
-  Paragraph,
-  XStack,
-  YStack,
   AnimatePresence,
+  Button,
+  Dialog,
+  Paragraph,
+  Sheet,
   Theme,
   useToastController,
+  XStack,
+  YStack,
   type ButtonProps,
-  Dialog,
-  Sheet,
 } from '@my/ui'
-import type { Address } from 'viem'
-import { shorten } from 'app/utils/strings'
-import { useEffect, useState } from 'react'
-import * as Sharing from 'expo-sharing'
-import * as Clipboard from 'expo-clipboard'
 import { CheckCheck } from '@tamagui/lucide-icons'
+import { shorten } from 'app/utils/strings'
+import * as Clipboard from 'expo-clipboard'
+import { useState } from 'react'
+import type { Address } from 'viem'
 import { IconCopy } from './icons'
 
 function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
@@ -66,24 +65,11 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
 export function DepositAddress({ address, ...props }: { address?: Address } & ButtonProps) {
   const toast = useToastController()
   const [hasCopied, setHasCopied] = useState(false)
-  const [canShare, setCanShare] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
-
-  useEffect(() => {
-    const canShare = async () => {
-      const canShare = await Sharing.isAvailableAsync()
-      setCanShare(canShare)
-    }
-    canShare()
-  }, [])
 
   if (!address) return null
 
-  const shareOrCopyOnPress = async () => {
-    if (canShare) {
-      return await Sharing.shareAsync(address)
-    }
-
+  const copyOnPress = async () => {
     await Clipboard.setStringAsync(address).catch(() =>
       toast.show('Something went wrong', {
         message: 'We were unable to copy your referral link to the clipboard',
@@ -158,7 +144,7 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
           setCopyAddressDialogIsOpen(false)
         }}
         onConfirm={() => {
-          shareOrCopyOnPress()
+          copyOnPress()
           setCopyAddressDialogIsOpen(false)
           setHasCopied(true)
         }}
