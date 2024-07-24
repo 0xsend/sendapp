@@ -374,7 +374,7 @@ function ReferredBy() {
           <XStack gap="$2" jc="flex-start" ai="flex-start">
             <Input
               id={'refcode'}
-              defaultValue={referralCode}
+              defaultValue={referralCode ?? ''}
               onChangeText={(text) => mutation.mutate(text)}
               col={'$color12'}
             />
