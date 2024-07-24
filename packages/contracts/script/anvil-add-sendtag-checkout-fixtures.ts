@@ -34,11 +34,13 @@ void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))
   await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine true`
 
+  $.env.OWNER = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
   $.env.MULTISIG = '0x71fa02bb11e4b119bEDbeeD2f119F62048245301'
   $.env.TOKEN = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
 
   console.log(
     `${chalk.blue('Deploying DeploySendtagCheckout contract...')}
+OWNER=${$.env.OWNER}\t\thttps://basescan.org/address/${$.env.OWNER}
 MULTISIG=${$.env.MULTISIG}\t\thttps://basescan.org/address/${$.env.MULTISIG}
 TOKEN=${$.env.TOKEN}\t\thttps://basescan.org/address/${$.env.TOKEN}
 `
@@ -55,6 +57,7 @@ TOKEN=${$.env.TOKEN}\t\thttps://basescan.org/address/${$.env.TOKEN}
         console.log(chalk.yellow('SendtagCheckout already deployed'))
         return
       }
+      throw e
     })
 
   console.log(chalk.blue('Disable auto-mining...'))
