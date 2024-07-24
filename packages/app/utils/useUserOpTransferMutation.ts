@@ -7,12 +7,7 @@ import {
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
-import {
-  getRequiredPrefund,
-  getUserOperationHash,
-  SendUserOperationError,
-  type UserOperation,
-} from 'permissionless'
+import { getRequiredPrefund, getUserOperationHash, type UserOperation } from 'permissionless'
 import {
   encodeFunctionData,
   erc20Abi,
@@ -23,7 +18,7 @@ import {
 } from 'viem'
 import { assert } from './assert'
 import { byteaToBase64 } from './byteaToBase64'
-import { signUserOp } from './userop'
+import { signUserOp, throwNiceError } from './userop'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
@@ -131,13 +126,8 @@ export async function sendUserOpTransfer({
     assert(receipt.success === true, 'Failed to send userOp')
     return receipt
   } catch (e) {
-    if (
-      e instanceof SendUserOperationError &&
-      e.details === 'Invalid UserOp signature or paymaster signature'
-    ) {
-      e.details = 'Invalid Passkey Authorization'
-    }
-    throw e
+    throwNiceError(e)
+    throw e // this is for typescript also incase there's ever a bug in `throwNiceError`
   }
 }
 

@@ -18,7 +18,9 @@
     "../../supabase",
     "../app",
     "../wagmi/src",
-    "../api/src"
+    "../api/src",
+    "../../globals.d.ts",
+    "../../environment.d.ts"
   ],
   "references": []
 }

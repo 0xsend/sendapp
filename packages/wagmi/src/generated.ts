@@ -3283,11 +3283,12 @@ export const sendtagCheckoutAbi = [
     type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'referrer', internalType: 'address', type: 'address', indexed: true },
-      { name: 'referred', internalType: 'address', type: 'address', indexed: false },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
       { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'referrer', internalType: 'address', type: 'address', indexed: false },
+      { name: 'reward', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
-    name: 'ReferralReward',
+    name: 'Receipt',
   },
   {
     type: 'event',
@@ -3327,7 +3328,7 @@ export const sendtagCheckoutAbi = [
  *
  */
 export const sendtagCheckoutAddress = {
-  845337: '0x3f14f917fB2DF7e0f3c6b06BB0Fa0522FBEA4Eec',
+  845337: '0xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
 } as const
 
 /**
@@ -7671,14 +7672,14 @@ export const watchSendtagCheckoutOwnershipTransferredEvent = /*#__PURE__*/ creat
 )
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralReward"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Receipt"`
  *
  *
  */
-export const watchSendtagCheckoutReferralRewardEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchSendtagCheckoutReceiptEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendtagCheckoutAbi,
   address: sendtagCheckoutAddress,
-  eventName: 'ReferralReward',
+  eventName: 'Receipt',
 })
 
 /**
@@ -12347,13 +12348,15 @@ export const useWatchSendtagCheckoutOwnershipTransferredEvent =
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralReward"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Receipt"`
  *
  *
  */
-export const useWatchSendtagCheckoutReferralRewardEvent = /*#__PURE__*/ createUseWatchContractEvent(
-  { abi: sendtagCheckoutAbi, address: sendtagCheckoutAddress, eventName: 'ReferralReward' }
-)
+export const useWatchSendtagCheckoutReceiptEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: sendtagCheckoutAbi,
+  address: sendtagCheckoutAddress,
+  eventName: 'Receipt',
+})
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Toggled"`

@@ -1,13 +1,17 @@
 import { faker } from '@faker-js/faker'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/models'
+import { userOnboarded } from '@my/snaplet'
+import { usdcAddress } from '@my/wagmi'
 import type { Page } from '@playwright/test'
 import { devices, mergeTests } from '@playwright/test'
+import { price, pricing, reward, total } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
 import debug from 'debug'
-import { parseEther } from 'viem'
 import { getAuthSessionFromContext } from './fixtures/auth'
 import { test as checkoutTest, expect } from './fixtures/checkout'
+import { lookupBalance, testBaseClient } from './fixtures/viem'
+import { fetchSendtagCheckoutReceipts } from 'app/features/account/sendtag/checkout/checkout-utils'
+import { hexToBytea } from 'app/utils/hexToBytea'
 
 let log: debug.Debugger
 
@@ -18,16 +22,7 @@ const debugAuthSession = async (page: Page) => {
   log('user authenticated', `id=${decoded.sub}`, `session=${decoded.session_id}`)
 }
 
-const pricingText = [
-  '6+ characters',
-  '0.002 ETH',
-  '5 characters',
-  '0.005 ETH',
-  '4 characters',
-  '0.01 ETH',
-  '1-3 characters',
-  '0.02 ETH',
-]
+const pricingText = pricing.flatMap((p) => [p.length, p.price])
 
 test.beforeEach(async ({ checkoutPage }) => {
   log = debug(`test:account-sendtag-checkout:logged-in:${test.info().parallelIndex}`)
@@ -52,7 +47,9 @@ test('can visit checkout page', async ({ page, checkoutPage }) => {
 })
 
 test('can add a pending tag', async ({ checkoutPage }) => {
-  const tagName = `${faker.lorem.word()}_${test.info().parallelIndex}`
+  const tagName = `${faker.lorem.word({
+    length: { min: 1, max: 16 },
+  })}_${test.info().parallelIndex}`
   await checkoutPage.addPendingTag(tagName)
   await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
 })
@@ -66,7 +63,7 @@ test('cannot add an invalid tag name', async ({ checkoutPage }) => {
 
 test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myProfile } }) => {
   // test.setTimeout(60_000) // 60 seconds
-  const tagName = `012345_${test.info().parallelIndex}` // ensure price is .002 ETH
+  const tagName = faker.string.alphanumeric({ length: { min: 1, max: 20 } })
   await checkoutPage.addPendingTag(tagName)
   await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeVisible()
   await checkoutPage.confirmTags(expect)
@@ -82,20 +79,20 @@ test('can confirm a tag', async ({ checkoutPage, supabase, user: { profile: myPr
   const { data, error: activityError } = await supabase
     .from('activity_feed')
     .select('*')
-    .eq('event_name', 'tag_receipts')
+    .eq('event_name', 'tag_receipt_usdc')
   expect(activityError).toBeFalsy()
   expect(data).toHaveLength(1)
   expect((data?.[0]?.data as { tags: string[] })?.tags).toEqual([tagName])
 
   const receiptEvent = {
-    event_name: 'tag_receipts',
+    event_name: 'tag_receipt_usdc',
     from_user: {
       id: myProfile.id,
       send_id: myProfile.send_id,
     },
     data: {
       tags: [tagName],
-      value: parseEther('0.002').toString(),
+      value: price(tagName.length).toString(),
     },
   }
   await expect(supabase).toHaveEventInActivityFeed(receiptEvent)
@@ -110,11 +107,15 @@ test('can refer a tag', async ({
 }) => {
   const plan = await seed.users([userOnboarded])
   const referrer = plan.profiles[0]
+  const referrerSendAccount = plan.sendAccounts[0]
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referralCode, 'referral code not found')
-  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
-  await checkoutPage.goto()
+  assert(!!referrerSendAccount, 'referrer send account not found')
+  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`) // visit referral
+  await checkoutPage.goto() // goto checkout
+
+  // register some sendtags
   const tagsCount = Math.floor(Math.random() * 5) + 1
   const tagsToRegister: string[] = []
   for (let i = 0; i < tagsCount; i++) {
@@ -139,16 +140,42 @@ test('can refer a tag', async ({
   await expect(referredBy).toBeVisible() // show the referred
 
   await checkoutPage.confirmTags(expect)
-  const { data: tags, error } = await supabase.from('tags').select('*').in('name', tagsToRegister)
+
+  // ensure sendtags are confirmed
+  const { data: tags, error } = await supabase
+    .from('tags')
+    .select('*')
+    .in('name', tagsToRegister)
+    .eq('status', 'confirmed')
   expect(error).toBeFalsy()
   expect(tags).toHaveLength(tagsCount)
-
+  assert(!!tags, 'tags not found')
   await expect(checkoutPage.page).toHaveTitle('Send | Sendtag')
 
   for (const tag of tagsToRegister) {
     await expect(checkoutPage.page.getByRole('heading', { name: tag })).toBeVisible()
   }
 
+  // ensure receipts are created
+  const { data: checkoutReceipt, error: checkoutReceiptError } =
+    await fetchSendtagCheckoutReceipts(supabase).single()
+  expect(checkoutReceipt).toBeTruthy()
+  assert(!!checkoutReceipt?.event_id, 'checkout receipt event id not found')
+  expect(BigInt(checkoutReceipt?.amount)).toBe(total(tags))
+  expect(checkoutReceipt?.referrer).toBe(hexToBytea(referrerSendAccount.address as `0x${string}`))
+  expect(BigInt(checkoutReceipt?.reward)).toBe(
+    tagsToRegister.reduce((acc, tag) => acc + reward(tag.length), 0n)
+  )
+  const { data: receipts, error: receiptError } = await supabase
+    .from('receipts')
+    .select('*')
+    .eq('event_id', checkoutReceipt.event_id)
+    .single()
+
+  expect(receiptError).toBeFalsy()
+  expect(receipts).toBeTruthy()
+
+  // ensure referrer has received a referral
   await expect(supabase).toHaveEventInActivityFeed({
     event_name: 'referrals',
     from_user: {
@@ -163,6 +190,16 @@ test('can refer a tag', async ({
       tags: tagsToRegister,
     },
   })
+
+  // ensure referrer received the referral reward
+  const referrerAddress = plan.sendAccounts[0]?.address as `0x${string}`
+  assert(!!referrerAddress, 'Referrer address is not found')
+  const referrerBalance = await lookupBalance({
+    address: referrerAddress,
+    token: usdcAddress[testBaseClient.chain.id],
+  })
+  const rewardAmount = tagsToRegister.reduce((acc, tag) => acc + reward(tag.length), 0n)
+  expect(referrerBalance).toBe(rewardAmount)
 })
 
 test('cannot confirm a tag without paying', async ({ checkoutPage, supabase }) => {

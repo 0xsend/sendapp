@@ -1,11 +1,11 @@
-import { expect, mergeTests } from '@playwright/test'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { test as webauthnTest } from '@my/playwright/fixtures/webauthn'
+import { userOnboarded } from '@my/snaplet'
+import { expect, mergeTests } from '@playwright/test'
+import { sendCoin } from 'app/data/coins'
+import { assert } from 'app/utils/assert'
 import debug from 'debug'
 import { signUp } from './fixtures/send-accounts'
-import { userOnboarded } from '@my/snaplet/src/models'
-import { sendTokenAddresses, testBaseClient } from './fixtures/viem'
-import { assert } from 'app/utils/assert'
 
 let log: debug.Debugger
 
@@ -42,13 +42,6 @@ test('redirect on sign-in', async ({ page, pg }) => {
   }
 })
 
-// this wouldn't be necessary if playwright supported ESM or we transpiled the tests, or @my/wagmi
-const sendToken = {
-  symbol: 'SEND',
-  address: sendTokenAddresses[testBaseClient.chain.id],
-  decimals: 0,
-} as { symbol: string; address: `0x${string}`; decimals: number }
-
 test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
   const phone = `${Math.floor(Math.random() * 1e9)}`
   const plan = await seed.users([userOnboarded])
@@ -66,12 +59,12 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
     // ensure use can log in with passkey
     await page.context().clearCookies()
     await page.goto(
-      `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendToken.address}`
+      `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
     )
     await page.waitForURL(/auth\/sign-in/)
     const beforeRedirectUrl = new URL(page.url())
     expect(Object.fromEntries(beforeRedirectUrl.searchParams.entries())).toMatchObject({
-      redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendToken.address}`,
+      redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`,
     })
     // redirect to send after user is logged in
     const signInButton = page.getByRole('button', { name: 'Sign In' })
@@ -81,7 +74,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
     //@todo: find a way to wait for the new url and check query params like above
     //       Checking the url strimg is not sturdy because it cares about the query params order
     await expect(page).toHaveURL(
-      `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendToken.address}`
+      `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
     )
   } finally {
     await pg.query('DELETE FROM auth.users WHERE phone = $1', [phone]).catch((e) => {

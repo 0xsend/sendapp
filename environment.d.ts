@@ -47,6 +47,9 @@ declare global {
    * if (__DEV__) console.log('Running in dev mode')
    */
   const __DEV__: boolean
+  interface Window {
+    ethereum: IWeb3Provider
+  }
 }
 
 export type {}

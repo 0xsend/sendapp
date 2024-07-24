@@ -5,3 +5,4 @@ export { integration as sendRevenuesSafeReceives } from './send-revenues-safe-re
 export { integration as sendAccountSigningKeyAdded } from './send-account-signing-key-added'
 export { integration as sendAccountSigningKeyRemoved } from './send-account-signing-key-removed'
 export { integration as sendAccountReceivesIntegration } from './send-account-receives'
+export { integration as sendtagCheckoutReceiptsIntegration } from './sendtag-checkout-receipts'

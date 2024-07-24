@@ -7,7 +7,7 @@ import { byteaToBytes } from 'app/utils/byteaToBytes'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { throwIf } from 'app/utils/throwIf'
-import { debug } from 'debug'
+import debug from 'debug'
 import { withRetry } from 'viem'
 import { expect, test } from './fixtures/send-accounts'
 

@@ -1,6 +1,6 @@
 import debug from 'debug'
 import { defineChain } from 'viem'
-import { base as baseMainnetViem, mainnet as mainnetViem, baseSepolia, sepolia } from 'viem/chains'
+import { base as baseMainnetViem, baseSepolia, mainnet as mainnetViem, sepolia } from 'viem/chains'
 
 const log = debug('wagmi:chains')
 

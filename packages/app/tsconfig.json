@@ -19,7 +19,9 @@
     "__mocks__",
     "tamagui.config.ts",
     "./.eslintrc.cjs",
-    "../../supabase"
+    "../../supabase",
+    "../../globals.d.ts",
+    "../../environment.d.ts"
   ],
   "exclude": ["coverage"],
   "compilerOptions": {

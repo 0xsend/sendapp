@@ -2,16 +2,17 @@
  * Deposit page is primarly used for logged in users to initiate deposits.
  */
 
-import { expect, test as sendAccountTest } from './fixtures/send-accounts'
-import { test as ethereumTest } from './fixtures/ethereum'
-import debug from 'debug'
+import HeadlessWeb3Provider from '@0xbigboss/headless-web3-provider'
+import { usdcAddress } from '@my/wagmi'
 import { mergeTests } from '@playwright/test'
-import { Web3RequestKind } from '@0xbigboss/headless-web3-provider'
 import { assert } from 'app/utils/assert'
-import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { testBaseClient, usdcAddress, lookupBalance } from './fixtures/viem'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { setERC20Balance } from 'app/utils/useSetErc20Balance'
+import debug from 'debug'
 import { parseEther } from 'viem'
+import { test as ethereumTest } from './fixtures/ethereum'
+import { expect, test as sendAccountTest } from './fixtures/send-accounts'
+import { lookupBalance, testBaseClient } from './fixtures/viem'
 
 const test = mergeTests(sendAccountTest, ethereumTest)
 
@@ -35,7 +36,7 @@ test('can deposit USDC with web3 wallet', async ({
   assert(!!account, 'no web3 accounts found')
   log('account', account)
 
-  const balance = await lookupBalance({ address: sendAccount.address, tokenAddress })
+  const balance = await lookupBalance({ address: sendAccount.address, token: tokenAddress })
 
   // fund account
   await setERC20Balance({
@@ -77,7 +78,9 @@ test('can deposit USDC with web3 wallet', async ({
   await expect
     .poll(
       async () => {
-        return wallet.getPendingRequestCount(Web3RequestKind.RequestPermissions)
+        return wallet.getPendingRequestCount(
+          HeadlessWeb3Provider.Web3RequestKind.RequestPermissions
+        )
       },
       {
         timeout: 5000,
@@ -85,11 +88,11 @@ test('can deposit USDC with web3 wallet', async ({
       }
     )
     .toBe(1)
-  await wallet.authorize(Web3RequestKind.RequestPermissions)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestPermissions)
   await expect
     .poll(
       async () => {
-        return wallet.getPendingRequestCount(Web3RequestKind.RequestAccounts)
+        return wallet.getPendingRequestCount(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
       },
       {
         timeout: 5000,
@@ -97,7 +100,7 @@ test('can deposit USDC with web3 wallet', async ({
       }
     )
     .toBe(1)
-  await wallet.authorize(Web3RequestKind.RequestAccounts)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
 
   await expect(
     page.getByRole('heading', { name: `Depositing from ${account.address}` })
@@ -114,11 +117,13 @@ test('can deposit USDC with web3 wallet', async ({
 
   await expect(async () => {
     await expect(page.getByTestId('DepositWeb3ScreenError')).toBeHidden()
-    expect(wallet.getPendingRequestCount(Web3RequestKind.SendTransaction)).toBe(1)
+    expect(
+      wallet.getPendingRequestCount(HeadlessWeb3Provider.Web3RequestKind.SendTransaction)
+    ).toBe(1)
   }).toPass({
     timeout: 5000,
   })
-  await wallet.authorize(Web3RequestKind.SendTransaction)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.SendTransaction)
 
   await expect(depositButton).not.toBeDisabled({ timeout: 10000 }) // wait for tx to be mined
   await expect(page.getByText(/View 0x[0-9a-f]{4}\.\.\.[0-9a-f]{3} on.+/i)).toBeVisible()
@@ -210,7 +215,9 @@ test('can deposit ETH with web3 wallet', async ({
   await expect
     .poll(
       async () => {
-        return wallet.getPendingRequestCount(Web3RequestKind.RequestPermissions)
+        return wallet.getPendingRequestCount(
+          HeadlessWeb3Provider.Web3RequestKind.RequestPermissions
+        )
       },
       {
         timeout: 5000,
@@ -218,11 +225,11 @@ test('can deposit ETH with web3 wallet', async ({
       }
     )
     .toBe(1)
-  await wallet.authorize(Web3RequestKind.RequestPermissions)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestPermissions)
   await expect
     .poll(
       async () => {
-        return wallet.getPendingRequestCount(Web3RequestKind.RequestAccounts)
+        return wallet.getPendingRequestCount(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
       },
       {
         timeout: 5000,
@@ -230,7 +237,7 @@ test('can deposit ETH with web3 wallet', async ({
       }
     )
     .toBe(1)
-  await wallet.authorize(Web3RequestKind.RequestAccounts)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
 
   await expect(
     page.getByRole('heading', { name: `Depositing from ${account.address}` })
@@ -249,11 +256,13 @@ test('can deposit ETH with web3 wallet', async ({
 
   await expect(async () => {
     await expect(page.getByTestId('DepositWeb3ScreenError')).toBeHidden()
-    expect(wallet.getPendingRequestCount(Web3RequestKind.SendTransaction)).toBe(1)
+    expect(
+      wallet.getPendingRequestCount(HeadlessWeb3Provider.Web3RequestKind.SendTransaction)
+    ).toBe(1)
   }).toPass({
     timeout: 5000,
   })
-  await wallet.authorize(Web3RequestKind.SendTransaction)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.SendTransaction)
 
   await expect(depositButton).not.toBeDisabled({ timeout: 10000 }) // wait for tx to be mined
   await expect(page.getByText(/View 0x[0-9a-f]{4}\.\.\.[0-9a-f]{3} on.+/i)).toBeVisible()

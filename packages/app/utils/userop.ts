@@ -10,7 +10,13 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import { queryOptions } from '@tanstack/react-query'
-import { getAccountNonce, type UserOperation } from 'permissionless'
+import {
+  EstimateUserOperationGasError,
+  getAccountNonce,
+  PaymasterValidationRevertedError,
+  SendUserOperationError,
+  type UserOperation,
+} from 'permissionless'
 import {
   bytesToHex,
   concat,
@@ -22,6 +28,7 @@ import {
   isHex,
   maxUint256,
   numberToBytes,
+  RpcRequestError,
   type Address,
   type Hex,
 } from 'viem'
@@ -295,9 +302,16 @@ function userOpQueryOptions({
       }
 
       // only estimate the gas for the call
-      const { callGasLimit } = await baseMainnetBundlerClient.estimateUserOperationGas({
-        userOperation: userOp,
-      })
+      const { callGasLimit } = await baseMainnetBundlerClient
+        .estimateUserOperationGas({
+          userOperation: userOp,
+        })
+        .catch((e) => {
+          if (e instanceof EstimateUserOperationGasError) {
+            throwNiceError(e)
+          }
+          throw e
+        })
 
       return { ...userOp, callGasLimit }
     },
@@ -355,4 +369,42 @@ export function useUserOp({
     enabled,
     queryFn,
   })
+}
+/**
+ * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
+ */
+export function throwNiceError(e: Error) {
+  const cause = e.cause
+  switch (true) {
+    case cause instanceof SendUserOperationError: {
+      switch (cause.details) {
+        case 'Invalid UserOp signature or paymaster signature':
+          throw new Error('Invalid Passkey Authorization')
+        case 'already expired':
+          throw new Error('User operation or paymaster has expired')
+        default:
+          throw e
+      }
+    }
+    case cause instanceof PaymasterValidationRevertedError: {
+      switch (cause.details) {
+        case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
+          throw new Error('Not enough USDC to cover transaction fees')
+        default:
+          throw e
+      }
+    }
+    case cause instanceof RpcRequestError: {
+      switch (cause.details) {
+        case 'execution reverted: revert: ERC20: transfer amount exceeds balance':
+          throw new Error('Not enough funds')
+        case 'FailedOp(0,"AA25 invalid account nonce")':
+          throw new Error('Invalid nonce, please try again')
+        default:
+          throw e
+      }
+    }
+    default:
+      throw e
+  }
 }

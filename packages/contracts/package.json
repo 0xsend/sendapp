@@ -5,6 +5,7 @@
   "private": true,
   "files": [
     "src/",
+    "script/",
     "out/",
     "broadcast/"
   ],
@@ -32,7 +33,7 @@
     "@my/supabase": "workspace:*",
     "@openzeppelin/merkle-tree": "1.0.5",
     "@supabase/supabase-js": "2.44.2",
-    "@types/bun": "latest",
+    "@types/bun": "^1.1.6",
     "@uniswap/v3-periphery": "^1.4.4",
     "debug": "^4.3.5",
     "solhint": "^3.6.2",

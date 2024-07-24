@@ -1,10 +1,8 @@
 import type { Tables } from '@my/supabase/database.types'
-import { H3, Label, ListItem, Paragraph, Spinner, Stack, YStack, Button, ButtonText } from '@my/ui'
-
-import { useUser } from 'app/utils/useUser'
-import { maxNumSendTags } from './checkout/checkout-utils'
-
+import { Button, ButtonText, H3, Label, ListItem, Paragraph, Spinner, Stack, YStack } from '@my/ui'
 import { IconPlus } from 'app/components/icons'
+import { maxNumSendTags } from 'app/data/sendtags'
+import { useUser } from 'app/utils/useUser'
 import { useRouter } from 'solito/router'
 
 export function SendTagScreen() {

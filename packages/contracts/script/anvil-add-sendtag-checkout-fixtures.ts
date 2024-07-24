@@ -1,4 +1,28 @@
 import 'zx/globals'
+import type { Database } from '@my/supabase/database.types'
+import { createClient } from '@supabase/supabase-js'
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  throw new Error(
+    'NEXT_PUBLIC_SUPABASE_URL is not set. Please update the root .env.local and restart the server.'
+  )
+}
+if (!process.env.SUPABASE_SERVICE_ROLE) {
+  throw new Error(
+    'SUPABASE_SERVICE_ROLE is not set. Please update the root .env.local and restart the server.'
+  )
+}
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE
+
+/**
+ * only meant to be used on the server side.
+ */
+const supabaseAdmin = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
+  auth: { persistSession: false },
+})
+
 $.verbose = true
 
 /**
@@ -25,6 +49,13 @@ TOKEN=${$.env.TOKEN}\t\thttps://basescan.org/address/${$.env.TOKEN}
               --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
               --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
               --broadcast`
+    .then(({ stdout }) => stdout.match(/contract SendtagCheckout (0x[a-fA-F0-9]{40})/)?.[1])
+    .catch((e) => {
+      if (e.toString().includes('EvmError: CreateCollision')) {
+        console.log(chalk.yellow('SendtagCheckout already deployed'))
+        return
+      }
+    })
 
   console.log(chalk.blue('Disable auto-mining...'))
   await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine false`

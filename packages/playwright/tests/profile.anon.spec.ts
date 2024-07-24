@@ -1,11 +1,11 @@
 import { test } from '@my/playwright/fixtures/snaplet'
-import { userOnboarded } from '@my/snaplet/src/models'
+import { userOnboarded } from '@my/snaplet/models'
 import { expect, type Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
-import { debug, type Debugger } from 'debug'
+import debug from 'debug'
 import { ProfilePage } from './fixtures/profiles'
 
-let log: Debugger
+let log: debug.Debugger
 
 test.beforeAll(async () => {
   log = debug(`test:profile:anon:${test.info().parallelIndex}`)

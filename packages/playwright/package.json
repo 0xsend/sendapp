@@ -1,14 +1,17 @@
 {
   "name": "@my/playwright",
+  "type": "module",
   "devDependencies": {
-    "@0xbigboss/headless-web3-provider": "0.2.5",
+    "@0xbigboss/headless-web3-provider": "0.2.6",
     "@0xsend/webauthn-authenticator": "workspace:*",
     "@biomejs/biome": "^1.6.3",
     "@faker-js/faker": "^8.1.0",
     "@my/snaplet": "workspace:*",
     "@my/supabase": "workspace:*",
+    "@my/wagmi": "workspace:*",
     "@playwright/test": "^1.45.1",
     "@supabase/supabase-js": "2.44.2",
+    "@types/bun": "^1.1.6",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/pg": "^8",
     "@wagmi/core": "^2.10.5",
@@ -23,12 +26,13 @@
   "scripts": {
     "_with-env": "dotenv -e ../../.env -c",
     "codegen": "npx ts-node ./bin/codegen.ts",
-    "test": "yarn _with-env -- yarn playwright test"
+    "test": "yarn _with-env -- yarn playwright test",
+    "lint": "tsc"
   },
   "dependencies": {
     "cbor": "^9.0.1",
     "permissionless": "^0.1.14",
-    "pg": "^8.11.3",
+    "pg": "^8.12.0",
     "typescript": "^5.5.3"
   }
 }
