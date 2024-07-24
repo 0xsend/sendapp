@@ -47,12 +47,6 @@ export function DepositWeb3Screen() {
   const { open: openConnectModal } = useWeb3Modal()
   const { isConnected, chainId, chain } = useAccount()
 
-  useEffect(() => {
-    if (!isConnected) {
-      openConnectModal?.()
-    }
-  }, [isConnected, openConnectModal])
-
   if (!isConnected) {
     return (
       <Wrapper>
@@ -70,6 +64,8 @@ export function DepositWeb3Screen() {
         >
           Connect to Deposit
         </Button>
+
+        <DepositAddressWrapper />
       </Wrapper>
     )
   }
@@ -99,6 +95,17 @@ export function DepositWeb3Screen() {
     <FailsafeChainId>
       <DepositForm />
     </FailsafeChainId>
+  )
+}
+
+function DepositAddressWrapper() {
+  const { data: sendAccount } = useSendAccount()
+
+  return (
+    <XStack width={'100%'} ai="center" mt="$size.1">
+      <Paragraph size="$3">Or direct deposit on base</Paragraph>
+      <DepositAddress address={sendAccount?.address} />
+    </XStack>
   )
 }
 
@@ -282,18 +289,8 @@ function DepositForm() {
       }}
       renderBefore={() => (
         <FormWrapper.Body pb="$4" testID="DepositWeb3ScreenBefore">
-          <Link
-            href={`${baseMainnet.blockExplorers.default.url}/address/${account}`}
-            target="_blank"
-          >
-            <H2 size={'$4'} fontWeight={'300'} color={'$color05'}>
-              Depositing from {account}
-            </H2>
-          </Link>
-          <XStack width={'100%'} f={1} ai="center">
-            <Paragraph size="$3">Or direct deposit on base</Paragraph>
-            <DepositAddress address={sendAccount?.address} />
-          </XStack>
+          <w3m-button />
+          <DepositAddressWrapper />
         </FormWrapper.Body>
       )}
       renderAfter={({ submit }) => (
