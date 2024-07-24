@@ -159,6 +159,8 @@ test('can refer a tag', async ({
   // ensure receipts are created
   const { data: checkoutReceipt, error: checkoutReceiptError } =
     await fetchSendtagCheckoutReceipts(supabase).single()
+
+  expect(checkoutReceiptError).toBeFalsy()
   expect(checkoutReceipt).toBeTruthy()
   assert(!!checkoutReceipt?.event_id, 'checkout receipt event id not found')
   expect(BigInt(checkoutReceipt?.amount)).toBe(total(tags))

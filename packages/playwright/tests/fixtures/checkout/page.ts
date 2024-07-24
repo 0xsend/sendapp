@@ -67,13 +67,18 @@ export class CheckoutPage {
   async confirmTags(expect: Expect<CheckoutPage>) {
     // sign transaction
     log('sign transaction')
-    const confirmTagsRequest = this.page.waitForRequest((request) => {
-      if (request.url().includes('/api/trpc/tag.confirm')) {
-        log('confirmTags request', request.url(), request.method(), request.postDataJSON())
-        return request.url().includes('/api/trpc/tag.confirm') && request.method() === 'POST'
+    const confirmTagsRequest = this.page.waitForRequest(
+      (request) => {
+        if (request.url().includes('/api/trpc/tag.confirm')) {
+          log('confirmTags request', request.url(), request.method(), request.postDataJSON())
+          return request.url().includes('/api/trpc/tag.confirm') && request.method() === 'POST'
+        }
+        return false
+      },
+      {
+        timeout: 15_000,
       }
-      return false
-    })
+    )
     const confirmTagsResponse = this.page.waitForEvent('response', async (response) => {
       const json = await response.json().catch(() => ({}))
       if (response.url().includes('/api/trpc/tag.confirm')) {
