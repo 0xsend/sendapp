@@ -77,7 +77,7 @@ describe('DepositWeb3Screen', () => {
         <DepositWeb3Screen />
       </Provider>
     )
-    await waitFor(() => expect(screen.getByText(`Depositing from ${'0x123'}`)).toBeVisible())
+    await waitFor(() => expect(screen.getByTestId('DepositWeb3ScreenBefore')).toBeVisible())
     expect(screen).toMatchSnapshot()
     const user = userEvent.setup()
     await user.type(screen.getByLabelText('Amount'), '0.01')
