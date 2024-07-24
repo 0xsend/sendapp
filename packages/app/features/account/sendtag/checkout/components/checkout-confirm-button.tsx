@@ -180,13 +180,15 @@ export function ConfirmButton({
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
     mutationFn: sendUserOpTransfer,
     onSuccess: (userOpReceipt) => {
-      queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
-      queryClient.invalidateQueries({ queryKey: [balanceQueryKey] })
       if (userOpReceipt.success) {
         setSentTx(userOpReceipt.receipt.transactionHash)
       } else {
         setError(`Something went wrong: ${userOpReceipt.receipt.transactionHash}`)
       }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+      queryClient.invalidateQueries({ queryKey: [balanceQueryKey] })
     },
   })
 
