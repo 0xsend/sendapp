@@ -5,7 +5,7 @@ import { assert } from 'app/utils/assert'
 import type { Activity } from 'app/utils/zod/activity'
 
 type PartialActivityUser = Partial<Activity['from_user']>
-type ActivityMatch = Pick<Activity, 'event_name' | 'data'> & {
+export type ActivityMatch = Pick<Activity, 'event_name' | 'data'> & {
   from_user?: PartialActivityUser
   to_user?: PartialActivityUser
 }
@@ -29,11 +29,15 @@ expect.extend({
     expect(error).toBeFalsy()
     expect(count, 'activity feed is empty').toBeGreaterThan(0)
 
+    const errors: string[] = []
     for (const event of activityFeed) {
       if (event.event_name === activity.event_name) {
         try {
           expect(event.data).toMatchObject(activity.data)
         } catch (e) {
+          if ((e as unknown as { matcherResult: { message: string } }).matcherResult) {
+            errors.push(e.matcherResult.message)
+          }
           continue
         }
 
@@ -46,7 +50,8 @@ expect.extend({
 
     return {
       pass: false,
-      message: () => 'Activity event is not in the activity feed',
+      message: () => `Activity event is not in the activity feed with errors:
+${errors.join('\n')}`,
     }
   },
 })
