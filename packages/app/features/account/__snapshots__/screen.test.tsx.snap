@@ -8,6 +8,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         "alignItems": "center",
         "flexDirection": "column",
         "gap": 24,
+        "paddingTop": 16,
         "width": "100%",
       }
     }

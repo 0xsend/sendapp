@@ -14,10 +14,11 @@ import {
   ButtonText,
   View,
   usePwa,
+  Avatar,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
 import { useThemeSetting } from '@tamagui/next-theme'
-import { IconArrowLeft, IconGear, IconHamburger, IconQr, IconSendLogo } from 'app/components/icons'
+import { IconAccount, IconArrowLeft, IconGear, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
@@ -27,6 +28,7 @@ import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
 import { IconCoin } from './icons/IconCoin'
 import { Link } from 'solito/link'
+import { useUser } from 'app/utils/useUser'
 
 export enum ButtonOption {
   QR = 'QR',
@@ -67,6 +69,7 @@ export function TopNav({
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
   const isPwa = usePwa()
+  const { profile } = useUser()
 
   const handleHomeBottomSheet = () => {
     setRootParams(
@@ -161,9 +164,23 @@ export function TopNav({
             <Button onPress={handleBack} icon={<IconArrowLeft size={'$2.5'} color={iconColor} />} />
           ) : (
             <Button
-              $gtLg={{ disabled: true, opacity: 0 }} // We need the button to be there for layout purposes
+              $gtLg={{
+                disabled: true,
+                opacity: 0,
+              }} /// We need the button to be there for layout purposes
               onPress={handleHomeBottomSheet}
-              icon={<IconHamburger size={'$2.5'} color={iconColor} />}
+              bw={'$1'}
+              br={'$2'}
+              boc={profile?.avatar_url ? '$primary' : undefined}
+              bc="$color2"
+              icon={
+                <Avatar size={'$2.5'}>
+                  <Avatar.Image src={profile?.avatar_url ?? ''} />
+                  <Avatar.Fallback jc={'center'}>
+                    <IconAccount size={'$2.5'} color={iconColor} />
+                  </Avatar.Fallback>
+                </Avatar>
+              }
             />
           )}
         </Stack>

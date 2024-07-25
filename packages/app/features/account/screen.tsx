@@ -176,7 +176,7 @@ export function AccountScreen() {
   ]
 
   return (
-    <YStack w={'100%'} ai={'center'} gap={'$size.1.5'}>
+    <YStack w={'100%'} ai={'center'} gap={'$size.1.5'} pt={'$3.5'}>
       <Card p={'$size.3.5'} w={'100%'}>
         <XStack gap={'$size.3.5'} w={'100%'} flexWrap="wrap">
           <View width={'100%'} $gtMd={{ width: 'auto' }}>
