@@ -24,12 +24,10 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
   const isPwa = usePwa()
 
   return (
-    <Container height={'100%'} f={1} safeAreaPadding={isPwa && 'vertical'}>
+    <Container height={'100%'} safeAreaPadding={isPwa && 'y'}>
       <YStack ai="center" f={1} pt="$7">
         <Anchor {...useLink({ href: '/' })} mx="auto" position="absolute" top={'$6'}>
-          <Theme inverse={true}>
-            <IconSendLogo size={'$6'} color={'$background'} />
-          </Theme>
+          <IconSendLogo size={'$6'} color={'$color12'} />
         </Anchor>
         <YStack pt="$14" mt="$10">
           {children}
