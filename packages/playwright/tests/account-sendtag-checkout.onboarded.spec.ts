@@ -205,7 +205,7 @@ test('can refer a tag', async ({
   const tagsToRegister = Array.from(
     { length: Math.floor(Math.random() * 5) + 1 },
     () => `${faker.lorem.word()}_${test.info().parallelIndex}`
-  )
+  ).sort()
   for (const tagName of tagsToRegister) {
     await addPendingTag(checkoutPage, tagName)
   }

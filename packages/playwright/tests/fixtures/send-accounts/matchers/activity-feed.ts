@@ -50,7 +50,7 @@ expect.extend({
 
     return {
       pass: false,
-      message: () => `Activity event is not in the activity feed with errors:
+      message: () => `Activity ${activity.event_name} is not in the activity feed with errors:
 ${errors.join('\n')}`,
     }
   },
