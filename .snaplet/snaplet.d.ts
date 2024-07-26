@@ -615,6 +615,9 @@ interface Schema_pgsodium_masks {
 interface Schema_pgtle {
   feature_info: Table_pgtle_feature_info;
 }
+interface Schema_private {
+
+}
 interface Schema_public {
   activity: Table_public_activity;
   chain_addresses: Table_public_chain_addresses;
@@ -678,6 +681,7 @@ interface Database {
   pgsodium: Schema_pgsodium;
   pgsodium_masks: Schema_pgsodium_masks;
   pgtle: Schema_pgtle;
+  private: Schema_private;
   public: Schema_public;
   realtime: Schema_realtime;
   shovel: Schema_shovel;
