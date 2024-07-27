@@ -10,7 +10,6 @@ import {
 } from '@my/wagmi'
 import { queryOptions } from '@tanstack/react-query'
 import {
-  EstimateUserOperationGasError,
   getAccountNonce,
   PaymasterValidationRevertedError,
   SendUserOperationError,

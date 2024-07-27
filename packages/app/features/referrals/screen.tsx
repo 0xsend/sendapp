@@ -1,4 +1,4 @@
-import { Card, CardHeader, Container, H3, H5, Paragraph, XStack, YStack } from '@my/ui'
+import { Card, CardHeader, H3, H5, Paragraph, XStack, YStack } from '@my/ui'
 import { IconSendToken } from 'app/components/icons'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
