@@ -26,7 +26,7 @@ import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { formatUnits } from 'viem'
+import { formatUnits, isAddressEqual, zeroAddress } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 import {
   useReferralReward,
@@ -96,7 +96,7 @@ export function ConfirmButton({
         const invalidReferrer =
           (!referrerProfile && rewardSent !== 0n) || // no referrer and reward is sent
           (referrerProfile && rewardSent !== rewardDue) || // referrer and invalid reward
-          (rewardSent > 0n && referrerProfile?.address !== referrer) // referrer and reward sent is not the correct referrer
+          (rewardSent > 0n && !isAddressEqual(referrerProfile?.address ?? zeroAddress, referrer)) // referrer and reward sent is not the correct referrer
 
         const isPurchase =
           amount === amountDue && // check the correct amount
