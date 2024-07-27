@@ -18,7 +18,8 @@ import {
 } from 'viem'
 import { assert } from './assert'
 import { byteaToBase64 } from './byteaToBase64'
-import { signUserOp, throwNiceError } from './userop'
+import { throwNiceError } from './userop'
+import { signUserOp } from './signUserOp'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
