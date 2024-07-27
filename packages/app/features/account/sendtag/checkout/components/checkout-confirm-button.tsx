@@ -231,7 +231,9 @@ export function ConfirmButton({
     }
   }, [txWaitError])
 
-  const possibleErrors = [checkoutErrors, userOpError, usdcFeesError]
+  const possibleErrors = [checkoutErrors, userOpError, usdcFeesError] as (Error & {
+    details?: string
+  })[]
 
   if (possibleErrors.some((e) => e?.message)) {
     for (const err of possibleErrors) {
@@ -243,8 +245,8 @@ export function ConfirmButton({
           <YStack gap="$2" ai="center">
             <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
               {possibleErrors
-                .filter((e) => e?.message)
-                .map((e) => e?.message.split('.').at(0))
+                .map((e) => (e?.details ?? e?.message ?? '').split('.').at(0))
+                .filter(Boolean)
                 .join(', ')}
             </Paragraph>
           </YStack>

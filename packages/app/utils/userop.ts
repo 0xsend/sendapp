@@ -204,10 +204,7 @@ function userOpQueryOptions({
           userOperation: _userOp,
         })
         .catch((e) => {
-          if (e instanceof EstimateUserOperationGasError) {
-            throwNiceError(e)
-          }
-          throw e
+          throwNiceError(e)
         })
 
       const userOp = { ..._userOp, callGasLimit }
@@ -275,7 +272,7 @@ export function useUserOp({
 /**
  * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
  */
-export function throwNiceError(e: Error) {
+export function throwNiceError(e: Error): never {
   const cause = e.cause
   switch (true) {
     case cause instanceof SendUserOperationError: {
