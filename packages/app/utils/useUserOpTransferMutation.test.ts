@@ -1,17 +1,12 @@
 import { describe, test } from '@jest/globals'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
-import { baseMainnetClient, baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
-import { signUserOp } from './userop'
+import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
+import { signUserOp } from './signUserOp'
 import { encodeFunctionData, erc20Abi } from 'viem'
-import {
-  useUserOpTransferMutation,
-  useGenerateTransferUserOp,
-  useUserOpGasEstimate,
-} from './useUserOpTransferMutation'
+import { useUserOpTransferMutation, useGenerateTransferUserOp } from './useUserOpTransferMutation'
 import { Wrapper } from './__mocks__/Wrapper'
-
+jest.mock('./signUserOp')
 jest.mock('./userop', () => ({
-  signUserOp: jest.fn(),
   entrypoint: {
     address: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
   },
@@ -332,40 +327,5 @@ describe('useGenerateTransferUserOp', () => {
     expect(result.current).toBeDefined()
     expect(result.current.error).toBeDefined()
     expect(result.current.error?.message).toBe('Invalid nonce')
-  })
-})
-
-describe('useUserOpGasEstimate', () => {
-  test('should estimate gas for user op', async () => {
-    const userOp = {
-      sender: `0x${'1'.repeat(40)}`,
-      nonce: 0n,
-      callData: '0x',
-      ...defaultUserOp,
-    } as const
-
-    baseMainnetClient.readContract = jest
-      .fn()
-      .mockResolvedValueOnce([1n, 1n, 1n, 1n, 1n]) // token paymaster config
-      .mockResolvedValueOnce(1n) // cached price
-      .mockResolvedValueOnce(1n) // wei to token
-      .mockResolvedValueOnce(1n) // wei to token
-
-    const { result } = renderHook(() => useUserOpGasEstimate({ userOp }), {
-      wrapper: Wrapper,
-    })
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-    expect(result.current).toBeDefined()
-    const gasEstimate = await result.current.data
-    expect(gasEstimate).toBeDefined()
-    expect(gasEstimate?.userOp.maxFeePerGas).toBe(userOp.maxFeePerGas)
-    expect(gasEstimate?.userOp.maxPriorityFeePerGas).toBe(userOp.maxPriorityFeePerGas)
-    expect(gasEstimate?.networkGasEstimate.maxFeePerGas).toBeDefined()
-    expect(gasEstimate?.networkGasEstimate.maxPriorityFeePerGas).toBeDefined()
-    expect(gasEstimate?.preChargeNative).toBeDefined()
-    expect(gasEstimate?.cachedPriceWithMarkup).toBeDefined()
-    expect(gasEstimate?.requiredUsdcBalance).toBeDefined()
   })
 })

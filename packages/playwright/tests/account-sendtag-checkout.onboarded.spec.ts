@@ -60,7 +60,9 @@ const confirmTags = async (checkoutPage: CheckoutPage, tagNames: string[]) => {
   await checkoutPage.confirmTags(expect)
   for (const tagName of tagNames) {
     await expect(checkoutPage.page.getByLabel(`Pending Sendtag ${tagName}`)).toBeHidden()
-    await expect(checkoutPage.page.getByRole('heading', { name: tagName })).toBeVisible()
+    await expect(
+      checkoutPage.page.getByRole('heading', { name: tagName, exact: true })
+    ).toBeVisible()
   }
 }
 

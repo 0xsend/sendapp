@@ -8,6 +8,7 @@ import {
   Input,
   Label,
   Paragraph,
+  Spinner,
   Stack,
   SubmitButton,
   Theme,
@@ -37,10 +38,12 @@ import {
   setCookie,
   useReferralCode,
   useReferrer,
+  useSendtagCheckout,
 } from './checkout-utils'
 import { CheckoutTagSchema } from './CheckoutTagSchema'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import { SendTagPricingDialog, SendTagPricingTooltip } from './SendTagPricingDialog'
+import formatAmount from 'app/utils/formatAmount'
 
 export const CheckoutForm = () => {
   const user = useUser()
@@ -448,7 +451,7 @@ function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
 
 function TotalPrice() {
   const pendingTags = usePendingTags()
-
+  const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
 
   return (
@@ -471,6 +474,22 @@ function TotalPrice() {
       >
         {formatUnits(_total, 6)} USDC
       </Paragraph>
+      {usdcFeesError && (
+        <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
+      )}
+      {isLoadingUSDCFees && <Spinner size="small" color={'$color11'} />}
+      {usdcFees && (
+        <Paragraph
+          fontFamily={'$mono'}
+          fontWeight={'400'}
+          fontSize={'$2'}
+          $theme-dark={{ col: '$white' }}
+          $theme-light={{ col: '$black' }}
+        >
+          + Fees:{' '}
+          {formatAmount(formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals))} USDC
+        </Paragraph>
+      )}
     </YStack>
   )
 }

@@ -874,7 +874,7 @@ exports[`DepositWeb3Screen renders the deposit web3 form when wallet is connecte
                   }
                 >
                   <TextInput
-                    accessibilityLabel="Amount"
+                    aria-label="Amount"
                     autoFocus={true}
                     control={
                       {

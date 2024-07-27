@@ -22,11 +22,11 @@
     "@my/wagmi": "workspace:*",
     "@openzeppelin/merkle-tree": "1.0.5",
     "@supabase/supabase-js": "2.44.2",
-    "@wagmi/core": "^2.10.5",
+    "@wagmi/core": "^2.13.1",
     "app": "workspace:*",
     "express": "^4.19.2",
     "pino": "^8.16.1",
-    "viem": "^2.13.7"
+    "viem": "^2.18.2"
   },
   "devDependencies": {
     "@types/bun": "^1.1.6",

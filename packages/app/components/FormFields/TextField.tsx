@@ -87,7 +87,7 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
             </Tooltip.Content>
             <Tooltip.Trigger>
               <Input
-                accessibilityLabel={label ?? field.name}
+                aria-label={label ?? field.name}
                 disabled={disabled}
                 maxLength={maxLength}
                 borderWidth={0}

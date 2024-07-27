@@ -18,7 +18,8 @@ import {
 } from 'viem'
 import { assert } from './assert'
 import { byteaToBase64 } from './byteaToBase64'
-import { signUserOp, throwNiceError } from './userop'
+import { throwNiceError } from './userop'
+import { signUserOp } from './signUserOp'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
@@ -130,7 +131,88 @@ export async function sendUserOpTransfer({
     throw e // this is for typescript also incase there's ever a bug in `throwNiceError`
   }
 }
+export function useGenerateTransferUserOp({
+  sender,
+  to,
+  token,
+  amount,
+  nonce,
+}: {
+  sender?: Hex
+  to?: Hex
+  token?: Hex
+  amount?: bigint
+  nonce?: bigint
+}): UseQueryResult<UserOperation<'v0.7'>> {
+  return useQuery({
+    queryKey: ['generateTransferUserOp', sender, to, token, String(amount), String(nonce)],
+    enabled: !!sender && !!to && amount !== undefined && nonce !== undefined,
+    queryFn: () => {
+      assert(!!sender && isAddress(sender), 'Invalid send account address')
+      assert(!!to && isAddress(to), 'Invalid to address')
+      assert(!token || isAddress(token), 'Invalid token address')
+      assert(typeof amount === 'bigint' && amount > 0n, 'Invalid amount')
+      assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
 
+      let callData: Hex | undefined
+      if (!token) {
+        callData = encodeFunctionData({
+          abi: sendAccountAbi,
+          functionName: 'executeBatch',
+          args: [
+            [
+              {
+                dest: to,
+                value: amount,
+                data: '0x',
+              },
+            ],
+          ],
+        })
+      } else {
+        callData = encodeFunctionData({
+          abi: sendAccountAbi,
+          functionName: 'executeBatch',
+          args: [
+            [
+              {
+                dest: token,
+                value: 0n,
+                data: encodeFunctionData({
+                  abi: erc20Abi,
+                  functionName: 'transfer',
+                  args: [to, amount],
+                }),
+              },
+            ],
+          ],
+        })
+      }
+
+      const chainId = baseMainnetClient.chain.id
+      const paymaster = tokenPaymasterAddress[chainId]
+      const userOp: UserOperation<'v0.7'> = {
+        ...defaultUserOp,
+        sender,
+        nonce,
+        callData,
+        paymaster,
+        paymasterData: '0x',
+        signature: '0x',
+      }
+      return userOp
+    },
+  })
+}
+
+/**
+ * Given a UserOperation, returns the gas estimate and the required usdc balance for executing the UserOperation.
+ *
+ * @deprecated use [useUSDCFees](./useUSDCFees.ts) instead
+ *
+ * @param userOp - The UserOperation to estimate the gas for.
+ * @returns The gas estimate and the required usdc balance.
+ */
 export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'> }) {
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- manually build query key since bigint values are not supported
@@ -215,80 +297,6 @@ export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'
         cachedPriceWithMarkup,
         requiredUsdcBalance,
       }
-    },
-  })
-}
-
-export function useGenerateTransferUserOp({
-  sender,
-  to,
-  token,
-  amount,
-  nonce,
-}: {
-  sender?: Hex
-  to?: Hex
-  token?: Hex
-  amount?: bigint
-  nonce?: bigint
-}): UseQueryResult<UserOperation<'v0.7'>> {
-  return useQuery({
-    queryKey: ['generateTransferUserOp', sender, to, token, String(amount), String(nonce)],
-    enabled: !!sender && !!to && amount !== undefined && nonce !== undefined,
-    queryFn: () => {
-      assert(!!sender && isAddress(sender), 'Invalid send account address')
-      assert(!!to && isAddress(to), 'Invalid to address')
-      assert(!token || isAddress(token), 'Invalid token address')
-      assert(typeof amount === 'bigint' && amount > 0n, 'Invalid amount')
-      assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
-
-      let callData: Hex | undefined
-      if (!token) {
-        callData = encodeFunctionData({
-          abi: sendAccountAbi,
-          functionName: 'executeBatch',
-          args: [
-            [
-              {
-                dest: to,
-                value: amount,
-                data: '0x',
-              },
-            ],
-          ],
-        })
-      } else {
-        callData = encodeFunctionData({
-          abi: sendAccountAbi,
-          functionName: 'executeBatch',
-          args: [
-            [
-              {
-                dest: token,
-                value: 0n,
-                data: encodeFunctionData({
-                  abi: erc20Abi,
-                  functionName: 'transfer',
-                  args: [to, amount],
-                }),
-              },
-            ],
-          ],
-        })
-      }
-
-      const chainId = baseMainnetClient.chain.id
-      const paymaster = tokenPaymasterAddress[chainId]
-      const userOp: UserOperation<'v0.7'> = {
-        ...defaultUserOp,
-        sender,
-        nonce,
-        callData,
-        paymaster,
-        paymasterData: '0x',
-        signature: '0x',
-      }
-      return userOp
     },
   })
 }

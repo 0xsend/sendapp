@@ -551,8 +551,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
             }
           >
             <TextInput
-              accessibilityLabel="query"
               accessibilityRole="search"
+              aria-label="query"
               control={
                 {
                   "_defaultValues": {
@@ -824,8 +824,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
             }
           >
             <TextInput
-              accessibilityLabel="query"
               accessibilityRole="search"
+              aria-label="query"
               control={
                 {
                   "_defaultValues": {

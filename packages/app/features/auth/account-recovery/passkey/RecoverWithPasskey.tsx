@@ -1,5 +1,5 @@
 import { Button, ButtonText } from '@my/ui'
-import { signChallenge } from 'app/utils/userop'
+import { signChallenge } from 'app/utils/signChallenge'
 import {
   RecoveryOptions,
   type ChallengeResponse,

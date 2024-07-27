@@ -11,9 +11,10 @@ import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { throwIf } from 'app/utils/throwIf'
 import { byteaTxHash } from 'app/utils/zod'
 import debug from 'debug'
-import { withRetry } from 'viem'
+import { isAddressEqual, withRetry, zeroAddress } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
+import { byteaToHex } from 'app/utils/byteaToHex'
 
 const log = debug('api:routers:tag')
 
@@ -128,16 +129,26 @@ export const tagRouter = createTRPCRouter({
         })
       })
 
-      const { event_id, amount, referrer, reward: rewardSentStr } = data
+      const { event_id, amount, referrer: referrerBytea, reward: rewardSentStr } = data
       const rewardSent = rewardSentStr ? BigInt(rewardSentStr) : 0n
-
+      const referrer = byteaToHex(referrerBytea as `\\x${string}`)
       const invalidAmount = !amount || BigInt(amount) !== amountDue
       const invalidReferrer =
-        (!referrer && rewardSent !== 0n) || // no referrer and reward is sent
-        (referrer && rewardSent !== rewardDue) // referrer and invalid reward
+        (!referrerProfile && rewardSent !== 0n) || // no referrer and reward is sent
+        (referrerProfile && rewardSent !== rewardDue) || // referrer and invalid reward
+        (rewardSent > 0n && !isAddressEqual(referrerProfile?.address ?? zeroAddress, referrer)) // referrer and reward sent is not the correct referrer
 
       if (invalidAmount || invalidReferrer) {
-        log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`, data)
+        log('transaction is not a payment for tags or incorrect amount', `txHash=${txHash}`, {
+          amount,
+          referrer,
+          rewardDue,
+          rewardSent,
+          referrerProfile,
+          event_id,
+          invalidAmount,
+          invalidReferrer,
+        })
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Transaction is not a payment for tags or incorrect amount.',

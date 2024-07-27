@@ -14,10 +14,7 @@ import {
 } from '@my/ui'
 
 export const TextAreaField = (
-  props: Pick<
-    TextAreaProps,
-    'size' | 'autoFocus' | 'accessibilityLabel' | 'placeholder' | 'fontStyle'
-  >
+  props: Pick<TextAreaProps, 'size' | 'autoFocus' | 'aria-label' | 'placeholder' | 'fontStyle'>
 ) => {
   const {
     field,

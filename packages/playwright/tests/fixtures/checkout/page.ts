@@ -85,13 +85,21 @@ export class CheckoutPage {
         timeout: 15_000,
       }
     )
-    const confirmTagsResponse = this.page.waitForEvent('response', async (response) => {
-      const json = await response.json().catch(() => ({}))
-      if (response.url().includes('/api/trpc/tag.confirm')) {
-        log('confirmTags response', response.url(), response.status(), await response.text())
-        return json?.[0]?.result?.data?.json === ''
-      }
-      return false
+    const confirmTagsResponse = this.page.waitForEvent('response', {
+      predicate: async (response) => {
+        const json = await response.json().catch(() => ({}))
+        if (response.url().includes('/api/trpc/tag.confirm')) {
+          log('confirmTags response', response.url(), response.status(), await response.text())
+          const error = json?.[0]?.error
+          if (error) {
+            log('confirmTags error', error)
+            expect(error).toBeFalsy()
+          }
+          return json?.[0]?.result?.data?.json === ''
+        }
+        return false
+      },
+      timeout: 10_000,
     })
     const signTransactionButton = this.page.getByRole('button', { name: 'Confirm' })
     expect?.(signTransactionButton).toBeEnabled({ timeout: 10_000 }) // blockchain stuff is a bit slow

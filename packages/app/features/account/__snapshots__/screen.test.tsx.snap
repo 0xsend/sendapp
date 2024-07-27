@@ -1177,7 +1177,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
             }
           >
             <View
-              accessibilityLabel="Share"
+              aria-label="Share"
               cancelable={true}
               disabled={false}
               focusVisibleStyle={{}}
