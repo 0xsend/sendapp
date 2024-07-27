@@ -40,6 +40,9 @@ import { throwIf } from './throwIf'
 import { defaultUserOp } from './useUserOpTransferMutation'
 import { baseMainnetClient } from './viem'
 import { useMemo } from 'react'
+import { debug as debugBase } from './debug'
+
+const debug = debugBase('app:utils:userop')
 
 export type SendAccountCall = {
   dest: `0x${string}`
@@ -289,7 +292,7 @@ function userOpQueryOptions({
       })
 
       const paymaster = tokenPaymasterAddress[chainId]
-      const userOp: UserOperation<'v0.7'> = {
+      const _userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
         maxFeePerGas,
         maxPriorityFeePerGas,
@@ -304,7 +307,7 @@ function userOpQueryOptions({
       // only estimate the gas for the call
       const { callGasLimit } = await baseMainnetBundlerClient
         .estimateUserOperationGas({
-          userOperation: userOp,
+          userOperation: _userOp,
         })
         .catch((e) => {
           if (e instanceof EstimateUserOperationGasError) {
@@ -313,7 +316,12 @@ function userOpQueryOptions({
           throw e
         })
 
-      return { ...userOp, callGasLimit }
+      const userOp = { ..._userOp, callGasLimit }
+      // const userOp = { ..._userOp, callGasLimit: _userOp.callGasLimit }
+
+      debug('useUserOpGasEstimate', { userOp, callGasLimit })
+
+      return userOp
     },
   })
 }

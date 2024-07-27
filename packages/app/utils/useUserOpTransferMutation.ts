@@ -3,19 +3,11 @@ import {
   baseMainnetClient,
   entryPointAddress,
   sendAccountAbi,
-  tokenPaymasterAbi,
   tokenPaymasterAddress,
 } from '@my/wagmi'
 import { useMutation, useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { getRequiredPrefund, getUserOperationHash, type UserOperation } from 'permissionless'
-import {
-  encodeFunctionData,
-  erc20Abi,
-  formatUnits,
-  isAddress,
-  type CallExecutionError,
-  type Hex,
-} from 'viem'
+import { getUserOperationHash, type UserOperation } from 'permissionless'
+import { encodeFunctionData, erc20Abi, isAddress, type CallExecutionError, type Hex } from 'viem'
 import { assert } from './assert'
 import { byteaToBase64 } from './byteaToBase64'
 import { signUserOp, throwNiceError } from './userop'
@@ -130,95 +122,6 @@ export async function sendUserOpTransfer({
     throw e // this is for typescript also incase there's ever a bug in `throwNiceError`
   }
 }
-
-export function useUserOpGasEstimate({ userOp }: { userOp?: UserOperation<'v0.7'> }) {
-  return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- manually build query key since bigint values are not supported
-    queryKey: ['userOpGasEstimate', ...Object.values(userOp ?? {}).map((v) => String(v))],
-    enabled: !!userOp,
-    queryFn: async () => {
-      assert(!!userOp, 'User op is required')
-      const feesPerGas = await baseMainnetClient.estimateFeesPerGas()
-
-      console.log('feesPerGas', {
-        maxFeePerGas: `${formatUnits(userOp.maxFeePerGas, 9)} gwei`,
-        maxPriorityFeePerGas: `${formatUnits(userOp.maxPriorityFeePerGas, 9)} gwei`,
-      })
-      console.log('feesPerGas [network]', {
-        maxFeePerGas: `${formatUnits(feesPerGas.maxFeePerGas ?? 0n, 9)} gwei`,
-        maxPriorityFeePerGas: `${formatUnits(feesPerGas.maxPriorityFeePerGas ?? 0n, 9)} gwei`,
-      })
-
-      const requiredPreFund = getRequiredPrefund({
-        userOperation: userOp,
-        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
-      })
-      // calculate the required usdc balance
-      const [priceMarkup, , refundPostopCost, , baseFee] = await baseMainnetClient.readContract({
-        address: tokenPaymasterAddress[baseMainnetClient.chain.id],
-        abi: tokenPaymasterAbi,
-        functionName: 'tokenPaymasterConfig',
-        args: [],
-      })
-      const cachedPrice = await baseMainnetClient.readContract({
-        address: tokenPaymasterAddress[baseMainnetClient.chain.id],
-        abi: tokenPaymasterAbi,
-        functionName: 'cachedPrice',
-        args: [],
-      })
-      const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * userOp.maxFeePerGas
-      const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
-      const requiredUsdcBalance = await baseMainnetClient.readContract({
-        address: tokenPaymasterAddress[baseMainnetClient.chain.id],
-        abi: tokenPaymasterAbi,
-        functionName: 'weiToToken',
-        args: [preChargeNative, cachedPriceWithMarkup],
-      })
-      console.log('usdc for gas', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
-      console.log(
-        'total + base fee',
-        requiredUsdcBalance + BigInt(baseFee),
-        formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
-      )
-      if ((feesPerGas.maxFeePerGas ?? 0n) > 0) {
-        const maxFeePerGas = feesPerGas.maxFeePerGas ?? 0n
-        const preChargeNative = requiredPreFund + BigInt(refundPostopCost) * maxFeePerGas
-        const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
-        const requiredUsdcBalance = await baseMainnetClient.readContract({
-          address: tokenPaymasterAddress[baseMainnetClient.chain.id],
-          abi: tokenPaymasterAbi,
-          functionName: 'weiToToken',
-          args: [preChargeNative, cachedPriceWithMarkup],
-        })
-        console.log(
-          'usdc for gas [network]',
-          requiredUsdcBalance,
-          formatUnits(requiredUsdcBalance, 6)
-        )
-        console.log(
-          'total + base fee [network]',
-          requiredUsdcBalance + BigInt(baseFee),
-          formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
-        )
-      }
-
-      return {
-        userOp: {
-          maxFeePerGas: userOp.maxFeePerGas,
-          maxPriorityFeePerGas: userOp.maxPriorityFeePerGas,
-        },
-        networkGasEstimate: {
-          maxFeePerGas: feesPerGas.maxFeePerGas,
-          maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
-        },
-        preChargeNative,
-        cachedPriceWithMarkup,
-        requiredUsdcBalance,
-      }
-    },
-  })
-}
-
 export function useGenerateTransferUserOp({
   sender,
   to,

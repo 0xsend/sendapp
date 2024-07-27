@@ -37,8 +37,8 @@
     "@trpc/client": "11.0.0-next-beta.264",
     "@vonovak/react-native-theme-control": "^5.0.1",
     "@wagmi/chains": "^1.8.0",
-    "@wagmi/connectors": "^5.0.15",
-    "@wagmi/core": "^2.10.5",
+    "@wagmi/connectors": "^5.1.1",
+    "@wagmi/core": "^2.13.1",
     "@web3modal/wagmi": "^5.0.2",
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.12.1",
@@ -60,8 +60,8 @@
     "react-native-svg": "15.2.0",
     "solito": "^4.0.1",
     "superjson": "^1.13.1",
-    "viem": "^2.13.7",
-    "wagmi": "^2.9.10",
+    "viem": "^2.18.2",
+    "wagmi": "^2.12.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

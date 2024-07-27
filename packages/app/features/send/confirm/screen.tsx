@@ -29,9 +29,9 @@ import { useProfileHref } from 'app/utils/useProfileHref'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import {
   useGenerateTransferUserOp,
-  useUserOpGasEstimate,
   useUserOpTransferMutation,
 } from 'app/utils/useUserOpTransferMutation'
+import { useRequiredUSDCBalance } from 'app/utils/fetchUserOpGasEstimate'
 import { useAccountNonce } from 'app/utils/userop'
 import {
   isSendAccountReceiveEvent,
@@ -111,7 +111,7 @@ export function SendConfirm() {
     nonce: nonce ?? 0n,
   })
 
-  const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
+  const { data: gasEstimate } = useRequiredUSDCBalance({ userOp })
   const {
     data: feesPerGas,
     isLoading: isFeesPerGasLoading,

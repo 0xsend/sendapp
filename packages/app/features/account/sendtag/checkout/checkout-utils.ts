@@ -1,12 +1,24 @@
 import type { Database, Tables } from '@my/supabase/database.types'
+import {
+  baseMainnetClient,
+  sendtagCheckoutAbi,
+  sendtagCheckoutAddress,
+  usdcAddress,
+} from '@my/wagmi'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { reward } from 'app/data/sendtags'
+import { reward, total } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
 import { fetchProfile } from 'app/utils/useProfileLookup'
+import { useUserOp } from 'app/utils/userop'
+import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useUser } from 'app/utils/useUser'
+import { useMemo } from 'react'
+import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 
 export const verifyAddressMsg = (a: string | `0x${string}`) =>
   `I am the owner of the address: ${a}.
@@ -161,4 +173,64 @@ function sendtagCheckoutReceiptsQueryOptions(supabase: SupabaseClient<Database>)
 export function useSendtagCheckoutReceipts() {
   const supabase = useSupabase()
   return useQuery(sendtagCheckoutReceiptsQueryOptions(supabase))
+}
+
+export function useSendtagCheckout() {
+  const { data: sendAccount } = useSendAccount()
+  const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
+  const chainId = baseMainnetClient.chain.id
+  const pendingTags = usePendingTags() ?? []
+  const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
+  const { data: referrer } = useReferrer()
+  const { data: reward } = useReferralReward({ tags: pendingTags })
+  const checkoutArgs = useMemo(
+    () => [amountDue, referrer?.address ?? zeroAddress, reward ?? 0n] as const,
+    [amountDue, referrer, reward]
+  )
+  const calls = useMemo(
+    () => [
+      {
+        dest: usdcAddress[chainId],
+        value: 0n,
+        data: encodeFunctionData({
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [sendtagCheckoutAddress[chainId], amountDue],
+        }),
+      },
+      {
+        dest: sendtagCheckoutAddress[chainId],
+        value: 0n,
+        data: encodeFunctionData({
+          abi: sendtagCheckoutAbi,
+          functionName: 'checkout',
+          args: checkoutArgs,
+        }),
+      },
+    ],
+    [amountDue, chainId, checkoutArgs]
+  )
+  const {
+    data: userOp,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+  } = useUserOp({
+    sender,
+    calls,
+  })
+  const {
+    data: usdcFees,
+    isLoading: isLoadingUSDCFees,
+    error: usdcFeesError,
+  } = useUSDCFees({
+    userOp,
+  })
+  return {
+    userOp,
+    userOpError,
+    isLoadingUserOp,
+    usdcFees,
+    usdcFeesError,
+    isLoadingUSDCFees,
+  }
 }

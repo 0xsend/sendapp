@@ -10,13 +10,7 @@ import {
   type ButtonProps,
   type YStackProps,
 } from '@my/ui'
-import {
-  baseMainnetClient,
-  erc20Abi,
-  sendtagCheckoutAbi,
-  sendtagCheckoutAddress,
-  usdcAddress,
-} from '@my/wagmi'
+import { baseMainnetClient, usdcAddress } from '@my/wagmi'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TRPCClientError } from '@trpc/client'
@@ -30,11 +24,16 @@ import { throwIf } from 'app/utils/throwIf'
 import { useReceipts } from 'app/utils/useReceipts'
 import { useUser } from 'app/utils/useUser'
 import { sendUserOpTransfer } from 'app/utils/useUserOpTransferMutation'
-import { useAccountNonce, useUserOp } from 'app/utils/userop'
+import { useAccountNonce } from 'app/utils/userop'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { encodeFunctionData, formatUnits, zeroAddress } from 'viem'
+import { formatUnits } from 'viem'
 import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
-import { useReferralReward, useReferrer, useSendtagCheckoutReceipts } from '../checkout-utils'
+import {
+  useReferralReward,
+  useReferrer,
+  useSendtagCheckout,
+  useSendtagCheckoutReceipts,
+} from '../checkout-utils'
 
 export function ConfirmButton({
   onConfirmed,
@@ -45,12 +44,17 @@ export function ConfirmButton({
   const { updateProfile } = useUser()
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
+
+  const chainId = baseMainnetClient.chain.id
+  const pendingTags = usePendingTags() ?? []
+  const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
+  const { data: referrerProfile } = useReferrer()
+  const { data: rewardDue } = useReferralReward({ tags: pendingTags })
+
   const webauthnCreds =
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
-  const chainId = baseMainnetClient.chain.id
-  const pendingTags = usePendingTags() ?? []
   const hasPendingTags = !!pendingTags?.length
   const {
     data: balance,
@@ -62,9 +66,7 @@ export function ConfirmButton({
     chainId: baseMainnetClient.chain.id,
     token: usdcAddress[chainId],
   })
-  const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
-  const { data: referrer } = useReferrer()
-  const { data: reward } = useReferralReward({ tags: pendingTags })
+
   const canAffordTags = balance && balance.value >= amountDue
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
@@ -88,11 +90,17 @@ export function ConfirmButton({
     const event = checkoutReceipts
       ?.filter((e) => {
         const hash = byteaToHex(e.tx_hash as `\\x${string}`)
+        const referrer = byteaToHex(e.referrer as `\\x${string}`)
         const amount = BigInt(e.amount)
         const rewardSent = BigInt(e.reward)
+        const invalidReferrer =
+          (!referrerProfile && rewardSent !== 0n) || // no referrer and reward is sent
+          (referrerProfile && rewardSent !== rewardDue) || // referrer and invalid reward
+          (rewardSent > 0n && referrerProfile?.address !== referrer) // referrer and reward sent is not the correct referrer
+
         const isPurchase =
           amount === amountDue && // check the correct amount
-          (!reward || rewardSent === reward) && // check the correct reward
+          !invalidReferrer && // check the correct reward
           !receiptEventIds.includes(e.event_id) && // don't double submit
           (!sentTx || sentTx === hash) // use the most recent tx if available
         return isPurchase
@@ -113,7 +121,8 @@ export function ConfirmButton({
     sentTx,
     receiptEventIds,
     submitting,
-    reward,
+    rewardDue,
+    referrerProfile,
   ])
 
   useEffect(() => {
@@ -141,41 +150,9 @@ export function ConfirmButton({
   const [error, setError] = useState<string>()
   const [confirmed, setConfirmed] = useState(false)
   const [attempts, setAttempts] = useState(0)
-  const checkoutArgs = useMemo(
-    () => [amountDue, referrer?.address ?? zeroAddress, reward ?? 0n] as const,
-    [amountDue, referrer, reward]
-  )
-  const calls = useMemo(
-    () => [
-      {
-        dest: usdcAddress[chainId],
-        value: 0n,
-        data: encodeFunctionData({
-          abi: erc20Abi,
-          functionName: 'approve',
-          args: [sendtagCheckoutAddress[chainId], amountDue],
-        }),
-      },
-      {
-        dest: sendtagCheckoutAddress[chainId],
-        value: 0n,
-        data: encodeFunctionData({
-          abi: sendtagCheckoutAbi,
-          functionName: 'checkout',
-          args: checkoutArgs,
-        }),
-      },
-    ],
-    [amountDue, chainId, checkoutArgs]
-  )
-  const {
-    data: userOp,
-    error: userOpError,
-    isLoading: isLoadingUserOp,
-  } = useUserOp({
-    sender,
-    calls,
-  })
+  const { userOp, userOpError, isLoadingUserOp, usdcFeesError, isLoadingUSDCFees } =
+    useSendtagCheckout()
+
   const queryClient = useQueryClient()
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
     mutationFn: sendUserOpTransfer,
@@ -253,13 +230,11 @@ export function ConfirmButton({
     }
   }, [txWaitError])
 
-  const possibleErrors = [checkoutErrors, userOpError]
+  const possibleErrors = [checkoutErrors, userOpError, usdcFeesError]
 
   if (possibleErrors.some((e) => e?.message)) {
-    if (__DEV__) {
-      for (const err of possibleErrors) {
-        if (err) console.error('encountered error', err.message, err)
-      }
+    for (const err of possibleErrors) {
+      if (err) console.error('encountered error', err.message, err)
     }
     return (
       <ConfirmButtonStack>
@@ -277,7 +252,9 @@ export function ConfirmButton({
     )
   }
 
-  if (error && !(submitting || sendTransactionIsPending || txWaitLoading)) {
+  const canRetry = error && !(submitting || sendTransactionIsPending || txWaitLoading)
+
+  if (canRetry) {
     return (
       <ConfirmButtonError
         buttonText={'Retry'}
@@ -342,12 +319,17 @@ export function ConfirmButton({
     !isLoadingUserOp &&
     !sendTransactionIsPending &&
     !submitting &&
-    !txWaitLoading
+    !txWaitLoading &&
+    !usdcFeesError &&
+    !isLoadingUSDCFees
 
   return (
     <ConfirmButtonStack ai="center" $gtMd={{ ai: 'flex-start' }} mx="auto" gap="$2">
       {balanceError && (
         <Paragraph color="$error">{balanceError?.message?.split('.').at(0)}</Paragraph>
+      )}
+      {usdcFeesError && (
+        <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
       )}
       {balance && (
         <Paragraph
