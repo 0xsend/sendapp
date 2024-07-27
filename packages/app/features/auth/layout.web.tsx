@@ -1,14 +1,4 @@
-import {
-  Anchor,
-  Container,
-  LinearGradient,
-  Stack,
-  Theme,
-  YStack,
-  isWeb,
-  useMedia,
-  usePwa,
-} from '@my/ui'
+import { Anchor, Container, LinearGradient, Stack, YStack, isWeb, useMedia, usePwa } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { AnimationLayout } from 'app/components/layout/animation-layout'
 import { AuthSideBarWrapper } from 'app/features/auth/components/AuthSideBar'
