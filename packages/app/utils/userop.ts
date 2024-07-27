@@ -208,7 +208,6 @@ function userOpQueryOptions({
         })
 
       const userOp = { ..._userOp, callGasLimit }
-      // const userOp = { ..._userOp, callGasLimit: _userOp.callGasLimit }
 
       debug('useUserOpGasEstimate', { userOp, callGasLimit })
 
@@ -272,8 +271,8 @@ export function useUserOp({
 /**
  * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
  */
-export function throwNiceError(e: Error): never {
-  const cause = e.cause
+export function throwNiceError(e: Error & { cause?: Error }): never {
+  const cause = e.cause ?? e
   switch (true) {
     case cause instanceof SendUserOperationError: {
       switch (cause.details) {
@@ -295,6 +294,8 @@ export function throwNiceError(e: Error): never {
     }
     case cause instanceof RpcRequestError: {
       switch (cause.details) {
+        case 'execution reverted: ERC20: transfer amount exceeds balance':
+          throw new Error('Not enough funds')
         case 'execution reverted: revert: ERC20: transfer amount exceeds balance':
           throw new Error('Not enough funds')
         case 'FailedOp(0,"AA25 invalid account nonce")':
