@@ -357,7 +357,7 @@ export function ConfirmButton({
       >
         {(() => {
           switch (true) {
-            case isLoadingUserOp || isLoadingBalance:
+            case isLoadingUserOp || isLoadingBalance || isLoadingUSDCFees || isLoadingReceipts:
               return (
                 <>
                   <Spinner color="$color11" />
