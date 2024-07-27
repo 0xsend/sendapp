@@ -1,14 +1,12 @@
 import { describe, test } from '@jest/globals'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
-import { baseMainnetClient, baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
+import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
 import { signUserOp } from './signUserOp'
 import { encodeFunctionData, erc20Abi } from 'viem'
 import { useUserOpTransferMutation, useGenerateTransferUserOp } from './useUserOpTransferMutation'
-import { useUSDCFees } from './useUSDCFees'
 import { Wrapper } from './__mocks__/Wrapper'
-
+jest.mock('./signUserOp')
 jest.mock('./userop', () => ({
-  signUserOp: jest.fn(),
   entrypoint: {
     address: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
   },

@@ -100,7 +100,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           {claimReceiptSuccess && (
             <Paragraph size="$1" theme="alt2">
               <Anchor
-                accessibilityLabel="View Claim on Etherscan"
+                aria-label="View Claim on Etherscan"
                 href={`${accountChain?.blockExplorers?.default.url}/tx/${claimWriteHash}`}
               >
                 {shorten(claimWriteHash)}
@@ -203,7 +203,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           {claimReceiptSuccess && (
             <Paragraph size="$1" theme="alt2">
               <Anchor
-                accessibilityLabel="View Claim on Etherscan"
+                aria-label="View Claim on Etherscan"
                 href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
               >
                 {shorten(claimWriteHash)}
@@ -223,7 +223,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           <Anchor
             size="$1"
             target="_blank"
-            accessibilityLabel="View on Etherscan"
+            aria-label="View on Etherscan"
             href={`${accountChain.blockExplorers?.default.url}/address/${share?.address}`}
           >
             {shorten(share?.address)}
@@ -235,7 +235,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
           <Anchor
             size="$1"
             target="_blank"
-            accessibilityLabel="View on Etherscan"
+            aria-label="View on Etherscan"
             href={`${accountChain.blockExplorers?.default.url}/address/${account}`}
           >
             {shorten(account)}
@@ -293,7 +293,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         <Paragraph size="$1" theme="alt2">
           Claimed!{' '}
           <Anchor
-            accessibilityLabel="View Claim on Etherscan"
+            aria-label="View Claim on Etherscan"
             href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
           >
             {shorten(claimWriteHash)}

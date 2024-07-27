@@ -73,7 +73,7 @@ exports[`DepositScreen renders the deposit screen 1`] = `
         }
       >
         <View
-          accessibilityLabel="Deposit with Web3 Wallet"
+          aria-label="Deposit with Web3 Wallet"
           cancelable={true}
           disabled={false}
           focusVisibleStyle={{}}

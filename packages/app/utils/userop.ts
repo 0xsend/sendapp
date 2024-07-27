@@ -36,7 +36,7 @@ import { throwIf } from './throwIf'
 import { defaultUserOp } from './useUserOpTransferMutation'
 import { baseMainnetClient } from './viem'
 import { useMemo } from 'react'
-import { debug as debugBase } from './debug'
+import debugBase from 'debug'
 
 const debug = debugBase('app:utils:userop')
 

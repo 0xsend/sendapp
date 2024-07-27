@@ -8,7 +8,7 @@ import {
   type Transport,
 } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
-import { debug as debugBase } from './debug'
+import debugBase from 'debug'
 import { baseLocal } from '@my/wagmi/chains'
 import { tokenPaymasterAbi, tokenPaymasterAddress } from '@my/wagmi'
 import type { UserOperation } from 'permissionless'

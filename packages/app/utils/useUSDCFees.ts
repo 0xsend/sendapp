@@ -11,7 +11,7 @@ import type { Chain, PublicClient, Transport } from 'viem'
 import { usePublicClient } from 'wagmi'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
 import { assert } from './assert'
-import { debug as debugBase } from './debug'
+import debugBase from 'debug'
 import { throwIf } from './throwIf'
 
 const debug = debugBase('app:utils:fetchUserOpFeeEstimate')
