@@ -1,4 +1,4 @@
-import { debug as debugOg } from 'debug'
+import debugOg from 'debug'
 const NODE_ENV = process.env.NODE_ENV
 // export debug but it's only activated if __DEV__ is true
 const DEBUG = [
