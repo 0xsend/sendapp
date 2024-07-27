@@ -128,7 +128,6 @@ export async function sendUserOpTransfer({
     return receipt
   } catch (e) {
     throwNiceError(e)
-    throw e // this is for typescript also incase there's ever a bug in `throwNiceError`
   }
 }
 export function useGenerateTransferUserOp({
