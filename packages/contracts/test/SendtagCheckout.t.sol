@@ -2,9 +2,9 @@
 pragma solidity ^0.8.23;
 
 import {Test} from "forge-std/Test.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {SendtagCheckout} from "../src/SendtagCheckout.sol";
+import {SendtagCheckout, IERC20} from "../src/SendtagCheckout.sol";
 
 contract Tendies is ERC20 {
     constructor() ERC20("TENDIES", "TENDIES") {}
@@ -25,7 +25,7 @@ contract SendtagCheckoutTest is Test {
         multisig = address(0x1337);
         owner = address(0xB055);
         vm.startPrank(owner);
-        checkout = new SendtagCheckout(multisig, token, owner);
+        checkout = new SendtagCheckout(multisig, address(token), owner);
         vm.stopPrank();
     }
 
@@ -125,7 +125,7 @@ contract SendtagCheckoutTest is Test {
         assertEq(token.balanceOf(address(checkout)), amount);
 
         vm.prank(owner);
-        checkout.withdrawToken(token, amount);
+        checkout.withdrawToken(IERC20(address(token)), amount);
 
         assertEq(token.balanceOf(address(checkout)), 0);
         assertEq(token.balanceOf(owner), amount);
@@ -137,7 +137,7 @@ contract SendtagCheckoutTest is Test {
         token.mint(amount);
         token.transfer(address(checkout), amount);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(0xb0b)));
-        checkout.withdrawToken(token, amount);
+        checkout.withdrawToken(IERC20(address(token)), amount);
         vm.stopPrank();
     }
 
