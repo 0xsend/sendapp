@@ -32,7 +32,7 @@ export const NumberField = (props: InputProps) => {
         )}
         <Shake shakeKey={error?.errorMessage}>
           <Input
-            accessibilityLabel={label}
+            aria-label={label}
             disabled={disabled}
             placeholderTextColor="$color10"
             keyboardType="number-pad"

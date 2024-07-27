@@ -70,8 +70,8 @@ exports[`HomeScreen should render with search when on / and a sendable account e
             }
           >
             <TextInput
-              accessibilityLabel="query"
               accessibilityRole="search"
+              aria-label="query"
               control={
                 {
                   "_defaultValues": {
@@ -319,8 +319,8 @@ exports[`HomeScreen should render with search when on / and a sendable account e
             }
           >
             <TextInput
-              accessibilityLabel="query"
               accessibilityRole="search"
+              aria-label="query"
               control={
                 {
                   "_defaultValues": {

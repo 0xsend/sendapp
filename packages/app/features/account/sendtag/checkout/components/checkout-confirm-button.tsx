@@ -258,7 +258,7 @@ export function ConfirmButton({
   if (possibleErrors.some((e) => e?.message)) {
     if (__DEV__) {
       for (const err of possibleErrors) {
-        if (err) console.error('encountered error', err)
+        if (err) console.error('encountered error', err.message, err)
       }
     }
     return (
@@ -268,7 +268,7 @@ export function ConfirmButton({
             <Paragraph $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
               {possibleErrors
                 .filter((e) => e?.message)
-                .map((e) => e?.message)
+                .map((e) => e?.message.split('.').at(0))
                 .join(', ')}
             </Paragraph>
           </YStack>
@@ -346,11 +346,6 @@ export function ConfirmButton({
 
   return (
     <ConfirmButtonStack ai="center" $gtMd={{ ai: 'flex-start' }} mx="auto" gap="$2">
-      {isLoadingBalance && (
-        <Paragraph>
-          <Spinner color="$color11" />
-        </Paragraph>
-      )}
       {balanceError && (
         <Paragraph color="$error">{balanceError?.message?.split('.').at(0)}</Paragraph>
       )}
@@ -379,7 +374,7 @@ export function ConfirmButton({
       >
         {(() => {
           switch (true) {
-            case isLoadingUserOp:
+            case isLoadingUserOp || isLoadingBalance:
               return (
                 <>
                   <Spinner color="$color11" />
