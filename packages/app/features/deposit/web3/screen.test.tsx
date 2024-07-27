@@ -10,6 +10,16 @@ jest.mock('wagmi')
 jest.mock('@my/wagmi')
 jest.mock('@web3modal/wagmi/react')
 
+jest.mock('app/utils/useSendAccountBalances', () => ({
+  useSendAccountBalances: jest.fn().mockReturnValue({
+    balances: {
+      0: { result: 0n },
+      1: { result: 1n },
+    },
+    totalBalance: () => 1n,
+  }),
+}))
+
 const { useAccount, useSendTransaction, useBalance, useSwitchAccount } =
   wagmi as unknown as typeof import('app/__mocks__/wagmi')
 const { useWriteErc20Transfer } = myWagmi as unknown as typeof import('app/__mocks__/@my/wagmi')
@@ -78,10 +88,13 @@ describe('DepositWeb3Screen', () => {
       </Provider>
     )
     await waitFor(() => expect(screen.getByTestId('DepositWeb3ScreenBefore')).toBeVisible())
+    const usdcLabel = screen.getByTestId('noUsdc')
+    await waitFor(() => expect(usdcLabel).toBeVisible())
+
     expect(screen).toMatchSnapshot()
     const user = userEvent.setup()
-    await user.type(screen.getByLabelText('Amount'), '0.01')
-    const depositButton = screen.getByRole('button', { name: 'Deposit' })
+    await user.type(screen.getByTestId('amountInput'), '0.01')
+    const depositButton = screen.getByRole('button', { name: 'Deposit USDC' })
     await act(async () => {
       // await user.press(depositButton) // something about tamagui button is causing this to fail
       await depositButton.props.onPress()

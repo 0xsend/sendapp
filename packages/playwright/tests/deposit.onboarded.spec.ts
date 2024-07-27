@@ -72,7 +72,8 @@ test('can deposit USDC with web3 wallet', async ({
   await depositWeb3Link.click()
   await page.waitForURL('/deposit/web3')
   await expect(page.locator('w3m-modal')).toBeVisible()
-
+  const connectButton = await page.getByTestId('connectButton')
+  await connectButton.click()
   await page.locator('w3m-connect-injected-widget').click()
 
   await expect
@@ -102,9 +103,7 @@ test('can deposit USDC with web3 wallet', async ({
     .toBe(1)
   await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
 
-  await expect(
-    page.getByRole('heading', { name: `Depositing from ${account.address}` })
-  ).toBeVisible()
+  await expect(page.getByText('10 USDC')).toBeVisible()
 
   expect(await page.getByLabel('Token').inputValue()).toBe(usdcAddress[testBaseClient.chain.id])
   await page.getByLabel('Amount').fill('10')
@@ -209,7 +208,8 @@ test('can deposit ETH with web3 wallet', async ({
   await depositWeb3Button.click()
   await page.waitForURL('/deposit/web3')
   await expect(page.locator('w3m-modal')).toBeVisible()
-
+  const connectButton = await page.getByTestId('connectButton')
+  await connectButton.click()
   await page.locator('w3m-connect-injected-widget').click()
 
   await expect
@@ -238,10 +238,6 @@ test('can deposit ETH with web3 wallet', async ({
     )
     .toBe(1)
   await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
-
-  await expect(
-    page.getByRole('heading', { name: `Depositing from ${account.address}` })
-  ).toBeVisible()
 
   const tokenSelect = page.getByLabel('Token')
   await page.getByLabel('Token').selectOption('eth')
