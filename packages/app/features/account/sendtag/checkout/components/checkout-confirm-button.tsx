@@ -67,7 +67,6 @@ export function ConfirmButton({
     token: usdcAddress[chainId],
   })
 
-  const canAffordTags = balance && balance.value >= amountDue
   const [submitting, setSubmitting] = useState(false)
   const confirm = api.tag.confirm.useMutation()
   const { receipts, refetch: refetchReceipts, isLoading: isLoadingReceipts } = useReceipts()
@@ -150,8 +149,10 @@ export function ConfirmButton({
   const [error, setError] = useState<string>()
   const [confirmed, setConfirmed] = useState(false)
   const [attempts, setAttempts] = useState(0)
-  const { userOp, userOpError, isLoadingUserOp, usdcFeesError, isLoadingUSDCFees } =
+  const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
     useSendtagCheckout()
+  const canAffordTags =
+    balance && usdcFees && balance.value + usdcFees.baseFee + usdcFees.gasFees >= amountDue
 
   const queryClient = useQueryClient()
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
