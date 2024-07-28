@@ -54,36 +54,30 @@ const baseClient = createPublicClient({
   transport: http(base.rpcUrls.default.http[0]),
 })
 
-const result = await fetchUserOpFeeEstimate({
+await fetchUserOpFeeEstimate({
   client: baseClient,
   userOp,
 })
-
-debug(result)
 
 const baseSepoliaClient = createPublicClient({
   chain: baseSepolia,
   transport: http(baseSepolia.rpcUrls.default.http[0]),
 })
 
-const resultSepolia = await fetchUserOpFeeEstimate({
+await fetchUserOpFeeEstimate({
   client: baseSepoliaClient,
   userOp,
 })
-
-debug(resultSepolia)
 
 const localClient = createPublicClient({
   chain: baseLocal,
   transport: http(baseLocal.rpcUrls.default.http[0]),
 })
 
-const resultLocal = await fetchUserOpFeeEstimate({
+await fetchUserOpFeeEstimate({
   client: localClient,
   userOp,
 })
-
-debug(resultLocal)
 
 /**
  * Fetches the fee estimate for a user operation and calculates the required usdc balance for using the USDC Token Paymaster.
@@ -97,9 +91,19 @@ export async function fetchUserOpFeeEstimate<TTransport extends Transport, TChai
   client: PublicClient<TTransport, TChain>
   userOp: UserOperation<'v0.7'>
 }) {
-  debug('feesPerGas', {
+  const log = debug.extend(client.chain.name)
+  log('checking', new URL(client.chain.rpcUrls.default.http[0] ?? '').hostname)
+
+  log('feesPerGas', {
     maxFeePerGas: `${formatUnits(userOp.maxFeePerGas, 9)} gwei`,
     maxPriorityFeePerGas: `${formatUnits(userOp.maxPriorityFeePerGas, 9)} gwei`,
+  })
+
+  const gasFees = await client.estimateFeesPerGas()
+
+  log('feesPerGas [network]', {
+    maxFeePerGas: `${formatUnits(gasFees.maxFeePerGas, 9)} gwei`,
+    maxPriorityFeePerGas: `${formatUnits(gasFees.maxPriorityFeePerGas, 9)} gwei`,
   })
 
   const [priceMarkup, minEntryPointBalance, refundPostopCost, priceMaxAge, baseFee, rewardsPool] =
@@ -110,7 +114,7 @@ export async function fetchUserOpFeeEstimate<TTransport extends Transport, TChai
       args: [],
     })
 
-  debug('tokenPaymasterConfig', {
+  log('tokenPaymasterConfig', {
     priceMarkup,
     minEntryPointBalance,
     refundPostopCost,
@@ -124,7 +128,7 @@ export async function fetchUserOpFeeEstimate<TTransport extends Transport, TChai
     functionName: 'cachedPrice',
     args: [],
   })
-  debug('cachedPrice', cachedPrice)
+  log('cachedPrice', cachedPrice)
   const cachedPriceWithMarkup = (cachedPrice * BigInt(1e26)) / priceMarkup
   const requiredUsdcBalance = await fetchRequiredUSDCBalance({
     userOp,
@@ -132,8 +136,8 @@ export async function fetchUserOpFeeEstimate<TTransport extends Transport, TChai
     client,
     cachedPriceWithMarkup,
   })
-  debug('usdc for gas', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
-  debug(
+  log('usdc for gas', requiredUsdcBalance, formatUnits(requiredUsdcBalance, 6))
+  log(
     'total + base fee',
     requiredUsdcBalance + BigInt(baseFee),
     formatUnits(requiredUsdcBalance + BigInt(baseFee), 6)
