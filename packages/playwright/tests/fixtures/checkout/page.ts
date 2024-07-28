@@ -104,6 +104,11 @@ export class CheckoutPage {
     const signTransactionButton = this.page.getByRole('button', { name: 'Confirm' })
     expect?.(signTransactionButton).toBeEnabled({ timeout: 10_000 }) // blockchain stuff is a bit slow
     await this.page.bringToFront()
+    const errorButton = this.page.getByRole('button', { name: 'Error' })
+    expect?.(errorButton).toBeHidden()
+    await this.page
+      .getByRole('button', { name: 'Loading' })
+      .waitFor({ state: 'detached', timeout: 10_000 })
     await signTransactionButton.click()
     await confirmTagsRequest
     await confirmTagsResponse

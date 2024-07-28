@@ -112,7 +112,8 @@ const verifyReferralReward = async (
   return rewardAmount
 }
 
-const generateTagName = () => faker.string.alphanumeric({ length: { min: 1, max: 20 } })
+// tag names are limited to 1-20 characters
+const generateTagName = () => faker.string.alphanumeric({ length: { min: 6, max: 20 } })
 
 const checkReferralCodeVisibility = async (
   checkoutPage: CheckoutPage,
@@ -207,7 +208,7 @@ test('can refer a tag', async ({
   const tagsToRegister = Array.from(
     { length: Math.floor(Math.random() * 5) + 1 },
     () => `${faker.lorem.word()}_${test.info().parallelIndex}`
-  ).sort()
+  ).sort((a, b) => a.localeCompare(b))
   for (const tagName of tagsToRegister) {
     await addPendingTag(checkoutPage, tagName)
   }
@@ -283,7 +284,7 @@ test('can refer multiple tags in separate transactions', async ({
   // First transaction with up to 2 tags
   const firstTags = Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () =>
     generateTagName()
-  ).sort()
+  ).sort((a, b) => a.localeCompare(b))
   for (const tagName of firstTags) {
     await addPendingTag(checkoutPage, tagName)
   }
@@ -315,7 +316,7 @@ test('can refer multiple tags in separate transactions', async ({
   // Second transaction with up to 3 tags
   const secondTags = Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () =>
     generateTagName()
-  ).sort()
+  ).sort((a, b) => a.localeCompare(b))
   for (const tagName of secondTags) {
     await addPendingTag(checkoutPage, tagName)
   }
