@@ -52,7 +52,10 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
         <Shake shakeKey={error?.errorMessage}>
           {/* @todo: We should make it so that placement can be passed from props */}
           {/* @todo Write a native component. tooltip doesn't work on native. Maybe wrap into field error */}
-          <Tooltip open={error !== undefined} placement={media.gtMd ? 'right' : 'bottom'}>
+          <Tooltip
+            open={error !== undefined && error.errorMessage !== undefined}
+            placement={media.gtMd ? 'right' : 'bottom'}
+          >
             <Tooltip.Content
               enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
               exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
@@ -84,7 +87,7 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
             </Tooltip.Content>
             <Tooltip.Trigger>
               <Input
-                accessibilityLabel={label ?? field.name}
+                aria-label={label ?? field.name}
                 disabled={disabled}
                 maxLength={maxLength}
                 borderWidth={0}
@@ -120,7 +123,11 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
           {(() => {
             switch (true) {
               case error !== undefined:
-                return <AlertTriangle color={'$red500'} />
+                return (
+                  <Theme name={'red'}>
+                    <AlertTriangle color={'$color9'} />
+                  </Theme>
+                )
               //@todo: Validating logic isn't working like it expect it to
               // case isValid:
               //   return <Check color={'$primary'} />

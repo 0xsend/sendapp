@@ -54,7 +54,7 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
         defaultValues={{ token: '' }}
         props={{
           token: {
-            accessibilityLabel: 'One-time Password',
+            'aria-label': 'One-time Password',
             '$theme-dark': {
               borderBottomColor: '$green10Dark',
             },

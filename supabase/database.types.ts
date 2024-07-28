@@ -7,11 +7,12 @@ import type { PostgrestError } from '@supabase/supabase-js'
  * @see https://www.postgresql.org/docs/16/functions-binarystring.html#ENCODE-FORMAT-HEX
  **/
 export type PgBytea = `\\x${string}`
+type Hex = `0x${string}`
 
 type ProfileLookupRow =
   DatabaseGenerated['public']['Functions']['profile_lookup']['Returns'][number]
 type ProfileLookup = {
-  [K in keyof ProfileLookupRow]: ProfileLookupRow[K] | null | undefined
+  [K in keyof ProfileLookupRow]: K extends 'address' ? Hex | null : ProfileLookupRow[K] | null
 }
 
 export type Database = MergeDeep<
@@ -21,24 +22,24 @@ export type Database = MergeDeep<
       Tables: {
         chain_addresses: {
           Row: {
-            address: `0x${string}`
+            address: Hex
           }
           Insert: {
-            address: `0x${string}`
+            address: Hex
           }
           Update: {
-            address: `0x${string}`
+            address: Hex
           }
         }
         distribution_shares: {
           Row: {
-            address: `0x${string}`
+            address: Hex
           }
           Insert: {
-            address: `0x${string}`
+            address: Hex
           }
           Update: {
-            address: `0x${string}`
+            address: Hex
           }
         }
         webauthn_credentials: {
@@ -60,23 +61,30 @@ export type Database = MergeDeep<
         }
         send_accounts: {
           Row: {
-            address: `0x${string}`
+            address: Hex
             init_code: PgBytea
           }
           Insert: {
-            address: `0x${string}`
+            address: Hex
             init_code: PgBytea
           }
           Update: {
-            address: `0x${string}`
+            address: Hex
             init_code: PgBytea
+          }
+        }
+        sendtag_checkout_receipts: {
+          Row: {
+            tx_hash: PgBytea
+            sender: PgBytea
+            referrer: PgBytea
           }
         }
       }
       Functions: {
         distribution_hodler_addresses: {
           Returns: {
-            address: `0x${string}`
+            address: Hex
             created_at: string
             user_id: string
           }[]

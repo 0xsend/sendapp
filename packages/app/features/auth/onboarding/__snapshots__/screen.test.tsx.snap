@@ -83,21 +83,6 @@ exports[`OnboardingScreen 1`] = `
           }
         }
       >
-        <Text
-          style={
-            {
-              "color": "#081619",
-              "fontFamily": "System",
-              "fontSize": 13.2,
-              "fontWeight": "500",
-              "lineHeight": 16,
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Passkey Name
-        </Text>
         <View
           style={
             {
@@ -138,7 +123,6 @@ exports[`OnboardingScreen 1`] = `
               }
             >
               <TextInput
-                accessibilityLabel="accountName"
                 aria-label="Account name"
                 autoFocus={true}
                 control={
@@ -342,6 +326,28 @@ exports[`OnboardingScreen 1`] = `
           >
             Why Passkey?
           </Text>
+          <View
+            style={
+              {
+                "maxWidth": 382,
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "hsl(358, 100%, 69.5%)",
+                  "flexWrap": "wrap",
+                  "fontFamily": "System",
+                  "fontSize": 16.8,
+                  "fontWeight": "400",
+                  "lineHeight": 19,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -477,10 +483,11 @@ exports[`OnboardingScreen 1`] = `
                     "flexGrow": 0,
                     "flexShrink": 1,
                     "fontFamily": "System",
-                    "fontSize": 13.2,
+                    "fontSize": 14.399999999999999,
                     "fontWeight": "300",
-                    "lineHeight": 16,
+                    "lineHeight": 17,
                     "textAlign": "center",
+                    "textTransform": "uppercase",
                     "userSelect": "none",
                   }
                 }

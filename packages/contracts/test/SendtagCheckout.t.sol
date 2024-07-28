@@ -2,9 +2,9 @@
 pragma solidity ^0.8.23;
 
 import {Test} from "forge-std/Test.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {SendtagCheckout} from "../src/SendtagCheckout.sol";
+import {SendtagCheckout, IERC20} from "../src/SendtagCheckout.sol";
 
 contract Tendies is ERC20 {
     constructor() ERC20("TENDIES", "TENDIES") {}
@@ -25,7 +25,7 @@ contract SendtagCheckoutTest is Test {
         multisig = address(0x1337);
         owner = address(0xB055);
         vm.startPrank(owner);
-        checkout = new SendtagCheckout(multisig, token);
+        checkout = new SendtagCheckout(multisig, address(token), owner);
         vm.stopPrank();
     }
 
@@ -37,6 +37,8 @@ contract SendtagCheckoutTest is Test {
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
+        vm.expectEmit(true, true, true, true);
+        emit SendtagCheckout.Receipt(sender, amount, address(0), 0);
         checkout.checkout(amount, address(0), 0);
         vm.stopPrank();
         assertEq(token.balanceOf(multisig), amount);
@@ -46,36 +48,34 @@ contract SendtagCheckoutTest is Test {
 
     /// @notice Test the checkout function with a referrer.
     /// Bob wants a sendtag, he just found send.app because of his friend Alice and uses her referral code
-    function testFuzzCheckoutReferrer(uint256 amount, uint256 bonus) public {
+    function testFuzzCheckoutReferrer(uint256 amount, uint256 rewards) public {
         vm.assume(amount > 0);
-        vm.assume(bonus <= amount);
+        vm.assume(rewards <= amount);
         address sender = address(0xb0b);
         address referrer = address(0xa71ce);
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
-        if (bonus > 0) {
-            vm.expectEmit(true, true, true, true);
-            emit SendtagCheckout.ReferralBonus(referrer, sender, bonus);
-        }
-        checkout.checkout(amount, referrer, bonus);
+        vm.expectEmit(true, true, true, true);
+        emit SendtagCheckout.Receipt(sender, amount, referrer, rewards);
+        checkout.checkout(amount, referrer, rewards);
         vm.stopPrank();
-        assertEq(token.balanceOf(multisig), amount - bonus);
+        assertEq(token.balanceOf(multisig), amount - rewards);
         assertEq(token.balanceOf(sender), 0);
-        assertEq(token.balanceOf(referrer), bonus);
+        assertEq(token.balanceOf(referrer), rewards);
     }
 
-    /// @notice Test the checkout function with a bonus and invalid referrer.
-    function testCheckoutInvalidReferrer(uint256 amount, uint256 bonus) public {
+    /// @notice Test the checkout function with a rewards and invalid referrer.
+    function testCheckoutInvalidReferrer(uint256 amount, uint256 rewards) public {
         vm.assume(amount > 0);
-        vm.assume(bonus > 0);
-        vm.assume(bonus <= amount);
+        vm.assume(rewards > 0);
+        vm.assume(rewards <= amount);
         address sender = address(0xb0b);
         vm.startPrank(sender);
         token.mint(amount);
         token.approve(address(checkout), amount);
         vm.expectRevert("Invalid referrer address");
-        checkout.checkout(amount, address(0), bonus);
+        checkout.checkout(amount, address(0), rewards);
         vm.stopPrank();
     }
 
@@ -93,7 +93,7 @@ contract SendtagCheckoutTest is Test {
         uint256 amount = 100;
         token.mint(amount);
         token.approve(address(checkout), amount);
-        vm.expectRevert("Not open");
+        vm.expectRevert("Closed");
         checkout.checkout(amount, address(0), 0);
         vm.stopPrank();
 
@@ -125,7 +125,7 @@ contract SendtagCheckoutTest is Test {
         assertEq(token.balanceOf(address(checkout)), amount);
 
         vm.prank(owner);
-        checkout.withdrawToken(token, amount);
+        checkout.withdrawToken(IERC20(address(token)), amount);
 
         assertEq(token.balanceOf(address(checkout)), 0);
         assertEq(token.balanceOf(owner), amount);
@@ -137,7 +137,7 @@ contract SendtagCheckoutTest is Test {
         token.mint(amount);
         token.transfer(address(checkout), amount);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(0xb0b)));
-        checkout.withdrawToken(token, amount);
+        checkout.withdrawToken(IERC20(address(token)), amount);
         vm.stopPrank();
     }
 

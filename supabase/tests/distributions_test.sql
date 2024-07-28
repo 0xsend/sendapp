@@ -485,32 +485,36 @@ SELECT tests.clear_authentication();
 
 SELECT set_config('role', 'service_role', true);
 
-INSERT INTO send_revenues_safe_receives (
+INSERT INTO sendtag_checkout_receipts (
     chain_id,
     log_addr,
     tx_hash,
-    sender,
-    v,
     ig_name,
     src_name,
     block_num,
     tx_idx,
     log_idx,
     block_time,
-    abi_idx
+    abi_idx,
+    sender,
+    amount,
+    referrer,
+    reward
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    '\xb0b0000000000000000000000000000000000000',
-    1,
-    'send_revenues_safe_receives',
-    'send_revenues_safe_receives',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
     1,
     0,
     0,
     1234567890,
+    0,
+    '\xb0b0000000000000000000000000000000000000',
+    1,
+    '\x0000000000000000000000000000000000000000',
     0
 );
 
@@ -518,7 +522,7 @@ SELECT confirm_tags( -- bob confirms tags
     '{bob}',
     (
         SELECT event_id
-        FROM send_revenues_safe_receives
+        FROM sendtag_checkout_receipts
         WHERE sender = '\xb0b0000000000000000000000000000000000000'
     ),
     null
@@ -558,32 +562,36 @@ SELECT tests.clear_authentication();
 
 SELECT set_config('role', 'service_role', true);
 
-INSERT INTO send_revenues_safe_receives (
+INSERT INTO sendtag_checkout_receipts (
     chain_id,
     log_addr,
     tx_hash,
-    sender,
-    v,
     ig_name,
     src_name,
     block_num,
     tx_idx,
     log_idx,
     block_time,
-    abi_idx
+    abi_idx,
+    sender,
+    amount,
+    referrer,
+    reward
 )
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
     '\x1234567890123456789012345678901234567890123456789012345678901234',
-    '\xa71ce00000000000000000000000000000000000',
-    1,
-    'send_revenues_safe_receives',
-    'send_revenues_safe_receives',
+    'sendtag_checkout_receipts',
+    'sendtag_checkout_receipts',
     2,
     0,
     0,
     1234567890,
+    0,
+    '\xa71ce00000000000000000000000000000000000',
+    1,
+    '\x0000000000000000000000000000000000000000',
     0
 );
 
@@ -591,7 +599,7 @@ SELECT confirm_tags(
     '{alice}',
     (
         SELECT event_id
-        FROM send_revenues_safe_receives
+        FROM sendtag_checkout_receipts
         WHERE sender = '\xa71ce00000000000000000000000000000000000'
     ),
     (

@@ -11,6 +11,7 @@ import {
   mockReceivedTransfer,
   mockReferral,
   mockSendAccountReceive,
+  mockSendtagReferralRewardUSDC,
   mockSentTransfer,
   mockTagReceipt,
 } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
@@ -63,6 +64,11 @@ describe('test eventNameFromActivity', () => {
       eventNameFromActivity({ ...EventSchema.parse(activity), event_name: 'i_am_rick_james' })
     ).toBe('I Am Rick James')
   })
+  it('should return Referral Reward when send_account_transfer from SendtagCheckout contract', () => {
+    const activity = mockSendtagReferralRewardUSDC
+    const _activity = EventSchema.parse(activity)
+    expect(eventNameFromActivity(_activity)).toBe('Referral Reward')
+  })
 })
 
 describe('test subtextFromActivity', () => {
@@ -101,6 +107,10 @@ describe('test subtextFromActivity', () => {
     assert(!!anyPaymaster, 'anyPaymaster not found')
     activity.data.f = anyPaymaster
     expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Paymaster')
+  })
+  it('should return Sendtag Checkout when received from SendtagCheckout contract', () => {
+    const activity = mockSendtagReferralRewardUSDC
+    expect(subtextFromActivity(EventSchema.parse(activity))).toBe('Sendtag Checkout')
   })
 })
 

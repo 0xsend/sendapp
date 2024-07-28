@@ -10,7 +10,7 @@ import {
   useToastController,
 } from '@my/ui'
 import { api } from 'app/utils/api'
-import { signChallenge } from 'app/utils/userop'
+import { signChallenge } from 'app/utils/signChallenge'
 import { useState } from 'react'
 import { useRouter } from 'solito/router'
 import { bytesToHex, hexToBytes } from 'viem'
@@ -61,7 +61,6 @@ export const SignInForm = () => {
         identifier: `${accountName}.${keySlot}`,
       })
 
-      toast.show('Successfully signed in')
       router.push(redirectUri ?? '/')
     } catch (error) {
       toast.show('Failed to sign in', { preset: 'error', isUrgent: true })

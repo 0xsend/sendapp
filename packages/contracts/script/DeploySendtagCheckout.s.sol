@@ -14,15 +14,18 @@ contract DeploySendtagCheckoutScript is Script, Helper {
 
     function run() external returns (SendtagCheckout) {
         address multisig = vm.envAddress("MULTISIG");
-        IERC20 token = IERC20(vm.envAddress("TOKEN"));
+        address token = vm.envAddress("TOKEN");
+        address owner = vm.envAddress("OWNER");
         require(multisig != address(0), "MULTISIG not set");
-        require(token != IERC20(address(0)), "TOKEN not set");
-        return this.deploy(multisig, token);
+        require(token != address(0), "TOKEN not set");
+        require(owner != address(0), "OWNER not set");
+        return this.deploy(multisig, token, owner);
     }
 
-    function deploy(address multisig, IERC20 token) external returns (SendtagCheckout) {
+    function deploy(address multisig, address token, address owner) external returns (SendtagCheckout) {
         vm.startBroadcast();
-        SendtagCheckout sendtagCheckout = new SendtagCheckout{salt: 0}(multisig, token);
+        bytes32 salt = keccak256("fjord");
+        SendtagCheckout sendtagCheckout = new SendtagCheckout{salt: salt}(multisig, token, owner);
         vm.stopBroadcast();
         return sendtagCheckout;
     }

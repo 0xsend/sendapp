@@ -1,14 +1,14 @@
-import { test as baseTest } from '@playwright/test'
-import { createSeedClient } from '@snaplet/seed'
 import { models, type SeedClient } from '@my/snaplet'
-import { Client as PgClient } from 'pg'
-import { debug, type Debugger } from 'debug'
+import { test as baseTest } from '@playwright/test'
 import { copycat } from '@snaplet/copycat'
+import { createSeedClient } from '@snaplet/seed'
+import debug from 'debug'
+import pg from 'pg'
 
-let log: Debugger
+let log: debug.Debugger
 
 // biome-ignore lint/complexity/noBannedTypes: playwright needs any type
-export const test = baseTest.extend<{}, { seed: SeedClient; pg: PgClient }>({
+export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
   seed: [
     async ({ pg }, use) => {
       const key = `test:fixtures:snaplet:${test.info().workerIndex}`
@@ -64,16 +64,16 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: PgClient }>({
   pg: [
     // biome-ignore lint/correctness/noEmptyPattern: playwright/test needs empty pattern
     async ({}, use) => {
-      const pg = new PgClient({
+      const conn = new pg.Client({
         connectionString: process.env.SUPABASE_DB_URL,
         application_name: `playwright_test_${test.info().workerIndex}`,
       })
-      await pg.connect()
+      await conn.connect()
 
       try {
-        await use(pg)
+        await use(conn)
       } finally {
-        await pg.end().catch((e) => {
+        await conn.end().catch((e) => {
           log('error closing pg client', e)
         })
       }

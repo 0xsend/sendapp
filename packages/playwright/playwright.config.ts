@@ -50,10 +50,14 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     /* Configure the video recording. */
-    // video: {
-    //   size: { width: 1366, height: 768 },
-    //   mode: 'on',
-    // },
+    ...(Boolean(process.env.PLAYWRIGHT_RECORD) === true
+      ? {
+          video: {
+            size: { width: 1366, height: 768 },
+            mode: 'on',
+          },
+        }
+      : undefined),
   },
 
   /* Configure projects for major browsers */

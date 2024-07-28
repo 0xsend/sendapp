@@ -189,3 +189,18 @@ forge script ./script/DeployTokenPaymaster.s.sol:DeployTokenPaymasterScript \
               --chain 84532 \
               --etherscan-api-key $BASESCAN_API_KEY
 ```
+
+#### Deploying SendtagCheckout
+
+```shell
+OWNWER='0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266' \
+MULTISIG='0x71fa02bb11e4b119bedbeed2f119f62048245301' \
+TOKEN='0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' \
+forge script ./script/DeploySendtagCheckout.s.sol:DeploySendtagCheckoutScript \
+              -vvvv \
+              --rpc-url base-sepolia \
+              --broadcast
+              --verify \
+              --chain-id 84532 \
+              --etherscan-api-key $BASESCAN_API_KEY
+```

@@ -438,6 +438,23 @@ interface Table_public_send_token_transfers {
   log_idx: number;
   abi_idx: number;
 }
+interface Table_public_sendtag_checkout_receipts {
+  id: number;
+  chain_id: number;
+  log_addr: string;
+  block_time: number;
+  tx_hash: string;
+  sender: string;
+  amount: number;
+  referrer: string;
+  reward: number;
+  ig_name: string;
+  src_name: string;
+  block_num: number;
+  tx_idx: number;
+  log_idx: number;
+  abi_idx: number;
+}
 interface Table_auth_sessions {
   id: string;
   user_id: string;
@@ -598,6 +615,9 @@ interface Schema_pgsodium_masks {
 interface Schema_pgtle {
   feature_info: Table_pgtle_feature_info;
 }
+interface Schema_private {
+
+}
 interface Schema_public {
   activity: Table_public_activity;
   chain_addresses: Table_public_chain_addresses;
@@ -619,6 +639,7 @@ interface Schema_public {
   send_liquidity_pools: Table_public_send_liquidity_pools;
   send_revenues_safe_receives: Table_public_send_revenues_safe_receives;
   send_token_transfers: Table_public_send_token_transfers;
+  sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
   tag_receipts: Table_public_tag_receipts;
   tag_reservations: Table_public_tag_reservations;
   tags: Table_public_tags;
@@ -660,6 +681,7 @@ interface Database {
   pgsodium: Schema_pgsodium;
   pgsodium_masks: Schema_pgsodium_masks;
   pgtle: Schema_pgtle;
+  private: Schema_private;
   public: Schema_public;
   realtime: Schema_realtime;
   shovel: Schema_shovel;

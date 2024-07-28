@@ -1,47 +1,36 @@
-import { expect, test } from '@jest/globals'
+import * as params from 'app/routers/params'
+import { expect } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, act, screen } from '@testing-library/react-native'
+import { render, act, screen, userEvent, waitFor } from '@testing-library/react-native'
 import { HomeScreen } from './screen'
+import { TagSearchProvider } from 'app/provider/tag-search'
 
 jest.mock('@my/wagmi')
-
-jest.mock('app/utils/useUser', () => ({
-  useUser: jest.fn().mockReturnValue({
-    user: {
-      id: '123',
-      profile: { referral_code: '123' },
-    },
-  }),
-}))
 
 jest.mock('app/routers/params', () => ({
   useNav: jest.fn().mockReturnValue([undefined, jest.fn()]),
 }))
 
-jest.mock('wagmi', () => ({
-  createConfig: jest.fn(),
-  useChainId: jest.fn().mockReturnValue(1337),
-  useBalance: jest.fn().mockReturnValue({
-    data: {
-      decimals: 6,
-      formatted: '0',
-      symbol: 'send',
-      value: 0n,
-    },
-    isPending: true,
-    refetch: jest.fn(),
-  }),
-  useAccount: jest.fn().mockReturnValue({
-    address: '0x123',
-    isConnected: false,
-  }),
-  useConnect: jest.fn().mockReturnValue({
-    connectAsync: jest.fn(),
-  }),
-  useDisconnect: jest.fn().mockReturnValue({
-    disconnect: jest.fn(),
-  }),
-}))
+jest.mock('solito', () => {
+  // console.log('mock solito')
+  const mockCreateParam = jest.fn(() => {
+    // console.log('createParam in')
+    return {
+      useParam: jest.fn(() => {
+        // console.log('useParam', name, opts)
+        return ['test', jest.fn()]
+      }),
+      useParams: jest.fn(() => {
+        // console.log('useParams', name, opts)
+        return ['test', jest.fn()]
+      }),
+    }
+  })
+  return {
+    __esModule: true,
+    createParam: mockCreateParam,
+  }
+})
 
 jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue(123),
@@ -50,22 +39,12 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
 jest.mock('app/utils/useSendAccountBalances', () => ({
   useSendAccountBalances: jest.fn().mockReturnValue({
     balances: {
-      '0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A': {},
-      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': {},
+      0: { result: 1n },
+      1: { result: 1n },
     },
-    totalBalance: () => 0,
+    totalBalance: () => 1n,
   }),
 }))
-
-jest.mock('app/utils/send-accounts', () => ({
-  useSendAccount: jest.fn().mockReturnValue({
-    account: {
-      address: '0x123',
-      init_code: '0x123',
-    },
-  }),
-}))
-
 jest.mock('@tamagui/tooltip', () => ({
   ...jest.requireActual('@tamagui/tooltip'),
   TooltipGroup: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -78,22 +57,101 @@ jest.mock('solito', () => ({
 }))
 
 jest.mock('app/routers/params', () => ({
-  useRootScreenParams: jest.fn().mockReturnValue([{ nav: 'home', token: undefined }, jest.fn()]),
+  useSendScreenParams: jest
+    .fn()
+    .mockReturnValue([
+      { idType: 'tag', recipient: 'test', amount: 'test', sendToken: 'test', note: 'test' },
+      jest.fn(),
+    ]),
+  useRootScreenParams: jest
+    .fn()
+    .mockReturnValue([{ nav: 'home', token: undefined, search: 'test' }, jest.fn()]),
 }))
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
-test('HomeScreen', async () => {
-  jest.useFakeTimers()
-  render(
-    <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <HomeScreen />
-    </TamaguiProvider>
-  )
-  await act(async () => {
-    jest.advanceTimersByTime(2000)
-    jest.runAllTimers()
-  })
+jest.mock('app/utils/supabase/useSupabase', () => ({
+  useSupabase: jest.fn().mockReturnValue({
+    rpc: jest.fn().mockReturnValue({
+      abortSignal: jest.fn().mockReturnValue({
+        data: [
+          {
+            send_id_matches: [],
+            tag_matches: [
+              {
+                send_id: 3665,
+                tag_name: 'test',
+                avatar_url: 'https://avatars.githubusercontent.com/u/123',
+              },
+            ],
+            phone_matches: [],
+          },
+        ],
+        error: null,
+      }),
+    }),
+  }),
+}))
 
-  expect(screen.toJSON()).toMatchSnapshot()
+jest.mock('app/utils/send-accounts', () => ({
+  useSendAccount: jest.fn().mockReturnValue({
+    data: {
+      avatar_url: 'https://avatars.githubusercontent.com/u/123',
+      name: 'test',
+      about: 'test',
+      refcode: 'test',
+      tag: 'test',
+      address: '0x123',
+      phone: 'test',
+      chain_id: 1,
+      is_public: true,
+      sendid: 1,
+      all_tags: ['test'],
+    },
+  }),
+}))
+
+import { usePathname } from 'expo-router'
+// @ts-expect-error mock
+usePathname.mockReturnValue('/')
+describe('HomeScreen', () => {
+  it('should render with search when on / and a sendable account exists', async () => {
+    jest.useFakeTimers()
+
+    const tree = render(
+      <TamaguiProvider defaultTheme={'dark'} config={config}>
+        <TagSearchProvider>
+          <HomeScreen />
+        </TagSearchProvider>
+      </TamaguiProvider>
+    ).toJSON()
+
+    act(() => {
+      jest.runAllTimers()
+    })
+
+    expect(tree).toMatchSnapshot('render')
+
+    expect(params.useRootScreenParams).toHaveBeenCalled()
+
+    const searchBy = await screen.findByRole('search', { name: 'query' })
+    const user = userEvent.setup()
+
+    await act(async () => {
+      await user.type(searchBy, 'test')
+      jest.advanceTimersByTime(3000)
+      jest.runAllTimers()
+    })
+    await waitFor(() => screen.findByTestId('searchResults'))
+    expect(screen.toJSON()).toMatchSnapshot('search')
+    expect(screen.getByTestId('tag-search-3665')).toHaveTextContent('??test/test')
+    const avatar = screen.getByTestId('avatar')
+    expect(avatar).toBeOnTheScreen()
+    expect(avatar.props.source.uri).toBe('https://avatars.githubusercontent.com/u/123')
+    const link = screen.getByTestId('MockSolitoLink')
+    expect(link).toBeOnTheScreen()
+    expect(link.props.href).toBe(
+      '/send?idType=tag&recipient=test&amount=test&sendToken=test&note=test'
+    )
+  })
 })

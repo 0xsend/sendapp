@@ -394,6 +394,27 @@ type Override = {
       event_id?: string;
     };
   }
+  sendtag_checkout_receipts?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      event_id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      sender?: string;
+      amount?: string;
+      referrer?: string;
+      reward?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      tx_idx?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
   tag_receipts?: {
     name?: string;
     fields?: {
@@ -710,6 +731,17 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     v?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendtagCheckoutReceipts?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    amount?: FingerprintNumberField;
+    reward?: FingerprintNumberField;
     blockNum?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;

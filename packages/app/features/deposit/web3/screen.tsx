@@ -15,6 +15,7 @@ import {
 } from '@my/ui'
 import { baseMainnet, useWriteErc20Transfer } from '@my/wagmi'
 import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { DepositAddress } from 'app/components/DepositAddress'
 import { IconEthereum, IconRefresh } from 'app/components/icons'
 import { IconChainBase } from 'app/components/icons/IconChainBase'
 import { coins } from 'app/data/coins'
@@ -289,6 +290,10 @@ function DepositForm() {
               Depositing from {account}
             </H2>
           </Link>
+          <XStack width={'100%'} f={1} ai="center">
+            <Paragraph size="$3">Or direct deposit on base</Paragraph>
+            <DepositAddress address={sendAccount?.address} />
+          </XStack>
         </FormWrapper.Body>
       )}
       renderAfter={({ submit }) => (
@@ -393,13 +398,11 @@ function FailsafeChainId({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string>()
   const [ignoreError, setIgnoreError] = useState(false)
   const { open: openWeb3Modal } = useWeb3Modal()
-  // @ts-expect-error wagmi connector ensures this is there
   const canCheckChainId = isWeb && window.ethereum
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: hack
   useEffect(() => {
     if (canCheckChainId) {
-      // @ts-expect-error wagmi connector ensures this is there
       window.ethereum
         .request({ method: 'eth_chainId' })
         .then((cid) => setFailsafeChainId(Number(cid)))

@@ -1,11 +1,14 @@
+import type { WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
 import {
   Authenticator,
   type CredentialCreationOptionsSerialized,
   type CredentialRequestOptionsSerialized,
 } from '@0xsend/webauthn-authenticator'
-import type { WebAuthnAuthenticator } from '@0xsend/webauthn-authenticator'
 import { type BrowserContext, type Page, test as base } from '@playwright/test'
 import debug from 'debug'
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
 
 let log: debug.Debugger
 

@@ -31,7 +31,7 @@ export const useProfileMutation = (userID: string | undefined) => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries({ queryKey: ['profile'] })
-      toast.show('Successfully updated')
+      toast.show('Successfully updated', { customData: { theme: 'green' } })
     },
   })
 }

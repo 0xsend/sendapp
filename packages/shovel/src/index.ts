@@ -8,12 +8,14 @@ import {
   sendRevenuesSafeReceives,
   sendAccountSigningKeyAdded,
   sendAccountSigningKeyRemoved,
+  sendtagCheckoutReceiptsIntegration,
 } from './integrations'
 
 // baseSrcBlockHeaders is to be used for integrations that require block headers
 const baseSrcBlockHeaders: Source = {
   name: 'base_block_headers',
   url: '$BASE_RPC_URL',
+  urls: ['$BASE_RPC_URL'],
   chain_id: '$BASE_CHAIN_ID',
   batch_size: 100,
   concurrency: 1,
@@ -23,6 +25,7 @@ const baseSrcBlockHeaders: Source = {
 const baseSrcLogs: Source = {
   name: 'base_logs',
   url: '$BASE_RPC_URL',
+  urls: ['$BASE_RPC_URL'],
   chain_id: '$BASE_CHAIN_ID',
   batch_size: 2000,
   concurrency: 2,
@@ -57,6 +60,10 @@ export const integrations: Integration[] = [
   },
   {
     ...sendAccountReceivesIntegration,
+    sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
+  },
+  {
+    ...sendtagCheckoutReceiptsIntegration,
     sources: [{ name: baseSrcLogs.name, start: '$BASE_BLOCK_START' }],
   },
 ]

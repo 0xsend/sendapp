@@ -29,19 +29,22 @@ export class OnboardingPage {
       }
       return false
     })
-    const response = this.page.waitForEvent('response', async (response) => {
-      if (response.url().includes('/api/trpc/sendAccount.create')) {
-        const json = await response.json()
-        expect(json.data?.[0]?.error).toBeFalsy()
-        this.log?.(
-          'sendAccount.create response',
-          response.url(),
-          response.status(),
-          JSON.stringify(json)
-        )
-        return true
-      }
-      return false
+    const response = this.page.waitForEvent('response', {
+      predicate: async (response) => {
+        if (response.url().includes('/api/trpc/sendAccount.create')) {
+          const json = await response.json()
+          expect(json.data?.[0]?.error).toBeFalsy()
+          this.log?.(
+            'sendAccount.create response',
+            response.url(),
+            response.status(),
+            JSON.stringify(json)
+          )
+          return true
+        }
+        return false
+      },
+      timeout: 15_000,
     })
 
     await this.page.getByRole('button', { name: 'Create Passkey' }).click()

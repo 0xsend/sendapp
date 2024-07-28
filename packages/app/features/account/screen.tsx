@@ -147,7 +147,7 @@ export function AccountScreen() {
             <Button
               bc={'$color0'}
               br="$2"
-              accessibilityLabel={canShare ? 'Share' : 'Copy'}
+              aria-label={canShare ? 'Share' : 'Copy'}
               f={1}
               fd="row"
               chromeless

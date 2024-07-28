@@ -31,26 +31,6 @@ jobs:
           echo github.ref=${{ github.ref }}
           echo github.head_ref=${{ github.head_ref }}
 
-  lint:
-    runs-on: self-hosted
-    needs: [cache-deps]
-    env:
-      YARN_ENABLE_HARDENED_MODE: 0
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Setup Environment
-        uses: ./.github/actions/setup-env
-        env:
-          YARN_ENABLE_HARDENED_MODE: 0
-          SKIP_YARN_POST_INSTALL: 1
-      - name: Build
-        run: yarn build
-      - name: Lint
-        run: yarn lint
-
   unit-tests:
     name: Unit Tests
     runs-on: self-hosted
@@ -94,6 +74,8 @@ jobs:
         id: tilt-ci
         shell: bash
         run: tilt ci unit-tests --timeout=10m
+      - name: Lint
+        run: yarn lint
       - name: Tilt Down
         # always run tilt down if tilt ci started
         if: always() && steps.tilt-ci.outcome != 'skipped'

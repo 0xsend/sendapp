@@ -1,4 +1,4 @@
-import { Card, CardHeader, Container, H3, H5, Paragraph, XStack, YStack } from '@my/ui'
+import { Card, CardHeader, H3, H5, Paragraph, XStack, YStack } from '@my/ui'
 import { IconSendToken } from 'app/components/icons'
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
 
@@ -7,19 +7,17 @@ const pageDescription =
 
 export const ReferralsScreen = () => {
   return (
-    <Container>
-      <YStack f={1} width={'100%'} py="$4" gap="$4">
-        <XStack alignItems="center" width={'100%'} jc="space-between" gap="$6">
-          <H3 fontWeight={'normal'}>Referral Rewards</H3>
-          <H3 fontWeight={'bold'}>Check Rewards</H3>
-        </XStack>
-        <Paragraph py={'$2'} size={'$4'}>
-          {pageDescription}
-        </Paragraph>
-        <StatsCards />
-        <RewardsHistory />
-      </YStack>
-    </Container>
+    <YStack f={1} width={'100%'} py="$4" gap="$4">
+      <XStack alignItems="center" width={'100%'} jc="space-between" gap="$6">
+        <H3 fontWeight={'normal'}>Referral Rewards</H3>
+        <H3 fontWeight={'bold'}>Check Rewards</H3>
+      </XStack>
+      <Paragraph py={'$2'} size={'$4'}>
+        {pageDescription}
+      </Paragraph>
+      <StatsCards />
+      <RewardsHistory />
+    </YStack>
   )
 }
 

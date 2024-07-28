@@ -1,5 +1,5 @@
-import { signWithPasskey } from '@daimo/expo-passkeys'
 import {
+  baseMainnetBundlerClient,
   entryPointAddress,
   sendAccountAbi,
   sendTokenAbi,
@@ -9,29 +9,35 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import { queryOptions } from '@tanstack/react-query'
-import { getAccountNonce, type UserOperation } from 'permissionless'
+import {
+  getAccountNonce,
+  PaymasterValidationRevertedError,
+  SendUserOperationError,
+  type UserOperation,
+} from 'permissionless'
 import {
   bytesToHex,
   concat,
-  encodeAbiParameters,
   encodeFunctionData,
-  getAbiItem,
   getContract,
   hexToBytes,
   isHex,
   maxUint256,
   numberToBytes,
+  RpcRequestError,
   type Address,
   type Hex,
 } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useQuery as useWagmiQuery, type UseQueryReturnType } from 'wagmi/query'
 import { assert } from './assert'
-import { parseAndNormalizeSig, parseSignResponse } from './passkeys'
 import { throwIf } from './throwIf'
 import { defaultUserOp } from './useUserOpTransferMutation'
 import { baseMainnetClient } from './viem'
 import { useMemo } from 'react'
+import debugBase from 'debug'
+
+const debug = debugBase('app:utils:userop')
 
 export type SendAccountCall = {
   dest: `0x${string}`
@@ -118,108 +124,6 @@ export function generateChallenge({
   }
 }
 
-/**
- * Signs a challenge using the user's passkey and returns the signature in a format that matches the ABI of a signature
- * struct for the SendVerifier contract.
- * @param challenge - The challenge to sign encoded as a 0x-prefixed hex string.
- * @param rawIdsB64 - The list of raw ids to use for signing. Required for Android and Chrome.
- * @returns The signature in a format that matches the ABI of a signature struct for the SendVerifier contract.
- */
-export async function signChallenge(
-  challenge: Hex,
-  allowedCredentials: { id: string; userHandle: string }[]
-) {
-  const challengeBytes = hexToBytes(challenge)
-  const challengeB64 = Buffer.from(challengeBytes).toString('base64')
-  const sign = await signWithPasskey({
-    domain: window.location.hostname,
-    challengeB64,
-    rawIdsB64: allowedCredentials.map(({ id }) => id), // pass the raw ids to the authenticator
-  })
-  // handle if a non-resident passkey is used so no userHandle is returned
-  sign.passkeyName =
-    sign.passkeyName ?? allowedCredentials.find(({ id }) => id === sign.id)?.userHandle ?? ''
-  assert(!!sign.passkeyName, 'No passkey name found')
-  const signResult = parseSignResponse(sign)
-  const clientDataJSON = signResult.clientDataJSON
-  const authenticatorData = bytesToHex(signResult.rawAuthenticatorData)
-  const challengeLocation = BigInt(clientDataJSON.indexOf('"challenge":'))
-  const responseTypeLocation = BigInt(clientDataJSON.indexOf('"type":'))
-  const { r, s } = parseAndNormalizeSig(signResult.derSig)
-  const webauthnSig = {
-    authenticatorData,
-    clientDataJSON,
-    challengeLocation,
-    responseTypeLocation,
-    r,
-    s,
-  }
-
-  const encodedWebAuthnSig = encodeAbiParameters(
-    getAbiItem({
-      abi: sendAccountAbi,
-      name: 'signatureStruct',
-    }).inputs,
-    [webauthnSig]
-  )
-  assert(isHex(encodedWebAuthnSig), 'Invalid encodedWebAuthnSig')
-
-  // @todo: verify signature with user's identifier to ensure it's the correct passkey
-  // const encodedWebAuthnSigBytes = hexToBytes(encodedWebAuthnSig)
-  // const newEncodedWebAuthnSigBytes = new Uint8Array(encodedWebAuthnSigBytes.length + 1)
-  // newEncodedWebAuthnSigBytes[0] = keySlot
-  // newEncodedWebAuthnSigBytes.set(encodedWebAuthnSigBytes, 1)
-  // const verified = await verifySignature(challenge, bytesToHex(newEncodedWebAuthnSigBytes), [
-  //   '0x5BCEE51E9210DAF159CC89BCFDA7FF0AE8AF0881A67D91082503BA90106878D0',
-  //   '0x02CC25B94834CD8214E579356848281F286DD9AED9E5E4D7DD58353990ADD661',
-  // ])
-  // console.log('verified', verified)
-
-  return {
-    keySlot: signResult.keySlot,
-    accountName: signResult.accountName,
-    encodedWebAuthnSig,
-  }
-}
-
-/**
- * Signs a user operation hash and returns the signature in a format for the SendVerifier contract.
- */
-export async function signUserOp({
-  userOpHash,
-  version,
-  validUntil,
-  allowedCredentials,
-}: {
-  userOpHash: Hex
-  version?: number
-  validUntil?: number
-  allowedCredentials?: { id: string; userHandle: string }[]
-}) {
-  version = version ?? USEROP_VERSION
-  validUntil = validUntil ?? Math.floor((Date.now() + 1000 * 120) / 1000) // default 120 seconds (2 minutes)
-  allowedCredentials = allowedCredentials ?? []
-  assert(version === USEROP_VERSION, 'version must be 1')
-  assert(typeof validUntil === 'number', 'validUntil must be a number')
-  assert(
-    validUntil === 0 || validUntil > Math.floor(Date.now() / 1000), // 0 means valid forever
-    'validUntil must be in the future'
-  )
-  const { challenge, versionBytes, validUntilBytes } = generateChallenge({
-    userOpHash,
-    version,
-    validUntil,
-  })
-  const { encodedWebAuthnSig, keySlot } = await signChallenge(challenge, allowedCredentials)
-  const signature = concat([
-    versionBytes,
-    validUntilBytes,
-    numberToBytes(keySlot, { size: 1 }),
-    hexToBytes(encodedWebAuthnSig),
-  ])
-  return bytesToHex(signature)
-}
-
 const useAccountNonceQueryKey = 'accountNonce'
 
 export function useAccountNonce({
@@ -279,8 +183,9 @@ function userOpQueryOptions({
         functionName: 'executeBatch',
         args: [calls],
       })
+
       const paymaster = tokenPaymasterAddress[chainId]
-      const userOp: UserOperation<'v0.7'> = {
+      const _userOp: UserOperation<'v0.7'> = {
         ...defaultUserOp,
         maxFeePerGas,
         maxPriorityFeePerGas,
@@ -291,6 +196,20 @@ function userOpQueryOptions({
         paymasterData: '0x',
         signature: '0x',
       }
+
+      // only estimate the gas for the call
+      const { callGasLimit } = await baseMainnetBundlerClient
+        .estimateUserOperationGas({
+          userOperation: _userOp,
+        })
+        .catch((e) => {
+          throwNiceError(e)
+        })
+
+      const userOp = { ..._userOp, callGasLimit }
+
+      debug('useUserOpGasEstimate', { userOp, callGasLimit })
+
       return userOp
     },
   })
@@ -347,4 +266,44 @@ export function useUserOp({
     enabled,
     queryFn,
   })
+}
+/**
+ * User operation errors are not very helpful and confusing. This function converts them to something more helpful.
+ */
+export function throwNiceError(e: Error & { cause?: Error }): never {
+  const cause = e.cause ?? e
+  switch (true) {
+    case cause instanceof SendUserOperationError: {
+      switch (cause.details) {
+        case 'Invalid UserOp signature or paymaster signature':
+          throw new Error('Invalid Passkey Authorization')
+        case 'already expired':
+          throw new Error('User operation or paymaster has expired')
+        default:
+          throw e
+      }
+    }
+    case cause instanceof PaymasterValidationRevertedError: {
+      switch (cause.details) {
+        case `FailedOpWithRevert(0,"AA33 reverted",Error(ERC20: transfer amount exceeds balance))`:
+          throw new Error('Not enough USDC to cover transaction fees')
+        default:
+          throw e
+      }
+    }
+    case cause instanceof RpcRequestError: {
+      switch (cause.details) {
+        case 'execution reverted: ERC20: transfer amount exceeds balance':
+          throw new Error('Not enough funds')
+        case 'execution reverted: revert: ERC20: transfer amount exceeds balance':
+          throw new Error('Not enough funds')
+        case 'FailedOp(0,"AA25 invalid account nonce")':
+          throw new Error('Invalid nonce, please try again')
+        default:
+          throw e
+      }
+    }
+    default:
+      throw e
+  }
 }

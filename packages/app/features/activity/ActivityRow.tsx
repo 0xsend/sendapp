@@ -20,6 +20,7 @@ export function ActivityRow({ activity }: { activity: Activity }) {
       pb="$5"
       borderBottomColor={'$decay'}
       $gtMd={{ borderBottomWidth: 0, pb: '0' }}
+      testID="ActivityRow"
     >
       <XStack gap="$4.5" width={'100%'} f={1}>
         <ActivityAvatar activity={activity} />

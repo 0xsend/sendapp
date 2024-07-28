@@ -1,11 +1,11 @@
-import type { Page, Expect } from '@playwright/test'
+import type { Tables } from '@my/supabase/database-generated.types'
+import { usdcAddress } from '@my/wagmi'
+import type { Expect, Page } from '@playwright/test'
 import { assert } from 'app/utils/assert'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import type { testClient } from 'app/utils/userop'
-import { debug } from 'debug'
+import debug from 'debug'
 import { parseEther, zeroAddress } from 'viem'
 import { test as base } from '../auth'
-import { usdcAddress } from '../viem'
 import { testBaseClient } from '../viem/base'
 import { OnboardingPage } from './page'
 
@@ -31,11 +31,12 @@ export const signUp = async (page: Page, phone: string, expect: Expect) => {
 
 const sendAccountTest = base.extend<{
   page: Page
+  sendAccount: Tables<'send_accounts'>
   setEthBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
   setUsdcBalance: ({ address, value }: { address: `0x${string}`; value: bigint }) => Promise<void>
 }>({
-  page: [
-    async ({ page, context, supabase, setEthBalance, setUsdcBalance, user: { user } }, use) => {
+  sendAccount: [
+    async ({ context, supabase, setEthBalance, setUsdcBalance, user: { user } }, use) => {
       log = debug(`test:send-accounts:${user.id}:${test.info().parallelIndex}`)
       log('start onboarding')
 
@@ -60,10 +61,11 @@ const sendAccountTest = base.extend<{
 
       await onboardingPage.page.close() // close the onboarding page
 
-      await use(page)
+      await use(sendAccount)
     },
-    { timeout: 60000, scope: 'test' },
+    { timeout: 20000, scope: 'test' },
   ],
+  page: [({ sendAccount: _, page }, use) => use(page), { scope: 'test' }],
   // biome-ignore lint/correctness/noEmptyPattern: playwright requires this
   setEthBalance: async ({}, use) => {
     use(async ({ address, value }) => {
@@ -84,7 +86,7 @@ const sendAccountTest = base.extend<{
     use(async ({ address, value }) => {
       log('fund send account with usdc', `address=${address} value=${value}`)
       await setERC20Balance({
-        client: testBaseClient as typeof testClient,
+        client: testBaseClient,
         address,
         tokenAddress: usdcAddress[testBaseClient.chain.id],
         value,

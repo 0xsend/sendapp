@@ -6,9 +6,9 @@ select pgtle.uninstall_extension_if_exists('supabase-dbdev');
 
 drop extension if exists "supabase-dbdev" cascade;
 
--- set timeouts to 10 seconds
-SELECT http_set_curlopt('CURLOPT_TIMEOUT', '10');
-SELECT http_set_curlopt('CURLOPT_CONNECTTIMEOUT', '10');
+-- set timeouts for installing dbdev
+SELECT http_set_curlopt('CURLOPT_TIMEOUT', '30');
+SELECT http_set_curlopt('CURLOPT_CONNECTTIMEOUT', '30');
 
 select pgtle.install_extension(
     'supabase-dbdev',

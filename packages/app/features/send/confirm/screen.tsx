@@ -25,11 +25,12 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
+import { useProfileHref } from 'app/utils/useProfileHref'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import {
   useGenerateTransferUserOp,
-  useUserOpGasEstimate,
   useUserOpTransferMutation,
+  useUserOpGasEstimate,
 } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import {
@@ -50,7 +51,7 @@ export function SendConfirmScreen() {
   const router = useRouter()
 
   useEffect(() => {
-    if (!profile && !recipient)
+    if (!recipient)
       router.replace({
         pathname: '/send',
         query: {
@@ -60,7 +61,8 @@ export function SendConfirmScreen() {
           amount: amount,
         },
       })
-  }, [profile, recipient, idType, router, sendToken, amount])
+  }, [recipient, idType, router, sendToken, amount])
+
   if (error) throw new Error(error.message)
   if (isLoading && !profile) return <Spinner size="large" />
   return <SendConfirm />
@@ -382,14 +384,10 @@ export function SendRecipient({ ...props }: YStackProps) {
   const { recipient, idType } = queryParams
   const router = useRouter()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const href = useProfileHref(idType ?? 'tag', recipient ?? '')
 
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
-
-  const href =
-    idType === 'address'
-      ? `${baseMainnet.blockExplorers.default.url}/address/${recipient}`
-      : `/profile/${recipient}`
 
   return (
     <YStack gap="$2.5" {...props}>
@@ -447,7 +445,7 @@ export function SendRecipient({ ...props }: YStackProps) {
             {(() => {
               switch (true) {
                 case idType === 'address':
-                  return shorten(recipient, 6, 6)
+                  return shorten(recipient, 5, 4)
                 case !!profile?.tag:
                   return `/${profile?.tag}`
                 default:

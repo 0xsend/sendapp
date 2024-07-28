@@ -97,15 +97,6 @@ exports[`shovel config 1`] = `
         },
         {
           "column": "log_addr",
-          "filter_arg": [
-            "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
-            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
-            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          ],
-          "filter_op": "contains",
           "name": "log_addr",
         },
       ],
@@ -115,12 +106,22 @@ exports[`shovel config 1`] = `
         "inputs": [
           {
             "column": "f",
+            "filter_op": "contains",
+            "filter_ref": {
+              "column": "account",
+              "integration": "send_account_created",
+            },
             "indexed": true,
             "name": "from",
             "type": "address",
           },
           {
             "column": "t",
+            "filter_op": "contains",
+            "filter_ref": {
+              "column": "account",
+              "integration": "send_account_created",
+            },
             "indexed": true,
             "name": "to",
             "type": "address",
@@ -642,6 +643,111 @@ exports[`shovel config 1`] = `
         "name": "send_account_receives",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x36f43082d01df4801AF2D95aeEd1a0200C5510AE",
+            "0x32b6F71420a0f8286D10D83eAf9EB8F12e6f33Ca",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address",
+          },
+          {
+            "column": "amount",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256",
+          },
+          {
+            "column": "referrer",
+            "indexed": false,
+            "internalType": "address",
+            "name": "referrer",
+            "type": "address",
+          },
+          {
+            "column": "reward",
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "reward",
+            "type": "uint256",
+          },
+        ],
+        "name": "Receipt",
+        "type": "event",
+      },
+      "name": "sendtag_checkout_receipts",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+          {
+            "name": "referrer",
+            "type": "bytea",
+          },
+          {
+            "name": "reward",
+            "type": "numeric",
+          },
+        ],
+        "name": "sendtag_checkout_receipts",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
@@ -651,6 +757,9 @@ exports[`shovel config 1`] = `
       "concurrency": 1,
       "name": "base_block_headers",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL",
+      ],
     },
     {
       "batch_size": 2000,
@@ -658,6 +767,9 @@ exports[`shovel config 1`] = `
       "concurrency": 2,
       "name": "base_logs",
       "url": "$BASE_RPC_URL",
+      "urls": [
+        "$BASE_RPC_URL",
+      ],
     },
   ],
 }

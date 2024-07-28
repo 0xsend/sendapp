@@ -1,4 +1,4 @@
-import { formatUnits } from 'viem'
+import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import {
   isTagReceiptsEvent,
@@ -8,13 +8,16 @@ import {
 } from './zod/activity'
 import type { Activity } from 'app/utils/zod/activity'
 import { isSendAccountReceiveEvent } from './zod/activity/SendAccountReceiveEventSchema'
-import { tokenPaymasterAddress } from '@my/wagmi'
+import { baseMainnet, sendtagCheckoutAddress, tokenPaymasterAddress } from '@my/wagmi'
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
 
 const AddressLabels = {
   ...Object.fromEntries(wagmiAddresWithLabel(Object.values(tokenPaymasterAddress), 'Paymaster')),
+  ...Object.fromEntries(
+    wagmiAddresWithLabel(Object.values(sendtagCheckoutAddress), 'Sendtag Checkout')
+  ),
 }
 
 const labelAddress = (address: `0x${string}`): string => AddressLabels[address] ?? address
@@ -104,10 +107,13 @@ export function amountFromActivity(activity: Activity): string {
  * @returns
  */
 export function eventNameFromActivity(activity: Activity) {
-  const { event_name, from_user, to_user } = activity
-  const isTransferOrReceive =
-    isSendAccountTransfersEvent(activity) || isSendAccountReceiveEvent(activity)
+  const { event_name, from_user, to_user, data } = activity
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const isETHReceive = isSendAccountReceiveEvent(activity)
+  const isTransferOrReceive = isERC20Transfer || isETHReceive
   switch (true) {
+    case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
+      return 'Referral Reward'
     case isTransferOrReceive && from_user === null:
       return 'Deposit'
     case isTransferOrReceive && !!to_user?.id:
@@ -133,7 +139,9 @@ export function eventNameFromActivity(activity: Activity) {
  */
 export function subtextFromActivity(activity: Activity): string | null {
   const _user = counterpart(activity)
-  const { from_user, to_user } = activity
+  const { from_user, to_user, data } = activity
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const isETHReceive = isSendAccountReceiveEvent(activity)
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
     return activity.data.tags.map((t) => `/${t}`).join(', ')
   }
@@ -148,17 +156,17 @@ export function subtextFromActivity(activity: Activity): string | null {
   if (_user) {
     return userNameFromActivityUser(_user)
   }
-  if (isSendAccountTransfersEvent(activity) && from_user?.id) {
-    return labelAddress(activity.data.t)
+  if (isERC20Transfer && from_user?.id) {
+    return labelAddress(data.t)
   }
-  if (isSendAccountReceiveEvent(activity) && from_user?.id) {
-    return labelAddress(activity.data.sender)
+  if (isETHReceive && from_user?.id) {
+    return labelAddress(data.sender)
   }
-  if (isSendAccountTransfersEvent(activity) && to_user?.id) {
-    return labelAddress(activity.data.f)
+  if (isERC20Transfer && to_user?.id) {
+    return labelAddress(data.f)
   }
-  if (isSendAccountReceiveEvent(activity) && to_user?.id) {
-    return labelAddress(activity.data.log_addr)
+  if (isETHReceive && to_user?.id) {
+    return labelAddress(data.log_addr)
   }
   return null
 }

@@ -1,16 +1,16 @@
 import { mergeTests } from '@playwright/test'
 import { test as sendAccountTest, expect } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { debug, type Debugger } from 'debug'
+import debug from 'debug'
 import { assert } from 'app/utils/assert'
-import { userOnboarded } from '@my/snaplet/src/models'
+import { userOnboarded } from '@my/snaplet/models'
 import { ProfilePage } from './fixtures/profiles'
 import { MockActivityFeed } from 'app/features/activity/utils/__mocks__/mock-activity-feed'
 import { SUPABASE_URL } from 'app/utils/supabase/admin'
 
 const test = mergeTests(sendAccountTest, snapletTest)
 
-let log: Debugger
+let log: debug.Debugger
 
 test.beforeAll(async () => {
   log = debug(`test:profile:logged-in:${test.info().workerIndex}`)
@@ -132,8 +132,14 @@ test('can view activities between another profile', async ({
   log('beforeEach', `url=${page.url()}`)
 
   await expect(profilePage2.sendButton).toBeVisible()
+  await expect(page.getByText('Jul 18, 2024')).toBeVisible()
+  await expect(page.getByText('You Received').nth(1)).toBeVisible()
+  await expect(page.getByText('8 USDC')).toBeVisible()
+  await expect(page.getByText('May 27, 2024')).toBeVisible()
+  await expect(page.getByText('You Sent').first()).toBeVisible()
+  await expect(page.getByText('0.077777 USDC')).toBeVisible()
   await expect(page.getByText('May 26, 2024')).toBeVisible()
-  await expect(page.getByText('You Received')).toBeVisible()
+  await expect(page.getByText('You Received').first()).toBeVisible()
   await expect(page.getByText('0.019032 USDC')).toBeVisible()
   await expect(page.getByText(anotherUser.name)).toBeVisible()
 })

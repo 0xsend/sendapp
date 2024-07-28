@@ -18,7 +18,10 @@
     "jest.setup-after-env.ts",
     "__mocks__",
     "tamagui.config.ts",
-    "./.eslintrc.cjs"
+    "./.eslintrc.cjs",
+    "../../supabase",
+    "../../globals.d.ts",
+    "../../environment.d.ts"
   ],
   "exclude": ["coverage"],
   "compilerOptions": {
@@ -32,6 +35,8 @@
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
       "@my/contracts/out/*": ["../contracts/out/*"],
+      "@my/supabase": ["../../supabase"],
+      "@my/supabase/*": ["../../supabase/*"],
       "@daimo/expo-passkeys/*": ["../daimo-expo-passkeys/src/*"]
     }
   },

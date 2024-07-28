@@ -54,10 +54,10 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
       schema={ProfileSchema}
       props={{
         name: {
-          accessibilityLabel: 'Name',
+          'aria-label': 'Name',
         },
         about: {
-          accessibilityLabel: 'Bio',
+          'aria-label': 'Bio',
           placeholder: 'Tell us about yourself',
         },
         isPublic: {

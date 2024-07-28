@@ -4,11 +4,11 @@ exports[`ReferralScreen 1`] = `
 <View
   style={
     {
-      "alignSelf": "center",
       "flex": 1,
-      "flexDirection": "row",
-      "paddingLeft": 18,
-      "paddingRight": 18,
+      "flexDirection": "column",
+      "gap": 18,
+      "paddingBottom": 18,
+      "paddingTop": 18,
       "width": "100%",
     }
   }
@@ -16,11 +16,368 @@ exports[`ReferralScreen 1`] = `
   <View
     style={
       {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "gap": 32,
+        "justifyContent": "space-between",
+        "width": "100%",
+      }
+    }
+  >
+    <Text
+      accessibilityRole="header"
+      style={
+        {
+          "color": "#FFFFFF",
+          "fontFamily": "System",
+          "fontSize": 23,
+          "fontWeight": "normal",
+          "lineHeight": 27,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+          "userSelect": "auto",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Referral Rewards
+    </Text>
+    <Text
+      accessibilityRole="header"
+      style={
+        {
+          "color": "#FFFFFF",
+          "fontFamily": "System",
+          "fontSize": 23,
+          "fontWeight": "bold",
+          "lineHeight": 27,
+          "marginBottom": 0,
+          "marginLeft": 0,
+          "marginRight": 0,
+          "marginTop": 0,
+          "textTransform": "none",
+          "userSelect": "auto",
+        }
+      }
+      suppressHighlighting={true}
+    >
+      Check Rewards
+    </Text>
+  </View>
+  <Text
+    style={
+      {
+        "color": "#FFFFFF",
+        "fontFamily": "System",
+        "fontSize": 16.8,
+        "fontWeight": "400",
+        "lineHeight": 19,
+        "paddingBottom": 7,
+        "paddingTop": 7,
+        "userSelect": "auto",
+      }
+    }
+    suppressHighlighting={true}
+  >
+    Share your unique link, and when someone joins or makes a purchase using it, you earn rewards in SEND token. Our system tracks referrals, ensuring you receive rewards. It's a win-win as you support us and enjoy the benefits. Thanks for being part of our community!
+  </Text>
+  <View
+    style={
+      {
+        "alignItems": "flex-start",
+        "flexDirection": "row",
+        "flexWrap": "wrap",
+        "gap": 46,
+        "justifyContent": "space-between",
+        "marginBottom": 18,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flex": 1,
+          "flexDirection": "column",
+          "position": "relative",
+          "width": "20%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "transparent",
+            "flexDirection": "column",
+            "marginBottom": "auto",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "zIndex": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Total Referrals
+        </Text>
+      </View>
+      <Text
+        accessibilityRole="header"
+        style={
+          {
+            "color": "#FFFFFF",
+            "fontFamily": "System",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": 24,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "paddingBottom": 13,
+            "paddingLeft": 18,
+            "textTransform": "none",
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        123
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flex": 1,
+          "flexDirection": "column",
+          "position": "relative",
+          "width": "20%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "transparent",
+            "flexDirection": "column",
+            "marginBottom": "auto",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "zIndex": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Transactions
+        </Text>
+      </View>
+      <Text
+        accessibilityRole="header"
+        style={
+          {
+            "color": "#FFFFFF",
+            "fontFamily": "System",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": 24,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "paddingBottom": 13,
+            "paddingLeft": 18,
+            "textTransform": "none",
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        1000
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flex": 1,
+          "flexDirection": "column",
+          "position": "relative",
+          "width": "20%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "transparent",
+            "flexDirection": "column",
+            "marginBottom": "auto",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "zIndex": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Total Rewards
+        </Text>
+      </View>
+      <Text
+        accessibilityRole="header"
+        style={
+          {
+            "color": "#FFFFFF",
+            "fontFamily": "System",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": 24,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "paddingBottom": 13,
+            "paddingLeft": 18,
+            "textTransform": "none",
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        1000
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "backgroundColor": "#111f22",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "flex": 1,
+          "flexDirection": "column",
+          "position": "relative",
+          "width": "20%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "transparent",
+            "flexDirection": "column",
+            "marginBottom": "auto",
+            "paddingBottom": 18,
+            "paddingLeft": 18,
+            "paddingRight": 18,
+            "paddingTop": 18,
+            "zIndex": 10,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 16.8,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Claimable Rewards
+        </Text>
+      </View>
+      <Text
+        accessibilityRole="header"
+        style={
+          {
+            "color": "#FFFFFF",
+            "fontFamily": "System",
+            "fontSize": 20,
+            "fontWeight": "700",
+            "lineHeight": 24,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "paddingBottom": 13,
+            "paddingLeft": 18,
+            "textTransform": "none",
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        1000
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
         "flex": 1,
         "flexDirection": "column",
-        "gap": 18,
-        "paddingBottom": 18,
-        "paddingTop": 18,
         "width": "100%",
       }
     }
@@ -55,7 +412,7 @@ exports[`ReferralScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Referral Rewards
+        Referral History
       </Text>
       <Text
         accessibilityRole="header"
@@ -76,320 +433,34 @@ exports[`ReferralScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Check Rewards
+        See All
       </Text>
     </View>
-    <Text
+    <View
+      pointerEvents="none"
       style={
         {
-          "color": "#FFFFFF",
-          "fontFamily": "System",
-          "fontSize": 16.8,
-          "fontWeight": "400",
-          "lineHeight": 19,
-          "paddingBottom": 7,
-          "paddingTop": 7,
-          "userSelect": "auto",
+          "height": 18,
+          "minHeight": 18,
+          "minWidth": 18,
+          "width": 18,
         }
       }
-      suppressHighlighting={true}
-    >
-      Share your unique link, and when someone joins or makes a purchase using it, you earn rewards in SEND token. Our system tracks referrals, ensuring you receive rewards. It's a win-win as you support us and enjoy the benefits. Thanks for being part of our community!
-    </Text>
+    />
     <View
       style={
         {
-          "alignItems": "flex-start",
-          "flexDirection": "row",
-          "flexWrap": "wrap",
-          "gap": 46,
-          "justifyContent": "space-between",
-          "marginBottom": 18,
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "backgroundColor": "#111f22",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "flex": 1,
-            "flexDirection": "column",
-            "position": "relative",
-            "width": "20%",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "backgroundColor": "transparent",
-              "flexDirection": "column",
-              "marginBottom": "auto",
-              "paddingBottom": 18,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 18,
-              "zIndex": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 16.8,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "userSelect": "auto",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Total Referrals
-          </Text>
-        </View>
-        <Text
-          accessibilityRole="header"
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "System",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "lineHeight": 24,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "paddingBottom": 13,
-              "paddingLeft": 18,
-              "textTransform": "none",
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          123
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "backgroundColor": "#111f22",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "flex": 1,
-            "flexDirection": "column",
-            "position": "relative",
-            "width": "20%",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "backgroundColor": "transparent",
-              "flexDirection": "column",
-              "marginBottom": "auto",
-              "paddingBottom": 18,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 18,
-              "zIndex": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 16.8,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "userSelect": "auto",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Transactions
-          </Text>
-        </View>
-        <Text
-          accessibilityRole="header"
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "System",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "lineHeight": 24,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "paddingBottom": 13,
-              "paddingLeft": 18,
-              "textTransform": "none",
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          1000
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "backgroundColor": "#111f22",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "flex": 1,
-            "flexDirection": "column",
-            "position": "relative",
-            "width": "20%",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "backgroundColor": "transparent",
-              "flexDirection": "column",
-              "marginBottom": "auto",
-              "paddingBottom": 18,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 18,
-              "zIndex": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 16.8,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "userSelect": "auto",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Total Rewards
-          </Text>
-        </View>
-        <Text
-          accessibilityRole="header"
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "System",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "lineHeight": 24,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "paddingBottom": 13,
-              "paddingLeft": 18,
-              "textTransform": "none",
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          1000
-        </Text>
-      </View>
-      <View
-        style={
-          {
-            "backgroundColor": "#111f22",
-            "borderBottomLeftRadius": 16,
-            "borderBottomRightRadius": 16,
-            "borderTopLeftRadius": 16,
-            "borderTopRightRadius": 16,
-            "flex": 1,
-            "flexDirection": "column",
-            "position": "relative",
-            "width": "20%",
-          }
-        }
-      >
-        <View
-          style={
-            {
-              "backgroundColor": "transparent",
-              "flexDirection": "column",
-              "marginBottom": "auto",
-              "paddingBottom": 18,
-              "paddingLeft": 18,
-              "paddingRight": 18,
-              "paddingTop": 18,
-              "zIndex": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 16.8,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "userSelect": "auto",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Claimable Rewards
-          </Text>
-        </View>
-        <Text
-          accessibilityRole="header"
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "System",
-              "fontSize": 20,
-              "fontWeight": "700",
-              "lineHeight": 24,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "paddingBottom": 13,
-              "paddingLeft": 18,
-              "textTransform": "none",
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          1000
-        </Text>
-      </View>
-    </View>
-    <View
-      style={
-        {
+          "backgroundColor": "#081619",
+          "borderBottomLeftRadius": 22,
+          "borderBottomRightRadius": 22,
+          "borderTopLeftRadius": 22,
+          "borderTopRightRadius": 22,
           "flex": 1,
           "flexDirection": "column",
+          "paddingBottom": 32,
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "paddingTop": 32,
           "width": "100%",
         }
       }
@@ -399,53 +470,122 @@ exports[`ReferralScreen 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 32,
+            "gap": 13,
             "justifyContent": "space-between",
-            "width": "100%",
           }
         }
       >
         <Text
-          accessibilityRole="header"
           style={
             {
               "color": "#FFFFFF",
               "fontFamily": "System",
-              "fontSize": 23,
-              "fontWeight": "normal",
-              "lineHeight": 27,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "textTransform": "none",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
               "userSelect": "auto",
+              "width": "12%",
             }
           }
           suppressHighlighting={true}
         >
-          Referral History
+          #
         </Text>
         <Text
-          accessibilityRole="header"
           style={
             {
               "color": "#FFFFFF",
+              "flex": 1,
               "fontFamily": "System",
-              "fontSize": 23,
-              "fontWeight": "bold",
-              "lineHeight": 27,
-              "marginBottom": 0,
-              "marginLeft": 0,
-              "marginRight": 0,
-              "marginTop": 0,
-              "textTransform": "none",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
               "userSelect": "auto",
+              "width": "12%",
             }
           }
           suppressHighlighting={true}
         >
-          See All
+          Date
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Wallet
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Referral rewards
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Status
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Details
         </Text>
       </View>
       <View
@@ -462,800 +602,647 @@ exports[`ReferralScreen 1`] = `
       <View
         style={
           {
-            "backgroundColor": "#081619",
-            "borderBottomLeftRadius": 22,
-            "borderBottomRightRadius": 22,
-            "borderTopLeftRadius": 22,
-            "borderTopRightRadius": 22,
-            "flex": 1,
-            "flexDirection": "column",
-            "paddingBottom": 32,
-            "paddingLeft": 32,
-            "paddingRight": 32,
-            "paddingTop": 32,
-            "width": "100%",
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
           }
         }
       >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          0x0
+        </Text>
         <View
           style={
             {
               "alignItems": "center",
+              "flex": 1,
               "flexDirection": "row",
-              "gap": 13,
-              "justifyContent": "space-between",
+              "gap": 7,
+              "justifyContent": "center",
+              "marginBottom": "0",
+              "width": "12%",
             }
           }
         >
-          <Text
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={20}
+            bbWidth={20}
+            color="#FFFFFF"
+            fill="none"
+            focusable={false}
+            height={20}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            strokeWidth="2"
             style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "userSelect": "auto",
-                "width": "12%",
-              }
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {},
+                {
+                  "flex": 0,
+                  "height": 20,
+                  "width": 20,
+                },
+              ]
             }
-            suppressHighlighting={true}
+            tintColor="#FFFFFF"
+            vbHeight={20}
+            vbWidth={20}
+            width={20}
           >
-            #
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Date
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Wallet
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Referral rewards
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Status
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "right",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Details
-          </Text>
-        </View>
-        <View
-          pointerEvents="none"
-          style={
-            {
-              "height": 18,
-              "minHeight": 18,
-              "minWidth": 18,
-              "width": 18,
-            }
-          }
-        />
-        <View
-          style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 13,
-              "justifyContent": "space-between",
-            }
-          }
-        >
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            ?
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            ?
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            0x0
-          </Text>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "gap": 7,
-                "justifyContent": "center",
-                "marginBottom": "0",
-                "width": "12%",
-              }
-            }
-          >
-            <RNSVGSvgView
-              align="xMidYMid"
-              bbHeight={20}
-              bbWidth={20}
-              color="#FFFFFF"
-              fill="none"
-              focusable={false}
-              height={20}
-              meetOrSlice={0}
-              minX={0}
-              minY={0}
-              strokeWidth="2"
-              style={
+            <RNSVGGroup
+              fill={null}
+              propList={
                 [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {},
-                  {
-                    "flex": 0,
-                    "height": 20,
-                    "width": 20,
-                  },
+                  "fill",
+                  "strokeWidth",
                 ]
               }
-              tintColor="#FFFFFF"
-              vbHeight={20}
-              vbWidth={20}
-              width={20}
+              strokeWidth="2"
             >
-              <RNSVGGroup
-                fill={null}
+              <RNSVGPath
+                d="M14.673 7.81H6.99v.876c0 .175.057.292.113.35.114.117.229.117.346.117h5.563c.345 0 .689.058.918.175.287.117.46.234.63.41.172.174.287.408.401.642.058.233.115.525.115.818v.642c0 .292-.057.526-.115.76-.113.233-.23.467-.401.642-.17.234-.345.35-.63.468-.23.117-.573.175-.918.175H6.788a1.694 1.694 0 01-1.695-1.694h7.493a.672.672 0 000-1.344H6.678a1.753 1.753 0 01-1.753-1.753V7.81h2.066V6.115h5.992c.935 0 1.692.76 1.69 1.694z"
+                fill={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
                 propList={
                   [
                     "fill",
+                  ]
+                }
+              />
+              <RNSVGCircle
+                cx={10}
+                cy={10}
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                propList={
+                  [
+                    "stroke",
                     "strokeWidth",
                   ]
                 }
-                strokeWidth="2"
-              >
-                <RNSVGPath
-                  d="M14.673 7.81H6.99v.876c0 .175.057.292.113.35.114.117.229.117.346.117h5.563c.345 0 .689.058.918.175.287.117.46.234.63.41.172.174.287.408.401.642.058.233.115.525.115.818v.642c0 .292-.057.526-.115.76-.113.233-.23.467-.401.642-.17.234-.345.35-.63.468-.23.117-.573.175-.918.175H6.788a1.694 1.694 0 01-1.695-1.694h7.493a.672.672 0 000-1.344H6.678a1.753 1.753 0 01-1.753-1.753V7.81h2.066V6.115h5.992c.935 0 1.692.76 1.69 1.694z"
-                  fill={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
+                r={9}
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
                   }
-                  propList={
-                    [
-                      "fill",
-                    ]
-                  }
-                />
-                <RNSVGCircle
-                  cx={10}
-                  cy={10}
-                  fill={
-                    {
-                      "payload": 4278190080,
-                      "type": 0,
-                    }
-                  }
-                  propList={
-                    [
-                      "stroke",
-                      "strokeWidth",
-                    ]
-                  }
-                  r={9}
-                  stroke={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
-                  }
-                  strokeWidth={2}
-                />
-              </RNSVGGroup>
-            </RNSVGSvgView>
-            <Text
-              style={
-                {
-                  "color": "#FFFFFF",
-                  "fontFamily": "System",
-                  "fontSize": 19.2,
-                  "fontWeight": "400",
-                  "lineHeight": 19,
-                  "textAlign": "center",
-                  "userSelect": "auto",
                 }
-              }
-              suppressHighlighting={true}
-            >
-              ?
-            </Text>
-          </View>
+                strokeWidth={2}
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
           <Text
             style={
               {
                 "color": "#FFFFFF",
-                "flex": 1,
                 "fontFamily": "System",
                 "fontSize": 19.2,
                 "fontWeight": "400",
                 "lineHeight": 19,
-                "marginBottom": "0",
                 "textAlign": "center",
                 "userSelect": "auto",
-                "width": "12%",
               }
             }
             suppressHighlighting={true}
           >
             ?
           </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "right",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Transaction
-          </Text>
         </View>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Transaction
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          0x0
+        </Text>
         <View
           style={
             {
               "alignItems": "center",
+              "flex": 1,
               "flexDirection": "row",
-              "gap": 13,
-              "justifyContent": "space-between",
+              "gap": 7,
+              "justifyContent": "center",
+              "marginBottom": "0",
+              "width": "12%",
             }
           }
         >
-          <Text
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={20}
+            bbWidth={20}
+            color="#FFFFFF"
+            fill="none"
+            focusable={false}
+            height={20}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            strokeWidth="2"
             style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "userSelect": "auto",
-                "width": "12%",
-              }
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {},
+                {
+                  "flex": 0,
+                  "height": 20,
+                  "width": 20,
+                },
+              ]
             }
-            suppressHighlighting={true}
+            tintColor="#FFFFFF"
+            vbHeight={20}
+            vbWidth={20}
+            width={20}
           >
-            ?
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            ?
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            0x0
-          </Text>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "gap": 7,
-                "justifyContent": "center",
-                "marginBottom": "0",
-                "width": "12%",
-              }
-            }
-          >
-            <RNSVGSvgView
-              align="xMidYMid"
-              bbHeight={20}
-              bbWidth={20}
-              color="#FFFFFF"
-              fill="none"
-              focusable={false}
-              height={20}
-              meetOrSlice={0}
-              minX={0}
-              minY={0}
-              strokeWidth="2"
-              style={
+            <RNSVGGroup
+              fill={null}
+              propList={
                 [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {},
-                  {
-                    "flex": 0,
-                    "height": 20,
-                    "width": 20,
-                  },
+                  "fill",
+                  "strokeWidth",
                 ]
               }
-              tintColor="#FFFFFF"
-              vbHeight={20}
-              vbWidth={20}
-              width={20}
+              strokeWidth="2"
             >
-              <RNSVGGroup
-                fill={null}
+              <RNSVGPath
+                d="M14.673 7.81H6.99v.876c0 .175.057.292.113.35.114.117.229.117.346.117h5.563c.345 0 .689.058.918.175.287.117.46.234.63.41.172.174.287.408.401.642.058.233.115.525.115.818v.642c0 .292-.057.526-.115.76-.113.233-.23.467-.401.642-.17.234-.345.35-.63.468-.23.117-.573.175-.918.175H6.788a1.694 1.694 0 01-1.695-1.694h7.493a.672.672 0 000-1.344H6.678a1.753 1.753 0 01-1.753-1.753V7.81h2.066V6.115h5.992c.935 0 1.692.76 1.69 1.694z"
+                fill={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
                 propList={
                   [
                     "fill",
+                  ]
+                }
+              />
+              <RNSVGCircle
+                cx={10}
+                cy={10}
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                propList={
+                  [
+                    "stroke",
                     "strokeWidth",
                   ]
                 }
-                strokeWidth="2"
-              >
-                <RNSVGPath
-                  d="M14.673 7.81H6.99v.876c0 .175.057.292.113.35.114.117.229.117.346.117h5.563c.345 0 .689.058.918.175.287.117.46.234.63.41.172.174.287.408.401.642.058.233.115.525.115.818v.642c0 .292-.057.526-.115.76-.113.233-.23.467-.401.642-.17.234-.345.35-.63.468-.23.117-.573.175-.918.175H6.788a1.694 1.694 0 01-1.695-1.694h7.493a.672.672 0 000-1.344H6.678a1.753 1.753 0 01-1.753-1.753V7.81h2.066V6.115h5.992c.935 0 1.692.76 1.69 1.694z"
-                  fill={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
+                r={9}
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
                   }
-                  propList={
-                    [
-                      "fill",
-                    ]
-                  }
-                />
-                <RNSVGCircle
-                  cx={10}
-                  cy={10}
-                  fill={
-                    {
-                      "payload": 4278190080,
-                      "type": 0,
-                    }
-                  }
-                  propList={
-                    [
-                      "stroke",
-                      "strokeWidth",
-                    ]
-                  }
-                  r={9}
-                  stroke={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
-                  }
-                  strokeWidth={2}
-                />
-              </RNSVGGroup>
-            </RNSVGSvgView>
-            <Text
-              style={
-                {
-                  "color": "#FFFFFF",
-                  "fontFamily": "System",
-                  "fontSize": 19.2,
-                  "fontWeight": "400",
-                  "lineHeight": 19,
-                  "textAlign": "center",
-                  "userSelect": "auto",
                 }
-              }
-              suppressHighlighting={true}
-            >
-              ?
-            </Text>
-          </View>
+                strokeWidth={2}
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
           <Text
             style={
               {
                 "color": "#FFFFFF",
-                "flex": 1,
                 "fontFamily": "System",
                 "fontSize": 19.2,
                 "fontWeight": "400",
                 "lineHeight": 19,
-                "marginBottom": "0",
                 "textAlign": "center",
                 "userSelect": "auto",
-                "width": "12%",
               }
             }
             suppressHighlighting={true}
           >
             ?
           </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "right",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Transaction
-          </Text>
         </View>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Transaction
+        </Text>
+      </View>
+      <View
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 13,
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          0x0
+        </Text>
         <View
           style={
             {
               "alignItems": "center",
+              "flex": 1,
               "flexDirection": "row",
-              "gap": 13,
-              "justifyContent": "space-between",
+              "gap": 7,
+              "justifyContent": "center",
+              "marginBottom": "0",
+              "width": "12%",
             }
           }
         >
-          <Text
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={20}
+            bbWidth={20}
+            color="#FFFFFF"
+            fill="none"
+            focusable={false}
+            height={20}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            strokeWidth="2"
             style={
-              {
-                "color": "#FFFFFF",
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "userSelect": "auto",
-                "width": "12%",
-              }
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {},
+                {
+                  "flex": 0,
+                  "height": 20,
+                  "width": 20,
+                },
+              ]
             }
-            suppressHighlighting={true}
+            tintColor="#FFFFFF"
+            vbHeight={20}
+            vbWidth={20}
+            width={20}
           >
-            ?
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            ?
-          </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "center",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            0x0
-          </Text>
-          <View
-            style={
-              {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "gap": 7,
-                "justifyContent": "center",
-                "marginBottom": "0",
-                "width": "12%",
-              }
-            }
-          >
-            <RNSVGSvgView
-              align="xMidYMid"
-              bbHeight={20}
-              bbWidth={20}
-              color="#FFFFFF"
-              fill="none"
-              focusable={false}
-              height={20}
-              meetOrSlice={0}
-              minX={0}
-              minY={0}
-              strokeWidth="2"
-              style={
+            <RNSVGGroup
+              fill={null}
+              propList={
                 [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {},
-                  {
-                    "flex": 0,
-                    "height": 20,
-                    "width": 20,
-                  },
+                  "fill",
+                  "strokeWidth",
                 ]
               }
-              tintColor="#FFFFFF"
-              vbHeight={20}
-              vbWidth={20}
-              width={20}
+              strokeWidth="2"
             >
-              <RNSVGGroup
-                fill={null}
+              <RNSVGPath
+                d="M14.673 7.81H6.99v.876c0 .175.057.292.113.35.114.117.229.117.346.117h5.563c.345 0 .689.058.918.175.287.117.46.234.63.41.172.174.287.408.401.642.058.233.115.525.115.818v.642c0 .292-.057.526-.115.76-.113.233-.23.467-.401.642-.17.234-.345.35-.63.468-.23.117-.573.175-.918.175H6.788a1.694 1.694 0 01-1.695-1.694h7.493a.672.672 0 000-1.344H6.678a1.753 1.753 0 01-1.753-1.753V7.81h2.066V6.115h5.992c.935 0 1.692.76 1.69 1.694z"
+                fill={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
                 propList={
                   [
                     "fill",
+                  ]
+                }
+              />
+              <RNSVGCircle
+                cx={10}
+                cy={10}
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                propList={
+                  [
+                    "stroke",
                     "strokeWidth",
                   ]
                 }
-                strokeWidth="2"
-              >
-                <RNSVGPath
-                  d="M14.673 7.81H6.99v.876c0 .175.057.292.113.35.114.117.229.117.346.117h5.563c.345 0 .689.058.918.175.287.117.46.234.63.41.172.174.287.408.401.642.058.233.115.525.115.818v.642c0 .292-.057.526-.115.76-.113.233-.23.467-.401.642-.17.234-.345.35-.63.468-.23.117-.573.175-.918.175H6.788a1.694 1.694 0 01-1.695-1.694h7.493a.672.672 0 000-1.344H6.678a1.753 1.753 0 01-1.753-1.753V7.81h2.066V6.115h5.992c.935 0 1.692.76 1.69 1.694z"
-                  fill={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
+                r={9}
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
                   }
-                  propList={
-                    [
-                      "fill",
-                    ]
-                  }
-                />
-                <RNSVGCircle
-                  cx={10}
-                  cy={10}
-                  fill={
-                    {
-                      "payload": 4278190080,
-                      "type": 0,
-                    }
-                  }
-                  propList={
-                    [
-                      "stroke",
-                      "strokeWidth",
-                    ]
-                  }
-                  r={9}
-                  stroke={
-                    {
-                      "payload": 4294967295,
-                      "type": 0,
-                    }
-                  }
-                  strokeWidth={2}
-                />
-              </RNSVGGroup>
-            </RNSVGSvgView>
-            <Text
-              style={
-                {
-                  "color": "#FFFFFF",
-                  "fontFamily": "System",
-                  "fontSize": 19.2,
-                  "fontWeight": "400",
-                  "lineHeight": 19,
-                  "textAlign": "center",
-                  "userSelect": "auto",
                 }
-              }
-              suppressHighlighting={true}
-            >
-              ?
-            </Text>
-          </View>
+                strokeWidth={2}
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
           <Text
             style={
               {
                 "color": "#FFFFFF",
-                "flex": 1,
                 "fontFamily": "System",
                 "fontSize": 19.2,
                 "fontWeight": "400",
                 "lineHeight": 19,
-                "marginBottom": "0",
                 "textAlign": "center",
                 "userSelect": "auto",
-                "width": "12%",
               }
             }
             suppressHighlighting={true}
           >
             ?
           </Text>
-          <Text
-            style={
-              {
-                "color": "#FFFFFF",
-                "flex": 1,
-                "fontFamily": "System",
-                "fontSize": 19.2,
-                "fontWeight": "400",
-                "lineHeight": 19,
-                "marginBottom": "0",
-                "textAlign": "right",
-                "userSelect": "auto",
-                "width": "12%",
-              }
-            }
-            suppressHighlighting={true}
-          >
-            Transaction
-          </Text>
         </View>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "center",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          ?
+        </Text>
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "flex": 1,
+              "fontFamily": "System",
+              "fontSize": 19.2,
+              "fontWeight": "400",
+              "lineHeight": 19,
+              "marginBottom": "0",
+              "textAlign": "right",
+              "userSelect": "auto",
+              "width": "12%",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Transaction
+        </Text>
       </View>
     </View>
   </View>

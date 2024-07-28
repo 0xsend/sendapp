@@ -3194,14 +3194,16 @@ export const senderCreatorAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const sendtagCheckoutAbi = [
   {
     type: 'constructor',
     inputs: [
       { name: '_sendRevenuesMultisig', internalType: 'address', type: 'address' },
-      { name: '_token', internalType: 'contract IERC20', type: 'address' },
+      { name: '_token', internalType: 'address', type: 'address' },
+      { name: '_owner', internalType: 'address', type: 'address' },
     ],
     stateMutability: 'nonpayable',
   },
@@ -3210,7 +3212,7 @@ export const sendtagCheckoutAbi = [
     inputs: [
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
       { name: 'referrer', internalType: 'address', type: 'address' },
-      { name: 'bonus', internalType: 'uint256', type: 'uint256' },
+      { name: 'reward', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'checkout',
     outputs: [],
@@ -3283,11 +3285,12 @@ export const sendtagCheckoutAbi = [
     type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'referrer', internalType: 'address', type: 'address', indexed: true },
-      { name: 'referred', internalType: 'address', type: 'address', indexed: false },
+      { name: 'sender', internalType: 'address', type: 'address', indexed: true },
       { name: 'amount', internalType: 'uint256', type: 'uint256', indexed: false },
+      { name: 'referrer', internalType: 'address', type: 'address', indexed: false },
+      { name: 'reward', internalType: 'uint256', type: 'uint256', indexed: false },
     ],
-    name: 'ReferralBonus',
+    name: 'Receipt',
   },
   {
     type: 'event',
@@ -3324,14 +3327,18 @@ export const sendtagCheckoutAbi = [
 ] as const
 
 /**
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const sendtagCheckoutAddress = {
-  845337: '0x3f14f917fB2DF7e0f3c6b06BB0Fa0522FBEA4Eec',
+  8453: '0x36f43082d01df4801AF2D95aeEd1a0200C5510AE',
+  84532: '0x32b6F71420a0f8286D10D83eAf9EB8F12e6f33Ca',
+  845337: '0x36f43082d01df4801AF2D95aeEd1a0200C5510AE',
 } as const
 
 /**
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const sendtagCheckoutConfig = {
   address: sendtagCheckoutAddress,
@@ -7448,7 +7455,8 @@ export const prepareWriteSenderCreatorCreateSender = /*#__PURE__*/ createSimulat
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const readSendtagCheckout = /*#__PURE__*/ createReadContract({
   abi: sendtagCheckoutAbi,
@@ -7458,7 +7466,8 @@ export const readSendtagCheckout = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"multisig"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const readSendtagCheckoutMultisig = /*#__PURE__*/ createReadContract({
   abi: sendtagCheckoutAbi,
@@ -7469,7 +7478,8 @@ export const readSendtagCheckoutMultisig = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"open"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const readSendtagCheckoutOpen = /*#__PURE__*/ createReadContract({
   abi: sendtagCheckoutAbi,
@@ -7480,7 +7490,8 @@ export const readSendtagCheckoutOpen = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const readSendtagCheckoutOwner = /*#__PURE__*/ createReadContract({
   abi: sendtagCheckoutAbi,
@@ -7491,7 +7502,8 @@ export const readSendtagCheckoutOwner = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"token"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const readSendtagCheckoutToken = /*#__PURE__*/ createReadContract({
   abi: sendtagCheckoutAbi,
@@ -7502,7 +7514,8 @@ export const readSendtagCheckoutToken = /*#__PURE__*/ createReadContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckout = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7512,7 +7525,8 @@ export const writeSendtagCheckout = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckoutCheckout = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7523,7 +7537,8 @@ export const writeSendtagCheckoutCheckout = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7534,7 +7549,8 @@ export const writeSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createWriteCo
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckoutToggle = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7545,7 +7561,8 @@ export const writeSendtagCheckoutToggle = /*#__PURE__*/ createWriteContract({
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckoutTransferOwnership = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7556,7 +7573,8 @@ export const writeSendtagCheckoutTransferOwnership = /*#__PURE__*/ createWriteCo
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckoutWithdrawEth = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7567,7 +7585,8 @@ export const writeSendtagCheckoutWithdrawEth = /*#__PURE__*/ createWriteContract
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const writeSendtagCheckoutWithdrawToken = /*#__PURE__*/ createWriteContract({
   abi: sendtagCheckoutAbi,
@@ -7578,7 +7597,8 @@ export const writeSendtagCheckoutWithdrawToken = /*#__PURE__*/ createWriteContra
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckout = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7588,7 +7608,8 @@ export const prepareWriteSendtagCheckout = /*#__PURE__*/ createSimulateContract(
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckoutCheckout = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7599,7 +7620,8 @@ export const prepareWriteSendtagCheckoutCheckout = /*#__PURE__*/ createSimulateC
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7610,7 +7632,8 @@ export const prepareWriteSendtagCheckoutRenounceOwnership = /*#__PURE__*/ create
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckoutToggle = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7621,7 +7644,8 @@ export const prepareWriteSendtagCheckoutToggle = /*#__PURE__*/ createSimulateCon
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckoutTransferOwnership = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7632,7 +7656,8 @@ export const prepareWriteSendtagCheckoutTransferOwnership = /*#__PURE__*/ create
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckoutWithdrawEth = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7643,7 +7668,8 @@ export const prepareWriteSendtagCheckoutWithdrawEth = /*#__PURE__*/ createSimula
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const prepareWriteSendtagCheckoutWithdrawToken = /*#__PURE__*/ createSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -7654,7 +7680,8 @@ export const prepareWriteSendtagCheckoutWithdrawToken = /*#__PURE__*/ createSimu
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const watchSendtagCheckoutEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendtagCheckoutAbi,
@@ -7664,27 +7691,30 @@ export const watchSendtagCheckoutEvent = /*#__PURE__*/ createWatchContractEvent(
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const watchSendtagCheckoutOwnershipTransferredEvent = /*#__PURE__*/ createWatchContractEvent(
   { abi: sendtagCheckoutAbi, address: sendtagCheckoutAddress, eventName: 'OwnershipTransferred' }
 )
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralBonus"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Receipt"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
-export const watchSendtagCheckoutReferralBonusEvent = /*#__PURE__*/ createWatchContractEvent({
+export const watchSendtagCheckoutReceiptEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendtagCheckoutAbi,
   address: sendtagCheckoutAddress,
-  eventName: 'ReferralBonus',
+  eventName: 'Receipt',
 })
 
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Toggled"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const watchSendtagCheckoutToggledEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendtagCheckoutAbi,
@@ -12121,7 +12151,8 @@ export const useSimulateSenderCreatorCreateSender = /*#__PURE__*/ createUseSimul
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useReadSendtagCheckout = /*#__PURE__*/ createUseReadContract({
   abi: sendtagCheckoutAbi,
@@ -12131,7 +12162,8 @@ export const useReadSendtagCheckout = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"multisig"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useReadSendtagCheckoutMultisig = /*#__PURE__*/ createUseReadContract({
   abi: sendtagCheckoutAbi,
@@ -12142,7 +12174,8 @@ export const useReadSendtagCheckoutMultisig = /*#__PURE__*/ createUseReadContrac
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"open"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useReadSendtagCheckoutOpen = /*#__PURE__*/ createUseReadContract({
   abi: sendtagCheckoutAbi,
@@ -12153,7 +12186,8 @@ export const useReadSendtagCheckoutOpen = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"owner"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useReadSendtagCheckoutOwner = /*#__PURE__*/ createUseReadContract({
   abi: sendtagCheckoutAbi,
@@ -12164,7 +12198,8 @@ export const useReadSendtagCheckoutOwner = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"token"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useReadSendtagCheckoutToken = /*#__PURE__*/ createUseReadContract({
   abi: sendtagCheckoutAbi,
@@ -12175,7 +12210,8 @@ export const useReadSendtagCheckoutToken = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckout = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12185,7 +12221,8 @@ export const useWriteSendtagCheckout = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckoutCheckout = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12196,7 +12233,8 @@ export const useWriteSendtagCheckoutCheckout = /*#__PURE__*/ createUseWriteContr
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12207,7 +12245,8 @@ export const useWriteSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createUseW
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckoutToggle = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12218,7 +12257,8 @@ export const useWriteSendtagCheckoutToggle = /*#__PURE__*/ createUseWriteContrac
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckoutTransferOwnership = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12229,7 +12269,8 @@ export const useWriteSendtagCheckoutTransferOwnership = /*#__PURE__*/ createUseW
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckoutWithdrawEth = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12240,7 +12281,8 @@ export const useWriteSendtagCheckoutWithdrawEth = /*#__PURE__*/ createUseWriteCo
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWriteSendtagCheckoutWithdrawToken = /*#__PURE__*/ createUseWriteContract({
   abi: sendtagCheckoutAbi,
@@ -12251,7 +12293,8 @@ export const useWriteSendtagCheckoutWithdrawToken = /*#__PURE__*/ createUseWrite
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckout = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12261,7 +12304,8 @@ export const useSimulateSendtagCheckout = /*#__PURE__*/ createUseSimulateContrac
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"checkout"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckoutCheckout = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12272,7 +12316,8 @@ export const useSimulateSendtagCheckoutCheckout = /*#__PURE__*/ createUseSimulat
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"renounceOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12283,7 +12328,8 @@ export const useSimulateSendtagCheckoutRenounceOwnership = /*#__PURE__*/ createU
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"toggle"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckoutToggle = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12294,7 +12340,8 @@ export const useSimulateSendtagCheckoutToggle = /*#__PURE__*/ createUseSimulateC
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"transferOwnership"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckoutTransferOwnership = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12305,7 +12352,8 @@ export const useSimulateSendtagCheckoutTransferOwnership = /*#__PURE__*/ createU
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawETH"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckoutWithdrawEth = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12316,7 +12364,8 @@ export const useSimulateSendtagCheckoutWithdrawEth = /*#__PURE__*/ createUseSimu
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `functionName` set to `"withdrawToken"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useSimulateSendtagCheckoutWithdrawToken = /*#__PURE__*/ createUseSimulateContract({
   abi: sendtagCheckoutAbi,
@@ -12327,7 +12376,8 @@ export const useSimulateSendtagCheckoutWithdrawToken = /*#__PURE__*/ createUseSi
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWatchSendtagCheckoutEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendtagCheckoutAbi,
@@ -12337,7 +12387,8 @@ export const useWatchSendtagCheckoutEvent = /*#__PURE__*/ createUseWatchContract
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWatchSendtagCheckoutOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -12347,20 +12398,22 @@ export const useWatchSendtagCheckoutOwnershipTransferredEvent =
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"ReferralBonus"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Receipt"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
-export const useWatchSendtagCheckoutReferralBonusEvent = /*#__PURE__*/ createUseWatchContractEvent({
+export const useWatchSendtagCheckoutReceiptEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendtagCheckoutAbi,
   address: sendtagCheckoutAddress,
-  eventName: 'ReferralBonus',
+  eventName: 'Receipt',
 })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendtagCheckoutAbi}__ and `eventName` set to `"Toggled"`
  *
- *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x36f43082d01df4801af2d95aeed1a0200c5510ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x32b6f71420a0f8286d10d83eaf9eb8f12e6f33ca)
  */
 export const useWatchSendtagCheckoutToggledEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendtagCheckoutAbi,

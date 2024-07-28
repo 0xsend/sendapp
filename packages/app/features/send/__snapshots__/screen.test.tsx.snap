@@ -551,8 +551,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
             }
           >
             <TextInput
-              accessibilityLabel="query"
               accessibilityRole="search"
+              aria-label="query"
               control={
                 {
                   "_defaultValues": {
@@ -685,19 +685,19 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               style={
                 {
                   "backgroundColor": "#111f22",
-                  "borderBottomColor": "#111f22",
+                  "borderBottomColor": "#343434",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
-                  "borderBottomWidth": 0,
-                  "borderLeftColor": "#111f22",
-                  "borderLeftWidth": 0,
-                  "borderRightColor": "#111f22",
-                  "borderRightWidth": 0,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#343434",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#343434",
+                  "borderRightWidth": 1,
                   "borderStyle": "solid",
-                  "borderTopColor": "#111f22",
+                  "borderTopColor": "#343434",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
-                  "borderTopWidth": 0,
+                  "borderTopWidth": 1,
                   "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 19.2,
@@ -824,8 +824,8 @@ exports[`SendScreen should render with search when on /send and no recipient in 
             }
           >
             <TextInput
-              accessibilityLabel="query"
               accessibilityRole="search"
+              aria-label="query"
               control={
                 {
                   "_defaultValues": {
@@ -963,19 +963,19 @@ exports[`SendScreen should render with search when on /send and no recipient in 
               style={
                 {
                   "backgroundColor": "#111f22",
-                  "borderBottomColor": "#111f22",
+                  "borderBottomColor": "#343434",
                   "borderBottomLeftRadius": 9,
                   "borderBottomRightRadius": 9,
-                  "borderBottomWidth": 0,
-                  "borderLeftColor": "#111f22",
-                  "borderLeftWidth": 0,
-                  "borderRightColor": "#111f22",
-                  "borderRightWidth": 0,
+                  "borderBottomWidth": 1,
+                  "borderLeftColor": "#343434",
+                  "borderLeftWidth": 1,
+                  "borderRightColor": "#343434",
+                  "borderRightWidth": 1,
                   "borderStyle": "solid",
-                  "borderTopColor": "#111f22",
+                  "borderTopColor": "#343434",
                   "borderTopLeftRadius": 9,
                   "borderTopRightRadius": 9,
-                  "borderTopWidth": 0,
+                  "borderTopWidth": 1,
                   "color": "#FFFFFF",
                   "fontFamily": "System",
                   "fontSize": 19.2,

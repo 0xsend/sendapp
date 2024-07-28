@@ -1,12 +1,15 @@
 import {
   Anchor,
   Button,
+  Container,
   LinearGradient,
   Stack,
   XStack,
   YStack,
   isWeb,
   useMedia,
+  usePwa,
+  useSafeAreaInsets,
   type ButtonProps,
 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
@@ -68,9 +71,22 @@ function Hero() {
   const { carouselImages, carouselProgress } = useAuthCarouselContext()
   const carouselImage = carouselImages[carouselProgress]
   const mobileImagePosition = carouselImagePositions[carouselProgress]
+  const isPwa = usePwa()
+  const { sat, sab } = useSafeAreaInsets()
+
+  const containerHeight = (() => {
+    switch (true) {
+      case isPwa:
+        return '100vh'
+      case isWeb:
+        return '100dvh'
+      default:
+        return '100%'
+    }
+  })()
 
   return (
-    <YStack h={isWeb ? '100svh' : '100%'} bc="$black" overflow="hidden">
+    <YStack h={containerHeight} pt={isPwa && sat} pb={isPwa && sab} bc="$black" overflow="hidden">
       {carouselImage && (
         <Stack
           pos="absolute"
@@ -130,7 +146,17 @@ function Hero() {
         </Stack>
       )}
 
-      <YStack f={1} jc="space-between" ai="center" px="$4" pt={'$4'} pb="$6">
+      <Container
+        f={1}
+        display="flex"
+        fd="column"
+        jc="space-between"
+        ai="center"
+        px="$4"
+        pt="$4"
+        safeAreaPadding={isPwa && 'y'}
+        pb="$6"
+      >
         <XStack ai="center" gap="$4" w="100%" mt="$4">
           <IconSendLogo size="$4" mx="auto" color="$white" />
           <SignInButton position="absolute" right={'$6'} display={media.gtMd ? 'flex' : 'none'} />
@@ -153,7 +179,7 @@ function Hero() {
             </Anchor>
           </XStack>
         </YStack>
-      </YStack>
+      </Container>
     </YStack>
   )
 }
