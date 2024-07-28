@@ -18,19 +18,6 @@ import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { baseMainnetClient } from '@my/wagmi'
 import { YStack, H1, H2 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
-import debug from 'debug'
-
-const NODE_ENV = process.env.NODE_ENV
-// start debug but it's only activated if __DEV__ is true
-const DEBUG = [
-  process.env.DEBUG,
-  process.env.NEXT_PUBLIC_DEBUG,
-  NODE_ENV === 'development' || __DEV__ ? 'app:*' : '',
-]
-  .filter(Boolean)
-  .join(',')
-debug.enable(DEBUG)
-debug.log('debug enabled', DEBUG)
 
 createWeb3Modal({
   wagmiConfig,
