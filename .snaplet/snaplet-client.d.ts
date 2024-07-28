@@ -139,6 +139,35 @@ type Override = {
       request_id?: string;
     };
   }
+  job?: {
+    name?: string;
+    fields?: {
+      jobid?: string;
+      schedule?: string;
+      command?: string;
+      nodename?: string;
+      nodeport?: string;
+      database?: string;
+      username?: string;
+      active?: string;
+      jobname?: string;
+    };
+  }
+  job_run_details?: {
+    name?: string;
+    fields?: {
+      jobid?: string;
+      runid?: string;
+      job_pid?: string;
+      database?: string;
+      username?: string;
+      command?: string;
+      status?: string;
+      return_message?: string;
+      start_time?: string;
+      end_time?: string;
+    };
+  }
   storage_migrations?: {
     name?: string;
     fields?: {
@@ -612,6 +641,17 @@ export interface Fingerprint {
     hookTableId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     requestId?: FingerprintNumberField;
+  }
+  jobs?: {
+    jobid?: FingerprintNumberField;
+    nodeport?: FingerprintNumberField;
+  }
+  jobRunDetails?: {
+    jobid?: FingerprintNumberField;
+    runid?: FingerprintNumberField;
+    jobPid?: FingerprintNumberField;
+    startTime?: FingerprintDateField;
+    endTime?: FingerprintDateField;
   }
   storageMigrations?: {
     id?: FingerprintNumberField;
