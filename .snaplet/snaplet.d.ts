@@ -175,39 +175,6 @@ interface Table_shovel_integrations {
   name: string | null;
   conf: Json | null;
 }
-interface Table_cron_job {
-  jobid: number;
-  schedule: string;
-  command: string;
-  nodename: string;
-  nodeport: number;
-  database: string;
-  username: string;
-  active: boolean;
-  /**
-  * We couldn't determine the type of this column. The type might be coming from an unknown extension
-  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
-  * Otherwise, please manually type this column by casting it to the correct type.
-  * @example
-  * Here is a cast example for copycat use:
-  * ```
-  * copycat.scramble(row.unknownColumn as string)
-  * ```
-  */
-  jobname: unknown | null;
-}
-interface Table_cron_job_run_details {
-  jobid: number | null;
-  runid: number;
-  job_pid: number | null;
-  database: string | null;
-  username: string | null;
-  command: string | null;
-  status: string | null;
-  return_message: string | null;
-  start_time: string | null;
-  end_time: string | null;
-}
 interface Table_pgsodium_key {
   id: string;
   status: Enum_pgsodium_key_status | null;
@@ -623,10 +590,6 @@ interface Schema_auth {
   sso_providers: Table_auth_sso_providers;
   users: Table_auth_users;
 }
-interface Schema_cron {
-  job: Table_cron_job;
-  job_run_details: Table_cron_job_run_details;
-}
 interface Schema_dbdev {
 
 }
@@ -710,7 +673,6 @@ interface Database {
   _analytics: Schema__analytics;
   _realtime: Schema__realtime;
   auth: Schema_auth;
-  cron: Schema_cron;
   dbdev: Schema_dbdev;
   extensions: Schema_extensions;
   graphql: Schema_graphql;
@@ -729,7 +691,7 @@ interface Database {
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "http" | "pg_cron" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "uuid-ossp";
+  extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "uuid-ossp";
   graphql: "pg_graphql";
   pgsodium: "pgsodium";
   pgtle: "pg_tle";
