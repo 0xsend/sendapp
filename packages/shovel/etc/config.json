@@ -721,8 +721,8 @@
           "column": "log_addr",
           "filter_op": "contains",
           "filter_arg": [
-            "0x0bD9297334a23De53b865c503Ee874d923892ccA",
-            "0xc2781d5FcDE2d80886d8EB0B80930FeE89a2061D"
+            "0x36f43082d01df4801AF2D95aeEd1a0200C5510AE",
+            "0x32b6F71420a0f8286D10D83eAf9EB8F12e6f33Ca"
           ]
         }
       ],

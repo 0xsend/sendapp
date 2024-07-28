@@ -42,6 +42,11 @@ abstract contract Helper is Script {
      * https://basescan.org/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032
      */
     address constant AA_ENTRY_POINT_V0_7 = 0x0000000071727De22E5E9d8BAf0edAc6f37da032;
+    /**
+     * USDC on Base
+     * https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+     */
+    address constant USDC_BASE = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
 
     function labels() public {
         vm.label(SEND_TOKEN, "SEND_TOKEN");
@@ -52,5 +57,6 @@ abstract contract Helper is Script {
         vm.label(SEND_AIRDROPS_SAFE, "SEND_AIRDROPS_SAFE");
         vm.label(AA_ENTRY_POINT_V0_6, "AA_ENTRY_POINT_V0_6");
         vm.label(AA_ENTRY_POINT_V0_7, "AA_ENTRY_POINT_V0_7");
+        vm.label(USDC_BASE, "USDC_BASE");
     }
 }

@@ -177,6 +177,12 @@ export default defineConfig({
         '**.s.sol/*.json',
         '**.t.sol/*.json',
         'SendPaymaster.sol/**', // avoid duplicate IMetaPaymaster
+        'SendtagCheckout.sol/Address.json',
+        'SendtagCheckout.sol/Context.json',
+        'SendtagCheckout.sol/IERC20.json',
+        'SendtagCheckout.sol/IERC20Permit.json',
+        'SendtagCheckout.sol/Ownable.json',
+        'SendtagCheckout.sol/SafeERC20.json',
         'DummyEntryPointSimulations.sol/**', // avoid dummies
       ],
     }),
