@@ -191,6 +191,12 @@ interface Table_pgsodium_key {
   comment: string | null;
   user_data: string | null;
 }
+interface Table_private_leaderboard_referrals_all_time {
+  user_id: string;
+  referrals: number | null;
+  rewards_usdc: number | null;
+  updated_at: string | null;
+}
 interface Table_auth_mfa_amr_claims {
   session_id: string;
   created_at: string;
@@ -616,7 +622,7 @@ interface Schema_pgtle {
   feature_info: Table_pgtle_feature_info;
 }
 interface Schema_private {
-
+  leaderboard_referrals_all_time: Table_private_leaderboard_referrals_all_time;
 }
 interface Schema_public {
   activity: Table_public_activity;
@@ -785,6 +791,14 @@ interface Tables_relationships {
        secrets_key_id_fkey: "vault.secrets";
     };
   };
+  "private.leaderboard_referrals_all_time": {
+    parent: {
+       leaderboard_referrals_all_time_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
   "auth.mfa_amr_claims": {
     parent: {
        mfa_amr_claims_session_id_fkey: "auth.sessions";
@@ -946,6 +960,7 @@ interface Tables_relationships {
        identities_user_id_fkey: "auth.identities";
        mfa_factors_user_id_fkey: "auth.mfa_factors";
        sessions_user_id_fkey: "auth.sessions";
+       leaderboard_referrals_all_time_user_id_fkey: "private.leaderboard_referrals_all_time";
        activity_from_user_id_fkey: "public.activity";
        activity_to_user_id_fkey: "public.activity";
        chain_addresses_user_id_fkey: "public.chain_addresses";

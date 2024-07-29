@@ -309,7 +309,10 @@ test('can refer multiple tags in separate transactions', async ({
       tags: firstTags,
     },
   })
-  await verifyReferralReward(referrerSendAccount.address as `0x${string}`, firstTags)
+  const firstRewardAmount = await verifyReferralReward(
+    referrerSendAccount.address as `0x${string}`,
+    firstTags
+  )
 
   // Second transaction
   await checkoutPage.goto() // Go back to the checkout page
@@ -346,11 +349,23 @@ test('can refer multiple tags in separate transactions', async ({
       tags: secondTags,
     },
   })
-  await verifyReferralReward(
+  const secondRewardAmount = await verifyReferralReward(
     referrerSendAccount.address as `0x${string}`,
     secondTags,
     currentBalance
   )
+
+  // peek at the leaderboard
+  const { data: leaderboardData, error: leaderboardError } = await supabase
+    .rpc('leaderboard_referrals_all_time')
+    .select('rewards_usdc::text,referrals::text,user')
+  expect(leaderboardError).toBeFalsy()
+  expect(leaderboardData?.[0]).toBeTruthy()
+  assert(!!leaderboardData?.[0], 'leaderboard data not found')
+  expect(leaderboardData[0].rewards_usdc).toBe((firstRewardAmount + secondRewardAmount).toString())
+  expect(leaderboardData[0].referrals).toBe((firstTags.length + secondTags.length).toString())
+  log('leaderboard', leaderboardData)
+
   log('done')
 })
 
