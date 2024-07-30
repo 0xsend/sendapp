@@ -493,6 +493,7 @@ type Override = {
       reauthentication_sent_at?: string;
       is_sso_user?: string;
       deleted_at?: string;
+      is_anonymous?: string;
       leaderboard_referrals_all_time?: string;
       activity_activity_from_user_idTousers?: string;
       activity_activity_to_user_idTousers?: string;

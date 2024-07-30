@@ -6,11 +6,12 @@ type Enum_auth_aal_level = 'aal1' | 'aal2' | 'aal3';
 type Enum_auth_code_challenge_method = 'plain' | 's256';
 type Enum_auth_factor_status = 'unverified' | 'verified';
 type Enum_auth_factor_type = 'totp' | 'webauthn';
+type Enum_auth_one_time_token_type = 'confirmation_token' | 'email_change_token_current' | 'email_change_token_new' | 'phone_change_token' | 'reauthentication_token' | 'recovery_token';
 type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgsodium_key_status = 'default' | 'expired' | 'invalid' | 'valid';
 type Enum_pgsodium_key_type = 'aead-det' | 'aead-ietf' | 'auth' | 'generichash' | 'hmacsha256' | 'hmacsha512' | 'kdf' | 'secretbox' | 'secretstream' | 'shorthash' | 'stream_xchacha20';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
-type Enum_pgtle_pg_tle_features = 'passcheck';
+type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
@@ -129,6 +130,7 @@ interface Table_auth_flow_state {
   created_at: string | null;
   updated_at: string | null;
   authentication_method: string;
+  auth_code_issued_at: string | null;
 }
 interface Table_supabase_functions_hooks {
   id: number;
@@ -243,6 +245,15 @@ interface Table_storage_objects {
   version: string | null;
   owner_id: string | null;
 }
+interface Table_auth_one_time_tokens {
+  id: string;
+  user_id: string;
+  token_type: Enum_auth_one_time_token_type;
+  token_hash: string;
+  relates_to: string;
+  created_at: string;
+  updated_at: string;
+}
 interface Table_public_profiles {
   id: string;
   avatar_url: string | null;
@@ -276,6 +287,28 @@ interface Table_auth_refresh_tokens {
   parent: string | null;
   session_id: string | null;
 }
+interface Table_storage_s_3_multipart_uploads {
+  id: string;
+  in_progress_size: number;
+  upload_signature: string;
+  bucket_id: string;
+  key: string;
+  version: string;
+  owner_id: string | null;
+  created_at: string;
+}
+interface Table_storage_s_3_multipart_uploads_parts {
+  id: string;
+  upload_id: string;
+  size: number;
+  part_number: number;
+  bucket_id: string;
+  key: string;
+  etag: string;
+  owner_id: string | null;
+  version: string;
+  created_at: string;
+}
 interface Table_auth_saml_providers {
   id: string;
   sso_provider_id: string;
@@ -285,6 +318,7 @@ interface Table_auth_saml_providers {
   attribute_mapping: Json | null;
   created_at: string | null;
   updated_at: string | null;
+  name_id_format: string | null;
 }
 interface Table_auth_saml_relay_states {
   id: string;
@@ -292,7 +326,6 @@ interface Table_auth_saml_relay_states {
   request_id: string;
   for_email: string | null;
   redirect_to: string | null;
-  from_ip_address: string | null;
   created_at: string | null;
   updated_at: string | null;
   flow_state_id: string | null;
@@ -558,6 +591,7 @@ interface Table_auth_users {
   reauthentication_sent_at: string | null;
   is_sso_user: boolean;
   deleted_at: string | null;
+  is_anonymous: boolean;
 }
 interface Table_public_webauthn_credentials {
   id: string;
@@ -587,6 +621,7 @@ interface Schema_auth {
   mfa_amr_claims: Table_auth_mfa_amr_claims;
   mfa_challenges: Table_auth_mfa_challenges;
   mfa_factors: Table_auth_mfa_factors;
+  one_time_tokens: Table_auth_one_time_tokens;
   refresh_tokens: Table_auth_refresh_tokens;
   saml_providers: Table_auth_saml_providers;
   saml_relay_states: Table_auth_saml_relay_states;
@@ -664,6 +699,8 @@ interface Schema_storage {
   buckets: Table_storage_buckets;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
+  s3_multipart_uploads: Table_storage_s_3_multipart_uploads;
+  s3_multipart_uploads_parts: Table_storage_s_3_multipart_uploads_parts;
 }
 interface Schema_supabase_functions {
   hooks: Table_supabase_functions_hooks;
@@ -720,6 +757,8 @@ interface Tables_relationships {
     };
     children: {
        objects_bucketId_fkey: "storage.objects";
+       s3_multipart_uploads_bucket_id_fkey: "storage.s3_multipart_uploads";
+       s3_multipart_uploads_parts_bucket_id_fkey: "storage.s3_multipart_uploads_parts";
     };
   };
   "public.chain_addresses": {
@@ -831,6 +870,14 @@ interface Tables_relationships {
 
     };
   };
+  "auth.one_time_tokens": {
+    parent: {
+       one_time_tokens_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+  };
   "public.profiles": {
     parent: {
        profiles_id_fkey: "auth.users";
@@ -861,6 +908,23 @@ interface Tables_relationships {
   "auth.refresh_tokens": {
     parent: {
        refresh_tokens_session_id_fkey: "auth.sessions";
+    };
+    children: {
+
+    };
+  };
+  "storage.s3_multipart_uploads": {
+    parent: {
+       s3_multipart_uploads_bucket_id_fkey: "storage.buckets";
+    };
+    children: {
+       s3_multipart_uploads_parts_upload_id_fkey: "storage.s3_multipart_uploads_parts";
+    };
+  };
+  "storage.s3_multipart_uploads_parts": {
+    parent: {
+       s3_multipart_uploads_parts_bucket_id_fkey: "storage.buckets";
+       s3_multipart_uploads_parts_upload_id_fkey: "storage.s3_multipart_uploads";
     };
     children: {
 
@@ -959,6 +1023,7 @@ interface Tables_relationships {
     children: {
        identities_user_id_fkey: "auth.identities";
        mfa_factors_user_id_fkey: "auth.mfa_factors";
+       one_time_tokens_user_id_fkey: "auth.one_time_tokens";
        sessions_user_id_fkey: "auth.sessions";
        leaderboard_referrals_all_time_user_id_fkey: "private.leaderboard_referrals_all_time";
        activity_from_user_id_fkey: "public.activity";
