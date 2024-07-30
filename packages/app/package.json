@@ -40,6 +40,7 @@
     "@wagmi/connectors": "^5.0.15",
     "@wagmi/core": "^2.10.5",
     "@web3modal/wagmi": "^5.0.2",
+    "@yudiel/react-qr-scanner": "^2.0.4",
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.12.1",
     "cbor": "^9.0.1",

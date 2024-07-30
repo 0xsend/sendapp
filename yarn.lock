@@ -10832,6 +10832,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/dom-webcodecs@npm:^0.1.11":
+  version: 0.1.11
+  resolution: "@types/dom-webcodecs@npm:0.1.11"
+  checksum: 10/00141b61720110bdfe75d0c0d84e69e44aaeb9a173f921d6252fe42bbbe01394e395e778cf8701d5ddfec3d5258b4ca841f7522210172c00b1d433ffa3d3ea51
+  languageName: node
+  linkType: hard
+
+"@types/emscripten@npm:^1.39.13":
+  version: 1.39.13
+  resolution: "@types/emscripten@npm:1.39.13"
+  checksum: 10/02c0446150f9cc2c74dc3a551f86ce13df266c33d8b98d11d9f17263e2d98a6a6b4d36bdd15066c4e1547ae1ed2d52eed9420116b4935d119009e0f53ddbb041
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.7
   resolution: "@types/eslint-scope@npm:3.7.7"
@@ -13175,6 +13189,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@yudiel/react-qr-scanner@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "@yudiel/react-qr-scanner@npm:2.0.4"
+  dependencies:
+    barcode-detector: "npm:^2.2.7"
+    webrtc-adapter: "npm:9.0.1"
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  checksum: 10/3dc8ae66f0fceb353909f4af03b87537b1e401e00496dd1a7f96f86ab366d21d777eb8023d4621079364affde73a6311ce36ec84ffca31c46d7300312d7e36e0
+  languageName: node
+  linkType: hard
+
 "@zxing/text-encoding@npm:0.9.0":
   version: 0.9.0
   resolution: "@zxing/text-encoding@npm:0.9.0"
@@ -13654,6 +13681,7 @@ __metadata:
     "@wagmi/connectors": "npm:^5.0.15"
     "@wagmi/core": "npm:^2.10.5"
     "@web3modal/wagmi": "npm:^5.0.2"
+    "@yudiel/react-qr-scanner": "npm:^2.0.4"
     babel-preset-expo: "npm:~11.0.0"
     base64-arraybuffer: "npm:^1.0.2"
     burnt: "npm:^0.12.1"
@@ -14426,6 +14454,16 @@ __metadata:
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
   checksum: 10/9706c088a283058a8a99e0bf91b0a2f75497f185980d9ffa8b304de1d9e58ebda7c72c07ebf01dadedaac5b2907b2c6f566f660d62bd336c3468e960403b9d65
+  languageName: node
+  linkType: hard
+
+"barcode-detector@npm:^2.2.7":
+  version: 2.2.7
+  resolution: "barcode-detector@npm:2.2.7"
+  dependencies:
+    "@types/dom-webcodecs": "npm:^0.1.11"
+    zxing-wasm: "npm:1.2.11"
+  checksum: 10/efa516981f3a1950dea86aadc672608d2e144758c06a20db9194c59269d01d57d6235035ffad1ee6d346efb0d46cfa772770eb6e0ba1e0977177fa5d371e1c45
   languageName: node
   linkType: hard
 
@@ -29896,6 +29934,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sdp@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "sdp@npm:3.2.0"
+  checksum: 10/3ea337c24f91f7429c79b97f1a16c19a5abb3b6672ce7c05cc931314af1318cdf3a7a88e66ea1ee71e05bf41bf3a20d5940b1c93f3099e820cec60068ddbd9b4
+  languageName: node
+  linkType: hard
+
 "secp256k1@npm:^5.0.0":
   version: 5.0.0
   resolution: "secp256k1@npm:5.0.0"
@@ -34005,6 +34050,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webrtc-adapter@npm:9.0.1":
+  version: 9.0.1
+  resolution: "webrtc-adapter@npm:9.0.1"
+  dependencies:
+    sdp: "npm:^3.2.0"
+  checksum: 10/5e73ddb6fb807e28fc4bb727bdee2717a697bcf24cfbe1e401c5a3c57d61627fa000b6185470ec3c9fcc1dca42093b67776742c7fde7002fbc14da272a020cbf
+  languageName: node
+  linkType: hard
+
 "whatwg-encoding@npm:^2.0.0":
   version: 2.0.0
   resolution: "whatwg-encoding@npm:2.0.0"
@@ -34705,5 +34759,14 @@ __metadata:
   bin:
     zx: build/cli.js
   checksum: 10/6e965bf651759ea778ad8b8ad56dfc7c072fc546563abc2f189de1be305994c82d3f228ed99aa9b4992d839f119158f2ddc0d7e00dc87a216ffc16ed87d57813
+  languageName: node
+  linkType: hard
+
+"zxing-wasm@npm:1.2.11":
+  version: 1.2.11
+  resolution: "zxing-wasm@npm:1.2.11"
+  dependencies:
+    "@types/emscripten": "npm:^1.39.13"
+  checksum: 10/d5f2b51e261f3b7d6203c0de08d22e3afe2841a3d0f1535a6a86c69a1958cee810aadffd7911df2a4b731d98b93c4e4d14e67c5d95058ff34d911da9ed8b30ba
   languageName: node
   linkType: hard
