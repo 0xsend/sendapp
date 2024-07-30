@@ -18,7 +18,7 @@ const USDollar = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 })
 
-const GreenSquare = styled(Stack, {
+export const GreenSquare = styled(Stack, {
   name: 'Surface',
   w: 11,
   h: 11,

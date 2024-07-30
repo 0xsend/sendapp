@@ -1,5 +1,5 @@
 import { type UseQueryResult, useQuery } from '@tanstack/react-query'
-import type { coins } from 'app/data/coins'
+import { coins } from 'app/data/coins'
 import type { Hex } from 'viem'
 import { z } from 'zod'
 
@@ -66,7 +66,7 @@ export const useSendPrice = () => useTokenPrice('send-token' as const)
 /**
  * Fetch coin market data
  */
-export const useTokenMarketData = <T extends coins[number]['coingeckoTokenId']>(tokenId: T) => {
+export const useTokenMarketData = <T extends coins[number]['coingeckoTokenId']>(tokenId?: T) => {
   return useQuery({
     queryKey: ['coin-market-data', tokenId],
     queryFn: async () => {
@@ -80,17 +80,23 @@ export const useTokenMarketData = <T extends coins[number]['coingeckoTokenId']>(
       return MarketDataSchema.parse(data)
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !!tokenId,
   })
 }
 
 /**
- * Fetch token metadata (from contract address)
+ * Get a token's goin gecko id from its contract address
  * @param {Hex} contractAddress - token contract address
  */
-export const useTokenMetadata = (contractAddress: Hex, queryParams?): UseQueryResult<object> => {
+export const useCoinGeckoTokenId = (contractAddress: Hex, queryParams?): UseQueryResult<string> => {
   return useQuery({
-    queryKey: ['token-thumbnail', contractAddress],
-    queryFn: async (): Promise<object> => {
+    queryKey: ['get-coin-gecko-token-id', contractAddress],
+    queryFn: async (): Promise<string> => {
+      const coin = coins.find((coin) => coin.token === contractAddress)
+      if (coin) {
+        return coin.coingeckoTokenId
+      }
+
       const response = await fetch(
         `https://api.coingecko.com/api/v3/coins/ethereum?contract_address=${contractAddress}&vs_currency=usd`
       )
@@ -98,8 +104,7 @@ export const useTokenMetadata = (contractAddress: Hex, queryParams?): UseQueryRe
       if (!response.ok)
         throw new Error(`Failed to fetch token metadata ${contractAddress} ${response.status}`)
       const data = await response.json()
-
-      return data
+      return data.id
     },
     enabled: !!contractAddress,
     ...queryParams,

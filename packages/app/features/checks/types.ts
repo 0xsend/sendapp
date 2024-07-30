@@ -14,26 +14,6 @@ export interface SendCheckData {
 }
 
 /**
- * Properties for the CreateSendCheck button component.
- *
- * @interface CreateSendCheckBtnProps
- * @property {bigint} amount - The amount of the token to be sent.
- * @property {Hex} tokenAddress - The address of the token.
- * @property {(receipt: GetUserOperationReceiptReturnType, senderSendId: string, EphemeralKeyPair: Hex) => void} onSuccess - Callback function to be called upon successful check creation and sending. Receives the sender's account ID and the ephemeral private key used in the operation.
- * @property {(error: Error) => void} onError - Callback function to be called in case of an error during the check creation or sending process.
- */
-export interface CreateSendCheckBtnProps {
-  amount: bigint
-  tokenAddress: Hex
-  onSuccess: (
-    receipt: GetUserOperationReceiptReturnType,
-    senderSendId: string,
-    ephemeralKeypair: EphemeralKeyPair
-  ) => void
-  onError: (error: Error) => void
-}
-
-/**
  * Defines the properties required to create and send a check.
  * @interface CreateSendCheckProps
  * @property {Hex} tokenAddress - The address of the token to be sent.
@@ -117,4 +97,13 @@ export type useClaimSendCheckReturnType = () => Promise<GetUserOperationReceiptR
 export interface EphemeralKeyPair {
   ephemeralPrivateKey: `0x${string}`
   ephemeralAddress: `0x${string}`
+}
+
+/**
+ * Represents the token metadata shown on the claim /send check page.
+ */
+export interface TokenMetadata {
+  name: string
+  imageUrl: string
+  coinGeckoTokenId: string
 }

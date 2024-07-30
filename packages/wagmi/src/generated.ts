@@ -2347,6 +2347,9 @@ export const sendAirdropsSafeConfig = {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendCheck
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+export const sendCheckAddress = {
+  845337: '0x6f6f570f45833e249e27022648a26f4076f48f78'
+}
 
 export const sendCheckAbi = [
   {
@@ -2388,6 +2391,25 @@ export const sendCheckAbi = [
     name: 'createCheck',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'ephemeralAddress', internalType: 'address', type: 'address' }],
+    name: 'getCheck',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct Check',
+        type: 'tuple',
+        components: [
+          { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
+          { name: 'from', internalType: 'address', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
   },
   {
     type: 'event',
@@ -6273,6 +6295,14 @@ export const readSendCheck = /*#__PURE__*/ createReadContract({ abi: sendCheckAb
 export const readSendCheckChecks = /*#__PURE__*/ createReadContract({
   abi: sendCheckAbi,
   functionName: 'checks',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"getCheck"`
+ */
+export const readSendCheckGetCheck = /*#__PURE__*/ createReadContract({
+  abi: sendCheckAbi,
+  functionName: 'getCheck',
 })
 
 /**
@@ -10965,6 +10995,14 @@ export const useReadSendCheck = /*#__PURE__*/ createUseReadContract({ abi: sendC
 export const useReadSendCheckChecks = /*#__PURE__*/ createUseReadContract({
   abi: sendCheckAbi,
   functionName: 'checks',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"getCheck"`
+ */
+export const useReadSendCheckGetCheck = /*#__PURE__*/ createUseReadContract({
+  abi: sendCheckAbi,
+  functionName: 'getCheck',
 })
 
 /**

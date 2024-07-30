@@ -54,7 +54,7 @@ export function SendTopNav() {
             display={'flex'}
             als={'center'}
           >
-            {sendParams.recipient ? 'Enter Amount' : 'Select Recipient'}
+            {sendParams.recipient ? 'Enter Amount' : sendParams.screen || 'Select Recipient'}
           </H2>
         </Stack>
         <Stack />
