@@ -69,7 +69,11 @@ const getCallData = (props: CreateSendCheckUserOpProps): Hex => {
 }
 
 const validateCreateSendCheckUserOpProps = (props: CreateSendCheckUserOpProps) => {
-  assert(!!sendCheckAddress[baseMainnetClient.chain.id], 'Invalid send check address')
+  assert(!!sendCheckAddress, 'Undefined send checks address')
+  assert(
+    !!sendCheckAddress[baseMainnetClient.chain.id],
+    `Undefined send checks address for chain ${baseMainnetClient.chain.id}`
+  )
   assert(!!props.maxFeesPerGas && typeof props.maxFeesPerGas === 'bigint', 'Invalid maxFeesPerGas')
   assert(!!props.tokenAddress && isAddress(props.tokenAddress), 'Invalid token address')
   assert(

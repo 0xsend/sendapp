@@ -5,9 +5,7 @@ interface Props {
   tokenAmount: bigint
   tokenName: string
   tokenIconSize: number
-
   tokenImageUrl?: string
-  tokenInfoUrl?: string
 }
 
 export const CheckTokenAmount = (props: Props) => {
@@ -17,7 +15,6 @@ export const CheckTokenAmount = (props: Props) => {
         <TokenIcon
           tokenImageUrl={props.tokenImageUrl}
           tokenName={props.tokenName}
-          tokenInfoUrl={props.tokenInfoUrl}
           tokenIconSize={props.tokenIconSize}
         />
       )

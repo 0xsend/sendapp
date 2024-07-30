@@ -3,7 +3,7 @@ import { CheckValue } from 'app/features/checks/components/claim/check/check-dat
 import { useState } from 'react'
 
 export interface ClaimSendCheckBtnProps {
-  tokenId?: number
+  tokenId?: string
   tokenAmount?: bigint
 }
 
@@ -33,7 +33,7 @@ export const ClaimButton = (props: Props) => {
             {showCheckValue()}
           </>
         )}
-        {loading && <Spinner size="large" color="$primary" />}
+        {loading && <Spinner size="large" color="black" />}
       </XStack>
     </Button>
   )

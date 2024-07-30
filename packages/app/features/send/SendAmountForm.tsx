@@ -1,4 +1,3 @@
-import type { Functions } from '@my/supabase/database.types'
 import { Button, Paragraph, Spinner, Stack, SubmitButton, XStack, YStack } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { coins, type coin } from 'app/data/coins'
@@ -14,6 +13,10 @@ import { useBalance } from 'wagmi'
 import { z } from 'zod'
 import { SendRecipient } from './confirm/screen'
 
+interface Props {
+  onSubmit?: () => Promise<void>
+}
+
 const removeDuplicateInString = (text: string, substring: string) => {
   const [first, ...after] = text.split(substring)
   return first + (after.length ? `${substring}${after.join('')}` : '')
@@ -24,7 +27,7 @@ const SendAmountSchema = z.object({
   token: formFields.coin,
 })
 
-export function SendAmountForm() {
+export function SendAmountForm(props: Props) {
   const form = useForm<z.infer<typeof SendAmountSchema>>()
   const { data: sendAccount } = useSendAccount()
   const router = useRouter()
@@ -90,7 +93,7 @@ export function SendAmountForm() {
       <SchemaForm
         form={form}
         schema={SendAmountSchema}
-        onSubmit={onSubmit}
+        onSubmit={props.onSubmit ?? onSubmit}
         props={{
           amount: {
             h: '$11',
@@ -158,7 +161,7 @@ export function SendAmountForm() {
       >
         {({ amount, token }) => (
           <YStack gap="$5" $gtSm={{ maw: 500 }} $gtLg={{ mx: 0 }} mx="auto">
-            <SendRecipient />
+            {sendParams.recipient && <SendRecipient />}
             {amount}
             <XStack jc="center" $gtLg={{ jc: 'flex-end' }} ai="center" gap="$3">
               <Stack

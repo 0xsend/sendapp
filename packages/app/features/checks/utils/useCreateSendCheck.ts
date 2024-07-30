@@ -13,6 +13,8 @@ import { getCreateSendCheckUserOp } from 'app/features/checks/utils/getCreateSen
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnetClient } from '@my/wagmi'
 import { useUser } from 'app/utils/useUser'
+import { type Hex, isAddress } from 'viem'
+import { assert } from 'app/utils/assert'
 
 const logger = debug.log
 
@@ -31,9 +33,13 @@ export const useCreateSendCheck = (props: CreateSendCheckProps): useCreateSendCh
 
   // get /send check creation user op
   return async () => {
-    if (!profile?.send_id || !nonce || !sendAccount?.address || !feesPerGas) {
-      return
-    }
+    validateCreateSendCheckArgs(
+      profile?.send_id,
+      nonce,
+      sendAccount?.address,
+      feesPerGas?.maxFeePerGas
+    )
+
     const userOpProps: CreateSendCheckUserOpProps = {
       senderAddress: sendAccount?.address as `0x${string}`,
       nonce: nonce as bigint,
@@ -73,4 +79,16 @@ export const createSendCheck = async (
   logger(`/send check created: [${receipt}]`)
   logger(`/send check creation trn hash: [${receipt.receipt.transactionHash}]`)
   return receipt
+}
+
+const validateCreateSendCheckArgs = (
+  sendId?: number,
+  nonce?: bigint,
+  senderAddress?: Hex,
+  feesPerGas?: bigint
+) => {
+  assert(!!sendId, 'Invalid send ID.')
+  assert(typeof nonce === 'bigint' && nonce >= 0n, `Invalid nonce. Received: ${nonce}`)
+  assert(!!senderAddress && isAddress(senderAddress), 'Invalid sender address.')
+  assert(!!feesPerGas && feesPerGas > 0n, `Invalid fees per gas. Received: ${feesPerGas}`)
 }

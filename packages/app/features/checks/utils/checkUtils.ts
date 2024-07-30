@@ -18,7 +18,7 @@ import { defaultUserOp } from 'app/utils/useUserOpTransferMutation'
  * @returns {string} The generated URL for claiming the check.
  */
 export const encodeClaimCheckUrl = (
-  senderSendId: string,
+  senderSendId: number,
   ephemeralKeyPair: EphemeralKeyPair
 ): string => {
   // TODO: /send check notes: add note field in encoded payload
