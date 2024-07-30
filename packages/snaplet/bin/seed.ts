@@ -8,7 +8,7 @@ import { createSeedClient } from '@snaplet/seed'
 import { models } from '../src'
 import * as pg from 'pg'
 import { pravatar } from '../src/utils'
-import { userOnboarded } from '../src/models'
+import { leaderboardReferralsAllTimes, userOnboarded } from '../src/models'
 
 // @ts-expect-error typescript is confused
 const { Client: PgClient } = pg.default as unknown as typeof pg
@@ -61,6 +61,7 @@ const pgClient = new PgClient({
       ],
       sendAccounts: [{}],
       chainAddresses: [{}],
+      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
     },
     {
       phone: '1234567890',
@@ -82,6 +83,7 @@ const pgClient = new PgClient({
       ],
       sendAccounts: [{}],
       chainAddresses: [{}],
+      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
     },
     {
       phone: '15555555555',
@@ -103,6 +105,7 @@ const pgClient = new PgClient({
       ],
       sendAccounts: [{}],
       chainAddresses: [{}],
+      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
     },
     ...Array(100).fill(userOnboarded),
   ])
