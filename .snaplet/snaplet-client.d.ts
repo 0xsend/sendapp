@@ -139,6 +139,16 @@ type Override = {
       request_id?: string;
     };
   }
+  leaderboard_referrals_all_time?: {
+    name?: string;
+    fields?: {
+      user_id?: string;
+      referrals?: string;
+      rewards_usdc?: string;
+      updated_at?: string;
+      users?: string;
+    };
+  }
   storage_migrations?: {
     name?: string;
     fields?: {
@@ -483,6 +493,8 @@ type Override = {
       reauthentication_sent_at?: string;
       is_sso_user?: string;
       deleted_at?: string;
+      is_anonymous?: string;
+      leaderboard_referrals_all_time?: string;
       activity_activity_from_user_idTousers?: string;
       activity_activity_to_user_idTousers?: string;
       chain_addresses?: string;
@@ -612,6 +624,12 @@ export interface Fingerprint {
     hookTableId?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     requestId?: FingerprintNumberField;
+  }
+  leaderboardReferralsAllTimes?: {
+    referrals?: FingerprintNumberField;
+    rewardsUsdc?: FingerprintNumberField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
   }
   storageMigrations?: {
     id?: FingerprintNumberField;
@@ -779,6 +797,7 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    leaderboardReferralsAllTimes?: FingerprintRelationField;
     activitiesByFromUserId?: FingerprintRelationField;
     activitiesByToUserId?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;

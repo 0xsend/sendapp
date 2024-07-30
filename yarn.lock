@@ -40,7 +40,7 @@ __metadata:
     "@types/debug": "npm:^4"
     "@vitest/coverage-v8": "npm:^0.34.6"
     cbor: "npm:^9.0.1"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     rollup: "npm:^4.6.1"
     rollup-plugin-polyfill-node: "npm:^0.13.0"
     typescript: "npm:^5.5.3"
@@ -5920,7 +5920,7 @@ __metadata:
     "@trpc/server": "npm:11.0.0-next-beta.264"
     "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     p-queue: "npm:^8.0.1"
     superjson: "npm:^1.13.1"
     viem: "npm:^2.18.2"
@@ -5937,7 +5937,7 @@ __metadata:
     "@supabase/supabase-js": "npm:2.44.2"
     "@types/bun": "npm:^1.1.6"
     "@uniswap/v3-periphery": "npm:^1.4.4"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     solhint: "npm:^3.6.2"
     zx: "npm:^8.1.2"
   languageName: unknown
@@ -5962,7 +5962,7 @@ __metadata:
     "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
     cbor: "npm:^9.0.1"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     dotenv-cli: "npm:^7.3.0"
     extract-zip: "npm:^2.0.1"
     jsonwebtoken: "npm:^9.0.2"
@@ -6048,7 +6048,7 @@ __metadata:
     "@wagmi/cli": "npm:^2.1.15"
     "@wagmi/core": "npm:^2.13.1"
     change-case: "npm:^5.4.2"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     globby: "npm:^14.0.0"
     permissionless: "npm:^0.1.14"
     typescript: "npm:^5.5.3"
@@ -13663,7 +13663,7 @@ __metadata:
     base64-arraybuffer: "npm:^1.0.2"
     burnt: "npm:^0.12.1"
     cbor: "npm:^9.0.1"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     dnum: "npm:^2.9.0"
     eslint: "npm:^8.46.0"
     eslint-config-custom: "workspace:*"
@@ -16599,15 +16599,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:^4.3.5":
-  version: 4.3.5
-  resolution: "debug@npm:4.3.5"
+"debug@npm:^4.3.6":
+  version: 4.3.6
+  resolution: "debug@npm:4.3.6"
   dependencies:
     ms: "npm:2.1.2"
   peerDependenciesMeta:
     supports-color:
       optional: true
-  checksum: 10/cb6eab424c410e07813ca1392888589972ce9a32b8829c6508f5e1f25f3c3e70a76731610ae55b4bbe58d1a2fffa1424b30e97fa8d394e49cd2656a9643aedd2
+  checksum: 10/d3adb9af7d57a9e809a68f404490cf776122acca16e6359a2702c0f462e510e91f9765c07f707b8ab0d91e03bad57328f3256f5082631cefb5393d0394d50fb7
   languageName: node
   linkType: hard
 
@@ -17062,7 +17062,7 @@ __metadata:
     "@types/supertest": "npm:^2.0.16"
     "@wagmi/core": "npm:^2.13.1"
     app: "workspace:*"
-    debug: "npm:^4.3.5"
+    debug: "npm:^4.3.6"
     dotenv-cli: "npm:^7.3.0"
     express: "npm:^4.19.2"
     pino: "npm:^8.16.1"
@@ -19900,9 +19900,9 @@ __metadata:
   linkType: hard
 
 "fast-loops@npm:^1.1.3":
-  version: 1.1.3
-  resolution: "fast-loops@npm:1.1.3"
-  checksum: 10/1bf9f102d8ed48a8c8304e2b27fd32afa65d370498db9b49d5762696ac4aa8c55593d505c142c2b7e25ca79f45207c4b25f778afd80f35df98cb2caaaf9609b7
+  version: 1.1.4
+  resolution: "fast-loops@npm:1.1.4"
+  checksum: 10/52516fc8bb95a60e512271e731c4dc7b7672af90c5e54681004ee2f509d6ccc8e62d5222e731377dafd48a31218f915fd6d0d02efe602b1b822e1ff93994d2a6
   languageName: node
   linkType: hard
 
@@ -19939,13 +19939,13 @@ __metadata:
   linkType: hard
 
 "fast-xml-parser@npm:^4.0.12, fast-xml-parser@npm:^4.2.4":
-  version: 4.4.0
-  resolution: "fast-xml-parser@npm:4.4.0"
+  version: 4.4.1
+  resolution: "fast-xml-parser@npm:4.4.1"
   dependencies:
     strnum: "npm:^1.0.5"
   bin:
     fxparser: src/cli/cli.js
-  checksum: 10/f1592fa810d3923c46c7037d5adf1c309580d1d14780312019f33e4967f6ffcb5632168a5e889fe9d30794f6a087a0a095bb21cdf62320a96c6b304395212658
+  checksum: 10/0c05ab8703630d8c857fafadbd78d0020d3a8e54310c3842179cd4a0d9d97e96d209ce885e91241f4aa9dd8dfc2fd924a682741a423d65153cad34da2032ec44
   languageName: node
   linkType: hard
 
