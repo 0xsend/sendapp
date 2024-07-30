@@ -8,6 +8,7 @@ import {
 import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
+import { convertBalanceToFiat } from './convertBalanceToUSD'
 
 const usdcBaseContract = {
   address: usdcAddresses[baseMainnet.id],
@@ -59,10 +60,22 @@ export const useSendAccountBalances = () => {
     return { balances, totalBalance: undefined }
   }
   const usdcBalanceInUsd =
-    (Number(tokenBalances?.[0].result ?? 0n) / 10 ** 6) * tokenPrices['usd-coin'].usd
-  const sendBalanceInUsd = Number(tokenBalances?.[1].result ?? 0n) * tokenPrices['send-token'].usd
+    convertBalanceToFiat(
+      usdcBaseContract.address,
+      tokenBalances?.[0].result ?? 0n,
+      tokenPrices['usd-coin'].usd
+    ) ?? 0
+
+  const sendBalanceInUsd =
+    convertBalanceToFiat(
+      sendBaseContract.address,
+      tokenBalances?.[1].result ?? 0n,
+      tokenPrices['send-token'].usd
+    ) ?? 0
+
   const ethBalanceInUsd =
-    (Number(ethBalanceOnBase?.value ?? 0n) / 10 ** 18) * tokenPrices.ethereum.usd
+    convertBalanceToFiat('eth', ethBalanceOnBase?.value ?? 0n, tokenPrices.ethereum.usd) ?? 0
+
   const totalBalance = usdcBalanceInUsd + sendBalanceInUsd + ethBalanceInUsd
 
   return { balances, totalBalance, isLoading }
