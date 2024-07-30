@@ -7,17 +7,26 @@ import { act, render, screen } from '@testing-library/react-native'
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
 
+jest.mock('app/utils/useTokenPrices', () => ({
+  useTokenPrices: jest.fn().mockReturnValue({
+    data: { 'usd-coin': { usd: 1 }, ethereum: { usd: 1 }, 'send-token': { usd: 1 } },
+  }),
+}))
+
 test('TokenDetails', async () => {
   jest.useFakeTimers()
+
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
       <TokenDetails coin={usdcCoin} />
     </TamaguiProvider>
   )
+
   await act(async () => {
     jest.advanceTimersByTime(2000)
     jest.runAllTimers()
   })
+
   expect(screen.toJSON()).toMatchSnapshot()
 
   expect(screen.getByText('Sent')).toBeOnTheScreen()

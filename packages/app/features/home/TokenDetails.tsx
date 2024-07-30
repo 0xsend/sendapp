@@ -24,6 +24,8 @@ import { useTokenMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 import type { PropsWithChildren } from 'react'
 import { TokenDetailsHistory } from './TokenDetailsHistory'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -67,7 +69,7 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
         <Label fontSize={'$5'} fontWeight={'500'} textTransform={'uppercase'}>
           {`${coin.label} BALANCE`}
         </Label>
-        <TokenDetailsBalance balance={balance} symbol={coin.symbol} />
+        <TokenDetailsBalance balance={balance} coin={coin} />
       </YStack>
       <Stack w={'100%'} py={'$4'}>
         <Separator />
@@ -136,9 +138,10 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
 }
 
 const TokenDetailsBalance = ({
-  symbol,
+  coin,
   balance,
-}: { symbol: string; balance: UseBalanceReturnType }) => {
+}: { coin: coins[number]; balance: UseBalanceReturnType }) => {
+  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
   if (balance?.isError) {
     return <>---</>
   }
@@ -149,43 +152,54 @@ const TokenDetailsBalance = ({
     return <></>
   }
 
+  const balanceInUSD = convertBalanceToFiat(
+    coin.token,
+    balance.data.value,
+    tokenPrices?.[coin.coingeckoTokenId].usd
+  )
+
   const balanceWithDecimals = Number(balance.data.value) / 10 ** (balance.data?.decimals ?? 0)
   const balanceWithDecimalsLength = balanceWithDecimals.toString().replace('.', '').length
 
   return (
-    <Tooltip placement="bottom">
-      <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
-        <BigHeading
-          $platform-web={{ width: 'fit-content' }}
-          $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68 }}
-          color={'$color12'}
-        >
-          {formatAmount(balanceWithDecimals.toString(), 10, 5)}
-        </BigHeading>
-      </Tooltip.Trigger>
-      <Tooltip.Content
-        enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-        exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-        scale={1}
-        x={0}
-        y={0}
-        opacity={1}
-        animation={[
-          'quick',
-          {
-            opacity: {
-              overshootClamping: true,
+    <XStack ai="flex-end" gap="$2">
+      <Tooltip placement="bottom">
+        <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
+          <BigHeading
+            $platform-web={{ width: 'fit-content' }}
+            $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68, lineHeight: 38 }}
+            color={'$color12'}
+          >
+            {formatAmount(balanceWithDecimals.toString(), 10, 5)}
+          </BigHeading>
+        </Tooltip.Trigger>
+        <Tooltip.Content
+          enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+          exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
+          scale={1}
+          x={0}
+          y={0}
+          opacity={1}
+          animation={[
+            'quick',
+            {
+              opacity: {
+                overshootClamping: true,
+              },
             },
-          },
-        ]}
-      >
-        <Tooltip.Arrow />
+          ]}
+        >
+          <Tooltip.Arrow />
 
-        <Paragraph fontSize={'$6'} fontWeight={'500'}>
-          {`${balanceWithDecimals.toLocaleString()} ${symbol}`}
-        </Paragraph>
-      </Tooltip.Content>
-    </Tooltip>
+          <Paragraph fontSize={'$6'} fontWeight={'500'}>
+            {`${balanceWithDecimals.toLocaleString()} ${coin.symbol}`}
+          </Paragraph>
+        </Tooltip.Content>
+      </Tooltip>
+      <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
+        {isLoadingTokenPrices || balanceInUSD ? `($${formatAmount(balanceInUSD, 4, 2)})` : ''}
+      </Paragraph>
+    </XStack>
   )
 }
 
