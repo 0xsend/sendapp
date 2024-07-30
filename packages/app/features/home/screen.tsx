@@ -51,47 +51,18 @@ function SendSearchBody() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
+  const { data: sendAccount } = useSendAccount()
   const selectedCoin = useCoinFromTokenParam()
 
   const { balances } = useSendAccountBalances()
   const usdcBalance = balances?.[0]?.result
 
-  const hasSendAccount = !!sendAccount
-  const canSend = !!sendAccount && usdcBalance && usdcBalance > 0n
+  const canSend = usdcBalance && usdcBalance > 0n
 
-  return (
-    <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
-      <YStack
-        $gtLg={{ width: 455, display: 'flex' }}
-        display={hasSendAccount && !selectedCoin ? 'flex' : 'none'}
-        width="100%"
-        ai={'center'}
-      >
-        {canSend ? (
-          <Card
-            $gtLg={{ p: 36 }}
-            $lg={{ bc: 'transparent' }}
-            py={'$6'}
-            px={'$2'}
-            w={'100%'}
-            jc="space-between"
-            br={12}
-            gap="$6"
-          >
-            <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
-              <TokenBalanceCard />
-            </XStack>
-            <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
-              <Stack f={1} w="50%">
-                <DepositPopover />
-              </Stack>
-              <Stack f={1} w="50%">
-                <SendButton />
-              </Stack>
-            </XStack>
-          </Card>
-        ) : (
+  if (!canSend) {
+    return (
+      <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
+        <YStack $gtLg={{ width: 455, display: 'flex' }} width="100%" ai={'center'}>
           <Card
             $lg={{ fd: 'column', bc: 'transparent' }}
             $gtLg={{ p: 36 }}
@@ -110,28 +81,54 @@ function HomeBody(props: XStackProps) {
               <DepositAddress address={sendAccount?.address} />
             </XStack>
           </Card>
-        )}
+          <Separator $gtLg={{ display: 'none' }} w={'100%'} />
+          <YStack w={'100%'} ai={'center'}>
+            <NoSendAccountMessage />
+          </YStack>
+        </YStack>
+      </XStack>
+    )
+  }
+
+  return (
+    <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
+      <YStack
+        $gtLg={{ width: 455, display: 'flex' }}
+        display={!selectedCoin ? 'flex' : 'none'}
+        width="100%"
+        ai={'center'}
+      >
+        <Card
+          $gtLg={{ p: 36 }}
+          $lg={{ bc: 'transparent' }}
+          py={'$6'}
+          px={'$2'}
+          w={'100%'}
+          jc="space-between"
+          br={12}
+          gap="$6"
+        >
+          <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
+            <TokenBalanceCard />
+          </XStack>
+          <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
+            <Stack f={1} w="50%">
+              <DepositPopover />
+            </Stack>
+            <Stack f={1} w="50%">
+              <SendButton />
+            </Stack>
+          </XStack>
+        </Card>
+
         <Separator $gtLg={{ display: 'none' }} w={'100%'} />
         <YStack w={'100%'} ai={'center'}>
-          {canSend ? (
-            <YStack width="100%" display={hasSendAccount ? 'flex' : 'none'}>
-              <TokenBalanceList coins={coins} />
-            </YStack>
-          ) : (
-            <NoSendAccountMessage />
-          )}
+          <YStack width="100%">
+            <TokenBalanceList coins={coins} />
+          </YStack>
         </YStack>
       </YStack>
-      {(() => {
-        switch (true) {
-          case sendAccountLoading:
-            return <Spinner size="large" />
-          case selectedCoin !== undefined:
-            return <TokenDetails coin={selectedCoin} />
-          default:
-            return <> </>
-        }
-      })()}
+      {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
     </XStack>
   )
 }
@@ -155,17 +152,7 @@ export function HomeScreen() {
 
   return (
     <YStack f={1} pt="$2">
-      {(() => {
-        switch (true) {
-          case media.lg && queryParams.token !== undefined:
-            return null
-          case canSend:
-            return <HomeSearchBar />
-          default:
-            return null
-        }
-      })()}
-
+      {(media.gtLg || !queryParams.token) && canSend && <HomeSearchBar />}
       <AnimatePresence>
         {(() => {
           switch (true) {
@@ -173,6 +160,12 @@ export function HomeScreen() {
               return (
                 <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
                   <Spinner size="large" />
+                </Stack>
+              )
+            case !sendAccount:
+              return (
+                <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
+                  <Paragraph theme="red_alt1">No send account found</Paragraph>
                 </Stack>
               )
             case search !== undefined:
