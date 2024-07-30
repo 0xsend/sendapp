@@ -6,7 +6,7 @@ import {
   usdcAbi,
 } from '@my/wagmi'
 import { useBalance, useReadContracts } from 'wagmi'
-import { useSendAccounts } from './send-accounts'
+import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 
 const usdcBaseContract = {
@@ -23,10 +23,9 @@ const sendBaseContract = {
 
 export const useSendAccountBalances = () => {
   const { data: tokenPrices } = useTokenPrices()
-  const { data: sendAccounts } = useSendAccounts()
-  const sendAccount = sendAccounts?.[0]
+  const { data: sendAccount } = useSendAccount()
 
-  const { data: tokenBalances, isPending: isPendingTokenBalances } = useReadContracts({
+  const { data: tokenBalances, isPending: isLoadingTokenBalances } = useReadContracts({
     query: { enabled: !!sendAccount },
     contracts: [
       {
@@ -42,14 +41,14 @@ export const useSendAccountBalances = () => {
     ],
   })
 
-  const { data: ethBalanceOnBase, isPending: isPendingEthBalanceOnBase } = useBalance({
+  const { data: ethBalanceOnBase, isLoading: isLoadingEthBalanceOnBase } = useBalance({
     address: sendAccount?.address,
     query: { enabled: !!sendAccount },
     chainId: baseMainnet.id,
   })
 
-  const isPending = isPendingTokenBalances || isPendingEthBalanceOnBase
-  const balances = isPending
+  const isLoading = isLoadingTokenBalances || isLoadingEthBalanceOnBase
+  const balances = isLoading
     ? undefined
     : {
         eth: ethBalanceOnBase,
@@ -66,5 +65,5 @@ export const useSendAccountBalances = () => {
     (Number(ethBalanceOnBase?.value ?? 0n) / 10 ** 18) * tokenPrices.ethereum.usd
   const totalBalance = usdcBalanceInUsd + sendBalanceInUsd + ethBalanceInUsd
 
-  return { balances, totalBalance, isPending }
+  return { balances, totalBalance, isLoading }
 }
