@@ -5,7 +5,7 @@ import type {
 } from '@snaplet/seed'
 import { pravatar, tagName } from './utils'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
-import { copycat, type Input } from '@snaplet/copycat'
+import { copycat } from '@snaplet/copycat'
 import crypto from 'node:crypto'
 
 export const models: SeedClientOptions['models'] = {
@@ -95,5 +95,4 @@ export const userOnboarded: usersInputs = {
     },
   ],
   chainAddresses: [{}],
-  leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
 }

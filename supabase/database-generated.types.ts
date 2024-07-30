@@ -1194,8 +1194,6 @@ export type Database = {
       leaderboard_referrals_all_time: {
         Args: Record<PropertyKey, never>
         Returns: {
-          rewards_usdc_rank: number
-          referrals_rank: number
           rewards_usdc: number
           referrals: number
           user: Database["public"]["CompositeTypes"]["activity_feed_user"]

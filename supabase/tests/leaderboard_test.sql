@@ -115,7 +115,7 @@ select tests.authenticate_as('alice');
 
 select results_eq(
     $$
-        select ("user").id, referrals::int, rewards_usdc::int, referrals_rank::int, rewards_usdc_rank::int
+        select ("user").id, referrals::int, rewards_usdc::int
         from public.leaderboard_referrals_all_time()
         where ("user").id = tests.get_supabase_uid('alice')
         limit 1
@@ -124,9 +124,7 @@ select results_eq(
         values (
             tests.get_supabase_uid('alice'),
             1,
-            100,
-            1,
-            1
+            100
         )
     $$,
     'alice is at the top of the leaderboard'
@@ -192,7 +190,7 @@ select tests.authenticate_as('bob');
 
 select results_eq(
     $$
-        select ("user").id, referrals::int, rewards_usdc::int, referrals_rank::int, rewards_usdc_rank::int
+        select ("user").id, referrals::int, rewards_usdc::int
         from public.leaderboard_referrals_all_time()
         where ("user").id = tests.get_supabase_uid('bob')
         limit 1
@@ -201,9 +199,7 @@ select results_eq(
         values (
             tests.get_supabase_uid('bob'),
             1,
-            1000,
-            2,
-            1
+            1000
         )
     $$,
     'bob is tied for first place referrals and top for rewards'

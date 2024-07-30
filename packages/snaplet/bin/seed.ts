@@ -107,7 +107,10 @@ const pgClient = new PgClient({
       chainAddresses: [{}],
       leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
     },
-    ...Array(100).fill(userOnboarded),
+    ...Array(100).fill({
+      ...userOnboarded,
+      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
+    }),
   ])
   await pgClient.end()
   console.log('Snaplet seed done!')

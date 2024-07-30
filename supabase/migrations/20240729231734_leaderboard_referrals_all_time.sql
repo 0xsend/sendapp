@@ -82,8 +82,6 @@ execute function private.update_leaderboard_referrals_all_time_sendtag_checkout_
 -- create a function to display the referral leaderboard
 create or replace function public.leaderboard_referrals_all_time()
     returns table (
-                      rewards_usdc_rank bigint,
-                      referrals_rank    bigint,
                       rewards_usdc      numeric,
                       referrals         integer,
                       "user"            activity_feed_user
@@ -94,9 +92,7 @@ create or replace function public.leaderboard_referrals_all_time()
 as
 $$
 begin
-    return query select row_number() over (order by l.rewards_usdc desc) as rewards_usdc_rank,
-                        row_number() over (order by l.referrals desc)    as referrals_rank,
-                        l.rewards_usdc,
+    return query select l.rewards_usdc,
                         l.referrals,
                         (case when l.user_id = ( select auth.uid() ) then ( select auth.uid() ) end, -- user_id
                          p.name, -- name
@@ -110,5 +106,4 @@ begin
 end
 $$ ;
 
-revoke all on function leaderboard_referrals_all_time from public;
 revoke all on function leaderboard_referrals_all_time from anon;
