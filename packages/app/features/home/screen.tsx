@@ -147,9 +147,9 @@ function HomeSearchBar() {
 export function HomeScreen() {
   const media = useMedia()
   const [queryParams] = useRootScreenParams()
-  const { data: sendAccount, isLoading: sendAccountLoading } = useSendAccount()
+  const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { search } = queryParams
-  const { balances } = useSendAccountBalances()
+  const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
   const usdcBalance = balances?.[0]?.result
   const canSend = !!sendAccount && usdcBalance && usdcBalance > 0n
 
@@ -169,7 +169,7 @@ export function HomeScreen() {
       <AnimatePresence>
         {(() => {
           switch (true) {
-            case sendAccountLoading:
+            case isSendAccountLoading || isBalanceLoading:
               return (
                 <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
                   <Spinner size="large" />
