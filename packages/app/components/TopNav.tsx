@@ -27,11 +27,13 @@ import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
 import { ReferralLink } from './ReferralLink'
 import { IconCoin } from './icons/IconCoin'
 import { Link } from 'solito/link'
+import { Flashlight } from '@tamagui/lucide-icons'
 
 export enum ButtonOption {
   QR = 'QR',
   SETTINGS = 'SETTINGS',
   REFERRAL = 'REFERRAL',
+  TORCH = 'TORCH',
 }
 
 interface TopNavProps {
@@ -64,9 +66,9 @@ export function TopNav({
   const parts = path.split('/').filter(Boolean)
   const { push } = useRouter()
   const media = useMedia()
-  const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
   const isPwa = usePwa()
+  const router = useRouter()
 
   const handleHomeBottomSheet = () => {
     setRootParams(
@@ -130,7 +132,7 @@ export function TopNav({
           <Button
             $gtLg={{ display: 'none' }}
             icon={<IconQr size={'$2.5'} color={iconColor} />}
-            onPress={() => toast.show('Coming Soon')}
+            onPress={() => router.push('/scan')}
           />
         )
       case button === ButtonOption.SETTINGS:
@@ -139,6 +141,14 @@ export function TopNav({
             $gtLg={{ display: 'none' }}
             icon={<IconGear size={'$2.5'} color={iconColor} />}
             onPress={handleSettingsBottomSheet}
+          />
+        )
+      case button === ButtonOption.TORCH:
+        return (
+          <Button
+            $gtLg={{ display: 'none' }}
+            icon={<Flashlight size={'$2.5'} color={iconColor} />}
+            onPress={() => console.log('flashlight')}
           />
         )
       default:
