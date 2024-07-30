@@ -16,6 +16,8 @@ type Enum_public_key_type_enum = 'ES256';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'confirmed' | 'pending';
 type Enum_public_verification_type = 'tag_referral' | 'tag_registration';
+type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
+type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
 interface Table_net_http_response {
   id: number | null;
   status_code: number | null;
@@ -199,6 +201,13 @@ interface Table_private_leaderboard_referrals_all_time {
   rewards_usdc: number | null;
   updated_at: string | null;
 }
+interface Table_realtime_messages {
+  id: number;
+  topic: string;
+  extension: string;
+  inserted_at: string;
+  updated_at: string;
+}
 interface Table_auth_mfa_amr_claims {
   session_id: string;
   created_at: string;
@@ -332,6 +341,10 @@ interface Table_auth_saml_relay_states {
 }
 interface Table_auth_schema_migrations {
   version: string;
+}
+interface Table_realtime_schema_migrations {
+  version: number;
+  inserted_at: string | null;
 }
 interface Table_supabase_migrations_schema_migrations {
   version: string;
@@ -525,6 +538,34 @@ interface Table_auth_sso_providers {
   created_at: string | null;
   updated_at: string | null;
 }
+interface Table_realtime_subscription {
+  id: number;
+  subscription_id: string;
+  /**
+  * We couldn't determine the type of this column. The type might be coming from an unknown extension
+  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
+  * Otherwise, please manually type this column by casting it to the correct type.
+  * @example
+  * Here is a cast example for copycat use:
+  * ```
+  * copycat.scramble(row.unknownColumn as string)
+  * ```
+  */
+  entity: unknown;
+  /**
+  * We couldn't determine the type of this column. The type might be coming from an unknown extension
+  * or be specific to your database. Please if it's a common used type report this issue so we can fix it!
+  * Otherwise, please manually type this column by casting it to the correct type.
+  * @example
+  * Here is a cast example for copycat use:
+  * ```
+  * copycat.scramble(row.unknownColumn as string)
+  * ```
+  */
+  filters: unknown[];
+  claims: Json;
+  created_at: string;
+}
 interface Table_public_tag_receipts {
   tag_name: string;
   hash: string | null;
@@ -613,6 +654,9 @@ interface Schema_analytics {
 interface Schema_realtime {
 
 }
+interface Schema_supavisor {
+
+}
 interface Schema_auth {
   audit_log_entries: Table_auth_audit_log_entries;
   flow_state: Table_auth_flow_state;
@@ -687,7 +731,9 @@ interface Schema_public {
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
-
+  messages: Table_realtime_messages;
+  schema_migrations: Table_realtime_schema_migrations;
+  subscription: Table_realtime_subscription;
 }
 interface Schema_shovel {
   ig_updates: Table_shovel_ig_updates;
@@ -715,6 +761,7 @@ interface Schema_vault {
 interface Database {
   _analytics: Schema__analytics;
   _realtime: Schema__realtime;
+  _supavisor: Schema__supavisor;
   auth: Schema_auth;
   dbdev: Schema_dbdev;
   extensions: Schema_extensions;
