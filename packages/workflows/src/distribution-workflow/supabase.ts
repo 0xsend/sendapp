@@ -27,7 +27,7 @@ export async function fetchDistribution(id: string) {
       `*,
         distribution_verification_values (*)`
     )
-    .eq('id', id)
+    .eq('id', Number(id))
     .single()
 }
 

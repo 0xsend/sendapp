@@ -6,8 +6,8 @@ import { useUser } from 'app/utils/useUser'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
-  const isFirstSendtagClaimable = tags?.length === 0
-  const confirmedTags = tags?.filter((tag) => tag.status === 'confirmed')
+  const isFirstSendtagClaimable = Array.isArray(tags) && tags.length === 0
+  const confirmedTags = Array.isArray(tags) ? tags.filter((tag) => tag.status === 'confirmed') : []
 
   if (isLoading)
     return (

@@ -99,7 +99,7 @@ function LeaderboardList({
         </Paragraph>
         <XStack f={1} gap={'$0.9'} ai={'center'}>
           <Avatar size="$2" borderRadius={'$3'}>
-            <Avatar.Image src={user.avatar_url} />
+            <Avatar.Image src={user.avatar_url ?? undefined} />
             <Avatar.Fallback
               backgroundColor={'$decay'}
               $theme-light={{ backgroundColor: '$white' }}
