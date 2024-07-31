@@ -1191,6 +1191,14 @@ export type Database = {
           id: number
         }
       }
+      leaderboard_referrals_all_time: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          rewards_usdc: number
+          referrals: number
+          user: Database["public"]["CompositeTypes"]["activity_feed_user"]
+        }[]
+      }
       profile_lookup: {
         Args: {
           lookup_type: Database["public"]["Enums"]["lookup_type_enum"]

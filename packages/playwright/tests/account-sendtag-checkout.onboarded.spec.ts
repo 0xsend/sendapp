@@ -84,18 +84,22 @@ const verifyActivityFeed = async (supabase: SupabaseClient<Database>, event: Act
 const setupReferral = async (
   seed: SeedClient
 ): Promise<{
-  referrer: { referralCode: string; sendId: number }
+  referrer: { referralCode: string; sendId: number; id: string }
   referrerSendAccount: { address: `0x${string}` }
   referrerTags: string[]
 }> => {
   const plan = await seed.users([userOnboarded])
-  const referrer = plan.profiles[0] as { referralCode: string; sendId: number }
+  const referrer = plan.profiles[0]
   const referrerSendAccount = plan.sendAccounts[0] as { address: `0x${string}` }
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
   assert(!!referrer.referralCode, 'referral code not found')
   assert(!!referrerSendAccount, 'referrer send account not found')
-  return { referrer, referrerSendAccount, referrerTags }
+  return { referrer, referrerSendAccount, referrerTags } as {
+    referrer: { referralCode: string; sendId: number; id: string }
+    referrerSendAccount: { address: `0x${string}` }
+    referrerTags: string[]
+  }
 }
 
 const verifyReferralReward = async (
@@ -309,7 +313,10 @@ test('can refer multiple tags in separate transactions', async ({
       tags: firstTags,
     },
   })
-  await verifyReferralReward(referrerSendAccount.address as `0x${string}`, firstTags)
+  const firstRewardAmount = await verifyReferralReward(
+    referrerSendAccount.address as `0x${string}`,
+    firstTags
+  )
 
   // Second transaction
   await checkoutPage.goto() // Go back to the checkout page
@@ -346,11 +353,24 @@ test('can refer multiple tags in separate transactions', async ({
       tags: secondTags,
     },
   })
-  await verifyReferralReward(
+  const secondRewardAmount = await verifyReferralReward(
     referrerSendAccount.address as `0x${string}`,
     secondTags,
     currentBalance
   )
+
+  // peek at the leaderboard
+  const { data: leaderboardData, error: leaderboardError } = await supabase
+    .rpc('leaderboard_referrals_all_time')
+    .eq('user ->> send_id', referrer.sendId)
+    .select('rewards_usdc::text,referrals::text,user')
+  expect(leaderboardError).toBeFalsy()
+  expect(leaderboardData?.[0]).toBeTruthy()
+  assert(!!leaderboardData?.[0], 'leaderboard data not found')
+  expect(leaderboardData[0].rewards_usdc).toBe((firstRewardAmount + secondRewardAmount).toString())
+  expect(leaderboardData[0].referrals).toBe((firstTags.length + secondTags.length).toString())
+  log('leaderboard', leaderboardData)
+
   log('done')
 })
 
