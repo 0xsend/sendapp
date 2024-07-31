@@ -3,7 +3,7 @@ import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
 import { ReferralsScreen } from 'app/features/referrals/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
-import { TopNav } from 'app/components/TopNav'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -20,7 +20,9 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Referrals" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Referrals" button={ButtonOption.PROFILE} />}>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

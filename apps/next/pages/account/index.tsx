@@ -1,4 +1,4 @@
-import { TopNav } from 'app/components/TopNav'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 import { AccountScreen } from 'app/features/account/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import Head from 'next/head'
@@ -23,7 +23,9 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Account" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Account" button={ButtonOption.PROFILE} />}>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

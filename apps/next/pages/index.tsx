@@ -34,7 +34,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
         <title>Send | Home</title>
       </Head>
       {session ? (
-        <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.QR} showLogo={true} />}>
+        <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.PROFILE} showLogo={true} />}>
           <HomeScreen />
         </HomeLayout>
       ) : (

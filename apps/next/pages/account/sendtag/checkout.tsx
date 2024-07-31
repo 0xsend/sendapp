@@ -27,7 +27,7 @@ const subheader = 'Sendtags are usernames within the Send platform. You may regi
 
 Page.getLayout = (children) => (
   <HomeLayout
-    TopNav={<TopNav header="Sendtag" subheader={subheader} button={ButtonOption.SETTINGS} />}
+    TopNav={<TopNav header="Sendtag" subheader={subheader} button={ButtonOption.PROFILE} />}
   >
     {children}
   </HomeLayout>
