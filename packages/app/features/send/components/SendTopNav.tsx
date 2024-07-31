@@ -1,4 +1,3 @@
-// TopNav.tsx
 import {
   Button as ButtonOg,
   Container,
@@ -6,29 +5,29 @@ import {
   Header,
   Separator,
   Stack,
-  useMedia,
+  usePwa,
+  XStack,
   type ButtonProps,
 } from '@my/ui'
-import { useThemeSetting } from '@tamagui/next-theme'
-import { IconHamburger } from 'app/components/icons'
+import { IconArrowLeft } from 'app/components/icons'
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
-import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
+import { useSendScreenParams } from 'app/routers/params'
+import { usePathname } from 'app/utils/usePathname'
+import { useRouter } from 'solito/router'
 
 export function SendTopNav() {
-  const [rootParams, setRootParams] = useRootScreenParams()
   const [sendParams] = useSendScreenParams()
+  const { isPwa } = usePwa()
+  const { push } = useRouter()
+  const path = usePathname()
+  const parts = path.split('/').filter(Boolean)
 
-  const media = useMedia()
-
-  const handleHomeBottomSheet = () => {
-    setRootParams(
-      { ...rootParams, nav: rootParams.nav ? undefined : 'home' },
-      { webBehavior: 'replace' }
-    )
+  const handleBack = () => {
+    // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
+    // else, go to home page
+    const newPath = parts.slice(0, -1).join('/')
+    push(`/${newPath}`)
   }
-
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
 
   return (
     <Header w="100%" pb="$6">
@@ -36,16 +35,17 @@ export function SendTopNav() {
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        $lg={{ py: '$6' }}
+        safeAreaPadding={isPwa && 't'}
+        $lg={{ pt: !isPwa && '$5', pb: '$5' }}
       >
-        <Stack display={media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
-          <Button
-            $gtLg={{ disabled: true, opacity: 0 }} // We need the button to be there for layout purposes
-            onPress={handleHomeBottomSheet}
-            icon={<IconHamburger size={'$2.5'} color={iconColor} />}
-          />
-        </Stack>
-        <Stack>
+        <Button
+          onPress={handleBack}
+          $gtLg={{ display: 'none' }}
+          icon={
+            <IconArrowLeft size={'$2.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+          }
+        />
+        <Stack $lg={{ f: 1 }}>
           <H2
             fontWeight={'300'}
             $theme-light={{ col: '$gray10Light' }}
@@ -57,7 +57,7 @@ export function SendTopNav() {
             {sendParams.recipient ? 'Enter Amount' : 'Select Recipient'}
           </H2>
         </Stack>
-        <Stack />
+        <XStack w={0} h={0} $lg={{ f: 1 }} />
       </Container>
 
       <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />

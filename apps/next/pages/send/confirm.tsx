@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Preview and Send" noSubroute />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Preview and Send" />}>{children}</HomeLayout>
 )
 
 export default Page

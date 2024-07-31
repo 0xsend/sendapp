@@ -30,7 +30,12 @@ Page.getLayout = (children) => (
       },
     }}
     TopNav={
-      <TopNav header="Send It Rewards" subheader={subheader} button={ButtonOption.SETTINGS} />
+      <TopNav
+        header="Send It Rewards"
+        showLogo
+        subheader={subheader}
+        button={ButtonOption.PROFILE}
+      />
     }
   >
     {children}
