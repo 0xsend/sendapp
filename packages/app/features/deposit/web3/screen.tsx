@@ -16,7 +16,7 @@ import {
 import { baseMainnet, useWriteErc20Transfer } from '@my/wagmi'
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 import { DepositAddress } from 'app/components/DepositAddress'
-import { IconEthereum, IconRefresh } from 'app/components/icons'
+import { IconInfoCircle, IconRefresh } from 'app/components/icons'
 import { IconChainBase } from 'app/components/icons/IconChainBase'
 import { coins } from 'app/data/coins'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
@@ -24,6 +24,7 @@ import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'solito/link'
@@ -44,7 +45,6 @@ import { z } from 'zod'
  * 3. Sign transaction
  */
 export function DepositWeb3Screen() {
-  const { open: openConnectModal } = useWeb3Modal()
   const { isConnected, chainId, chain } = useAccount()
 
   if (!isConnected) {
@@ -56,14 +56,7 @@ export function DepositWeb3Screen() {
         <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
           You need to connect to a wallet to deposit funds.
         </Paragraph>
-        <Button
-          accessible
-          icon={<IconEthereum size={'$1'} color={'$color12'} />}
-          onPress={() => openConnectModal()}
-          maxWidth={'$20'}
-        >
-          Connect to Deposit
-        </Button>
+        <w3m-button />
 
         <DepositAddressWrapper />
       </Wrapper>
@@ -79,14 +72,7 @@ export function DepositWeb3Screen() {
         <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
           You are currently on {chain?.name}. Switch to {baseMainnet.name} to deposit funds.
         </Paragraph>
-        <Button
-          accessible
-          icon={<IconChainBase size={'$1'} />}
-          onPress={() => openConnectModal({ view: 'Networks' })}
-          maxWidth={'$20'}
-        >
-          Switch
-        </Button>
+        <w3m-button />
       </Wrapper>
     )
   }
@@ -121,6 +107,8 @@ function DepositForm() {
   const options = coins.map((coin) => ({ name: coin.symbol, value: coin.token }))
   const first = options[0]
   assert(!!first, 'first coin not found')
+  const { balances } = useSendAccountBalances()
+  const sendUSDCBalance = balances?.[0]?.result
 
   const coin = coins.find((coin) => coin.token === form.watch('token'))
   const isCoinSelected = !!coin
@@ -277,6 +265,7 @@ function DepositForm() {
         },
         amount: {
           autoFocus: true,
+          testID: 'amountInput',
         },
       }}
       formProps={{
@@ -336,7 +325,7 @@ function DepositForm() {
               br={12}
             >
               <ButtonText col={'$color12'}>
-                {isLoadingReceipt ? 'Depositing...' : 'Deposit'}
+                {isLoadingReceipt ? 'Depositing...' : `Deposit ${coin?.symbol}`}
               </ButtonText>
             </SubmitButton>
 
@@ -357,17 +346,36 @@ function DepositForm() {
     >
       {({ token, amount }) => (
         <FormWrapper.Body testID="DepositWeb3ScreeFields">
+          {!sendUSDCBalance && (
+            <XStack gap="$2" mb="$4">
+              <IconInfoCircle color="$color10" />
+              <Paragraph color="$color10">
+                Send recommends depositing USDC first. This will ensure a smooth sending experience
+                throughout the app
+              </Paragraph>
+            </XStack>
+          )}
           <XStack gap="$2" width={'100%'} f={1}>
-            {token}
+            {sendUSDCBalance ? (
+              token
+            ) : (
+              <YStack ai="center" jc="space-between" mr="$6">
+                <Paragraph
+                  size={'$5'}
+                  fontFamily={'$mono'}
+                  lineHeight={'$11'}
+                  textTransform={'uppercase'}
+                  color="$olive"
+                >
+                  Token
+                </Paragraph>
+                <YStack h={'$size.4'} jc="center">
+                  <Paragraph testID="noUsdc">USDC</Paragraph>
+                </YStack>
+              </YStack>
+            )}
             <YStack gap="$2" width={'100%'} f={1}>
               {amount}
-              {depositorBalance?.value !== undefined && !!coin ? (
-                <Paragraph size="$3">
-                  Balance:{' '}
-                  {formatAmount(formatUnits(depositorBalance?.value ?? 0n, coin?.decimals ?? 0))}{' '}
-                  {coin?.symbol}
-                </Paragraph>
-              ) : null}
             </YStack>
           </XStack>
         </FormWrapper.Body>
