@@ -1212,7 +1212,6 @@ export type Database = {
           refcode: string
           tag: string
           address: string
-          phone: string
           chain_id: number
           is_public: boolean
           sendid: number
