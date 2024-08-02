@@ -55,7 +55,7 @@ describe('formatAmount', () => {
   })
 
   it('should format to locale string', () => {
-    expect(formatAmount(123.4567, 4, 2)).toBe('123.45')
+    expect(formatAmount(123.4567, 4, 2)).toBe('123.46')
   })
 
   it('should not round string numbers', () => {
@@ -75,7 +75,7 @@ describe('maxIntegers handling', () => {
 })
 describe('maxDecimals handling', () => {
   it('should truncate decimals that exceed maxDecimals', () => {
-    expect(formatAmount(123.45678, 5, 2)).toBe('123.45') // input has 5 decimals, but only 2 are expected in output
+    expect(formatAmount(123.45678, 5, 2)).toBe('123.46') // input has 5 decimals, but only 2 are expected in output
   })
 
   it('should format to maxDecimals even if input has fewer decimals', () => {
