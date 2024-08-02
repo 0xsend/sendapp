@@ -73,7 +73,7 @@ export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | n
       bc="$color2"
       size={'$3.5'}
       icon={
-        <Avatar size={'$3.5'}>
+        <Avatar size={'$3.5'} br={'$2'}>
           <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
           <Avatar.Fallback jc={'center'} ai="center" theme="green_active">
             <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
