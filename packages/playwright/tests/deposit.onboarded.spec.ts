@@ -72,7 +72,8 @@ test('can deposit USDC with web3 wallet', async ({
   await depositWeb3Link.click()
   await page.waitForURL('/deposit/web3')
   await expect(page.locator('w3m-modal')).toBeVisible()
-
+  const connectButton = await page.locator('w3m-button')
+  await connectButton.click()
   await page.locator('w3m-connect-injected-widget').click()
 
   await expect
@@ -102,9 +103,7 @@ test('can deposit USDC with web3 wallet', async ({
     .toBe(1)
   await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
 
-  await expect(
-    page.getByRole('heading', { name: `Depositing from ${account.address}` })
-  ).toBeVisible()
+  await expect(page.getByText('10 USDC')).toBeVisible()
 
   expect(await page.getByLabel('Token').inputValue()).toBe(usdcAddress[testBaseClient.chain.id])
   await page.getByLabel('Amount').fill('10')
@@ -209,7 +208,8 @@ test('can deposit ETH with web3 wallet', async ({
   await depositWeb3Button.click()
   await page.waitForURL('/deposit/web3')
   await expect(page.locator('w3m-modal')).toBeVisible()
-
+  const connectButton = await page.locator('w3m-button')
+  await connectButton.click()
   await page.locator('w3m-connect-injected-widget').click()
 
   await expect
@@ -238,10 +238,6 @@ test('can deposit ETH with web3 wallet', async ({
     )
     .toBe(1)
   await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
-
-  await expect(
-    page.getByRole('heading', { name: `Depositing from ${account.address}` })
-  ).toBeVisible()
 
   const tokenSelect = page.getByLabel('Token')
   await page.getByLabel('Token').selectOption('eth')
@@ -289,4 +285,121 @@ test('can deposit ETH with web3 wallet', async ({
   ).toPass({
     timeout: 10000,
   })
+})
+
+test('can connect and disconnect using wallet button', async ({
+  page,
+  injectWeb3Provider,
+  accounts,
+  user: { profile },
+  supabase,
+}) => {
+  log = debug(`test:activity:${profile.id}:${test.info().parallelIndex}`)
+  const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
+  expect(error).toBeFalsy()
+  assert(!!sendAccount, 'no send account found')
+
+  const wallet = await injectWeb3Provider()
+  const account = accounts[0]
+  assert(!!account, 'no web3 accounts found')
+  log('account', account)
+
+  await page.goto('/deposit/web3')
+
+  const connectButton = await page.locator('w3m-button')
+  expect(connectButton).toHaveText('Connect Wallet')
+  await connectButton.click()
+  await page.locator('w3m-connect-injected-widget').click()
+
+  await expect
+    .poll(
+      async () => {
+        return wallet.getPendingRequestCount(
+          HeadlessWeb3Provider.Web3RequestKind.RequestPermissions
+        )
+      },
+      {
+        timeout: 5000,
+        message: 'Did not receive accounts request',
+      }
+    )
+    .toBe(1)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestPermissions)
+  await expect
+    .poll(
+      async () => {
+        return wallet.getPendingRequestCount(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
+      },
+      {
+        timeout: 5000,
+        message: 'Did not receive accounts request',
+      }
+    )
+    .toBe(1)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
+  const walletButton = page.getByTestId('account-button')
+  await expect(walletButton).toBeVisible()
+  await walletButton.click()
+  await page.getByRole('button', { name: 'Disconnect' }).click()
+  expect(page.locator('w3m-button')).toHaveText('Connect Wallet')
+})
+
+test('must switch to supported network', async ({
+  page,
+  injectWeb3Provider,
+  accounts,
+  user: { profile },
+  supabase,
+}) => {
+  log = debug(`test:activity:${profile.id}:${test.info().parallelIndex}`)
+  const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
+  expect(error).toBeFalsy()
+  assert(!!sendAccount, 'no send account found')
+
+  const wallet = await injectWeb3Provider()
+  const account = accounts[0]
+  assert(!!account, 'no web3 accounts found')
+  log('account', account)
+
+  await page.goto('/deposit/web3')
+
+  const walletButton = page.locator('w3m-button')
+  expect(walletButton).toHaveText('Connect Wallet')
+  await walletButton.click()
+  await page.locator('w3m-connect-injected-widget').click()
+
+  await expect
+    .poll(
+      async () => {
+        return wallet.getPendingRequestCount(
+          HeadlessWeb3Provider.Web3RequestKind.RequestPermissions
+        )
+      },
+      {
+        timeout: 5000,
+        message: 'Did not receive accounts request',
+      }
+    )
+    .toBe(1)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestPermissions)
+  await expect
+    .poll(
+      async () => {
+        return wallet.getPendingRequestCount(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
+      },
+      {
+        timeout: 5000,
+        message: 'Did not receive accounts request',
+      }
+    )
+    .toBe(1)
+  await wallet.authorize(HeadlessWeb3Provider.Web3RequestKind.RequestAccounts)
+
+  await expect(walletButton).toContainText('0.000')
+
+  wallet.addNetwork(1, 'https://eth.public-rpc.com')
+  wallet.switchNetwork(1)
+  await expect(page.getByTestId('account-button')).toContainText('Switch Network')
+  await expect(page.getByRole('heading', { name: 'Switch to Base Localhost' })).toBeVisible()
+  await expect(page.getByTestId('SubmitButton')).toHaveCount(0)
 })

@@ -17,7 +17,6 @@ import {
   Avatar,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
-import { useThemeSetting } from '@tamagui/next-theme'
 import { IconAccount, IconArrowLeft, IconGear, IconQr, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
@@ -29,8 +28,10 @@ import { ReferralLink } from './ReferralLink'
 import { IconCoin } from './icons/IconCoin'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
+import type { Tables } from '@my/supabase/database-generated.types'
 
 export enum ButtonOption {
+  PROFILE = 'PROFILE',
   QR = 'QR',
   SETTINGS = 'SETTINGS',
   REFERRAL = 'REFERRAL',
@@ -43,7 +44,6 @@ interface TopNavProps {
   showReferral?: boolean
   /**
    * Customize the button on the right side of the top nav.
-   * @default ButtonOption.QR
    */
   button?: ButtonOption
   /**
@@ -51,6 +51,37 @@ interface TopNavProps {
    * @default false
    */
   noSubroute?: boolean
+}
+
+export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
+  const [queryParams, setRootParams] = useRootScreenParams()
+  const handleHomeBottomSheet = () => {
+    setRootParams(
+      { ...queryParams, nav: queryParams.nav ? undefined : 'home' },
+      { webBehavior: 'replace' }
+    )
+  }
+
+  return (
+    <Button
+      $gtLg={{
+        disabled: true,
+        opacity: 0,
+      }} /// We need the button to be there for layout purposes
+      onPress={handleHomeBottomSheet}
+      br={'$2'}
+      bc="$color2"
+      size={'$3.5'}
+      icon={
+        <Avatar size={'$3.5'} br={'$2'}>
+          <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
+          <Avatar.Fallback jc={'center'} ai="center" theme="green_active">
+            <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
+          </Avatar.Fallback>
+        </Avatar>
+      }
+    />
+  )
 }
 
 export function TopNav({
@@ -71,13 +102,6 @@ export function TopNav({
   const isPwa = usePwa()
   const { profile } = useUser()
 
-  const handleHomeBottomSheet = () => {
-    setRootParams(
-      { ...queryParams, nav: queryParams.nav ? undefined : 'home' },
-      { webBehavior: 'replace' }
-    )
-  }
-
   const handleSettingsBottomSheet = () => {
     setRootParams(
       { ...queryParams, nav: queryParams.nav ? undefined : 'settings' },
@@ -88,18 +112,16 @@ export function TopNav({
   const hasSelectedCoin = selectedCoin !== undefined
 
   const handleBack = () => {
-    // always pop to the base path. e.g. /account/settings/edit-profile -> /account
+    // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
+    // else, go to home page
     if (hasSelectedCoin) {
       setRootParams({ ...queryParams, token: undefined })
     }
-    const newPath = parts.slice(0, 1).join('/')
+    const newPath = parts.length > 1 ? parts.slice(0, 1).join('/') : '/'
     push(`/${newPath}`)
   }
 
-  const { resolvedTheme } = useThemeSetting()
-  const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
-
-  const isSubRoute = !noSubroute && parts.length > 1
+  const isSubRoute = (!noSubroute && parts.length > 1) || path.includes('/secret-shop')
 
   const renderButton = () => {
     switch (true) {
@@ -132,7 +154,7 @@ export function TopNav({
         return (
           <Button
             $gtLg={{ display: 'none' }}
-            icon={<IconQr size={'$2.5'} color={iconColor} />}
+            icon={<IconQr size={'$2.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />}
             onPress={() => toast.show('Coming Soon')}
           />
         )
@@ -140,10 +162,14 @@ export function TopNav({
         return (
           <Button
             $gtLg={{ display: 'none' }}
-            icon={<IconGear size={'$2.5'} color={iconColor} />}
+            icon={
+              <IconGear size={'$2.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+            }
             onPress={handleSettingsBottomSheet}
           />
         )
+      case button === ButtonOption.PROFILE:
+        return <AvatarMenuButton profile={profile} />
       default:
         if (__DEV__) throw new Error(`Unknown button option: ${button}`)
         return null
@@ -159,59 +185,72 @@ export function TopNav({
         safeAreaPadding={isPwa && 't'}
         $lg={{ pt: !isPwa && '$5', pb: '$5' }}
       >
-        <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
-          {isSubRoute || hasSelectedCoin ? (
-            <Button onPress={handleBack} icon={<IconArrowLeft size={'$2.5'} color={iconColor} />} />
-          ) : (
-            <Button
-              $gtLg={{
-                disabled: true,
-                opacity: 0,
-              }} /// We need the button to be there for layout purposes
-              onPress={handleHomeBottomSheet}
-              bw={'$1'}
-              br={'$2'}
-              boc={profile?.avatar_url ? '$primary' : undefined}
-              bc="$color2"
-              icon={
-                <Avatar size={'$2.5'}>
-                  <Avatar.Image src={profile?.avatar_url ?? ''} />
-                  <Avatar.Fallback jc={'center'}>
-                    <IconAccount size={'$2.5'} color={iconColor} />
-                  </Avatar.Fallback>
-                </Avatar>
-              }
-            />
-          )}
-        </Stack>
-        {showLogo && media.lg ? (
-          <XStack>
-            <Link href="/send">
-              <IconSendLogo
-                size={'$2.5'}
-                color={'$color12'}
-                display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
-              />
-            </Link>
-          </XStack>
-        ) : (
-          <H2
-            fontWeight={'300'}
-            col="$color10"
-            lineHeight={32}
-            $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
-            display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
-            als={'center'}
-          >
-            {header}
-          </H2>
-        )}
+        {(() => {
+          switch (true) {
+            case media.lg:
+              return (
+                <>
+                  {isSubRoute || hasSelectedCoin ? (
+                    <Button
+                      onPress={handleBack}
+                      icon={
+                        <IconArrowLeft
+                          size={'$2.5'}
+                          color={'$primary'}
+                          $theme-light={{ color: '$color12' }}
+                        />
+                      }
+                    />
+                  ) : null}
+                  {showLogo ? (
+                    <XStack>
+                      <Link href="/send">
+                        <IconSendLogo
+                          size={'$2.5'}
+                          color={'$color12'}
+                          display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                        />
+                      </Link>
+                    </XStack>
+                  ) : (
+                    <H2
+                      fontWeight={'300'}
+                      col="$color10"
+                      lineHeight={32}
+                      $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
+                      display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                      als={'center'}
+                    >
+                      {header}
+                    </H2>
+                  )}
+                </>
+              )
+            default:
+              return (
+                <H2
+                  fontWeight={'300'}
+                  col="$color10"
+                  lineHeight={32}
+                  $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
+                  display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                  als={'center'}
+                >
+                  {header}
+                </H2>
+              )
+          }
+        })()}
+
         {showReferral && media.gtLg && (
           <XStack jc={'center'} ai={'center'} ml="auto">
             <Paragraph>Referral Link</Paragraph> <ReferralLink />
           </XStack>
         )}
-        <XStack>{renderButton()}</XStack>
+
+        <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
+          {renderButton()}
+        </Stack>
       </Container>
       {subheader && (
         <Container fd="column">
@@ -271,7 +310,7 @@ function Button(props: ButtonProps) {
       focusStyle={{
         backgroundColor: 'transparent',
       }}
-      theme="green"
+      theme="green_active"
       {...props}
     />
   )

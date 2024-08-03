@@ -13,28 +13,40 @@ export const CoinSchema = z.object({
   coingeckoTokenId: z.string(),
 })
 export type coin = z.infer<typeof CoinSchema>
-export type coins = coin[]
 
-export const usdcCoin: coin = {
+export const usdcCoin = {
   label: 'USDC',
   symbol: 'USDC',
   token: usdcAddresses[baseMainnet.id],
   decimals: 6,
   coingeckoTokenId: 'usd-coin',
-}
+} as const
 
-export const ethCoin: coin = {
+export const ethCoin = {
   label: 'Ethereum',
   symbol: 'ETH',
   token: 'eth',
   decimals: 18,
   coingeckoTokenId: 'ethereum',
-}
-export const sendCoin: coin = {
+} as const
+
+export const sendCoin = {
   label: 'Send',
   symbol: 'SEND',
   token: sendAddresses[baseMainnet.id],
   decimals: 0,
   coingeckoTokenId: 'send-token',
-}
-export const coins: coins = [usdcCoin, ethCoin, sendCoin] as const
+} as const
+
+export const coins = [usdcCoin, ethCoin, sendCoin] as const
+export type coins = typeof coins
+
+type CoinsDict = { [key in coins[number]['token']]: coins[number] }
+
+export const coinsDict = {
+  [usdcCoin.token]: usdcCoin,
+  [ethCoin.token]: ethCoin,
+  [sendCoin.token]: sendCoin,
+} as const as CoinsDict
+
+export type coinsDict = typeof coinsDict
