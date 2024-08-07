@@ -65,7 +65,7 @@ export function SendAmountForm() {
     !balanceIsLoading &&
     balance?.value !== undefined &&
     sendParams.amount !== undefined &&
-    balance?.value > parsedAmount && // @todo: ensure enough USDC for gas fees
+    balance?.value >= parsedAmount && // @todo: ensure enough USDC for gas fees
     parsedAmount > BigInt(0)
 
   async function onSubmit() {
