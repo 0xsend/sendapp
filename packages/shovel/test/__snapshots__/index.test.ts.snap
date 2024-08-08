@@ -747,6 +747,196 @@ exports[`shovel config 1`] = `
         "name": "sendtag_checkout_receipts",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xe1f30594e663400EeA4e51e2B5603204cfE81712",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "token",
+            "indexed": false,
+            "name": "token",
+            "type": "address",
+          },
+          {
+            "column": "amount",
+            "indexed": false,
+            "name": "amount",
+            "type": "uint256",
+          },
+          {
+            "column": "from",
+            "indexed": false,
+            "name": "from",
+            "type": "address",
+          },
+        ],
+        "name": "CheckCreated",
+        "type": "event",
+      },
+      "name": "send_check_created",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "token",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+          {
+            "name": "from",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_check_created",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xe1f30594e663400EeA4e51e2B5603204cfE81712",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "token",
+            "indexed": false,
+            "name": "token",
+            "type": "address",
+          },
+          {
+            "column": "amount",
+            "indexed": false,
+            "name": "amount",
+            "type": "uint256",
+          },
+          {
+            "column": "from",
+            "indexed": false,
+            "name": "from",
+            "type": "address",
+          },
+          {
+            "column": "redeemer",
+            "indexed": false,
+            "name": "redeemer",
+            "type": "address",
+          },
+        ],
+        "name": "CheckClaimed",
+        "type": "event",
+      },
+      "name": "send_check_claimed",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "token",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+          {
+            "name": "from",
+            "type": "bytea",
+          },
+          {
+            "name": "redeemer",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_check_claimed",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
