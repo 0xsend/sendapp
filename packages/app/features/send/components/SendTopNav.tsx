@@ -3,24 +3,22 @@ import {
   Container,
   H2,
   Header,
-  Separator,
   Stack,
-  usePwa,
+  useSafeAreaInsets,
   XStack,
   type ButtonProps,
 } from '@my/ui'
 import { IconArrowLeft } from 'app/components/icons'
-import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
 import { useSendScreenParams } from 'app/routers/params'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
 export function SendTopNav() {
   const [sendParams] = useSendScreenParams()
-  const { isPwa } = usePwa()
   const { push } = useRouter()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
+  const { sat } = useSafeAreaInsets()
 
   const handleBack = () => {
     // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
@@ -35,8 +33,8 @@ export function SendTopNav() {
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeAreaPadding={isPwa && 't'}
-        $lg={{ pt: !isPwa && '$5', pb: '$5' }}
+        safeAreaPadding={'t'}
+        $lg={{ pt: sat === '0px' && '$5', pb: '$5' }}
       >
         <Button
           onPress={handleBack}
@@ -59,10 +57,6 @@ export function SendTopNav() {
         </Stack>
         <XStack w={0} h={0} $lg={{ f: 1 }} />
       </Container>
-
-      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
-
-      <SettingsBottomSheet />
     </Header>
   )
 }
