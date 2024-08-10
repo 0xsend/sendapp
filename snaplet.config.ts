@@ -142,6 +142,12 @@ export default defineConfig({
           // tag_name: tagName(row.tag_name),
         }
       },
+      send_check_created: ({ row }) => {
+        return {}
+      },
+      send_check_claimed: ({ row }) => {
+        return {}
+      },
     },
   },
 })
