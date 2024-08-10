@@ -102,9 +102,12 @@ for (const token of coins) {
       // goto send page
       await page.goto('/')
 
+      //Press send button
+      await page.getByRole('link', { name: 'Send', exact: true }).click()
+
       // fill search input
       const searchInput = page.getByRole('search', { name: 'query' })
-      await expect(searchInput).toBeVisible()
+      expect(searchInput).toBeVisible()
       await searchInput.fill(query)
       await expect(searchInput).toHaveValue(query)
 
