@@ -9,7 +9,7 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { TopNav } from 'app/components/TopNav'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout<{ sendid: string }> = ({ sendid }) => {
   return (
@@ -82,7 +82,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Profile" noSubroute />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Profile" noSubroute button={ButtonOption.PROFILE} />}>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

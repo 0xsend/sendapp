@@ -169,7 +169,7 @@ export function TopNav({
           />
         )
       case button === ButtonOption.PROFILE:
-        return <AvatarMenuButton profile={profile} />
+        return profile ? <AvatarMenuButton profile={profile} /> : null
       default:
         if (__DEV__) throw new Error(`Unknown button option: ${button}`)
         return null
