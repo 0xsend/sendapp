@@ -151,33 +151,18 @@ function HomeBody(props: XStackProps) {
   )
 }
 
-function HomeSearchBar() {
-  return (
-    <Stack $gtLg={{ pb: 36, pt: 0 }} pt={'$4'}>
-      <Search label={undefined} placeholder="Search..." />
-    </Stack>
-  )
-}
-
 export function HomeScreen() {
   const media = useMedia()
   const [queryParams] = useRootScreenParams()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { search } = queryParams
-  const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
-  const usdcBalance = balances?.usdc?.result
-  const canSend =
-    !!sendAccount &&
-    usdcBalance &&
-    usdcBalance >= parseUnits('.5', coinsDict[usdcAddress[baseMainnet.id]].decimals)
 
   return (
     <YStack f={1} pt="$2">
-      {(media.gtLg || !queryParams.token) && canSend && <HomeSearchBar />}
       <AnimatePresence>
         {(() => {
           switch (true) {
-            case isSendAccountLoading || isBalanceLoading:
+            case isSendAccountLoading:
               return (
                 <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
                   <Spinner size="large" />
