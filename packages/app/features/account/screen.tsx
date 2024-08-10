@@ -243,7 +243,7 @@ export function AccountScreen() {
             <XStack pt={'$size.0.9'} mt="auto">
               <Theme name="green">
                 <LinkableButton
-                  href="/account/settings/edit-profile"
+                  href={media.lg ? '/account?nav=settings' : '/account/settings/edit-profile'}
                   theme={'ghost'}
                   variant="outlined"
                   borderRadius={'$4'}
