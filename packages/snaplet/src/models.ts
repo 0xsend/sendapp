@@ -58,6 +58,18 @@ export const models: SeedClientOptions['models'] = {
       address: () => privateKeyToAddress(generatePrivateKey()),
     },
   },
+  sendCheckCreateds: {
+    data: {
+      from: () => privateKeyToAddress(generatePrivateKey()),
+      chainId: 845337,
+    },
+  },
+  sendCheckClaimeds: {
+    data: {
+      redeemer: () => privateKeyToAddress(generatePrivateKey()),
+      chainId: 845337,
+    },
+  },
 }
 
 export const userOnboarded: usersInputs = {
