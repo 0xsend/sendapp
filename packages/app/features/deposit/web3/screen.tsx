@@ -108,7 +108,7 @@ function DepositForm() {
   const first = options[0]
   assert(!!first, 'first coin not found')
   const { balances } = useSendAccountBalances()
-  const sendUSDCBalance = balances?.[0]?.result
+  const sendUSDCBalance = balances?.usdc?.result
 
   const coin = coins.find((coin) => coin.token === form.watch('token'))
   const isCoinSelected = !!coin
