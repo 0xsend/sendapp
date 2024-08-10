@@ -39,10 +39,10 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
 jest.mock('app/utils/useSendAccountBalances', () => ({
   useSendAccountBalances: jest.fn().mockReturnValue({
     balances: {
-      0: { result: 1n },
-      1: { result: 1n },
+      usdc: { result: 500000n },
+      send: { result: 500000n },
     },
-    totalBalance: () => 1n,
+    totalBalance: () => 1000000n,
   }),
 }))
 jest.mock('@tamagui/tooltip', () => ({

@@ -15,8 +15,8 @@ import {
   useMedia,
   type XStackProps,
 } from '@my/ui'
-import { IconArrowRight, IconPlus } from 'app/components/icons'
-import { coins } from 'app/data/coins'
+import { IconArrowRight, IconError, IconPlus } from 'app/components/icons'
+import { coins, coinsDict } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { DepositPopover } from '../deposit/DepositPopover'
@@ -28,6 +28,8 @@ import Search from 'app/components/SearchBar'
 import { useTagSearch } from 'app/provider/tag-search'
 import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
+import { parseUnits } from 'viem'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -55,9 +57,17 @@ function HomeBody(props: XStackProps) {
   const selectedCoin = useCoinFromTokenParam()
 
   const { balances } = useSendAccountBalances()
-  const usdcBalance = balances?.[0]?.result
+  const [usdcBalance, sendBalance, ethBalance] = [
+    balances?.usdc?.result,
+    balances?.send?.result,
+    balances?.eth?.value,
+  ]
 
-  const canSend = usdcBalance && usdcBalance > 0n
+  const canSend =
+    usdcBalance && usdcBalance >= parseUnits('.5', coinsDict[usdcAddress[baseMainnet.id]].decimals)
+
+  const transfersUnavailable =
+    !canSend && ((sendBalance && sendBalance > 0n) || (ethBalance && ethBalance > 0n))
 
   if (!canSend) {
     return (
@@ -69,10 +79,18 @@ function HomeBody(props: XStackProps) {
             py={'$6'}
             px={'$2'}
             ai={'center'}
-            gap="$5"
+            gap="$7"
             jc="space-around"
             w={'100%'}
           >
+            {transfersUnavailable && (
+              <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
+                <IconError size={'$3'} />
+                <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
+                  A minimum of .50 USDC is required to unlock sending
+                </Paragraph>
+              </XStack>
+            )}
             <XStack w="100%">
               <DepositPopover />
             </XStack>
@@ -147,8 +165,11 @@ export function HomeScreen() {
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { search } = queryParams
   const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
-  const usdcBalance = balances?.[0]?.result
-  const canSend = !!sendAccount && usdcBalance && usdcBalance > 0n
+  const usdcBalance = balances?.usdc?.result
+  const canSend =
+    !!sendAccount &&
+    usdcBalance &&
+    usdcBalance >= parseUnits('.5', coinsDict[usdcAddress[baseMainnet.id]].decimals)
 
   return (
     <YStack f={1} pt="$2">
