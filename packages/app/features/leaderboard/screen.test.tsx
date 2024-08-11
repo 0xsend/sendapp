@@ -14,7 +14,7 @@ const testReferral = {
   },
 }
 
-jest.mock('./utils/useLeaderBoard', () => ({
+jest.mock('./utils/useLeaderboard', () => ({
   useLeaderboard: jest.fn().mockReturnValue({
     data: {
       referrals: [testReferral],
