@@ -1,5 +1,5 @@
 import { Avatar, Card, H2, H3, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
-import { useLeaderboard } from './utils/useLeaderBoard'
+import { useLeaderboard } from './utils/useLeaderboard'
 import type { LeaderboardEntry } from 'app/utils/zod/leaderboard'
 
 export function LeaderboardScreen() {
