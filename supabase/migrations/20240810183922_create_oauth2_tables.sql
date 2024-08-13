@@ -43,3 +43,14 @@ CREATE TABLE "public"."oauth2_client_access_tokens" (
     enabled boolean DEFAULT TRUE NOT NULL
     scopes TEXT[] NOT NULL
 );
+
+-- table storing the refresh tokens for clients
+CREATE TABLE "public"."oauth2_client_refresh_tokens" (
+    id SERIAL PRIMARY KEY,
+    client_id TEXT NOT NULL REFERENCES "public"."oauth2_clients"(client_id) ON DELETE CASCADE,
+    refresh_token TEXT NOT NULL UNIQUE,
+    refresh_token_issued_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    refresh_token_expires_at TIMESTAMPTZ NOT NULL,
+    enabled boolean DEFAULT TRUE NOT NULL
+    scopes TEXT[] NOT NULL
+);
