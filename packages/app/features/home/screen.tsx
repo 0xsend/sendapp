@@ -55,8 +55,8 @@ function SendSearchBody() {
 function HomeBody(props: XStackProps) {
   const { data: sendAccount } = useSendAccount()
   const selectedCoin = useCoinFromTokenParam()
+  const { balances, isLoading: balanceIsLoading } = useSendAccountBalances()
 
-  const { balances } = useSendAccountBalances()
   const [usdcBalance, sendBalance, ethBalance] = [balances?.USDC, balances?.SEND, balances?.ETH]
 
   const canSend =
@@ -64,6 +64,13 @@ function HomeBody(props: XStackProps) {
 
   const transfersUnavailable =
     !canSend && ((sendBalance && sendBalance > 0n) || (ethBalance && ethBalance > 0n))
+
+  if (balanceIsLoading)
+    return (
+      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
+        <Spinner size="large" />
+      </Stack>
+    )
 
   if (!canSend) {
     return (
