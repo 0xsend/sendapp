@@ -41,7 +41,6 @@ import {
   isSendAccountTransfersEvent,
   type Activity,
 } from 'app/utils/zod/activity'
-import type { UserOperation } from 'permissionless'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
