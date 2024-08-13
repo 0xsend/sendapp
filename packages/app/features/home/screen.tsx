@@ -60,7 +60,7 @@ function HomeBody(props: XStackProps) {
   const [usdcBalance, sendBalance, ethBalance] = [balances?.USDC, balances?.SEND, balances?.ETH]
 
   const canSend =
-    usdcBalance && usdcBalance >= parseUnits('.5', coinsDict[usdcAddress[baseMainnet.id]].decimals)
+    usdcBalance && usdcBalance >= parseUnits('.25', coinsDict[usdcAddress[baseMainnet.id]].decimals)
 
   const transfersUnavailable =
     !canSend && ((sendBalance && sendBalance > 0n) || (ethBalance && ethBalance > 0n))
@@ -83,7 +83,7 @@ function HomeBody(props: XStackProps) {
               <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
                 <IconError size={'$3'} />
                 <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
-                  A minimum of .50 USDC is required to unlock sending
+                  A minimum of .25 USDC is required to unlock sending
                 </Paragraph>
               </XStack>
             )}
