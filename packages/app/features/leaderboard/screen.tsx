@@ -1,138 +1,133 @@
-import { Container, Paragraph, XStack, YStack } from '@my/ui'
-
-const users = [
-  {
-    rank: 1,
-    sendTag: '0xUser',
-    points: 100,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 2,
-    sendTag: '0xUser1',
-    points: 90,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 3,
-    sendTag: '0xUser2',
-    points: 80,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 4,
-    sendTag: '0xUser3',
-    points: 70,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 5,
-    sendTag: '0xUser4',
-    points: 60,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 6,
-    sendTag: '0xUser5',
-    points: 50,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 7,
-    sendTag: '0xUser6',
-    points: 40,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 8,
-    sendTag: '0xUser7',
-    points: 30,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 9,
-    sendTag: '0xUser8',
-    points: 20,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 10,
-    sendTag: '0xUser9',
-    points: 10,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 11,
-    sendTag: '0xUser10',
-    points: 5,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 12,
-    sendTag: '0xUser11',
-    points: 5,
-    referralLink: 'send.it/referral/132442314',
-  },
-  {
-    rank: 13,
-    sendTag: '0xUser12',
-    points: 5,
-    referralLink: 'send.it/referral/132442314',
-  },
-]
+import { Avatar, Card, H2, H3, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
+import { useLeaderboard } from './utils/useLeaderboard'
+import type { LeaderboardEntry } from 'app/utils/zod/leaderboard'
 
 export function LeaderboardScreen() {
-  return (
-    <Container>
-      <YStack f={1} width={'100%'} py="$4" space="$4">
-        <LeaderboardSection />
-      </YStack>
-    </Container>
-  )
-}
+  const { data } = useLeaderboard()
 
-function LeaderboardSection() {
   return (
-    <YStack gap="$6" p="$8" br="$8" bg="$backgroundStrong">
-      <LeaderBoardHeader />
-      <LeaderboardList />
+    <YStack w={'100%'} gap={'$size.3.5'} pb={'$size.2'} $gtMd={{ pt: 0 }} pt={'$size.3.5'}>
+      <YStack gap={'$size.0.9'}>
+        <H2 tt={'uppercase'} fontWeight={'900'} testID="mainTitle">
+          Best in Class
+        </H2>
+        <Paragraph color={'$color10'} size={'$5'}>
+          Register a Sendtag, maintain the minimum balance, and refer others to rise in the ranks.
+        </Paragraph>
+      </YStack>
+      {data?.referrals.length ? (
+        <YStack
+          gap={'$size.1.5'}
+          $gtMd={{ flexDirection: 'row' }}
+          // @TODO: remove when we get transactions
+          maxWidth={'600px'}
+        >
+          <Leaderboard title="Referrals" list={data?.referrals} />
+          {/* <Leaderboard title="Transactions" list={data?.rewards} /> */}
+        </YStack>
+      ) : (
+        <Paragraph>Unable to find leaderboard data</Paragraph>
+      )}
     </YStack>
   )
 }
 
-function LeaderBoardHeader() {
+function Leaderboard({ title, list }: { title: string; list: LeaderboardEntry[] }) {
+  const isReferrals = title === 'Referrals'
   return (
-    <XStack gap="$3" ai="center" jc="center">
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" color={'$gray8'}>
-        Rank
-      </Paragraph>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" color={'$gray8'} ta="center">
-        Sendtag
-      </Paragraph>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" color={'$gray8'} ta="center">
-        Points
-      </Paragraph>
-      <Paragraph w="20%" f={2} mb="0" size="$6" lineHeight="$4" color={'$gray8'} ta="right">
-        Referral Link
+    <Card f={1} pb={0}>
+      <YStack br="$8">
+        <YStack gap="$size.0.9" p="$5" $gtMd={{ p: '$8', pb: '$size.0.9' }} pb="$size.0.9" br="$8">
+          <H3 pb={'$size.0.9'} fontWeight={'600'} size={'$7'} testID={`title${title}`}>
+            {title}
+          </H3>
+          <LeaderBoardHeader isReferrals={isReferrals} />
+          <LeaderboardList list={list} isReferrals={isReferrals} />
+        </YStack>
+        <LinearGradient
+          pos="absolute"
+          w="100%"
+          h={'$size.9'}
+          locations={[0, 1]}
+          colors={['transparent', 'black']}
+          b={0}
+          borderBottomRightRadius={'$8'}
+          borderBottomLeftRadius={'$8'}
+        />
+      </YStack>
+    </Card>
+  )
+}
+
+function LeaderBoardHeader({ isReferrals }: { isReferrals: boolean }) {
+  return (
+    <XStack
+      gap="$3"
+      ai="center"
+      jc="space-between"
+      borderBottomWidth={2}
+      borderBottomColor={'$color9'}
+      pb="$size.0.9"
+    >
+      <XStack>
+        <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'} w="$size.3">
+          #
+        </Paragraph>
+        <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'}>
+          Sendtag
+        </Paragraph>
+      </XStack>
+
+      <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'} ta="right">
+        {isReferrals ? 'Referrals' : 'Total transactions'}
       </Paragraph>
     </XStack>
   )
 }
 
-function LeaderboardList() {
-  return users.map((user) => (
-    <XStack gap="$3" ai="center" jc={'center'} key={user.sendTag}>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4">
-        {user.rank}
-      </Paragraph>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" ta="center">
-        {user.sendTag}
-      </Paragraph>
-      <Paragraph w="20%" f={1} mb="0" size="$6" lineHeight="$4" ta="center">
-        {user.points}
-      </Paragraph>
-      <Paragraph w="20%" f={2} mb="0" size="$6" lineHeight="$4" ta="right" color={'$gold8'}>
-        {user.referralLink}
+const getName = (user: LeaderboardEntry['user']) => {
+  switch (true) {
+    case Array.isArray(user.tags) && !!user.tags.length:
+      return `/${user.tags[0]}`
+    case !!user.name:
+      return user.name
+    case !!user.send_id:
+      return user.send_id
+  }
+}
+
+function LeaderboardList({
+  list,
+  isReferrals,
+}: { isReferrals: boolean; list: LeaderboardEntry[] }) {
+  return list.map(({ user, referrals, rewards_usdc }, i) => (
+    <XStack
+      gap={'$size.0.9'}
+      ai="center"
+      jc={'space-between'}
+      key={user.send_id}
+      testID={`${user.id}-${user.send_id}`}
+    >
+      <XStack gap={'$2'} flexShrink={1}>
+        <Paragraph mb="0" w="$size.3" lineHeight="$4" color={'$color10'} fontFamily={'$mono'}>
+          {i + 1}
+        </Paragraph>
+        <XStack f={1} gap={'$size.0.9'} ai={'center'}>
+          <Avatar size="$2" borderRadius={'$3'}>
+            <Avatar.Image src={user.avatar_url} />
+            <Avatar.Fallback
+              backgroundColor={'$decay'}
+              $theme-light={{ backgroundColor: '$white' }}
+            />
+          </Avatar>
+          <Paragraph mb="0" lineHeight="$4" color="$primary">
+            {getName(user)}
+          </Paragraph>
+        </XStack>
+      </XStack>
+
+      <Paragraph flexShrink={0} ta="right">
+        {isReferrals ? referrals : rewards_usdc}
       </Paragraph>
     </XStack>
   ))

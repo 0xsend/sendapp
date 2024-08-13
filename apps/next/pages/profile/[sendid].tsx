@@ -7,7 +7,7 @@ import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { TopNav } from 'app/components/TopNav'
+import { ButtonOption, TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -67,7 +67,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Profile" noSubroute />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Profile" noSubroute button={ButtonOption.PROFILE} />}>
+    {children}
+  </HomeLayout>
 )
 
 export default Page

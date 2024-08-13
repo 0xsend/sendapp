@@ -1,9 +1,6 @@
-import * as params from 'app/routers/params'
-import { expect } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
-import { render, act, screen, userEvent, waitFor } from '@testing-library/react-native'
+import { render, act, screen } from '@testing-library/react-native'
 import { HomeScreen } from './screen'
-import { TagSearchProvider } from 'app/provider/tag-search'
 
 jest.mock('@my/wagmi')
 
@@ -39,10 +36,10 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
 jest.mock('app/utils/useSendAccountBalances', () => ({
   useSendAccountBalances: jest.fn().mockReturnValue({
     balances: {
-      0: { result: 1n },
-      1: { result: 1n },
+      usdc: { result: 500000n },
+      send: { result: 500000n },
     },
-    totalBalance: () => 1n,
+    totalBalance: () => 1000000n,
   }),
 }))
 jest.mock('@tamagui/tooltip', () => ({
@@ -57,15 +54,7 @@ jest.mock('solito', () => ({
 }))
 
 jest.mock('app/routers/params', () => ({
-  useSendScreenParams: jest
-    .fn()
-    .mockReturnValue([
-      { idType: 'tag', recipient: 'test', amount: 'test', sendToken: 'test', note: 'test' },
-      jest.fn(),
-    ]),
-  useRootScreenParams: jest
-    .fn()
-    .mockReturnValue([{ nav: 'home', token: undefined, search: 'test' }, jest.fn()]),
+  useRootScreenParams: jest.fn().mockReturnValue([{ nav: 'home', token: undefined }, jest.fn()]),
 }))
 
 jest.mock('app/features/home/utils/useTokenActivityFeed')
@@ -114,44 +103,16 @@ jest.mock('app/utils/send-accounts', () => ({
 import { usePathname } from 'expo-router'
 // @ts-expect-error mock
 usePathname.mockReturnValue('/')
-describe('HomeScreen', () => {
-  it('should render with search when on / and a sendable account exists', async () => {
-    jest.useFakeTimers()
-
-    const tree = render(
-      <TamaguiProvider defaultTheme={'dark'} config={config}>
-        <TagSearchProvider>
-          <HomeScreen />
-        </TagSearchProvider>
-      </TamaguiProvider>
-    ).toJSON()
-
-    act(() => {
-      jest.runAllTimers()
-    })
-
-    expect(tree).toMatchSnapshot('render')
-
-    expect(params.useRootScreenParams).toHaveBeenCalled()
-
-    const searchBy = await screen.findByRole('search', { name: 'query' })
-    const user = userEvent.setup()
-
-    await act(async () => {
-      await user.type(searchBy, 'test')
-      jest.advanceTimersByTime(3000)
-      jest.runAllTimers()
-    })
-    await waitFor(() => screen.findByTestId('searchResults'))
-    expect(screen.toJSON()).toMatchSnapshot('search')
-    expect(screen.getByTestId('tag-search-3665')).toHaveTextContent('??test/test')
-    const avatar = screen.getByTestId('avatar')
-    expect(avatar).toBeOnTheScreen()
-    expect(avatar.props.source.uri).toBe('https://avatars.githubusercontent.com/u/123')
-    const link = screen.getByTestId('MockSolitoLink')
-    expect(link).toBeOnTheScreen()
-    expect(link.props.href).toBe(
-      '/send?idType=tag&recipient=test&amount=test&sendToken=test&note=test'
-    )
+test('HomeScreen', async () => {
+  jest.useFakeTimers()
+  render(
+    <TamaguiProvider defaultTheme={'dark'} config={config}>
+      <HomeScreen />
+    </TamaguiProvider>
+  )
+  await act(async () => {
+    jest.advanceTimersByTime(2000)
+    jest.runAllTimers()
   })
+  expect(screen.toJSON()).toMatchSnapshot()
 })
