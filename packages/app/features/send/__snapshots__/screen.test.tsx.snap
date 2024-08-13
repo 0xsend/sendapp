@@ -142,7 +142,6 @@ exports[`SendScreen should render /send check when no send account: render 1`] =
           "borderBottomRightRadius": 7,
           "borderTopLeftRadius": 7,
           "borderTopRightRadius": 7,
-          "flex": 1,
           "flexDirection": "row",
           "gap": 13,
           "paddingBottom": 7,
