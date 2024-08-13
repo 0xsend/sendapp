@@ -33,6 +33,24 @@ CREATE TABLE "public"."oauth2_client_authorization_grant_types" (
 ALTER TABLE "public"."oauth2_client_authorization_grant_types" ENABLE ROW LEVEL SECURITY;
 CREATE INDEX "idx_oauth2_authorization_grant_types_client_id" ON "public"."oauth2_client_authorization_grant_types"("client_id");
 
+-- table storing the authorization codes for clients
+CREATE TABLE "public"."oauth2_client_authorization_codes" (
+    id SERIAL PRIMARY KEY,
+    client_id TEXT NOT NULL REFERENCES "public"."oauth2_clients"(client_id) ON DELETE CASCADE,
+    authorization_code TEXT NOT NULL UNIQUE,
+    code_issued_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    code_expires_at TIMESTAMPTZ NOT NULL,
+    redirect_uri TEXT NOT NULL,
+    scopes TEXT[] NOT NULL,
+    user_id TEXT NOT NULL,
+    used BOOLEAN DEFAULT FALSE NOT NULL, 
+    enabled BOOLEAN DEFAULT TRUE NOT NULL
+);
+ALTER TABLE "public"."oauth2_client_authorization_codes" ENABLE ROW LEVEL SECURITY;
+CREATE INDEX "idx_oauth2_authorization_codes_client_id" ON "public"."oauth2_client_authorization_codes"("client_id");
+CREATE INDEX "idx_oauth2_authorization_codes_user_id" ON "public"."oauth2_client_authorization_codes"("user_id");
+
+
 -- table storing the access tokens for clients
 CREATE TABLE "public"."oauth2_client_access_tokens" (
     id SERIAL PRIMARY KEY,
@@ -40,9 +58,11 @@ CREATE TABLE "public"."oauth2_client_access_tokens" (
     access_token TEXT NOT NULL UNIQUE,
     access_token_issued_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     access_token_expires_at TIMESTAMPTZ NOT NULL,
-    enabled boolean DEFAULT TRUE NOT NULL
+    enabled boolean DEFAULT TRUE NOT NULL,
     scopes TEXT[] NOT NULL
 );
+ALTER TABLE "public"."oauth2_client_access_tokens" ENABLE ROW LEVEL SECURITY;
+CREATE INDEX "idx_oauth2_access_tokens_client_id" ON "public"."oauth2_client_access_tokens"("client_id");
 
 -- table storing the refresh tokens for clients
 CREATE TABLE "public"."oauth2_client_refresh_tokens" (
@@ -51,6 +71,8 @@ CREATE TABLE "public"."oauth2_client_refresh_tokens" (
     refresh_token TEXT NOT NULL UNIQUE,
     refresh_token_issued_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     refresh_token_expires_at TIMESTAMPTZ NOT NULL,
-    enabled boolean DEFAULT TRUE NOT NULL
+    enabled boolean DEFAULT TRUE NOT NULL,
     scopes TEXT[] NOT NULL
 );
+ALTER TABLE "public"."oauth2_client_refresh_tokens" ENABLE ROW LEVEL SECURITY;
+CREATE INDEX "idx_oauth2_refresh_tokens_client_id" ON "public"."oauth2_client_refresh_tokens"("client_id");
