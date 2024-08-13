@@ -15,7 +15,7 @@ import {
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { IconAccount } from 'app/components/icons'
+import { IconAccount, IconUSDC } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { coins, coinsDict } from 'app/data/coins'
 import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
@@ -28,6 +28,7 @@ import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
 import { useProfileHref } from 'app/utils/useProfileHref'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import {
   useGenerateTransferUserOp,
@@ -40,10 +41,11 @@ import {
   isSendAccountTransfersEvent,
   type Activity,
 } from 'app/utils/zod/activity'
+import type { UserOperation } from 'permissionless'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
-import { useBalance, useEstimateFeesPerGas } from 'wagmi'
+import { useEstimateFeesPerGas } from 'wagmi'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -71,11 +73,15 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm() {
-  const queryClient = useQueryClient()
-  const { data: sendAccount } = useSendAccount()
-
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType } = queryParams
+
+  const queryClient = useQueryClient()
+  const { data: sendAccount } = useSendAccount()
+  const { balances } = useSendAccountBalances()
+  const usdcBalance = balances?.USDC
+  const [tokenSymbol, tokenDecimals] = [coinsDict[sendToken].symbol, coinsDict[sendToken].decimals]
+  const tokenBalance = balances?.[tokenSymbol]
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
     idType ?? 'tag',
@@ -89,14 +95,8 @@ export function SendConfirm() {
   const [sentTxHash, setSentTxHash] = useState<Hex>()
 
   const router = useRouter()
-  const { data: balance, isLoading: balanceIsLoading } = useBalance({
-    address: sendAccount?.address,
-    token: sendToken === 'eth' ? undefined : sendToken,
-    query: { enabled: !!sendAccount },
-    chainId: baseMainnet.id,
-  })
 
-  const amount = parseUnits((queryParams.amount ?? '0').toString(), balance?.decimals ?? 0)
+  const amount = parseUnits((queryParams.amount ?? '0').toString(), tokenDecimals ?? 0)
   const {
     data: nonce,
     error: nonceError,
@@ -145,25 +145,27 @@ export function SendConfirm() {
 
   const [dataFirstFetch, setDataFirstFetch] = useState<number>()
 
-  const hasEnoughBalance =
-    usdcFees && (balance?.value ?? BigInt(0)) >= amount + usdcFees.baseFee + usdcFees.gasFees
+  const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
+
+  const hasEnoughBalance = tokenBalance && tokenBalance >= amount
 
   const canSubmit =
     Number(queryParams.amount) > 0 &&
     coinsDict[queryParams.sendToken] &&
+    hasEnoughGas &&
     hasEnoughBalance &&
     !sentTxHash
 
   async function onSubmit() {
     try {
       assert(!!userOp, 'User op is required')
-      assert(!!balance, 'Balance is not available')
+      assert(!!tokenBalance, 'Balance is not available')
       assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
 
-      assert(balance.value >= amount, 'Insufficient balance')
+      assert(tokenBalance >= amount, 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
       const _userOp = {
@@ -218,8 +220,7 @@ export function SendConfirm() {
     }
   }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
 
-  if (balanceIsLoading || nonceIsLoading || isProfileLoading)
-    return <Spinner size="large" color={'$color'} />
+  if (nonceIsLoading || isProfileLoading) return <Spinner size="large" color={'$color'} />
 
   return (
     <YStack
@@ -242,88 +243,16 @@ export function SendConfirm() {
         <Stack w="100%" gap="$5" ai="flex-end">
           <Stack $gtLg={{ fd: 'row', gap: '$12', miw: 80 }} w="100%" gap="$5">
             <SendRecipient $gtLg={{ f: 1, maw: 350 }} />
-
-            <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
-              <XStack jc="space-between" ai="center" gap="$3">
-                <Label
-                  fontWeight="500"
-                  fontSize="$5"
-                  textTransform="uppercase"
-                  $theme-dark={{ col: '$gray8Light' }}
-                >
-                  AMOUNT
-                </Label>
-                <Button
-                  bc="transparent"
-                  chromeless
-                  hoverStyle={{ bc: 'transparent' }}
-                  pressStyle={{ bc: 'transparent' }}
-                  focusStyle={{ bc: 'transparent' }}
-                  onPress={() =>
-                    router.push({
-                      pathname: '/send',
-                      query: {
-                        recipient,
-                        idType,
-                        sendToken: queryParams.sendToken,
-                        amount: queryParams.amount,
-                      },
-                    })
-                  }
-                >
-                  <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
-                </Button>
-              </XStack>
-              <XStack
-                ai="center"
-                gap="$3"
-                bc="$metalTouch"
-                p="$3"
-                br="$3"
-                $theme-light={{ bc: '$gray3Light' }}
-                f={1}
-              >
-                <Paragraph fontSize="$9" fontWeight="600" color="$color12">
-                  {queryParams.amount}
-                </Paragraph>
-                {(() => {
-                  const coin = coins.find((coin) => coin.token === queryParams.sendToken)
-                  if (coin) {
-                    return <IconCoin coin={coin} />
-                  }
-                  return null
-                })()}
-              </XStack>
-            </YStack>
+            <SendAmount />
           </Stack>
           <XStack gap="$5" jc="flex-end">
             {isLoadingUSDCFees && <Spinner size="small" color={'$color11'} />}
             {usdcFees && (
-              <YStack gap="$4" ai="flex-end">
-                <Paragraph fontFamily={'$mono'} fontWeight={'400'} fontSize={'$5'} col={'$color12'}>
-                  + Fees:{' '}
-                  {formatAmount(
-                    formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals)
-                  )}{' '}
-                  USDC
-                </Paragraph>
-                <Paragraph
-                  fontFamily={'$mono'}
-                  fontWeight={'400'}
-                  fontSize={'$5'}
-                  $theme-dark={{ col: '$color12' }}
-                >
-                  {' '}
-                  Total:{' '}
-                  {formatAmount(
-                    formatUnits(
-                      usdcFees.baseFee + usdcFees.gasFees + BigInt(amount),
-                      usdcFees.decimals
-                    )
-                  )}{' '}
-                  USDC
-                </Paragraph>
-              </YStack>
+              <Paragraph fontFamily={'$mono'} fontWeight={'400'} fontSize={'$5'} col={'$color12'}>
+                + Transaction Fee:{' '}
+                {formatAmount(formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals))}{' '}
+                USDC
+              </Paragraph>
             )}
             {usdcFeesError && (
               <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
@@ -405,12 +334,10 @@ export function SendConfirm() {
                 )
               case !hasEnoughBalance:
                 return <Button.Text>Insufficient Balance</Button.Text>
+              case !hasEnoughGas:
+                return <Button.Text>Insufficient Gas</Button.Text>
               default:
-                return (
-                  <Button.Text>{`/SEND ${
-                    usdcFees && formatAmount(formatUnits(BigInt(amount), usdcFees.decimals))
-                  } ${coinsDict[queryParams.sendToken]?.symbol ?? 'USDC'}`}</Button.Text>
-                )
+                return <Button.Text fontWeight={'500'}>/SEND</Button.Text>
             }
           })()}
         </Button>
@@ -476,7 +403,6 @@ export function SendRecipient({ ...props }: YStackProps) {
         p="$2"
         br="$3"
         $theme-light={{ bc: '$gray3Light' }}
-        f={1}
       >
         <LinkableAvatar size="$4.5" br="$3" href={href}>
           <Avatar.Image src={profile?.avatar_url ?? ''} />
@@ -507,6 +433,60 @@ export function SendRecipient({ ...props }: YStackProps) {
             })()}
           </Paragraph>
         </YStack>
+      </XStack>
+    </YStack>
+  )
+}
+
+const SendAmount = () => {
+  const [queryParams] = useSendScreenParams()
+  const { sendToken, recipient, idType, amount } = queryParams
+  const router = useRouter()
+  return (
+    <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
+      <XStack jc="space-between" ai="center" gap="$3">
+        <Label
+          fontWeight="500"
+          fontSize="$5"
+          textTransform="uppercase"
+          $theme-dark={{ col: '$gray8Light' }}
+        >
+          AMOUNT
+        </Label>
+        <Button
+          bc="transparent"
+          chromeless
+          hoverStyle={{ bc: 'transparent' }}
+          pressStyle={{ bc: 'transparent' }}
+          focusStyle={{ bc: 'transparent' }}
+          onPress={() =>
+            router.push({
+              pathname: '/send',
+              query: {
+                recipient,
+                idType,
+                sendToken,
+                amount,
+              },
+            })
+          }
+        >
+          <ButtonText $theme-dark={{ col: '$primary' }}>edit</ButtonText>
+        </Button>
+      </XStack>
+      <XStack
+        ai="center"
+        gap="$3"
+        bc="$metalTouch"
+        p="$3"
+        br="$3"
+        $theme-light={{ bc: '$gray3Light' }}
+        f={1}
+      >
+        <Paragraph fontSize="$9" fontWeight="600" color="$color12">
+          {queryParams.amount}
+        </Paragraph>
+        <IconCoin coin={coinsDict[queryParams.sendToken]} />
       </XStack>
     </YStack>
   )
