@@ -32,3 +32,14 @@ CREATE TABLE "public"."oauth2_client_authorization_grant_types" (
 );
 ALTER TABLE "public"."oauth2_client_authorization_grant_types" ENABLE ROW LEVEL SECURITY;
 CREATE INDEX "idx_oauth2_authorization_grant_types_client_id" ON "public"."oauth2_client_authorization_grant_types"("client_id");
+
+-- table storing the access tokens for clients
+CREATE TABLE "public"."oauth2_client_access_tokens" (
+    id SERIAL PRIMARY KEY,
+    client_id TEXT NOT NULL REFERENCES "public"."oauth2_clients"(client_id) ON DELETE CASCADE,
+    access_token TEXT NOT NULL UNIQUE,
+    access_token_issued_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    access_token_expires_at TIMESTAMPTZ NOT NULL,
+    enabled boolean DEFAULT TRUE NOT NULL
+    scopes TEXT[] NOT NULL
+);
