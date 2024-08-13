@@ -14,6 +14,7 @@ import {
   H4,
   useMedia,
   type XStackProps,
+  H5,
 } from '@my/ui'
 import { IconArrowRight, IconError, IconPlus } from 'app/components/icons'
 import { coins, coinsDict } from 'app/data/coins'
@@ -28,8 +29,8 @@ import Search from 'app/components/SearchBar'
 import { useTagSearch } from 'app/provider/tag-search'
 import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
-import { parseUnits } from 'viem'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { parseUnits, formatUnits } from 'viem'
+import { baseMainnet, sendTokenAddress, usdcAddress } from '@my/wagmi'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -82,25 +83,29 @@ function HomeBody(props: XStackProps) {
             py={'$6'}
             px={'$2'}
             ai={'center'}
-            gap="$7"
+            gap="$5"
             jc="space-around"
             w={'100%'}
           >
-            {transfersUnavailable && (
-              <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
-                <IconError size={'$3'} />
-                <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
-                  A minimum of .20 USDC is required to unlock sending
-                </Paragraph>
-              </XStack>
-            )}
             <XStack w="100%">
               <DepositPopover />
             </XStack>
+
             <XStack ai="center">
-              <Paragraph>Or direct deposit on Base</Paragraph>
+              <Paragraph fontWeight={'500'}>Or direct deposit on Base</Paragraph>
               <DepositAddress address={sendAccount?.address} />
             </XStack>
+            {transfersUnavailable && (
+              <>
+                <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
+                  <IconError size={'$3'} />
+                  <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
+                    A minimum of .20 USDC is required to unlock sending
+                  </Paragraph>
+                </XStack>
+                <NoGasBalances />
+              </>
+            )}
           </Card>
           <Separator $gtLg={{ display: 'none' }} w={'100%'} />
           <YStack w={'100%'} ai={'center'}>
@@ -219,6 +224,25 @@ const SendButton = () => {
         </Button.Icon>
       </XStack>
     </LinkableButton>
+  )
+}
+
+const NoGasBalances = () => {
+  const { balances } = useSendAccountBalances()
+
+  const [usdcBalance, sendBalance, ethBalance] = [
+    formatUnits(balances?.USDC ?? 0n, coinsDict[usdcAddress[baseMainnet.id]].decimals),
+    formatUnits(balances?.SEND ?? 0n, coinsDict[sendTokenAddress[baseMainnet.id]].decimals),
+    formatUnits(balances?.ETH ?? 0n, coinsDict.eth.decimals),
+  ]
+
+  return (
+    <YStack gap="$1" alignSelf="flex-start">
+      <H5>Current Balances </H5>
+      <Paragraph fontWeight={'500'}>USDC: {Number(usdcBalance).toLocaleString()}</Paragraph>
+      <Paragraph fontWeight={'500'}>ETH: {Number(ethBalance).toLocaleString()}</Paragraph>
+      <Paragraph fontWeight={'500'}>SEND: {Number(sendBalance).toLocaleString()}</Paragraph>
+    </YStack>
   )
 }
 
