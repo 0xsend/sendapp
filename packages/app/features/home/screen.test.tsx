@@ -36,8 +36,8 @@ jest.mock('app/utils/useUserReferralsCount', () => ({
 jest.mock('app/utils/useSendAccountBalances', () => ({
   useSendAccountBalances: jest.fn().mockReturnValue({
     balances: {
-      usdc: { result: 500000n },
-      send: { result: 500000n },
+      USDC: 500000n,
+      SEND: 500000n,
     },
     totalBalance: () => 1000000n,
   }),
