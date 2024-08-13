@@ -13,8 +13,8 @@ jest.mock('@web3modal/wagmi/react')
 jest.mock('app/utils/useSendAccountBalances', () => ({
   useSendAccountBalances: jest.fn().mockReturnValue({
     balances: {
-      usdc: { result: 0n },
-      send: { result: 1n },
+      USDC: 0n,
+      SEND: 1n,
     },
     totalBalance: () => 1n,
   }),

@@ -52,9 +52,9 @@ export const useSendAccountBalances = () => {
   const balances = isLoading
     ? undefined
     : {
-        eth: ethBalanceOnBase,
-        usdc: tokenBalances?.[0],
-        send: tokenBalances?.[1],
+        ETH: ethBalanceOnBase?.value,
+        USDC: tokenBalances?.[0].result,
+        SEND: tokenBalances?.[1].result,
       }
 
   if (!tokenPrices) {

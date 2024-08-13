@@ -57,11 +57,7 @@ function HomeBody(props: XStackProps) {
   const selectedCoin = useCoinFromTokenParam()
 
   const { balances } = useSendAccountBalances()
-  const [usdcBalance, sendBalance, ethBalance] = [
-    balances?.usdc?.result,
-    balances?.send?.result,
-    balances?.eth?.value,
-  ]
+  const [usdcBalance, sendBalance, ethBalance] = [balances?.USDC, balances?.SEND, balances?.ETH]
 
   const canSend =
     usdcBalance && usdcBalance >= parseUnits('.5', coinsDict[usdcAddress[baseMainnet.id]].decimals)
