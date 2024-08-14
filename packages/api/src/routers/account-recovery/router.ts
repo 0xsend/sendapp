@@ -15,7 +15,7 @@ import {
   getPasskey,
   isChallengeExpired,
 } from 'app/utils/account-recovery'
-import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
+import { JWT_ACCESS_TOKEN_EXPIRY_SECS, mintAuthenticatedJWTToken } from 'app/utils/jwt'
 import { verifyMessage, hexToBytes } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
@@ -123,7 +123,10 @@ export const accountRecoveryRouter = createTRPCRouter({
       const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
 
       console.log(`Account recovered - Recovery type: [${recoveryType}]. User: [${userId}].`)
-      ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/`)
+      ctx.res.setHeader(
+        'Set-Cookie',
+        `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/; Max-Age=${JWT_ACCESS_TOKEN_EXPIRY_SECS}`
+      )
       return {
         jwt,
       }

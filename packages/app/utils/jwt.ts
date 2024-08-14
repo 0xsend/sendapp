@@ -3,6 +3,9 @@ import type { SignOptions, Secret } from 'jsonwebtoken'
 
 const jwtSecret = process.env.SUPABASE_JWT_SECRET as Secret
 
+// 14 days
+export const JWT_ACCESS_TOKEN_EXPIRY_SECS = 1209600
+
 /**
  * @todo Audit capabilities for JWTs created via this method, see https://github.com/0xsend/sendapp/pull/437#discussion_r1624477143
  * @param {string} sub - subject (userId of user in the public.auth table)
@@ -10,7 +13,7 @@ const jwtSecret = process.env.SUPABASE_JWT_SECRET as Secret
  */
 export const mintAuthenticatedJWTToken = (sub: string): string => {
   const options = {
-    expiresIn: '7d',
+    expiresIn: JWT_ACCESS_TOKEN_EXPIRY_SECS,
   }
 
   return mintJWTToken('authenticated', 'authenticated', sub, options)
