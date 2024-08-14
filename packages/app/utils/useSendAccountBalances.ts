@@ -26,7 +26,7 @@ export const useSendAccountBalances = () => {
   const { data: tokenPrices } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
-  const { data: tokenBalances, isPending: isLoadingTokenBalances } = useReadContracts({
+  const { data: tokenBalances, isLoading: isLoadingTokenBalances } = useReadContracts({
     query: { enabled: !!sendAccount },
     contracts: [
       {
@@ -49,16 +49,17 @@ export const useSendAccountBalances = () => {
   })
 
   const isLoading = isLoadingTokenBalances || isLoadingEthBalanceOnBase
+
   const balances = isLoading
     ? undefined
     : {
-        eth: ethBalanceOnBase,
-        usdc: tokenBalances?.[0],
-        send: tokenBalances?.[1],
+        ETH: ethBalanceOnBase?.value,
+        USDC: tokenBalances?.[0].result,
+        SEND: tokenBalances?.[1].result,
       }
 
   if (!tokenPrices) {
-    return { balances, totalBalance: undefined }
+    return { balances, isLoading, totalBalance: undefined }
   }
   const usdcBalanceInUsd =
     convertBalanceToFiat(
