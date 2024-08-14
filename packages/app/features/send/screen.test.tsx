@@ -7,6 +7,16 @@ jest.mock('expo-router', () => ({
   usePathname: jest.fn().mockReturnValue('/send'),
 }))
 
+jest.mock('app/utils/useSendAccountBalances', () => ({
+  useSendAccountBalances: jest.fn().mockReturnValue({
+    balances: {
+      USDC: 250000n,
+      SEND: 250000n,
+    },
+    totalBalance: () => 5000000n,
+  }),
+}))
+
 jest.mock('solito', () => {
   // console.log('mock solito')
   const mockCreateParam = jest.fn(() => {
