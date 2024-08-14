@@ -1,9 +1,9 @@
-import { Avatar, Card, H2, H3, LinearGradient, Paragraph, XStack, YStack } from '@my/ui'
+import { Avatar, Card, H2, H3, LinearGradient, Paragraph, Spinner, XStack, YStack } from '@my/ui'
 import { useLeaderboard } from './utils/useLeaderboard'
 import type { LeaderboardEntry } from 'app/utils/zod/leaderboard'
 
 export function LeaderboardScreen() {
-  const { data } = useLeaderboard()
+  const { data, isLoading } = useLeaderboard()
 
   return (
     <YStack w={'100%'} gap={'$size.3.5'} pb={'$size.2'} $gtMd={{ pt: 0 }} pt={'$size.3.5'}>
@@ -15,7 +15,8 @@ export function LeaderboardScreen() {
           Register a Sendtag, maintain the minimum balance, and refer others to rise in the ranks.
         </Paragraph>
       </YStack>
-      {data?.referrals.length ? (
+      {isLoading && <Spinner size="large" color="$olive" />}
+      {data?.referrals.length && !isLoading ? (
         <YStack
           gap={'$size.1.5'}
           $gtMd={{ flexDirection: 'row' }}

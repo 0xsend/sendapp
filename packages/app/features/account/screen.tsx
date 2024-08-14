@@ -27,6 +27,7 @@ import {
   IconBadgeCheck,
   IconInfoCircle,
   IconX,
+  IconLeaderboard,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'
 import { useUser } from 'app/utils/useUser'
@@ -326,6 +327,15 @@ const ActionCard = ({
           {title}
         </Heading>
         {title === 'Sendtags' && <InfoDialog />}
+        {title === 'Referrals' && (
+          <XStack f={1} jc={'flex-end'} maxWidth={'106px'}>
+            <LinkableButton href={'/leaderboard'} unstyled aria-label="go to leaderboard.">
+              <Button.Icon>
+                <IconLeaderboard color={'$primary'} size={'$size.3'} />
+              </Button.Icon>
+            </LinkableButton>
+          </XStack>
+        )}
       </XStack>
       <Paragraph size={'$6'} color="$color10" mb="$size.1.5">
         {description}

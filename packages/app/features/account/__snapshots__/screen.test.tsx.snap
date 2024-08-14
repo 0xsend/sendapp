@@ -1140,6 +1140,85 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           >
             Referrals
           </Text>
+          <View
+            style={
+              {
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "flex-end",
+                "maxWidth": "106px",
+              }
+            }
+          >
+            <View
+              aria-label="go to leaderboard."
+              focusable={true}
+              role="button"
+              style={
+                {
+                  "flexDirection": "column",
+                }
+              }
+            >
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbWidth={36}
+                color="#40FB50"
+                fill="none"
+                focusable={false}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#40FB50",
+                    },
+                  ]
+                }
+                tintColor="#40FB50"
+                vbHeight={30}
+                vbWidth={34}
+                width={36}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M3.114 27.222h7.417V12.778H3.114v14.444Zm10.194 0h7.39V2.778h-7.39v24.444Zm10.167 0h7.416v-11.11h-7.416v11.11ZM.335 30V10H10.53V0h12.945v13.333h10.194V30H.336Z"
+                    fill={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+            </View>
+          </View>
         </View>
         <Text
           style={
