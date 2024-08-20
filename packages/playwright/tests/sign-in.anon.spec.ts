@@ -30,7 +30,7 @@ test('redirect on sign-in', async ({ page, pg }) => {
     await page.waitForURL(/auth\/sign-in/)
     // redirect to send after user is logged in
     await expect(page).toHaveURL(`/auth/sign-in?redirectUri=${encodeURIComponent('/send')}`)
-    const signInButton = page.getByRole('button', { name: 'Sign In' })
+    const signInButton = page.getByTestId('SubmitButton')
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     const sendSearchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
@@ -67,7 +67,7 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
       redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`,
     })
     // redirect to send after user is logged in
-    const signInButton = page.getByRole('button', { name: 'Sign In' })
+    const signInButton = page.getByTestId('SubmitButton')
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     await page.waitForURL(/send\/confirm/)
