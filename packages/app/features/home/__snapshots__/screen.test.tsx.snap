@@ -488,6 +488,7 @@ exports[`HomeScreen 1`] = `
                     "width": "100%",
                   }
                 }
+                testID="homeSendButton"
               >
                 <View
                   style={
