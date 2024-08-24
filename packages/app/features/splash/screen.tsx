@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonText,
   H1,
   LinearGradient,
   Paragraph,
@@ -18,14 +19,14 @@ import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useState } from 'react'
-import { SignInButton } from '../auth/components/SignInButton'
-
-export const formatErrorMessage = (error: Error) => {
-  if (error.message.startsWith('The operation either timed out or was not allowed')) {
-    return 'Passkey Authentication Failed'
-  }
-  return error.message
-}
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
+import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
+import { SubmitButton, useToastController } from '@my/ui'
+import { api } from 'app/utils/api'
+import { signChallenge } from 'app/utils/signChallenge'
+import { useRouter } from 'solito/router'
+import { bytesToHex, hexToBytes } from 'viem'
+import { useAuthScreenParams } from 'app/routers/params'
 
 export function SplashScreen() {
   return (
@@ -149,7 +150,7 @@ function Hero() {
             height={isWeb ? '100dvh' : '100%'}
           >
             <Stack
-              bc="$black"
+              bc="$color1"
               pos="absolute"
               top={0}
               left={0}
@@ -243,8 +244,52 @@ function Hero() {
 }
 
 function AuthButtons() {
-  const [signInError, setSignInError] = useState<Error | null>(null)
+  const [queryParams] = useAuthScreenParams()
+  const { redirectUri } = queryParams
+  const toast = useToastController()
+  const router = useRouter()
   const signUpLink = useLink({ href: '/auth/sign-up' })
+  const [signInError, setSignInError] = useState<Error | null>(null)
+  const [isSigningIn, setIsSigningIn] = useState(false)
+
+  const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
+    retry: false,
+  })
+  const { mutateAsync: validateSignatureMutateAsync } = api.challenge.validateSignature.useMutation(
+    { retry: false }
+  )
+
+  const handleSignIn = async () => {
+    setIsSigningIn(true)
+    try {
+      const challengeData = await getChallengeMutateAsync()
+
+      const rawIdsB64: { id: string; userHandle: string }[] = []
+      const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
+        challengeData.challenge as `0x${string}`,
+        rawIdsB64
+      )
+
+      const encodedWebAuthnSigBytes = hexToBytes(encodedWebAuthnSig)
+      const newEncodedWebAuthnSigBytes = new Uint8Array(encodedWebAuthnSigBytes.length + 1)
+      newEncodedWebAuthnSigBytes[0] = keySlot
+      newEncodedWebAuthnSigBytes.set(encodedWebAuthnSigBytes, 1)
+
+      await validateSignatureMutateAsync({
+        recoveryType: RecoveryOptions.WEBAUTHN,
+        signature: bytesToHex(newEncodedWebAuthnSigBytes),
+        challengeId: challengeData.id,
+        identifier: `${accountName}.${keySlot}`,
+      })
+
+      router.push(redirectUri ?? '/')
+    } catch (error) {
+      toast.show('Failed to sign in', { preset: 'error', isUrgent: true })
+      setSignInError(error as Error)
+    } finally {
+      setIsSigningIn(false)
+    }
+  }
 
   return (
     <XStack
@@ -256,7 +301,10 @@ function AuthButtons() {
       w="100%"
       alignSelf="center"
     >
-      <SignInButton setError={setSignInError} size="$4" w="$12" />
+      <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
+        <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+      </SubmitButton>
+
       <Button {...signUpLink} borderColor="$primary" variant="outlined" size="$4" w="$12">
         <Button.Text color="$white" $gtMd={{ color: '$color12' }}>
           SIGN-UP
