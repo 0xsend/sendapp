@@ -1,15 +1,27 @@
+import { useState } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
-import { BigHeading, ButtonText, H3, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
+import {
+  BigHeading,
+  ButtonText,
+  H3,
+  Paragraph,
+  SubmitButton,
+  XStack,
+  YStack,
+  useToastController,
+} from '@my/ui'
 import { TRPCClientError } from '@trpc/client'
+import { bytesToHex, hexToBytes } from 'viem'
+import { useRouter } from 'solito/router'
+import { z } from 'zod'
+import { FormProvider, useForm } from 'react-hook-form'
+import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
-import { useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { useRouter } from 'solito/router'
-import { z } from 'zod'
-import { SignInButton } from '../components/SignInButton'
-import { formatErrorMessage } from 'app/features/splash/screen'
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
+import { signChallenge } from 'app/utils/signChallenge'
+import { useAuthScreenParams } from 'app/routers/params'
 
 const SignUpSchema = z.object({
   countrycode: formFields.countrycode,
@@ -20,8 +32,51 @@ export const SignUpForm = () => {
   const form = useForm<z.infer<typeof SignUpSchema>>()
   const signInWithOtp = api.auth.signInWithOtp.useMutation()
   const router = useRouter()
+  const [queryParams] = useAuthScreenParams()
+  const { redirectUri } = queryParams
+  const toast = useToastController()
   const [captchaToken, setCaptchaToken] = useState<string | undefined>()
   const [signInError, setSignInError] = useState<Error | null>(null)
+  const [isSigningIn, setIsSigningIn] = useState(false)
+
+  const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
+    retry: false,
+  })
+  const { mutateAsync: validateSignatureMutateAsync } = api.challenge.validateSignature.useMutation(
+    { retry: false }
+  )
+
+  const handleSignIn = async () => {
+    setIsSigningIn(true)
+    try {
+      const challengeData = await getChallengeMutateAsync()
+
+      const rawIdsB64: { id: string; userHandle: string }[] = []
+      const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
+        challengeData.challenge as `0x${string}`,
+        rawIdsB64
+      )
+
+      const encodedWebAuthnSigBytes = hexToBytes(encodedWebAuthnSig)
+      const newEncodedWebAuthnSigBytes = new Uint8Array(encodedWebAuthnSigBytes.length + 1)
+      newEncodedWebAuthnSigBytes[0] = keySlot
+      newEncodedWebAuthnSigBytes.set(encodedWebAuthnSigBytes, 1)
+
+      await validateSignatureMutateAsync({
+        recoveryType: RecoveryOptions.WEBAUTHN,
+        signature: bytesToHex(newEncodedWebAuthnSigBytes),
+        challengeId: challengeData.id,
+        identifier: `${accountName}.${keySlot}`,
+      })
+
+      router.push(redirectUri ?? '/')
+    } catch (error) {
+      toast.show('Failed to sign in', { preset: 'error', isUrgent: true })
+      setSignInError(error as Error)
+    } finally {
+      setIsSigningIn(false)
+    }
+  }
 
   async function signUpWithPhone({ phone, countrycode }: z.infer<typeof SignUpSchema>) {
     const { error } = await signInWithOtp
@@ -134,16 +189,11 @@ export const SignUpForm = () => {
                   <Paragraph size="$2" color="$color11">
                     Already have an account?
                   </Paragraph>
-                  <SignInButton
-                    setError={setSignInError}
-                    unstyled
-                    color="$color11"
-                    renderButtonText={(isSigningIn) => (
-                      <ButtonText textDecorationLine="underline">
-                        {isSigningIn ? 'Signing in...' : 'Sign in'}
-                      </ButtonText>
-                    )}
-                  />
+                  <SubmitButton onPress={handleSignIn} disabled={isSigningIn} unstyled>
+                    <ButtonText color="$color11" size="$2" textDecorationLine="underline">
+                      {isSigningIn ? 'Signing in...' : 'Sign in'}
+                    </ButtonText>
+                  </SubmitButton>
                 </XStack>
 
                 {signInError && (
