@@ -7,7 +7,7 @@ export function UnknownScreen() {
       <YStack jc={'center'} alignItems="center" f={1} gap="$6">
         <H1>Not found.</H1>
         <H2>Send, Instant Payments.</H2>
-        <Link href="/auth/sign-in">
+        <Link href="/">
           <Button>Need to sign in?</Button>
         </Link>
       </YStack>

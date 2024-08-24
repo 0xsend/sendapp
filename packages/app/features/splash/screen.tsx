@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   H1,
   LinearGradient,
   Paragraph,
@@ -11,7 +10,6 @@ import {
   useMedia,
   usePwa,
   useSafeAreaInsets,
-  type ButtonProps,
 } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
@@ -22,7 +20,7 @@ import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useState } from 'react'
 import { SignInButton } from '../auth/components/SignInButton'
 
-const formatErrorMessage = (error: Error) => {
+export const formatErrorMessage = (error: Error) => {
   if (error.message.startsWith('The operation either timed out or was not allowed')) {
     return 'Passkey Authentication Failed'
   }
@@ -30,7 +28,6 @@ const formatErrorMessage = (error: Error) => {
 }
 
 export function SplashScreen() {
-  const media = useMedia()
   return (
     <XStack
       h={isWeb ? '100svh' : '100%'}

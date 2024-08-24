@@ -1,14 +1,15 @@
 import { Turnstile } from '@marsidev/react-turnstile'
-import { Anchor, BigHeading, ButtonText, H3, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
+import { BigHeading, ButtonText, H3, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { TRPCClientError } from '@trpc/client'
 import { VerifyCode } from 'app/features/auth/components/VerifyCode'
 import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { api } from 'app/utils/api'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useLink } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
+import { SignInButton } from '../components/SignInButton'
+import { formatErrorMessage } from 'app/features/splash/screen'
 
 const SignUpSchema = z.object({
   countrycode: formFields.countrycode,
@@ -20,7 +21,7 @@ export const SignUpForm = () => {
   const signInWithOtp = api.auth.signInWithOtp.useMutation()
   const router = useRouter()
   const [captchaToken, setCaptchaToken] = useState<string | undefined>()
-  const signInLink = useLink({ href: '/auth/sign-in' })
+  const [signInError, setSignInError] = useState<Error | null>(null)
 
   async function signUpWithPhone({ phone, countrycode }: z.infer<typeof SignUpSchema>) {
     const { error } = await signInWithOtp
@@ -128,14 +129,29 @@ export const SignUpForm = () => {
                   </ButtonText>
                 </SubmitButton>
               </XStack>
-              <XStack jc="center" ai="center" mt="$4">
-                <Paragraph size="$2" color="$color11">
-                  Already have an account?{' '}
-                  <Anchor color="$color12" {...signInLink}>
-                    Sign in
-                  </Anchor>
-                </Paragraph>
-              </XStack>
+              <YStack pos="relative" pb={'$size.1'} w="100%" maw="$size.22">
+                <XStack jc="center" ai="center" mt="$4" gap="$1">
+                  <Paragraph size="$2" color="$color11">
+                    Already have an account?
+                  </Paragraph>
+                  <SignInButton
+                    setError={setSignInError}
+                    unstyled
+                    color="$color11"
+                    renderButtonText={(isSigningIn) => (
+                      <ButtonText textDecorationLine="underline">
+                        {isSigningIn ? 'Signing in...' : 'Sign in'}
+                      </ButtonText>
+                    )}
+                  />
+                </XStack>
+
+                {signInError && (
+                  <Paragraph pos={'absolute'} color="$error" bottom={0} alignSelf="center">
+                    {formatErrorMessage(signInError)}
+                  </Paragraph>
+                )}
+              </YStack>
               <YStack pt="$4">
                 {!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                   <Turnstile

@@ -1,14 +1,20 @@
-// sign-in-form.tsx
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
-import { ButtonText, SubmitButton, useToastController } from '@my/ui'
+import { type ButtonProps, ButtonText, SubmitButton, useToastController } from '@my/ui'
 import { api } from 'app/utils/api'
 import { signChallenge } from 'app/utils/signChallenge'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { bytesToHex, hexToBytes } from 'viem'
 import { useAuthScreenParams } from 'app/routers/params'
 
-export const SignInButton = ({ setError, ...props }) => {
+export const SignInButton = ({
+  setError,
+  renderButtonText,
+  ...props
+}: ButtonProps & {
+  renderButtonText?: (isSigningIn: boolean) => ReactNode
+  setError: (e: Error) => void
+}) => {
   const [queryParams] = useAuthScreenParams()
   const { redirectUri } = queryParams
   const [isSigningIn, setIsSigningIn] = useState(false)
@@ -56,9 +62,13 @@ export const SignInButton = ({ setError, ...props }) => {
 
   return (
     <SubmitButton onPress={handleSignIn} disabled={isSigningIn} br={'$4'} {...props}>
-      <ButtonText padding={'unset'} margin={'unset'}>
-        {isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}
-      </ButtonText>
+      {renderButtonText ? (
+        renderButtonText(isSigningIn)
+      ) : (
+        <ButtonText padding={'unset'} margin={'unset'}>
+          {isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}
+        </ButtonText>
+      )}
     </SubmitButton>
   )
 }
