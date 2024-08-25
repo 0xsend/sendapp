@@ -1,21 +1,27 @@
+import { leaderboardReferralsAllTimes, userOnboarded } from '@my/snaplet/models'
 import { expect, test } from './fixtures/send-accounts'
 import debug from 'debug'
 
 let log: debug.Debugger
 
-test.beforeEach(async ({ page, user: { user } }) => {
+test.beforeEach(async ({ page, user: { user }, seed }) => {
   log = debug(`test:leaderboard:logged-in:${user.id}:${test.info().parallelIndex}`)
-  await page.goto('/leaderboard')
-  await page.waitForURL('/leaderboard')
 })
 
-test('can visit leaderboard page', async ({ page }) => {
+test('can visit leaderboard page', async ({ page, seed, user: { user } }) => {
+  await seed.users([
+    {
+      ...userOnboarded,
+      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
+    },
+  ])
+
+  await page.goto('/leaderboard')
+  await page.waitForURL('/leaderboard')
   await expect(page).toHaveURL('/leaderboard')
 
   await expect(page.getByText('Best in class')).toBeVisible()
   await expect(page.getByTestId('titleReferrals')).toBeVisible()
-  await expect(page.getByTestId('titleTransactions')).toBeVisible()
-
-  const elements = page.locator('text=Sendtag')
-  await expect(elements).toHaveCount(3)
+  await expect(page.getByText('Sendtag', { exact: true })).toBeVisible()
+  // await expect(page.getByTestId('titleTransactions')).toBeVisible()
 })

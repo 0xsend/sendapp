@@ -21,11 +21,7 @@ test('can sign up', async ({ page, pg }) => {
   const phone = `${Math.floor(Math.random() * 1e9)}`
   // naive but go to home page to see if user is logged in
   await page.goto('/')
-  const signInLink = page.getByRole('link', { name: 'Sign In' })
-  await expect(signInLink).toBeVisible()
-  await signInLink.click()
-  await expect(page).toHaveURL('/auth/sign-in')
-  const signUpLink = page.getByRole('link', { name: 'Sign Up' })
+  const signUpLink = page.getByRole('link', { name: 'SIGN-UP' })
   await expect(signUpLink).toBeVisible()
   await signUpLink.click()
   await expect(page).toHaveURL('/auth/sign-up')
@@ -37,10 +33,7 @@ test('can sign up', async ({ page, pg }) => {
     await page.context().clearCookies()
     await page.goto('/')
     await expect(page).toHaveURL('/')
-    await expect(signInLink).toBeVisible()
-    await signInLink.click()
-    await expect(page).toHaveURL('/auth/sign-in')
-    const signInButton = page.getByRole('button', { name: 'Sign In' })
+    const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     const homeHeader = page
