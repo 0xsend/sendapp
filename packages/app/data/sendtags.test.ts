@@ -4,18 +4,18 @@ import { reward, total } from './sendtags'
 const decimals = 10n ** 6n
 
 const tags = [
-  { name: '1' }, // 64 USDC (48 USDC reward)
-  { name: '12' }, // 64 USDC (48 USDC reward)
-  { name: '123' }, // 64 USDC (48 USDC reward)
-  { name: '1234' }, // 32 USDC (24 USDC reward)
-  { name: '12345' }, // 16 USDC (12 USDC reward)
-  { name: '123456' }, // 8 USDC (6 USDC reward)
-  { name: '1234567' }, // 8 USDC (6 USDC reward)
+  { name: '1' }, // 32 USDC (24 USDC reward)
+  { name: '12' }, // 32 USDC (24 USDC reward)
+  { name: '123' }, // 32 USDC (24 USDC reward)
+  { name: '1234' }, // 16 USDC (12 USDC reward)
+  { name: '12345' }, // 8 USDC (6 USDC reward)
+  { name: '123456' }, // 4 USDC (3 USDC reward)
+  { name: '1234567' }, // 4 USDC (3 USDC reward)
 ]
 
-const totalDue = (64n + 64n + 64n + 32n + 16n + 8n + 8n) * decimals
+const totalDue = (32n + 32n + 32n + 16n + 8n + 4n + 4n) * decimals
 
-const rewardDue = (48n + 48n + 48n + 24n + 12n + 6n + 6n) * decimals
+const rewardDue = (24n + 24n + 24n + 12n + 6n + 3n + 3n) * decimals
 
 describe('Sendtag data', () => {
   it('can calculate total correctly', () => {
