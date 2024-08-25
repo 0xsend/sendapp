@@ -77,7 +77,7 @@ export function SendConfirm() {
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
-  const { balances } = useSendAccountBalances()
+  const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
   const usdcBalance = balances?.USDC
   const [tokenSymbol, tokenDecimals] = [coinsDict[sendToken].symbol, coinsDict[sendToken].decimals]
   const tokenBalance = balances?.[tokenSymbol]
@@ -152,8 +152,7 @@ export function SendConfirm() {
     Number(queryParams.amount) > 0 &&
     coinsDict[queryParams.sendToken] &&
     hasEnoughGas &&
-    hasEnoughBalance &&
-    !sentTxHash
+    hasEnoughBalance
 
   async function onSubmit() {
     try {
@@ -298,8 +297,8 @@ export function SendConfirm() {
           theme={canSubmit ? 'green' : 'red_alt1'}
           onPress={onSubmit}
           br={12}
-          disabledStyle={{ opacity: 0.5, cursor: 'not-allowed' }}
-          disabled={!canSubmit}
+          disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
+          disabled={!canSubmit || isTransferPending || !!sentTxHash}
           gap={4}
           mx="auto"
           $gtXs={{
@@ -313,6 +312,12 @@ export function SendConfirm() {
         >
           {(() => {
             switch (true) {
+              case isBalanceLoading:
+                return (
+                  <Button.Icon>
+                    <Spinner size="small" color="$color" />
+                  </Button.Icon>
+                )
               case isTransferPending && !isTransferError:
                 return (
                   <>
