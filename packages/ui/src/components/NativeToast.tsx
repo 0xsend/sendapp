@@ -23,6 +23,7 @@ export const NativeToast = () => {
         bw={1}
         boc="color12"
         $theme-dark={{ boc: '$primary' }}
+        maxWidth="$size.22"
       >
         <YStack py="$1.5" px="$2">
           <Toast.Title>{currentToast.title}</Toast.Title>
