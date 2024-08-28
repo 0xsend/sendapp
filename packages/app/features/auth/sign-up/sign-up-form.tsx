@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 import {
   BigHeading,
@@ -36,7 +36,6 @@ export const SignUpForm = () => {
   const { redirectUri } = queryParams
   const toast = useToastController()
   const [captchaToken, setCaptchaToken] = useState<string | undefined>()
-  const [signInError, setSignInError] = useState<Error | null>(null)
   const [isSigningIn, setIsSigningIn] = useState(false)
 
   const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
@@ -71,8 +70,7 @@ export const SignUpForm = () => {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      toast.show('Failed to sign in', { preset: 'error', isUrgent: true })
-      setSignInError(error as Error)
+      toast.show(formatErrorMessage(error), { preset: 'error', isUrgent: true, duration: 10000 })
     } finally {
       setIsSigningIn(false)
     }
@@ -98,6 +96,8 @@ export const SignUpForm = () => {
       form.setError('phone', { type: 'custom', message: errorMessage })
     }
   }
+
+  useEffect(() => () => toast.hide(), [toast])
 
   return (
     <FormProvider {...form}>
@@ -195,12 +195,6 @@ export const SignUpForm = () => {
                     </ButtonText>
                   </SubmitButton>
                 </XStack>
-
-                {signInError && (
-                  <Paragraph pos={'absolute'} color="$error" bottom={0} alignSelf="center">
-                    {formatErrorMessage(signInError)}
-                  </Paragraph>
-                )}
               </YStack>
               <YStack pt="$4">
                 {!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (

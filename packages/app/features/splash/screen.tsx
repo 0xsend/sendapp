@@ -18,7 +18,7 @@ import { Carousel, carouselImagePositions } from 'app/features/auth/components/C
 import { SolitoImage } from 'solito/image'
 import { useLink } from 'solito/link'
 import { AnimationLayout } from '../../components/layout/animation-layout'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { SubmitButton, useToastController } from '@my/ui'
@@ -249,7 +249,6 @@ function AuthButtons() {
   const toast = useToastController()
   const router = useRouter()
   const signUpLink = useLink({ href: '/auth/sign-up' })
-  const [signInError, setSignInError] = useState<Error | null>(null)
   const [isSigningIn, setIsSigningIn] = useState(false)
 
   const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
@@ -284,12 +283,13 @@ function AuthButtons() {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      toast.show('Failed to sign in', { preset: 'error', isUrgent: true })
-      setSignInError(error as Error)
+      toast.show(formatErrorMessage(error), { preset: 'error', isUrgent: true, duration: 10000 })
     } finally {
       setIsSigningIn(false)
     }
   }
+
+  useEffect(() => () => toast.hide(), [toast])
 
   return (
     <XStack
@@ -310,12 +310,6 @@ function AuthButtons() {
           SIGN-UP
         </Button.Text>
       </Button>
-
-      {signInError && (
-        <Paragraph pos={'absolute'} color="$error" bottom={0}>
-          {formatErrorMessage(signInError)}
-        </Paragraph>
-      )}
     </XStack>
   )
 }
