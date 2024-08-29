@@ -6,6 +6,16 @@ jest.mock('expo-router', () => ({
   usePathname: jest.fn().mockReturnValue('/send'),
 }))
 
+jest.mock('app/utils/api', () => ({
+  transfer: {
+    withUserOp: jest.fn().mockReturnValue({
+      useMutation: jest.fn().mockReturnValue({
+        mutateAsync: jest.fn().mockReturnValue(Promise.resolve('123')),
+      }),
+    }),
+  },
+}))
+
 jest.mock('app/provider/coins', () => ({
   useCoins: jest.fn().mockReturnValue({
     coins: [
