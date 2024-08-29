@@ -13,7 +13,7 @@ import {
   type ParagraphProps,
   type YStackProps,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount, IconUSDC } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -32,7 +32,6 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import {
   useGenerateTransferUserOp,
-  useUserOpTransferMutation,
   useUserOpGasEstimate,
 } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
@@ -45,6 +44,11 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
+import { api } from 'app/utils/api'
+import { TRPCClientError } from '@trpc/client'
+import { getUserOperationHash } from 'permissionless'
+import { signUserOp } from 'app/utils/signUserOp'
+import { byteaToBase64 } from 'app/utils/byteaToBase64'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -74,6 +78,11 @@ export function SendConfirmScreen() {
 export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType } = queryParams
+  const {
+    mutateAsync: transfer,
+    isPending: isTransferPending,
+    isError: isTransferError,
+  } = api.transfer.transfer.useMutation()
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
@@ -124,11 +133,6 @@ export function SendConfirm() {
   const { data: feesPerGas, error: feesPerGasError } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    isError: isTransferError,
-  } = useUserOpTransferMutation()
 
   const [error, setError] = useState<Error>()
 
@@ -162,6 +166,7 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
+      assert(!!profile?.address, 'Could not resolve recipients send account')
 
       assert(tokenBalance >= amount, 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -175,10 +180,37 @@ export function SendConfirm() {
       console.log('gasEstimate', gasEstimate)
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
-      const receipt = await sendUserOp({
-        userOp: _userOp,
-        webauthnCreds,
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+      const userOpHash = getUserOperationHash({
+        userOperation: userOp,
+        entryPoint,
+        chainId,
       })
+      const signature = await signUserOp({
+        userOpHash,
+        allowedCredentials:
+          webauthnCreds?.map((c) => ({
+            id: byteaToBase64(c.raw_credential_id),
+            userHandle: c.name,
+          })) ?? [],
+      })
+
+      const receipt = await transfer({
+        sender: sender,
+        to: profile.address,
+        token: sendToken === 'eth' ? undefined : sendToken,
+        amount: amount.toString(),
+        nonce: nonce.toString() ?? '0',
+        signature,
+      }).catch((e) => {
+        console.error("Couldn't send the userOp", e)
+        if (e instanceof TRPCClientError) {
+          return { error: { message: e.message } }
+        }
+        return { error: { message: e.message } }
+      })
+
       assert(receipt.success, 'Failed to send user op')
       setSentTxHash(receipt.receipt.transactionHash)
     } catch (e) {
