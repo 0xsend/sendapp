@@ -20,8 +20,8 @@
   "scripts": {
     "lint": "tsc",
     "server": "temporal server start-dev --db-filename ./var/temporal.db",
-    "build-converter": "esbuild --bundle --outfile=build/payload-converter.cjs --target=esnext --platform=node --external:@temporalio/common --external:@bufbuild/protobuf src/payload-converter.ts"
-  },
+    "build": "esbuild --bundle --outfile=build/payload-converter.cjs --target=esnext --platform=node --external:@temporalio/common --external:@bufbuild/protobuf src/payload-converter.ts"
+    },
   "dependencies": {
     "@temporalio/client": "^1.10.1",
     "@temporalio/common": "^1.11.1",
