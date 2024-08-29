@@ -1,4 +1,3 @@
-import { log, ApplicationFailure } from '@temporalio/activity'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 
