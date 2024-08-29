@@ -33,7 +33,6 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import {
   useGenerateTransferUserOp,
   useUserOpTransferMutation,
-  useUserOpGasEstimate,
 } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import {
@@ -114,13 +113,12 @@ export function SendConfirm() {
 
   const {
     data: usdcFees,
-    isLoading: isLoadingUSDCFees,
+    isLoading: isFeesLoading,
     error: usdcFeesError,
   } = useUSDCFees({
     userOp,
   })
 
-  const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
   const { data: feesPerGas, error: feesPerGasError } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
@@ -172,7 +170,7 @@ export function SendConfirm() {
         maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
       }
 
-      console.log('gasEstimate', gasEstimate)
+      console.log('gasEstimate', usdcFees)
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
       const receipt = await sendUserOp({
@@ -244,7 +242,7 @@ export function SendConfirm() {
             <SendAmount />
           </Stack>
           <XStack gap="$5" jc="flex-end">
-            {isLoadingUSDCFees && <Spinner size="small" color={'$color11'} />}
+            {isFeesLoading && <Spinner size="small" color={'$color11'} />}
             {usdcFees && (
               <Paragraph fontFamily={'$mono'} fontWeight={'400'} fontSize={'$5'} col={'$color12'}>
                 + Transaction Fee:{' '}
@@ -312,7 +310,7 @@ export function SendConfirm() {
         >
           {(() => {
             switch (true) {
-              case isBalanceLoading:
+              case isBalanceLoading || isFeesLoading:
                 return (
                   <Button.Icon>
                     <Spinner size="small" color="$color" />
