@@ -2,15 +2,10 @@ import { proxyActivities, ApplicationFailure, defineQuery, setHandler } from '@t
 import type { createTransferActivities } from './activities'
 import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
 
-const {
-  simulateUserOpActivity,
-  sendUserOpActivity,
-  waitForTransactionReceiptActivity,
-  isTransferIndexedActivity,
-} = proxyActivities<ReturnType<typeof createTransferActivities>>({
-  // TODO: make this configurable
-  startToCloseTimeout: '45 seconds',
-})
+const { sendUserOpActivity, waitForTransactionReceiptActivity, fetchTransferActivity } =
+  proxyActivities<ReturnType<typeof createTransferActivities>>({
+    startToCloseTimeout: '30 seconds',
+  })
 
 type simulating = { status: 'simulating'; data: { userOp: UserOperation<'v0.7'> } }
 type sending = { status: 'sending'; data: { userOp: UserOperation<'v0.7'> } }
