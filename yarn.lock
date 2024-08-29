@@ -6213,7 +6213,9 @@ __metadata:
   resolution: "@my/api@workspace:packages/api"
   dependencies:
     "@my/supabase": "workspace:*"
+    "@my/temporal": "workspace:*"
     "@my/wagmi": "workspace:*"
+    "@my/workflows": "workspace:*"
     "@supabase/supabase-js": "npm:2.44.2"
     "@tanstack/react-query": "npm:^5.18.1"
     "@trpc/client": "npm:11.0.0-next-beta.264"
