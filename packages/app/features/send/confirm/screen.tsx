@@ -13,10 +13,11 @@ import {
   type ParagraphProps,
   type YStackProps,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { coinsDict } from 'app/data/coins'
 import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
@@ -27,10 +28,7 @@ import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
-import {
-  useGenerateTransferUserOp,
-  useUserOpTransferMutation,
-} from 'app/utils/useUserOpTransferMutation'
+import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import {
   isSendAccountReceiveEvent,
@@ -45,6 +43,11 @@ import { localizeAmount } from 'app/utils/formatAmount'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
+import { api } from 'app/utils/api'
+import { TRPCClientError } from '@trpc/client'
+import { getUserOperationHash } from 'permissionless'
+import { signUserOp } from 'app/utils/signUserOp'
+import { byteaToBase64 } from 'app/utils/byteaToBase64'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -74,6 +77,11 @@ export function SendConfirmScreen() {
 export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
+  const {
+    mutateAsync: transfer,
+    isPending: isTransferPending,
+    isError: isTransferError,
+  } = api.transfer.withUserOp.useMutation()
 
   const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
@@ -124,11 +132,6 @@ export function SendConfirm() {
   } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    isError: isTransferError,
-  } = useUserOpTransferMutation()
 
   const [error, setError] = useState<Error>()
 
@@ -159,6 +162,7 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
+      assert(!!profile?.address, 'Could not resolve recipients send account')
 
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -172,12 +176,35 @@ export function SendConfirm() {
       console.log('gasEstimate', usdcFees)
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
-      const receipt = await sendUserOp({
-        userOp: _userOp,
-        webauthnCreds,
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+      const userOpHash = getUserOperationHash({
+        userOperation: userOp,
+        entryPoint,
+        chainId,
       })
-      assert(receipt.success, 'Failed to send user op')
-      setSentTxHash(receipt.receipt.transactionHash)
+      const signature = await signUserOp({
+        userOpHash,
+        allowedCredentials:
+          webauthnCreds?.map((c) => ({
+            id: byteaToBase64(c.raw_credential_id),
+            userHandle: c.name,
+          })) ?? [],
+      })
+      userOp.signature = signature
+
+      const { data: workflowId, error } = await transfer({
+        token: selectedCoin.token,
+        userOp,
+      }).catch((e) => {
+        console.error("Couldn't send the userOp", e)
+        if (e instanceof TRPCClientError) {
+          return { data: undefined, error: { message: e.message } }
+        }
+        return { data: undefined, error: { message: e.message } }
+      })
+      console.log('workflowId', workflowId)
+      console.log('error', error)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
       } else {
