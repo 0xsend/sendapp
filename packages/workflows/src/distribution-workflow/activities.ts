@@ -19,7 +19,7 @@ const inBatches = <T>(array: T[], batchSize = Math.max(8, cpuCount - 1)) => {
   )
 }
 
-export function createActivities(supabaseUrl: string, supabaseKey: string) {
+export function createDistributionActivities(supabaseUrl: string, supabaseKey: string) {
   globalThis.process = globalThis.process || {}
   globalThis.process.env.SUPABASE_URL = supabaseUrl // HACK: set the supabase url in the environment
   globalThis.process.env.SUPABASE_SERVICE_ROLE = supabaseKey // HACK: set the supabase key in the environment
