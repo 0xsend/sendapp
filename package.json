@@ -33,6 +33,7 @@
     "playwright": "yarn workspace @my/playwright",
     "distributor": "yarn workspace distributor",
     "snaplet": "yarn workspace @my/snaplet",
+    "workers": "yarn workspace workers",
     "shovel": "yarn workspace @my/shovel",
     "clean": "yarn workspaces foreach --all -pi run clean"
   },
