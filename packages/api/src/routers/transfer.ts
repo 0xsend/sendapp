@@ -5,7 +5,7 @@ import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { client } from '@my/temporal/client'
 import type { UserOperation } from 'permissionless'
 import { TransferWorkflow, type transferState } from '@my/workflows'
-import type { coinsDict } from 'app/data/coins'
+import type { allCoins } from 'app/data/coins'
 
 const log = debug('api:transfer')
 
@@ -14,7 +14,7 @@ export const transferRouter = createTRPCRouter({
     .input(
       z.object({
         userOp: z.custom<UserOperation<'v0.7'>>(),
-        token: z.custom<keyof coinsDict>(), //@ todo: might be safer to decode the token from the userOp, to ensure we don't apply the wrong token
+        token: z.custom<allCoins[number]['token']>(), //@ todo: might be safer to decode the token from the userOp, to ensure we don't apply the wrong token
       })
     )
     .mutation(async ({ input: { token, userOp } }) => {
@@ -50,7 +50,7 @@ export const transferRouter = createTRPCRouter({
   getPending: protectedProcedure
     .input(
       z.object({
-        token: z.custom<keyof coinsDict>(),
+        token: z.custom<allCoins[number]['token']>(),
         sender: z.string(),
       })
     )
@@ -77,7 +77,7 @@ export const transferRouter = createTRPCRouter({
   getFailed: protectedProcedure
     .input(
       z.object({
-        token: z.custom<keyof coinsDict>(),
+        token: z.custom<allCoins[number]['token']>(),
         sender: z.string(),
       })
     )
