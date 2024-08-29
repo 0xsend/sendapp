@@ -6,6 +6,7 @@ import { distributionRouter } from './distribution'
 import { tagRouter } from './tag'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
+import { transferRouter } from './transfer'
 import { accountRecoveryRouter } from './account-recovery/router'
 
 export const appRouter = createTRPCRouter({
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   distribution: distributionRouter,
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
+  transfer: transferRouter,
 })
 
 export type AppRouter = typeof appRouter
