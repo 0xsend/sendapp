@@ -1,6 +1,13 @@
+import { log, ApplicationFailure } from '@temporalio/activity'
 import type { UserOperation } from 'permissionless'
-import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import type { Hex } from 'viem'
+import {
+  baseMainnetBundlerClient,
+  baseMainnetClient,
+  sendAccountAbi,
+  tokenPaymasterAddress,
+  entryPointAddress,
+} from '@my/wagmi'
+import { encodeFunctionData, erc20Abi, isAddress, type Hex } from 'viem'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
