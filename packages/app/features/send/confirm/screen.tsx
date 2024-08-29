@@ -2,7 +2,6 @@ import {
   Avatar,
   Button,
   ButtonText,
-  isWeb,
   Label,
   LinkableAvatar,
   Paragraph,
@@ -14,41 +13,32 @@ import {
   YStack,
   type YStackProps,
 } from '@my/ui'
-import { baseMainnet } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
-import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
+import { IconCoin } from 'app/components/icons/IconCoin'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
-import {
-  useGenerateTransferUserOp,
-  useUserOpTransferMutation,
-} from 'app/utils/useUserOpTransferMutation'
+import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import {
-  type Activity,
-  isSendAccountReceiveEvent,
-  isSendAccountTransfersEvent,
-} from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, type Hex, isAddress } from 'viem'
+import { formatUnits, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
-import { IconCoin } from 'app/components/icons/IconCoin'
-
-import debug from 'debug'
-
-const log = debug('app:features:send:confirm:screen')
+import { api } from 'app/utils/api'
+import { TRPCClientError } from '@trpc/client'
+import { getUserOperationHash } from 'permissionless'
+import { signUserOp } from 'app/utils/signUserOp'
+import { byteaToBase64 } from 'app/utils/byteaToBase64'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -78,6 +68,11 @@ export function SendConfirmScreen() {
 export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
+  const {
+    mutateAsync: transfer,
+    isPending: isTransferPending,
+    isError: isTransferError,
+  } = api.transfer.withUserOp.useMutation()
 
   const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
@@ -96,7 +91,6 @@ export function SendConfirm() {
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
-  const [sentTxHash, setSentTxHash] = useState<Hex>()
 
   const router = useRouter()
 
@@ -131,20 +125,8 @@ export function SendConfirm() {
   } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
-  const {
-    mutateAsync: sendUserOp,
-    isPending: isTransferPending,
-    isError: isTransferError,
-    submittedAt,
-  } = useUserOpTransferMutation()
 
   const [error, setError] = useState<Error>()
-
-  const { data: transfers, error: tokenActivityError } = useTokenActivityFeed({
-    address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
-    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
-    enabled: !!sentTxHash,
-  })
 
   const hasEnoughBalance = selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
   const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
@@ -180,6 +162,7 @@ export function SendConfirm() {
       assert(nonce !== undefined, 'Nonce is not available')
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
+      assert(!!profile?.address, 'Could not resolve recipients send account')
 
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
@@ -190,15 +173,38 @@ export function SendConfirm() {
         maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
       }
 
-      log('gasEstimate', usdcFees)
-      log('feesPerGas', feesPerGas)
-      log('userOp', _userOp)
-      const receipt = await sendUserOp({
-        userOp: _userOp,
-        webauthnCreds,
+      console.log('gasEstimate', usdcFees)
+      console.log('feesPerGas', feesPerGas)
+      console.log('userOp', _userOp)
+      const chainId = baseMainnetClient.chain.id
+      const entryPoint = entryPointAddress[chainId]
+      const userOpHash = getUserOperationHash({
+        userOperation: userOp,
+        entryPoint,
+        chainId,
       })
-      assert(receipt.success, 'Failed to send user op')
-      setSentTxHash(receipt.receipt.transactionHash)
+      const signature = await signUserOp({
+        userOpHash,
+        allowedCredentials:
+          webauthnCreds?.map((c) => ({
+            id: byteaToBase64(c.raw_credential_id),
+            userHandle: c.name,
+          })) ?? [],
+      })
+      userOp.signature = signature
+
+      const { data: workflowId, error } = await transfer({
+        token: selectedCoin.token,
+        userOp,
+      }).catch((e) => {
+        console.error("Couldn't send the userOp", e)
+        if (e instanceof TRPCClientError) {
+          return { data: undefined, error: { message: e.message } }
+        }
+        return { data: undefined, error: { message: e.message } }
+      })
+      console.log('workflowId', workflowId)
+      console.log('error', error)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
       } else {
@@ -211,62 +217,6 @@ export function SendConfirm() {
     }
   }
 
-  useEffect(() => {
-    if (!submittedAt) return
-
-    const hasBeenLongEnough = Date.now() - submittedAt > 5_000
-
-    log('check if submitted at is long enough', {
-      submittedAt,
-      sentTxHash,
-      hasBeenLongEnough,
-      isTransferPending,
-    })
-
-    if (sentTxHash) {
-      log('sent tx hash', { sentTxHash })
-      const tfr = transfers?.pages.some((page) =>
-        page.some((activity: Activity) => {
-          if (isSendAccountTransfersEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          if (isSendAccountReceiveEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          return false
-        })
-      )
-
-      if (tokenActivityError) {
-        console.error(tokenActivityError)
-      }
-      // found the transfer or we waited too long or we got an error 😢
-      // or we are sending eth since event logs are not always available for eth
-      // (when receipient is not a send account or contract)
-      if (tfr || tokenActivityError || hasBeenLongEnough || (sentTxHash && sendToken === 'eth')) {
-        router.replace({ pathname: '/', query: { token: sendToken } })
-      }
-    }
-
-    // create a window unload event on web
-    const eventHandlersToRemove: (() => void)[] = []
-    if (isWeb) {
-      const unloadHandler = (e: BeforeUnloadEvent) => {
-        // prevent unload if we have a tx hash or a submitted at
-        if (submittedAt || sentTxHash) {
-          e.preventDefault()
-        }
-      }
-      window.addEventListener('beforeunload', unloadHandler)
-      eventHandlersToRemove.push(() => window.removeEventListener('beforeunload', unloadHandler))
-    }
-
-    return () => {
-      for (const remove of eventHandlersToRemove) {
-        remove()
-      }
-    }
-  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, submittedAt, isTransferPending])
 
   if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
     return <Spinner size="large" color={'$color'} />
@@ -394,7 +344,7 @@ export function SendConfirm() {
         onPress={onSubmit}
         br={'$4'}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-        disabled={!canSubmit || isTransferPending || !!sentTxHash}
+        disabled={!canSubmit || isTransferPending}
         gap={4}
         py={'$5'}
         width={'100%'}
@@ -414,15 +364,6 @@ export function SendConfirm() {
                     <Spinner size="small" color="$color12" />
                   </Button.Icon>
                   <Button.Text fontWeight={'600'}>Sending...</Button.Text>
-                </>
-              )
-            case sentTxHash !== undefined:
-              return (
-                <>
-                  <Button.Icon>
-                    <Spinner size="small" color="$color12" />
-                  </Button.Icon>
-                  <Button.Text fontWeight={'600'}>Confirming...</Button.Text>
                 </>
               )
             case !hasEnoughBalance:
