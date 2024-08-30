@@ -33,7 +33,6 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import {
   useGenerateTransferUserOp,
   useUserOpTransferMutation,
-  useUserOpGasEstimate,
 } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import {
@@ -77,7 +76,7 @@ export function SendConfirm() {
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
-  const { balances } = useSendAccountBalances()
+  const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
   const usdcBalance = balances?.USDC
   const [tokenSymbol, tokenDecimals] = [coinsDict[sendToken].symbol, coinsDict[sendToken].decimals]
   const tokenBalance = balances?.[tokenSymbol]
@@ -114,13 +113,12 @@ export function SendConfirm() {
 
   const {
     data: usdcFees,
-    isLoading: isLoadingUSDCFees,
+    isLoading: isFeesLoading,
     error: usdcFeesError,
   } = useUSDCFees({
     userOp,
   })
 
-  const { data: gasEstimate } = useUserOpGasEstimate({ userOp })
   const { data: feesPerGas, error: feesPerGasError } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
@@ -152,8 +150,7 @@ export function SendConfirm() {
     Number(queryParams.amount) > 0 &&
     coinsDict[queryParams.sendToken] &&
     hasEnoughGas &&
-    hasEnoughBalance &&
-    !sentTxHash
+    hasEnoughBalance
 
   async function onSubmit() {
     try {
@@ -173,7 +170,7 @@ export function SendConfirm() {
         maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
       }
 
-      console.log('gasEstimate', gasEstimate)
+      console.log('gasEstimate', usdcFees)
       console.log('feesPerGas', feesPerGas)
       console.log('userOp', _userOp)
       const receipt = await sendUserOp({
@@ -245,7 +242,7 @@ export function SendConfirm() {
             <SendAmount />
           </Stack>
           <XStack gap="$5" jc="flex-end">
-            {isLoadingUSDCFees && <Spinner size="small" color={'$color11'} />}
+            {isFeesLoading && <Spinner size="small" color={'$color11'} />}
             {usdcFees && (
               <Paragraph fontFamily={'$mono'} fontWeight={'400'} fontSize={'$5'} col={'$color12'}>
                 + Transaction Fee:{' '}
@@ -298,8 +295,8 @@ export function SendConfirm() {
           theme={canSubmit ? 'green' : 'red_alt1'}
           onPress={onSubmit}
           br={12}
-          disabledStyle={{ opacity: 0.5, cursor: 'not-allowed' }}
-          disabled={!canSubmit}
+          disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
+          disabled={!canSubmit || isTransferPending || !!sentTxHash}
           gap={4}
           mx="auto"
           $gtXs={{
@@ -313,6 +310,12 @@ export function SendConfirm() {
         >
           {(() => {
             switch (true) {
+              case isBalanceLoading || isFeesLoading:
+                return (
+                  <Button.Icon>
+                    <Spinner size="small" color="$color" />
+                  </Button.Icon>
+                )
               case isTransferPending && !isTransferError:
                 return (
                   <>
