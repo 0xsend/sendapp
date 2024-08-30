@@ -8,7 +8,7 @@ const useRedirectAfterSignOut = () => {
   useEffect(() => {
     const signOutListener = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
-        router.replace('/auth/sign-in')
+        router.replace('/')
       }
     })
     return () => {

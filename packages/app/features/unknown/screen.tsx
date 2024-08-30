@@ -1,5 +1,4 @@
-import { Button, Container, H1, H2, YStack } from '@my/ui'
-import { Link } from 'solito/link'
+import { Container, H1, H2, YStack, LinkableButton } from '@my/ui'
 
 export function UnknownScreen() {
   return (
@@ -7,9 +6,7 @@ export function UnknownScreen() {
       <YStack jc={'center'} alignItems="center" f={1} gap="$6">
         <H1>Not found.</H1>
         <H2>Send, Instant Payments.</H2>
-        <Link href="/auth/sign-in">
-          <Button>Need to sign in?</Button>
-        </Link>
+        <LinkableButton href="/">Need to sign in?</LinkableButton>
       </YStack>
     </Container>
   )

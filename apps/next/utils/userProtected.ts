@@ -32,8 +32,8 @@ export function userProtectedGetSSP<
         log('no session')
         const destination =
           ctx.req.url === undefined || ctx.req.url.includes('/auth')
-            ? '/auth/sign-in'
-            : `/auth/sign-in?redirectUri=${encodeURIComponent(ctx.req.url)}`
+            ? '/'
+            : `/?redirectUri=${encodeURIComponent(ctx.req.url)}`
 
         return {
           redirect: {
@@ -59,7 +59,7 @@ export function userProtectedGetSSP<
       ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=; Max-Age=0; path=/`)
       return {
         redirect: {
-          destination: '/auth/sign-in',
+          destination: '/',
           permanent: false,
         },
       }

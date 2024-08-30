@@ -27,10 +27,10 @@ test('redirect on sign-in', async ({ page, pg }) => {
     // ensure use can log in with passkey
     await page.context().clearCookies()
     await page.goto('/send')
-    await page.waitForURL(/auth\/sign-in/)
+    await page.waitForURL(/\//)
     // redirect to send after user is logged in
-    await expect(page).toHaveURL(`/auth/sign-in?redirectUri=${encodeURIComponent('/send')}`)
-    const signInButton = page.getByTestId('SubmitButton')
+    await expect(page).toHaveURL(`/?redirectUri=${encodeURIComponent('/send')}`)
+    const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     const sendSearchInput = page.getByPlaceholder('Sendtag, Phone, Send ID, Address')
@@ -61,13 +61,13 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
     await page.goto(
       `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
     )
-    await page.waitForURL(/auth\/sign-in/)
+    await page.waitForURL(/\//)
     const beforeRedirectUrl = new URL(page.url())
     expect(Object.fromEntries(beforeRedirectUrl.searchParams.entries())).toMatchObject({
       redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`,
     })
     // redirect to send after user is logged in
-    const signInButton = page.getByTestId('SubmitButton')
+    const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
     await page.waitForURL(/send\/confirm/)
