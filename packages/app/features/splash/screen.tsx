@@ -283,7 +283,11 @@ function AuthButtons() {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      toast.show(formatErrorMessage(error), { preset: 'error', isUrgent: true, duration: 10000 })
+      toast.show(formatErrorMessage(error), {
+        preset: 'error',
+        isUrgent: true,
+        duration: 10000000,
+      })
     } finally {
       setIsSigningIn(false)
     }
