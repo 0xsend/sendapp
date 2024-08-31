@@ -367,7 +367,7 @@ function ReferredBy() {
         mb="$0"
         pb="$0"
       >
-        Referred by someone? Enter their referral code below.
+        Referred by someone? Enter their referral code below. No slash before.
       </Paragraph>
       <XStack gap="$2" ai={'center'} jc="flex-start">
         <YStack jc="flex-start" ai="flex-start">

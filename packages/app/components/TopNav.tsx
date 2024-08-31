@@ -183,7 +183,7 @@ export function TopNav({
         ai="center"
         jc="space-between"
         safeAreaPadding={isPwa && 't'}
-        $lg={{ pt: !isPwa && '$5', pb: '$5' }}
+        $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
         {(() => {
           switch (true) {
@@ -261,7 +261,7 @@ export function TopNav({
             lineHeight={24}
             py="$3"
             $gtSm={{ py: '$6' }}
-            $gtLg={{ pl: '$1', pb: '$6', pt: '$0', ...{ ml: isSubRoute ? '$10' : '$1' } }}
+            $gtLg={{ pl: '$1', pb: '$6', pt: '$0', ...{ ml: isSubRoute ? '$4' : '$1' } }}
             col="$color10"
           >
             {subheader}
