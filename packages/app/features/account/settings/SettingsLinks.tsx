@@ -13,20 +13,6 @@ export function SettingsLinks(): JSX.Element {
       href: '/account/settings/personal-info',
     },
     {
-      text: 'Notifications',
-      href: '/account/settings/notification',
-      disabled: true,
-    },
-    {
-      text: 'Security',
-      href: '/account/settings/security',
-      disabled: true,
-    },
-    {
-      text: 'Privacy',
-      href: 'https://info.send.it/legal/privacy-policy',
-    },
-    {
       text: 'Backup',
       href: '/account/settings/backup',
     },

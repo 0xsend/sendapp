@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Send It Rewards</title>
+        <title>Send | Send Rewards</title>
       </Head>
       <RewardsScreen />
     </>
@@ -30,12 +30,7 @@ Page.getLayout = (children) => (
       },
     }}
     TopNav={
-      <TopNav
-        header="Send It Rewards"
-        showLogo
-        subheader={subheader}
-        button={ButtonOption.PROFILE}
-      />
+      <TopNav header="Send Rewards" showLogo subheader={subheader} button={ButtonOption.PROFILE} />
     }
   >
     {children}

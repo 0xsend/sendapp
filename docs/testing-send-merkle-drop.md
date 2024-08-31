@@ -107,7 +107,7 @@ Let's claim the tokens. Let's use that user's phone number to impersonate them i
 - Open the [Send app](http://localhost:3000/)
 - Paste the phone number of the user you want to impersonate without the country code prefix, all phones in the snapshot are in the US (dial code 1).
 - Enter `123456` as the OTP code
-- Navigate to the [Send It Rewards](http://localhost:3000/account/rewards) page
+- Navigate to the [Send Rewards](http://localhost:3000/account/rewards) page
 - Click the `Connect Wallet` button
 - Select `Browser Wallet` from the modal
 - Approve in Rivet
