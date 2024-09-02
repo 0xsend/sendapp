@@ -1,11 +1,16 @@
 import { proxyActivities, ApplicationFailure, defineQuery, setHandler } from '@temporalio/workflow'
 import type { createTransferActivities } from './activities'
-import type { Hex } from 'viem'
+import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
 
-const { sendUserOpActivity, waitForTransactionReceiptActivity, fetchTransferActivity } =
-  proxyActivities<ReturnType<typeof createTransferActivities>>({
-    startToCloseTimeout: '30 seconds',
-  })
+const {
+  simulateUserOpActivity,
+  sendUserOpActivity,
+  waitForTransactionReceiptActivity,
+  isTransferIndexedActivity,
+} = proxyActivities<ReturnType<typeof createTransferActivities>>({
+  // TODO: make this configurable
+  startToCloseTimeout: '45 seconds',
+})
 
 type simulating = { status: 'simulating'; data: { userOp: UserOperation<'v0.7'> } }
 type sending = { status: 'sending'; data: { userOp: UserOperation<'v0.7'> } }
@@ -23,24 +28,18 @@ export type transferState = simulating | sending | waiting | indexing | confirme
 
 export const getTransferStateQuery = defineQuery<transferState>('getTransferState')
 
-export type TransferWorkflowArgs = {
-  sender: Hex
-  to: Hex
-  token?: Hex
-  amount: string
-  nonce: string
-  signature: Hex
-}
-
-export async function TransferWorkflow(args: TransferWorkflowArgs) {
-  const hash = await sendUserOpActivity(args)
+export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
+  setHandler(getTransferStateQuery, () => ({ status: 'simulating', data: { userOp } }))
+  await simulateUserOpActivity(userOp)
+  setHandler(getTransferStateQuery, () => ({ status: 'sending', data: { userOp } }))
+  const hash = await sendUserOpActivity(userOp)
   if (!hash) throw ApplicationFailure.nonRetryable('No hash returned from sendUserOperation')
   setHandler(getTransferStateQuery, () => ({ status: 'waiting', data: { userOp, hash } }))
   const receipt = await waitForTransactionReceiptActivity(hash)
   if (!receipt)
     throw ApplicationFailure.nonRetryable('No receipt returned from waitForTransactionReceipt')
   setHandler(getTransferStateQuery, () => ({ status: 'indexing', data: { userOp, receipt } }))
-  const transfer = await fetchTransferActivity(receipt.userOpHash)
+  const transfer = await isTransferIndexedActivity(receipt.userOpHash)
   if (!transfer) throw ApplicationFailure.retryable('Transfer not yet indexed in db')
   setHandler(getTransferStateQuery, () => ({ status: 'confirmed', data: { userOp, receipt } }))
   return transfer
