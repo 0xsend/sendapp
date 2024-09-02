@@ -21,6 +21,7 @@
     "./src",
     "../../packages/workflows/src",
     "../../globals.d.ts",
-    "../../environment.d.ts"
+    "../../environment.d.ts",
+    "../../packages/temporal/src"
   ]
 }
