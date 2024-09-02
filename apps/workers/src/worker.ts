@@ -1,30 +1,20 @@
 import { Worker } from '@temporalio/worker'
-import {
-  createTransferActivities,
-  createDistributionActivities,
-} from '@my/workflows/all-activities'
-import { URL, fileURLToPath } from 'node:url'
-import path from 'node:path'
+import { createTransferActivities } from '@my/workflows/activities'
+
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
 
 async function run() {
-  const workflowsPathUrl = new URL(
-    `../../../packages/workflows/src/all-workflows${path.extname(import.meta.url)}`,
-    import.meta.url
-  )
   // Step 1: Register Workflows and Activities with the Worker and connect to
   // the Temporal server.
-  const transferWorker = await Worker.create({
-    workflowsPath: fileURLToPath(workflowsPathUrl),
-    activities: {
-      ...createTransferActivities(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE
+  const worker = await Worker.create({
+    workflowsPath: require.resolve('@my/workflows'),
+    dataConverter: {
+      payloadConverterPath: require.resolve(
+        '../../../packages/temporal/build/payload-converter.cjs' //@Todo: figure out how to get this path from the temporal package and add build to Tilt deps
       ),
-      // ...createDistributionActivities(
-      //   process.env.NEXT_PUBLIC_SUPABASE_URL,
-      //   process.env.SUPABASE_SERVICE_ROLE
-      // ),
     },
+    activities: { ...createTransferActivities() },
     namespace: 'default',
     taskQueue: 'monorepo',
     bundlerOptions: {
@@ -40,7 +30,7 @@ async function run() {
   // https://github.com/temporalio/samples-typescript/tree/main/hello-world-mtls
 
   // Step 2: Start accepting tasks on the `monorepo` queue
-  await transferWorker.run()
+  await worker.run()
 
   // You may create multiple Workers in a single process in order to poll on multiple task queues.
 }

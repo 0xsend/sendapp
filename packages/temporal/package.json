@@ -1,0 +1,38 @@
+{
+  "version": "0.0.0",
+  "name": "@my/temporal",
+  "type": "module",
+  "files": [
+    "package.json",
+    "src"
+  ],
+  "exports": {
+    "./payload-converter": {
+      "types": "./src/payload-converter.ts",
+      "require": "./build/payload-converter.cjs",
+      "default": "./src/payload-converter.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    }
+  },
+  "scripts": {
+    "lint": "tsc",
+    "server": "temporal server start-dev --db-filename ./var/temporal.db",
+    "build-converter": "esbuild --bundle --outfile=build/payload-converter.cjs --target=esnext --platform=node --external:@temporalio/common --external:@bufbuild/protobuf src/payload-converter.ts"
+  },
+  "dependencies": {
+    "@temporalio/client": "^1.10.1",
+    "@temporalio/common": "^1.11.1",
+    "superjson": "^2.2.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.23.1",
+    "temporal": "^0.7.1",
+    "typescript": "^5.5.3"
+  }
+}
