@@ -5,10 +5,6 @@ import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 
 async function run() {
-  const workflowsPathUrl = new URL(
-    `../../../packages/workflows/src/all-workflows${path.extname(import.meta.url)}`,
-    import.meta.url
-  )
   // Step 1: Register Workflows and Activities with the Worker and connect to
   // the Temporal server.
   const worker = await Worker.create({
@@ -34,7 +30,7 @@ async function run() {
   // https://github.com/temporalio/samples-typescript/tree/main/hello-world-mtls
 
   // Step 2: Start accepting tasks on the `monorepo` queue
-  await transferWorker.run()
+  await worker.run()
 
   // You may create multiple Workers in a single process in order to poll on multiple task queues.
 }
