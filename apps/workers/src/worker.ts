@@ -32,7 +32,7 @@ async function run() {
   // https://github.com/temporalio/samples-typescript/tree/main/hello-world-mtls
 
   // Step 2: Start accepting tasks on the `monorepo` queue
-  await transferWorker.run()
+  await worker.run()
 
   // You may create multiple Workers in a single process in order to poll on multiple task queues.
 }
