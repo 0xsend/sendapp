@@ -20,6 +20,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@my/temporal": "workspace:*",
     "@my/workflows": "workspace:*",
     "@temporalio/worker": "^1.10.1"
   }

@@ -120,6 +120,7 @@ local_resource(
     serve_cmd = "yarn workspace workers start",
     deps = ts_files(
         config.main_dir + "/packages/workflows/src",
+        config.main_dir + "/packages/temporal/src",
         config.main_dir + "/apps/workers",
     ),
 )

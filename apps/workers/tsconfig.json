@@ -13,7 +13,8 @@
     "baseUrl": ".",
     "paths": {
       "@my/workflows": ["../../packages/workflows/src/*"],
-      "@my/workflows/*": ["../../packages/workflows/src/*"]
+      "@my/workflows/*": ["../../packages/workflows/src/*"],
+      "@my/temporal/*": ["../../packages/temporal/src/*"]
     }
   },
   "references": [],
@@ -21,6 +22,7 @@
     "./src",
     "../../packages/workflows/src",
     "../../globals.d.ts",
-    "../../environment.d.ts"
+    "../../environment.d.ts",
+    "../../packages/temporal/src"
   ]
 }

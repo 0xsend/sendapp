@@ -35,6 +35,7 @@
     "snaplet": "yarn workspace @my/snaplet",
     "workers": "yarn workspace workers",
     "shovel": "yarn workspace @my/shovel",
+    "temporal": "yarn workspace @my/temporal",
     "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
