@@ -19,10 +19,7 @@ describe('DepositScreen', () => {
     )
 
     // screen.debug({ message: 'DepositScreen: render' })
-    await waitFor(() => expect(screen.getByText('Deposit funds')).toBeVisible())
-    await waitFor(() => expect(screen.getByText('Web3 Wallet')).toBeVisible())
-    // await waitFor(() => expect(screen.getByText('Coinbase Pay')).toBeVisible())
-    await waitFor(() => expect(screen.getByText('Coming Soon')).toBeVisible())
+    await waitFor(() => expect(screen.getByText('Deposit on Base')).toBeVisible())
     expect(screen).toMatchSnapshot()
   })
 })

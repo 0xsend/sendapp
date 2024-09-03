@@ -16,11 +16,10 @@ import {
   type XStackProps,
   H5,
 } from '@my/ui'
-import { IconArrowRight, IconError, IconPlus } from 'app/components/icons'
+import { IconArrowRight, IconDeposit, IconError, IconPlus } from 'app/components/icons'
 import { coins, coinsDict } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { DepositPopover } from '../deposit/DepositPopover'
 import { TokenBalanceCard } from './TokenBalanceCard'
 import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
@@ -88,7 +87,27 @@ function HomeBody(props: XStackProps) {
             w={'100%'}
           >
             <XStack w="100%">
-              <DepositPopover />
+              <LinkableButton
+                theme="green"
+                href="/deposit"
+                px={'$3.5'}
+                h={'$4.5'}
+                borderRadius={'$4'}
+                f={1}
+              >
+                <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+                  <Button.Text
+                    fontWeight={'500'}
+                    textTransform={'uppercase'}
+                    $theme-dark={{ col: '$color0' }}
+                  >
+                    Deposit
+                  </Button.Text>
+                  <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                    <IconDeposit size={'$2.5'} $theme-dark={{ color: '$color0' }} />
+                  </XStack>
+                </XStack>
+              </LinkableButton>
             </XStack>
 
             <XStack ai="center">
@@ -139,7 +158,27 @@ function HomeBody(props: XStackProps) {
           </XStack>
           <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
             <Stack f={1} w="50%">
-              <DepositPopover />
+              <LinkableButton
+                theme="green"
+                href="/deposit"
+                px={'$3.5'}
+                h={'$4.5'}
+                borderRadius={'$4'}
+                f={1}
+              >
+                <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+                  <Button.Text
+                    fontWeight={'500'}
+                    textTransform={'uppercase'}
+                    $theme-dark={{ col: '$color0' }}
+                  >
+                    Deposit
+                  </Button.Text>
+                  <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
+                    <IconDeposit size={'$2.5'} $theme-dark={{ color: '$color0' }} />
+                  </XStack>
+                </XStack>
+              </LinkableButton>
             </Stack>
             <Stack f={1} w="50%">
               <SendButton />
