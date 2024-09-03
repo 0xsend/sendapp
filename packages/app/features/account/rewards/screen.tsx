@@ -479,7 +479,6 @@ const DistributionStatus = ({
   )
 }
 
-const numOfDistributions = 10
 const DistributionRewardsList = ({
   distributions,
 }: { distributions?: (UseDistributionsResultData[number] | undefined)[] }) => {
@@ -488,18 +487,11 @@ const DistributionRewardsList = ({
 
   const isDark = useThemeName().includes('dark')
 
-  const mock = (len: number, start = 0) =>
-    new Array(len).fill(undefined).map((_, i) => ({ number: start + i + 1 }))
-
-  // @ts-expect-error we're mocking the data here
-  const allDistributions: UseDistributionsResultData[number][] =
-    distributions === undefined
-      ? mock(numOfDistributions)
-      : [...distributions, ...mock(numOfDistributions - distributions.length, distributions.length)]
-
   if (error) throw error
 
   if (isLoading) return <DistributionRewardsSkeleton />
+
+  if (!distributions) return <DistributionRewardsSkeleton />
 
   return (
     <Stack my="auto">
@@ -512,19 +504,9 @@ const DistributionRewardsList = ({
         pb="$5"
       >
         <XStack w="100%" gap="$2" jc={'space-between'} maw={1072} mx="auto">
-          {allDistributions?.map((distribution, i) => {
+          {distributions?.map((distribution, i) => {
             return distribution?.id === undefined ? (
-              <Card
-                key={distribution.number}
-                f={1}
-                maw={84}
-                miw="$7"
-                h="$2"
-                br={6}
-                disabled
-                jc="center"
-                opacity={0.5}
-              >
+              <Card f={1} maw={84} miw="$7" h="$2" br={6} disabled jc="center" opacity={0.5}>
                 <Paragraph
                   size={'$1'}
                   padding={'unset'}
@@ -538,7 +520,7 @@ const DistributionRewardsList = ({
             ) : queryParams.distribution === distribution?.number ||
               (queryParams.distribution === undefined &&
                 distribution?.number === distributions?.length) ? (
-              <Stack key={distribution.number} f={1} maw={84} miw="$7" h="$2" jc="center">
+              <Stack key={distribution?.number ?? i + 1} maw={84} miw="$7" h="$2" jc="center">
                 <View
                   theme="green_alt1"
                   position="absolute"
@@ -555,11 +537,10 @@ const DistributionRewardsList = ({
                   borderLeftWidth={8}
                   borderRightWidth={8}
                 />
-
                 <Button
                   theme="green"
                   onPress={() =>
-                    setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
+                    setParams({ distribution: distribution?.number }, { webBehavior: 'replace' })
                   }
                   br={6}
                   h="$2"
@@ -587,7 +568,7 @@ const DistributionRewardsList = ({
                 theme={isDark ? 'green_alt2' : undefined}
                 $theme-light={{ bc: '$color2' }}
                 onPress={() =>
-                  setParams({ distribution: distribution.number }, { webBehavior: 'replace' })
+                  setParams({ distribution: distribution?.number }, { webBehavior: 'replace' })
                 }
               >
                 <ButtonText

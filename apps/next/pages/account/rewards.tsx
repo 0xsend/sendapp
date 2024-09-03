@@ -24,9 +24,9 @@ const subheader =
 Page.getLayout = (children) => (
   <HomeLayout
     $platform-web={{
-      h: '100vh',
+      h: '100svh',
       contentContainerStyle: {
-        h: '100vh',
+        h: '100svh',
       },
     }}
     TopNav={
