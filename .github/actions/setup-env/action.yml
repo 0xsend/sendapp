@@ -49,7 +49,7 @@ runs:
         cp .env.local.template .env.local
         yarn web:prod
         rm .env.local
-        ls -a ${{ github.workspace }}/apps/next
+        ls -a ${{ github.workspace }}/apps/next/.next
     - name: Save Next.js
       if: ${{ inputs.build-nextjs == 'true' }}
       uses: actions/upload-artifact@v4
