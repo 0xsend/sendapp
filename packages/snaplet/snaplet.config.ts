@@ -49,6 +49,7 @@ export default defineConfig({
     vault: false,
     net: false,
     shovel: false,
+    // @ts-ignore
     pgtap: false,
   },
   transform: {

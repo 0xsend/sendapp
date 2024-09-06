@@ -12,7 +12,7 @@ test('can visit leaderboard page', async ({ page, seed, user: { user } }) => {
   await seed.users([
     {
       ...userOnboarded,
-      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
+      leaderboard_referrals_all_time: [leaderboardReferralsAllTimes],
     },
   ])
 

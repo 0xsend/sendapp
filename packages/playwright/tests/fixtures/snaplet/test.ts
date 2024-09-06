@@ -4,6 +4,7 @@ import { copycat } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
 import debug from 'debug'
 import pg from 'pg'
+import { SeedPg } from '@snaplet/seed/adapter-pg'
 
 let log: debug.Debugger
 
@@ -15,34 +16,52 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
       log = debug(key)
 
       log('seed')
+      const adapter = {
+        execute: async (queryText) => {
+          log('execute', queryText)
+          await pg
+            .query(queryText)
+            .then((results) =>
+              pg.query('COMMIT').then(() => {
+                return results
+              })
+            )
+            .catch(async (e) => {
+              await pg.query('ROLLBACK')
+              throw e
+            })
+        },
+
+        async query(queryText) {
+          try {
+            await pg.query('SET session_replication_role = replica') // do not run any triggers
+            await pg.query('BEGIN')
+            log('query', queryText)
+            return await pg
+              .query(queryText)
+              .then((results) =>
+                pg.query('COMMIT').then(() => {
+                  return results
+                })
+              )
+              .catch(async (e) => {
+                await pg.query('ROLLBACK')
+                throw e
+              })
+          } finally {
+            await pg.query('SET session_replication_role = DEFAULT').catch((e) => {
+              log('error resetting session_replication_role', e)
+            }) // turn on triggers
+          }
+        },
+
+        client: pg,
+      }
 
       const seed = await createSeedClient({
         dryRun: false,
         models,
-        client: {
-          async query(queryText) {
-            try {
-              await pg.query('SET session_replication_role = replica') // do not run any triggers
-              await pg.query('BEGIN')
-              log('query', queryText)
-              return await pg
-                .query(queryText)
-                .then((results) =>
-                  pg.query('COMMIT').then(() => {
-                    return results
-                  })
-                )
-                .catch(async (e) => {
-                  await pg.query('ROLLBACK')
-                  throw e
-                })
-            } finally {
-              await pg.query('SET session_replication_role = DEFAULT').catch((e) => {
-                log('error resetting session_replication_role', e)
-              }) // turn on triggers
-            }
-          },
-        },
+        adapter,
       })
 
       try {

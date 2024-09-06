@@ -40,17 +40,17 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   const tag2 = plan2.tags[0]
   assert(!tag2, 'should not have a tag')
   const profile2 = plan2.profiles[0]
-  assert(!!profile2?.sendId, 'profile send_id not found')
+  assert(!!profile2?.send_id, 'profile send_id not found')
   assert(!!profile2?.name, 'profile name not found')
   assert(!!profile2?.about, 'profile about not found')
   const profilePage2 = new ProfilePage(page, { name: profile2.name, about: profile2.about })
-  await page.goto(`/profile/${profile2.sendId}`)
+  await page.goto(`/profile/${profile2.send_id}`)
   await expect(profilePage2.sendButton).toBeVisible()
   await profilePage2.sendButton.click()
   await page.waitForURL(/\/send/)
   url = new URL(page.url())
   expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-    recipient: profile2?.sendId.toString(),
+    recipient: profile2?.send_id.toString(),
     idType: 'sendid',
   })
   await expect(page.getByText('Enter Amount')).toBeVisible()
@@ -65,11 +65,11 @@ test('can visit my own profile', async ({
   page,
   seed,
   user: {
-    user: { id: userId },
+    user: { id: user_id },
     profile,
   },
 }) => {
-  const plan = await seed.tags([{ userId, status: 'confirmed' }])
+  const plan = await seed.tags([{ user_id, status: 'confirmed' }])
   const tag = plan.tags[0]
   assert(!!tag?.name, 'tag not found')
   assert(!!profile?.name, 'profile name not found')
@@ -80,7 +80,7 @@ test('can visit my own profile', async ({
 })
 
 test('can visit private profile', async ({ page, seed }) => {
-  const plan = await seed.users([{ ...userOnboarded, profiles: [{ isPublic: false }] }])
+  const plan = await seed.users([{ ...userOnboarded, profiles: [{ is_public: false }] }])
   const tag = plan.tags[0]
   const profile = plan.profiles[0]
   assert(!!tag?.name, 'tag not found')
@@ -126,7 +126,7 @@ test('can view activities between another profile', async ({
 
   const res = page.waitForResponse(`${SUPABASE_URL}/rest/v1/activity_feed*`)
   const profilePage2 = new ProfilePage(page, { name: anotherUser.name, about: anotherUser.about })
-  await page.goto(`/profile/${anotherUser.sendId}`)
+  await page.goto(`/profile/${anotherUser.send_id}`)
   await res
 
   log('beforeEach', `url=${page.url()}`)
