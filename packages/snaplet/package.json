@@ -13,11 +13,14 @@
   },
   "scripts": {
     "seed": "DRY=0 bunx tsx ./bin/seed.ts",
-    "restore": "bun run ./bin/snaplet.ts --restore"
+    "restore": "bun run ./bin/snaplet.ts --restore",
+    "sync": "bunx @snaplet/seed sync",
+    "snapshot": "bunx @snaplet/snapshot"
   },
   "devDependencies": {
     "@snaplet/copycat": "^5.0.0",
-    "@snaplet/seed": "^0.89.4",
+    "@snaplet/seed": "^0.98.0",
+    "@snaplet/snapshot": "^0.93.2",
     "@types/pg": "^8",
     "zx": "^8.1.2"
   },

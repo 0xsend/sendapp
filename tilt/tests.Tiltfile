@@ -16,7 +16,7 @@ local_resource(
         "contracts:build",
         "wagmi:generate",
         "supabase:generate",
-        # "snaplet:generate",
+        "snaplet:sync",
         "ui:build",
         "ui:generate-theme",
         "daimo-expo-passkeys:build",
@@ -74,7 +74,7 @@ local_resource(
         "anvil:base",
         "anvil:fixtures",
         "aa_bundler:base",
-        # "snaplet:generate",
+        "snaplet:sync",
         "next:web",
         "supabase",
         "shovel",
@@ -161,7 +161,7 @@ local_resource(
     labels = labels,
     resource_deps = [
         "supabase",
-        # "snaplet:generate",  # hack to ensure snaplet doesn't include test pg_tap schema
+        "snaplet:sync",  # hack to ensure snaplet doesn't include test pg_tap schema
     ],
     deps = files_matching(
         os.path.join(
