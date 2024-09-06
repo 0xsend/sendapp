@@ -30,13 +30,11 @@ export default defineConfig({
       sessions: false,
       sso_domains: false,
       sso_providers: false,
-      // @ts-expect-error it's in prod, but we don't want to include it in the test environment
       one_time_tokens: false,
     },
     storage: {
       buckets: true,
       objects: true,
-      // @ts-expect-error it's in prod, but we don't want to include it in the test environment
       s3_multipart_uploads: false,
       s3_multipart_uploads_parts: false,
     },

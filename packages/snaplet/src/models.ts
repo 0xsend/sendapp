@@ -1,5 +1,5 @@
 import type {
-  leaderboardReferralsAllTimesInputs,
+  leaderboard_referrals_all_timeInputs,
   SeedClientOptions,
   usersInputs,
 } from '@snaplet/seed'
@@ -21,29 +21,11 @@ export const models: SeedClientOptions['models'] = {
           })
           .replace('+', '')
       },
-      emailChangeTokenNew: (ctx) => {
-        return copycat.uuid(ctx.seed)
-      },
-      confirmationToken: (ctx) => {
-        return copycat.uuid(ctx.seed)
-      },
-      recoveryToken: (ctx) => {
-        return copycat.uuid(ctx.seed)
-      },
-      phoneChangeToken: (ctx) => {
-        return copycat.uuid(ctx.seed)
-      },
-      reauthenticationToken: (ctx) => {
-        return copycat.uuid(ctx.seed)
-      },
-      emailChangeTokenCurrent: (ctx) => {
-        return copycat.uuid(ctx.seed)
-      },
     },
   },
   profiles: {
     data: {
-      avatarUrl: (ctx) => pravatar(copycat.fullName(ctx.seed)),
+      avatar_url: (ctx) => pravatar(copycat.fullName(ctx.seed)),
     },
   },
   tags: {
@@ -51,21 +33,21 @@ export const models: SeedClientOptions['models'] = {
       name: (ctx) => tagName(copycat.username(ctx.seed)),
     },
   },
-  sendAccounts: {
+  send_accounts: {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
-      chainId: 845337,
+      chain_id: 845337,
     },
   },
-  chainAddresses: {
+  chain_addresses: {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
     },
   },
 }
 
-export const leaderboardReferralsAllTimes: leaderboardReferralsAllTimesInputs = {
-  rewardsUsdc: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
+export const leaderboardReferralsAllTimes: leaderboard_referrals_all_timeInputs = {
+  rewards_usdc: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
   referrals: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
 }
 
@@ -81,7 +63,7 @@ export const userOnboarded: usersInputs = {
   },
   profiles: [
     {
-      referralCode: (ctx) => crypto.randomBytes(8).toString('hex'),
+      referral_code: (ctx) => crypto.randomBytes(8).toString('hex'),
     },
   ],
   tags: [
@@ -89,10 +71,10 @@ export const userOnboarded: usersInputs = {
       status: 'confirmed',
     },
   ],
-  sendAccounts: [
+  send_accounts: [
     {
-      chainId: 845337,
+      chain_id: 845337,
     },
   ],
-  chainAddresses: [{}],
+  chain_addresses: [{}],
 }

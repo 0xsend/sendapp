@@ -1,8 +1,9 @@
-// You can use @snaplet/copycat to generate fake data for a field, for example:
-// ```
-// await seed.users([{ email: ({ seed }) => copycat.email(seed) }])
-// ```
-// More on this in our docs: https://docs.snaplet.dev/core-concepts/seed#inside-the-snapletseed-workflow
+/**
+ * ! Executing this script will delete all data in your database and seed it with new users.
+ * ! Make sure to adjust the script to your needs.
+ * Use any TypeScript runner to run this script, for example: `npx tsx seed.ts`
+ * Learn more about the Seed Client by following our guide: https://docs.snaplet.dev/seed/getting-started
+ */
 import { copycat, faker } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
 import { models } from '../src'
@@ -30,13 +31,17 @@ const pgClient = new PgClient({
   const seed = await createSeedClient({
     dryRun,
     models,
-    client: pgClient,
   })
 
   console.log('Snaplet resetting database.', `dryRun=${dryRun}`)
 
   // Clears all existing data in the database, but keep the structure
-  await seed.$resetDatabase()
+  await seed.$resetDatabase(
+    /**
+     * Tables that should be selected when seeding
+     */
+    ['!pgtle.*', '!net.*', '!pgsodium.key']
+  )
 
   console.log('Snaplet seeding database.')
 
@@ -46,7 +51,7 @@ const pgClient = new PgClient({
       profiles: [
         {
           name: 'Alice',
-          avatarUrl: pravatar('Alice'),
+          avatar_url: pravatar('Alice'),
         },
       ],
       tags: [
@@ -59,16 +64,16 @@ const pgClient = new PgClient({
           status: 'confirmed',
         },
       ],
-      sendAccounts: [{}],
-      chainAddresses: [{}],
-      leaderboardReferralsAllTimes: [leaderboardReferralsAllTimes],
+      send_accounts: [{}],
+      chain_addresses: [{}],
+      leaderboard_referrals_all_time: [leaderboardReferralsAllTimes],
     },
     {
       phone: '1234567890',
       profiles: [
         {
           name: 'Jane',
-          avatarUrl: pravatar('Jane'),
+          avatar_url: pravatar('Jane'),
         },
       ],
       tags: [
@@ -114,6 +119,7 @@ const pgClient = new PgClient({
   ])
   await pgClient.end()
   console.log('Snaplet seed done!')
+  process.exit()
 })().catch((err) => {
   console.error('Snaplet seed failed:', err)
   process.exit(1)
