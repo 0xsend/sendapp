@@ -1,8 +1,8 @@
 # -*- mode: python -*-
 
-load("ext://uibutton", "cmd_button", "location")
 load("./common.Tiltfile", "CI", "contract_files")
 load("./utils.Tiltfile", "files_matching")
+load("ext://uibutton", "cmd_button", "location")
 
 labels = ["deps"]
 
@@ -104,24 +104,24 @@ local_resource(
     ),
 )
 
-local_resource(
-    name = "snaplet:generate",
-    allow_parallel = True,
-    cmd = "bunx snaplet generate",
-    labels = labels,
-    resource_deps = [
-        "yarn:install",
-        "supabase",
-    ],
-    deps = files_matching(
-        os.path.join(
-            config.main_dir,
-            "supabase",
-            "migrations",
-        ),
-        lambda f: f.endswith(".sql"),
-    ),
-)
+# local_resource(
+#     name = "snaplet:generate",
+#     allow_parallel = True,
+#     cmd = "bunx snaplet generate",
+#     labels = labels,
+#     resource_deps = [
+#         "yarn:install",
+#         "supabase",
+#     ],
+#     deps = files_matching(
+#         os.path.join(
+#             config.main_dir,
+#             "supabase",
+#             "migrations",
+#         ),
+#         lambda f: f.endswith(".sql"),
+#     ),
+# )
 
 ui_theme_dir = os.path.join(
     config.main_dir,
