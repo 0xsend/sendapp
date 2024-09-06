@@ -16,9 +16,21 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
       log = debug(key)
 
       log('seed')
+
+      //             export class SeedPg extends DatabaseClient {
+      //     async execute(query) {
+      //         await this.client.query(query);
+      //     }
+      //     async query(query) {
+      //         const { rows } = await this.client.query(query);
+      //         return rows;
+      //     }
+      // }
       const adapter = {
         execute: async (queryText) => {
           log('execute', queryText)
+          await pg.query('SET session_replication_role = replica') // do not run any triggers
+          await pg.query('BEGIN')
           await pg
             .query(queryText)
             .then((results) =>
@@ -29,6 +41,11 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
             .catch(async (e) => {
               await pg.query('ROLLBACK')
               throw e
+            })
+            .finally(async () => {
+              await pg.query('SET session_replication_role = DEFAULT').catch((e) => {
+                log('error resetting session_replication_role', e)
+              }) // turn on triggers
             })
         },
 
@@ -41,7 +58,8 @@ export const test = baseTest.extend<{}, { seed: SeedClient; pg: pg.Client }>({
               .query(queryText)
               .then((results) =>
                 pg.query('COMMIT').then(() => {
-                  return results
+                  const { rows } = results
+                  return rows
                 })
               )
               .catch(async (e) => {
