@@ -31,7 +31,7 @@ for (const token of coins) {
     const plan = await seed.users([userOnboarded])
     const tag = plan.tags[0]
     const profile = plan.profiles[0]
-    const recvAccount = plan.sendAccounts[0]
+    const recvAccount = plan.send_accounts[0]
     assert(!!tag?.name, 'tag not found')
     assert(!!profile?.name, 'profile name not found')
     assert(!!profile?.about, 'profile about not found')
@@ -73,23 +73,23 @@ for (const token of coins) {
 
       assert(!!profile, 'profile not found')
       assert(!!profile.name, 'profile name not found')
-      assert(!!profile.sendId, 'profile send id not found')
-      assert(!!plan.sendAccounts[0], 'send account not found')
+      assert(!!profile.send_id, 'profile send id not found')
+      assert(!!plan.send_accounts[0], 'send account not found')
 
       const recvAccount: { address: `0x${string}` } = (() => {
         switch (idType) {
           case 'address':
             return { address: privateKeyToAccount(generatePrivateKey()).address }
           default:
-            assert(!!plan.sendAccounts[0], 'send account not found')
-            return { address: plan.sendAccounts[0].address as `0x${string}` }
+            assert(!!plan.send_accounts[0], 'send account not found')
+            return { address: plan.send_accounts[0].address as `0x${string}` }
         }
       })()
 
       const query = (() => {
         switch (idType) {
           case 'sendid':
-            return profile?.sendId.toString()
+            return profile?.send_id.toString()
           case 'address':
             return recvAccount.address
           default:
@@ -146,7 +146,7 @@ for (const token of coins) {
               case 'address':
                 return shorten(recvAccount.address, 5, 4)
               case 'sendid':
-                return `#${profile.sendId}`
+                return `#${profile.send_id}`
               default:
                 return `/${tag?.name}`
             }
@@ -191,7 +191,7 @@ for (const token of coins) {
  * @param {string} params.recvAccount.address - The Ethereum address of the receiving account.
  * @param {object} params.profile - The profile details for the account.
  * @param {string} params.profile.id - The profile ID.
- * @param {string} params.profile.sendId - The send ID of the profile.
+ * @param {string} params.profile.send_id - The send ID of the profile.
  *
  * @returns {Promise<void>} Returns a promise that resolves when the transfer is completed.
  */
@@ -208,7 +208,7 @@ async function handleTokenTransfer({
   page: Page
   counterparty: string
   recvAccount: { address: string }
-  profile?: { id: string; sendId?: number }
+  profile?: { id: string; send_id?: number }
 }): Promise<void> {
   const isETH = token.symbol === 'ETH'
   const decimalAmount = (Math.random() * 1000).toFixed(token.decimals).toString()
@@ -250,7 +250,7 @@ async function handleTokenTransfer({
         ).toBe(transferAmount)
       : await expect(supabase).toHaveEventInActivityFeed({
           event_name: 'send_account_transfers',
-          ...(profile ? { to_user: { id: profile.id, send_id: profile.sendId } } : {}),
+          ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
           data: {
             t: hexToBytea(recvAccount.address as `0x${string}`),
             v: transferAmount.toString(),

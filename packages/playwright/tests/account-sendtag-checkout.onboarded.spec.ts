@@ -84,19 +84,19 @@ const verifyActivityFeed = async (supabase: SupabaseClient<Database>, event: Act
 const setupReferral = async (
   seed: SeedClient
 ): Promise<{
-  referrer: { referralCode: string; sendId: number; id: string }
+  referrer: { referral_code: string; send_id: number; id: string }
   referrerSendAccount: { address: `0x${string}` }
   referrerTags: string[]
 }> => {
   const plan = await seed.users([userOnboarded])
   const referrer = plan.profiles[0]
-  const referrerSendAccount = plan.sendAccounts[0] as { address: `0x${string}` }
+  const referrerSendAccount = plan.send_accounts[0] as { address: `0x${string}` }
   const referrerTags = plan.tags.map((t) => t.name)
   assert(!!referrer, 'profile not found')
-  assert(!!referrer.referralCode, 'referral code not found')
+  assert(!!referrer.referral_code, 'referral code not found')
   assert(!!referrerSendAccount, 'referrer send account not found')
   return { referrer, referrerSendAccount, referrerTags } as {
-    referrer: { referralCode: string; sendId: number; id: string }
+    referrer: { referral_code: string; send_id: number; id: string }
     referrerSendAccount: { address: `0x${string}` }
     referrerTags: string[]
   }
@@ -121,12 +121,12 @@ const generateTagName = () => faker.string.alphanumeric({ length: { min: 6, max:
 
 const checkReferralCodeVisibility = async (
   checkoutPage: CheckoutPage,
-  referrer: { tags: string[]; referralCode: string }
+  referrer: { tags: string[]; referral_code: string }
 ) => {
   const refcode = checkoutPage.page.getByLabel('Referral Code:')
   const referredBy = checkoutPage.page.getByText(`/${referrer.tags[0]}`)
   await expect(refcode).toBeVisible()
-  await expect(refcode).toHaveValue(referrer.referralCode)
+  await expect(refcode).toHaveValue(referrer.referral_code)
   await expect(referredBy).toBeVisible()
 }
 
@@ -206,7 +206,7 @@ test('can refer a tag', async ({
   user: { profile: myProfile },
 }) => {
   const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
-  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
+  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
   const tagsToRegister = Array.from(
@@ -221,13 +221,13 @@ test('can refer a tag', async ({
   const refcode = checkoutPage.page.getByLabel('Referral Code:')
   const referredBy = checkoutPage.page.getByText(`/${referrerTags[0]}`)
   await expect(refcode).toBeVisible()
-  await expect(refcode).toHaveValue(referrer.referralCode)
+  await expect(refcode).toHaveValue(referrer.referral_code)
   await expect(referredBy).toBeVisible() // show the referred
   // can change the referral code
   await refcode.fill('1234567890')
   await expect(referredBy).toBeHidden() // invalid code, no referral
   // can change the referrer to valid code
-  await refcode.fill(referrer.referralCode)
+  await refcode.fill(referrer.referral_code)
   await expect(refcode).toBeVisible() // show the referral code
   await expect(referredBy).toBeVisible() // show the referred
 
@@ -260,7 +260,7 @@ test('can refer a tag', async ({
   await verifyActivityFeed(supabase, {
     event_name: 'referrals',
     from_user: {
-      send_id: referrer.sendId,
+      send_id: referrer.send_id,
       tags: referrerTags,
     },
     to_user: {
@@ -282,7 +282,7 @@ test('can refer multiple tags in separate transactions', async ({
   user: { profile: myProfile },
 }) => {
   const { referrer, referrerSendAccount, referrerTags } = await setupReferral(seed)
-  await checkoutPage.page.goto(`/?referral=${referrer.referralCode}`)
+  await checkoutPage.page.goto(`/?referral=${referrer.referral_code}`)
   await checkoutPage.goto()
 
   // First transaction with up to 2 tags
@@ -293,7 +293,7 @@ test('can refer multiple tags in separate transactions', async ({
     await addPendingTag(checkoutPage, tagName)
   }
   await checkReferralCodeVisibility(checkoutPage, {
-    referralCode: referrer.referralCode,
+    referral_code: referrer.referral_code,
     tags: referrerTags,
   })
   await confirmTags(checkoutPage, firstTags)
@@ -302,7 +302,7 @@ test('can refer multiple tags in separate transactions', async ({
   await verifyActivityFeed(supabase, {
     event_name: 'referrals',
     from_user: {
-      send_id: referrer.sendId,
+      send_id: referrer.send_id,
       tags: referrerTags,
     },
     to_user: {
@@ -328,7 +328,7 @@ test('can refer multiple tags in separate transactions', async ({
     await addPendingTag(checkoutPage, tagName)
   }
   await checkReferralCodeVisibility(checkoutPage, {
-    referralCode: referrer.referralCode,
+    referral_code: referrer.referral_code,
     tags: referrerTags,
   })
   // save current balance so we can verify the reward later
@@ -342,7 +342,7 @@ test('can refer multiple tags in separate transactions', async ({
   await verifyActivityFeed(supabase, {
     event_name: 'referrals',
     from_user: {
-      send_id: referrer.sendId,
+      send_id: referrer.send_id,
       tags: referrerTags,
     },
     to_user: {
@@ -362,7 +362,7 @@ test('can refer multiple tags in separate transactions', async ({
   // peek at the leaderboard
   const { data: leaderboardData, error: leaderboardError } = await supabase
     .rpc('leaderboard_referrals_all_time')
-    .eq('user ->> send_id', referrer.sendId)
+    .eq('user ->> send_id', referrer.send_id)
     .select('rewards_usdc::text,referrals::text,user')
   expect(leaderboardError).toBeFalsy()
   expect(leaderboardData?.[0]).toBeTruthy()
