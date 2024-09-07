@@ -30,6 +30,8 @@
     "baseUrl": ".",
     "paths": {
       "app/*": ["./*"],
+      "@my/api": ["../api/src"],
+      "@my/api/*": ["../api/src/*"],
       "@my/ui": ["../ui/src"],
       "@my/ui/*": ["../ui/src/*"],
       "@my/wagmi": ["../wagmi/src"],

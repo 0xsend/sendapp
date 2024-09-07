@@ -15,12 +15,13 @@ import {
   getPasskey,
   isChallengeExpired,
 } from 'app/utils/account-recovery'
-import { mintAuthenticatedJWTToken } from 'app/utils/jwt'
+import { mintAuthenticatedJWTToken, mintJWTToken } from 'app/utils/jwt'
 import { verifyMessage, hexToBytes } from 'viem'
 import { verifySignature } from 'app/utils/userop'
 import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
+import ms from 'ms'
 
 const logger = debug('api:routers:account-recovery')
 
@@ -119,11 +120,27 @@ export const accountRecoveryRouter = createTRPCRouter({
 
       // identify user from identifier
       const userId = await getUserIdByIdentifier(recoveryType, identifier)
-      const jwt = mintAuthenticatedJWTToken(userId)
-      const encodedJwt = encodeURIComponent(JSON.stringify([jwt, null, null, null, null, null]))
-
+      const expiresIn = ms('7d') / 1000
+      const options = {
+        expiresIn,
+      }
+      logger('minting new jwt', options)
+      const jwt = mintJWTToken('authenticated', 'authenticated', userId, options)
+      const encodedJwt = encodeURIComponent(
+        JSON.stringify([
+          jwt,
+          'not-used', // refresh token
+          null,
+          null,
+          null,
+          null,
+        ])
+      )
       console.log(`Account recovered - Recovery type: [${recoveryType}]. User: [${userId}].`)
-      ctx.res.setHeader('Set-Cookie', `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/`)
+      ctx.res.setHeader(
+        'Set-Cookie',
+        `sb-${SUPABASE_SUBDOMAIN}-auth-token=${encodedJwt}; Path=/; Max-Age=${expiresIn}; SameSite=Lax`
+      )
       return {
         jwt,
       }
