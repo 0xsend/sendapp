@@ -6,11 +6,12 @@
     "typeRoots": ["node_modules/@types"],
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
   },
   "references": [
     { "path": "apps/expo" },
     { "path": "apps/next" },
+    { "path": "apps/workers" },
     { "path": "packages/app" },
     { "path": "packages/ui" },
     { "path": "packages/api" },
@@ -21,6 +22,7 @@
     { "path": "packages/daimo-expo-passkeys" },
     { "path": "packages/wagmi" },
     { "path": "packages/workflows" },
-    { "path": "supabase" }
-  ]
+    { "path": "packages/temporal" },
+    { "path": "supabase" },
+  ],
 }

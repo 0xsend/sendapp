@@ -1,5 +1,22 @@
 # Temporal Workflows
 
+## How to develop Workflow logic
+
+Workflow logic is constrained by deterministic execution requirements. Therefore, each language is limited to the use of certain idiomatic techniques. However, each Temporal SDK provides a set of APIs that can be used inside your Workflow to interact with external (to the Workflow) application code.
+
+In the Temporal TypeScript SDK, Workflows run in a deterministic sandboxed environment. The code is bundled on Worker creation using Webpack, and can import any package as long as it does not reference Node.js or DOM APIs.
+
+> [!NOTE]
+> If you must use a library that references a Node.js or DOM API and you are certain that those APIs are not used at runtime, add that module to the ignoreModules list.
+
+The Workflow sandbox can run only deterministic code, so side effects and access to external state must be done through Activities because Activity outputs are recorded in the Event History and can read deterministically by the Workflow.
+
+This limitation also means that Workflow code cannot directly import the [Activity Definition](https://docs.temporal.io/activities#activity-definition). [Activity Types](https://docs.temporal.io/activities#activity-type) can be imported, so they can be invoked in a type-safe manner.
+
+To make the Workflow runtime deterministic, functions like `Math.random()`, `Date`, and `setTimeout()` are replaced by deterministic versions.
+
+[FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry) and [WeakRef](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) are removed because v8's garbage collector is not deterministic.
+
 - **Workflows require one file**: you can organize Workflow code however you like, but each Worker needs to reference a single file that exports all the Workflows it handles (so you have to handle name conflicts instead of us)
 - **Activities are top level**:
   - Inside the Temporal Worker, Activities are registered at the same level Workflows are.

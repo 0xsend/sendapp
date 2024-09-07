@@ -40,7 +40,23 @@ export class SuperjsonPayloadConverter implements PayloadConverterWithEncoding {
   }
 
   public fromPayload<T>(content: Payload): T {
-    return content.data ? superjson.parse<T>(decode(content.data)) : content.data
+    try {
+      if (!content.data) {
+        throw new UnsupportedSuperjsonTypeError(
+          `Can't run SUPERJSON.parse on this value: ${content.data}. Either convert it (or its properties) to SUPERJSON-serializable values (see https://github.com/flightcontrolhq/superjson#readme ), or create a custom data converter. No data found in payload.`
+        )
+      }
+      return superjson.parse<T>(decode(content.data))
+    } catch (e) {
+      throw new UnsupportedSuperjsonTypeError(
+        `Can't run SUPERJSON.parse on this value: ${
+          content.data
+        }. Either convert it (or its properties) to SUPERJSON-serializable values (see https://github.com/flightcontrolhq/superjson#readme ), or create a custom data converter. SJSON.parse error message: ${errorMessage(
+          e
+        )}`,
+        e as Error
+      )
+    }
   }
 }
 

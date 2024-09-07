@@ -1,5 +1,5 @@
 import { Connection, Client } from '@temporalio/client'
-import { TransferWorkflow } from '@my/workflows/workflows'
+import { TransferWorkflow } from '@my/workflows'
 import type { UserOperation } from 'permissionless'
 
 // async function runDistributionWorkflow() {
