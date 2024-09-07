@@ -5,7 +5,7 @@
     "src"
   ],
   "exports": {
-    "./activities": {
+    "./all-activities": {
       "types": "./src/all-activities.ts",
       "default": "./src/all-activities.ts"
     },
