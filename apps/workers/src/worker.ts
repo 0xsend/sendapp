@@ -1,5 +1,5 @@
 import { Worker } from '@temporalio/worker'
-import { createTransferActivities } from '@my/workflows/activities'
+import { createTransferActivities } from '@my/workflows/all-activities'
 
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
@@ -14,7 +14,9 @@ async function run() {
         '../../../packages/temporal/build/payload-converter.cjs' //@Todo: figure out how to get this path from the temporal package and add build to Tilt deps
       ),
     },
-    activities: { ...createTransferActivities() },
+    activities: {
+      ...createTransferActivities(process.env),
+    },
     namespace: 'default',
     taskQueue: 'monorepo',
     bundlerOptions: {
