@@ -30,7 +30,7 @@ test('anon user can visit public profile', async ({ page, seed }) => {
 })
 
 test('anon user cannot visit private profile', async ({ page, seed }) => {
-  const plan = await seed.users([{ ...userOnboarded, profiles: [{ isPublic: false }] }])
+  const plan = await seed.users([{ ...userOnboarded, profiles: [{ is_public: false }] }])
   const tag = plan.tags[0]
   assert(!!tag, 'tag not found')
   await visitProfile({ page, tag: tag.name })

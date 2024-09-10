@@ -12,5 +12,5 @@ test.beforeEach(async ({ page }) => {
 test('can visit rewards page', async ({ page }) => {
   await page.goto('/account/rewards')
   await expect(page).toHaveURL('/account/rewards')
-  await expect(page.getByRole('heading', { name: 'Send It Rewards', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Send Rewards', exact: true })).toBeVisible()
 })

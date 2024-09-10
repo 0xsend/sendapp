@@ -16,7 +16,12 @@ export const mintAuthenticatedJWTToken = (sub: string): string => {
   return mintJWTToken('authenticated', 'authenticated', sub, options)
 }
 
-const mintJWTToken = (aud: string, role: string, sub: string, options?: SignOptions): string => {
+export const mintJWTToken = (
+  aud: string,
+  role: string,
+  sub: string,
+  options?: SignOptions
+): string => {
   const payload = {
     aud,
     role,

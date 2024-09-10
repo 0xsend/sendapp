@@ -19,9 +19,9 @@ test('can visit account page', async ({ page, context, user: { profile } }) => {
 
   // @todo add back when we figure out if we want to support firefox
   // copy referral code
-  // const referralCode = page.getByRole('button', { name: 'Copy' })
+  // const referral_code = page.getByRole('button', { name: 'Copy' })
   // await context.grantPermissions(['clipboard-read', 'clipboard-write'])
-  // await referralCode.click()
+  // await referral_code.click()
   // await expect(page.getByText('Copy')).toBeVisible()
   // const handle = await page.evaluateHandle(() => navigator.clipboard.readText())
   // const clipboardContent = await handle.jsonValue()

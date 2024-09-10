@@ -67,9 +67,9 @@ jobs:
         with:
           name: nextjs-build
           path: ${{ github.workspace }}/apps/next/.next
-      - name: Snaplet Login
-        shell: bash
-        run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
+      # - name: Snaplet Login
+      #   shell: bash
+      #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Tilt CI
         id: tilt-ci
         shell: bash
@@ -122,9 +122,9 @@ jobs:
         with:
           name: nextjs-build
           path: ${{ github.workspace }}/apps/next/.next
-      - name: Snaplet Login
-        shell: bash
-        run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
+      # - name: Snaplet Login
+      #   shell: bash
+      #   run: bunx snaplet auth login ${{ secrets.CI_SNAPLET_AUTH_TOKEN }}
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps
       # @todo anvil fixtures cause dirty repo, but only in github actions 😢
@@ -160,7 +160,7 @@ jobs:
           wait_timeout=7
           for ((i=1; i<=max_attempts; i++)); do
             echo "Attempt $i: Waiting for tilt with timeout ${wait_timeout}s"
-            
+
             # Check if the Tilt process is still running
             if ! ps -p $tilt_pid > /dev/null; then
               echo "Tilt process (PID: $tilt_pid) is no longer running, exiting"
@@ -169,34 +169,34 @@ jobs:
 
             # Check if any targets are in error
             has_errors=$(tilt dump engine | jq '
-              .ManifestTargets 
-              | to_entries 
-              | map(select(.value.State.RuntimeState.Status == "error")) 
+              .ManifestTargets
+              | to_entries
+              | map(select(.value.State.RuntimeState.Status == "error"))
               | length > 0
             ')
 
             if [ "$has_errors" = "true" ]; then
               echo "There are targets in error status:"
               tilt dump engine | jq '
-                .ManifestTargets 
-                | to_entries 
-                | map(select(.value.State.RuntimeState.Status == "error")) 
+                .ManifestTargets
+                | to_entries
+                | map(select(.value.State.RuntimeState.Status == "error"))
                 | map(.key)
               '
               exit 1
             fi
-            
+
             if tilt wait --timeout "${wait_timeout}s" --for=condition=Ready "uiresource/playwright:deps"; then
               echo "Tilt is ready"
               break
             else
               echo "Tilt not ready, retrying..."
               tilt dump engine | jq '
-                .ManifestTargets 
-                | to_entries 
-                | map({key: (.value.State.RuntimeState.Status // "in_progress"), value: .key}) 
-                | group_by(.key) 
-                | map({key: .[0].key, value: map(.value)}) 
+                .ManifestTargets
+                | to_entries
+                | map({key: (.value.State.RuntimeState.Status // "in_progress"), value: .key})
+                | group_by(.key)
+                | map({key: .[0].key, value: map(.value)})
                 | from_entries
               '
             fi
@@ -327,16 +327,16 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           public-hostname: ${{ steps.public-hostname.outputs.public-hostname }}
           deploy-preview-extra-args: >-
-            -e SUPABASE_DB_URL="postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres" 
-            -e SUPABASE_JWT_SECRET="${{steps.supabase-branch.outputs.jwt_secret}}" 
-            -e SUPABASE_SERVICE_ROLE="${{ steps.supabase-branch.outputs.service_role_key }}" 
-            -e NEXT_PUBLIC_SUPABASE_URL="https://${{ steps.supabase-branch.outputs.project_ref }}.supabase.co" 
-            -e NEXT_PUBLIC_SUPABASE_PROJECT_ID="${{steps.supabase-branch.outputs.project_ref}}" 
-            -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="${{steps.supabase-branch.outputs.graphql_url}}" 
-            -e NEXT_PUBLIC_BASE_CHAIN_ID="84532" 
-            -e NEXT_PUBLIC_MAINNET_CHAIN_ID="11155111" 
-            -e NEXT_PUBLIC_BASE_RPC_URL="${{ secrets.BASE_SEPOLIA_RPC_URL }}" 
-            -e NEXT_PUBLIC_MAINNET_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com" 
+            -e SUPABASE_DB_URL="postgresql://${{steps.supabase-branch.outputs.db_user}}.${{steps.supabase-branch.outputs.project_ref}}:${{steps.supabase-branch.outputs.db_pass}}@fly-0-iad.pooler.supabase.com:${{steps.supabase-branch.outputs.db_port}}/postgres"
+            -e SUPABASE_JWT_SECRET="${{steps.supabase-branch.outputs.jwt_secret}}"
+            -e SUPABASE_SERVICE_ROLE="${{ steps.supabase-branch.outputs.service_role_key }}"
+            -e NEXT_PUBLIC_SUPABASE_URL="https://${{ steps.supabase-branch.outputs.project_ref }}.supabase.co"
+            -e NEXT_PUBLIC_SUPABASE_PROJECT_ID="${{steps.supabase-branch.outputs.project_ref}}"
+            -e NEXT_PUBLIC_SUPABASE_GRAPHQL_URL="${{steps.supabase-branch.outputs.graphql_url}}"
+            -e NEXT_PUBLIC_BASE_CHAIN_ID="84532"
+            -e NEXT_PUBLIC_MAINNET_CHAIN_ID="11155111"
+            -e NEXT_PUBLIC_BASE_RPC_URL="${{ secrets.BASE_SEPOLIA_RPC_URL }}"
+            -e NEXT_PUBLIC_MAINNET_RPC_URL="https://ethereum-sepolia-rpc.publicnode.com"
             -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ steps.supabase-branch.outputs.anon_key }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

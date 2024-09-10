@@ -4,6 +4,7 @@ import {
   H1,
   LinearGradient,
   Paragraph,
+  Spinner,
   Stack,
   XStack,
   YStack,
@@ -27,6 +28,8 @@ import { signChallenge } from 'app/utils/signChallenge'
 import { useRouter } from 'solito/router'
 import { bytesToHex, hexToBytes } from 'viem'
 import { useAuthScreenParams } from 'app/routers/params'
+import { useQuery } from '@tanstack/react-query'
+import { assert } from 'app/utils/assert'
 
 export function SplashScreen() {
   return (
@@ -72,21 +75,21 @@ export function SplashScreen() {
             icon={<IconEthereum size="$6" />}
             backgroundColor="$blue10"
           />
-  
+
           <Section
             title="DEFI INTEGRATION"
             description="Access decentralized finance protocols directly"
             icon={<Check color="white" size={60} />}
             backgroundColor="$purple10"
           />
-  
+
           <Section
             title="SECURE SMART CONTRACTS"
             description="Leverage Ethereum's smart contract capabilities"
             icon={<Check color="white" size={60} />}
             backgroundColor="$green10"
           />
-  
+
           <Section
             title="JOIN THE ETHEREUM ECOSYSTEM"
             description="Be part of the future of finance"
@@ -254,6 +257,16 @@ function AuthButtons() {
   const { mutateAsync: getChallengeMutateAsync } = api.challenge.getChallenge.useMutation({
     retry: false,
   })
+  const {
+    data: challengeData,
+    isLoading: isLoadingChallenge,
+    error: challengeError,
+  } = useQuery({
+    queryKey: ['challenge'],
+    queryFn: async () => await getChallengeMutateAsync(),
+    enabled: !!getChallengeMutateAsync,
+  })
+
   const { mutateAsync: validateSignatureMutateAsync } = api.challenge.validateSignature.useMutation(
     { retry: false }
   )
@@ -261,7 +274,8 @@ function AuthButtons() {
   const handleSignIn = async () => {
     setIsSigningIn(true)
     try {
-      const challengeData = await getChallengeMutateAsync()
+      assert(!!challengeData, 'Challenge data is missing')
+      assert(!!challengeData.challenge, 'Challenge challenge is missing')
 
       const rawIdsB64: { id: string; userHandle: string }[] = []
       const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
@@ -283,13 +297,27 @@ function AuthButtons() {
 
       router.push(redirectUri ?? '/')
     } catch (error) {
-      toast.show(formatErrorMessage(error), { preset: 'error', isUrgent: true, duration: 10000 })
+      toast.show(formatErrorMessage(error), {
+        preset: 'error',
+        isUrgent: true,
+        duration: 10000000,
+      })
     } finally {
       setIsSigningIn(false)
     }
   }
 
   useEffect(() => () => toast.hide(), [toast])
+
+  useEffect(() => {
+    if (challengeError) {
+      toast.show(challengeError.message, {
+        preset: 'error',
+        isUrgent: true,
+        duration: 10000000,
+      })
+    }
+  }, [challengeError, toast])
 
   return (
     <XStack
@@ -301,8 +329,20 @@ function AuthButtons() {
       w="100%"
       alignSelf="center"
     >
-      <SubmitButton size="$4" w="$12" onPress={handleSignIn} disabled={isSigningIn}>
-        <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+      <SubmitButton
+        size="$4"
+        w="$12"
+        onPress={handleSignIn}
+        disabled={isSigningIn || isLoadingChallenge || !!challengeError}
+      >
+        {(() => {
+          switch (true) {
+            case isLoadingChallenge:
+              return <Spinner size="small" color={'$color11'} />
+            default:
+              return <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+          }
+        })()}
       </SubmitButton>
 
       <Button {...signUpLink} borderColor="$primary" variant="outlined" size="$4" w="$12">

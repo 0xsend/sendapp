@@ -39,9 +39,9 @@ test('can visit activity page and see correct activity feed', async ({
     userOnboarded,
   ])
   const anotherUser = plan.profiles[0]
-  const anotherSendAccount = plan.sendAccounts[0]
+  const anotherSendAccount = plan.send_accounts[0]
   const thirdUser = plan.profiles[1]
-  const thirdSendAccount = plan.sendAccounts[1]
+  const thirdSendAccount = plan.send_accounts[1]
   const thirdTag = plan.tags[0]
 
   assert(!!anotherUser, 'another user not found')

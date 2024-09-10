@@ -37,7 +37,16 @@ function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
             <Dialog.Description>
               Please confirm you agree to the following before copying your address:
             </Dialog.Description>
-            <Paragraph>1. The tokens I am depositing are on Base Network.</Paragraph>
+            <Paragraph>
+              1. The external address is on the Base Network and{' '}
+              <a
+                target="_blank"
+                href="https://support.send.app/en/articles/9809554-smart-contract-deposit-issue"
+                rel="noreferrer"
+              >
+                can receive transfers from Smart Contracts
+              </a>
+            </Paragraph>
 
             <Paragraph>
               2. I have double checked that the tokens are USDC, SEND, or ETH on Base Network.

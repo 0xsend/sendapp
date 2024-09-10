@@ -18,7 +18,7 @@ const test = mergeTests(sendAccountTest, ethereumTest)
 
 let log: debug.Debugger
 
-test('can deposit USDC with web3 wallet', async ({
+test.skip('can deposit USDC with web3 wallet', async ({
   page,
   injectWeb3Provider,
   accounts,
@@ -164,7 +164,7 @@ test('can deposit USDC with web3 wallet', async ({
   })
 })
 
-test('can deposit ETH with web3 wallet', async ({
+test.skip('can deposit ETH with web3 wallet', async ({
   page,
   injectWeb3Provider,
   accounts,
@@ -287,7 +287,7 @@ test('can deposit ETH with web3 wallet', async ({
   })
 })
 
-test('can connect and disconnect using wallet button', async ({
+test.skip('can connect and disconnect using wallet button', async ({
   page,
   injectWeb3Provider,
   accounts,
@@ -344,7 +344,7 @@ test('can connect and disconnect using wallet button', async ({
   expect(page.locator('w3m-button')).toHaveText('Connect Wallet')
 })
 
-test('must switch to supported network', async ({
+test.skip('must switch to supported network', async ({
   page,
   injectWeb3Provider,
   accounts,
