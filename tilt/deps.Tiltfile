@@ -259,6 +259,16 @@ local_resource(
 )
 
 local_resource(
+    name="workflows:bundle",
+    allow_parallel = True,
+    cmd = "yarn workspace @my/workflows bundle",
+    labels = labels,
+    resource_deps = [
+        "yarn:install",
+    ],
+)
+
+local_resource(
     name = "shovel:generate-config",
     allow_parallel = True,
     cmd = "yarn workspace @my/shovel generate",

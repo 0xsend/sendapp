@@ -10,19 +10,20 @@
       "app/*": ["../app/*"],
       "@my/wagmi": ["../wagmi/src"],
       "@my/wagmi/*": ["../wagmi/src/*"],
-      "@my/api/*": ["../api/src/*"],
-      "@my/workflows": ["./packages/workflows/src/all-workflows.ts"]
+      "@my/workflows": ["./src/all-workflows.ts"],
+      "@my/workflows/*": ["./src/*"],
+      "@my/temporal": ["../temporal/src"],
+      "@my/temporal/*": ["../temporal/src/*"]
     }
   },
   "include": [
     "./src",
+    "../temporal/src",
     "./jest.config.ts",
     "../../supabase",
     "../app",
     "../wagmi/src",
-    "../api/src",
     "../../globals.d.ts",
     "../../environment.d.ts"
-  ],
-  "references": []
+  ]
 }

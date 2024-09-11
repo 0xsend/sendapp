@@ -4,8 +4,7 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { getTemporalClient } from '@my/temporal/client'
 import type { UserOperation } from 'permissionless'
-
-import { TransferWorkflow, type transferState } from '@my/workflows'
+import { TransferWorkflow, type transferState } from '@my/workflows/all-workflows'
 import type { allCoins } from 'app/data/coins'
 
 const log = debug('api:transfer')
@@ -24,7 +23,7 @@ export const transferRouter = createTRPCRouter({
         const client = await getTemporalClient()
         const handle = await client.workflow.start(TransferWorkflow, {
           taskQueue: 'monorepo',
-          workflowId: `send-transfer-workflow-${token}-${sender}-${nonce}`,
+          workflowId: `transfer-workflow-${token}-${sender}-${nonce}`,
           args: [userOp],
         })
         log(`Workflow Created: ${handle.workflowId}`)
@@ -65,6 +64,7 @@ export const transferRouter = createTRPCRouter({
         })
         for await (const workflow of workflows) {
           const handle = client.workflow.getHandle(workflow.workflowId)
+          console.log('handle: ', handle)
 
           const state = await handle.query<transferState, []>('getTransferState')
           states.push(state)
