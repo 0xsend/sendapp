@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@my/temporal": ["../temporal"],
+      "@my/temporal/*": ["../temporal/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "../../globals.d.ts", "../../environment.d.ts"]
+}

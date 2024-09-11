@@ -16,6 +16,13 @@ declare global {
       NEXT_PUBLIC_SUPABASE_PROJECT_ID: string
       NEXT_PUBLIC_SUPABASE_GRAPHQL_URL: string
       NEXT_PUBLIC_MAINNET_RPC_URL: string
+      /**
+       * The URL of the ERC 4337 Account Abstraction Bundler RPC endpoint
+       */
+      BUNDLER_RPC_URL: string
+      /**
+       * The URL of the ERC 4337 Account Abstraction Bundler RPC endpoint
+       */
       NEXT_PUBLIC_BASE_RPC_URL: string
       NEXT_PUBLIC_BUNDLER_RPC_URL: string
       SUPABASE_DB_URL: string
