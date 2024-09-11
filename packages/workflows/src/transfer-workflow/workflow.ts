@@ -16,41 +16,43 @@ const {
   startToCloseTimeout: '45 seconds',
 })
 
-type simulating = { status: 'simulating'; data: { userOp: UserOperation<'v0.7'> } }
-type sending = { status: 'sending'; data: { userOp: UserOperation<'v0.7'> } }
-type waiting = { status: 'waiting'; data: { hash: string; userOp: UserOperation<'v0.7'> } }
-type indexing = {
+type BaseState = { userOp: UserOperation<'v0.7'> }
+
+type Simulating = { status: 'simulating' } & BaseState
+type Sending = { status: 'sending' } & BaseState
+type Waiting = { status: 'waiting'; hash: string } & BaseState
+type Indexing = {
   status: 'indexing'
-  data: { receipt: GetUserOperationReceiptReturnType; userOp: UserOperation<'v0.7'> }
-}
-type confirmed = {
+  receipt: GetUserOperationReceiptReturnType
+} & BaseState
+type Confirmed = {
   status: 'confirmed'
   receipt: GetUserOperationReceiptReturnType | boolean
 } & BaseState
 
-export type transferState = simulating | sending | waiting | indexing | confirmed
+export type transferState = Simulating | Sending | Waiting | Indexing | Confirmed
 
 export const getTransferStateQuery = defineQuery<transferState>('getTransferState')
 
 export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
-  setHandler(getTransferStateQuery, () => ({ status: 'simulating', data: { userOp } }))
-  log('SendTransferWorkflow started with userOp:', JSON.stringify(parsedUserOp, null, 2))
+  setHandler(getTransferStateQuery, () => ({ status: 'simulating', userOp }))
+  log('SendTransferWorkflow started with userOp:', superjson.stringify(userOp))
   await simulateUserOpActivity(userOp)
   log('Simulation completed')
-  setHandler(getTransferStateQuery, () => ({ status: 'sending', data: { userOp } }))
+  setHandler(getTransferStateQuery, () => ({ status: 'sending', userOp }))
   log('Sending UserOperation')
   const hash = await sendUserOpActivity(userOp)
   if (!hash) throw ApplicationFailure.nonRetryable('No hash returned from sendUserOperation')
   log('UserOperation sent, hash:', hash)
-  setHandler(getTransferStateQuery, () => ({ status: 'waiting', data: { userOp, hash } }))
+  setHandler(getTransferStateQuery, () => ({ status: 'waiting', userOp, hash }))
   const receipt = await waitForTransactionReceiptActivity(hash)
   if (!receipt)
     throw ApplicationFailure.nonRetryable('No receipt returned from waitForTransactionReceipt')
   log('Receipt received:', superjson.stringify(receipt))
-  setHandler(getTransferStateQuery, () => ({ status: 'indexing', data: { userOp, receipt } }))
-  const transfer = await isTransferIndexedActivity(receipt.userOpHash)
+  setHandler(getTransferStateQuery, () => ({ status: 'indexing', userOp, receipt }))
+  const transfer = await isTransferIndexedActivity(receipt.receipt.transactionHash)
   if (!transfer) throw ApplicationFailure.retryable('Transfer not yet indexed in db')
   log('Transfer indexed:', superjson.stringify(transfer))
-  setHandler(getTransferStateQuery, () => ({ status: 'confirmed', data: { userOp, receipt } }))
+  setHandler(getTransferStateQuery, () => ({ status: 'confirmed', userOp, receipt }))
   return transfer
 }

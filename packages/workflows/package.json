@@ -4,8 +4,9 @@
     "package.json",
     "src"
   ],
+  "type": "module",
   "exports": {
-    "./activities": {
+    "./all-activities": {
       "types": "./src/all-activities.ts",
       "default": "./src/all-activities.ts"
     },
@@ -17,15 +18,15 @@
       "types": "./src/all-workflows.ts",
       "default": "./src/all-workflows.ts"
     },
-    "/": {
-      "types": "./src/all-workflows.ts",
-      "default": "./src/all-workflows.ts"
+    "./workflow-bundle": {
+      "types": "./workflow-bundle.d.ts",
+      "default": "./workflow-bundle.js"
     }
   },
-  "type": "module",
   "scripts": {
     "lint": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "bundle": "node --loader ts-node/esm --experimental-specifier-resolution=node src/scripts/build-workflow-bundle.ts"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

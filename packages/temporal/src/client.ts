@@ -1,5 +1,5 @@
 import { Client, Connection } from '@temporalio/client'
-import { dataConverter } from './payload-converter'
+import { payloadConverter } from './payload-converter'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 import debug from 'debug'
@@ -37,7 +37,9 @@ export async function getTemporalClient(): Promise<Client> {
     client = new Client({
       connection,
       namespace: process.env.TEMPORAL_NAMESPACE ?? 'default',
-      dataConverter: dataConverter,
+      dataConverter: {
+        payloadConverterPath: require.resolve('../build/payload-converter.cjs'),
+      },
     })
   }
   return client
