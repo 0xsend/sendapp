@@ -38,7 +38,7 @@ export async function TransferWorkflow(userOp: UserOperation<'v0.7'>) {
   const receipt = await waitForTransactionReceiptActivity(hash)
   if (!receipt)
     throw ApplicationFailure.nonRetryable('No receipt returned from waitForTransactionReceipt')
-  setHandler(getTransferStateQuery, () => ({ status: 'indexing', data: { userOp, receipt } }))
+  setHandler(getTransferStateQuery, () => ({ status: 'indexing', userOp, receipt }))
   const transfer = await isTransferIndexedActivity(receipt.receipt.transactionHash)
   if (!transfer) throw ApplicationFailure.retryable('Transfer not yet indexed in db')
   setHandler(getTransferStateQuery, () => ({ status: 'confirmed', data: { userOp, receipt } }))
