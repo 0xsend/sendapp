@@ -8,7 +8,9 @@
     "../wagmi",
     "../contracts/out",
     "../webauthn-authenticator",
-    "../../supabase"
+    "../../supabase",
+    "../temporal/src",
+    "../workflows/src"
   ],
   "compilerOptions": {
     "noEmit": true,
@@ -28,7 +30,11 @@
       "@0xsend/webauthn-authenticator": ["../webauthn-authenticator/src"],
       "@0xsend/webauthn-authenticator/*": ["../webauthn-authenticator/src/*"],
       "@my/supabase": ["../../supabase"],
-      "@my/supabase/*": ["../../supabase/*"]
+      "@my/supabase/*": ["../../supabase/*"],
+      "@my/temporal": ["../temporal/src"],
+      "@my/temporal/*": ["../temporal/src/*"],
+      "@my/workflows": ["../workflows/src"],
+      "@my/workflows/*": ["../workflows/src/*"]
     }
   },
   "references": []
