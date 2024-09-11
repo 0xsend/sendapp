@@ -4,8 +4,9 @@
     "package.json",
     "src"
   ],
+  "type": "module",
   "exports": {
-    "./activities": {
+    "./all-activities": {
       "types": "./src/all-activities.ts",
       "default": "./src/all-activities.ts"
     },
@@ -16,13 +17,8 @@
     "./all-workflows": {
       "types": "./src/all-workflows.ts",
       "default": "./src/all-workflows.ts"
-    },
-    "/": {
-      "types": "./src/all-workflows.ts",
-      "default": "./src/all-workflows.ts"
     }
   },
-  "type": "module",
   "scripts": {
     "lint": "tsc",
     "test": "jest"

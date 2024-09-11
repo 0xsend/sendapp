@@ -1,11 +1,7 @@
 import { Worker, NativeConnection } from '@temporalio/worker'
-import {
-  createTransferActivities,
-  createDistributionActivities,
-} from '@my/workflows/all-activities'
+import { createTransferActivities } from '@my/workflows/all-activities'
 import fs from 'node:fs/promises'
 import { createRequire } from 'node:module'
-import { dataConverter } from '@my/temporal/payload-converter'
 const require = createRequire(import.meta.url)
 
 const { NODE_ENV = 'development' } = process.env
@@ -32,8 +28,10 @@ async function run() {
 
   const worker = await Worker.create({
     connection,
-    dataConverter: dataConverter,
-    workflowsPath: require.resolve('@my/workflows'),
+    dataConverter: {
+      payloadConverterPath: require.resolve('@my/temporal/payload-converter'),
+    },
+    workflowsPath: require.resolve('@my/workflows/all-workflows'),
     activities: {
       ...createTransferActivities(process.env),
     },
