@@ -30,7 +30,7 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress } from 'viem'
+import { formatUnits, isAddress, zeroAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -41,10 +41,10 @@ import { useTokenPrices } from 'app/utils/useTokenPrices'
 
 const log = debug('app:features:send:confirm:screen')
 import { api } from 'app/utils/api'
-import { TRPCClientError } from '@trpc/client'
 import { getUserOperationHash } from 'permissionless'
 import { signUserOp } from 'app/utils/signUserOp'
 import { byteaToBase64 } from 'app/utils/byteaToBase64'
+import { usePendingTransfers } from 'app/features/home/utils/usePendingTransfers'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -73,17 +73,27 @@ export function SendConfirmScreen() {
 
 export function SendConfirm() {
   const submitButtonRef = useRef<TamaguiElement | null>(null)
+  const router = useRouter()
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
-  const {
-    mutateAsync: transfer,
-    isPending: isTransferPending,
-    isError: isTransferError,
-  } = api.transfer.withUserOp.useMutation()
-
-  const queryClient = useQueryClient()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { coin: selectedCoin, tokensQuery, ethQuery } = useCoinFromSendTokenParam()
+
+  const { mutateAsync: transfer } = api.transfer.withUserOp.useMutation()
+  const { data: pendingTransfers, isLoading: isPendingTransfersLoading } = usePendingTransfers({
+    address: sendAccount?.address ?? zeroAddress,
+    token: sendToken,
+  })
+
+  const [workflowId, setWorkflowId] = useState<string | undefined>()
+
+  useEffect(() => {
+    if (workflowId) {
+      router.replace({ pathname: '/', query: { token: sendToken } })
+    }
+  }, [workflowId, router, sendToken])
+
+  const queryClient = useQueryClient()
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
   const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
@@ -100,8 +110,6 @@ export function SendConfirm() {
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
-  const router = useRouter()
-
   const {
     data: nonce,
     error: nonceError,
@@ -115,7 +123,8 @@ export function SendConfirm() {
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
     amount: BigInt(queryParams.amount ?? '0'),
-    nonce: nonce,
+    nonce:
+      nonce && pendingTransfers !== undefined ? nonce + BigInt(pendingTransfers.length) : nonce,
   })
 
   const {
@@ -211,18 +220,8 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const { data: workflowId, error } = await transfer({
-        token: selectedCoin.token,
-        userOp,
-      }).catch((e) => {
-        console.error("Couldn't send the userOp", e)
-        if (e instanceof TRPCClientError) {
-          return { data: undefined, error: { message: e.message } }
-        }
-        return { data: undefined, error: { message: e.message } }
-      })
-      console.log('workflowId', workflowId)
-      console.log('error', error)
+      const workflowId = await transfer({ userOp, token: sendToken })
+      setWorkflowId(workflowId)
       if (selectedCoin?.token === 'eth') {
         await ethQuery.refetch()
       } else {
@@ -241,7 +240,13 @@ export function SendConfirm() {
     }
   }, [])
 
-  if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
+  useEffect(() => {
+    if (submitButtonRef.current) {
+      submitButtonRef.current.focus()
+    }
+  }, [])
+
+  if (nonceIsLoading || isProfileLoading || isSendAccountLoading || isPendingTransfersLoading)
     return <Spinner size="large" color={'$color'} />
 
   return (
@@ -383,7 +388,7 @@ export function SendConfirm() {
         onPress={onSubmit}
         br={'$4'}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-        disabled={!canSubmit || isTransferPending}
+        disabled={!canSubmit || !!workflowId}
         gap={4}
         py={'$5'}
         width={'100%'}
@@ -395,15 +400,6 @@ export function SendConfirm() {
                 <Button.Icon>
                   <Spinner size="small" color="$color12" />
                 </Button.Icon>
-              )
-            case isTransferPending && !isTransferError:
-              return (
-                <>
-                  <Button.Icon>
-                    <Spinner size="small" color="$color12" />
-                  </Button.Icon>
-                  <Button.Text fontWeight={'600'}>Sending...</Button.Text>
-                </>
               )
             case !hasEnoughBalance:
               return <Button.Text fontWeight={'600'}>Insufficient Balance</Button.Text>
