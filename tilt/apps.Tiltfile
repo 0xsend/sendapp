@@ -117,6 +117,7 @@ local_resource(
         "wagmi:generate",
         "temporal:build",
         "temporal",
+        "workflows:bundle",
     ],
     serve_cmd = "yarn workspace workers start",
     deps = ts_files(
