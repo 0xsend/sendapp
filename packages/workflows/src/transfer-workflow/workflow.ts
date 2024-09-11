@@ -16,19 +16,21 @@ const {
   startToCloseTimeout: '45 seconds',
 })
 
-type simulating = { status: 'simulating'; data: { userOp: UserOperation<'v0.7'> } }
-type sending = { status: 'sending'; data: { userOp: UserOperation<'v0.7'> } }
-type waiting = { status: 'waiting'; data: { hash: string; userOp: UserOperation<'v0.7'> } }
-type indexing = {
+type BaseState = { userOp: UserOperation<'v0.7'> }
+
+type Simulating = { status: 'simulating' } & BaseState
+type Sending = { status: 'sending' } & BaseState
+type Waiting = { status: 'waiting'; hash: string } & BaseState
+type Indexing = {
   status: 'indexing'
-  data: { receipt: GetUserOperationReceiptReturnType; userOp: UserOperation<'v0.7'> }
-}
-type confirmed = {
+  receipt: GetUserOperationReceiptReturnType
+} & BaseState
+type Confirmed = {
   status: 'confirmed'
   receipt: GetUserOperationReceiptReturnType | boolean
 } & BaseState
 
-export type transferState = simulating | sending | waiting | indexing | confirmed
+export type transferState = Simulating | Sending | Waiting | Indexing | Confirmed
 
 export const getTransferStateQuery = defineQuery<transferState>('getTransferState')
 
