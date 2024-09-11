@@ -206,8 +206,7 @@ const TokenDetailsBalance = ({
 export function RowLabel({ children }: PropsWithChildren) {
   return (
     <H4
-      // @TODO: Update with theme color variable
-      color="hsl(0, 0%, 42.5%)"
+      color="$color10"
       fontFamily={'$mono'}
       fontWeight={'500'}
       size={'$5'}

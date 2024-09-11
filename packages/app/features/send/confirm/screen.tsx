@@ -18,11 +18,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { coinsDict } from 'app/data/coins'
-import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import formatAmount from 'app/utils/formatAmount'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
@@ -32,17 +30,11 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import {
-  isSendAccountReceiveEvent,
-  isSendAccountTransfersEvent,
-  type Activity,
-} from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
+import { formatUnits, isAddress, parseUnits } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { api } from 'app/utils/api'
-import { TRPCClientError } from '@trpc/client'
 import { getUserOperationHash } from 'permissionless'
 import { signUserOp } from 'app/utils/signUserOp'
 import { byteaToBase64 } from 'app/utils/byteaToBase64'
@@ -73,13 +65,19 @@ export function SendConfirmScreen() {
 }
 
 export function SendConfirm() {
+  const router = useRouter()
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType } = queryParams
-  const {
-    mutateAsync: transfer,
-    isPending: isTransferPending,
-    isError: isTransferError,
-  } = api.transfer.withUserOp.useMutation()
+
+  const { mutateAsync: transfer } = api.transfer.withUserOp.useMutation()
+
+  const [workflowId, setWorkflowId] = useState<string | undefined>()
+
+  useEffect(() => {
+    if (workflowId) {
+      router.replace({ pathname: '/', query: { token: sendToken } })
+    }
+  }, [workflowId, router, sendToken])
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
@@ -97,9 +95,6 @@ export function SendConfirm() {
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
-  const [sentTxHash, setSentTxHash] = useState<Hex>()
-
-  const router = useRouter()
 
   const amount = parseUnits((queryParams.amount ?? '0').toString(), tokenDecimals ?? 0)
   const {
@@ -131,18 +126,6 @@ export function SendConfirm() {
   })
 
   const [error, setError] = useState<Error>()
-
-  const {
-    data: transfers,
-    error: tokenActivityError,
-    dataUpdatedAt,
-  } = useTokenActivityFeed({
-    address: sendToken === 'eth' ? undefined : hexToBytea(sendToken),
-    refetchInterval: sentTxHash ? 1000 : undefined, // refetch every second if we have sent a tx
-    enabled: !!sentTxHash,
-  })
-
-  const [dataFirstFetch, setDataFirstFetch] = useState<number>()
 
   const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
 
@@ -193,51 +176,14 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const { data: workflowId, error } = await transfer(userOp).catch((e) => {
-        console.error("Couldn't send the userOp", e)
-        if (e instanceof TRPCClientError) {
-          return { data: undefined, error: { message: e.message } }
-        }
-        return { data: undefined, error: { message: e.message } }
-      })
-      console.log('workflowId', workflowId)
-      console.log('error', error)
+      const workflowId = await transfer({ userOp, token: sendToken })
+      setWorkflowId(workflowId)
     } catch (e) {
       console.error(e)
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }
   }
-
-  useEffect(() => {
-    if (!dataFirstFetch && dataUpdatedAt) {
-      setDataFirstFetch(dataUpdatedAt)
-    }
-    if (!dataFirstFetch) return
-    if (!dataUpdatedAt) return
-    const hasBeenLongEnough = dataUpdatedAt - dataFirstFetch > 5_000
-    if (sentTxHash) {
-      const tfr = transfers?.pages.some((page) =>
-        page.some((activity: Activity) => {
-          if (isSendAccountTransfersEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          if (isSendAccountReceiveEvent(activity)) {
-            return activity.data.tx_hash === sentTxHash
-          }
-          return false
-        })
-      )
-
-      if (tokenActivityError) {
-        console.error(tokenActivityError)
-      }
-      // found the transfer or we waited 5 seconds or we got an error 😢
-      if (tfr || tokenActivityError || hasBeenLongEnough) {
-        router.replace({ pathname: '/', query: { token: sendToken } })
-      }
-    }
-  }, [sentTxHash, transfers, router, sendToken, tokenActivityError, dataFirstFetch, dataUpdatedAt])
 
   if (nonceIsLoading || isProfileLoading) return <Spinner size="large" color={'$color'} />
 
@@ -319,7 +265,7 @@ export function SendConfirm() {
           onPress={onSubmit}
           br={12}
           disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-          disabled={!canSubmit || isTransferPending || !!sentTxHash}
+          disabled={!canSubmit || !!workflowId}
           gap={4}
           mx="auto"
           $gtXs={{
@@ -338,24 +284,6 @@ export function SendConfirm() {
                   <Button.Icon>
                     <Spinner size="small" color="$color" />
                   </Button.Icon>
-                )
-              case isTransferPending && !isTransferError:
-                return (
-                  <>
-                    <Button.Icon>
-                      <Spinner size="small" color="$color" />
-                    </Button.Icon>
-                    <Button.Text>Sending...</Button.Text>
-                  </>
-                )
-              case sentTxHash !== undefined:
-                return (
-                  <>
-                    <Button.Icon>
-                      <Spinner size="small" color="$color" />
-                    </Button.Icon>
-                    <Button.Text>Confirming...</Button.Text>
-                  </>
                 )
               case !hasEnoughBalance:
                 return <Button.Text>Insufficient Balance</Button.Text>

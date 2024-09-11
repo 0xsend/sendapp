@@ -60,7 +60,7 @@ export const transferRouter = createTRPCRouter({
         const states: transferState[] = []
         const client = await getTemporalClient()
         const workflows = client.workflow.list({
-          query: `ExecutionStatus = "Running" AND WorkflowId BETWEEN "transfer-workflow-${token}-${sender}-" AND "transfer-workflow-${token}-${sender}-~"`,
+          query: `ExecutionStatus = "Running" AND WorkflowId BETWEEN "send-transfer-workflow-${token}-${sender}-" AND "send-transfer-workflow-${token}-${sender}-~"`,
         })
         for await (const workflow of workflows) {
           const handle = client.workflow.getHandle(workflow.workflowId)
@@ -88,7 +88,7 @@ export const transferRouter = createTRPCRouter({
         const states: transferState[] = []
         const client = await getTemporalClient()
         const workflows = client.workflow.list({
-          query: `ExecutionStatus = "Failed" AND WorkflowId BETWEEN "transfer-workflow-${token}-${sender}-" AND "transfer-workflow-${token}-${sender}-~"`,
+          query: `ExecutionStatus = "Failed" AND WorkflowId BETWEEN "send-transfer-workflow-${token}-${sender}-" AND "send-transfer-workflow-${token}-${sender}-~"`,
         })
         for await (const workflow of workflows) {
           const handle = client.workflow.getHandle(workflow.workflowId)
