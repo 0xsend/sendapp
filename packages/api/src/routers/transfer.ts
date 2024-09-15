@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server'
 import debug from 'debug'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
-import { client } from '@my/temporal/client'
+import { getTemporalClient } from '@my/temporal/client'
 import type { UserOperation } from 'permissionless'
 import { TransferWorkflow, type transferState } from '@my/workflows'
 import type { coinsDict } from 'app/data/coins'
@@ -20,7 +20,7 @@ export const transferRouter = createTRPCRouter({
     .mutation(async ({ input: { token, userOp } }) => {
       const { sender, nonce } = userOp
       try {
-        const handle = await client.workflow.start(TransferWorkflow, {
+        const handle = await getTemporalClient().workflow.start(TransferWorkflow, {
           taskQueue: 'monorepo',
           workflowId: `transfer-workflow-${token}-${sender}-${nonce}`,
           args: [userOp],
@@ -37,7 +37,7 @@ export const transferRouter = createTRPCRouter({
     }),
   getState: protectedProcedure.input(z.string()).query(async ({ input: workflowId }) => {
     try {
-      const handle = await client.workflow.getHandle(workflowId)
+      const handle = await getTemporalClient().workflow.getHandle(workflowId)
       const state = await handle.query<transferState, []>('getTransferState')
       return state
     } catch (error) {
@@ -57,11 +57,11 @@ export const transferRouter = createTRPCRouter({
     .query(async ({ input: { token, sender } }) => {
       try {
         const states: transferState[] = []
-        const workflows = await client.workflow.list({
+        const workflows = await getTemporalClient().workflow.list({
           query: `ExecutionStatus = "Running" AND WorkflowId BETWEEN "transfer-workflow-${token}-${sender}-" AND "transfer-workflow-${token}-${sender}-~"`,
         })
         for await (const workflow of workflows) {
-          const handle = await client.workflow.getHandle(workflow.workflowId)
+          const handle = await getTemporalClient().workflow.getHandle(workflow.workflowId)
 
           const state = await handle.query<transferState, []>('getTransferState')
           states.push(state)
@@ -84,11 +84,11 @@ export const transferRouter = createTRPCRouter({
     .query(async ({ input: { token, sender } }) => {
       try {
         const states: transferState[] = []
-        const workflows = await client.workflow.list({
+        const workflows = await getTemporalClient().workflow.list({
           query: `ExecutionStatus = "Failed" AND WorkflowId BETWEEN "transfer-workflow-${token}-${sender}-" AND "transfer-workflow-${token}-${sender}-~"`,
         })
         for await (const workflow of workflows) {
-          const handle = await client.workflow.getHandle(workflow.workflowId)
+          const handle = await getTemporalClient().workflow.getHandle(workflow.workflowId)
           const state = await handle.query<transferState, []>('getTransferState')
           states.push(state)
         }
