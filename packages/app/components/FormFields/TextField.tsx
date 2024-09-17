@@ -7,6 +7,7 @@ import {
   Paragraph,
   Shake,
   Stack,
+  type LabelProps,
   Theme,
   Tooltip,
   useMedia,
@@ -17,7 +18,9 @@ import { useId } from 'react'
 
 import { AlertTriangle } from '@tamagui/lucide-icons'
 
-export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps }) => {
+export const TextField = (
+  props: InputProps & { fieldsetProps?: FieldsetProps } & { labelProps?: LabelProps }
+) => {
   const media = useMedia()
   const {
     field,
@@ -44,7 +47,8 @@ export const TextField = (props: InputProps & { fieldsetProps?: FieldsetProps })
             lineHeight={'$11'}
             htmlFor={id}
             textTransform={'uppercase'}
-            color="$olive"
+            color={props.labelProps?.color ?? '$olive'}
+            {...props.labelProps}
           >
             {label} {isOptional && '(Optional)'}
           </Label>

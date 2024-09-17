@@ -1,4 +1,4 @@
-import { SubmitButton, YStack, isWeb, useToastController, XStack, Paragraph } from '@my/ui'
+import { SubmitButton, YStack, isWeb, useToastController, XStack, Button, H1 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
@@ -22,10 +22,10 @@ export const PersonalInfoScreen = () => {
 
   return (
     <YStack w={'100%'} als={'center'}>
-      <XStack w={'100%'} $lg={{ display: 'none' }}>
-        <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
+      <XStack w={'100%'}>
+        <H1 size={'$9'} fontWeight={'600'} color="$color12">
           Personal Information
-        </Paragraph>
+        </H1>
       </XStack>
       <XStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }}>
         <FormProvider {...form}>
@@ -52,6 +52,10 @@ export const PersonalInfoScreen = () => {
                   autoComplete: 'tel',
                   keyboardType: 'phone-pad',
                   autoCapitalize: 'none',
+                  bc: '$color0',
+                  labelProps: {
+                    color: '$color10',
+                  },
                 },
                 // email: {
                 //   'aria-label': 'Email',
@@ -66,16 +70,19 @@ export const PersonalInfoScreen = () => {
                 // address: '',
               }}
               renderAfter={({ submit }) => (
-                <YStack ai={'center'}>
+                <YStack ai={'flex-start'}>
                   <SubmitButton
                     f={1}
                     marginTop={'$5'}
-                    px={'$12'}
-                    py={'$5'}
                     fontWeight={'500'}
                     onPress={() => submit()}
+                    theme="green"
+                    borderRadius={'$3'}
+                    px={'$size.1.5'}
                   >
-                    SAVE
+                    <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
+                      SAVE
+                    </Button.Text>
                   </SubmitButton>
                 </YStack>
               )}

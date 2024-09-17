@@ -1,7 +1,8 @@
 import type { Tables } from '@my/supabase/database-generated.types'
 import {
+  Button,
   FormWrapper,
-  H2,
+  H1,
   Paragraph,
   Spinner,
   SubmitButton,
@@ -81,14 +82,21 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
       }}
       gap={'$2'}
     >
-      <H2 size={'$8'} fontWeight={'300'} color={'$color05'}>
-        Passkey {webauthnCred?.display_name} has been saved
-      </H2>
-      <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
-        Add your new passkey as a Signer to authorize it to sign transactions on your account.
-      </Paragraph>
-      <YStack gap={'$2'} jc="center">
-        <AddSignerButton webauthnCred={webauthnCred} />
+      <YStack gap={'$size.3.5'}>
+        <H1 size={'$9'} fontWeight={'600'} color="$color12">
+          Add Passkey as Signer
+        </H1>
+        <Paragraph size={'$5'} color={'$color10'}>
+          Your passkey{' '}
+          <Paragraph color={'$color12'} fontWeight={600}>
+            {webauthnCred?.display_name}
+          </Paragraph>{' '}
+          has been saved. Add your new passkey as a signer. This will allow you to sign transactions
+          on your account with your new passkey.
+        </Paragraph>
+        <YStack gap={'$2'} jc="center">
+          <AddSignerButton webauthnCred={webauthnCred} />
+        </YStack>
       </YStack>
     </FormWrapper>
   )
@@ -231,12 +239,16 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         onSubmit={onSubmit}
         renderAfter={({ submit }) => (
           <SubmitButton
-            mx="auto"
-            px="$6"
+            mr="auto"
             onPress={submit}
+            theme="green"
+            borderRadius={'$3'}
+            px={'$size.1.5'}
             {...(isLoading ? { disabled: true } : {})}
           >
-            Add Passkey as Signer
+            <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
+              Add Passkey as Signer
+            </Button.Text>
           </SubmitButton>
         )}
       >
