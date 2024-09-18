@@ -70,21 +70,11 @@ export const BackupScreen = () => {
   const hasSendAccount = !!sendAcct
   return (
     <YStack w={'100%'} als={'center'} gap={'$size.3.5'}>
-      <YStack w={'100%'} gap={'$size.2'}>
-        <H1
-          size={'$8'}
-          fontWeight={'300'}
-          $theme-dark={{ color: '$lightGrayTextField' }}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Add Passkeys as Signers
+      <YStack w={'100%'} gap={'$size.2.5'}>
+        <H1 size={'$9'} fontWeight={'600'} color="$color12">
+          Add Passkey as Signer
         </H1>
-
-        <Paragraph
-          size={'$5'}
-          $theme-dark={{ color: '$lightGrayTextField' }}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
+        <Paragraph size={'$5'} color={'$color10'}>
           Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
           authorized to sign your account&apos;s transactions.
         </Paragraph>
@@ -174,16 +164,16 @@ const WebauthnCreds = ({
     href: '/account/settings/backup/create',
   })
   return (
-    <YStack w={'100%'} gap={'$size.3'}>
+    <YStack w={'100%'} gap={'$size.3.5'}>
       <XStack w={'100%'} gap={'$2'} jc="space-between" ai="center">
         <YStack>
-          <Button theme="green" {...addPasskeyLink}>
-            Add Passkey
+          <Button theme="green" borderRadius={'$3'} px={'$size.1.5'} {...addPasskeyLink}>
+            <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
+              Add Passkey as signer
+            </Button.Text>
           </Button>
         </YStack>
       </XStack>
-
-      <Separator w={'100%'} $theme-dark={{ borderColor: '$decay' }} />
 
       <XStack gap="$5" flexWrap="wrap" ai="flex-start">
         {webAuthnCreds.map((cred) => (
@@ -230,7 +220,7 @@ const WebAuthnCred = ({
       w={'100%'}
       gap={'$size.1.5'}
       p={'$size.1.5'}
-      bc={'$color2'}
+      bc={'$color0'}
       borderRadius={'$5'}
       $gtLg={{
         width: isWeb ? 'calc((100% - 24px) / 2)' : '100%',
@@ -240,7 +230,7 @@ const WebAuthnCred = ({
       }}
     >
       <XStack jc="space-between" ai="center">
-        <H4 fontWeight={'700'} color={cardStatus === 'remove' ? '$error' : '$primary'}>
+        <H4 fontWeight={'700'} color={cardStatus === 'remove' ? '$error' : '$color12'}>
           {cardStatus === 'remove' ? 'Remove Passkey?' : cred.display_name}
         </H4>
         {cardStatus !== 'remove' && (
@@ -263,9 +253,10 @@ const WebAuthnCred = ({
             return (
               <Button
                 borderColor={'$error'}
-                color={'$error'}
+                color={'$color12'}
                 variant="outlined"
                 mt={'$size.0.9'}
+                borderRadius={'$5'}
                 hoverStyle={{ borderColor: '$error' }}
                 onPress={() => setCardStatus('remove')}
               >
@@ -355,19 +346,15 @@ const CardTextBlock = ({
     <YStack gap={'$size.0.5'}>
       <H5
         size={'$5'}
-        $theme-dark={{ color: '$lightGrayTextField' }}
-        $theme-light={{ color: '$darkGrayTextField' }}
-        fontWeight={'400'}
+        ff={'$mono'}
+        color={'$color9'}
+        $theme-light={{ color: '$color10' }}
+        fontWeight={'500'}
+        tt={'uppercase'}
       >
         {label}
       </H5>
-      <Paragraph
-        fontWeight={'300'}
-        size={'$5'}
-        $theme-dark={{ color: warningText ? '$error' : '$white' }}
-        $theme-light={{ color: warningText ? '$error' : '$black' }}
-        fontFamily={'$mono'}
-      >
+      <Paragraph fontWeight={'600'} size={'$5'} color={warningText ? '$error' : 'color12'}>
         {text}
       </Paragraph>
     </YStack>

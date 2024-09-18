@@ -11,10 +11,14 @@ import {
   useThemeName,
   FieldError,
   Shake,
+  type LabelProps,
 } from '@my/ui'
 
 export const TextAreaField = (
-  props: Pick<TextAreaProps, 'size' | 'autoFocus' | 'aria-label' | 'placeholder' | 'fontStyle'>
+  props: Pick<
+    TextAreaProps,
+    'size' | 'autoFocus' | 'aria-label' | 'placeholder' | 'fontStyle' | 'backgroundColor' | 'rows'
+  > & { labelProps?: LabelProps }
 ) => {
   const {
     field,
@@ -34,11 +38,12 @@ export const TextAreaField = (
         {!!label && (
           <Label
             size={props.size || '$5'}
-            fontFamily={'$mono'}
-            lineHeight={52}
             htmlFor={id}
-            textTransform={'uppercase'}
-            color="$olive"
+            fontFamily={props.labelProps?.fontFamily ?? '$mono'}
+            lineHeight={props.labelProps?.lineHeight ?? 52}
+            textTransform={props.labelProps?.textTransform ?? 'uppercase'}
+            color={props.labelProps?.color ?? '$olive'}
+            {...props.labelProps}
           >
             {label} {isOptional && '(Optional)'}
           </Label>

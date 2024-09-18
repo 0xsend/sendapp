@@ -1,30 +1,41 @@
-import { Link, Paragraph, XStack, YStack } from '@my/ui'
-import {
-  // IconFaq,
-  IconNote,
-} from 'app/components/icons'
+import { Card, H1, LinkableButton, Paragraph, XStack, YStack } from '@my/ui'
+import { IconInfoCircle, IconQuestionCircle } from 'app/components/icons'
 
 export const SupportScreen = () => {
   return (
     <YStack w={'100%'} als={'center'}>
-      <YStack w={'100%'} $lg={{ display: 'none' }}>
-        <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
+      <YStack w={'100%'} mb={'$size.3.5'}>
+        <H1 size={'$9'} fontWeight={'600'} color="$color12">
           Support
-        </Paragraph>
+        </H1>
       </YStack>
-      <YStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }} gap={'$6'}>
-        <XStack ai={'center'} gap={'$3.5'}>
-          <IconNote color={'$primary'} />
-          <Link href={'https://go.send.it/support'} color={'$primary'}>
-            Submit a Request
-          </Link>
-        </XStack>
-        {/* <XStack ai={'center'} gap={'$3.5'}>
-          <IconFaq color={'$primary'} />
-          <Link href={'#'} color={'$primary'}>
-            FAQs
-          </Link>
-        </XStack> */}
+      <YStack w={'100%'} $lg={{ jc: 'center' }} gap={'$6'}>
+        <LinkableButton href={'https://support.send.app/en/'} unstyled>
+          <Card bg={'$color0'} p={'$size.1.5'}>
+            <XStack ai={'center'} gap={'$size.0.9'}>
+              <IconInfoCircle color={'$primary'} size={24} />
+              <Paragraph color={'$color12'} size={'$6'} fontWeight={600}>
+                Learn more about Send
+              </Paragraph>
+            </XStack>
+          </Card>
+        </LinkableButton>
+
+        <LinkableButton
+          href={
+            'https://support.send.app/en/articles/9783120-general-questions-support-suggestions-or-complaints'
+          }
+          unstyled
+        >
+          <Card bg={'$color0'} p={'$size.1.5'}>
+            <XStack ai={'center'} gap={'$size.0.9'}>
+              <IconQuestionCircle color={'$primary'} size={24} />
+              <Paragraph color={'$color12'} size={'$6'} fontWeight={600}>
+                Reach out
+              </Paragraph>
+            </XStack>
+          </Card>
+        </LinkableButton>
       </YStack>
     </YStack>
   )
