@@ -1,14 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ReferralScreen 1`] = `
+exports[`AffiliateScreen 1`] = `
 <View
   style={
     {
       "flex": 1,
       "flexDirection": "column",
       "gap": 18,
-      "paddingBottom": 18,
-      "paddingTop": 18,
       "width": "100%",
     }
   }
@@ -28,28 +26,7 @@ exports[`ReferralScreen 1`] = `
       accessibilityRole="header"
       style={
         {
-          "color": "#FFFFFF",
-          "fontFamily": "System",
-          "fontSize": 23,
-          "fontWeight": "normal",
-          "lineHeight": 27,
-          "marginBottom": 0,
-          "marginLeft": 0,
-          "marginRight": 0,
-          "marginTop": 0,
-          "textTransform": "none",
-          "userSelect": "auto",
-        }
-      }
-      suppressHighlighting={true}
-    >
-      Referral Rewards
-    </Text>
-    <Text
-      accessibilityRole="header"
-      style={
-        {
-          "color": "#FFFFFF",
+          "color": "#B2B2B2",
           "fontFamily": "System",
           "fontSize": 23,
           "fontWeight": "bold",
@@ -64,8 +41,70 @@ exports[`ReferralScreen 1`] = `
       }
       suppressHighlighting={true}
     >
-      Check Rewards
+      Affiliate
     </Text>
+    <View
+      cancelable={true}
+      disabled={false}
+      focusVisibleStyle={{}}
+      focusable={[Function]}
+      minPressDuration={0}
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      onPress={[Function]}
+      onPressIn={[Function]}
+      onPressOut={[Function]}
+      role="button"
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#081619",
+          "borderBottomColor": "transparent",
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderBottomWidth": 1,
+          "borderLeftColor": "transparent",
+          "borderLeftWidth": 1,
+          "borderRightColor": "transparent",
+          "borderRightWidth": 1,
+          "borderStyle": "solid",
+          "borderTopColor": "transparent",
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "borderTopWidth": 1,
+          "display": "flex",
+          "flexDirection": "row",
+          "flexWrap": "nowrap",
+          "fontWeight": "bold",
+          "height": 44,
+          "justifyContent": "center",
+          "paddingLeft": 18,
+          "paddingRight": 18,
+        }
+      }
+    >
+      <Text
+        lineBreakMode="clip"
+        numberOfLines={1}
+        style={
+          {
+            "color": "#FFFFFF",
+            "flexGrow": 0,
+            "flexShrink": 1,
+            "fontFamily": "System",
+            "fontSize": 16.8,
+            "fontWeight": "bold",
+            "lineHeight": 19,
+            "userSelect": "none",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Check Leaderboard
+      </Text>
+    </View>
   </View>
   <Text
     style={
@@ -82,7 +121,7 @@ exports[`ReferralScreen 1`] = `
     }
     suppressHighlighting={true}
   >
-    Share your unique link, and when someone joins or makes a purchase using it, you earn rewards in SEND token. Our system tracks referrals, ensuring you receive rewards. It's a win-win as you support us and enjoy the benefits. Thanks for being part of our community!
+    View your network, track your transactions, and see your referrals activity.
   </Text>
   <View
     style={
@@ -91,8 +130,9 @@ exports[`ReferralScreen 1`] = `
         "flexDirection": "row",
         "flexWrap": "wrap",
         "gap": 46,
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "marginBottom": 18,
+        "width": "100%",
       }
     }
   >
@@ -107,7 +147,6 @@ exports[`ReferralScreen 1`] = `
           "flex": 1,
           "flexDirection": "column",
           "position": "relative",
-          "width": "20%",
         }
       }
     >
@@ -138,7 +177,7 @@ exports[`ReferralScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Total Referrals
+          Referrals
         </Text>
       </View>
       <Text
@@ -162,7 +201,7 @@ exports[`ReferralScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        123
+        0
       </Text>
     </View>
     <View
@@ -176,7 +215,6 @@ exports[`ReferralScreen 1`] = `
           "flex": 1,
           "flexDirection": "column",
           "position": "relative",
-          "width": "20%",
         }
       }
     >
@@ -245,7 +283,6 @@ exports[`ReferralScreen 1`] = `
           "flex": 1,
           "flexDirection": "column",
           "position": "relative",
-          "width": "20%",
         }
       }
     >
@@ -276,76 +313,7 @@ exports[`ReferralScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Total Rewards
-        </Text>
-      </View>
-      <Text
-        accessibilityRole="header"
-        style={
-          {
-            "color": "#FFFFFF",
-            "fontFamily": "System",
-            "fontSize": 20,
-            "fontWeight": "700",
-            "lineHeight": 24,
-            "marginBottom": 0,
-            "marginLeft": 0,
-            "marginRight": 0,
-            "marginTop": 0,
-            "paddingBottom": 13,
-            "paddingLeft": 18,
-            "textTransform": "none",
-            "userSelect": "auto",
-          }
-        }
-        suppressHighlighting={true}
-      >
-        1000
-      </Text>
-    </View>
-    <View
-      style={
-        {
-          "backgroundColor": "#111f22",
-          "borderBottomLeftRadius": 16,
-          "borderBottomRightRadius": 16,
-          "borderTopLeftRadius": 16,
-          "borderTopRightRadius": 16,
-          "flex": 1,
-          "flexDirection": "column",
-          "position": "relative",
-          "width": "20%",
-        }
-      }
-    >
-      <View
-        style={
-          {
-            "backgroundColor": "transparent",
-            "flexDirection": "column",
-            "marginBottom": "auto",
-            "paddingBottom": 18,
-            "paddingLeft": 18,
-            "paddingRight": 18,
-            "paddingTop": 18,
-            "zIndex": 10,
-          }
-        }
-      >
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "fontFamily": "System",
-              "fontSize": 16.8,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "userSelect": "auto",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Claimable Rewards
+          Referral Transactions
         </Text>
       </View>
       <Text
@@ -387,8 +355,7 @@ exports[`ReferralScreen 1`] = `
         {
           "alignItems": "center",
           "flexDirection": "row",
-          "gap": 32,
-          "justifyContent": "space-between",
+          "gap": 13,
           "width": "100%",
         }
       }
@@ -412,28 +379,7 @@ exports[`ReferralScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        Referral History
-      </Text>
-      <Text
-        accessibilityRole="header"
-        style={
-          {
-            "color": "#FFFFFF",
-            "fontFamily": "System",
-            "fontSize": 23,
-            "fontWeight": "bold",
-            "lineHeight": 27,
-            "marginBottom": 0,
-            "marginLeft": 0,
-            "marginRight": 0,
-            "marginTop": 0,
-            "textTransform": "none",
-            "userSelect": "auto",
-          }
-        }
-        suppressHighlighting={true}
-      >
-        See All
+        Referrals
       </Text>
     </View>
     <View
@@ -470,8 +416,7 @@ exports[`ReferralScreen 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 13,
-            "justifyContent": "space-between",
+            "gap": 2,
           }
         }
       >
@@ -509,7 +454,7 @@ exports[`ReferralScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Date
+          Sendtag
         </Text>
         <Text
           style={
@@ -528,64 +473,7 @@ exports[`ReferralScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Wallet
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Referral rewards
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Status
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "right",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Details
+          Referred Date
         </Text>
       </View>
       <View
@@ -604,8 +492,7 @@ exports[`ReferralScreen 1`] = `
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 13,
-            "justifyContent": "space-between",
+            "gap": 2,
           }
         }
       >
@@ -644,25 +531,6 @@ exports[`ReferralScreen 1`] = `
           suppressHighlighting={true}
         >
           ?
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          0x0
         </Text>
         <View
           style={
@@ -775,52 +643,13 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
         </View>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          ?
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "right",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Transaction
-        </Text>
       </View>
       <View
         style={
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 13,
-            "justifyContent": "space-between",
+            "gap": 2,
           }
         }
       >
@@ -859,25 +688,6 @@ exports[`ReferralScreen 1`] = `
           suppressHighlighting={true}
         >
           ?
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          0x0
         </Text>
         <View
           style={
@@ -990,52 +800,13 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
         </View>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          ?
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "right",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Transaction
-        </Text>
       </View>
       <View
         style={
           {
             "alignItems": "center",
             "flexDirection": "row",
-            "gap": 13,
-            "justifyContent": "space-between",
+            "gap": 2,
           }
         }
       >
@@ -1074,25 +845,6 @@ exports[`ReferralScreen 1`] = `
           suppressHighlighting={true}
         >
           ?
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          0x0
         </Text>
         <View
           style={
@@ -1205,44 +957,6 @@ exports[`ReferralScreen 1`] = `
             ?
           </Text>
         </View>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "center",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          ?
-        </Text>
-        <Text
-          style={
-            {
-              "color": "#FFFFFF",
-              "flex": 1,
-              "fontFamily": "System",
-              "fontSize": 19.2,
-              "fontWeight": "400",
-              "lineHeight": 19,
-              "marginBottom": "0",
-              "textAlign": "right",
-              "userSelect": "auto",
-              "width": "12%",
-            }
-          }
-          suppressHighlighting={true}
-        >
-          Transaction
-        </Text>
       </View>
     </View>
   </View>
