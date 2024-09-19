@@ -218,7 +218,7 @@ export function TopNav({
                       col="$color10"
                       lineHeight={32}
                       $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
-                      display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                      display={selectedCoin ? 'none' : 'flex'}
                       als={'center'}
                     >
                       {header}
@@ -233,7 +233,7 @@ export function TopNav({
                   col="$color10"
                   lineHeight={32}
                   $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
-                  display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                  display={isSubRoute ? 'flex' : 'none'}
                   als={'center'}
                 >
                   {header}

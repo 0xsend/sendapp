@@ -29,7 +29,7 @@ const suggestions = [
 export function ActivityScreen() {
   return (
     <TagSearchProvider>
-      <YStack f={1} width={'100%'} py="$6">
+      <YStack f={1} width={'100%'} pb="$3">
         <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
           <Search label="SEARCH BY" />
         </YStack>

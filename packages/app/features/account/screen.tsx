@@ -55,6 +55,19 @@ export function AccountScreen() {
     canShare()
   }, [])
 
+  const copyOnPress = async () => {
+    await Clipboard.setStringAsync(referralHref)
+      .then(() => toast.show('Copied your referral link to the clipboard'))
+      .catch(() =>
+        toast.show('Something went wrong', {
+          message: 'We were unable to copy your referral link to the clipboard',
+          customData: {
+            theme: 'red',
+          },
+        })
+      )
+  }
+
   const shareOrCopyOnPress = async () => {
     if (canShare) {
       return await Sharing.shareAsync(referralHref)
@@ -79,7 +92,7 @@ export function AccountScreen() {
       case media.xs:
         return 360
       default:
-        return 480
+        return 400
     }
   })()
 
@@ -195,40 +208,47 @@ export function AccountScreen() {
                 borderRadius={'$3'}
                 flexBasis={'50%'}
                 flexShrink={1}
+                ai={'center'}
               >
                 <XStack jc={'space-between'} ai={'center'} gap={'$size.0.75'}>
-                  <Button.Icon>
-                    <IconGear size={20} />
-                  </Button.Icon>
                   <Button.Text fontWeight={600} tt={'uppercase'}>
                     Settings
                   </Button.Text>
+                  <Button.Icon>
+                    <IconGear size={20} />
+                  </Button.Icon>
                 </XStack>
               </LinkableButton>
-              <LinkableButton
-                href={tags?.[0] ? `/${tags[0].name}` : `/profile/${send_id}`}
+              <Button
+                onPress={shareOrCopyOnPress}
                 theme="green"
                 variant={'outlined'}
                 borderRadius={'$3'}
                 flexBasis={'50%'}
                 flexShrink={1}
                 borderColor={'$primary'}
+                ai={'center'}
               >
                 <XStack jc={'space-between'} gap={'$size.0.75'} ai={'center'}>
-                  <Button.Icon>
-                    <IconQRFull size={16} color="$color12" />
-                  </Button.Icon>
                   <Button.Text color="$color12" fontWeight={600} tt={'uppercase'}>
                     Share
                   </Button.Text>
+                  <Button.Icon>
+                    <IconShare
+                      size="$1"
+                      col={'$background'}
+                      $theme-light={{ color: '$color12' }}
+                      $platform-web={{ cursor: 'pointer' }}
+                    />
+                  </Button.Icon>
                 </XStack>
-              </LinkableButton>
+              </Button>
             </XStack>
           </YStack>
         </YStack>
       </YStack>
 
-      <YStack gap={'$size.1.5'} maxWidth={avatarWidth} f={1} width="100%">
+      <YStack gap={'$size.1.5'} maxWidth={480} f={1} width="100%">
         {links.map((linkProps) => (
           <StackButton key={linkProps.label} {...linkProps} />
         ))}
@@ -257,40 +277,28 @@ export function AccountScreen() {
               {referralsCount ?? 0}
             </Paragraph>
           </XStack>
-
           <YStack>
             <Paragraph color="$color10">Referral Code</Paragraph>
             <XStack py={'$2.5'} borderRadius={'$4'}>
-              <TooltipSimple
-                label={<Paragraph color="$white">{canShare ? 'Share' : 'Copy'}</Paragraph>}
-              >
+              <TooltipSimple label={<Paragraph color="$white">{'Copy'}</Paragraph>}>
                 <Button
                   bc={'$color0'}
                   br="$2"
-                  aria-label={canShare ? 'Share' : 'Copy'}
+                  aria-label={'Copy'}
                   f={1}
                   fd="row"
                   chromeless
-                  onPress={shareOrCopyOnPress}
+                  onPress={copyOnPress}
                   color="$color12"
                   justifyContent="space-between"
                   iconAfter={
                     <Theme name="green_Button">
-                      {canShare ? (
-                        <IconShare
-                          size="$1"
-                          col={'$background'}
-                          $theme-light={{ color: '$color12' }}
-                          $platform-web={{ cursor: 'pointer' }}
-                        />
-                      ) : (
-                        <IconCopy
-                          size="$1"
-                          col={'$background'}
-                          $theme-light={{ color: '$color12' }}
-                          $platform-web={{ cursor: 'pointer' }}
-                        />
-                      )}
+                      <IconCopy
+                        size="$1"
+                        col={'$background'}
+                        $theme-light={{ color: '$color12' }}
+                        $platform-web={{ cursor: 'pointer' }}
+                      />
                     </Theme>
                   }
                 >

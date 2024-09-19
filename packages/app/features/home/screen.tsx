@@ -205,7 +205,7 @@ export function HomeScreen() {
   const { search } = queryParams
 
   return (
-    <YStack f={1} pt="$2">
+    <YStack f={1}>
       <AnimatePresence>
         {(() => {
           switch (true) {
