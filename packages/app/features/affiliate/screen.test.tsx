@@ -1,17 +1,17 @@
 import { expect, test } from '@jest/globals'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, act, screen } from '@testing-library/react-native'
-import { ReferralsScreen } from './screen'
+import { AffiliateScreen } from './screen'
 
 jest.mock('app/utils/useUserReferralsCount', () => ({
   useUserReferralsCount: jest.fn().mockReturnValue({ data: 123, error: null }),
 }))
 
-test('ReferralScreen', async () => {
+test('AffiliateScreen', async () => {
   jest.useFakeTimers()
   render(
     <TamaguiProvider defaultTheme={'dark'} config={config}>
-      <ReferralsScreen />
+      <AffiliateScreen />
     </TamaguiProvider>
   )
   await act(async () => {
