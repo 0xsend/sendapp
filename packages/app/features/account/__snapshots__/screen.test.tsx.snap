@@ -22,7 +22,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
         "borderTopLeftRadius": 16,
         "borderTopRightRadius": 16,
         "flexDirection": "column",
-        "maxWidth": 480,
+        "maxWidth": 400,
       }
     }
   >
@@ -51,15 +51,15 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               "borderTopLeftRadius": 16,
               "borderTopRightRadius": 16,
               "flexDirection": "column",
-              "height": 480,
+              "height": 400,
               "justifyContent": "center",
-              "maxHeight": 480,
-              "maxWidth": 480,
-              "minHeight": 480,
-              "minWidth": 480,
+              "maxHeight": 400,
+              "maxWidth": 400,
+              "minHeight": 400,
+              "minWidth": 400,
               "overflow": "hidden",
               "position": "relative",
-              "width": 480,
+              "width": 400,
             }
           }
         >
@@ -88,8 +88,8 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               }
               style={
                 {
-                  "height": 480,
-                  "width": 480,
+                  "height": 400,
+                  "width": 400,
                 }
               }
             />
@@ -111,8 +111,8 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           >
             <RNSVGSvgView
               align="xMidYMid"
-              bbHeight={432}
-              bbWidth={432}
+              bbHeight={360}
+              bbWidth={360}
               c$theme-light={
                 {
                   "color": "$color12",
@@ -121,7 +121,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               color="#40FB50"
               fill="none"
               focusable={false}
-              height={432}
+              height={360}
               meetOrSlice={0}
               minX={0}
               minY={0}
@@ -135,15 +135,15 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   {},
                   {
                     "flex": 0,
-                    "height": 432,
-                    "width": 432,
+                    "height": 360,
+                    "width": 360,
                   },
                 ]
               }
               tintColor="#40FB50"
               vbHeight={20}
               vbWidth={20}
-              width={432}
+              width={360}
             >
               <RNSVGGroup
                 fill={null}
@@ -412,6 +412,26 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 }
               }
             >
+              <Text
+                lineBreakMode="clip"
+                numberOfLines={1}
+                style={
+                  {
+                    "color": "#12643F",
+                    "flexGrow": 0,
+                    "flexShrink": 1,
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": 600,
+                    "lineHeight": 19,
+                    "textTransform": "uppercase",
+                    "userSelect": "none",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Settings
+              </Text>
               <RNSVGSvgView
                 align="xMidYMid"
                 bbHeight={20}
@@ -470,26 +490,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                   />
                 </RNSVGGroup>
               </RNSVGSvgView>
-              <Text
-                lineBreakMode="clip"
-                numberOfLines={1}
-                style={
-                  {
-                    "color": "#12643F",
-                    "flexGrow": 0,
-                    "flexShrink": 1,
-                    "fontFamily": "System",
-                    "fontSize": 16.8,
-                    "fontWeight": 600,
-                    "lineHeight": 19,
-                    "textTransform": "uppercase",
-                    "userSelect": "none",
-                  }
-                }
-                suppressHighlighting={true}
-              >
-                Settings
-              </Text>
             </View>
           </View>
           <View
@@ -531,8 +531,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 "borderTopLeftRadius": 7,
                 "borderTopRightRadius": 7,
                 "borderTopWidth": 2,
-                "color": "#081619",
-                "display": "flex",
                 "flexBasis": "50%",
                 "flexDirection": "row",
                 "flexShrink": 1,
@@ -554,64 +552,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 }
               }
             >
-              <RNSVGSvgView
-                align="xMidYMid"
-                bbHeight={16}
-                bbWidth={16}
-                color="#FFFFFF"
-                fill="none"
-                focusable={false}
-                height={16}
-                meetOrSlice={0}
-                minX={0}
-                minY={0}
-                strokeWidth="2"
-                style={
-                  [
-                    {
-                      "backgroundColor": "transparent",
-                      "borderWidth": 0,
-                    },
-                    {
-                      "color": "#FFFFFF",
-                    },
-                    {
-                      "flex": 0,
-                      "height": 16,
-                      "width": 16,
-                    },
-                  ]
-                }
-                tintColor="#FFFFFF"
-                vbHeight={30}
-                vbWidth={30}
-                width={16}
-              >
-                <RNSVGGroup
-                  fill={null}
-                  propList={
-                    [
-                      "fill",
-                      "strokeWidth",
-                    ]
-                  }
-                  strokeWidth="2"
-                >
-                  <RNSVGPath
-                    d="M0 13.611V0h13.611v13.611H0Zm2.778-2.778h8.055V2.778H2.778v8.055ZM0 30V16.389h13.611V30H0Zm2.778-2.778h8.055v-8.055H2.778v8.055Zm13.61-13.61V0H30v13.611H16.389Zm2.779-2.779h8.055V2.778h-8.055v8.055ZM26.61 30v-3.389H30V30h-3.389ZM16.39 19.805V16.39h3.389v3.416h-3.39Zm3.389 3.39v-3.39h3.417v3.39h-3.417Zm-3.39 3.416v-3.416h3.39v3.416h-3.39ZM19.779 30v-3.389h3.417V30h-3.417Zm3.417-3.389v-3.416h3.416v3.416h-3.416Zm0-6.806V16.39h3.416v3.416h-3.416Zm3.416 3.39v-3.39H30v3.39h-3.389Z"
-                    fill={
-                      {
-                        "type": 2,
-                      }
-                    }
-                    propList={
-                      [
-                        "fill",
-                      ]
-                    }
-                  />
-                </RNSVGGroup>
-              </RNSVGSvgView>
               <Text
                 lineBreakMode="clip"
                 numberOfLines={1}
@@ -632,6 +572,76 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               >
                 Share
               </Text>
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={20}
+                bbWidth={20}
+                color="#12643F"
+                fill="none"
+                focusable={false}
+                height={20}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "#12643F",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 20,
+                      "width": 20,
+                    },
+                  ]
+                }
+                tintColor="#12643F"
+                vbHeight={24}
+                vbWidth={24}
+                width={20}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                    ]
+                  }
+                  strokeWidth="2"
+                >
+                  <RNSVGPath
+                    d="M4.19995 10.8V18.48C4.19995 18.9892 4.40224 19.4776 4.76231 19.8376C5.12238 20.1977 5.61074 20.4 6.11995 20.4H17.64C18.1492 20.4 18.6375 20.1977 18.9976 19.8376C19.3577 19.4776 19.56 18.9892 19.56 18.48V10.8M15.72 7.43998L11.88 3.59998M11.88 3.59998L8.03995 7.43998M11.88 3.59998V13.68"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                        "strokeWidth",
+                        "strokeLinecap",
+                        "strokeLinejoin",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                    strokeLinecap={1}
+                    strokeLinejoin={1}
+                    strokeWidth="2"
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
             </View>
           </View>
         </View>
@@ -1336,7 +1346,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
           }
         >
           <View
-            aria-label="Share"
+            aria-label="Copy"
             cancelable={true}
             disabled={false}
             focusVisibleStyle={{}}
@@ -1444,8 +1454,8 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 ]
               }
               tintColor="#40FB50"
-              vbHeight={24}
-              vbWidth={24}
+              vbHeight={16}
+              vbWidth={16}
               width={20}
             >
               <RNSVGGroup
@@ -1459,28 +1469,20 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
                 strokeWidth="2"
               >
                 <RNSVGPath
-                  d="M4.19995 10.8V18.48C4.19995 18.9892 4.40224 19.4776 4.76231 19.8376C5.12238 20.1977 5.61074 20.4 6.11995 20.4H17.64C18.1492 20.4 18.6375 20.1977 18.9976 19.8376C19.3577 19.4776 19.56 18.9892 19.56 18.48V10.8M15.72 7.43998L11.88 3.59998M11.88 3.59998L8.03995 7.43998M11.88 3.59998V13.68"
+                  d="M13.2727 0H8.36364C6.85982 0 5.63636 1.22345 5.63636 2.72727V4H7.45455V2.72727C7.45455 2.226 7.86236 1.81818 8.36364 1.81818H13.2727C13.774 1.81818 14.1818 2.226 14.1818 2.72727V7.45455C14.1818 7.95582 13.774 8.36364 13.2727 8.36364H12.1818V10.1818H13.2727C14.7765 10.1818 16 8.95836 16 7.45455V2.72727C16 1.22345 14.7765 0 13.2727 0ZM7.63636 5.81818H2.72727C1.22345 5.81818 0 7.04164 0 8.54545V13.2727C0 14.7765 1.22345 16 2.72727 16H7.63636C9.14018 16 10.3636 14.7765 10.3636 13.2727V8.54545C10.3636 7.04164 9.14018 5.81818 7.63636 5.81818ZM8.54545 13.2727C8.54545 13.774 8.13764 14.1818 7.63636 14.1818H2.72727C2.226 14.1818 1.81818 13.774 1.81818 13.2727V8.54545C1.81818 8.04418 2.226 7.63636 2.72727 7.63636H7.63636C8.13764 7.63636 8.54545 8.04418 8.54545 8.54545V13.2727Z"
                   fill={
-                    {
-                      "payload": 4278190080,
-                      "type": 0,
-                    }
-                  }
-                  propList={
-                    [
-                      "stroke",
-                      "strokeWidth",
-                      "strokeLinecap",
-                      "strokeLinejoin",
-                    ]
-                  }
-                  stroke={
                     {
                       "type": 2,
                     }
                   }
+                  propList={
+                    [
+                      "fill",
+                      "strokeWidth",
+                      "strokeLinecap",
+                    ]
+                  }
                   strokeLinecap={1}
-                  strokeLinejoin={1}
                   strokeWidth="2"
                 />
               </RNSVGGroup>

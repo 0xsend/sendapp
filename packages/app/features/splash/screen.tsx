@@ -59,7 +59,7 @@ export function SplashScreen() {
             to Send
           </H1>
           <Paragraph size={'$6'} color={'$color10'}>
-            Sign in with your passkey.
+            Sign in with your passkey
           </Paragraph>
         </YStack>
         <AuthButtons />
