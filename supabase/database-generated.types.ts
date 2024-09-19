@@ -54,6 +54,38 @@ export type Database = {
           },
         ]
       }
+      affiliate_stats: {
+        Row: {
+          created_at: string
+          id: string
+          paymaster_tx_count: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          paymaster_tx_count?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          paymaster_tx_count?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chain_addresses: {
         Row: {
           address: string
