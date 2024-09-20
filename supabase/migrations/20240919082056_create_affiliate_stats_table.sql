@@ -1,5 +1,5 @@
 CREATE TABLE "public"."affiliate_stats"(
-    "paymaster_tx_count" integer NOT NULL DEFAULT 0 ::integer,
+    "paymaster_tx_count" int8 NOT NULL DEFAULT 0,
     "user_id" uuid,
     "id" uuid NOT NULL DEFAULT gen_random_uuid(),
     "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
