@@ -116,8 +116,14 @@ export function TopNav({
     // else, go to home page
     if (hasSelectedCoin) {
       setRootParams({ ...queryParams, token: undefined })
+      return
     }
     const newPath = parts.length > 1 ? parts.slice(0, 1).join('/') : '/'
+    if (path.includes('/settings')) {
+      push(`/${newPath}?nav=settings`)
+      return
+    }
+
     push(`/${newPath}`)
   }
 
