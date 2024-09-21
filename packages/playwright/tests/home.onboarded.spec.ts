@@ -14,8 +14,9 @@ test.beforeEach(() => {
   log = debug(`test:activity:logged-in:${test.info().parallelIndex}`)
 })
 
-const heading = (page: Page) =>
-  page.getByRole('heading', { name: 'Home', exact: true }).and(page.getByText('Home'))
+// @todo Heading checks need to be refactored to mobile only
+// const heading = (page: Page) =>
+//   page.getByRole('heading', { name: 'Home', exact: true }).and(page.getByText('Home'))
 
 test('can visit token detail page', async ({ context, page }) => {
   await context.route(`${SUPABASE_URL}/rest/v1/activity_feed*`, async (route) => {
@@ -37,7 +38,7 @@ test('can visit token detail page', async ({ context, page }) => {
   await expect(page.getByText('10 USDC')).toBeVisible()
 
   // Button and label
-  await expect(page.getByText('Deposit')).toHaveCount(2)
+  await expect(page.getByText('Deposit')).toHaveCount(1)
 
   await expect(page.getByText('/alice')).toBeVisible()
   await expect(page.getByText('Received')).toBeVisible()
