@@ -206,9 +206,13 @@ exports[`HomeScreen 1`] = `
           style={
             {
               "alignItems": "center",
+              "display": "none",
               "flexDirection": "row",
               "gap": 18,
               "justifyContent": "space-around",
+              "marginLeft": "auto",
+              "marginRight": "auto",
+              "maxWidth": 768,
               "paddingTop": 18,
               "width": "100%",
             }
@@ -218,6 +222,7 @@ exports[`HomeScreen 1`] = `
             style={
               {
                 "flex": 1,
+                "flexDirection": "row-reverse",
                 "width": "50%",
               }
             }
@@ -440,6 +445,7 @@ exports[`HomeScreen 1`] = `
             style={
               {
                 "flex": 1,
+                "justifyContent": "center",
                 "width": "50%",
               }
             }
@@ -813,7 +819,7 @@ exports[`HomeScreen 1`] = `
                       "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 36,
-                      "fontWeight": "500",
+                      "fontWeight": "600",
                       "lineHeight": 19,
                       "userSelect": "auto",
                     }
@@ -1176,7 +1182,7 @@ exports[`HomeScreen 1`] = `
                       "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 36,
-                      "fontWeight": "500",
+                      "fontWeight": "600",
                       "lineHeight": 19,
                       "userSelect": "auto",
                     }
@@ -1472,7 +1478,7 @@ exports[`HomeScreen 1`] = `
                       "color": "#FFFFFF",
                       "fontFamily": "System",
                       "fontSize": 36,
-                      "fontWeight": "500",
+                      "fontWeight": "600",
                       "lineHeight": 19,
                       "userSelect": "auto",
                     }
