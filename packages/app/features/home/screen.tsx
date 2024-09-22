@@ -28,7 +28,7 @@ import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
 import { parseUnits, formatUnits } from 'viem'
 import { baseMainnet, sendTokenAddress, usdcAddress } from '@my/wagmi'
-import { ActionButtonRow, DepositButton } from './ActionButtonRow'
+import { HomeButtonRow, DepositButton } from './HomeButtons'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -134,7 +134,7 @@ function HomeBody(props: XStackProps) {
           <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
             <TokenBalanceCard />
           </XStack>
-          {<ActionButtonRow $lg={{ display: 'none' }} />}
+          {<HomeButtonRow $lg={{ display: 'none' }} />}
         </Card>
 
         <Separator $gtLg={{ display: 'none' }} w={'100%'} />

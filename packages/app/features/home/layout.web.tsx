@@ -1,18 +1,10 @@
-import {
-  YStack,
-  ScrollView,
-  Container,
-  type ScrollViewProps,
-  Stack,
-  usePwa,
-  LinearGradient,
-} from '@my/ui'
-
+import { YStack, ScrollView, Container, type ScrollViewProps, useMedia } from '@my/ui'
 import { HomeSideBarWrapper } from 'app/components/sidebar/HomeSideBar'
 import { TagSearchProvider } from 'app/provider/tag-search'
-
 import { usePathname } from 'app/utils/usePathname'
-import { ActionButtonRow } from './ActionButtonRow'
+import { HomeButtonRow } from './HomeButtons'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { useState } from 'react'
 
 export function HomeLayout({
   children,
@@ -22,9 +14,24 @@ export function HomeLayout({
   children: React.ReactNode
   TopNav?: React.ReactNode
 } & ScrollViewProps) {
-  const isPwa = usePwa()
-
   const pathname = usePathname()
+  const media = useMedia()
+  const [isActionRowVisible, setIsActionRowVisible] = useState(true)
+  const [, setScrollY] = useState(0)
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
+    const isEndOfView = layoutMeasurement.height + contentOffset.y >= contentSize.height - 50
+    setScrollY((prev) => {
+      if ((prev > contentOffset.y && !isEndOfView) || contentOffset.y < 50) {
+        setIsActionRowVisible(true)
+      } else if (prev < e.nativeEvent.contentOffset.y || isEndOfView) {
+        setIsActionRowVisible(false)
+      } else {
+        setIsActionRowVisible(true)
+      }
+      return e.nativeEvent.contentOffset.y
+    })
+  }
   return (
     <HomeSideBarWrapper>
       <TagSearchProvider>
@@ -33,6 +40,8 @@ export function HomeLayout({
           contentContainerStyle={{
             mih: '100%',
           }}
+          scrollEventThrottle={128}
+          onScroll={onScroll}
           {...props}
         >
           <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
@@ -40,29 +49,7 @@ export function HomeLayout({
           </YStack>
           <Container $gtLg={{ pt: '$5', pb: '$0' }}>{children}</Container>
         </ScrollView>
-        {pathname === '/' && (
-          <Stack
-            w={'100%'}
-            pb={!isPwa && '$5'}
-            px="$4"
-            $platform-web={{
-              position: 'fixed',
-              bottom: 0,
-              left: '50%',
-              transform: 'translate(-50%, 0)', //center fixed element
-            }}
-            $gtLg={{ display: 'none' }}
-          >
-            <LinearGradient
-              start={{ x: 0, y: 1 }}
-              end={{ x: 0, y: 0 }}
-              locations={[0, 0.8]}
-              fullscreen
-              colors={['transparent', '$background']}
-            />
-            <ActionButtonRow />
-          </Stack>
-        )}
+        {media.lg && pathname === '/' && <HomeButtonRow isVisible={isActionRowVisible} />}
       </TagSearchProvider>
     </HomeSideBarWrapper>
   )
