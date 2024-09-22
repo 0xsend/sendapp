@@ -1,27 +1,78 @@
 import { IconArrowRight, IconDeposit } from 'app/components/icons'
 import { useRootScreenParams } from 'app/routers/params'
-import { XStack, LinkableButton, Stack, styled, type XStackProps } from '@my/ui'
+import {
+  XStack,
+  LinkableButton,
+  Stack,
+  styled,
+  type XStackProps,
+  AnimatePresence,
+  LinearGradient,
+  usePwa,
+  useMedia,
+} from '@my/ui'
 
 const Row = styled(XStack, {
   w: '100%',
   ai: 'center',
   mx: 'auto',
-  pt: '$4',
   jc: 'space-around',
   gap: '$4',
   maw: 768,
+  $gtLg: {
+    pt: '$4',
+  },
 })
 
-export const ActionButtonRow = (props: XStackProps) => {
+export const HomeButtonRow = ({
+  isVisible = true,
+  ...props
+}: XStackProps & { isVisible?: boolean }) => {
+  const isPwa = usePwa()
+  const media = useMedia()
   return (
-    <Row {...props}>
-      <Stack f={1} w="50%" flexDirection="row-reverse">
-        <DepositButton />
-      </Stack>
-      <Stack f={1} w="50%" jc={'center'}>
-        <SendButton />
-      </Stack>
-    </Row>
+    <AnimatePresence>
+      {isVisible && (
+        <Stack
+          w={'100%'}
+          pb={isPwa ? '$1' : '$5'}
+          px="$4"
+          $platform-web={{
+            position: media.lg ? 'fixed' : 'relative',
+            bottom: 0,
+          }}
+          $gtLg={{
+            position: 'relative',
+            pb: '$0',
+            px: '$0',
+          }}
+          animation="200ms"
+          opacity={1}
+          animateOnly={['scale', 'transform', 'opacity']}
+          enterStyle={{ opacity: 0, scale: 0.9 }}
+          exitStyle={{ opacity: 0, scale: 0.95 }}
+        >
+          <LinearGradient
+            h={'150%'}
+            top={'-50%'}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+            locations={[0, 0.33]}
+            fullscreen
+            colors={['transparent', '$background']}
+            $gtLg={{ display: 'none' }}
+          />
+          <Row {...props}>
+            <Stack f={1} w="50%" flexDirection="row-reverse">
+              <DepositButton />
+            </Stack>
+            <Stack f={1} w="50%" jc={'center'}>
+              <SendButton />
+            </Stack>
+          </Row>
+        </Stack>
+      )}
+    </AnimatePresence>
   )
 }
 
