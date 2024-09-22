@@ -20,8 +20,8 @@ export const AffiliateScreen = () => {
 }
 
 const StatsCards = () => {
-  const { referralsCount, error: referralsCountError } = useUserReferralsCount()
-
+  const { data: affiliateStats, error: affiliateStatsError } = useAffiliateStats()
+  const { data: referralsCount, error: referralsCountError } = useUserReferralsCount()
   return (
     <XStack flexWrap="wrap" ai="flex-start" jc="space-around" gap="$8" mb="$4" width={'100%'}>
       <Card f={1} bc={'$background'}>
@@ -37,7 +37,7 @@ const StatsCards = () => {
           <Paragraph>Transactions</Paragraph>
         </CardHeader>
         <H5 pl="$4" pb="$3" fontWeight="600" size={'$7'}>
-          1000
+          {affiliateStatsError ? '?' : affiliateStats?.paymaster_tx_count || 0}
         </H5>
       </Card>
       <Card f={1} bc={'$background'}>
