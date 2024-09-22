@@ -1,6 +1,8 @@
 import { Card, CardHeader, H3, H5, LinkableButton, Paragraph, XStack, YStack } from '@my/ui'
 
 import { useUserReferralsCount } from 'app/utils/useUserReferralsCount'
+import { useAffiliateStats } from './utils/useAffiliateStats'
+import formatAmount from 'app/utils/formatAmount'
 
 export const AffiliateScreen = () => {
   return (
@@ -17,8 +19,8 @@ export const AffiliateScreen = () => {
 }
 
 const StatsCards = () => {
+  const { data: affiliateStats, error: affiliateStatsError } = useAffiliateStats()
   const { data: referralsCount, error: referralsCountError } = useUserReferralsCount()
-
   return (
     <XStack flexWrap="wrap" ai="flex-start" jc="space-around" gap="$8" mb="$4" width={'100%'}>
       <Card f={1} bc={'$background'}>
@@ -34,7 +36,7 @@ const StatsCards = () => {
           <Paragraph>Transactions</Paragraph>
         </CardHeader>
         <H5 pl="$4" pb="$3" fontWeight="600" size={'$7'}>
-          1000
+          {affiliateStatsError ? '?' : affiliateStats?.paymaster_tx_count || 0}
         </H5>
       </Card>
       <Card f={1} bc={'$background'}>
