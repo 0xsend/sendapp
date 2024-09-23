@@ -1,4 +1,4 @@
-import { RewardsScreen } from 'app/features/account/rewards/screen'
+import { RewardsScreen } from 'app/features/account/rewards/activity/screen'
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from 'next-app/pages/_app'
