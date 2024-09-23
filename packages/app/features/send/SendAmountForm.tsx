@@ -70,7 +70,6 @@ export function SendAmountForm() {
 
   async function onSubmit() {
     if (!canSubmit) return
-    const sendToken = sendParams.sendToken || usdcAddress[baseMainnet.id]
 
     const amount = formatUnits(parsedAmount, selectedCoin.decimals)
     router.push({
@@ -127,6 +126,9 @@ export function SendAmountForm() {
               form.setValue('amount', formattedText)
             },
           },
+          token: {
+            defaultValue: sendToken,
+          },
         }}
         formProps={{
           testID: 'SendForm',
@@ -137,7 +139,7 @@ export function SendAmountForm() {
           height: '100%',
         }}
         defaultValues={{
-          token: sendParams.sendToken || usdcAddress[baseMainnet.id],
+          token: sendToken,
           amount: sendParams.amount,
         }}
         renderAfter={({ submit }) => (
