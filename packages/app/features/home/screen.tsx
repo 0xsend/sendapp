@@ -76,8 +76,8 @@ function HomeBody(props: XStackProps) {
       <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
         <YStack $gtLg={{ width: 455, display: 'flex' }} width="100%" ai={'center'}>
           <Card
-            $lg={{ fd: 'column', bc: 'transparent' }}
             $gtLg={{ p: 36 }}
+            $lg={{ display: 'none' }}
             py={'$6'}
             px={'$2'}
             ai={'center'}

@@ -303,6 +303,7 @@ exports[`HomeScreen 1`] = `
                 {
                   "flex": 1,
                   "flexDirection": "row-reverse",
+                  "maxWidth": 350,
                   "width": "50%",
                 }
               }
@@ -526,6 +527,7 @@ exports[`HomeScreen 1`] = `
                 {
                   "flex": 1,
                   "justifyContent": "center",
+                  "maxWidth": 350,
                   "width": "50%",
                 }
               }

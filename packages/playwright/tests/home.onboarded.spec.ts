@@ -38,7 +38,7 @@ test('can visit token detail page', async ({ context, page }) => {
   await expect(page.getByText('10 USDC')).toBeVisible()
 
   // Button and label
-  await expect(page.getByText('Deposit')).toHaveCount(1)
+  await expect(page.getByText('Deposit')).toHaveCount(2)
 
   await expect(page.getByText('/alice')).toBeVisible()
   await expect(page.getByText('Received')).toBeVisible()
