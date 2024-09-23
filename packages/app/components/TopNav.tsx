@@ -126,8 +126,9 @@ export function TopNav({
 
     push(`/${newPath}`)
   }
-
-  const isSubRoute = (!noSubroute && parts.length > 1) || path.includes('/secret-shop')
+  //@todo Refactor this so we can put back arrows on screens that need it
+  const isSubRoute =
+    (!noSubroute && parts.length > 1) || path.includes('/secret-shop') || path.includes('/deposit')
 
   const renderButton = () => {
     switch (true) {
