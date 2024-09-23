@@ -28,7 +28,10 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useId, useState } from 'react'
 import { useBalance, type UseBalanceReturnType } from 'wagmi'
 import { IconCoin } from '../icons/IconCoin'
-export const CoinField = ({ native = false, ...props }: Pick<SelectProps, 'size' | 'native'>) => {
+export const CoinField = ({
+  native = false,
+  ...props
+}: Pick<SelectProps, 'size' | 'native' | 'defaultValue'>) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const {
@@ -48,9 +51,10 @@ export const CoinField = ({ native = false, ...props }: Pick<SelectProps, 'size'
           <Select
             native={native}
             id={id}
-            value={field.value || usdcAddress[baseMainnet.id]}
+            value={field.value}
             onValueChange={field.onChange}
             onOpenChange={setIsOpen}
+            defaultValue={usdcAddress[baseMainnet.id]}
             open={isOpen}
             {...props}
           >

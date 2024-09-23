@@ -16,6 +16,7 @@ import {
   useMedia,
   type LinkableButtonProps,
 } from '@my/ui'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -35,6 +36,7 @@ export const HomeButtonRow = ({
 }: XStackProps & { isVisible?: boolean }) => {
   const isPwa = usePwa()
   const media = useMedia()
+  const { isLoading: isSendAccountLoading } = useSendAccount()
   const { balances, isLoading: balancesIsLoading } = useSendAccountBalances()
   const usdcBalance = balances?.USDC
   const canSend =
@@ -43,7 +45,7 @@ export const HomeButtonRow = ({
 
   return (
     <AnimatePresence>
-      {!balancesIsLoading && isVisible && (
+      {!balancesIsLoading && !isSendAccountLoading && isVisible && (
         <Stack
           w={'100%'}
           pb={isPwa ? '$1' : '$5'}
