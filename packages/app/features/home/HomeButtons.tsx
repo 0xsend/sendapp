@@ -1,5 +1,9 @@
 import { IconArrowRight, IconDeposit } from 'app/components/icons'
 import { useRootScreenParams } from 'app/routers/params'
+import { parseUnits } from 'viem'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { coinsDict } from 'app/data/coins'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
 import {
   XStack,
   LinkableButton,
@@ -10,6 +14,7 @@ import {
   LinearGradient,
   usePwa,
   useMedia,
+  type LinkableButtonProps,
 } from '@my/ui'
 
 const Row = styled(XStack, {
@@ -30,9 +35,15 @@ export const HomeButtonRow = ({
 }: XStackProps & { isVisible?: boolean }) => {
   const isPwa = usePwa()
   const media = useMedia()
+  const { balances, isLoading: balancesIsLoading } = useSendAccountBalances()
+  const usdcBalance = balances?.USDC
+  const canSend =
+    usdcBalance !== undefined &&
+    usdcBalance >= parseUnits('.20', coinsDict[usdcAddress[baseMainnet.id]].decimals)
+
   return (
     <AnimatePresence>
-      {isVisible && (
+      {!balancesIsLoading && isVisible && (
         <Stack
           w={'100%'}
           pb={isPwa ? '$1' : '$5'}
@@ -63,12 +74,14 @@ export const HomeButtonRow = ({
             $gtLg={{ display: 'none' }}
           />
           <Row {...props}>
-            <Stack f={1} w="50%" flexDirection="row-reverse">
+            <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
               <DepositButton />
             </Stack>
-            <Stack f={1} w="50%" jc={'center'}>
-              <SendButton />
-            </Stack>
+            {canSend && (
+              <Stack f={1} w="50%" jc={'center'} maw={350}>
+                <SendButton />
+              </Stack>
+            )}
           </Row>
         </Stack>
       )}
@@ -94,19 +107,20 @@ export const DepositButton = () => {
     </LinkableButton>
   )
 }
-
-export const SendButton = () => {
+//@todo this patch should be fixed in LinkableButtonProps
+export const SendButton = (props: Omit<LinkableButtonProps, 'href' | 'children'>) => {
   const [{ token }] = useRootScreenParams()
   const href = token ? `/send?sendToken=${token}` : '/send'
   return (
     <LinkableButton
       href={href}
-      theme="green"
+      theme={'green'}
       br="$4"
       px={'$3.5'}
       h={'$4.5'}
       w="100%"
       testID="homeSendButton"
+      {...props}
     >
       <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
         <LinkableButton.Text
