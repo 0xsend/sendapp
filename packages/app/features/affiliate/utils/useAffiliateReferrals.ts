@@ -3,7 +3,6 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 
 /**
-/**
  * Infinite query to fetch referrals
  * @param pageSize - number of items to fetch per page
  */
