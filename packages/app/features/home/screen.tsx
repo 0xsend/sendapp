@@ -71,47 +71,47 @@ function HomeBody(props: XStackProps) {
       </Stack>
     )
 
-  if (!canSend) {
-    return (
-      <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
-        <YStack $gtLg={{ width: 455, display: 'flex' }} width="100%" ai={'center'}>
-          <Card
-            $gtLg={{ p: 36 }}
-            $lg={{ display: 'none' }}
-            py={'$6'}
-            px={'$2'}
-            ai={'center'}
-            gap="$5"
-            jc="space-around"
-            w={'100%'}
-          >
-            <XStack w="100%">
-              <DepositButton />
-            </XStack>
-            <XStack ai="center">
-              <Paragraph fontWeight={'500'}>Or direct deposit on Base</Paragraph>
-              <DepositAddress address={sendAccount?.address} />
-            </XStack>
-            {transfersUnavailable && (
-              <>
-                <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
-                  <IconError size={'$3'} />
-                  <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
-                    A minimum of .20 USDC is required to unlock sending
-                  </Paragraph>
-                </XStack>
-                <NoGasBalances />
-              </>
-            )}
-          </Card>
-          <Separator $gtLg={{ display: 'none' }} w={'100%'} />
-          <YStack w={'100%'} ai={'center'}>
-            <NoSendAccountMessage />
-          </YStack>
-        </YStack>
-      </XStack>
-    )
-  }
+  // if (!canSend) {
+  //   return (
+  //     <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
+  //       <YStack $gtLg={{ width: 455, display: 'flex' }} width="100%" ai={'center'}>
+  //         <Card
+  //           p={36}
+  //           ai={'center'}
+  //           gap="$5"
+  //           jc="space-around"
+  //           w={'100%'}
+  //           $lg={{ bc: '$backgroundTransparent' }}
+  //         >
+  //           <YStack gap="$5" $lg={{ display: 'none' }}>
+  //             <XStack w="100%">
+  //               <DepositButton />
+  //             </XStack>
+  //             <XStack ai="center">
+  //               <Paragraph fontWeight={'500'}>Or direct deposit on Base</Paragraph>
+  //               <DepositAddress address={sendAccount?.address} />
+  //             </XStack>
+  //           </YStack>
+  //           {transfersUnavailable && (
+  //             <>
+  //               <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
+  //                 <IconError size={'$3'} />
+  //                 <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
+  //                   A minimum of .20 USDC is required to unlock sending
+  //                 </Paragraph>
+  //               </XStack>
+  //               <NoGasBalances />
+  //             </>
+  //           )}
+  //         </Card>
+  //         <Separator $gtLg={{ display: 'none' }} w={'100%'} />
+  //         <YStack w={'100%'} ai={'center'}>
+  //           <NoSendAccountMessage />
+  //         </YStack>
+  //       </YStack>
+  //     </XStack>
+  //   )
+  // }
 
   return (
     <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
@@ -121,22 +121,52 @@ function HomeBody(props: XStackProps) {
         width="100%"
         ai={'center'}
       >
-        <Card
-          $gtLg={{ p: 36 }}
-          $lg={{ bc: 'transparent' }}
-          py={'$6'}
-          px={'$2'}
-          w={'100%'}
-          jc="space-between"
-          br={12}
-          gap="$6"
-        >
-          <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
-            <TokenBalanceCard />
-          </XStack>
-          {<HomeButtonRow $lg={{ display: 'none' }} />}
-        </Card>
-
+        {!canSend ? (
+          <Card
+            p={36}
+            ai={'center'}
+            gap="$5"
+            jc="space-around"
+            w={'100%'}
+            $lg={{ bc: '$backgroundTransparent' }}
+          >
+            <YStack gap="$5" $lg={{ display: 'none' }}>
+              <XStack w="100%">
+                <DepositButton />
+              </XStack>
+              <XStack ai="center">
+                <Paragraph fontWeight={'500'}>Or direct deposit on Base</Paragraph>
+                <DepositAddress address={sendAccount?.address} />
+              </XStack>
+            </YStack>
+            {transfersUnavailable && (
+              <>
+                <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
+                  <IconError size={'$3'} />
+                  <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
+                    A minimum of .20 USDC is required to unlock sending
+                  </Paragraph>
+                </XStack>
+              </>
+            )}
+          </Card>
+        ) : (
+          <Card
+            $gtLg={{ p: 36 }}
+            $lg={{ bc: 'transparent' }}
+            py={'$6'}
+            px={'$2'}
+            w={'100%'}
+            jc="space-between"
+            br={12}
+            gap="$6"
+          >
+            <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
+              <TokenBalanceCard />
+            </XStack>
+            {<HomeButtonRow $lg={{ display: 'none' }} />}
+          </Card>
+        )}
         <Separator $gtLg={{ display: 'none' }} w={'100%'} />
         <YStack w={'100%'} ai={'center'}>
           <YStack width="100%">
