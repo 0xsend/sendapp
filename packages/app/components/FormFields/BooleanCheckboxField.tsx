@@ -12,11 +12,12 @@ import {
   type ThemeName,
   XStack,
   useThemeName,
+  type LabelProps,
 } from '@my/ui'
 import { useThemeSetting } from '@tamagui/next-theme'
 
 export const BooleanCheckboxField = (
-  props: Pick<CheckboxProps, 'size' | 'native' | 'defaultChecked'>
+  props: Pick<CheckboxProps, 'size' | 'native' | 'defaultChecked'> & { labelProps?: LabelProps }
 ) => {
   const {
     field,
@@ -47,7 +48,8 @@ export const BooleanCheckboxField = (
               lineHeight={52}
               htmlFor={id}
               textTransform={'uppercase'}
-              color="$olive"
+              color={props.labelProps?.color ?? '$olive'}
+              {...props.labelProps}
             >
               {label} {isOptional && '(Optional)'}
             </Label>

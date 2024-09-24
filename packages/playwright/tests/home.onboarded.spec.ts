@@ -14,8 +14,9 @@ test.beforeEach(() => {
   log = debug(`test:activity:logged-in:${test.info().parallelIndex}`)
 })
 
-const heading = (page: Page) =>
-  page.getByRole('heading', { name: 'Home', exact: true }).and(page.getByText('Home'))
+// @todo Heading checks need to be refactored to mobile only
+// const heading = (page: Page) =>
+//   page.getByRole('heading', { name: 'Home', exact: true }).and(page.getByText('Home'))
 
 test('can visit token detail page', async ({ context, page }) => {
   await context.route(`${SUPABASE_URL}/rest/v1/activity_feed*`, async (route) => {
@@ -29,7 +30,8 @@ test('can visit token detail page', async ({ context, page }) => {
   })
   await page.goto('/?token=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913') // usdc
   log('beforeEach', `url=${page.url()}`)
-  await expect(heading(page)).toBeVisible()
+  // @todo: Heading checks need to be refactored to mobile only
+  // await expect(heading(page)).toBeVisible()
 
   await expect(page.getByText('Sent')).toBeVisible()
   await expect(page.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()

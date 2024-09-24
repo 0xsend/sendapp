@@ -5,7 +5,7 @@ export function SettingsLinks(): JSX.Element {
   const supabase = useSupabase()
   const settingsLinks = [
     {
-      text: 'Edit Profile',
+      text: 'My Profile',
       href: '/account/settings/edit-profile',
     },
     {

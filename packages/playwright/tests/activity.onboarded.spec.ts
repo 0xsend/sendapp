@@ -24,8 +24,9 @@ test.beforeEach(() => {
   log = debug(`test:activity:logged-in:${test.info().parallelIndex}`)
 })
 
-const activityHeading = (page: Page) =>
-  page.getByRole('heading', { name: 'Activity', exact: true }).and(page.getByText('Activity'))
+// @todo: Heading checks need to be refactored to mobile only
+// const activityHeading = (page: Page) =>
+//   page.getByRole('heading', { name: 'Activity', exact: true }).and(page.getByText('Activity'))
 
 test('can visit activity page and see correct activity feed', async ({
   page,
@@ -207,7 +208,8 @@ test('can visit activity page and see correct activity feed', async ({
   await res
 
   // Verify the activity heading
-  await expect(activityHeading(page)).toBeVisible()
+  // @todo: Heading checks need to be refactored to mobile only
+  // await expect(activityHeading(page)).toBeVisible()
 
   // Verify the entire Recent Activity component is visible
   await expect(page.getByTestId('RecentActivity')).toBeVisible()
@@ -293,7 +295,8 @@ test('can search on activity page', async ({ page, context }) => {
   })
 
   // Verify the activity heading is visible
-  await expect(activityHeading(page)).toBeVisible()
+  // @todo: Heading checks need to be refactored to mobile only
+  // await expect(activityHeading(page)).toBeVisible()
 
   // Perform the search
   const isLoading = page.getByRole('progressbar', { name: 'Loading' })

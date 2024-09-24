@@ -12,6 +12,11 @@ jest.mock('app/utils/getReferralLink', () => ({
 jest.mock('app/routers/params', () => ({
   useRootScreenParams: jest.fn().mockReturnValue([{ nav: 'home', token: undefined }, jest.fn()]),
 }))
+
+jest.mock('app/utils/useUserReferralsCount', () => ({
+  useUserReferralsCount: jest.fn().mockReturnValue({ referralsCount: 10 }),
+}))
+
 describe('AccountScreen', () => {
   it('renders the account screen', async () => {
     jest.useFakeTimers()

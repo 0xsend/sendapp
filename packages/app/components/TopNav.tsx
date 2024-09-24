@@ -116,12 +116,19 @@ export function TopNav({
     // else, go to home page
     if (hasSelectedCoin) {
       setRootParams({ ...queryParams, token: undefined })
+      return
     }
     const newPath = parts.length > 1 ? parts.slice(0, 1).join('/') : '/'
+    if (path.includes('/settings')) {
+      push(`/${newPath}?nav=settings`)
+      return
+    }
+
     push(`/${newPath}`)
   }
-
-  const isSubRoute = (!noSubroute && parts.length > 1) || path.includes('/secret-shop')
+  //@todo Refactor this so we can put back arrows on screens that need it
+  const isSubRoute =
+    (!noSubroute && parts.length > 1) || path.includes('/secret-shop') || path.includes('/deposit')
 
   const renderButton = () => {
     switch (true) {
@@ -218,7 +225,7 @@ export function TopNav({
                       col="$color10"
                       lineHeight={32}
                       $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
-                      display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                      display={selectedCoin ? 'none' : 'flex'}
                       als={'center'}
                     >
                       {header}
@@ -233,7 +240,7 @@ export function TopNav({
                   col="$color10"
                   lineHeight={32}
                   $gtLg={{ ml: isSubRoute ? '$4' : '$0' }}
-                  display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
+                  display={isSubRoute ? 'flex' : 'none'}
                   als={'center'}
                 >
                   {header}
@@ -269,7 +276,7 @@ export function TopNav({
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
-      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} />
+      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} mt="$2" />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
         <Container pos="relative">
           <View

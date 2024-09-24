@@ -1,5 +1,4 @@
 import {
-  Button,
   Paragraph,
   Separator,
   XStack,
@@ -9,14 +8,13 @@ import {
   Link,
   H3,
   Card,
-  LinkableButton,
   AnimatePresence,
   H4,
   useMedia,
   type XStackProps,
   H5,
 } from '@my/ui'
-import { IconArrowRight, IconDeposit, IconError, IconPlus } from 'app/components/icons'
+import { IconError, IconPlus } from 'app/components/icons'
 import { coins, coinsDict } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -30,6 +28,7 @@ import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
 import { parseUnits, formatUnits } from 'viem'
 import { baseMainnet, sendTokenAddress, usdcAddress } from '@my/wagmi'
+import { HomeButtonRow, DepositButton } from './HomeButtons'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -77,8 +76,8 @@ function HomeBody(props: XStackProps) {
       <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
         <YStack $gtLg={{ width: 455, display: 'flex' }} width="100%" ai={'center'}>
           <Card
-            $lg={{ fd: 'column', bc: 'transparent' }}
             $gtLg={{ p: 36 }}
+            $lg={{ display: 'none' }}
             py={'$6'}
             px={'$2'}
             ai={'center'}
@@ -87,29 +86,8 @@ function HomeBody(props: XStackProps) {
             w={'100%'}
           >
             <XStack w="100%">
-              <LinkableButton
-                theme="green"
-                href="/deposit"
-                px={'$3.5'}
-                h={'$4.5'}
-                borderRadius={'$4'}
-                f={1}
-              >
-                <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                  <Button.Text
-                    fontWeight={'500'}
-                    textTransform={'uppercase'}
-                    $theme-dark={{ col: '$color0' }}
-                  >
-                    Deposit
-                  </Button.Text>
-                  <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                    <IconDeposit size={'$2.5'} $theme-dark={{ color: '$color0' }} />
-                  </XStack>
-                </XStack>
-              </LinkableButton>
+              <DepositButton />
             </XStack>
-
             <XStack ai="center">
               <Paragraph fontWeight={'500'}>Or direct deposit on Base</Paragraph>
               <DepositAddress address={sendAccount?.address} />
@@ -156,34 +134,7 @@ function HomeBody(props: XStackProps) {
           <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
             <TokenBalanceCard />
           </XStack>
-          <XStack w={'100%'} ai={'center'} pt={'$4'} jc="space-around" gap={'$4'}>
-            <Stack f={1} w="50%">
-              <LinkableButton
-                theme="green"
-                href="/deposit"
-                px={'$3.5'}
-                h={'$4.5'}
-                borderRadius={'$4'}
-                f={1}
-              >
-                <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-                  <Button.Text
-                    fontWeight={'500'}
-                    textTransform={'uppercase'}
-                    $theme-dark={{ col: '$color0' }}
-                  >
-                    Deposit
-                  </Button.Text>
-                  <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-                    <IconDeposit size={'$2.5'} $theme-dark={{ color: '$color0' }} />
-                  </XStack>
-                </XStack>
-              </LinkableButton>
-            </Stack>
-            <Stack f={1} w="50%">
-              <SendButton />
-            </Stack>
-          </XStack>
+          {<HomeButtonRow $lg={{ display: 'none' }} />}
         </Card>
 
         <Separator $gtLg={{ display: 'none' }} w={'100%'} />
@@ -205,7 +156,7 @@ export function HomeScreen() {
   const { search } = queryParams
 
   return (
-    <YStack f={1} pt="$2">
+    <YStack f={1}>
       <AnimatePresence>
         {(() => {
           switch (true) {
@@ -242,35 +193,6 @@ export function HomeScreen() {
         })()}
       </AnimatePresence>
     </YStack>
-  )
-}
-
-const SendButton = () => {
-  const [{ token }] = useRootScreenParams()
-  const href = token ? `/send?sendToken=${token}` : '/send'
-  return (
-    <LinkableButton
-      href={href}
-      theme="green"
-      br="$4"
-      px={'$3.5'}
-      h={'$4.5'}
-      w="100%"
-      testID="homeSendButton"
-    >
-      <XStack w={'100%'} jc={'space-between'} ai={'center'} h="100%">
-        <Button.Text
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          $theme-dark={{ col: '$color0' }}
-        >
-          Send
-        </Button.Text>
-        <Button.Icon>
-          <IconArrowRight size={'$2.5'} $theme-dark={{ col: '$color0' }} />
-        </Button.Icon>
-      </XStack>
-    </LinkableButton>
   )
 }
 

@@ -17,8 +17,7 @@ export function SettingsNavLink({
     : false // no href is never active
 
   const { resolvedTheme } = useThemeSetting()
-  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$green3Light'
-  const iconInActiveColor = resolvedTheme?.startsWith('dark') ? '$gray5Light' : '$color12'
+  const iconActiveColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$color12'
 
   return (
     <Link
@@ -26,24 +25,24 @@ export function SettingsNavLink({
         props.disabled ? {} : { opacity: 1, backgroundColor: 'transparent', borderWidth: 0 }
       }
       cursor={props.disabled ? 'not-allowed' : 'pointer'}
-      opacity={isActiveRoute ? 1 : 0.63}
       disabled={props.disabled}
       {...props}
       href={props.disabled ? '' : props.href}
     >
       <Paragraph
         f={1}
-        $md={{ fontSize: '$5' }}
-        fontWeight={isActiveRoute ? 'bold' : '300'}
-        color={isActiveRoute ? iconActiveColor : iconInActiveColor}
+        fontWeight={isActiveRoute ? '600' : '400'}
+        color={isActiveRoute ? iconActiveColor : '$color10'}
         pl="$4"
+        fontSize={'$5'}
       >
         {text}
       </Paragraph>
       {isActiveRoute && !sheet.open && (
         <Separator
           vertical
-          borderColor="$greenBackground"
+          borderColor="$primary"
+          $theme-light={{ borderColor: '$color12' }}
           pos="absolute"
           right={-1.5}
           top={-2}

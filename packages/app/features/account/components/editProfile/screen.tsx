@@ -10,6 +10,7 @@ import {
   AnimatePresence,
   ButtonText,
   Button,
+  H1,
 } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useProfileMutation, ProfileSchema } from 'app/utils/useProfileMutation'
@@ -23,13 +24,13 @@ export const EditProfile = () => {
   const { profile } = useUser()
 
   return (
-    <YStack w={'100%'} als={'center'} pt="$6" $gtMd={{ pt: '$10' }} $gtLg={{ pt: '$0' }}>
-      <XStack $lg={{ display: 'none' }}>
-        <Paragraph size={'$8'} fontWeight={'300'} color={'$color05'}>
-          Edit Profile
-        </Paragraph>
+    <YStack w={'100%'} als={'center'}>
+      <XStack $lg={{ maw: 600 }} mx="auto" w={'100%'} mb={'$size.2'} $gtLg={{ mb: '$size.3.5' }}>
+        <H1 size={'$9'} fontWeight={'600'} color="$color12">
+          My Profile
+        </H1>
       </XStack>
-      <XStack w={'100%'} $gtLg={{ paddingTop: '$6' }} $lg={{ jc: 'center' }}>
+      <XStack w={'100%'} $lg={{ jc: 'center' }}>
         {profile ? <EditProfileForm profile={profile} /> : <Spinner size="large" />}
       </XStack>
     </YStack>
@@ -55,13 +56,25 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
       props={{
         name: {
           'aria-label': 'Name',
+          bc: '$color0',
+          labelProps: {
+            color: '$color10',
+          },
         },
         about: {
           'aria-label': 'Bio',
           placeholder: 'Tell us about yourself',
+          backgroundColor: '$color0',
+          rows: 1,
+          labelProps: {
+            color: '$color10',
+          },
         },
         isPublic: {
           defaultChecked: is_public !== null ? is_public : true,
+          labelProps: {
+            color: '$color10',
+          },
         },
       }}
       defaultValues={{
@@ -71,7 +84,7 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
       }}
       onSubmit={(values) => mutate(values)}
       renderAfter={({ submit }) => (
-        <YStack ai={'center'}>
+        <YStack ai={'flex-start'}>
           {error && <Paragraph theme="red">{error.message}</Paragraph>}
           <AnimatePresence exitBeforeEnter>
             {hasSaved ? (
@@ -96,9 +109,8 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
               <SubmitButton
                 f={1}
                 marginTop={'$5'}
-                px={'$12'}
-                py={'$5'}
-                fontWeight={'500'}
+                borderRadius={'$3'}
+                px={'$size.1.5'}
                 onPress={() => submit()}
                 theme="green"
               >
@@ -107,7 +119,9 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
                     <CheckCheck size={'$2'} />
                   </ButtonIcon>
                 ) : (
-                  <ButtonText>SAVE</ButtonText>
+                  <ButtonText size={'$5'} fontWeight={500} ff={'$mono'}>
+                    SAVE
+                  </ButtonText>
                 )}
               </SubmitButton>
             )}
@@ -117,10 +131,41 @@ function EditProfileForm({ profile }: { profile: Tables<'profiles'> }) {
     >
       {(fields) => (
         <>
-          <XStack ai={'center'} gap={'$6'} width={'100%'}>
+          <XStack gap={'$6'} width={'100%'}>
             <UploadAvatar ref={avatarRef}>
-              <ProfileAvatar avatarUrl={avatar_url ? avatar_url : undefined} />
+              <ProfileAvatar
+                avatarUrl={avatar_url ? avatar_url : undefined}
+                $gtMd={{ size: 88 }}
+                size={88}
+              />
             </UploadAvatar>
+            <YStack jc={'space-between'} ai={'flex-start'}>
+              <YStack>
+                <Paragraph
+                  ff={'$mono'}
+                  size={'$5'}
+                  tt={'uppercase'}
+                  fontWeight={500}
+                  color={'$color10'}
+                >
+                  Profile Picture
+                </Paragraph>
+                <Paragraph color={'$color9'} $theme-light={{ color: '$color10' }} size={'$5'}>
+                  (Upload an image of your choice)
+                </Paragraph>
+              </YStack>
+
+              <Button unstyled onPress={() => avatarRef.current?.pickImage()}>
+                <Button.Text
+                  textDecorationLine="underline"
+                  color="$primary"
+                  $theme-light={{ color: '$color12' }}
+                  size={'$5'}
+                >
+                  Change
+                </Button.Text>
+              </Button>
+            </YStack>
           </XStack>
           <Separator my={'$7'} $gtLg={{ display: 'none' }} />
           {Object.values(fields)}

@@ -1,6 +1,6 @@
 import { createPasskey } from '@daimo/expo-passkeys'
 import type { Tables } from '@my/supabase/database-generated.types'
-import { H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
+import { Button, H1, Paragraph, Shake, Spinner, SubmitButton, YStack } from '@my/ui'
 import {
   baseMainnetClient,
   useReadSendAccountGetActiveSigningKeys,
@@ -144,12 +144,20 @@ const CreatePasskeyForm = ({
         }}
         schema={CreatePasskeySchema}
         onSubmit={onSubmit}
+        props={{
+          accountName: {
+            bc: '$color0',
+            labelProps: {
+              color: '$color10',
+            },
+          },
+        }}
         renderBefore={() => (
-          <YStack w={'100%'} gap={'$2'}>
-            <H1 size={'$8'} fontWeight={'300'} color={'$color05'}>
-              Add Passkey
+          <YStack w={'100%'} gap={'$size.3.5'}>
+            <H1 size={'$9'} fontWeight={'600'} color="$color12">
+              Add Passkey as Signer
             </H1>
-            <Paragraph size={'$6'} fontWeight={'300'} color={'$color05'}>
+            <Paragraph size={'$5'} color={'$color10'}>
               Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
               authorized to sign your account&apos;s transactions.
             </Paragraph>
@@ -167,8 +175,17 @@ const CreatePasskeyForm = ({
             {isLoading ? (
               <Spinner size="small" color={'$color'} />
             ) : (
-              <SubmitButton mx="auto" px="$6" onPress={submit}>
-                Create Passkey
+              <SubmitButton
+                mr="auto"
+                onPress={submit}
+                theme="green"
+                borderRadius={'$3'}
+                px={'$size.1.5'}
+                mt={'$size.1.5'}
+              >
+                <Button.Text ff={'$mono'} fontWeight={'600'} tt="uppercase" size={'$5'}>
+                  Create Passkey
+                </Button.Text>
               </SubmitButton>
             )}
           </>
