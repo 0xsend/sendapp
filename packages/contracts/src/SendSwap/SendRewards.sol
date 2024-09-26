@@ -1,10 +1,9 @@
 /// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// import {Owned} from 'contracts/src/Owned.sol';
-// import {IERC20} from 'contracts/src/IERC20.sol';
 import {ISendRewards} from './ISendRewards.sol';
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';

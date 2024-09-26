@@ -27,10 +27,14 @@
     "dev:anvil-add-send-check-fixtures": "bun run ./script/anvil-add-send-check-fixtures.ts",
     "dev:anvil-token-paymaster-deposit": "bun run ./script/anvil-token-paymaster-deposit.ts",
     "dev:anvil-deploy-fjord-send-verifier-fixtures": "bun run ./script/anvil-deploy-fjord-send-verifier-fixtures.ts",
-    "dev:anvil-add-sendtag-checkout-fixtures": "bun run ./script/anvil-add-sendtag-checkout-fixtures.ts"
+    "dev:anvil-add-sendtag-checkout-fixtures": "bun run ./script/anvil-add-sendtag-checkout-fixtures.ts",
+    "dev:deploy-send-swap": "bash ./script/util/sendswap.sh && forge script ./script/DeploySendSwap.s.sol:DeploySendSwapScript -vvvv --fork-url http://localhost:8545 --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast"
   },
   "devDependencies": {
     "@my/supabase": "workspace:*",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@openzeppelin/contracts-upgradeable": "^5.0.2",
+    "@openzeppelin/hardhat-upgrades": "^3.2.1",
     "@openzeppelin/merkle-tree": "1.0.5",
     "@supabase/supabase-js": "2.44.2",
     "@types/bun": "^1.1.6",

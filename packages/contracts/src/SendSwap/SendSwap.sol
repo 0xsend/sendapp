@@ -3,14 +3,11 @@ pragma solidity ^0.8.20;
 
 import {ISendSwapCallee} from './ISendSwapCallee.sol';
 import {ISendSwapPair} from './ISendSwapPair.sol';
-// import {ReentrancyGuard} from 'contracts/src/ReentrancyGuard.sol';
-// import {ERC20} from 'contracts/src/ERC20.sol';
-// import {Owned} from 'contracts/src/Owned.sol';
-
 import {Math} from './Math.sol';
 import {UQ112x112} from './UQ112x112.sol';
 
 // import {IERC20} from 'contracts/src/IERC20.sol';
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
@@ -18,7 +15,7 @@ import '@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 
 /// @title SendSwap
 /// @author CopyPaste
-/// @notice A UniswapV2 Core adaptation for Points Trading
+/// @notice A UniswapV2 Core adaptation for Rewards Trading
 
 contract SendSwap is
     Initializable,
