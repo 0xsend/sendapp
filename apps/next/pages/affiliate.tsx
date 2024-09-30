@@ -3,7 +3,7 @@ import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
 import { AffiliateScreen } from 'app/features/affiliate/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
