@@ -1,6 +1,6 @@
 import type { UserOperation } from 'permissionless'
 import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import type { Hex } from 'viem'
+import { log } from '@temporalio/activity'
 
 /**
  * default user op with preset gas values that work will probably need to move this to the database.
@@ -39,13 +39,28 @@ export async function simulateUserOperation(userOp: UserOperation<'v0.7'>) {
 }
 
 export async function sendUserOperation(userOp: UserOperation<'v0.7'>) {
-  const hash = await baseMainnetBundlerClient.sendUserOperation({
-    userOperation: userOp,
-  })
-  return hash
+  log.info('Sending UserOperation', { userOp: JSON.stringify(userOp, null, 2) })
+  try {
+    const hash = await baseMainnetBundlerClient.sendUserOperation({
+      userOperation: userOp,
+    })
+    log.info('UserOperation sent successfully', { hash })
+    return hash
+  } catch (error) {
+    log.error('Error in sendUserOperation', {
+      error: error instanceof Error ? error.message : String(error),
+      userOp: JSON.stringify(userOp, null, 2),
+    })
+    throw error
+  }
 }
 
 export async function waitForTransactionReceipt(hash: `0x${string}`) {
   const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
-  return receipt
+
+  const serializedReceipt = JSON.parse(
+    JSON.stringify(receipt, (_, value) => (typeof value === 'bigint' ? value.toString() : value))
+  )
+
+  return serializedReceipt
 }

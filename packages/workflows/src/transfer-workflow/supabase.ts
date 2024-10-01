@@ -8,6 +8,7 @@ export async function isTransferIndexed(hash: `0x${string}`) {
     .select('*', { count: 'exact', head: true })
     .eq('tx_hash', hexToBytea(hash))
 
+  log.info('isTransferIndexed', { count, error, status, statusText })
   if (error) {
     throw ApplicationFailure.nonRetryable(
       'Error reading transfer from send_account_transfers column.',
