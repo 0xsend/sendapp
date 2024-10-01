@@ -8,6 +8,16 @@ import {
 import superjson from 'superjson'
 import { decode, encode } from '@temporalio/common/lib/encoding'
 
+// Register BigInt serialization
+superjson.registerCustom<bigint, string>(
+  {
+    isApplicable: (v): v is bigint => typeof v === 'bigint',
+    serialize: (v) => `0x${v.toString(16)}`,
+    deserialize: (v) => BigInt(v.startsWith('0x') ? v : `0x${v}`),
+  },
+  'bigint'
+)
+
 /**
  * Converts between values and [SUPERJSON](https://github.com/flightcontrolhq/superjson) Payloads.
  */
@@ -22,7 +32,9 @@ export class SuperjsonPayloadConverter implements PayloadConverterWithEncoding {
       sjson = superjson.stringify(value)
     } catch (e) {
       throw new UnsupportedSuperjsonTypeError(
-        `Can't run SUPERJSON.stringify on this value: ${value}. Either convert it (or its properties) to SUPERJSON-serializable values (see https://github.com/flightcontrolhq/superjson#readme ), or create a custom data converter. SJSON.stringify error message: ${errorMessage(
+        `Can't run SUPERJSON.stringify on this value: ${JSON.stringify(
+          value
+        )}. Either convert it (or its properties) to SUPERJSON-serializable values (see https://github.com/flightcontrolhq/superjson#readme ), or create a custom data converter. SJSON.stringify error message: ${errorMessage(
           e
         )}`,
         e as Error
