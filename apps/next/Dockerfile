@@ -32,6 +32,7 @@ COPY packages/eslint-config-custom/package.json packages/eslint-config-custom/pa
 COPY packages/playwright/package.json packages/playwright/package.json
 COPY packages/shovel/package.json packages/shovel/package.json
 COPY packages/snaplet/package.json packages/snaplet/package.json
+COPY packages/temporal/package.json packages/temporal/package.json
 COPY packages/ui/package.json packages/ui/package.json
 COPY packages/wagmi/package.json packages/wagmi/package.json
 COPY packages/webauthn-authenticator/package.json packages/webauthn-authenticator/package.json
