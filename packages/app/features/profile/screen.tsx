@@ -24,15 +24,20 @@ import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
 import { Fragment } from 'react'
-const { useParam } = createParam<{ sendid: string }>()
+import { useProfileScreenParams } from 'app/routers/params'
+
 interface ProfileScreenProps {
-  sendid?: string
+  sendid?: number | null
 }
 
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
-  const [paramSendid] = useParam('sendid')
-  const otherUserId = propSendid || paramSendid
-  const { data: otherUserProfile, isLoading, error } = useProfileLookup('sendid', otherUserId || '')
+  const [{ sendid: paramSendid }] = useProfileScreenParams()
+  const otherUserId = propSendid || Number(paramSendid)
+  const {
+    data: otherUserProfile,
+    isLoading,
+    error,
+  } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
   const router = useRouter()
   const media = useMedia()
@@ -48,7 +53,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useInterUserActivityFeed({
     pageSize: 10,
     otherUserId,
-    currentUserId: currentUserProfile?.send_id.toString(),
+    currentUserId: currentUserProfile?.send_id,
   })
   const { pages } = data ?? {}
   const formatTags = (tags: string[]) => tags?.map((tag) => `/${tag}`).join(' ')

@@ -131,7 +131,23 @@ export const useSendScreenParams = () => {
   ] as const
 }
 
-export type ProfileScreenParams = undefined
+export type ProfileScreenParams = {
+  sendid?: string
+}
+
+const { useParam: useProfileParam, useParams: useProfileParams } =
+  createParam<ProfileScreenParams>()
+
+export const useSendId = () => {
+  const [sendid, setSendid] = useProfileParam('sendid')
+  return [sendid, setSendid] as const
+}
+
+export const useProfileScreenParams = () => {
+  const { setParams } = useProfileParams()
+  const [sendid] = useSendId()
+  return [{ sendid }, setParams] as const
+}
 
 export type AuthScreenParams = {
   redirectUri?: string
