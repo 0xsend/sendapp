@@ -14,7 +14,14 @@ import { AuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { useEffect, useState } from 'react'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
-
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { parseUnits } from 'viem'
+import { coinsDict } from 'app/data/coins'
+import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { DepositButton, SendButton } from 'app/features/home/HomeButtons'
+import { MobileButtonRow, useScrollToggle } from 'app/components/MobileButtonRow'
+import { Stack } from '@my/ui'
 const log = debug('app:pages:index')
 
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
@@ -28,15 +35,42 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
     if (carouselImages.length === 0) setCarouselImages(images)
   }, [carouselImages, images])
 
+  const { isLoading: isLoadingSendAccount } = useSendAccount()
+  const { balances, isLoading: isLoadingBalances } = useSendAccountBalances()
+  const usdcBalance = balances?.USDC
+  const canSend =
+    usdcBalance !== undefined &&
+    usdcBalance >= parseUnits('.20', coinsDict[usdcAddress[baseMainnet.id]].decimals)
+
+  const { isVisible: isMobileRowVisible, onScroll } = useScrollToggle()
+
   return (
     <>
       <Head>
         <title>Send | Home</title>
       </Head>
       {session ? (
-        <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.PROFILE} showLogo={true} />}>
-          <HomeScreen />
-        </HomeLayout>
+        <>
+          <HomeLayout
+            TopNav={<TopNav header="Home" button={ButtonOption.PROFILE} showLogo={true} />}
+            onScroll={onScroll}
+          >
+            <HomeScreen />
+          </HomeLayout>
+          <MobileButtonRow
+            isVisible={isMobileRowVisible}
+            isLoading={isLoadingSendAccount && !isLoadingBalances}
+          >
+            <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
+              <DepositButton />
+            </Stack>
+            {canSend && (
+              <Stack f={1} w="50%" jc={'center'} maw={350}>
+                <SendButton />
+              </Stack>
+            )}
+          </MobileButtonRow>
+        </>
       ) : (
         <AuthCarouselContext.Provider
           value={{
