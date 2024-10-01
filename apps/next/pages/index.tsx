@@ -15,6 +15,8 @@ import { useEffect, useState } from 'react'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 
+import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
+
 const log = debug('app:pages:index')
 
 export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
@@ -34,9 +36,13 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
         <title>Send | Home</title>
       </Head>
       {session ? (
-        <HomeLayout TopNav={<TopNav header="Home" button={ButtonOption.PROFILE} showLogo={true} />}>
-          <HomeScreen />
-        </HomeLayout>
+        <MobileButtonRowLayout.Home>
+          <HomeLayout
+            TopNav={<TopNav header="Home" button={ButtonOption.PROFILE} showLogo={true} />}
+          >
+            <HomeScreen />
+          </HomeLayout>
+        </MobileButtonRowLayout.Home>
       ) : (
         <AuthCarouselContext.Provider
           value={{
