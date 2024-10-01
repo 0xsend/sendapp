@@ -11,7 +11,7 @@
     "serve": "NODE_ENV=production yarn with-env next start --port 8151",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env -c --"
+    "with-env": "TAMAGUI_TARGET=web dotenv -e ../../.env.localtemp -c --"
   },
   "dependencies": {
     "@my/api": "workspace:*",
