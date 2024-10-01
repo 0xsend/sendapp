@@ -14,6 +14,10 @@ import { coinsDict } from 'app/data/coins'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
+import { ProfileButtons } from 'app/features/profile/ProfileButtons'
+import { useUser } from 'app/utils/useUser'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { usePathname } from 'app/utils/usePathname'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -87,4 +91,70 @@ export const Home = ({ children, ...props }: XStackProps) => {
       </AnimatePresence>
     </>
   )
+}
+
+export const Profile = (
+  { children, ...props }: XStackProps //@todo another use case for a generated type for our route names
+) => {
+  const isPwa = usePwa()
+  const pathname = usePathname()
+  const identifier = pathname.split('/').at(-1)
+  const identifierType = pathname.split('/').at(-2) === 'profile' ? 'sendid' : 'tag'
+  const { profile, isLoading } = useUser()
+  const { data: otherUserProfile } = useProfileLookup(identifierType, identifier?.toString() || '')
+
+  const { direction } = useScrollDirection()
+
+  const isVisible = Boolean(otherUserProfile) && profile?.send_id !== otherUserProfile?.sendid
+
+  return (
+    <>
+      {children}
+      <AnimatePresence>
+        {!isLoading && isVisible && direction !== 'down' && (
+          <Stack
+            w={'100%'}
+            pb={isPwa ? '$1' : '$5'}
+            px="$4"
+            $platform-web={{
+              position: 'fixed',
+              bottom: 0,
+            }}
+            $gtLg={{
+              display: 'none',
+            }}
+            animation="200ms"
+            opacity={1}
+            animateOnly={['scale', 'transform', 'opacity']}
+            enterStyle={{ opacity: 0, scale: 0.9 }}
+            exitStyle={{ opacity: 0, scale: 0.95 }}
+          >
+            <LinearGradient
+              h={'150%'}
+              top={'-50%'}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              locations={[0, 0.33]}
+              fullscreen
+              colors={['transparent', '$background']}
+              $gtLg={{ display: 'none' }}
+            />
+            <Row {...props}>
+              <Stack w={200}>
+                <ProfileButtons.SendButton
+                  identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                  idType="tag"
+                />
+              </Stack>
+            </Row>
+          </Stack>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
+export const MobileButtonRowLayout = {
+  Home: Home,
+  Profile: Profile,
 }
