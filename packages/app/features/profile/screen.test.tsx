@@ -3,6 +3,7 @@ import { ProfileScreen } from './screen'
 import { TamaguiProvider, config } from '@my/ui'
 import { render, screen, act, waitFor } from '@testing-library/react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useProfileScreenParams } from 'app/routers/params'
 
 const queryClient = new QueryClient()
 const TAG_NAME = 'pip_test44677'
@@ -97,6 +98,10 @@ jest.mock('solito/router', () => ({
   useRouter: jest.fn().mockReturnValue({
     push: jest.fn(),
   }),
+}))
+
+jest.mock('app/routers/params', () => ({
+  useProfileScreenParams: jest.fn().mockReturnValue([{ sendid: 0 }, jest.fn()]),
 }))
 
 test('ProfileScreen', async () => {
