@@ -1,6 +1,6 @@
 import { Connection, Client } from '@temporalio/client'
 
-import { TransferWorkflow } from '@my/workflows'
+import { SendTransferWorkflow } from '@my/workflows'
 import type { UserOperation } from 'permissionless'
 
 // async function runDistributionWorkflow() {
@@ -26,13 +26,13 @@ import type { UserOperation } from 'permissionless'
 //   return result
 // }
 
-async function runTransferWorkflow(userOp: UserOperation<'v0.7'>) {
+export async function runTransferWorkflow(userOp: UserOperation<'v0.7'>) {
   const connection = await Connection.connect()
   const client = new Client({
     connection,
   })
 
-  const handle = await client.workflow.start(TransferWorkflow, {
+  const handle = await client.workflow.start(SendTransferWorkflow, {
     taskQueue: 'monorepo',
     workflowId: `transfers-workflow-${userOp.sender}-${userOp.nonce.toString()}`, // TODO: remember to replace this with a meaningful business ID
     args: [userOp],
