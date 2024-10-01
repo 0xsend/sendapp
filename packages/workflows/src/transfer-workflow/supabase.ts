@@ -9,6 +9,7 @@ export async function isTransferIndexed(hash: `0x${string}`) {
     .eq('tx_hash', hexToBytea(hash))
     .single()
 
+  log.info('isTransferIndexed', { count, error, status, statusText })
   if (error) {
     if (error.code === 'PGRST116') {
       log.info('isTransferIndexedActivity', { error })

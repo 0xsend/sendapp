@@ -15,6 +15,10 @@
     "./client": {
       "types": "./src/client.ts",
       "default": "./src/client.ts"
+    },
+    "./superjson-payload-converter": {
+      "types": "./src/superjson-payload-converter.ts",
+      "default": "./src/superjson-payload-converter.ts"
     }
   },
   "scripts": {
