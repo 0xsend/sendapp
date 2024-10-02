@@ -4,11 +4,10 @@ import {
   H1,
   H2,
   isWeb,
-  LinearGradient,
   Paragraph,
-  ScrollView,
   Separator,
   Spinner,
+  Stack,
   Text,
   useMedia,
   XStack,
@@ -16,25 +15,27 @@ import {
 } from '@my/ui'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useUser } from 'app/utils/useUser'
-import { useRouter } from 'solito/router'
-import { createParam } from 'solito'
 import { AvatarProfile } from './AvatarProfile'
-// import { IconDots } from 'app/components/icons'
 import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
 import { Fragment } from 'react'
-const { useParam } = createParam<{ sendid: string }>()
+import { useProfileScreenParams } from 'app/routers/params'
+import { SendButton } from './ProfileButtons'
+
 interface ProfileScreenProps {
-  sendid?: string
+  sendid?: number | null
 }
 
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
-  const [paramSendid] = useParam('sendid')
-  const otherUserId = propSendid || paramSendid
-  const { data: otherUserProfile, isLoading, error } = useProfileLookup('sendid', otherUserId || '')
+  const [{ sendid: paramSendid }] = useProfileScreenParams()
+  const otherUserId = propSendid || Number(paramSendid)
+  const {
+    data: otherUserProfile,
+    isLoading,
+    error,
+  } = useProfileLookup('sendid', otherUserId?.toString() || '')
   const { user, profile: currentUserProfile } = useUser()
-  const router = useRouter()
   const media = useMedia()
 
   const {
@@ -48,7 +49,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   } = useInterUserActivityFeed({
     pageSize: 10,
     otherUserId,
-    currentUserId: currentUserProfile?.send_id.toString(),
+    currentUserId: currentUserProfile?.send_id,
   })
   const { pages } = data ?? {}
   const formatTags = (tags: string[]) => tags?.map((tag) => `/${tag}`).join(' ')
@@ -57,17 +58,17 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     <>
       <YStack f={1} gap="$6">
         {error && <Text theme="red">{error.message}</Text>}
-        {isLoading && <Spinner size="large" color="$color10" />}
+        {isLoading && (
+          <Stack w="100%" h="100%" jc={'center'} ai={'center'} f={1} gap="$6">
+            <Spinner size="large" color="$color10" />
+          </Stack>
+        )}
         {otherUserProfile ? (
           <YStack
             h={isWeb ? (media.shorter ? '83vh' : '88vh') : media.shorter ? '83%' : '88%'}
             $gtMd={{ height: 'auto' }}
           >
-            <ScrollView
-              py="$size.3.5"
-              $gtLg={{ h: 'auto', pt: '$0' }}
-              showsVerticalScrollIndicator={false}
-            >
+            <Stack py="$size.3.5" $gtLg={{ h: 'auto', pt: '$0' }}>
               <YStack width="100%" gap="$2">
                 <YStack
                   jc="space-between"
@@ -96,35 +97,17 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     </YStack>
                   </YStack>
 
-                  {otherUserProfile && user?.id !== otherUserProfile?.id ? (
+                  {Boolean(otherUserProfile) && user?.id !== otherUserProfile?.id ? (
                     <XStack
                       gap="$size.1.5"
                       ai={'center'}
                       display="none"
                       $gtMd={{ display: 'flex' }}
                     >
-                      <Button
-                        testID="openSendDialogButton"
-                        f={1}
-                        width={'100%'}
-                        px={'$size.4'}
-                        theme={'green'}
-                        onPress={() => {
-                          router.push({
-                            pathname: '/send',
-                            query: {
-                              recipient: otherUserProfile.tag ?? otherUserProfile.sendid,
-                              idType: otherUserProfile.tag ? 'tag' : 'sendid',
-                            },
-                          })
-                        }}
-                      >
-                        /SEND
-                      </Button>
-
-                      {/* <Button unstyled display="none" $gtMd={{ display: 'flex' }}>
-                        <IconDots size={'$1'} color={'$primary'} />
-                      </Button> */}
+                      <SendButton
+                        identifier={otherUserProfile?.tag ?? otherUserProfile?.sendid ?? ''}
+                        idType={otherUserProfile?.tag ? 'tag' : 'sendid'}
+                      />
                     </XStack>
                   ) : null}
                 </YStack>
@@ -214,41 +197,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   </Fade>
                 </YStack>
               </YStack>
-            </ScrollView>
-            {otherUserProfile && user?.id !== otherUserProfile?.id ? (
-              <>
-                <LinearGradient
-                  start={[0, 1]}
-                  end={[0, 0]}
-                  width={'100%'}
-                  height={'$6'}
-                  colors={['$background', 'transparent']}
-                  pos={'absolute'}
-                  pointerEvents={'none'}
-                  b={'$size.1.5'}
-                  $gtMd={{ display: 'none' }}
-                />
-                <YStack $gtMd={{ display: 'none' }}>
-                  <Button
-                    f={1}
-                    width={'100%'}
-                    px={'$size.4'}
-                    theme={'green'}
-                    onPress={() => {
-                      router.push({
-                        pathname: '/send',
-                        query: {
-                          recipient: otherUserProfile.tag ?? otherUserProfile.sendid,
-                          idType: otherUserProfile.tag ? 'tag' : 'sendid',
-                        },
-                      })
-                    }}
-                  >
-                    /SEND
-                  </Button>
-                </YStack>
-              </>
-            ) : null}
+            </Stack>
           </YStack>
         ) : null}
       </YStack>

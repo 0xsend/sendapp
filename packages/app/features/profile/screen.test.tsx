@@ -99,6 +99,10 @@ jest.mock('solito/router', () => ({
   }),
 }))
 
+jest.mock('app/routers/params', () => ({
+  useProfileScreenParams: jest.fn().mockReturnValue([{ sendid: 0 }, jest.fn()]),
+}))
+
 test('ProfileScreen', async () => {
   jest.useFakeTimers()
 
@@ -128,8 +132,6 @@ test('ProfileScreen', async () => {
   expect(image.props.source).toStrictEqual({
     uri: PROFILE.avatar_url,
   })
-  const button1 = screen.getByText('/SEND')
-  expect(button1).toBeOnTheScreen()
 
   const activity = screen.getByTestId('activityTest')
   expect(activity).toBeOnTheScreen()
