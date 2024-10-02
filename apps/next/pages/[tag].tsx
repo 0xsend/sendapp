@@ -10,8 +10,9 @@ import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/Checkou
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 
-export const Page: NextPageWithLayout<{ sendid: string }> = ({ sendid }) => {
+export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
   return (
     <>
       <Head>
@@ -82,9 +83,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 }) satisfies GetServerSideProps
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Profile" noSubroute button={ButtonOption.PROFILE} />}>
-    {children}
-  </HomeLayout>
+  <MobileButtonRowLayout.Profile>
+    <HomeLayout TopNav={<TopNav header="Profile" noSubroute button={ButtonOption.PROFILE} />}>
+      {children}
+    </HomeLayout>
+  </MobileButtonRowLayout.Profile>
 )
 
 export default Page

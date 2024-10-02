@@ -1,4 +1,10 @@
-import { proxyActivities, ApplicationFailure, defineQuery, setHandler } from '@temporalio/workflow'
+import {
+  proxyActivities,
+  ApplicationFailure,
+  defineQuery,
+  setHandler,
+  workflowInfo,
+} from '@temporalio/workflow'
 import type { createTransferActivities } from './activities'
 import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
 import debug from 'debug'
@@ -27,7 +33,7 @@ type Indexing = {
 } & BaseState
 type Confirmed = {
   status: 'confirmed'
-  receipt: GetUserOperationReceiptReturnType | boolean
+  receipt: GetUserOperationReceiptReturnType
 } & BaseState
 
 export type transferState = Simulating | Sending | Waiting | Indexing | Confirmed
@@ -68,9 +74,11 @@ export const SendTransferWorkflow = Object.defineProperty(
     setHandler(getTransferStateQuery, () => ({
       status: 'confirmed',
       userOp: parsedUserOp,
-      receipt: transfer,
+      receipt: receipt,
     }))
-    return transfer
+    return `Completed ${workflowInfo().workflowId}, Transfer succesfully indexed: ${
+      receipt.receipt.transactionHash
+    }`
   },
   'name',
   { value: 'SendTransferWorkflow', writable: false, enumerable: false, configurable: true }

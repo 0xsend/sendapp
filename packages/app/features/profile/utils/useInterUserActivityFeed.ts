@@ -21,8 +21,8 @@ import type { ZodError } from 'zod'
 export function useInterUserActivityFeed(params: {
   pageSize?: number
   refetchInterval?: number
-  currentUserId?: string
-  otherUserId?: string
+  currentUserId?: number
+  otherUserId?: number
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const { pageSize = 3, refetchInterval = 30_000, otherUserId, currentUserId } = params
 

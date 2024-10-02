@@ -27,7 +27,9 @@ export const transferRouter = createTRPCRouter({
           args: [userOp],
         })
         log(`Workflow Created: ${handle.workflowId}`)
-        return handle.workflowId
+        // wait for the workflow to be ready
+        const state = await handle.query<transferState, []>('getTransferState')
+        return { workflowId: handle.workflowId, state: state }
       } catch (error) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',

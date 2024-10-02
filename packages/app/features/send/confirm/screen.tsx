@@ -38,6 +38,7 @@ import { api } from 'app/utils/api'
 import { getUserOperationHash } from 'permissionless'
 import { signUserOp } from 'app/utils/signUserOp'
 import { byteaToBase64 } from 'app/utils/byteaToBase64'
+import type { transferState } from '@my/workflows'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -71,13 +72,16 @@ export function SendConfirm() {
 
   const { mutateAsync: transfer } = api.transfer.withUserOp.useMutation()
 
-  const [workflowId, setWorkflowId] = useState<string | undefined>()
+  const [workflow, setWorkflow] = useState<{
+    id?: string
+    state?: transferState
+  }>()
 
   useEffect(() => {
-    if (workflowId) {
+    if (Boolean(workflow) && Boolean(workflow?.state)) {
       router.replace({ pathname: '/', query: { token: sendToken } })
     }
-  }, [workflowId, router, sendToken])
+  }, [workflow, router, sendToken])
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
@@ -176,8 +180,8 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
-      const workflowId = await transfer({ userOp, token: sendToken })
-      setWorkflowId(workflowId)
+      const workflow = await transfer({ userOp, token: sendToken })
+      setWorkflow(workflow)
     } catch (e) {
       console.error(e)
       setError(e)
@@ -265,7 +269,7 @@ export function SendConfirm() {
           onPress={onSubmit}
           br={12}
           disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-          disabled={!canSubmit || !!workflowId}
+          disabled={!canSubmit || Boolean(workflow)}
           gap={4}
           mx="auto"
           $gtXs={{
