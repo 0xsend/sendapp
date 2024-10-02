@@ -15,13 +15,17 @@ export function RewardsScreen() {
         </YStack>
 
         <YStack $gtLg={{ flexDirection: 'row' }} gap={'$size.3.5'}>
-          {/* @TODO: href, reward */}
+          {/* @TODO: reward */}
           <Section
             title="Activity Rewards"
             href="/account/rewards/activity"
             reward="120,000 SEND"
           />
-          <Section title="Lock &amp; Earn" href="/" reward="120,000 SEND" />
+          <Section
+            title="Lock &amp; Earn"
+            href="/account/rewards/lock-and-earn"
+            reward="120,000 SEND"
+          />
         </YStack>
       </YStack>
     </YStack>
