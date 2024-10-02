@@ -17,7 +17,7 @@ import { useScrollDirection } from '../provider/scroll'
 import { ProfileButtons } from 'app/features/profile/ProfileButtons'
 import { useUser } from 'app/utils/useUser'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { usePathname } from 'app/utils/usePathname'
+import { useProfileScreenParams } from 'app/routers/params'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -42,7 +42,7 @@ export const Home = ({ children, ...props }: XStackProps) => {
 
   const { direction } = useScrollDirection()
 
-  const isLoading = !isLoadingSendAccount || isLoadingBalances
+  const isLoading = isLoadingSendAccount || isLoadingBalances
 
   return (
     <>
@@ -97,9 +97,9 @@ export const Profile = (
   { children, ...props }: XStackProps //@todo another use case for a generated type for our route names
 ) => {
   const isPwa = usePwa()
-  const pathname = usePathname()
-  const identifier = pathname.split('/').at(-1)
-  const identifierType = pathname.split('/').at(-2) === 'profile' ? 'sendid' : 'tag'
+  const [{ sendid, tag }] = useProfileScreenParams()
+  const identifier = tag ?? sendid ?? ''
+  const identifierType = tag ? 'tag' : 'sendid'
   const { profile, isLoading } = useUser()
   const { data: otherUserProfile } = useProfileLookup(identifierType, identifier?.toString() || '')
 

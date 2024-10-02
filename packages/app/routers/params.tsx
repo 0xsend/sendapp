@@ -133,6 +133,7 @@ export const useSendScreenParams = () => {
 
 export type ProfileScreenParams = {
   sendid?: string
+  tag?: string
 }
 
 const { useParam: useProfileParam, useParams: useProfileParams } =
@@ -143,10 +144,17 @@ export const useSendId = () => {
   return [sendid, setSendid] as const
 }
 
+export const useTag = () => {
+  const [tag, setTag] = useProfileParam('tag')
+  return [tag, setTag] as const
+}
+
 export const useProfileScreenParams = () => {
   const { setParams } = useProfileParams()
   const [sendid] = useSendId()
-  return [{ sendid }, setParams] as const
+  const [tag] = useTag()
+
+  return [{ sendid, tag }, setParams] as const
 }
 
 export type AuthScreenParams = {

@@ -264,6 +264,7 @@ exports[`HomeScreen 1`] = `
                   "paddingRight": 16,
                 }
               }
+              testID="homeDepositButton"
             >
               <View
                 style={

@@ -13,7 +13,7 @@ export const SendButton = ({
     w="100%"
     miw={150}
     theme={'green'}
-    testID={profileSendButton}
+    testID={'profileSendButton'}
   >
     <XStack w={'100%'} jc={'center'} ai={'center'} gap={'$2'} h="100%">
       <LinkableButton.Text
@@ -29,3 +29,7 @@ export const SendButton = ({
     </XStack>
   </LinkableButton>
 )
+
+export const ProfileButtons = {
+  SendButton: SendButton,
+}
