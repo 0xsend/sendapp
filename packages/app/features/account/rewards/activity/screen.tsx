@@ -1,43 +1,283 @@
-import { YStack, H1, Paragraph, Image, LinearGradient, Stack } from '@my/ui'
+import {
+  YStack,
+  H1,
+  Paragraph,
+  XStack,
+  Button,
+  Image,
+  LinearGradient,
+  Stack,
+  Spinner,
+  Select,
+  H3,
+  Adapt,
+  Sheet,
+  type SelectItemProps,
+  Theme,
+} from '@my/ui'
+import { ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
+import { IconX } from 'app/components/icons'
+import { useRewardsScreenParams } from 'app/routers/params'
+import { useMonthlyDistributions } from 'app/utils/distributions'
+import { useId, useRef, useState } from 'react'
 
 export function ActivityRewardsScreen() {
+  const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
+  const { data: distributions, isLoading } = useMonthlyDistributions()
+  const [isOpen, setIsOpen] = useState(false)
+  const id = useId()
+
+  const selectTriggerRef = useRef<HTMLSelectElement>(null)
+
+  const initialDistributionIndex = distributions?.findIndex(
+    (d) => d.number === queryParams.distribution
+  )
+
+  const [selectedDistributionIndex, setSelectedDistributionIndex] = useState(
+    !initialDistributionIndex || initialDistributionIndex === -1 ? 0 : initialDistributionIndex
+  )
+
+  if (isLoading)
+    return (
+      <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+        <Header />
+        <Stack w="100%" f={1} jc={'center'} ai={'center'}>
+          <Spinner color="$color" size="large" />
+        </Stack>
+      </YStack>
+    )
+  if (!distributions || !distributions[selectedDistributionIndex])
+    return (
+      <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+        <Header />
+        <Stack w="100%" f={1} jc={'center'} ai={'center'}>
+          <Paragraph color={'$color10'} size={'$5'}>
+            No rewards available
+          </Paragraph>
+        </Stack>
+      </YStack>
+    )
+
+  const distributionDates = distributions.map(
+    (d) =>
+      `${d.qualification_end.toLocaleString('default', {
+        month: 'long',
+      })} ${d.qualification_end.toLocaleString('default', { year: 'numeric' })}`
+  )
+
+  const onValueChange = (value: string) => {
+    setSelectedDistributionIndex(Number(value))
+    setRewardsScreenParams(
+      { distribution: distributions[Number(value)]?.number },
+      { webBehavior: 'replace' }
+    )
+  }
+
   return (
     <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
-      <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'}>
-        <Image
-          pos={'absolute'}
-          br={'$6'}
-          t={0}
-          zIndex={0}
-          source={{
-            height: 1024,
-            width: 1024,
-            uri: 'https://ghassets.send.app/app_images/flower.jpg',
-          }}
-          h={'100%'}
-          w={'100%'}
-          objectFit="cover"
-        />
-        <LinearGradient
-          pos={'absolute'}
-          br={'$6'}
-          t={0}
-          start={[0, 0]}
-          end={[0, 1]}
-          fullscreen
-          colors={['$darkest', 'transparent', '$darkest']}
-        />
+      <Header />
+      <XStack w={'100%'} jc={'space-between'} ai={'center'}>
+        <H3 fontWeight={'600'} color={'$color12'}>
+          {`${distributionDates[selectedDistributionIndex]?.split(' ')[0]} Rewards`}
+        </H3>
+        <Select
+          native={false}
+          id={id}
+          value={queryParams.distribution?.toString() ?? '0'}
+          onValueChange={onValueChange}
+          onOpenChange={setIsOpen}
+          defaultValue="0"
+          open={isOpen}
+        >
+          <Select.Trigger
+            ref={selectTriggerRef}
+            testID={'SelectDistributionDate'}
+            br="$3"
+            w={'fit-content'}
+            borderWidth={1.5}
+            $theme-light={{
+              boc: isOpen ? '$color1' : '$transparent',
+              bc: isOpen ? '$color1' : '$primary',
+            }}
+            $theme-dark={{
+              boc: isOpen ? '$color1' : '$transparent',
+              bc: isOpen ? '$color1' : '$primary',
+              hoverStyle: { bc: '$primary' },
+            }}
+            iconAfter={
+              isOpen ? (
+                <ChevronUp
+                  $theme-dark={{
+                    color: isOpen ? '$color12' : '$black',
+                  }}
+                  color={'$color11'}
+                />
+              ) : (
+                <ChevronDown
+                  $theme-dark={{
+                    color: isOpen ? '$color12' : '$black',
+                    hoverStyle: { color: '$color12' },
+                  }}
+                  color="$black"
+                />
+              )
+            }
+          >
+            <Select.Value
+              testID={'SelectDistributionDateValue'}
+              fontWeight={'bold'}
+              color={isOpen ? '$color12' : '$black'}
+              $theme-dark={{
+                color: isOpen ? '$color12' : '$black',
+              }}
+              placeholder={distributions[selectedDistributionIndex]?.number}
+            />
+          </Select.Trigger>
 
-        <YStack p="$size.2.5" pt={'$size.1.5'} maw={463} position="absolute" zIndex={1}>
-          <H1 tt={'uppercase'} $theme-light={{ col: '$color0' }}>
-            Unlock Extra Rewards
-          </H1>
-          <Paragraph $theme-light={{ col: '$color2' }} color={'$color10'} size={'$5'}>
-            Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer
-            others for a bonus multiplier.
-          </Paragraph>
-        </YStack>
-      </Stack>
+          <Adapt when="sm" platform="touch">
+            <Sheet
+              native
+              modal
+              dismissOnSnapToBottom
+              snapPoints={[30]}
+              animation={'quick'}
+              disableDrag
+            >
+              <Sheet.Frame maw={738} bc={'$color1'}>
+                <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
+                  <XStack ai="center" jc="space-between" w="100%" px="$4">
+                    <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                      Select Month
+                    </Paragraph>
+                    <Button
+                      chromeless
+                      unstyled
+                      icon={<IconX color={'$color12'} size={'$1.5'} />}
+                      onPress={() => setIsOpen(false)}
+                    />
+                  </XStack>
+                </Sheet.Handle>
+                <Sheet.ScrollView>
+                  <Adapt.Contents />
+                </Sheet.ScrollView>
+              </Sheet.Frame>
+              <Sheet.Overlay />
+            </Sheet>
+          </Adapt>
+
+          <Select.Content zIndex={200000}>
+            <Select.Viewport
+              br={'$3'}
+              style={{
+                left: '66%',
+              }}
+              w={320}
+              btrr={0}
+              boc="transparent"
+              bc={'$color1'}
+              pt={'$5'}
+            >
+              <Select.Group>
+                {distributions.map((distribution, i) => (
+                  <DistributionItem
+                    isActive={
+                      distribution.number === distributions[selectedDistributionIndex]?.number
+                    }
+                    value={i.toString()}
+                    index={i}
+                    key={distribution?.number}
+                  >
+                    {distributionDates[i]}
+                  </DistributionItem>
+                ))}
+              </Select.Group>
+            </Select.Viewport>
+          </Select.Content>
+        </Select>
+      </XStack>
     </YStack>
+  )
+}
+
+const Header = () => (
+  <Stack w={'100%'} h={224} position="relative" jc={'center'} br={'$6'} overflow="hidden">
+    <Image
+      pos={'absolute'}
+      br={'$6'}
+      t={0}
+      zIndex={0}
+      bc="$black"
+      source={{
+        height: 1024,
+        width: 1024,
+        uri: 'https://ghassets.send.app/app_images/flower.jpg',
+      }}
+      h={'100%'}
+      w={'100%'}
+      $sm={{
+        scale: 1.5,
+      }}
+      objectFit="cover"
+    />
+    <LinearGradient
+      pos={'absolute'}
+      br={'$6'}
+      t={0}
+      start={[0, 0]}
+      end={[0, 1]}
+      fullscreen
+      colors={['$darkest', 'transparent', '$darkest']}
+    />
+
+    <YStack p="$4" pt={'$3'} maw={463} position="absolute" zIndex={1}>
+      <H1 tt={'uppercase'} $theme-light={{ col: '$color0' }} size={'$9'} $gtMd={{ size: '$10' }}>
+        Unlock <br />
+        Extra Rewards
+      </H1>
+      <Paragraph
+        $theme-light={{ color: '$color2' }}
+        color={'$color10'}
+        size={'$2'}
+        $gtMd={{
+          size: '$5',
+        }}
+      >
+        Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others
+        for a bonus multiplier.
+      </Paragraph>
+    </YStack>
+  </Stack>
+)
+
+const DistributionItem = ({
+  isActive,
+  value,
+  index,
+  children,
+  ...props
+}: {
+  isActive: boolean
+} & SelectItemProps) => {
+  return (
+    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
+      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
+        <Select.ItemText
+          display="flex"
+          fontSize={'$5'}
+          fontWeight={'500'}
+          textTransform={'uppercase'}
+          color={'$color12'}
+          jc={'center'}
+          ai={'center'}
+        >
+          {children}
+        </Select.ItemText>
+        {isActive && (
+          <Theme name="green_active">
+            <Dot size={'$3'} />
+          </Theme>
+        )}
+      </XStack>
+    </Select.Item>
   )
 }
