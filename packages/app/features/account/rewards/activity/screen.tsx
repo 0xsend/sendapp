@@ -13,13 +13,18 @@ import {
   Adapt,
   Sheet,
   type SelectItemProps,
+  Card,
+  Label,
   Theme,
 } from '@my/ui'
-import { ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
-import { IconX } from 'app/components/icons'
+import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
+import { IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
-import { useMonthlyDistributions } from 'app/utils/distributions'
+import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
+import formatAmount from 'app/utils/formatAmount'
 import { useId, useRef, useState } from 'react'
+import { zeroAddress } from 'viem'
 
 export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -195,6 +200,9 @@ export function ActivityRewardsScreen() {
           </Select.Content>
         </Select>
       </XStack>
+      <YStack f={1} w={'100%'} gap={'$7'}>
+        <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+      </YStack>
     </YStack>
   )
 }
@@ -249,6 +257,95 @@ const Header = () => (
   </Stack>
 )
 
+const DistributionRequirementsCard = ({
+  distribution,
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const {
+    data: snapshotBalance,
+    isLoading: isLoadingSnapshotBalance,
+    error: snapshotBalanceError,
+  } = useReadSendTokenBalanceOf({
+    chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+    args: [distribution.distribution_shares.at(0)?.address ?? zeroAddress],
+    blockNumber: distribution.snapshot_block_num
+      ? BigInt(distribution.snapshot_block_num)
+      : undefined,
+    query: {
+      enabled: !!distribution.distribution_shares.at(0)?.address,
+    },
+  })
+
+  if (snapshotBalanceError) throw snapshotBalanceError
+
+  const sendTagRegistrations =
+    distribution.distribution_verifications_summary.at(0)?.tag_registrations
+
+  return (
+    <Card br={12} $theme-light={{ bc: '$color2' }} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+      <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
+        <YStack gap="$2">
+          <Label fontSize={'$5'} col={'$color10'}>
+            Your SEND Balance
+          </Label>
+          {isLoadingSnapshotBalance ? (
+            <Spinner size="small" color={'$color11'} />
+          ) : (
+            <Theme reset>
+              <Paragraph
+                fontFamily={'$mono'}
+                fontWeight={'500'}
+                color={'$color12'}
+                lh={'$8'}
+                fontSize={'$9'}
+                $gtXl={{ fontSize: '$10' }}
+              >
+                {`${formatAmount(snapshotBalance?.toString() ?? 0, 9, 0)} SEND`}
+              </Paragraph>
+            </Theme>
+          )}
+        </YStack>
+        <YStack gap="$2" ai={'flex-end'}>
+          <XStack ai="center" gap="$2">
+            <Paragraph>
+              Min. Balance {formatAmount(distribution.hodler_min_balance, 9, 0)}
+            </Paragraph>
+            {(() => {
+              switch (true) {
+                case isLoadingSnapshotBalance:
+                  return <Spinner size="small" />
+                case distribution.hodler_min_balance < (snapshotBalance ?? 0):
+                  return (
+                    <CheckCircle2
+                      $theme-light={{ color: '$color12' }}
+                      color="$primary"
+                      size={'$1.5'}
+                    />
+                  )
+                default:
+                  return (
+                    <Theme name="red">
+                      <IconInfoCircle color={'$color8'} size={'$1'} />
+                    </Theme>
+                  )
+              }
+            })()}
+          </XStack>
+
+          <XStack ai="center" gap="$2">
+            <Paragraph>Sendtag Registered</Paragraph>
+            {sendTagRegistrations && sendTagRegistrations > 0 ? (
+              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+            ) : (
+              <Theme name="red">
+                <IconInfoCircle color={'$color8'} size={'$1'} />
+              </Theme>
+            )}
+          </XStack>
+        </YStack>
+      </Stack>
+    </Card>
+  )
+}
 const DistributionItem = ({
   isActive,
   value,
