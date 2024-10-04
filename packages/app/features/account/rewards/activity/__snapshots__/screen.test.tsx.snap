@@ -1,19 +1,154 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
-<Text
+<View
   style={
     {
-      "color": "#FFFFFF",
-      "fontFamily": "System",
-      "fontSize": 16.8,
-      "fontWeight": "400",
-      "lineHeight": 19,
-      "userSelect": "auto",
+      "flex": 1,
+      "flexDirection": "column",
+      "gap": 39,
+      "paddingBottom": 7,
+      "paddingTop": 32,
     }
   }
-  suppressHighlighting={true}
 >
-  Rewards Activity
-</Text>
+  <View
+    style={
+      {
+        "borderBottomLeftRadius": 16,
+        "borderBottomRightRadius": 16,
+        "borderTopLeftRadius": 16,
+        "borderTopRightRadius": 16,
+        "height": 224,
+        "justifyContent": "center",
+        "position": "relative",
+        "width": "100%",
+      }
+    }
+  >
+    <Image
+      objectFit="cover"
+      source={
+        {
+          "height": 1024,
+          "uri": "https://ghassets.send.app/app_images/flower.jpg",
+          "width": 1024,
+        }
+      }
+      style={
+        {
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "height": "100%",
+          "position": "absolute",
+          "top": 0,
+          "width": "100%",
+          "zIndex": 0,
+        }
+      }
+    />
+    <View
+      style={
+        {
+          "borderBottomLeftRadius": 16,
+          "borderBottomRightRadius": 16,
+          "borderTopLeftRadius": 16,
+          "borderTopRightRadius": 16,
+          "bottom": 0,
+          "flexDirection": "column",
+          "left": 0,
+          "overflow": "hidden",
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+        }
+      }
+    >
+      <ViewManagerAdapter_ExpoLinearGradient
+        colors={
+          [
+            4278720025,
+            0,
+            4278720025,
+          ]
+        }
+        endPoint={
+          [
+            0,
+            1,
+          ]
+        }
+        startPoint={
+          [
+            0,
+            0,
+          ]
+        }
+        style={
+          {
+            "bottom": 0,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "zIndex": 0,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "column",
+          "maxWidth": 463,
+          "paddingBottom": 32,
+          "paddingLeft": 32,
+          "paddingRight": 32,
+          "paddingTop": 24,
+          "position": "absolute",
+          "zIndex": 1,
+        }
+      }
+    >
+      <Text
+        accessibilityRole="header"
+        style={
+          {
+            "color": "#FFFFFF",
+            "fontFamily": "System",
+            "fontSize": 46,
+            "fontWeight": "700",
+            "lineHeight": 50,
+            "marginBottom": 0,
+            "marginLeft": 0,
+            "marginRight": 0,
+            "marginTop": 0,
+            "textTransform": "uppercase",
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Unlock Extra Rewards
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#B2B2B2",
+            "fontFamily": "System",
+            "fontSize": 19.2,
+            "fontWeight": "400",
+            "lineHeight": 21,
+            "userSelect": "auto",
+          }
+        }
+        suppressHighlighting={true}
+      >
+        Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others for a bonus multiplier.
+      </Text>
+    </View>
+  </View>
+</View>
 `;
