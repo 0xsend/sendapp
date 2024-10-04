@@ -60,6 +60,24 @@ jest.mock('app/utils/tags', () => ({
   useConfirmedTags: jest.fn().mockReturnValue({ data: [{ name: 'tag1' }, { name: 'tag2' }] }),
 }))
 
+jest.mock('app/utils/send-accounts', () => ({
+  useSendAccount: jest.fn().mockReturnValue({
+    data: {
+      avatar_url: 'https://avatars.githubusercontent.com/u/123',
+      name: 'test',
+      about: 'test',
+      refcode: 'test',
+      tag: 'test',
+      address: '0x123',
+      phone: 'test',
+      chain_id: 1,
+      is_public: true,
+      sendid: 1,
+      all_tags: ['test'],
+    },
+  }),
+}))
+
 describe('ActivityRewardsScreen', () => {
   it('renders', async () => {
     jest.useFakeTimers()
