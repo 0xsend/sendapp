@@ -29,6 +29,37 @@ jest.mock('app/routers/params', () => ({
   useRewardsScreenParams: () => [{ distributionNumber: 1 }, jest.fn()],
 }))
 
+jest.mock('app/utils/useChainAddresses', () => ({
+  useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
+}))
+jest.mock('wagmi')
+jest.mock('@web3modal/wagmi/react', () => ({
+  useWeb3Modal: jest.fn().mockReturnValue({ open: jest.fn() }),
+}))
+jest.mock('@my/wagmi', () => ({
+  __esModule: true,
+  ...jest.requireActual('@my/wagmi'),
+  baseMainnetClient: {
+    chain: {
+      id: 845337,
+    },
+    simulateContract: jest.fn().mockResolvedValue({}),
+  },
+  baseMainnetBundlerClient: {
+    sendUserOperation: jest.fn(),
+    waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),
+  },
+  useReadSendTokenBalanceOf: jest.fn().mockReturnValue({
+    data: 0n,
+    isSuccess: true,
+    error: null,
+  }),
+}))
+
+jest.mock('app/utils/tags', () => ({
+  useConfirmedTags: jest.fn().mockReturnValue({ data: [{ name: 'tag1' }, { name: 'tag2' }] }),
+}))
+
 describe('ActivityRewardsScreen', () => {
   it('renders', async () => {
     jest.useFakeTimers()
