@@ -16,6 +16,7 @@ import {
   Card,
   Label,
   Theme,
+  type CardProps,
 } from '@my/ui'
 import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
@@ -23,8 +24,18 @@ import { IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
-import { useId, useRef, useState } from 'react'
 import { zeroAddress } from 'viem'
+import { type PropsWithChildren, useRef, useId, useState } from 'react'
+
+//@todo get this from the db
+const verificationTypesAndTitles = [
+  ['create_passkey', 'Create a Passkey'],
+  ['send_ten', '10+ Sends'],
+  ['send_one_hundred', '100+ Sends'],
+  ['tag_registration', 'Register a Sendtag', '(per tag)'],
+  ['tag_referral', 'Referrals'],
+  ['total_tag_referrals', 'Total Referrals'],
+] as const
 
 export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -202,6 +213,7 @@ export function ActivityRewardsScreen() {
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
         <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+        <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
       </YStack>
     </YStack>
   )
@@ -346,6 +358,75 @@ const DistributionRequirementsCard = ({
     </Card>
   )
 }
+
+const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResultData[number] }) => {
+  const verificationValues =
+    distribution.distribution_verifications_summary.at(0)?.verification_values
+
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Perks
+      </H3>
+      <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
+        {verificationTypesAndTitles
+          .filter(([verificationType]) => verificationValues?.[verificationType].fixed_value > 0)
+          .map(([verificationType, title, details]) => (
+            <PerkCard
+              key={verificationType}
+              isCompleted={Boolean(verificationValues?.[verificationType].count)}
+            >
+              <YStack gap="$2">
+                <H3 fontWeight={'600'} color={'$color12'}>
+                  {title}
+                </H3>
+                <Paragraph fontWeight={'500'} color={'$color12'}>
+                  + {verificationValues?.[verificationType]?.fixed_value.toLocaleString() ?? 0} SEND{' '}
+                  {details ?? ''}
+                </Paragraph>
+              </YStack>
+            </PerkCard>
+          ))}
+      </Stack>
+    </YStack>
+  )
+}
+
+const PerkCard = ({
+  isCompleted,
+  children,
+}: PropsWithChildren<CardProps> & { isCompleted: boolean }) => {
+  return (
+    <Card
+      br={12}
+      $gtLg={{ gap: '$4' }}
+      p="$7"
+      jc={'space-between'}
+      mih={208}
+      $gtSm={{ maw: 331 }}
+      $theme-light={{ bc: '$color2' }}
+      w={'100%'}
+    >
+      <XStack ai="center" gap="$2">
+        {isCompleted ? (
+          <>
+            <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+            <Paragraph color="$color11">Completed</Paragraph>
+          </>
+        ) : (
+          <>
+            <Theme name="red">
+              <IconInfoCircle color={'$color8'} size={'$1'} />
+            </Theme>
+            <Paragraph color="$color11">Pending</Paragraph>
+          </>
+        )}
+      </XStack>
+      {children}
+    </Card>
+  )
+}
+
 const DistributionItem = ({
   isActive,
   value,
