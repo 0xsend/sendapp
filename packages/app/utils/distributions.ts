@@ -14,6 +14,7 @@ import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useBalance, useSimulateContract } from 'wagmi'
 import { api } from './api'
+import { useSendAccount } from './send-accounts'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
@@ -38,6 +39,38 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
       const { data, error } = await supabase
         .from('distributions')
         .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .order('number', { ascending: false })
+
+      if (error) {
+        throw error
+      }
+
+      return data.map((distribution) => ({
+        ...distribution,
+        qualification_end: new Date(distribution.qualification_end),
+        qualification_start: new Date(distribution.qualification_start),
+        claim_end: new Date(distribution.claim_end),
+      }))
+    },
+  })
+}
+
+/*
+After distribution 6 we switched to monthly distributions
+This function cuts out the first 6 distributions
+*/
+export const useMonthlyDistributions = () => {
+  const supabase = useSupabase()
+  const { data: sendAccount } = useSendAccount()
+  return useQuery({
+    queryKey: ['monthly_distributions', sendAccount?.created_at],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('distributions')
+        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .gt('number', 6)
+        .gt('qualification_end', sendAccount?.created_at)
+        .order('number', { ascending: false })
 
       if (error) {
         throw error
