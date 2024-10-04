@@ -355,6 +355,394 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         </RNSVGSvgView>
       </View>
     </View>
+    <View
+      style={
+        {
+          "flex": 1,
+          "flexDirection": "column",
+          "gap": 39,
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        style={
+          {
+            "backgroundColor": "#111f22",
+            "borderBottomLeftRadius": 12,
+            "borderBottomRightRadius": 12,
+            "borderTopLeftRadius": 12,
+            "borderTopRightRadius": 12,
+            "flexDirection": "column",
+            "paddingBottom": 24,
+            "paddingLeft": 24,
+            "paddingRight": 24,
+            "paddingTop": 24,
+            "position": "relative",
+          }
+        }
+      >
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "gap": 24,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "flexDirection": "column",
+                "gap": 7,
+              }
+            }
+          >
+            <Text
+              cancelable={true}
+              disabled={false}
+              focusable={true}
+              id=":r4:"
+              minPressDuration={0}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onPress={[Function]}
+              onPressIn={[Function]}
+              onPressOut={[Function]}
+              style={
+                {
+                  "alignItems": "center",
+                  "backgroundColor": "transparent",
+                  "color": "#B2B2B2",
+                  "display": "flex",
+                  "fontFamily": "System",
+                  "fontSize": 19.2,
+                  "fontWeight": "400",
+                  "lineHeight": 44,
+                  "userSelect": "none",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              Your SEND Balance
+            </Text>
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 55.199999999999996,
+                  "fontWeight": "500",
+                  "lineHeight": 28,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              0 SEND
+            </Text>
+          </View>
+          <View
+            style={
+              {
+                "alignItems": "flex-end",
+                "flexDirection": "column",
+                "gap": 7,
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Min. Balance 
+              </Text>
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={20}
+                bbWidth={20}
+                fill="none"
+                focusable={false}
+                height={20}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                stroke="hsl(358, 85.3%, 64.0%)"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "hsl(358, 85.3%, 64.0%)",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 20,
+                      "width": 20,
+                    },
+                  ]
+                }
+                tintColor="hsl(358, 85.3%, 64.0%)"
+                vbHeight={24}
+                vbWidth={24}
+                width={20}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeWidth",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4294071642,
+                      "type": 0,
+                    }
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                  strokeWidth="2"
+                >
+                  <RNSVGCircle
+                    cx="12"
+                    cy="12"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    r="10"
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                  />
+                  <RNSVGPath
+                    d="M12 16v-4"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                  />
+                  <RNSVGPath
+                    d="M12 8h.01"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+            </View>
+            <View
+              style={
+                {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "gap": 7,
+                }
+              }
+            >
+              <Text
+                style={
+                  {
+                    "color": "#FFFFFF",
+                    "fontFamily": "System",
+                    "fontSize": 16.8,
+                    "fontWeight": "400",
+                    "lineHeight": 19,
+                    "userSelect": "auto",
+                  }
+                }
+                suppressHighlighting={true}
+              >
+                Sendtag Registered
+              </Text>
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={20}
+                bbWidth={20}
+                fill="none"
+                focusable={false}
+                height={20}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                stroke="hsl(358, 85.3%, 64.0%)"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                style={
+                  [
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "color": "hsl(358, 85.3%, 64.0%)",
+                    },
+                    {
+                      "flex": 0,
+                      "height": 20,
+                      "width": 20,
+                    },
+                  ]
+                }
+                tintColor="hsl(358, 85.3%, 64.0%)"
+                vbHeight={24}
+                vbWidth={24}
+                width={20}
+              >
+                <RNSVGGroup
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeWidth",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4294071642,
+                      "type": 0,
+                    }
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                  strokeWidth="2"
+                >
+                  <RNSVGCircle
+                    cx="12"
+                    cy="12"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    r="10"
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                  />
+                  <RNSVGPath
+                    d="M12 16v-4"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                  />
+                  <RNSVGPath
+                    d="M12 8h.01"
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "stroke",
+                      ]
+                    }
+                    stroke={
+                      {
+                        "type": 2,
+                      }
+                    }
+                  />
+                </RNSVGGroup>
+              </RNSVGSvgView>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
   </View>,
   <View
     pointerEvents="box-none"
@@ -590,7 +978,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         >
           <View>
             <View
-              aria-labelledby=":r4:"
+              aria-labelledby=":r5:"
               role="group"
               style={
                 {
@@ -600,7 +988,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
             >
               <View
-                aria-labelledby=":r5:"
+                aria-labelledby=":r6:"
                 aria-selected={true}
                 cancelable={true}
                 disabled={false}
@@ -655,7 +1043,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                   }
                 >
                   <Text
-                    id=":r5:"
+                    id=":r6:"
                     lineBreakMode="clip"
                     numberOfLines={1}
                     style={
