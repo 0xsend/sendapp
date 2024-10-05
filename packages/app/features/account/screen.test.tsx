@@ -14,7 +14,7 @@ jest.mock('app/routers/params', () => ({
 }))
 
 jest.mock('app/utils/useUserReferralsCount', () => ({
-  useUserReferralsCount: jest.fn().mockReturnValue({ referralsCount: 10 }),
+  useUserReferralsCount: jest.fn().mockReturnValue({ data: 10 }),
 }))
 
 describe('AccountScreen', () => {

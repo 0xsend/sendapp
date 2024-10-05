@@ -4,7 +4,7 @@ import { render, act, screen } from '@testing-library/react-native'
 import { ReferralsScreen } from './screen'
 
 jest.mock('app/utils/useUserReferralsCount', () => ({
-  useUserReferralsCount: jest.fn().mockReturnValue({ referralsCount: 123, error: null }),
+  useUserReferralsCount: jest.fn().mockReturnValue({ data: 123, error: null }),
 }))
 
 test('ReferralScreen', async () => {

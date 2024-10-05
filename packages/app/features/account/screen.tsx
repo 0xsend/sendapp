@@ -36,7 +36,7 @@ export function AccountScreen() {
   const media = useMedia()
   const toast = useToastController()
   const { profile } = useUser()
-  const { referralsCount } = useUserReferralsCount()
+  const { data: referralsCount } = useUserReferralsCount()
 
   const name = profile?.name
   const send_id = profile?.send_id

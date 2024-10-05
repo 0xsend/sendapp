@@ -45,7 +45,7 @@ const RewardsHistoryHeader = () => (
 )
 
 const StatsCards = () => {
-  const { referralsCount, error: referralsCountError } = useUserReferralsCount()
+  const { data: referralsCount, error: referralsCountError } = useUserReferralsCount()
 
   return (
     <XStack flexWrap="wrap" ai="flex-start" jc="space-between" gap="$8" mb="$4">

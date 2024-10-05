@@ -1,20 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
+import type { Functions } from '@my/supabase/database.types'
+import type { PostgrestError } from '@supabase/postgrest-js'
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 
-export type UserReferralsCount = {
-  referralsCount: number | undefined
-  error: Error | null
-  isLoading: boolean
-  refetch: () => void
-}
-export const useUserReferralsCount = () => {
+export const useUserReferralsCount = (): UseQueryResult<
+  Functions<'user_referrals_count'>,
+  PostgrestError
+> => {
   const supabase = useSupabase()
-  const {
-    data: referralsCount,
-    isLoading,
-    refetch,
-    error,
-  } = useQuery({
+  return useQuery({
     queryKey: ['user_referrals_count'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('user_referrals_count').select('*')
@@ -28,11 +22,4 @@ export const useUserReferralsCount = () => {
       return data
     },
   })
-
-  return {
-    referralsCount,
-    isLoading,
-    error,
-    refetch,
-  } as UserReferralsCount
 }

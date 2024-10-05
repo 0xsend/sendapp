@@ -30,7 +30,7 @@ jest.mock('solito', () => {
 })
 
 jest.mock('app/utils/useUserReferralsCount', () => ({
-  useUserReferralsCount: jest.fn().mockReturnValue(123),
+  useUserReferralsCount: jest.fn().mockReturnValue({ data: 123 }),
 }))
 
 jest.mock('app/utils/useSendAccountBalances', () => ({
