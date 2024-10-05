@@ -20,7 +20,7 @@ import {
 } from '@my/ui'
 import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
-import { IconInfoCircle, IconX } from 'app/components/icons'
+import { IconAccount, IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
@@ -55,7 +55,7 @@ export function ActivityRewardsScreen() {
 
   if (isLoading)
     return (
-      <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+      <YStack f={1} pt={'$6'} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Spinner color="$color" size="large" />
@@ -64,7 +64,7 @@ export function ActivityRewardsScreen() {
     )
   if (!distributions || !distributions[selectedDistributionIndex])
     return (
-      <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+      <YStack f={1} pt={'$6'} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Paragraph color={'$color10'} size={'$5'}>
@@ -90,7 +90,7 @@ export function ActivityRewardsScreen() {
   }
 
   return (
-    <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+    <YStack f={1} pb={'$12'} pt={'$6'} gap={'$7'}>
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
         <H3 fontWeight={'600'} color={'$color12'}>
@@ -214,6 +214,10 @@ export function ActivityRewardsScreen() {
       <YStack f={1} w={'100%'} gap={'$7'}>
         <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
         <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
+        <MultiplierCards
+          distribution={distributions[selectedDistributionIndex]}
+          distributionDate={distributionDates[selectedDistributionIndex]}
+        />
       </YStack>
     </YStack>
   )
@@ -423,6 +427,67 @@ const PerkCard = ({
         )}
       </XStack>
       {children}
+    </Card>
+  )
+}
+
+const MultiplierCards = ({
+  distribution,
+  distributionDate,
+}: {
+  distribution: UseDistributionsResultData[number]
+  distributionDate?: string
+}) => {
+  const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Multiplier
+      </H3>
+      <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
+        {verificationTypesAndTitles
+          .filter(([verificationType]) => multipliers?.[verificationType].multiplier_step > 0)
+          .map(([verificationType, title]) => (
+            <MultiplierCard key={verificationType}>
+              <XStack ai="center" gap="$2">
+                <IconAccount size={'2'} color={'$color10'} />
+                <H3 fontWeight={'500'} color={'$color10'}>
+                  {verificationType === 'tag_referral'
+                    ? distributionDate?.split(' ')[0] ?? 'Monthly'
+                    : ''}{' '}
+                  {title}
+                </H3>
+              </XStack>
+              <Paragraph
+                fontSize={'$9'}
+                $sm={{ fontSize: '$8' }}
+                fontWeight={'600'}
+                color={'$color12'}
+              >
+                X {multipliers?.[verificationType].value ?? 1}
+              </Paragraph>
+            </MultiplierCard>
+          ))}
+      </Stack>
+    </YStack>
+  )
+}
+
+const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
+  return (
+    <Card
+      br={'$6'}
+      p="$5"
+      $gtXs={{ p: '$7' }}
+      jc={'center'}
+      ai={'center'}
+      mih={112}
+      w={'fit-content'}
+    >
+      <XStack ai="center" w={'100%'} jc="space-between" $gtXs={{ gap: '$7' }} gap={'$5'}>
+        {children}
+      </XStack>
     </Card>
   )
 }
