@@ -1,14 +1,6 @@
-import {
-  Anchor,
-  Button as ButtonOg,
-  ButtonText,
-  Paragraph,
-  ScrollView,
-  Spinner,
-  type ButtonProps,
-  Stack,
-} from '@my/ui'
+import { Button as ButtonOg, Paragraph, ScrollView, Spinner, type ButtonProps, Stack } from '@my/ui'
 import type { sendMerkleDropAddress } from '@my/wagmi'
+import { IconDollar } from 'app/components/icons'
 import { assert } from 'app/utils/assert'
 import {
   type UseDistributionsResultData,
@@ -16,17 +8,8 @@ import {
   useSendMerkleDropIsClaimed,
   useSendMerkleDropTrancheActive,
 } from 'app/utils/distributions'
-import { shorten } from 'app/utils/strings'
-import {
-  useAccount,
-  useConnect,
-  useWriteContract,
-  useSwitchChain,
-  useWaitForTransactionReceipt,
-} from 'wagmi'
 
-import { OpenConnectModalWrapper } from 'app/utils/OpenConnectModalWrapper'
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
@@ -58,10 +41,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     tranche: trancheId,
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
   })
-  const { isConnected, address: account, chain: accountChain } = useAccount()
-  const { open: openConnectModal } = useWeb3Modal()
-  const { error: connectError } = useConnect()
-  const { chains, switchChain, error: switchError } = useSwitchChain()
+
   const {
     data: claimWriteConfig,
     error: claimWriteConfigError,
@@ -94,21 +74,9 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   // If the user is eligible but has already claimed, show the claim button disabled
   if (isClaimed) {
     return (
-      <>
-        <Paragraph size="$1" theme="alt2" mx="auto">
-          Already claimed
-          {claimReceiptSuccess && (
-            <Paragraph size="$1" theme="alt2">
-              <Anchor
-                aria-label="View Claim on Etherscan"
-                href={`${accountChain?.blockExplorers?.default.url}/tx/${claimWriteHash}`}
-              >
-                {shorten(claimWriteHash)}
-              </Anchor>
-            </Paragraph>
-          )}
-        </Paragraph>
-      </>
+      <Paragraph size="$1" theme="alt2" mx="auto">
+        Claimed
+      </Paragraph>
     )
   }
 
@@ -124,7 +92,10 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     return (
       <>
         <Button disabled f={1}>
-          Claim Reward
+          <ButtonOg.Icon>
+            <IconDollar size={'$2.5'} />
+          </ButtonOg.Icon>
+          <ButtonOg.Text>Claim Reward</ButtonOg.Text>
         </Button>
         <ErrorMessage
           error={`Error checking eligibility. Please try again later. ${isTrancheActiveError?.message} ${isClaimedError?.message}`}
@@ -142,108 +113,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         </Button>
       </Stack>
     )
-
-  if (!isConnected) {
-    return (
-      <>
-        <OpenConnectModalWrapper>
-          <Button onPress={() => openConnectModal()}>
-            <ButtonText col="$black">Connect Wallet to Claim</ButtonText>
-          </Button>
-        </OpenConnectModalWrapper>
-
-        {connectError ? (
-          connectError.message?.includes('Connector not found') ? (
-            <ErrorMessage
-              error={'Error finding wallet. Please install a web3 wallet like MetaMask.'}
-            />
-          ) : (
-            <ErrorMessage
-              error={`Error connecting wallet. Please try again later. ${connectError.message}`}
-            />
-          )
-        ) : null}
-      </>
-    )
-  }
-
-  if (distribution.chain_id !== accountChain?.id) {
-    const distributionChain = chains.find((c) => c.id === distribution.chain_id)
-    assert(!!distributionChain, `No chain found for ${distribution.chain_id}`)
-    return (
-      <>
-        <Button
-          onPress={() => {
-            assert(!!switchChain, 'No switchChain found')
-            switchChain(
-              { chainId: distributionChain.id as keyof typeof sendMerkleDropAddress },
-              { onError: (error) => console.error(error) }
-            )
-          }}
-        >
-          <ButtonText col="$black">Switch Network</ButtonText>
-        </Button>
-        <ErrorMessage
-          error={
-            switchError
-              ? `Error switching network. Please try again later. ${switchError.message}`
-              : ''
-          }
-        />
-      </>
-    )
-  }
-
-  // If the user is eligible but has already claimed, show the claim button disabled
-  if (isClaimed) {
-    return (
-      <Stack>
-        <Paragraph size="$1" theme="alt2" mx="auto">
-          Already claimed
-          {claimReceiptSuccess && (
-            <Paragraph size="$1" theme="alt2">
-              <Anchor
-                aria-label="View Claim on Etherscan"
-                href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
-              >
-                {shorten(claimWriteHash)}
-              </Anchor>
-            </Paragraph>
-          )}
-        </Paragraph>
-      </Stack>
-    )
-  }
-
-  if (account !== share?.address) {
-    return (
-      <>
-        <Paragraph size="$1" theme="alt2">
-          Please switch to the address you verified previously to claim,{' '}
-          <Anchor
-            size="$1"
-            target="_blank"
-            aria-label="View on Etherscan"
-            href={`${accountChain.blockExplorers?.default.url}/address/${share?.address}`}
-          >
-            {shorten(share?.address)}
-          </Anchor>
-          .
-        </Paragraph>
-        <Paragraph size="$1" theme="alt2">
-          Connected address:{' '}
-          <Anchor
-            size="$1"
-            target="_blank"
-            aria-label="View on Etherscan"
-            href={`${accountChain.blockExplorers?.default.url}/address/${account}`}
-          >
-            {shorten(account)}
-          </Anchor>
-        </Paragraph>
-      </>
-    )
-  }
 
   if (claimWriteConfigError) {
     return (
@@ -288,17 +157,6 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         <ErrorMessage
           error={`Error claiming. Please try again later. ${writeClaimError.message}`}
         />
-      )}
-      {claimReceiptSuccess && (
-        <Paragraph size="$1" theme="alt2">
-          Claimed!{' '}
-          <Anchor
-            aria-label="View Claim on Etherscan"
-            href={`${accountChain.blockExplorers?.default.url}/tx/${claimWriteHash}`}
-          >
-            {shorten(claimWriteHash)}
-          </Anchor>
-        </Paragraph>
       )}
     </>
   )

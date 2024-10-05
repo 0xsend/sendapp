@@ -8,7 +8,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         "flex": 1,
         "flexDirection": "column",
         "gap": 39,
-        "paddingBottom": 7,
+        "paddingBottom": 88,
         "paddingTop": 32,
       }
     }
@@ -39,6 +39,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         }
         style={
           {
+            "backgroundColor": "#122023",
             "borderBottomLeftRadius": 16,
             "borderBottomRightRadius": 16,
             "borderTopLeftRadius": 16,
@@ -138,7 +139,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Unlock
+          Unlock 
           <br />
           Extra Rewards
         </Text>
@@ -188,7 +189,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         }
         suppressHighlighting={true}
       >
-        1,721,001,600,000 1,721,001,600,000 Rewards
+        1,721,001,600,000 Rewards
       </Text>
       <View
         aria-autocomplete="none"
@@ -215,17 +216,17 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#081619",
-            "borderBottomColor": "#40FB50",
+            "backgroundColor": "#40FB50",
+            "borderBottomColor": "#081619",
             "borderBottomLeftRadius": 7,
             "borderBottomRightRadius": 7,
             "borderBottomWidth": 1.5,
-            "borderLeftColor": "#40FB50",
+            "borderLeftColor": "#081619",
             "borderLeftWidth": 1.5,
-            "borderRightColor": "#40FB50",
+            "borderRightColor": "#081619",
             "borderRightWidth": 1.5,
             "borderStyle": "solid",
-            "borderTopColor": "#40FB50",
+            "borderTopColor": "#081619",
             "borderTopLeftRadius": 7,
             "borderTopRightRadius": 7,
             "borderTopWidth": 1.5,
@@ -251,7 +252,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           pointerEvents="none"
           style={
             {
-              "color": "#FFFFFF",
+              "color": "#122023",
               "fontFamily": "System",
               "fontSize": 16.8,
               "fontWeight": "bold",
@@ -285,7 +286,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           meetOrSlice={0}
           minX={0}
           minY={0}
-          stroke="#FFFFFF"
+          stroke="#122023"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2"
@@ -296,7 +297,10 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                 "borderWidth": 0,
               },
               {
-                "color": "#FFFFFF",
+                "color": "#122023",
+                "hoverStyle": {
+                  "color": "$color12",
+                },
               },
               {
                 "flex": 0,
@@ -305,7 +309,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               },
             ]
           }
-          tintColor="#FFFFFF"
+          tintColor="#122023"
           vbHeight={24}
           vbWidth={24}
           width={16.8}
@@ -323,7 +327,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
             }
             stroke={
               {
-                "payload": 4294967295,
+                "payload": 4279377955,
                 "type": 0,
               }
             }
@@ -346,7 +350,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               stroke={
                 {
-                  "payload": 4294967295,
+                  "payload": 4279377955,
                   "type": 0,
                 }
               }
@@ -435,7 +439,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                 {
                   "color": "#FFFFFF",
                   "fontFamily": "System",
-                  "fontSize": 55.199999999999996,
+                  "fontSize": 36,
                   "fontWeight": "500",
                   "lineHeight": 28,
                   "userSelect": "auto",
@@ -742,6 +746,167 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          {
+            "flex": 1,
+            "flexDirection": "column",
+            "gap": 24,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          accessibilityRole="header"
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 23,
+              "fontWeight": "600",
+              "lineHeight": 27,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textTransform": "none",
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Perks
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "gap": 24,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "flex": 1,
+            "flexDirection": "column",
+            "gap": 24,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          accessibilityRole="header"
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 23,
+              "fontWeight": "600",
+              "lineHeight": 27,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textTransform": "none",
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Multiplier
+        </Text>
+        <View
+          style={
+            {
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "gap": 24,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "display": "none",
+            "flex": 1,
+            "flexDirection": "column",
+            "gap": 24,
+            "width": "100%",
+          }
+        }
+      >
+        <Text
+          accessibilityRole="header"
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontFamily": "System",
+              "fontSize": 23,
+              "fontWeight": "600",
+              "lineHeight": 27,
+              "marginBottom": 0,
+              "marginLeft": 0,
+              "marginRight": 0,
+              "marginTop": 0,
+              "textTransform": "none",
+              "userSelect": "auto",
+            }
+          }
+          suppressHighlighting={true}
+        >
+          Total Claimable Rewards
+        </Text>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#111f22",
+              "borderBottomLeftRadius": 16,
+              "borderBottomRightRadius": 16,
+              "borderTopLeftRadius": 16,
+              "borderTopRightRadius": 16,
+              "flexDirection": "column",
+              "paddingBottom": 39,
+              "paddingLeft": 39,
+              "paddingRight": 39,
+              "paddingTop": 39,
+              "position": "relative",
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            style={
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "width": "100%",
+              }
+            }
+          >
+            <Text
+              style={
+                {
+                  "color": "#FFFFFF",
+                  "fontFamily": "System",
+                  "fontSize": 55.199999999999996,
+                  "fontWeight": "500",
+                  "lineHeight": 40,
+                  "userSelect": "auto",
+                }
+              }
+              suppressHighlighting={true}
+            >
+              1 SEND
+            </Text>
+          </View>
+        </View>
+      </View>
     </View>
   </View>,
   <View
@@ -868,7 +1033,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              Select Distribution
+              Select Month
             </Text>
             <View
               cancelable={true}
@@ -1036,9 +1201,10 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                   style={
                     {
                       "alignItems": "center",
+                      "flex": 1,
                       "flexDirection": "row",
                       "gap": 2,
-                      "width": "100%",
+                      "justifyContent": "center",
                     }
                   }
                 >
@@ -1051,7 +1217,6 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                         "alignItems": "center",
                         "color": "#FFFFFF",
                         "display": "flex",
-                        "flex": 1,
                         "fontFamily": "System",
                         "fontSize": 19.2,
                         "fontWeight": "500",

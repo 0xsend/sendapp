@@ -23,6 +23,21 @@ jest.mock('app/utils/distributions', () => ({
       },
     ],
   }),
+  useSendMerkleDropTrancheActive: jest.fn().mockReturnValue({
+    data: true,
+    isSuccess: true,
+    error: null,
+  }),
+  useSendMerkleDropIsClaimed: jest.fn().mockReturnValue({
+    data: true,
+    isSuccess: true,
+    error: null,
+  }),
+  usePrepareSendMerkleDropClaimTrancheWrite: jest.fn().mockReturnValue({
+    data: {},
+    isSuccess: true,
+    error: null,
+  }),
 }))
 
 jest.mock('app/routers/params', () => ({

@@ -26,6 +26,7 @@ import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/ut
 import formatAmount from 'app/utils/formatAmount'
 import { zeroAddress } from 'viem'
 import { type PropsWithChildren, useRef, useId, useState } from 'react'
+import { DistributionClaimButton } from '../components/DistributionClaimButton'
 
 //@todo get this from the db
 const verificationTypesAndTitles = [
@@ -218,6 +219,7 @@ export function ActivityRewardsScreen() {
           distribution={distributions[selectedDistributionIndex]}
           distributionDate={distributionDates[selectedDistributionIndex]}
         />
+        <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
       </YStack>
     </YStack>
   )
@@ -297,7 +299,7 @@ const DistributionRequirementsCard = ({
     distribution.distribution_verifications_summary.at(0)?.tag_registrations
 
   return (
-    <Card br={12} $theme-light={{ bc: '$color2' }} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+    <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack gap="$2">
           <Label fontSize={'$5'} col={'$color10'}>
@@ -408,7 +410,6 @@ const PerkCard = ({
       jc={'space-between'}
       mih={208}
       $gtSm={{ maw: 331 }}
-      $theme-light={{ bc: '$color2' }}
       w={'100%'}
     >
       <XStack ai="center" gap="$2">
@@ -489,6 +490,34 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
         {children}
       </XStack>
     </Card>
+  )
+}
+
+const ClaimableRewardsCard = ({
+  distribution,
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const shareAmount = distribution.distribution_shares?.[0]?.amount
+  if (shareAmount === undefined || shareAmount === 0) return null
+  return (
+    <YStack f={1} w={'100%'} gap="$5" $lg={{ display: 'none' }}>
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Total Claimable Rewards
+      </H3>
+      <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>
+        <Stack ai="center" jc="space-between" fd="row" w="100%">
+          <Paragraph
+            fontFamily={'$mono'}
+            $gtXs={{ fontSize: '$10' }}
+            fontSize={'$9'}
+            fontWeight={'500'}
+            lh={40}
+          >
+            {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+          </Paragraph>
+          <DistributionClaimButton distribution={distribution} />
+        </Stack>
+      </Card>
+    </YStack>
   )
 }
 

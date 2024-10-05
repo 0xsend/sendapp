@@ -6,6 +6,7 @@ import {
   AnimatePresence,
   LinearGradient,
   usePwa,
+  Paragraph,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
@@ -17,7 +18,10 @@ import { useScrollDirection } from '../provider/scroll'
 import { ProfileButtons } from 'app/features/profile/ProfileButtons'
 import { useUser } from 'app/utils/useUser'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useProfileScreenParams } from 'app/routers/params'
+import { useProfileScreenParams, useRewardsScreenParams } from 'app/routers/params'
+import { useMonthlyDistributions } from 'app/utils/distributions'
+import { DistributionClaimButton } from 'app/features/account/rewards/components/DistributionClaimButton'
+import formatAmount from 'app/utils/formatAmount'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -154,7 +158,72 @@ export const Profile = (
   )
 }
 
+export const ActivityRewards = ({ children, ...props }: XStackProps) => {
+  const isPwa = usePwa()
+  const [queryParams] = useRewardsScreenParams()
+  const { data: distributions, isLoading } = useMonthlyDistributions()
+  const distribution =
+    distributions?.find((d) => d.number === queryParams.distribution) ?? distributions?.[0]
+  const shareAmount = distribution?.distribution_shares?.[0]?.amount
+  const { direction } = useScrollDirection()
+
+  const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
+
+  return (
+    <>
+      {children}
+      <AnimatePresence>
+        {!isLoading && isVisible && direction !== 'down' && (
+          <Stack
+            w={'100%'}
+            pb={isPwa ? '$1' : '$5'}
+            px="$4"
+            $platform-web={{
+              position: 'fixed',
+              bottom: 0,
+            }}
+            $gtLg={{
+              display: 'none',
+            }}
+            animation="200ms"
+            opacity={1}
+            animateOnly={['scale', 'transform', 'opacity']}
+            enterStyle={{ opacity: 0, scale: 0.9 }}
+            exitStyle={{ opacity: 0, scale: 0.95 }}
+          >
+            <LinearGradient
+              h={'150%'}
+              top={'-50%'}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              locations={[0, 0.33]}
+              fullscreen
+              colors={['transparent', '$background']}
+              $gtLg={{ display: 'none' }}
+            />
+            <Stack ai="center" jc="space-between" gap="$3" pt="$5">
+              <Paragraph
+                fontFamily={'$mono'}
+                $gtXs={{ fontSize: '$10' }}
+                fontSize={'$9'}
+                fontWeight={'500'}
+                lh={40}
+              >
+                {shareAmount === undefined ? '' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+              </Paragraph>
+              <Row {...props}>
+                <DistributionClaimButton distribution={distribution} />
+              </Row>
+            </Stack>
+          </Stack>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
 export const MobileButtonRowLayout = {
   Home: Home,
   Profile: Profile,
+  ActivityRewards: ActivityRewards,
 }
