@@ -103,7 +103,7 @@ for (const token of coins) {
       await page.goto('/')
 
       //Press send button
-      await page.getByTestId('homeSendButton').click()
+      await page.getByTestId('homeSendButton').first().click()
 
       // fill search input
       const searchInput = page.getByRole('search', { name: 'query' })

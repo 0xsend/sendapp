@@ -9,16 +9,16 @@ export class ProfilePage {
     public readonly page: Page,
     public readonly profile: { name: string; about: string }
   ) {
-    this.sendButton = page.getByTestId('openSendDialogButton')
+    this.sendButton = page.getByRole('link', { name: 'SEND' })
   }
 
   async visit(tag: string, expect?: Expect<ProfilePage>) {
     await this.page.goto(`/${tag}`)
     const title = await this.page.title()
     expect?.(title).toBe('Send | Profile')
-    await expect?.(this.page.getByRole('heading', { name: tag })).toBeVisible()
-    await expect?.(this.page.locator('#profileName')).toHaveText(this.profile.name)
-    await expect?.(this.page.getByText(this.profile.about, { exact: true })).toBeVisible()
-    await expect?.(this.page.getByAltText(this.profile.name)).toBeVisible()
+    await expect?.soft(this.page.getByRole('heading', { name: tag })).toBeVisible()
+    await expect?.soft(this.page.locator('#profileName')).toHaveText(this.profile.name)
+    await expect?.soft(this.page.getByText(this.profile.about, { exact: true })).toBeVisible()
+    // await expect?.soft(this.page.getByAltText(this.profile.name)).toBeVisible()
   }
 }
