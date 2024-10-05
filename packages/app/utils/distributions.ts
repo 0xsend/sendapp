@@ -38,6 +38,36 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
       const { data, error } = await supabase
         .from('distributions')
         .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .order('number', { ascending: false })
+
+      if (error) {
+        throw error
+      }
+
+      return data.map((distribution) => ({
+        ...distribution,
+        qualification_end: new Date(distribution.qualification_end),
+        qualification_start: new Date(distribution.qualification_start),
+        claim_end: new Date(distribution.claim_end),
+      }))
+    },
+  })
+}
+
+/*
+After distribution 6 we switched to monthly distributions
+This function cuts out the first 6 distributions
+*/
+export const useMonthlyDistributions = () => {
+  const supabase = useSupabase()
+  return useQuery({
+    queryKey: ['distributions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('distributions')
+        .select('*, distribution_shares(*), distribution_verifications_summary(*)')
+        .gt('number', 6)
+        .order('number', { ascending: false })
 
       if (error) {
         throw error
