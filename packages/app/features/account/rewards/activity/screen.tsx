@@ -24,6 +24,7 @@ import { useRewardsScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
+import { useSendAccount } from 'app/utils/send-accounts'
 import { useConfirmedTags } from 'app/utils/tags'
 import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useId, useState } from 'react'
@@ -176,6 +177,7 @@ export function ActivityRewardsScreen() {
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
         <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+        <SendPerksCards />
       </YStack>
     </YStack>
   )
@@ -312,6 +314,75 @@ const DistributionRequirementsCard = ({
     </Card>
   )
 }
+
+const SendPerksCards = () => {
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Perks
+      </H3>
+      <CreatePasskeyCard />
+    </YStack>
+  )
+}
+
+const CreatePasskeyCard = () => {
+  const { data: sendAccount, isLoading, error } = useSendAccount()
+
+  return (
+    <Card
+      br={12}
+      $gtLg={{ gap: '$4' }}
+      p="$7"
+      jc={'space-between'}
+      mih={208}
+      $gtSm={{ maw: 331 }}
+      $theme-light={{ bc: '$color2' }}
+      w={'100%'}
+    >
+      <XStack ai="center" gap="$2">
+        {(() => {
+          switch (true) {
+            case isLoading:
+              return <Spinner size="small" />
+            case error !== null:
+              return <Paragraph theme="red_active">{error?.message.split('.').at(0)}</Paragraph>
+            case !sendAccount:
+              return (
+                <>
+                  <Theme name="red">
+                    <IconX color={'$color8'} size={'$1'} />
+                  </Theme>
+                  <Paragraph color="$color11">Completed</Paragraph>
+                </>
+              )
+            default:
+              return (
+                <>
+                  <CheckCircle2
+                    $theme-light={{ color: '$color12' }}
+                    color="$primary"
+                    size={'$1.5'}
+                  />
+
+                  <Paragraph color="$color11">Completed</Paragraph>
+                </>
+              )
+          }
+        })()}
+      </XStack>
+      <YStack gap="$2">
+        <H3 fontWeight={'600'} color={'$color12'}>
+          Create a Passkey
+        </H3>
+        <Paragraph fontWeight={'500'} color={'$color12'}>
+          +10,000 SEND
+        </Paragraph>
+      </YStack>
+    </Card>
+  )
+}
+
 const DistributionItem = ({
   isActive,
   value,
