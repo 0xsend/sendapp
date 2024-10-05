@@ -33,19 +33,21 @@ test('can visit token detail page', async ({ context, page }) => {
   // @todo: Heading checks need to be refactored to mobile only
   // await expect(heading(page)).toBeVisible()
 
-  await expect(page.getByText('Sent')).toBeVisible()
-  await expect(page.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()
-  await expect(page.getByText('10 USDC')).toBeVisible()
+  const history = page.getByTestId('TokenDetailsHistory')
+
+  await expect.soft(history.getByText('Sent')).toBeVisible()
+  await expect.soft(history.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()
+  await expect.soft(history.getByText('10 USDC')).toBeVisible()
 
   // Button and label
-  await expect(page.getByText('Deposit')).toHaveCount(2)
+  await expect.soft(history.getByText('Deposit')).toHaveCount(1)
 
-  await expect(page.getByText('/alice')).toBeVisible()
-  await expect(page.getByText('Received')).toBeVisible()
-  await expect(page.getByText('20 USDC')).toBeVisible()
-  await expect(page.getByText('0xa71CE00000000000000000000000000000000000')).toBeVisible()
-  await expect(page.getByText('30 USDC')).toBeVisible()
-  await expect(page.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()
+  await expect.soft(history.getByText('/alice')).toBeVisible()
+  await expect.soft(history.getByText('Received')).toBeVisible()
+  await expect.soft(history.getByText('20 USDC')).toBeVisible()
+  await expect.soft(history.getByText('0xa71CE00000000000000000000000000000000000')).toBeVisible()
+  await expect.soft(history.getByText('30 USDC')).toBeVisible()
+  await expect.soft(history.getByText('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a')).toBeVisible()
 
   expect(page.getByTestId('TokenDetailsHistory')).toBeVisible()
   // expect(await page.getByTestId('TokenDetailsHistory').textContent()).toMatchSnapshot(
