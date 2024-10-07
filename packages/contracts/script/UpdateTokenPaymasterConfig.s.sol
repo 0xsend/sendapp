@@ -60,7 +60,8 @@ contract UpdateTokenPaymasterConfigScript is Script, Helper {
         require(refundPostopCost > 0, "REFUND_POSTOP_COST env variable not set");
         require(minEntryPointBalance > 0, "MIN_ENTRY_POINT_BALANCE env variable not set");
         require(priceMarkup > 0, "PRICE_MARKUP env variable not set");
-        require(baseFee > 0 || (baseFee == 0 && baseFeeClear), "BASE_FEE env variable not set");
+        // ensure base fee is greater than 0, clearing the fee, or we are not changing the fee
+        require(baseFee > 0 || (baseFee == 0 && baseFeeClear) || baseFee == _baseFee, "BASE_FEE env variable not set");
 
         vm.startBroadcast();
         TokenPaymasterConfig memory tpc = TokenPaymasterConfig({
