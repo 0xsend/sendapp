@@ -1,6 +1,6 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
 // import { sendAccountFactorySenderFilterRef, sendAcctFactoryTable } from './send-account-deployed'
-import { sendTokenAddress, usdcAddress } from '@my/wagmi'
+import { sendTokenAddress, spx6900Address, usdcAddress } from '@my/wagmi'
 import { sendAccountFactorySenderFilterRef } from './send-account-created'
 
 export const transfersTable: Table = {
@@ -40,6 +40,7 @@ export const integration: Omit<Integration, 'sources'> = {
       filter_arg: [
         ...new Set(Object.values(sendTokenAddress)),
         ...new Set(Object.values(usdcAddress)),
+        ...new Set(Object.values(spx6900Address)),
       ].sort(),
     },
   ] as BlockData[],

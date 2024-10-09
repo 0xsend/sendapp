@@ -211,7 +211,14 @@ async function handleTokenTransfer({
   profile?: { id: string; send_id?: number }
 }): Promise<void> {
   const isETH = token.symbol === 'ETH'
-  const decimalAmount = (Math.random() * 1000).toFixed(token.decimals).toString()
+  const decimalAmount: string = (() => {
+    const amt = (Math.random() * 1000).toFixed(token.decimals).toString()
+    if (token.decimals > 0) {
+      // trailing zeros are not allowed in the decimal part
+      return amt.replace(/0+$/, '')
+    }
+    return amt
+  })()
   const transferAmount = parseUnits(decimalAmount, token.decimals)
   const balanceBefore = transferAmount * 10n // padding
 
