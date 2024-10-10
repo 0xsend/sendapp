@@ -4,6 +4,7 @@ import { DistributorV1Worker } from './distributor'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { selectAll } from 'app/utils/supabase/selectAll'
 import { supabaseAdmin } from './supabase'
+import { DistributorV2Worker } from './distributorv2'
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -11,7 +12,8 @@ const logger = pino({
 })
 
 // Initialize DistributorWorker
-const distributorV1Worker = new DistributorV1Worker(logger)
+const distributorV1Worker = new DistributorV1Worker(logger, false)
+const distributorV2Worker = new DistributorV2Worker(logger)
 
 // Initialize Express app
 const app = express()
@@ -29,6 +31,13 @@ distributorRouter.get('/v1', async (req: Request, res: Response) => {
   res.json({
     distributor: true,
     ...distributorV1Worker.toJSON(),
+  })
+})
+
+distributorRouter.get('/v2', async (req: Request, res: Response) => {
+  res.json({
+    distributor: true,
+    ...distributorV2Worker.toJSON(),
   })
 })
 
@@ -109,6 +118,22 @@ distributorRouter.post('/v1', checkAuthorization, async (req, res) => {
       message: err?.message?.split('.').at(0) || 'An unexpected error occurred.',
     })
     return
+  }
+
+  res.json({
+    distributor: true,
+    id: id,
+  })
+})
+
+distributorRouter.post('/v2', checkAuthorization, async (req, res) => {
+  const { id } = req.body as { id: string }
+  logger.info({ id }, 'Received request to calculate distribution')
+  try {
+    await distributorV2Worker.calculateDistribution(id)
+  } catch (err) {
+    logger.error(err, 'Error while calculating distribution')
+    throw err
   }
 
   res.json({
