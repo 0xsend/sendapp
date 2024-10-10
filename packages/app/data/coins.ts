@@ -40,7 +40,7 @@ export const sendCoin = {
 } as const
 
 export const spx6900Coin = {
-  label: 'SPX6900',
+  label: 'SPX',
   symbol: 'SPX',
   token: spx6900Addresses[baseMainnet.id],
   decimals: 8,
@@ -50,7 +50,7 @@ export const spx6900Coin = {
 /**
  * The coins (tokens) array that are supported by Send App.
  */
-export const coins = [usdcCoin, ethCoin, sendCoin, spx6900Coin] as const
+export const coins = [usdcCoin, ethCoin, spx6900Coin, sendCoin] as const
 export type coins = typeof coins
 
 type CoinsDict = { [key in coins[number]['token']]: coins[number] }
