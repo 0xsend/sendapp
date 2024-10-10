@@ -1,9 +1,14 @@
 import type { Enums } from '@my/supabase/database.types'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
+import type { coins } from 'app/data/coins'
 import { createParam } from 'solito'
 import type { Address } from 'viem'
 
-export type RootParams = { nav?: 'home' | 'settings'; token?: string; search?: string }
+export type RootParams = {
+  nav?: 'home' | 'settings'
+  token?: coins[number]['token']
+  search?: string
+}
 
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
 
@@ -70,7 +75,7 @@ export type SendScreenParams = {
   idType?: Enums<'lookup_type_enum'> | Address
   recipient?: string
   amount?: string
-  sendToken?: `0x${string}` | 'eth'
+  sendToken?: coins[number]['token']
   note?: string
 }
 

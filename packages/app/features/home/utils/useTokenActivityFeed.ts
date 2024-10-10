@@ -1,19 +1,17 @@
-import type { PgBytea } from '@my/supabase/database.types'
 import { tokenPaymasterAddress } from '@my/wagmi'
-import type { PostgrestError } from '@supabase/postgrest-js'
-import {
-  useInfiniteQuery,
-  type InfiniteData,
-  type UseInfiniteQueryResult,
-} from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
-import type { ZodError } from 'zod'
+import { usePendingTransfers } from './usePendingTransfers'
+import type { Address } from 'viem'
+import type { coins } from 'app/data/coins'
 
 /**
- * Infinite query to fetch ERC-20 token activity feed.
+ * Returns two hooks
+ * 1. useTokenActivityFeed - Infinite query to fetch ERC-20 token activity feed.
+ * 2. usePendingTransfers - Returns a list from temporal of pending transfers for the given address and token
  *
  * @note does not support ETH transfers. Need to add another shovel integration to handle ETH receives, and another one for ETH sends
  *
@@ -21,20 +19,21 @@ import type { ZodError } from 'zod'
  */
 export function useTokenActivityFeed(params: {
   pageSize?: number
-  address?: PgBytea
+  address: Address
+  token: coins[number]['token']
   refetchInterval?: number
   enabled?: boolean
-}): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
-  const { pageSize = 10, address, refetchInterval = 30_000, enabled = true } = params
+}) {
+  const { pageSize = 10, token, address, refetchInterval = 30_000, enabled = true } = params
   const supabase = useSupabase()
 
   async function fetchTokenActivityFeed({ pageParam }: { pageParam: number }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
     let query = supabase.from('activity_feed').select('*')
-
-    if (address) {
-      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', address)
+    const logAddress = token === 'eth' ? undefined : hexToBytea(token)
+    if (logAddress) {
+      query = query.eq('event_name', Events.SendAccountTransfers).eq('data->>log_addr', logAddress)
     } else {
       query = query.eq('event_name', Events.SendAccountReceive)
     }
@@ -55,21 +54,29 @@ export function useTokenActivityFeed(params: {
     return EventArraySchema.parse(data)
   }
 
-  return useInfiniteQuery({
-    queryKey: ['token_activity_feed', address],
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-      if (lastPage !== null && lastPage.length < pageSize) return undefined
-      return lastPageParam + 1
-    },
-    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
-      if (firstPageParam <= 1) {
-        return undefined
-      }
-      return firstPageParam - 1
-    },
-    queryFn: fetchTokenActivityFeed,
-    refetchInterval,
-    enabled,
-  })
+  return {
+    pendingTransfers: usePendingTransfers({
+      address: address,
+      token,
+      refetchInterval,
+      enabled,
+    }),
+    activityFeed: useInfiniteQuery({
+      queryKey: ['token_activity_feed', token],
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+        if (lastPage !== null && lastPage.length < pageSize) return undefined
+        return lastPageParam + 1
+      },
+      getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
+        if (firstPageParam <= 1) {
+          return undefined
+        }
+        return firstPageParam - 1
+      },
+      queryFn: fetchTokenActivityFeed,
+      refetchInterval,
+      enabled,
+    }),
+  }
 }

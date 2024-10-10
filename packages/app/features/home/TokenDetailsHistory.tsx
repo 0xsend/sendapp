@@ -1,28 +1,66 @@
 import { Button, Paragraph, Spinner, YStack } from '@my/ui'
 import type { coins } from 'app/data/coins'
-import { hexToBytea } from 'app/utils/hexToBytea'
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTokenActivityFeed } from './utils/useTokenActivityFeed'
 import { RowLabel, AnimateEnter } from './TokenDetails'
-import { TokenActivityRow } from './TokenActivityRow'
+import { PendingTransferActivityRow, TokenActivityRow } from './TokenActivityRow'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { zeroAddress } from 'viem'
 
 export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
-  const result = useTokenActivityFeed({
+  const { data: sendAccount } = useSendAccount()
+  const [hasPendingTransfers, setHasPendingTransfers] = useState<boolean | undefined>(true)
+  const { pendingTransfers, activityFeed } = useTokenActivityFeed({
+    address: sendAccount?.address ?? zeroAddress,
+    token: coin.token,
     pageSize: 10,
-    address: coin.token === 'eth' ? undefined : hexToBytea(coin.token),
+    refetchInterval: 1000,
+    enabled:
+      (hasPendingTransfers === undefined || hasPendingTransfers) &&
+      sendAccount?.address !== undefined,
   })
+
+  const { data: pendingTransfersData, isError: pendingTransfersError } = pendingTransfers
+
   const {
-    data,
+    data: activityFeedData,
     isLoading: isLoadingActivities,
     error: activitiesError,
     isFetching: isFetchingActivities,
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
     hasNextPage,
-  } = result
-  const { pages } = data ?? {}
+  } = activityFeed
+
+  const { pages } = activityFeedData ?? {}
+
+  // Check if there are any pending transfers in the temporal db. If not set hasPendingTransfers to false to control refetches
+  useEffect(() => {
+    if (Array.isArray(pendingTransfersData)) {
+      setHasPendingTransfers(pendingTransfersData?.length > 0)
+    } else if (pendingTransfersError) {
+      setHasPendingTransfers(false)
+    } else {
+      setHasPendingTransfers(undefined)
+    }
+  }, [pendingTransfersData, pendingTransfersError])
+
   return (
     <YStack gap="$5" testID="TokenDetailsHistory">
+      {hasPendingTransfers && (
+        <>
+          <RowLabel>Pending Transfers</RowLabel>
+          <AnimateEnter>
+            {pendingTransfersData?.map((state) => (
+              <Fragment key={`${state.userOp.nonce}-pending`}>
+                <AnimateEnter>
+                  <PendingTransferActivityRow coin={coin} state={state} />
+                </AnimateEnter>
+              </Fragment>
+            ))}
+          </AnimateEnter>
+        </>
+      )}
       {(() => {
         switch (true) {
           case isLoadingActivities:
@@ -34,11 +72,7 @@ export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
               </Paragraph>
             )
           case pages?.length === 0:
-            return (
-              <>
-                <RowLabel>No activities</RowLabel>
-              </>
-            )
+            return <RowLabel>No activities</RowLabel>
           default: {
             let lastDate: string | undefined
             return pages?.map((activities) => {

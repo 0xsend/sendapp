@@ -147,7 +147,7 @@ exports[`TokenDetails 1`] = `
         accessibilityRole="header"
         style={
           {
-            "color": "hsl(0, 0%, 42.5%)",
+            "color": "#B2B2B2",
             "display": "none",
             "fontFamily": "System",
             "fontSize": 19.2,

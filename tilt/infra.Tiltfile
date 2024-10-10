@@ -335,7 +335,7 @@ local_resource(
     labels = labels,
     links = [link("http://localhost:8233", "Temporal Web UI")],
     resource_deps = [],
-    serve_cmd = "temporal server start-dev --db-filename ./var/temporal.db",
+    serve_cmd = "yarn workspace @my/temporal server",
     serve_dir = _prj_root,
 )
 
