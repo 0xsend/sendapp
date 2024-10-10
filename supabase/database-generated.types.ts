@@ -196,6 +196,9 @@ export type Database = {
           created_at: string
           distribution_id: number
           fixed_value: number
+          multiplier_max: number
+          multiplier_min: number
+          multiplier_step: number
           type: Database["public"]["Enums"]["verification_type"]
           updated_at: string
         }
@@ -204,6 +207,9 @@ export type Database = {
           created_at?: string
           distribution_id: number
           fixed_value: number
+          multiplier_max?: number
+          multiplier_min?: number
+          multiplier_step?: number
           type: Database["public"]["Enums"]["verification_type"]
           updated_at?: string
         }
@@ -212,6 +218,9 @@ export type Database = {
           created_at?: string
           distribution_id?: number
           fixed_value?: number
+          multiplier_max?: number
+          multiplier_min?: number
+          multiplier_step?: number
           type?: Database["public"]["Enums"]["verification_type"]
           updated_at?: string
         }
@@ -1299,7 +1308,13 @@ export type Database = {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
-      verification_type: "tag_registration" | "tag_referral"
+      verification_type:
+        | "tag_registration"
+        | "tag_referral"
+        | "create_passkey"
+        | "send_ten"
+        | "send_one_hundred"
+        | "total_tag_referral"
     }
     CompositeTypes: {
       activity_feed_user: {
