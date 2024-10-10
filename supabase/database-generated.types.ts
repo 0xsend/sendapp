@@ -196,6 +196,9 @@ export type Database = {
           created_at: string
           distribution_id: number
           fixed_value: number
+          multiplier_max: number
+          multiplier_min: number
+          multiplier_step: number
           type: Database["public"]["Enums"]["verification_type"]
           updated_at: string
         }
@@ -204,6 +207,9 @@ export type Database = {
           created_at?: string
           distribution_id: number
           fixed_value: number
+          multiplier_max?: number
+          multiplier_min?: number
+          multiplier_step?: number
           type: Database["public"]["Enums"]["verification_type"]
           updated_at?: string
         }
@@ -212,6 +218,9 @@ export type Database = {
           created_at?: string
           distribution_id?: number
           fixed_value?: number
+          multiplier_max?: number
+          multiplier_min?: number
+          multiplier_step?: number
           type?: Database["public"]["Enums"]["verification_type"]
           updated_at?: string
         }
@@ -1106,8 +1115,13 @@ export type Database = {
       distribution_verifications_summary: {
         Row: {
           distribution_id: number | null
+          has_create_passkey: boolean | null
+          has_send_one_hundred: boolean | null
+          has_send_ten: boolean | null
+          multipliers: Json | null
           tag_referrals: number | null
           tag_registrations: number | null
+          total_referrals: number | null
           user_id: string | null
         }
         Relationships: [
@@ -1200,7 +1214,12 @@ export type Database = {
         }
         Returns: {
           address: string
+          chain_id: number
           created_at: string
+          deleted_at: string | null
+          id: string
+          init_code: string
+          updated_at: string
           user_id: string
         }[]
       }
@@ -1299,7 +1318,13 @@ export type Database = {
       key_type_enum: "ES256"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
       tag_status: "pending" | "confirmed"
-      verification_type: "tag_registration" | "tag_referral"
+      verification_type:
+        | "tag_registration"
+        | "tag_referral"
+        | "create_passkey"
+        | "send_ten"
+        | "send_one_hundred"
+        | "total_tag_referrals"
     }
     CompositeTypes: {
       activity_feed_user: {
