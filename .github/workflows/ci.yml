@@ -45,7 +45,9 @@ jobs:
       - name: Install Tilt
         id: tilt
         shell: bash
-        run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+        run: |
+          cd /tmp
+          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
       - name: Add hosts to /etc/hosts
         run: |
           sudo su
@@ -114,7 +116,9 @@ jobs:
       - name: Install Tilt
         id: tilt
         shell: bash
-        run: curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+        run: |
+          cd /tmp
+          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
       - name: Add hosts to /etc/hosts
         run: |
           sudo su

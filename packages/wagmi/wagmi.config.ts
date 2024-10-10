@@ -114,6 +114,18 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
+      name: 'SPX6900',
+      address: {
+        [mainnet.id]: '0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c', // mainnet
+        [localhost.id]: '0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c', // mainnet localhost fork
+        [sepolia.id]: '0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c', // sepolia
+        [baseLocal.id]: '0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C', //  base mainnet fork
+        [base.id]: '0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C', // base mainnet
+        [baseSepolia.id]: '0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C', // base sepolia
+      },
+      abi: erc20Abi,
+    },
+    {
       name: 'EntryPoint',
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',

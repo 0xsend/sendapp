@@ -9,6 +9,7 @@ export const TokenPricesSchema = z.object({
   ethereum: TokenPriceSchema,
   'send-token': TokenPriceSchema,
   'usd-coin': TokenPriceSchema,
+  spx6900: TokenPriceSchema,
 })
 
 export const useTokenPrices = (): UseQueryResult<z.infer<typeof TokenPricesSchema>, Error> => {
@@ -17,7 +18,7 @@ export const useTokenPrices = (): UseQueryResult<z.infer<typeof TokenPricesSchem
     gcTime: 1000 * 60 * 5,
     queryFn: async () => {
       const res = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,send-token&vs_currencies=usd'
+        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,send-token,spx6900&vs_currencies=usd'
       )
       if (!res.ok) {
         throw new Error(`Failed to fetch token prices. Status: ${res.status}`)

@@ -12,7 +12,13 @@ import {
 } from '@my/ui'
 import { useSendAccounts } from 'app/utils/send-accounts'
 import { setERC20Balance } from 'app/utils/useSetErc20Balance'
-import { baseMainnet, baseMainnetClient, sendTokenAddress, usdcAddress } from '@my/wagmi'
+import {
+  baseMainnet,
+  baseMainnetClient,
+  sendTokenAddress,
+  spx6900Address,
+  usdcAddress,
+} from '@my/wagmi'
 import { api } from 'app/utils/api'
 import {
   createTestClient,
@@ -119,6 +125,19 @@ export function SecretShopScreen() {
                     }}
                   >
                     Fund with 1M Send
+                  </Button>
+                  <Button
+                    onPress={async () => {
+                      await setERC20Balance({
+                        client: testClient,
+                        address: sendAcct.address,
+                        tokenAddress: spx6900Address[baseMainnetClient.chain.id],
+                        value: BigInt(6900 * 1e8),
+                      })
+                      toast.show('Funded with 69K SPX6900')
+                    }}
+                  >
+                    Fund with 69K SPX6900
                   </Button>
                 </>
               ) : (
