@@ -6,7 +6,7 @@ import request from 'supertest'
 import app from './app'
 import { supabaseAdmin } from './supabase'
 import pino from 'pino'
-import { DistributorWorker } from './distributor'
+import { DistributorV1Worker } from './distributor'
 import type { Tables } from '@my/supabase/database.types'
 
 describe('Root Route', () => {
@@ -210,7 +210,7 @@ describe('Distributor Worker', () => {
     const logger = pino({
       level: 'silent',
     })
-    const distributor = new DistributorWorker(logger, false)
+    const distributor = new DistributorV1Worker(logger, false)
     await distributor.calculateDistribution('4')
 
     const expectedShares = [

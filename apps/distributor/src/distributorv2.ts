@@ -28,7 +28,7 @@ const jsonBigint = (key, value) => {
   return value
 }
 
-export class DistributorV1Worker {
+export class DistributorV2Worker {
   private log: Logger
   private running: boolean
   private id: string
