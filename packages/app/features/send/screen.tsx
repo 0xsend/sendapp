@@ -13,15 +13,17 @@ import {
 } from '@my/ui'
 import Search from 'app/components/SearchBar'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
-import { useSendScreenParams } from 'app/routers/params'
+import { ScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { SendRecipient } from './confirm/screen'
 import { type Address, isAddress } from 'viem'
+import { CreateSendCheckBtn } from 'app/features/checks/components/create/CreateSendCheckBtn'
+import { CreateSendCheck } from 'app/features/checks/components/create/CreateSendCheck'
 
 export const SendScreen = () => {
-  const [{ recipient, idType }] = useSendScreenParams()
+  const [{ recipient, idType, screen }] = useSendScreenParams()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
@@ -29,6 +31,11 @@ export const SendScreen = () => {
   if (idType === 'address' && isAddress(recipient as Address)) {
     return <SendAmountForm />
   }
+
+  if (!recipient && screen === ScreenParams.SEND_CHECKS) {
+    return <CreateSendCheck />
+  }
+
   if (!profile)
     return (
       <TagSearchProvider>
@@ -56,6 +63,14 @@ export const SendScreen = () => {
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
 
+  const noSearchResultsPlaceholder = () => {
+    return (
+      <YStack gap="$2">
+        <CreateSendCheckBtn />
+      </YStack>
+    )
+  }
+
   return (
     <AnimatePresence>
       {isLoading && (
@@ -69,7 +84,10 @@ function SendSearchBody() {
           <Text>{error.message}</Text>
         </YStack>
       )}
-      <Search.Results />
+      <Search.Results>
+        {/** Render a placeholder if there are no search results */}
+        {noSearchResultsPlaceholder()}
+      </Search.Results>
     </AnimatePresence>
   )
 }
@@ -77,6 +95,7 @@ function SendSearchBody() {
 function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
   const toast = useToastController()
   const [clicked, setClicked] = useState(false)
+
   return (
     <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>
       <SendRecipient width={'100%'} />
@@ -101,27 +120,6 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
           has no send account! Ask them to create one or write a /send Check.
         </Text>
       </Anchor>
-
-      <Button
-        mx="auto"
-        miw="$16"
-        maw="$20"
-        disabled={clicked}
-        onPress={() => {
-          setClicked(true)
-          console.error('TODO: create send account')
-          toast.show('Coming soon')
-        }}
-      >
-        Write /send Check
-      </Button>
-      {clicked && (
-        <Fade>
-          <Paragraph width={'100%'} textAlign="center" color="$color12">
-            <Text>/send Checks Coming Soon</Text>
-          </Paragraph>
-        </Fade>
-      )}
     </YStack>
   )
 }
