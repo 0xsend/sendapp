@@ -30,6 +30,10 @@ runs:
       with:
         node-version-file: .node-version
         cache: "yarn"
+    - name: Enable Corepack
+      if: ${{ inputs.install-node == 'true' }}
+      shell: bash
+      run: corepack enable
     - name: Setup Bun
       if: ${{ inputs.install-bun == 'true' }}
       uses: oven-sh/setup-bun@v1
