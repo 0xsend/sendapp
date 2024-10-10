@@ -33,6 +33,19 @@ export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   return percentage / PERC_DENOM
 }
 
+export function calculateMultiplier(
+  totalReferrals: bigint,
+  verificationValue: { multiplier_min: number; multiplier_max: number; multiplier_step: number }
+): bigint {
+  const { multiplier_min, multiplier_max, multiplier_step } = verificationValue
+  const steps = Math.min(
+    Number(totalReferrals),
+    Math.floor((multiplier_max - multiplier_min) / multiplier_step)
+  )
+  const multiplier = multiplier_min + steps * multiplier_step
+  return BigInt(Math.floor(multiplier * Number(PERC_DENOM)))
+}
+
 /**
  * Given a list of balances and a distribution amount, calculate the distribution weights and share amounts.
  */
