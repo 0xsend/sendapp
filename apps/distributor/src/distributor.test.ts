@@ -6,7 +6,7 @@ import request from 'supertest'
 import app from './app'
 import { supabaseAdmin } from './supabase'
 import pino from 'pino'
-import { DistributorWorker } from './distributor'
+import { DistributorV1Worker } from './distributor'
 import type { Tables } from '@my/supabase/database.types'
 
 describe('Root Route', () => {
@@ -20,19 +20,19 @@ describe('Root Route', () => {
 
 describe('Distributor Route', () => {
   it('should reject unauthorized requests', async () => {
-    const res = await request(app).post('/distributor')
+    const res = await request(app).post('/distributor/v1')
 
     expect(res.statusCode).toBe(401)
     expect(res.body).toEqual('Unauthorized')
   })
 
   it('should handle authorization correctly', async () => {
-    const res = await request(app).get('/distributor')
+    const res = await request(app).get('/distributor/v1')
 
     expect(res.statusCode).toBe(200)
     expect(res.body).toMatchObject({
       distributor: true,
-      running: true,
+      running: false,
     })
   })
 
@@ -58,7 +58,7 @@ describe('Distributor Route', () => {
     expect(distribution).toBeDefined()
 
     const res = await request(app)
-      .post('/distributor')
+      .post('/distributor/v1')
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)
       .send({ id: distribution.number })
@@ -210,7 +210,7 @@ describe('Distributor Worker', () => {
     const logger = pino({
       level: 'silent',
     })
-    const distributor = new DistributorWorker(logger, false)
+    const distributor = new DistributorV1Worker(logger, false)
     await distributor.calculateDistribution('4')
 
     const expectedShares = [
