@@ -1,46 +1,48 @@
-import {
-  baseMainnet,
-  usdcAddress as usdcAddresses,
-  sendTokenAddress as sendAddresses,
-  sendTokenAbi,
-  usdcAbi,
-} from '@my/wagmi'
+import { baseMainnet, erc20Abi } from '@my/wagmi'
 import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
+import { coins } from '../data/coins'
 
-const usdcBaseContract = {
-  address: usdcAddresses[baseMainnet.id],
-  abi: usdcAbi,
-  chainId: baseMainnet.id,
-} as const
-
-const sendBaseContract = {
-  address: sendAddresses[baseMainnet.id],
-  abi: sendTokenAbi,
-  chainId: baseMainnet.id,
-} as const
+type BalanceOfResult =
+  | {
+      error?: undefined
+      result: string | number | bigint
+      status: 'success'
+    }
+  | {
+      error: Error
+      result?: undefined
+      status: 'failure'
+    }
+  | undefined
 
 export const useSendAccountBalances = () => {
   const { data: tokenPrices } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
+  const tokenContracts = coins
+    .filter((coin) => coin.token !== 'eth')
+    .map((coin) => ({
+      address: coin.token,
+      abi: erc20Abi,
+      chainId: baseMainnet.id,
+      functionName: 'balanceOf',
+      args: sendAccount?.address && [sendAccount?.address],
+    }))
+
   const { data: tokenBalances, isLoading: isLoadingTokenBalances } = useReadContracts({
     query: { enabled: !!sendAccount },
-    contracts: [
-      {
-        ...usdcBaseContract,
-        functionName: 'balanceOf',
-        args: sendAccount?.address && [sendAccount?.address],
-      },
-      {
-        ...sendBaseContract,
-        functionName: 'balanceOf',
-        args: sendAccount?.address && [sendAccount?.address],
-      },
-    ],
+    contracts: tokenContracts,
   })
+
+  const unpackResult = (result: BalanceOfResult): bigint | undefined => {
+    if (result && result.status === 'success' && BigInt(result.result) > 0n) {
+      return BigInt(result.result)
+    }
+    return undefined
+  }
 
   const { data: ethBalanceOnBase, isLoading: isLoadingEthBalanceOnBase } = useBalance({
     address: sendAccount?.address,
@@ -52,33 +54,34 @@ export const useSendAccountBalances = () => {
 
   const balances = isLoading
     ? undefined
-    : {
-        ETH: ethBalanceOnBase?.value,
-        USDC: tokenBalances?.[0].result,
-        SEND: tokenBalances?.[1].result,
-      }
+    : coins.reduce(
+        (acc, coin) => {
+          if (coin.token === 'eth') {
+            acc[coin.symbol] = ethBalanceOnBase?.value
+            console.log
+            return acc
+          }
+          const idx = tokenContracts.findIndex((c) => c.address === coin.token)
+          if (idx === -1) {
+            console.error('No token contract found for coin', coin)
+            return acc
+          }
+          const tokenBal = tokenBalances?.[idx]
+          acc[coin.symbol] = unpackResult(tokenBal)
+          return acc
+        },
+        {} as Record<string, bigint | undefined>
+      )
 
   if (!tokenPrices) {
     return { balances, isLoading, totalBalance: undefined }
   }
-  const usdcBalanceInUsd =
-    convertBalanceToFiat(
-      usdcBaseContract.address,
-      tokenBalances?.[0].result ?? 0n,
-      tokenPrices['usd-coin'].usd
-    ) ?? 0
 
-  const sendBalanceInUsd =
-    convertBalanceToFiat(
-      sendBaseContract.address,
-      tokenBalances?.[1].result ?? 0n,
-      tokenPrices['send-token'].usd
-    ) ?? 0
-
-  const ethBalanceInUsd =
-    convertBalanceToFiat('eth', ethBalanceOnBase?.value ?? 0n, tokenPrices.ethereum.usd) ?? 0
-
-  const totalBalance = usdcBalanceInUsd + sendBalanceInUsd + ethBalanceInUsd
+  const totalBalance = coins.reduce((total, coin) => {
+    const balance = coin.token === 'eth' ? ethBalanceOnBase?.value : balances?.[coin.symbol]
+    const price = tokenPrices[coin.coingeckoTokenId].usd
+    return total + (convertBalanceToFiat(coin.token, balance ?? 0n, price) ?? 0)
+  }, 0)
 
   return { balances, totalBalance, isLoading }
 }

@@ -2,6 +2,7 @@ import {
   baseMainnet,
   usdcAddress as usdcAddresses,
   sendTokenAddress as sendAddresses,
+  spx6900Address as spx6900Addresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -38,15 +39,28 @@ export const sendCoin = {
   coingeckoTokenId: 'send-token',
 } as const
 
-export const coins = [usdcCoin, ethCoin, sendCoin] as const
+export const spx6900Coin = {
+  label: 'SPX',
+  symbol: 'SPX',
+  token: spx6900Addresses[baseMainnet.id],
+  decimals: 8,
+  coingeckoTokenId: 'spx6900',
+} as const
+
+/**
+ * The coins (tokens) array that are supported by Send App.
+ */
+export const coins = [usdcCoin, ethCoin, spx6900Coin, sendCoin] as const
 export type coins = typeof coins
 
 type CoinsDict = { [key in coins[number]['token']]: coins[number] }
 
-export const coinsDict = {
-  [usdcCoin.token]: usdcCoin,
-  [ethCoin.token]: ethCoin,
-  [sendCoin.token]: sendCoin,
-} as const as CoinsDict
+/**
+ * A dictionary of coins (tokens) by token address.
+ */
+export const coinsDict = coins.reduce((acc, coin) => {
+  acc[coin.token] = coin
+  return acc
+}, {} as CoinsDict)
 
 export type coinsDict = typeof coinsDict

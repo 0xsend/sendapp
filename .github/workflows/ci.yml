@@ -42,12 +42,23 @@ jobs:
       YARN_ENABLE_HARDENED_MODE: 0
 
     steps:
+      - name: Install Tilt
+        id: tilt
+        shell: bash
+        run: |
+          cd /tmp
+          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+      - name: Add hosts to /etc/hosts
+        run: |
+          sudo su
+          if grep -q "host.docker.internal" /etc/hosts; then
+            echo "Hosts file already contains host.docker.internal"
+          else
+            echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
+          fi
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      # No idea how homebrew bundle broke with tilt depending on python so installing manually
-      - name: Install Tilt
-        uses: ./.github/actions/install-tilt
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -99,12 +110,26 @@ jobs:
     permissions:
       pull-requests: write
 
+    timeout-minutes: 40
+
     steps:
+      - name: Install Tilt
+        id: tilt
+        shell: bash
+        run: |
+          cd /tmp
+          curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
+      - name: Add hosts to /etc/hosts
+        run: |
+          sudo su
+          if grep -q "host.docker.internal" /etc/hosts; then
+            echo "Hosts file already contains host.docker.internal"
+          else
+            echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
+          fi
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install Tilt
-        uses: ./.github/actions/install-tilt
       - name: Set up Homebrew
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
