@@ -30,8 +30,11 @@ import { useBalance, type UseBalanceReturnType } from 'wagmi'
 import { IconCoin } from '../icons/IconCoin'
 export const CoinField = ({
   native = false,
+  supportedCoins = [...coins],
   ...props
-}: Pick<SelectProps, 'size' | 'native' | 'defaultValue'>) => {
+}: Pick<SelectProps, 'size' | 'native' | 'defaultValue'> & {
+  supportedCoins?: coin[]
+}) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const {
@@ -121,7 +124,7 @@ export const CoinField = ({
                 <XStack als="flex-start" w={320} $sm={{ w: '100%' }} boc={'transparent'} f={1}>
                   <Select.Group disabled={disabled} space="$0">
                     {/* <Select.Label>{label}</Select.Label> */}
-                    {coins.map((coin, i) => {
+                    {supportedCoins.map((coin, i) => {
                       return (
                         <CoinFieldItem
                           active={coin.token === field.value}
