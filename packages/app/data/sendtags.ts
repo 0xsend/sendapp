@@ -19,15 +19,15 @@ export function total(pendingTags: { name: string }[]) {
 export function price(length: number) {
   switch (length) {
     case 5:
-      return parseUnits('8', 6) // 8 USDC
+      return parseUnits('4', 6) // 4 USDC
     case 4:
-      return parseUnits('16', 6) // 16 USDC
+      return parseUnits('8', 6) // 8 USDC
     case 3:
     case 2:
     case 1:
-      return parseUnits('32', 6) // 32 USDC
+      return parseUnits('16', 6) // 16 USDC
     default:
-      return parseUnits('4', 6) // 4 USDC for 6+ characters
+      return parseUnits('2', 6) // 2 USDC for 6+ characters
   }
 }
 
@@ -39,15 +39,15 @@ export function price(length: number) {
 export function reward(length: number) {
   switch (length) {
     case 5:
-      return parseUnits('6', 6) // 6 USDC
+      return parseUnits('3', 6) // 3 USDC
     case 4:
-      return parseUnits('12', 6) // 12 USDC
+      return parseUnits('6', 6) // 6 USDC
     case 3:
     case 2:
     case 1:
-      return parseUnits('24', 6) // 24 USDC
+      return parseUnits('12', 6) // 12 USDC
     default:
-      return parseUnits('3', 6) // 3 USDC for 6+ characters
+      return parseUnits('1.5', 6) // 1.5 USDC for 6+ characters
   }
 }
 
