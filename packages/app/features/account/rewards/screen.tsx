@@ -506,7 +506,17 @@ const DistributionRewardsList = ({
         <XStack w="100%" gap="$2" jc={'space-between'} maw={1072} mx="auto">
           {distributions?.map((distribution, i) => {
             return distribution?.id === undefined ? (
-              <Card f={1} maw={84} miw="$7" h="$2" br={6} disabled jc="center" opacity={0.5}>
+              <Card
+                key={`inactive-${i + 1}`}
+                f={1}
+                maw={84}
+                miw="$7"
+                h="$2"
+                br={6}
+                disabled
+                jc="center"
+                opacity={0.5}
+              >
                 <Paragraph
                   size={'$1'}
                   padding={'unset'}

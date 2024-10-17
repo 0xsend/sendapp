@@ -23,7 +23,9 @@
       "./packages/app/components/img/**",
       "packages/shovel/etc/config.json",
       "./supabase/.temp/**",
-      "./packages/contracts/var/*.json"
+      "./packages/contracts/var/*.json",
+      "**/tsconfig.json",
+      "**/*.tsconfig.json"
     ]
   },
   "organizeImports": {
