@@ -23,7 +23,7 @@ import { SchemaForm } from 'app/utils/SchemaForm'
 import { shorten } from 'app/utils/strings'
 import { useSearchResultHref } from 'app/utils/useSearchResultHref'
 import * as Linking from 'expo-linking'
-import { useEffect, useState } from 'react'
+import { type PropsWithChildren, useEffect, useState } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
@@ -45,7 +45,7 @@ const formatResultsKey = (str: string): string => {
   return str.replace(/_matches/g, '').replace(/_/g, ' ')
 }
 
-function SearchResults() {
+function SearchResults(props: PropsWithChildren) {
   const { results, isLoading, error } = useTagSearch()
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
@@ -58,8 +58,10 @@ function SearchResults() {
       </YStack>
     )
   }
+
+  // if there are no results or an error, show the children
   if (!results || error) {
-    return null
+    return props.children
   }
 
   if (isAddress(query ?? '')) {

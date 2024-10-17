@@ -5,6 +5,10 @@ import type { Address } from 'viem'
 
 export type RootParams = { nav?: 'home' | 'settings'; token?: string; search?: string }
 
+export enum ScreenParams {
+  SEND_CHECKS = 'Send Checks',
+}
+
 const { useParam: useRootParam, useParams: useRootParams } = createParam<RootParams>()
 
 const useNav = () => {
@@ -72,6 +76,7 @@ export type SendScreenParams = {
   amount?: string
   sendToken?: `0x${string}` | 'eth'
   note?: string
+  screen?: ScreenParams
 }
 
 const { useParam: useSendParam, useParams: useSendParams } = createParam<SendScreenParams>()
@@ -97,6 +102,12 @@ const useAmount = () => {
   return [amount, setAmountParam] as const
 }
 
+const useScreen = () => {
+  const [screen, useScreen] = useSendParam('screen')
+
+  return [screen, useScreen] as const
+}
+
 export const useSendToken = () => {
   const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
     initial: usdcAddress[baseMainnet.id],
@@ -118,6 +129,7 @@ export const useSendScreenParams = () => {
   const [amount] = useAmount()
   const [sendToken] = useSendToken()
   const [note] = useNote()
+  const [screen] = useScreen()
 
   return [
     {
@@ -126,6 +138,7 @@ export const useSendScreenParams = () => {
       amount,
       sendToken,
       note,
+      screen,
     },
     setParams,
   ] as const
