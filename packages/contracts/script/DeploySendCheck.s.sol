@@ -13,7 +13,7 @@ contract DeploySendCheckScript is Script, Helper {
 
     function run() external returns (SendCheck) {
         vm.startBroadcast();
-        SendCheck sendCheck = new SendCheck();
+        SendCheck sendCheck = new SendCheck{salt: keccak256("SendCheck")}();
 
         vm.stopBroadcast();
         return sendCheck;
