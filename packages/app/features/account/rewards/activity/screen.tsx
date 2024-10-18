@@ -19,7 +19,7 @@ import {
   type CardProps,
 } from '@my/ui'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
-import { IconInfoCircle, IconX } from 'app/components/icons'
+import { IconAccount, IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
@@ -37,7 +37,7 @@ export function ActivityRewardsScreen() {
 
   if (isLoading)
     return (
-      <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+      <YStack f={1} pt={'$6'} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Spinner color="$color" size="large" />
@@ -46,7 +46,7 @@ export function ActivityRewardsScreen() {
     )
   if (!distributions || !distributions[selectedDistributionIndex])
     return (
-      <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+      <YStack f={1} pt={'$6'} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Paragraph color={'$color10'} size={'$5'}>
@@ -72,7 +72,7 @@ export function ActivityRewardsScreen() {
   }
 
   return (
-    <YStack f={1} pb={'$2'} pt={'$6'} gap={'$7'}>
+    <YStack f={1} pb={'$12'} pt={'$6'} gap={'$7'}>
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
         <H3 fontWeight={'600'} color={'$color12'}>
@@ -173,7 +173,14 @@ export function ActivityRewardsScreen() {
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
         <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+<<<<<<< HEAD
         <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
+=======
+        <MultiplierCards
+          distribution={distributions[selectedDistributionIndex]}
+          distributionDate={distributionDates[selectedDistributionIndex]}
+        />
+>>>>>>> 6c1fe9b1 (Rewards Referral Multiplier Card)
       </YStack>
     </YStack>
   )
@@ -337,6 +344,98 @@ const PerkCard = ({
           </>
         )}
         {children}
+      </XStack>
+    </Card>
+  )
+}
+
+const MultiplierCards = ({
+  distribution,
+  distributionDate,
+}: {
+  distribution: UseDistributionsResultData[number]
+  distributionDate?: string
+}) => {
+  const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Multiplier
+      </H3>
+      <MonthlyReferralsMultiplierCard
+        distributionDate={distributionDate}
+        multiplier={multipliers?.tag_referral}
+      />
+      <TotalReferralsMultiplierCard multiplier={multipliers?.total_tag_referrals} />
+    </YStack>
+  )
+}
+
+const MonthlyReferralsMultiplierCard = ({
+  multiplier,
+  distributionDate,
+}: {
+  distributionDate?: string
+  multiplier?: {
+    multiplier_max: number
+    multiplier_min: number
+    multiplier_step: number
+    value: number
+  } | null
+}) => {
+  return (
+    <Card
+      br={'$6'}
+      p="$7"
+      jc={'space-between'}
+      ai={'center'}
+      mih={112}
+      $gtSm={{ maw: 285 }}
+      w={'100%'}
+    >
+      <XStack ai="center" w={'100%'} jc="space-between">
+        <XStack ai="center" gap="$2">
+          <IconAccount size={'2'} color={'$color10'} />
+          <H3 fontWeight={'500'} color={'$color10'}>
+            {distributionDate?.split(' ')[0] ?? 'Monthly'} Referrals
+          </H3>
+        </XStack>
+        <Paragraph fontSize={'$8'} $sm={{ fontSize: '$9' }} fontWeight={'600'} color={'$color12'}>
+          X {multiplier?.value ?? 1}
+        </Paragraph>
+      </XStack>
+    </Card>
+  )
+}
+
+const TotalReferralsMultiplierCard = ({
+  multiplier,
+}: {
+  multiplier:
+    | UseDistributionsResultData[number]['distribution_verifications_summary'][number]['multipliers']
+    | null
+}) => {
+  return (
+    <Card
+      br={'$6'}
+      p="$7"
+      jc={'space-between'}
+      ai={'center'}
+      mih={112}
+      $gtSm={{ maw: 331 }}
+      w={'100%'}
+    >
+      <XStack ai="center" w={'100%'} jc="space-between">
+        <XStack ai="center" gap="$2">
+          <IconAccount size={'2'} color={'$color10'} />
+          <H3 fontWeight={'500'} color={'$color10'}>
+            Referrals
+          </H3>
+        </XStack>
+        <Paragraph fontSize={'$8'} $sm={{ fontSize: '$9' }} fontWeight={'600'} color={'$color12'}>
+          X {multiplier?.value ?? 1}
+        </Paragraph>
       </XStack>
     </Card>
   )
