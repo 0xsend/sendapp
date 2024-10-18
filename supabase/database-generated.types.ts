@@ -1115,14 +1115,12 @@ export type Database = {
       distribution_verifications_summary: {
         Row: {
           distribution_id: number | null
-          has_create_passkey: boolean | null
-          has_send_one_hundred: boolean | null
-          has_send_ten: boolean | null
           multipliers: Json | null
           tag_referrals: number | null
           tag_registrations: number | null
-          total_referrals: number | null
+          total_tag_referrals: number | null
           user_id: string | null
+          verification_values: Json | null
         }
         Relationships: [
           {
