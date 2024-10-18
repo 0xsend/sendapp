@@ -1,14 +1,4 @@
-import {
-  YStack,
-  H1,
-  Paragraph,
-  XStack,
-  LinkableButton,
-  Button,
-  Image,
-  Stack,
-  Spinner,
-} from '@my/ui'
+import { YStack, H1, Paragraph, XStack, LinkableButton, Button, Image, Stack } from '@my/ui'
 import type { sendMerkleDropAddress } from '@my/wagmi'
 import { IconArrowRight, IconSend } from 'app/components/icons'
 import {
@@ -82,6 +72,7 @@ const Section = ({
   isLoading = false,
   claimStatus,
 }: {
+  //@todo: using props like this is weird, better to pass children so we don't have to pass as much state
   title: string
   href: string
   reward: string
@@ -105,42 +96,35 @@ const Section = ({
         objectFit="cover"
       />
       <Stack pos="absolute" t={0} l={0} h="100%" w="100%" backgroundColor={'black'} opacity={0.2} />
-      {isLoading ? (
-        <YStack
+
+      <YStack p="$size.3.5" gap={'$size.11'} mih={290}>
+        <XStack
+          gap={6}
+          ai="center"
+          alignSelf="flex-start"
           pos={'relative'}
-          h={'100%'}
-          w={'100%'}
+          p={'$size.0.75'}
+          pr={'$size.0.9'}
+          borderRadius={'$4'}
           backgroundColor={'$color1'}
-          $gtLg={{ h: 'auto', w: 'auto' }}
         >
-          <Spinner size="large" color={'$color'} />
-        </YStack>
-      ) : (
-        <YStack p="$size.3.5" gap={'$size.11'}>
-          <XStack
-            gap={6}
-            ai="center"
-            alignSelf="flex-start"
-            pos={'relative'}
-            p={'$size.0.75'}
-            pr={'$size.0.9'}
-            borderRadius={'$4'}
-            backgroundColor={'$color1'}
-          >
-            <IconSend size={24} color="$primary" />
-            <Paragraph size={'$5'}>{title}</Paragraph>
-          </XStack>
-          <XStack gap={'$size.1'} jc="space-between">
-            <YStack w="100%">
-              <Paragraph
-                fontWeight={400}
-                color={'$color10'}
-                $theme-light={{ color: '$color3' }}
-                size={'$5'}
-              >
-                {claimStatus}
-              </Paragraph>
-              <XStack ai={'center'} jc="space-between">
+          <IconSend size={24} color="$primary" />
+          <Paragraph size={'$5'}>{title}</Paragraph>
+        </XStack>
+        <XStack gap={'$size.1'} jc="space-between">
+          <YStack w="100%">
+            <Paragraph
+              fontWeight={400}
+              color={'$color10'}
+              $theme-light={{ color: '$color3' }}
+              size={'$5'}
+            >
+              {isLoading ? '' : claimStatus}
+            </Paragraph>
+            <XStack ai={'center'} jc="space-between">
+              {isLoading ? (
+                <Stack />
+              ) : (
                 <Paragraph
                   fontWeight={500}
                   ff={'$mono'}
@@ -149,16 +133,16 @@ const Section = ({
                 >
                   {reward === '' ? '' : `${reward} SEND`}
                 </Paragraph>
-                <LinkableButton href={href} unstyled borderRadius={'$3'} p={'$size.0.5'}>
-                  <Button.Icon>
-                    <IconArrowRight size={'3'} color={'$primary'} />
-                  </Button.Icon>
-                </LinkableButton>
-              </XStack>
-            </YStack>
-          </XStack>
-        </YStack>
-      )}
+              )}
+              <LinkableButton href={href} unstyled borderRadius={'$3'} p={'$size.0.5'}>
+                <Button.Icon>
+                  <IconArrowRight size={'3'} color={'$primary'} />
+                </Button.Icon>
+              </LinkableButton>
+            </XStack>
+          </YStack>
+        </XStack>
+      </YStack>
     </YStack>
   )
 }

@@ -7,6 +7,7 @@ import {
   LinearGradient,
   usePwa,
   Paragraph,
+  H3,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
@@ -168,6 +169,12 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const { direction } = useScrollDirection()
 
   const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
+  const distributionMonth = distribution?.qualification_end.toLocaleString('default', {
+    month: 'long',
+  })
+
+  const now = new Date()
+  const isQualificationOver = distribution?.qualification_end < now
 
   return (
     <>
@@ -176,7 +183,7 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
         {!isLoading && isVisible && direction !== 'down' && (
           <Stack
             w={'100%'}
-            pb={isPwa ? '$1' : '$5'}
+            pb={isPwa ? '$1' : '$3'}
             px="$4"
             $platform-web={{
               position: 'fixed',
@@ -202,6 +209,11 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
               $gtLg={{ display: 'none' }}
             />
             <Stack ai="center" jc="space-between" gap="$3" pt="$5">
+              <H3 fontWeight={'600'} color={'$color10'}>
+                {isQualificationOver
+                  ? `Total ${distributionMonth} Rewards`
+                  : `Estimated ${distributionMonth} Rewards`}
+              </H3>
               <Paragraph
                 fontFamily={'$mono'}
                 $gtXs={{ fontSize: '$10' }}
