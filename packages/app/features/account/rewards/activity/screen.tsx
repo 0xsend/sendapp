@@ -16,14 +16,13 @@ import {
   Card,
   Label,
   Theme,
+  type CardProps,
 } from '@my/ui'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
 import { IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
-import { useConfirmedTags } from 'app/utils/tags'
-import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useId, useState } from 'react'
 
 export function ActivityRewardsScreen() {
@@ -174,6 +173,7 @@ export function ActivityRewardsScreen() {
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
         <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+        <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
       </YStack>
     </YStack>
   )
@@ -282,6 +282,66 @@ const DistributionRequirementsCard = ({
     </Card>
   )
 }
+
+const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResultData[number] }) => {
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Perks
+      </H3>
+      <PerkCard
+        isCompleted={Boolean(
+          distribution.distribution_verifications_summary?.at(0)?.has_create_passkey
+        )}
+      >
+        <YStack gap="$2">
+          <H3 fontWeight={'600'} color={'$color12'}>
+            Create a Passkey
+          </H3>
+          <Paragraph fontWeight={'500'} color={'$color12'}>
+            +{amount.toLocaleString()} SEND
+          </Paragraph>
+        </YStack>
+      </PerkCard>
+    </YStack>
+  )
+}
+
+const PerkCard = ({
+  isCompleted,
+  children,
+}: React.PropsWithChildren<CardProps> & { isCompleted: boolean }) => {
+  return (
+    <Card
+      br={12}
+      $gtLg={{ gap: '$4' }}
+      p="$7"
+      jc={'space-between'}
+      mih={208}
+      $gtSm={{ maw: 331 }}
+      $theme-light={{ bc: '$color2' }}
+      w={'100%'}
+    >
+      <XStack ai="center" gap="$2">
+        {isCompleted ? (
+          <>
+            <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+            <Paragraph color="$color11">Completed</Paragraph>
+          </>
+        ) : (
+          <>
+            <Theme name="red">
+              <IconX color={'$color8'} size={'$1'} />
+            </Theme>
+            <Paragraph color="$color11">Completed</Paragraph>
+          </>
+        )}
+        {children}
+      </XStack>
+    </Card>
+  )
+}
+
 const DistributionItem = ({
   isActive,
   value,
