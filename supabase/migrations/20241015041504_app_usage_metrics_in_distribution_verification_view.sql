@@ -52,5 +52,4 @@ FROM
     AND bc.type = dvv.type
 GROUP BY
   bc.distribution_id,
-  bc.user_id;
-
+  bc.user_id
