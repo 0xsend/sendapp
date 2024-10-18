@@ -88,7 +88,7 @@ export async function fetchReferrer({
       .maybeSingle(),
   ])
 
-  const referrer = [profileByTag, profileByReferralCode].find((p) => {
+  const referrer = [profileByReferralCode, profileByTag].find((p) => {
     if (!p) return false
     if (p.id === profile.id) return false // no self referrals
     if (!p.address) return false // need a send account
