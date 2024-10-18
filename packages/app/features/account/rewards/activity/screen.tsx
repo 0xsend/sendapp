@@ -18,7 +18,7 @@ import {
   Theme,
   type CardProps,
 } from '@my/ui'
-import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
+import { useReadSendTokenBalanceOf } from '@my/wagmi'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
 import { IconAccount, IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
@@ -31,9 +31,9 @@ import { DistributionClaimButton } from '../components/DistributionClaimButton'
 //@todo get this from the db
 const verificationTypesAndTitles = [
   ['create_passkey', 'Create a Passkey'],
+  ['tag_registration', 'Register a Sendtag', '(per tag)'],
   ['send_ten', '10+ Sends'],
   ['send_one_hundred', '100+ Sends'],
-  ['tag_registration', 'Register a Sendtag', '(per tag)'],
   ['tag_referral', 'Referrals'],
   ['total_tag_referrals', 'Total Referrals'],
 ] as const
@@ -195,7 +195,7 @@ export function ActivityRewardsScreen() {
               pt={'$5'}
             >
               <Select.Group>
-                {distributions.map((distribution, i) => (
+                {distributions.toReversed().map((distribution, i) => (
                   <DistributionItem
                     isActive={
                       distribution.number === distributions[selectedDistributionIndex]?.number
@@ -256,13 +256,12 @@ const Header = () => (
     />
 
     <YStack p="$4" pt={'$3'} maw={463} position="absolute" zIndex={1}>
-      <H1 tt={'uppercase'} $theme-light={{ col: '$color0' }} size={'$9'} $gtMd={{ size: '$10' }}>
+      <H1 tt={'uppercase'} color={'white'} size={'$9'} $gtMd={{ size: '$10' }}>
         Unlock <br />
         Extra Rewards
       </H1>
       <Paragraph
-        $theme-light={{ color: '$color2' }}
-        color={'$color10'}
+        color="$darkAlabaster"
         size={'$2'}
         $gtMd={{
           size: '$5',
@@ -283,7 +282,7 @@ const DistributionRequirementsCard = ({
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
   } = useReadSendTokenBalanceOf({
-    chainId: distribution.chain_id as keyof typeof sendTokenAddress,
+    chainId: distribution.chain_id ?? 8453,
     args: [distribution.distribution_shares.at(0)?.address ?? zeroAddress],
     blockNumber: distribution.snapshot_block_num
       ? BigInt(distribution.snapshot_block_num)
@@ -331,19 +330,20 @@ const DistributionRequirementsCard = ({
               switch (true) {
                 case isLoadingSnapshotBalance:
                   return <Spinner size="small" />
-                case distribution.hodler_min_balance < (snapshotBalance ?? 0):
+                case distribution.hodler_min_balance === undefined ||
+                  distribution.hodler_min_balance > (snapshotBalance ?? 0):
+                  return (
+                    <Theme name="red">
+                      <IconInfoCircle color={'$color8'} size={'$1'} />
+                    </Theme>
+                  )
+                default:
                   return (
                     <CheckCircle2
                       $theme-light={{ color: '$color12' }}
                       color="$primary"
                       size={'$1.5'}
                     />
-                  )
-                default:
-                  return (
-                    <Theme name="red">
-                      <IconInfoCircle color={'$color8'} size={'$1'} />
-                    </Theme>
                   )
               }
             })()}
@@ -369,6 +369,9 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
   const verificationValues =
     distribution.distribution_verifications_summary.at(0)?.verification_values
 
+  const now = new Date()
+  const isQualificationOver = distribution.qualification_end < now
+
   return (
     <YStack f={1} w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
@@ -376,7 +379,13 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
         {verificationTypesAndTitles
-          .filter(([verificationType]) => verificationValues?.[verificationType].fixed_value > 0)
+          .filter(
+            ([verificationType]) =>
+              (verificationValues?.[verificationType].fixed_value > 0 && !isQualificationOver) ||
+              (isQualificationOver &&
+                verificationValues?.[verificationType].count !== 0 &&
+                verificationValues?.[verificationType].fixed_value > 0)
+          )
           .map(([verificationType, title, details]) => (
             <PerkCard
               key={verificationType}
@@ -498,10 +507,19 @@ const ClaimableRewardsCard = ({
 }: { distribution: UseDistributionsResultData[number] }) => {
   const shareAmount = distribution.distribution_shares?.[0]?.amount
   if (shareAmount === undefined || shareAmount === 0) return null
+  const now = new Date()
+  const isQualificationOver = distribution.qualification_end < now
+
+  const distributionMonth = distribution.qualification_end.toLocaleString('default', {
+    month: 'long',
+  })
+
   return (
     <YStack f={1} w={'100%'} gap="$5" $lg={{ display: 'none' }}>
       <H3 fontWeight={'600'} color={'$color12'}>
-        Total Claimable Rewards
+        {isQualificationOver
+          ? `Total ${distributionMonth} Rewards`
+          : `Estimated ${distributionMonth} Rewards`}
       </H3>
       <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>
         <Stack ai="center" jc="space-between" fd="row" w="100%">

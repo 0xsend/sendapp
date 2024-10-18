@@ -124,7 +124,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           accessibilityRole="header"
           style={
             {
-              "color": "#FFFFFF",
+              "color": "white",
               "fontFamily": "System",
               "fontSize": 30,
               "fontWeight": "700",
@@ -146,7 +146,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         <Text
           style={
             {
-              "color": "#B2B2B2",
+              "color": "#E6E6E6",
               "fontFamily": "System",
               "fontSize": 14.399999999999999,
               "fontWeight": "300",
@@ -858,7 +858,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Total Claimable Rewards
+          Estimated 1,721,001,600,000 Rewards
         </Text>
         <View
           style={
