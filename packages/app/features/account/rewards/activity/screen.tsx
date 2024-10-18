@@ -13,12 +13,17 @@ import {
   Adapt,
   Sheet,
   type SelectItemProps,
+  Card,
+  Label,
   Theme,
 } from '@my/ui'
-import { ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
-import { IconX } from 'app/components/icons'
+import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
+import { IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
-import { useMonthlyDistributions } from 'app/utils/distributions'
+import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
+import formatAmount from 'app/utils/formatAmount'
+import { useConfirmedTags } from 'app/utils/tags'
+import { useChainAddresses } from 'app/utils/useChainAddresses'
 import { useId, useState } from 'react'
 
 export function ActivityRewardsScreen() {
@@ -167,6 +172,9 @@ export function ActivityRewardsScreen() {
           </Select.Content>
         </Select>
       </XStack>
+      <YStack f={1} w={'100%'} gap={'$7'}>
+        <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+      </YStack>
     </YStack>
   )
 }
@@ -221,6 +229,59 @@ const Header = () => (
   </Stack>
 )
 
+const DistributionRequirementsCard = ({
+  distribution,
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const snapshotBalance = distribution.distribution_shares.at(0)?.amount
+
+  return (
+    <Card br={12} $theme-light={{ bc: '$color2' }} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+      <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
+        <YStack gap="$2">
+          <Label fontSize={'$5'} col={'$color10'}>
+            Your SEND Balance
+          </Label>
+          <Theme reset>
+            <Paragraph
+              fontFamily={'$mono'}
+              fontSize={'$10'}
+              fontWeight={'500'}
+              color={'$color12'}
+              lh={'$8'}
+            >
+              {`${formatAmount(snapshotBalance?.toString() ?? 0, 9, 0)} SEND`}
+            </Paragraph>
+          </Theme>
+        </YStack>
+        <YStack gap="$2" ai={'flex-end'}>
+          <XStack ai="center" gap="$2">
+            <Paragraph>
+              Min. Balance {formatAmount(distribution.hodler_min_balance, 9, 0)}
+            </Paragraph>
+            {distribution.hodler_min_balance < (snapshotBalance ?? 0) ? (
+              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+            ) : (
+              <Theme name="red">
+                <IconInfoCircle color={'$color8'} size={'$1'} />
+              </Theme>
+            )}
+          </XStack>
+          {/* TODO: Add tag*/}
+          {/* <XStack ai="center" gap="$2">
+            <Paragraph>Sendtag Registered</Paragraph>
+            {Array.isArray(tags) && tags.length > 0 ? (
+              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+            ) : (
+              <Theme name="red">
+                <IconInfoCircle color={'$color8'} size={'$1'} />
+              </Theme>
+            )}
+          </XStack> */}
+        </YStack>
+      </Stack>
+    </Card>
+  )
+}
 const DistributionItem = ({
   isActive,
   value,
