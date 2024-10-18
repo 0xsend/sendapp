@@ -24,6 +24,7 @@ import { useRewardsScreenParams } from 'app/routers/params'
 import { useMonthlyDistributions, type UseDistributionsResultData } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { useId, useState } from 'react'
+import { DistributionClaimButton } from '../components/DistributionClaimButton'
 
 export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -173,14 +174,12 @@ export function ActivityRewardsScreen() {
       </XStack>
       <YStack f={1} w={'100%'} gap={'$7'}>
         <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
-<<<<<<< HEAD
         <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
-=======
         <MultiplierCards
           distribution={distributions[selectedDistributionIndex]}
           distributionDate={distributionDates[selectedDistributionIndex]}
         />
->>>>>>> 6c1fe9b1 (Rewards Referral Multiplier Card)
+        <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
       </YStack>
     </YStack>
   )
@@ -242,7 +241,7 @@ const DistributionRequirementsCard = ({
   const snapshotBalance = distribution.distribution_shares.at(0)?.amount
 
   return (
-    <Card br={12} $theme-light={{ bc: '$color2' }} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+    <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack gap="$2">
           <Label fontSize={'$5'} col={'$color10'}>
@@ -326,7 +325,6 @@ const PerkCard = ({
       jc={'space-between'}
       mih={208}
       $gtSm={{ maw: 331 }}
-      $theme-light={{ bc: '$color2' }}
       w={'100%'}
     >
       <XStack ai="center" gap="$2">
@@ -438,6 +436,33 @@ const TotalReferralsMultiplierCard = ({
         </Paragraph>
       </XStack>
     </Card>
+  )
+}
+
+const ClaimableRewardsCard = ({
+  distribution,
+}: { distribution: UseDistributionsResultData[number] }) => {
+  const shareAmount = distribution.distribution_shares?.[0]?.amount
+  return (
+    <YStack f={1} w={'100%'} gap="$5">
+      <H3 fontWeight={'600'} color={'$color12'}>
+        Total Claimable Rewards
+      </H3>
+      <Card br={'$6'} p="$7" jc={'space-between'} ai={'center'} w={'100%'}>
+        <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
+          <Paragraph
+            fontFamily={'$mono'}
+            $gtXs={{ fontSize: '$10' }}
+            fontSize={'$9'}
+            fontWeight={'500'}
+            lh={40}
+          >
+            {shareAmount === undefined ? 'N/A' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+          </Paragraph>
+          <DistributionClaimButton distribution={distribution} />
+        </Stack>
+      </Card>
+    </YStack>
   )
 }
 
