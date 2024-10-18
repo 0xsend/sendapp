@@ -74,7 +74,7 @@ if (argv.restore) {
     process.exit(1)
   })
   // restore the database from the latest snapshot
-  await $` env SNAPLET_TARGET_DATABASE_URL=$SUPABASE_DB_URL bunx @snaplet/snapshot snapshot restore --no-reset --latest`.catch(
+  await $`env SNAPLET_TARGET_DATABASE_URL=$SUPABASE_DB_URL bunx @snaplet/snapshot snapshot restore --no-reset --latest`.catch(
     (e) => {
       console.log(chalk.red('Error restoring database:'), e.stderr)
       process.exit(1)
