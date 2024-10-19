@@ -377,8 +377,7 @@ export class DistributorV2Worker {
     }
 
     // Calculate hodler pool share weights
-    // -500 to account for rounding errors
-    const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount - 500n
+    const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount
 
     let hodlerShares: { address: string; amount: bigint }[] = []
     if (hodlerPoolAvailableAmount > 0n) {
