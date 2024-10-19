@@ -66,6 +66,22 @@ export function calculateWeights(
     }
   }
 
+  //@todo: this is a hack to ensure the total distributed amount is equal to the amount
+  // We really should handle these rounding errors instead
+  let totalDistributed = 0n
+  for (const share of Object.values(weightedShares)) {
+    totalDistributed += share.amount
+  }
+
+  if (totalDistributed !== amount) {
+    const difference = amount - totalDistributed
+    // Add or subtract the difference from the largest share
+    const largestShare = Object.values(weightedShares).reduce((a, b) =>
+      a.amount > b.amount ? a : b
+    )
+    largestShare.amount += difference
+  }
+
   return { totalWeight, weightPerSend, poolWeights, weightedShares }
 }
 
