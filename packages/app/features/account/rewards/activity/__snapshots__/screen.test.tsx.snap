@@ -9,7 +9,6 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         "flexDirection": "column",
         "gap": 39,
         "paddingBottom": 88,
-        "paddingTop": 32,
       }
     }
   >
@@ -110,7 +109,6 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         style={
           {
             "flexDirection": "column",
-            "maxWidth": 463,
             "paddingBottom": 18,
             "paddingLeft": 18,
             "paddingRight": 18,
@@ -156,7 +154,9 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others for a bonus multiplier.
+          Register at least 1 Sendtag, maintain the minimum balance,
+          <br />
+           avoid selling, and refer others for a bonus multiplier.
         </Text>
       </View>
     </View>

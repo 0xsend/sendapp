@@ -10,7 +10,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Send Rewards</title>
+        <title>Send | Activity Rewards</title>
       </Head>
       <ActivityRewardsScreen />
     </>
@@ -19,20 +19,10 @@ export const Page: NextPageWithLayout = () => {
 
 export const getServerSideProps = userProtectedGetSSP()
 
-const subheader =
-  'Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. '
-
 Page.getLayout = (children) => (
   <MobileButtonRowLayout.ActivityRewards>
     <HomeLayout
-      TopNav={
-        <TopNav
-          header="Send Rewards"
-          showLogo
-          subheader={subheader}
-          button={ButtonOption.PROFILE}
-        />
-      }
+      TopNav={<TopNav header="Activity Rewards" showLogo button={ButtonOption.PROFILE} />}
     >
       {children}
     </HomeLayout>
