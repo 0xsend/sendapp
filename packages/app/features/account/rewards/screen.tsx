@@ -28,11 +28,17 @@ export function RewardsScreen() {
   })
 
   return (
-    <YStack pt={'$size.3.5'} $gtLg={{ pt: 0 }} f={1} $gtMd={{ ml: '$4' }}>
+    <YStack pt={'$size.3.5'} $gtLg={{ pt: 0 }} f={1}>
       <YStack pb={'$size.3.5'}>
         <YStack w={'100%'} mb={'$size.3.5'} gap={'$size.0.9'}>
-          <H1 size={'$9'} fontWeight={'900'} color="$color12" tt={'uppercase'}>
-            Claim Your Network Benefits
+          <H1
+            size={'$9'}
+            fontWeight={'900'}
+            color="$color12"
+            tt={'uppercase'}
+            verticalAlign={'middle'}
+          >
+            Invest Time, EARN Send
           </H1>
           <Paragraph color={'$color10'} size={'$5'}>
             Participate in the Send Ecosystem and earn Send Tokens. Your Network! Your Rewards!
@@ -80,7 +86,14 @@ const Section = ({
   claimStatus?: 'Claimable' | 'Claimed' | 'Upcoming Reward'
 }) => {
   return (
-    <YStack f={1} pos={'relative'} overflow="hidden" borderRadius={'$6'} backgroundColor={'$black'}>
+    <YStack
+      f={1}
+      pos={'relative'}
+      overflow="hidden"
+      borderRadius={'$6'}
+      backgroundColor={'$black'}
+      maw={500}
+    >
       <Image
         pos={'absolute'}
         br={'$6'}
@@ -106,19 +119,16 @@ const Section = ({
           p={'$size.0.75'}
           pr={'$size.0.9'}
           borderRadius={'$4'}
-          backgroundColor={'$color1'}
+          backgroundColor={'#1F352A'}
         >
           <IconSend size={24} color="$primary" />
-          <Paragraph size={'$5'}>{title}</Paragraph>
+          <Paragraph size={'$5'} color="$white">
+            {title}
+          </Paragraph>
         </XStack>
         <XStack gap={'$size.1'} jc="space-between">
           <YStack w="100%">
-            <Paragraph
-              fontWeight={400}
-              color={'$color10'}
-              $theme-light={{ color: '$color3' }}
-              size={'$5'}
-            >
+            <Paragraph fontWeight={400} color={'$white'} size={'$5'}>
               {isLoading ? '' : claimStatus}
             </Paragraph>
             <XStack ai={'center'} jc="space-between">
