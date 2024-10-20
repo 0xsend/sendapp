@@ -55,6 +55,7 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
   })
 }
 
+//@todo: make a Zod type for the JSON in distribution_verifications_summary
 /*
 After distribution 6 we switched to monthly distributions
 This function cuts out the first 6 distributions

@@ -9,6 +9,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         "flexDirection": "column",
         "gap": 39,
         "paddingBottom": 88,
+        "paddingTop": 32,
       }
     }
   >

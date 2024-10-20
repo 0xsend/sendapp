@@ -80,6 +80,7 @@ export const Home = ({ children, ...props }: XStackProps) => {
               fullscreen
               colors={['transparent', '$background']}
               $gtLg={{ display: 'none' }}
+              pointerEvents="none"
             />
             <Row {...props}>
               <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
@@ -133,6 +134,7 @@ export const Profile = (
             animateOnly={['scale', 'transform', 'opacity']}
             enterStyle={{ opacity: 0, scale: 0.9 }}
             exitStyle={{ opacity: 0, scale: 0.95 }}
+            pointerEvents="none"
           >
             <LinearGradient
               h={'150%'}
@@ -174,7 +176,8 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
   })
 
   const now = new Date()
-  const isQualificationOver = distribution?.qualification_end < now
+  const isQualificationOver =
+    distribution?.qualification_end !== undefined && distribution.qualification_end < now
 
   return (
     <>
@@ -197,6 +200,7 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
             animateOnly={['scale', 'transform', 'opacity']}
             enterStyle={{ opacity: 0, scale: 0.9 }}
             exitStyle={{ opacity: 0, scale: 0.95 }}
+            pointerEvents="none"
           >
             <LinearGradient
               h={'150%'}
@@ -208,7 +212,7 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
               colors={['transparent', '$background']}
               $gtLg={{ display: 'none' }}
             />
-            <Stack ai="center" jc="space-between" gap="$3" pt="$5">
+            <Stack ai="center" jc="space-between" gap="$3" pt="$1">
               <H3 fontWeight={'600'} color={'$color10'}>
                 {isQualificationOver
                   ? `Total ${distributionMonth} Rewards`
