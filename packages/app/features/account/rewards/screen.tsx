@@ -140,7 +140,7 @@ const Section = ({
                   ff={'$mono'}
                   size={'$8'}
                   $gtXs={{ size: '$9' }}
-                  $theme-light={{ color: '$color0' }}
+                  color="$white"
                 >
                   {reward === '' ? '' : `${reward} SEND`}
                 </Paragraph>
