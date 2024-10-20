@@ -1,4 +1,3 @@
-
 # Send Token Distributor
 
 This is a singleton Fastify app that analyzes Ethereum mainnet blocks for Send token transfers and re-calculates the distribution shares for each Send token holder.
@@ -20,7 +19,7 @@ if (err.error) {
 
 // send post request to distributor running at localhost:3050
 
-const response = await fetch('http://localhost:3050/distributor', {
+const response = await fetch('http://localhost:3050/distributor/v2', {
   method: 'POST',
   body: JSON.stringify({ id: 1 }),
   headers: {
@@ -32,7 +31,6 @@ const response = await fetch('http://localhost:3050/distributor', {
 // get the response body
 const body = await response.json()
 console.log(body)
-
 ```
 
 ## Getting Started with [Fastify-CLI](https://www.npmjs.com/package/fastify-cli)

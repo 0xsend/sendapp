@@ -1,13 +1,12 @@
 import { Wrapper } from 'app/utils/__mocks__/Wrapper'
-import { RewardsScreen } from './screen'
+import { ActivityRewardsScreen } from './screen'
 import { act, render, screen } from '@testing-library/react-native'
 
-jest.mock('app/utils/useUser')
 jest.mock('app/utils/distributions', () => ({
-  useDistributions: () => ({
+  useMonthlyDistributions: () => ({
     data: [
       {
-        number: 1,
+        number: 7,
         chain_id: 845337,
         qualification_end: Date.UTC(2024, 6, 15),
         distribution_shares: [
@@ -41,11 +40,12 @@ jest.mock('app/utils/distributions', () => ({
   }),
 }))
 
-jest.mock('app/utils/useChainAddresses', () => ({
-  useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
-}))
 jest.mock('app/routers/params', () => ({
   useRewardsScreenParams: () => [{ distributionNumber: 1 }, jest.fn()],
+}))
+
+jest.mock('app/utils/useChainAddresses', () => ({
+  useChainAddresses: jest.fn().mockReturnValue({ data: { address: '0x123' } }),
 }))
 jest.mock('wagmi')
 jest.mock('@web3modal/wagmi/react', () => ({
@@ -70,27 +70,43 @@ jest.mock('@my/wagmi', () => ({
     error: null,
   }),
 }))
-jest.mock('app/utils/coin-gecko', () => ({
-  useSendPrice: jest
-    .fn()
-    .mockReturnValue({ data: { 'send-token': { usd: 1 } }, isSuccess: true, error: null }),
-}))
+
 jest.mock('app/utils/tags', () => ({
   useConfirmedTags: jest.fn().mockReturnValue({ data: [{ name: 'tag1' }, { name: 'tag2' }] }),
 }))
-describe('EarnTokensScreen', () => {
+
+jest.mock('app/utils/send-accounts', () => ({
+  useSendAccount: jest.fn().mockReturnValue({
+    data: {
+      avatar_url: 'https://avatars.githubusercontent.com/u/123',
+      name: 'test',
+      about: 'test',
+      refcode: 'test',
+      tag: 'test',
+      address: '0x123',
+      phone: 'test',
+      chain_id: 1,
+      is_public: true,
+      sendid: 1,
+      all_tags: ['test'],
+    },
+  }),
+}))
+
+describe('ActivityRewardsScreen', () => {
   it('renders', async () => {
     jest.useFakeTimers()
     jest.setSystemTime(Date.UTC(2024, 6, 12))
     render(
       <Wrapper>
-        <RewardsScreen />
+        <ActivityRewardsScreen />
       </Wrapper>
     )
 
     await act(async () => {
       jest.advanceTimersByTime(2000)
     })
-    expect(screen.toJSON()).toMatchSnapshot('EarnTokensScreen')
+    expect(screen.getByTestId('SelectDistributionDate')).toBeVisible()
+    expect(screen.toJSON()).toMatchSnapshot('ActivityRewardsScreen')
   })
 })

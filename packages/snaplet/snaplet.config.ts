@@ -51,8 +51,27 @@ export default defineConfig({
     shovel: false,
     // @ts-ignore
     pgtap: false,
+    public: {
+      // activity: false,
+    },
   },
+  // TODO: figure out how much data we need to snapshot
+  // subset: {
+  //   targets: [
+  //     // {
+  //     //   table: "public.activity",
+  //     //   orderBy: `"activity"."created_at" desc`,
+  //     //   percent: 10
+  //     // },
+  //     // {
+  //     //   table: "public.send_account_transfers",
+  //     //   orderBy: `"send_account_transfers"."block_num" desc`,
+  //     //   percent: 5
+  //     // }
+  //   ],
+  // },
   transform: {
+    $mode: 'auto',
     auth: {
       users: ({ row }) => {
         let phone: string

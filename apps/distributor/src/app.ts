@@ -1,9 +1,10 @@
 import express, { type Request, type Response, Router } from 'express'
 import pino from 'pino'
-import { DistributorWorker } from './distributor'
+import { DistributorV1Worker } from './distributor'
 import { StandardMerkleTree } from '@openzeppelin/merkle-tree'
 import { selectAll } from 'app/utils/supabase/selectAll'
 import { supabaseAdmin } from './supabase'
+import { DistributorV2Worker } from './distributorv2'
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -11,7 +12,8 @@ const logger = pino({
 })
 
 // Initialize DistributorWorker
-const distributorWorker = new DistributorWorker(logger)
+const distributorV1Worker = new DistributorV1Worker(logger, false)
+const distributorV2Worker = new DistributorV2Worker(logger)
 
 // Initialize Express app
 const app = express()
@@ -25,10 +27,17 @@ app.get('/', (req, res) => {
 
 const distributorRouter = Router()
 
-distributorRouter.get('/', async (req: Request, res: Response) => {
+distributorRouter.get('/v1', async (req: Request, res: Response) => {
   res.json({
     distributor: true,
-    ...distributorWorker.toJSON(),
+    ...distributorV1Worker.toJSON(),
+  })
+})
+
+distributorRouter.get('/v2', async (req: Request, res: Response) => {
+  res.json({
+    distributor: true,
+    ...distributorV2Worker.toJSON(),
   })
 })
 
@@ -97,11 +106,11 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
   res.json(result)
 })
 
-distributorRouter.post('/', checkAuthorization, async (req, res) => {
+distributorRouter.post('/v1', checkAuthorization, async (req, res) => {
   const { id } = req.body as { id: string }
   logger.info({ id }, 'Received request to calculate distribution')
   try {
-    await distributorWorker.calculateDistribution(id)
+    await distributorV1Worker.calculateDistribution(id)
   } catch (err) {
     logger.error(err, 'Error while calculating distribution')
     res.status(500).json({
@@ -109,6 +118,22 @@ distributorRouter.post('/', checkAuthorization, async (req, res) => {
       message: err?.message?.split('.').at(0) || 'An unexpected error occurred.',
     })
     return
+  }
+
+  res.json({
+    distributor: true,
+    id: id,
+  })
+})
+
+distributorRouter.post('/v2', checkAuthorization, async (req, res) => {
+  const { id } = req.body as { id: string }
+  logger.info({ id }, 'Received request to calculate distribution')
+  try {
+    await distributorV2Worker.calculateDistribution(id)
+  } catch (err) {
+    logger.error(err, 'Error while calculating distribution')
+    throw err
   }
 
   res.json({

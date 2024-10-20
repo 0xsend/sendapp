@@ -9,7 +9,14 @@ import {
   supabaseAdmin,
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
-import { calculateWeights, calculatePercentageWithBips, PERC_DENOM } from './weights'
+import { calculateWeights, PERC_DENOM } from './weights'
+
+type Multiplier = {
+  value: number
+  min: number
+  max: number
+  step: number
+}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -28,7 +35,15 @@ const jsonBigint = (key, value) => {
   return value
 }
 
-export class DistributorV1Worker {
+/**
+ * Changes from V1:
+ * Fixed Pool Calculation: In V2, fixed pool amounts are calculated first from the total distribution amount, whereas V1 calculated hodler, bonus, and fixed pools separately.
+ * Removal of Bips: V2 no longer uses holder and bonus bips (basis points) for calculations, simplifying the distribution logic.
+ * Bonus Shares Elimination: In V2, bonus shares are always 0, effectively removing the bonus pool concept that existed in V1.
+ * Multiplier System: V2 introduces a new multiplier system, particularly for referrals and certain verification types
+ */
+
+export class DistributorV2Worker {
   private log: Logger
   private running: boolean
   private id: string
@@ -103,9 +118,6 @@ export class DistributorV1Worker {
     }
   }
 
-  /**
-   * Calculates distribution shares for a single distribution.
-   */
   private async _calculateDistributionShares(
     distribution: Tables<'distributions'> & {
       distribution_verification_values: Tables<'distribution_verification_values'>[]
@@ -113,7 +125,6 @@ export class DistributorV1Worker {
   ): Promise<void> {
     const log = this.log.child({ distribution_id: distribution.id })
 
-    // verify tranche is not created when in production
     if (await isMerkleDropActive(distribution)) {
       throw new Error('Tranche is active. Cannot calculate distribution shares.')
     }
@@ -140,7 +151,6 @@ export class DistributorV1Worker {
     }
 
     log.info(`Found ${verifications.length} verifications.`)
-    // log.debug({ verifications })
     if (log.isLevelEnabled('debug')) {
       await Bun.write(
         'dist/verifications.json',
@@ -155,12 +165,21 @@ export class DistributorV1Worker {
         acc[verification.type] = {
           fixedValue: BigInt(verification.fixed_value),
           bipsValue: BigInt(verification.bips_value),
+          multiplier_min: verification.multiplier_min,
+          multiplier_max: verification.multiplier_max,
+          multiplier_step: verification.multiplier_step,
         }
         return acc
       },
       {} as Record<
         Database['public']['Enums']['verification_type'],
-        { fixedValue?: bigint; bipsValue?: bigint }
+        {
+          fixedValue?: bigint
+          bipsValue?: bigint
+          multiplier_min: number
+          multiplier_max: number
+          multiplier_step: number
+        }
       >
     )
     const verificationsByUserId = verifications.reduce(
@@ -173,7 +192,6 @@ export class DistributorV1Worker {
     )
 
     log.info(`Found ${Object.keys(verificationsByUserId).length} users with verifications.`)
-    // log.debug({ verificationsByUserId })
     if (log.isLevelEnabled('debug')) {
       await Bun.write(
         'dist/verificationsByUserId.json',
@@ -211,7 +229,6 @@ export class DistributorV1Worker {
     )
 
     log.info(`Found ${hodlerAddresses.length} addresses.`)
-    // log.debug({ hodlerAddresses })
     if (log.isLevelEnabled('debug')) {
       await Bun.write(
         'dist/hodlerAddresses.json',
@@ -231,13 +248,13 @@ export class DistributorV1Worker {
       )
     })
 
+    // Filter out hodler with not enough send token balance
     let minBalanceAddresses: { user_id: string; address: `0x${string}`; balance: string }[] = []
     for await (const batch of batches) {
       minBalanceAddresses = minBalanceAddresses.concat(...batch)
     }
 
     log.info(`Found ${minBalanceAddresses.length} balances.`)
-    // log.debug({ balances })
 
     // Filter out hodler with not enough send token balance
     minBalanceAddresses = minBalanceAddresses.filter(
@@ -247,7 +264,6 @@ export class DistributorV1Worker {
     log.info(
       `Found ${minBalanceAddresses.length} balances after filtering hodler_min_balance of ${distribution.hodler_min_balance}`
     )
-    // log.debug({ balances })
 
     if (log.isLevelEnabled('debug')) {
       await Bun.write(
@@ -258,12 +274,10 @@ export class DistributorV1Worker {
       })
     }
 
-    // Calculate hodler pool share weights
+    // Calculate fixed pool share weights
     const distAmt = BigInt(distribution.amount)
-    const hodlerPoolBips = BigInt(distribution.hodler_pool_bips)
-    const fixedPoolBips = BigInt(distribution.fixed_pool_bips)
-    const bonusPoolBips = BigInt(distribution.bonus_pool_bips)
-    const hodlerPoolAvailableAmount = calculatePercentageWithBips(distAmt, hodlerPoolBips)
+    const fixedPoolAvailableAmount = distAmt
+
     const minBalanceByAddress: Record<string, bigint> = minBalanceAddresses.reduce(
       (acc, balance) => {
         acc[balance.address] = BigInt(balance.balance)
@@ -271,77 +285,111 @@ export class DistributorV1Worker {
       },
       {} as Record<string, bigint>
     )
-    const { totalWeight, weightPerSend, poolWeights, weightedShares } = calculateWeights(
-      minBalanceAddresses,
-      hodlerPoolAvailableAmount
-    )
 
-    log.info(
-      { totalWeight, hodlerPoolAvailableAmount, weightPerSend },
-      `Calculated ${Object.keys(poolWeights).length} weights.`
-    )
-    // log.debug({ poolWeights })
-    if (log.isLevelEnabled('debug')) {
-      await Bun.write('dist/poolWeights.json', JSON.stringify(poolWeights, jsonBigint, 2)).catch(
-        (e) => {
-          log.error(e, 'Error writing poolWeights.json')
-        }
-      )
-    }
-
-    if (totalWeight === 0n) {
-      log.warn('Total weight is 0. Skipping distribution.')
-      return
-    }
-
-    const fixedPoolAvailableAmount = calculatePercentageWithBips(distAmt, fixedPoolBips)
     let fixedPoolAllocatedAmount = 0n
     const fixedPoolAmountsByAddress: Record<string, bigint> = {}
-    const bonusPoolBipsByAddress: Record<string, bigint> = {}
-    const maxBonusPoolBips = (bonusPoolBips * PERC_DENOM) / hodlerPoolBips // 3500*10000/6500 = 5384.615384615385% 1.53X
 
     for (const [userId, verifications] of Object.entries(verificationsByUserId)) {
       const hodler = hodlerAddressesByUserId[userId]
-      if (!hodler || !hodler.address) {
-        continue
-      }
+      if (!hodler || !hodler.address) continue
       const { address } = hodler
-      if (!minBalanceByAddress[address]) {
-        continue
-      }
+      if (!minBalanceByAddress[address]) continue
+
+      let userFixedAmount = 0n
+      let totalReferrals = 0
+      const multipliers: Record<string, Multiplier> = {}
+
       for (const verification of verifications) {
-        const { fixedValue, bipsValue } = verificationValues[verification.type]
-        if (fixedValue && fixedPoolAllocatedAmount + fixedValue <= fixedPoolAvailableAmount) {
-          if (fixedPoolAmountsByAddress[address] === undefined) {
-            fixedPoolAmountsByAddress[address] = 0n
+        const verificationValue = verificationValues[verification.type]
+        if (!verificationValue) continue
+
+        // Calculate fixed amount
+        if (verificationValue.fixedValue) {
+          userFixedAmount += verificationValue.fixedValue
+        }
+
+        // Initialize or update multiplier info
+        if (!multipliers[verification.type] && verificationValue.multiplier_min) {
+          multipliers[verification.type] = {
+            value: 1.0,
+            min: verificationValue.multiplier_min,
+            max: verificationValue.multiplier_max,
+            step: verificationValue.multiplier_step,
           }
-          fixedPoolAmountsByAddress[address] += fixedValue
-          fixedPoolAllocatedAmount += fixedValue
         }
-        if (bipsValue) {
-          bonusPoolBipsByAddress[address] = (bonusPoolBipsByAddress[address] || 0n) as bigint
-          bonusPoolBipsByAddress[address] += bipsValue
-          bonusPoolBipsByAddress[address] =
-            (bonusPoolBipsByAddress[address] as bigint) > maxBonusPoolBips
-              ? maxBonusPoolBips
-              : (bonusPoolBipsByAddress[address] as bigint) // cap at max bonus pool bips
+        const multiplierInfo = multipliers[verification.type]
+        if (!multiplierInfo) continue
+
+        // Calculate multipliers
+        switch (verification.type) {
+          case 'total_tag_referrals': {
+            // @ts-expect-error this is json
+            totalReferrals = verification.metadata?.value ?? 0
+            // Minus 1 from the count so 1 = multiplier min
+            if (totalReferrals > 0n) {
+              multiplierInfo.value = Math.min(
+                multiplierInfo.min + (totalReferrals - 1) * multiplierInfo.step,
+                multiplierInfo.max
+              )
+            } else {
+              multiplierInfo.value = 0
+            }
+
+            break
+          }
+          case 'tag_referral': {
+            multiplierInfo.value = Math.max(multiplierInfo.value, multiplierInfo.min)
+            // Count tag_referral verifications
+            const tagReferralCount = verifications.filter((v) => v.type === 'tag_referral').length
+            // Increase multiplier for each additional tag_referral. Minus 1 from the count so 1 = multiplier min
+            for (let i = 1; i < tagReferralCount; i++) {
+              multiplierInfo.value = Math.min(
+                multiplierInfo.min + (tagReferralCount - 1) * multiplierInfo.step,
+                multiplierInfo.max
+              )
+            }
+            break
+          }
         }
+      }
+
+      // Calculate the final multiplier
+      const finalMultiplier = Object.values(multipliers).reduce(
+        (acc, info) => acc * info.value,
+        1.0
+      )
+
+      // Apply the multiplier to the fixed amount
+      userFixedAmount =
+        (userFixedAmount * BigInt(Math.round(finalMultiplier * Number(PERC_DENOM)))) / PERC_DENOM
+
+      if (
+        userFixedAmount > 0n &&
+        fixedPoolAllocatedAmount + userFixedAmount <= fixedPoolAvailableAmount
+      ) {
+        fixedPoolAmountsByAddress[address] =
+          (fixedPoolAmountsByAddress[address] || 0n) + userFixedAmount
+        fixedPoolAllocatedAmount += userFixedAmount
+
+        // Log or save the multipliers for each verification type
+        log.debug({ userId, address, multipliers, finalMultiplier }, 'User multipliers')
       }
     }
 
-    const hodlerShares = Object.values(weightedShares)
+    // Calculate hodler pool share weights
+    const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount
+
+    let hodlerShares: { address: string; amount: bigint }[] = []
+    if (hodlerPoolAvailableAmount > 0n) {
+      const { weightedShares } = calculateWeights(minBalanceAddresses, hodlerPoolAvailableAmount)
+      hodlerShares = Object.values(weightedShares)
+    }
+
     let totalAmount = 0n
     let totalHodlerPoolAmount = 0n
-    let totalBonusPoolAmount = 0n
+    const totalBonusPoolAmount = 0n
     let totalFixedPoolAmount = 0n
 
-    log.info(
-      {
-        maxBonusPoolBips,
-      },
-      'Calculated fixed & bonus pool amounts.'
-    )
-    // log.debug({ hodlerShares, fixedPoolAmountsByAddress, bonusPoolBipsByAddress })
     if (log.isLevelEnabled('debug')) {
       await Bun.write('dist/hodlerShares.json', JSON.stringify(hodlerShares, jsonBigint, 2)).catch(
         (e) => {
@@ -354,24 +402,16 @@ export class DistributorV1Worker {
       ).catch((e) => {
         log.error(e, 'Error writing fixedPoolAmountsByAddress.json')
       })
-      await Bun.write(
-        'dist/bonusPoolBipsByAddress.json',
-        JSON.stringify(bonusPoolBipsByAddress, jsonBigint, 2)
-      ).catch((e) => {
-        log.error(e, 'Error writing bonusPoolBipsByAddress.json')
-      })
     }
+
     const shares = hodlerShares
       .map((share) => {
         const userId = hodlerUserIdByAddress[share.address]
-        const bonusBips = bonusPoolBipsByAddress[share.address] || 0n
         const hodlerPoolAmount = share.amount
-        const bonusPoolAmount = calculatePercentageWithBips(hodlerPoolAmount, bonusBips)
         const fixedPoolAmount = fixedPoolAmountsByAddress[share.address] || 0n
-        const amount = hodlerPoolAmount + bonusPoolAmount + fixedPoolAmount
+        const amount = hodlerPoolAmount + fixedPoolAmount
         totalAmount += amount
         totalHodlerPoolAmount += hodlerPoolAmount
-        totalBonusPoolAmount += bonusPoolAmount
         totalFixedPoolAmount += fixedPoolAmount
 
         if (!userId) {
@@ -398,9 +438,9 @@ export class DistributorV1Worker {
           distribution_id: distribution.id,
           user_id: userId,
           amount: amount.toString(),
-          bonus_pool_amount: bonusPoolAmount.toString(),
           fixed_pool_amount: fixedPoolAmount.toString(),
           hodler_pool_amount: hodlerPoolAmount.toString(),
+          bonus_pool_amount: '0',
         } as Tables<'distribution_shares'>
       })
       .filter(Boolean) as Tables<'distribution_shares'>[]
@@ -414,14 +454,12 @@ export class DistributorV1Worker {
         totalFixedPoolAmount,
         fixedPoolAllocatedAmount,
         fixedPoolAvailableAmount,
-        maxBonusPoolBips,
         name: distribution.name,
         shares: shares.length,
       },
       'Distribution totals'
     )
     log.info(`Calculated ${shares.length} shares.`)
-    // log.debug({ shares })
     if (log.isLevelEnabled('debug')) {
       await Bun.write('dist/shares.json', JSON.stringify(shares, jsonBigint, 2)).catch((e) => {
         log.error(e, 'Error writing shares.json')
@@ -434,7 +472,6 @@ export class DistributorV1Worker {
       )
     }
 
-    // ensure share amounts do not exceed the total distribution amount, ideally this should be done in the database
     const totalShareAmounts = shares.reduce((acc, share) => acc + BigInt(share.amount), 0n)
     if (totalShareAmounts > distAmt) {
       throw new Error('Share amounts exceed total distribution amount')
@@ -456,7 +493,7 @@ export class DistributorV1Worker {
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
       }
-      await sleep(60_000) // sleep for 1 minute
+      await sleep(60_000)
     }
 
     this.log.info('Distributor stopped.')

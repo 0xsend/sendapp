@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "forge build",
-    "gen-dist-merkle-tree": "bun run ./script/gen-dist-merkle-tree.ts",
+    "gen-dist-merkle-tree": "bun run --env-file=../../.env ./script/gen-dist-merkle-tree.ts",
     "forge": "forge",
     "clean": "forge clean",
     "test": "forge test",

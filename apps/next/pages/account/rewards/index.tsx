@@ -17,22 +17,8 @@ export const Page: NextPageWithLayout = () => {
 }
 
 export const getServerSideProps = userProtectedGetSSP()
-
-const subheader =
-  'Register at least 1 Sendtag, maintain the minimum balance, avoid selling, and refer others for a bonus multiplier. '
-
 Page.getLayout = (children) => (
-  <HomeLayout
-    $platform-web={{
-      h: '100svh',
-      contentContainerStyle: {
-        h: '100svh',
-      },
-    }}
-    TopNav={
-      <TopNav header="Send Rewards" showLogo subheader={subheader} button={ButtonOption.PROFILE} />
-    }
-  >
+  <HomeLayout TopNav={<TopNav header="Rewards" button={ButtonOption.PROFILE} />}>
     {children}
   </HomeLayout>
 )

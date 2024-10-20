@@ -74,10 +74,12 @@ if (argv.restore) {
     process.exit(1)
   })
   // restore the database from the latest snapshot
-  await $`bunx snaplet snapshot restore --no-reset --latest`.catch((e) => {
-    console.log(chalk.red('Error restoring database:'), e)
-    process.exit(1)
-  })
+  await $`env SNAPLET_TARGET_DATABASE_URL=$SUPABASE_DB_URL bunx @snaplet/snapshot snapshot restore --no-reset --latest`.catch(
+    (e) => {
+      console.log(chalk.red('Error restoring database:'), e.stderr)
+      process.exit(1)
+    }
+  )
   if (rmMigs) {
     // now migrate the database with the latest migrations
     await $`git checkout ${prjRoot}/supabase/migrations`.catch((e) => {

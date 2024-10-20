@@ -6,7 +6,7 @@ import request from 'supertest'
 import app from './app'
 import { supabaseAdmin } from './supabase'
 import pino from 'pino'
-import { DistributorV1Worker } from './distributor'
+import { DistributorV2Worker } from './distributorv2'
 import type { Tables } from '@my/supabase/database.types'
 
 describe('Root Route', () => {
@@ -20,19 +20,19 @@ describe('Root Route', () => {
 
 describe('Distributor Route', () => {
   it('should reject unauthorized requests', async () => {
-    const res = await request(app).post('/distributor/v1')
+    const res = await request(app).post('/distributor/v2')
 
     expect(res.statusCode).toBe(401)
     expect(res.body).toEqual('Unauthorized')
   })
 
   it('should handle authorization correctly', async () => {
-    const res = await request(app).get('/distributor/v1')
+    const res = await request(app).get('/distributor/v2')
 
     expect(res.statusCode).toBe(200)
     expect(res.body).toMatchObject({
       distributor: true,
-      running: false,
+      running: true,
     })
   })
 
@@ -58,7 +58,7 @@ describe('Distributor Route', () => {
     expect(distribution).toBeDefined()
 
     const res = await request(app)
-      .post('/distributor/v1')
+      .post('/distributor/v2')
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`)
       .send({ id: distribution.number })
@@ -84,15 +84,15 @@ describe('Distributor Route', () => {
   })
 })
 
-describe('Distributor Worker', () => {
+describe('Distributor V2 Worker', () => {
   it('should calculate distribution shares', async () => {
     const distribution = {
       id: 4,
       number: 4,
       amount: 10000,
-      hodler_pool_bips: 6500,
-      bonus_pool_bips: 3500,
-      fixed_pool_bips: 1000,
+      hodler_pool_bips: 10000,
+      bonus_pool_bips: 0,
+      fixed_pool_bips: 10000,
       name: 'Distribution #4',
       description: 'Fourth distributions of 900,000,000 SEND tokens to early hodlers',
       qualification_start: '2024-04-08T00:00:00+00:00',
@@ -106,15 +106,47 @@ describe('Distributor Worker', () => {
       distribution_verification_values: [
         {
           type: 'tag_referral',
+          fixed_value: 50,
+          bips_value: 0,
+          multiplier_min: 1.5,
+          multiplier_max: 2.5,
+          multiplier_step: 0.1,
+          distribution_id: 4,
+        },
+        {
+          type: 'total_tag_referrals',
           fixed_value: 0,
-          bips_value: 500,
+          bips_value: 0,
+          multiplier_min: 1.0,
+          multiplier_max: 2.0,
+          multiplier_step: 0.01,
+          distribution_id: 4,
+        },
+        {
+          type: 'create_passkey',
+          fixed_value: 200,
+          bips_value: 0,
+          distribution_id: 4,
+        },
+        {
+          type: 'tag_registration',
+          fixed_value: 100,
+          bips_value: 0,
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
         },
         {
-          type: 'tag_registration',
+          type: 'send_ten',
           fixed_value: 100,
+          bips_value: 0,
+          distribution_id: 4,
+          created_at: '2024-04-06T16:49:02.569245+00:00',
+          updated_at: '2024-04-06T16:49:02.569245+00:00',
+        },
+        {
+          type: 'send_one_hundred',
+          fixed_value: 200,
           bips_value: 0,
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
@@ -145,24 +177,62 @@ describe('Distributor Worker', () => {
           error: null,
         })
       }),
+      /*
+      Back of the napkin
+      Pool = 10,000
+      Fixed
+        Bobs = 200 + 200 + 100 + 100 + 50 = 650 * 1.5 * 1.01 = 985
+        Alices = 100 + 100 * 1.05 = 205
+      Hodlers = 10,000 - 985 - 205 = 8810
+        Bobs = 8810 * 1,000,000 /1,500,000 = 5873
+        Alices = 8810 * 500,000 /1,500,000 = 2937
+      */
       fetchAllVerifications: mock((distributionId: number) => {
         return Promise.resolve({
           data: [
+            { user_id, type: 'create_passkey' },
             {
               user_id,
               type: 'tag_referral',
             },
+
             {
               user_id,
               type: 'tag_registration',
+            },
+            {
+              user_id,
+              type: 'send_ten',
+            },
+            {
+              user_id,
+              type: 'send_one_hundred',
+            },
+            {
+              user_id,
+              type: 'total_tag_referrals',
+              metadata: {
+                value: 2,
+              },
             },
             // alice only has tag_registration
             {
               user_id: user_id2,
               type: 'tag_registration',
             },
+            {
+              user_id: user_id2,
+              type: 'send_ten',
+            },
+            {
+              user_id: user_id2,
+              type: 'total_tag_referrals',
+              metadata: {
+                value: 5,
+              },
+            },
           ],
-          count: 3,
+          count: 9,
           error: null,
         })
       }),
@@ -210,27 +280,29 @@ describe('Distributor Worker', () => {
     const logger = pino({
       level: 'silent',
     })
-    const distributor = new DistributorV1Worker(logger, false)
+    const distributor = new DistributorV2Worker(logger, false)
     await distributor.calculateDistribution('4')
 
+    //Expected values are a little different than back of the napkin because of rounding
+    //Keep an eye on this, may need to investigate if we see distro problems
     const expectedShares = [
       {
         address: bobAddr,
         distribution_id: 4,
         user_id,
-        amount: '4649',
-        bonus_pool_amount: '216',
-        fixed_pool_amount: '100',
-        hodler_pool_amount: '4333',
+        amount: '6856',
+        bonus_pool_amount: '0', // Always 0 in V2
+        fixed_pool_amount: '984',
+        hodler_pool_amount: '5872',
       },
       {
         address: aliceAddr,
         distribution_id: 4,
         user_id: user_id2,
-        amount: '2266',
-        bonus_pool_amount: '0',
-        fixed_pool_amount: '100',
-        hodler_pool_amount: '2166',
+        amount: '3144',
+        bonus_pool_amount: '0', // Always 0 in V2
+        fixed_pool_amount: '208',
+        hodler_pool_amount: '2936',
       },
     ]
     expect(createDistributionShares).toHaveBeenCalled()
