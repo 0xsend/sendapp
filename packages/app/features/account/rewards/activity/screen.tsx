@@ -18,7 +18,7 @@ import {
   Theme,
   type CardProps,
 } from '@my/ui'
-import { useReadSendTokenBalanceOf } from '@my/wagmi'
+import { type sendTokenAddress, useReadSendTokenBalanceOf } from '@my/wagmi'
 import { CheckCircle2, ChevronDown, ChevronUp, Dot } from '@tamagui/lucide-icons'
 import { IconAccount, IconInfoCircle, IconX } from 'app/components/icons'
 import { useRewardsScreenParams } from 'app/routers/params'
@@ -56,7 +56,7 @@ export function ActivityRewardsScreen() {
 
   if (isLoading)
     return (
-      <YStack f={1} gap={'$7'}>
+      <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Spinner color="$color" size="large" />
@@ -65,7 +65,7 @@ export function ActivityRewardsScreen() {
     )
   if (!distributions || !distributions[selectedDistributionIndex])
     return (
-      <YStack f={1} gap={'$7'}>
+      <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Paragraph color={'$color10'} size={'$5'}>
@@ -91,7 +91,7 @@ export function ActivityRewardsScreen() {
   }
 
   return (
-    <YStack f={1} pb={'$12'} gap={'$7'}>
+    <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
         <H3 fontWeight={'600'} color={'$color12'}>
@@ -282,7 +282,7 @@ const DistributionRequirementsCard = ({
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
   } = useReadSendTokenBalanceOf({
-    chainId: (distribution.chain_id ?? 8453) as keyof typeof sendTokenAddress,
+    chainId: distribution.chain_id as keyof typeof sendTokenAddress,
     args: [distribution.distribution_shares.at(0)?.address ?? zeroAddress],
     blockNumber: distribution.snapshot_block_num
       ? BigInt(distribution.snapshot_block_num)

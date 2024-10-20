@@ -110,7 +110,7 @@ const Section = ({
       />
       <Stack pos="absolute" t={0} l={0} h="100%" w="100%" backgroundColor={'black'} opacity={0.2} />
 
-      <YStack p="$size.3.5" gap={'$size.11'} mih={290}>
+      <YStack p={'$4.5'} $gtSm={{ p: '$size.3.5' }} gap={'$size.11'} mih={290}>
         <XStack
           gap={6}
           ai="center"
@@ -138,7 +138,8 @@ const Section = ({
                 <Paragraph
                   fontWeight={500}
                   ff={'$mono'}
-                  size={'$9'}
+                  size={'$8'}
+                  $gtXs={{ size: '$9' }}
                   $theme-light={{ color: '$color0' }}
                 >
                   {reward === '' ? '' : `${reward} SEND`}
