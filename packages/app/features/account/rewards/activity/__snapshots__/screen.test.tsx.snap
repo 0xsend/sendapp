@@ -911,9 +911,9 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                 {
                   "color": "#FFFFFF",
                   "fontFamily": "System",
-                  "fontSize": 13.2,
+                  "fontSize": 15.6,
                   "fontWeight": "300",
-                  "lineHeight": 16,
+                  "lineHeight": 18,
                   "marginLeft": "auto",
                   "marginRight": "auto",
                   "userSelect": "auto",

@@ -200,7 +200,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   // If the user is eligible but has already claimed, show the claim button disabled
   if (isClaimed) {
     return (
-      <Paragraph size="$1" color="$color12" mx="auto">
+      <Paragraph size="$3" color="$color12" mx="auto">
         Claimed
       </Paragraph>
     )
@@ -209,7 +209,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   return (
     <YStack>
       <Button
-        theme={canClaim ? 'green' : 'red_alt1'}
+        theme={canClaim ? 'green' : error || hasEnoughGas ? 'red_active' : undefined}
         onPress={onSubmit}
         br={12}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
@@ -237,16 +237,14 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
               )
             case !isTrancheActive:
               return (
-                <ButtonOg.Text bc="$color5" opacity={0.5} disabled>
+                <ButtonOg.Text opacity={0.5} disabled>
                   Not yet claimable
                 </ButtonOg.Text>
               )
             case !!isTrancheActiveError || !!isClaimedError || !!nonceError:
               return (
                 <>
-                  <ButtonOg.Text bc="$color5" opacity={0.5}>
-                    Error
-                  </ButtonOg.Text>
+                  <ButtonOg.Text opacity={0.5}>Error</ButtonOg.Text>
                 </>
               )
             case !!feesPerGasError || !!usdcFeesError:
