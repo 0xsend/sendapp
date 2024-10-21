@@ -70,7 +70,7 @@ export function ActivityRewardsScreen() {
   const selectedDistributionIndex =
     queryParams.distribution === undefined || distributions.length > queryParams.distribution
       ? 0
-      : distributions.length - (queryParams.distribution - 6) //-6 because we skip the first 6 distributions
+      : distributions.findIndex((d) => d.number === queryParams.distribution)
 
   const distributionDates = distributions.map(
     (d) =>
@@ -91,122 +91,131 @@ export function ActivityRewardsScreen() {
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
         <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
-          {`${distributionDates[selectedDistributionIndex]?.split(' ')[0]} Rewards`}
+          {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
-        <Select
-          native={false}
-          id={id}
-          value={selectedDistributionIndex.toString() ?? '0'}
-          onValueChange={onValueChange}
-          onOpenChange={setIsOpen}
-          defaultValue="0"
-          open={isOpen}
-        >
-          <Select.Trigger
-            ref={selectTriggerRef}
-            testID={'SelectDistributionDate'}
-            br="$3"
-            w={'fit-content'}
-            borderWidth={1.5}
-            $theme-light={{
-              boc: isOpen ? '$color1' : '$transparent',
-              bc: isOpen ? '$color1' : '$primary',
-            }}
-            $theme-dark={{
-              boc: isOpen ? '$color1' : '$transparent',
-              bc: isOpen ? '$color1' : '$primary',
-              hoverStyle: { bc: '$primary' },
-            }}
-            iconAfter={
-              isOpen ? (
-                <ChevronUp
-                  $theme-dark={{
-                    color: isOpen ? '$color12' : '$black',
-                  }}
-                  color={'$color11'}
-                />
-              ) : (
-                <ChevronDown
-                  $theme-dark={{
-                    color: isOpen ? '$color12' : '$black',
-                    hoverStyle: { color: '$color12' },
-                  }}
-                  color="$black"
-                />
-              )
-            }
+        {distributions.length > 1 && (
+          <Select
+            native={false}
+            id={id}
+            value={selectedDistributionIndex.toString() ?? '0'}
+            onValueChange={onValueChange}
+            onOpenChange={setIsOpen}
+            defaultValue="0"
+            open={isOpen}
           >
-            <Select.Value
-              testID={'SelectDistributionDateValue'}
-              fontWeight={'bold'}
-              color={isOpen ? '$color12' : '$black'}
+            <Select.Trigger
+              ref={selectTriggerRef}
+              testID={'SelectDistributionDate'}
+              br="$3"
+              w={'fit-content'}
+              borderWidth={1.5}
+              $theme-light={{
+                boc: isOpen ? '$color1' : '$transparent',
+                bc: isOpen ? '$color1' : '$primary',
+              }}
               $theme-dark={{
-                color: isOpen ? '$color12' : '$black',
+                boc: isOpen ? '$color1' : '$transparent',
+                bc: isOpen ? '$color1' : '$primary',
+                hoverStyle: { bc: '$primary' },
               }}
-              placeholder={distributions[selectedDistributionIndex]?.number}
-            />
-          </Select.Trigger>
-
-          <Adapt when="sm" platform="touch">
-            <Sheet
-              native
-              modal
-              dismissOnSnapToBottom
-              snapPoints={[30]}
-              animation={'quick'}
-              disableDrag
+              iconAfter={
+                isOpen ? (
+                  <ChevronUp
+                    $theme-dark={{
+                      color: isOpen ? '$color12' : '$black',
+                    }}
+                    color={'$color11'}
+                  />
+                ) : (
+                  <ChevronDown
+                    $theme-dark={{
+                      color: isOpen ? '$color12' : '$black',
+                      hoverStyle: { color: '$color12' },
+                    }}
+                    color="$black"
+                  />
+                )
+              }
             >
-              <Sheet.Frame maw={738} bc={'$color1'}>
-                <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
-                  <XStack ai="center" jc="space-between" w="100%" px="$4">
-                    <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                      Select Month
-                    </Paragraph>
-                    <Button
-                      chromeless
-                      unstyled
-                      icon={<IconX color={'$color12'} size={'$1.5'} />}
-                      onPress={() => setIsOpen(false)}
-                    />
-                  </XStack>
-                </Sheet.Handle>
-                <Sheet.ScrollView>
-                  <Adapt.Contents />
-                </Sheet.ScrollView>
-              </Sheet.Frame>
-              <Sheet.Overlay />
-            </Sheet>
-          </Adapt>
+              <Select.Value
+                testID={'SelectDistributionDateValue'}
+                fontWeight={'bold'}
+                color={isOpen ? '$color12' : '$black'}
+                $theme-dark={{
+                  color: isOpen ? '$color12' : '$black',
+                }}
+                placeholder={distributions[selectedDistributionIndex]?.number}
+              />
+            </Select.Trigger>
 
-          <Select.Content zIndex={200000}>
-            <Select.Viewport
-              br={'$3'}
-              style={{
-                left: '66%',
-              }}
-              w={320}
-              btrr={0}
-              boc="transparent"
-              bc={'$color1'}
-              pt={'$5'}
-            >
-              <Select.Group>
-                {distributions.map((distribution, i) => (
-                  <DistributionItem
-                    isActive={
-                      distribution.number === distributions[selectedDistributionIndex]?.number
-                    }
-                    value={i.toString()}
-                    index={i}
-                    key={distribution?.number}
+            <Adapt when="sm" platform="touch">
+              <Sheet
+                native
+                modal
+                dismissOnSnapToBottom
+                snapPoints={[30]}
+                animation={'quick'}
+                disableDrag
+              >
+                <Sheet.Frame maw={738} bc={'$color1'}>
+                  <Sheet.Handle
+                    py="$5"
+                    f={1}
+                    bc="transparent"
+                    jc={'space-between'}
+                    opacity={1}
+                    m={0}
                   >
-                    {distributionDates[i]}
-                  </DistributionItem>
-                ))}
-              </Select.Group>
-            </Select.Viewport>
-          </Select.Content>
-        </Select>
+                    <XStack ai="center" jc="space-between" w="100%" px="$4">
+                      <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                        Select Month
+                      </Paragraph>
+                      <Button
+                        chromeless
+                        unstyled
+                        icon={<IconX color={'$color12'} size={'$1.5'} />}
+                        onPress={() => setIsOpen(false)}
+                      />
+                    </XStack>
+                  </Sheet.Handle>
+                  <Sheet.ScrollView>
+                    <Adapt.Contents />
+                  </Sheet.ScrollView>
+                </Sheet.Frame>
+                <Sheet.Overlay />
+              </Sheet>
+            </Adapt>
+
+            <Select.Content zIndex={200000}>
+              <Select.Viewport
+                br={'$3'}
+                style={{
+                  left: '66%',
+                }}
+                w={320}
+                btrr={0}
+                boc="transparent"
+                bc={'$color1'}
+                pt={'$5'}
+              >
+                <Select.Group>
+                  {distributions.map((distribution, i) => (
+                    <DistributionItem
+                      isActive={
+                        distribution.number === distributions[selectedDistributionIndex]?.number
+                      }
+                      value={i.toString()}
+                      index={i}
+                      key={distribution?.number}
+                    >
+                      {distributionDates[i]}
+                    </DistributionItem>
+                  ))}
+                </Select.Group>
+              </Select.Viewport>
+            </Select.Content>
+          </Select>
+        )}
       </XStack>
       {!distributions[selectedDistributionIndex] ? (
         <YStack f={1} w={'100%'} gap={'$7'}>
