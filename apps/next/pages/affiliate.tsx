@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from './_app'
-import { ReferralsScreen } from 'app/features/referrals/screen'
+import { AffiliateScreen } from 'app/features/affiliate/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { ButtonOption, TopNav } from 'app/components/TopNav'
 
@@ -9,10 +9,10 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Send | Referral Rewards</title>
-        <meta name="description" content="Referral Rewards" key="desc" />
+        <title>Send | Affiliates</title>
+        <meta name="description" content="Send Affiliates" key="desc" />
       </Head>
-      <ReferralsScreen />
+      <AffiliateScreen />
     </>
   )
 }
@@ -20,9 +20,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Referrals" button={ButtonOption.PROFILE} />}>
-    {children}
-  </HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Affiliates" />}>{children}</HomeLayout>
 )
 
 export default Page
