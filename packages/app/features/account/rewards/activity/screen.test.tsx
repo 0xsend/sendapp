@@ -34,8 +34,17 @@ jest.mock('app/utils/distributions', () => ({
     isSuccess: true,
     error: null,
   }),
-  usePrepareSendMerkleDropClaimTrancheWrite: jest.fn().mockReturnValue({
-    data: {},
+  useGenerateClaimUserOp: jest.fn().mockReturnValue({
+    data: null,
+  }),
+  useUserOpClaimMutation: jest.fn().mockReturnValue({
+    mutateAsync: jest.fn().mockReturnValue(Promise.resolve()),
+  }),
+}))
+
+jest.mock('app/utils/useUSDCFees', () => ({
+  useUSDCFees: jest.fn().mockReturnValue({
+    data: { baseFee: 100000, gasFees: 100000 },
     isSuccess: true,
     error: null,
   }),
@@ -90,7 +99,18 @@ jest.mock('app/utils/send-accounts', () => ({
       is_public: true,
       sendid: 1,
       all_tags: ['test'],
+      send_account_credentials: [],
     },
+  }),
+}))
+
+jest.mock('app/utils/useSendAccountBalances', () => ({
+  useSendAccountBalances: jest.fn().mockReturnValue({
+    balances: {
+      USDC: 250000n,
+      SEND: 250000n,
+    },
+    totalBalance: () => 5000000n,
   }),
 }))
 
