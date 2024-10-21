@@ -190,13 +190,13 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
         {!isLoading && isVisible && direction !== 'down' && (
           <Stack
             w={'100%'}
-            pb={isPwa ? '$1' : '$3'}
+            pb={isPwa ? '$1' : '$5'}
             px="$4"
             $platform-web={{
               position: 'fixed',
               bottom: 0,
             }}
-            $gtLg={{
+            $gtSm={{
               display: 'none',
             }}
             animation="200ms"
@@ -222,16 +222,17 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
                   ? `Total ${distributionMonth} Rewards`
                   : `Estimated ${distributionMonth} Rewards`}
               </H3>
-              <Paragraph
-                fontFamily={'$mono'}
-                $gtXs={{ fontSize: '$10' }}
-                fontSize={'$9'}
-                fontWeight={'500'}
-                lh={40}
-              >
-                {shareAmount === undefined ? '' : `${formatAmount(shareAmount, 10, 0)} SEND`}
-              </Paragraph>
-              <Row {...props}>
+
+              <Row {...props} $xs={{ fd: 'column' }}>
+                <Paragraph
+                  fontFamily={'$mono'}
+                  $gtXs={{ fontSize: '$10' }}
+                  fontSize={'$9'}
+                  fontWeight={'500'}
+                  lh={40}
+                >
+                  {shareAmount === undefined ? '' : `${formatAmount(shareAmount, 10, 0)} SEND`}
+                </Paragraph>
                 <DistributionClaimButton distribution={distribution} />
               </Row>
             </Stack>

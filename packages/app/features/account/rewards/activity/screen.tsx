@@ -218,10 +218,7 @@ export function ActivityRewardsScreen() {
         <YStack f={1} w={'100%'} gap={'$7'}>
           <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
           <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
-          <MultiplierCards
-            distribution={distributions[selectedDistributionIndex]}
-            distributionDate={distributionDates[selectedDistributionIndex]}
-          />
+          <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
           <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
         </YStack>
       )}
@@ -480,12 +477,16 @@ const PerkCard = ({
 
 const MultiplierCards = ({
   distribution,
-  distributionDate,
 }: {
   distribution: UseDistributionsResultData[number]
-  distributionDate?: string
 }) => {
   const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+  const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
+    'default',
+    {
+      month: 'long',
+    }
+  )
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
@@ -497,12 +498,10 @@ const MultiplierCards = ({
           .filter(([verificationType]) => multipliers?.[verificationType].multiplier_step > 0)
           .map(([verificationType, title]) => (
             <MultiplierCard key={verificationType}>
-              <XStack ai="center" gap="$2">
+              <XStack ai="center" gap="$2" jc="center">
                 <IconAccount size={'2'} color={'$color10'} />
                 <H3 fontWeight={'500'} color={'$color10'}>
-                  {verificationType === 'tag_referral'
-                    ? distributionDate?.split(' ')[0] ?? 'Monthly'
-                    : ''}{' '}
+                  {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
                   {title}
                 </H3>
               </XStack>
@@ -511,6 +510,7 @@ const MultiplierCards = ({
                 $sm={{ fontSize: '$8' }}
                 fontWeight={'600'}
                 color={'$color12'}
+                mx="auto"
               >
                 X {multipliers?.[verificationType].value ?? 1}
               </Paragraph>
@@ -532,7 +532,14 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
       mih={112}
       w={'fit-content'}
     >
-      <XStack ai="center" w={'100%'} jc="space-between" $gtXs={{ gap: '$7' }} gap={'$5'}>
+      <XStack
+        ai="center"
+        w={'100%'}
+        jc="space-between"
+        $gtXs={{ gap: '$7' }}
+        gap={'$5'}
+        flexWrap="wrap"
+      >
         {children}
       </XStack>
     </Card>
@@ -555,7 +562,7 @@ const ClaimableRewardsCard = ({
   )
 
   return (
-    <YStack f={1} w={'100%'} gap="$5" $lg={{ display: 'none' }}>
+    <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
       <H3 fontWeight={'600'} color={'$color12'}>
         {isQualificationOver ? `Total ${distributionMonth}` : `Estimated ${distributionMonth}`}
       </H3>
