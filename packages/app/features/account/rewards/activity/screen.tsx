@@ -77,9 +77,9 @@ export function ActivityRewardsScreen() {
 
   const distributionDates = distributions.map(
     (d) =>
-      `${d.qualification_end.toLocaleString('default', {
+      `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
         month: 'long',
-      })} ${d.qualification_end.toLocaleString('default', { year: 'numeric' })}`
+      })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
   )
 
   const onValueChange = (value: string) => {
@@ -94,7 +94,7 @@ export function ActivityRewardsScreen() {
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-        <H3 fontWeight={'600'} color={'$color12'}>
+        <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
           {`${distributionDates[selectedDistributionIndex]?.split(' ')[0]} Rewards`}
         </H3>
         <Select
@@ -510,16 +510,17 @@ const ClaimableRewardsCard = ({
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
-  const distributionMonth = distribution.qualification_end.toLocaleString('default', {
-    month: 'long',
-  })
+  const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
+    'default',
+    {
+      month: 'long',
+    }
+  )
 
   return (
     <YStack f={1} w={'100%'} gap="$5" $lg={{ display: 'none' }}>
       <H3 fontWeight={'600'} color={'$color12'}>
-        {isQualificationOver
-          ? `Total ${distributionMonth} Rewards`
-          : `Estimated ${distributionMonth} Rewards`}
+        {isQualificationOver ? `Total ${distributionMonth}` : `Estimated ${distributionMonth}`}
       </H3>
       <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>
         <Stack ai="center" jc="space-between" fd="row" w="100%">

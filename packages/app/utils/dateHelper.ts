@@ -27,3 +27,22 @@ export const CommentsTime = (dateString: string) => {
   }
   return `${secondsAgo} sec ago`
 }
+
+export const adjustUTCDateForTimezone = (date: Date, offset?: number) => {
+  const adjustedDate = date
+
+  // Get the timezone offset in minutes
+  const timezoneOffset = offset ?? adjustedDate.getTimezoneOffset()
+
+  // Add the timezone offset to the date
+  adjustedDate.setMinutes(adjustedDate.getMinutes() + timezoneOffset)
+
+  // Check if the adjusted date is in the next month
+  if (adjustedDate.getUTCMonth() !== date.getUTCMonth()) {
+    // If so, set it back to the last day of the original month
+    // 0 day doesn't exist so it will roll back to the last day of the previous month
+    adjustedDate.setUTCDate(0)
+  }
+
+  return adjustedDate
+}
