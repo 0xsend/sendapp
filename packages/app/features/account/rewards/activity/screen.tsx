@@ -46,14 +46,6 @@ export function ActivityRewardsScreen() {
 
   const selectTriggerRef = useRef<HTMLSelectElement>(null)
 
-  const initialDistributionIndex = distributions?.findIndex(
-    (d) => d.number === queryParams.distribution
-  )
-
-  const [selectedDistributionIndex, setSelectedDistributionIndex] = useState(
-    !initialDistributionIndex || initialDistributionIndex === -1 ? 0 : initialDistributionIndex
-  )
-
   if (isLoading)
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
@@ -63,7 +55,7 @@ export function ActivityRewardsScreen() {
         </Stack>
       </YStack>
     )
-  if (!distributions || !distributions[selectedDistributionIndex])
+  if (!distributions)
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
@@ -75,6 +67,11 @@ export function ActivityRewardsScreen() {
       </YStack>
     )
 
+  const selectedDistributionIndex =
+    queryParams.distribution === undefined || distributions.length > queryParams.distribution
+      ? 0
+      : distributions.length - (queryParams.distribution - 6) //-6 because we skip the first 6 distributions
+
   const distributionDates = distributions.map(
     (d) =>
       `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
@@ -83,7 +80,6 @@ export function ActivityRewardsScreen() {
   )
 
   const onValueChange = (value: string) => {
-    setSelectedDistributionIndex(Number(value))
     setRewardsScreenParams(
       { distribution: distributions[Number(value)]?.number },
       { webBehavior: 'replace' }
@@ -100,7 +96,7 @@ export function ActivityRewardsScreen() {
         <Select
           native={false}
           id={id}
-          value={queryParams.distribution?.toString() ?? '0'}
+          value={selectedDistributionIndex.toString() ?? '0'}
           onValueChange={onValueChange}
           onOpenChange={setIsOpen}
           defaultValue="0"
@@ -195,7 +191,7 @@ export function ActivityRewardsScreen() {
               pt={'$5'}
             >
               <Select.Group>
-                {distributions.toReversed().map((distribution, i) => (
+                {distributions.map((distribution, i) => (
                   <DistributionItem
                     isActive={
                       distribution.number === distributions[selectedDistributionIndex]?.number
@@ -212,16 +208,57 @@ export function ActivityRewardsScreen() {
           </Select.Content>
         </Select>
       </XStack>
-      <YStack f={1} w={'100%'} gap={'$7'}>
-        <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
-        <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
-        <MultiplierCards
-          distribution={distributions[selectedDistributionIndex]}
-          distributionDate={distributionDates[selectedDistributionIndex]}
-        />
-        <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
-      </YStack>
+      {!distributions[selectedDistributionIndex] ? (
+        <YStack f={1} w={'100%'} gap={'$7'}>
+          <Paragraph color={'$color10'} size={'$5'}>
+            No rewards available
+          </Paragraph>
+        </YStack>
+      ) : (
+        <YStack f={1} w={'100%'} gap={'$7'}>
+          <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+          <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
+          <MultiplierCards
+            distribution={distributions[selectedDistributionIndex]}
+            distributionDate={distributionDates[selectedDistributionIndex]}
+          />
+          <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
+        </YStack>
+      )}
     </YStack>
+  )
+}
+
+const DistributionItem = ({
+  isActive,
+  value,
+  index,
+  children,
+  ...props
+}: {
+  isActive: boolean
+} & SelectItemProps) => {
+  return (
+    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
+      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
+        <Select.ItemText
+          display="flex"
+          fontSize={'$5'}
+          fontWeight={'500'}
+          textTransform={'uppercase'}
+          color={'$color12'}
+          jc={'center'}
+          ai={'center'}
+        >
+          {children}
+        </Select.ItemText>
+        {isActive && (
+          <Theme name="green_active">
+            <Dot size={'$3'} />
+          </Theme>
+        )}
+      </XStack>
+    </Select.Item>
   )
 }
 
@@ -537,38 +574,5 @@ const ClaimableRewardsCard = ({
         </Stack>
       </Card>
     </YStack>
-  )
-}
-
-const DistributionItem = ({
-  isActive,
-  value,
-  index,
-  children,
-  ...props
-}: {
-  isActive: boolean
-} & SelectItemProps) => {
-  return (
-    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
-      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
-        <Select.ItemText
-          display="flex"
-          fontSize={'$5'}
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          color={'$color12'}
-          jc={'center'}
-          ai={'center'}
-        >
-          {children}
-        </Select.ItemText>
-        {isActive && (
-          <Theme name="green_active">
-            <Dot size={'$3'} />
-          </Theme>
-        )}
-      </XStack>
-    </Select.Item>
   )
 }

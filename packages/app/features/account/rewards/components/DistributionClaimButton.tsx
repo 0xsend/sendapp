@@ -1,27 +1,52 @@
-import { Button as ButtonOg, Paragraph, ScrollView, Spinner, type ButtonProps, Stack } from '@my/ui'
-import type { sendMerkleDropAddress } from '@my/wagmi'
+import {
+  Button as ButtonOg,
+  Paragraph,
+  Spinner,
+  type ButtonProps,
+  YStack,
+  useToastController,
+} from '@my/ui'
+import { baseMainnet, type sendMerkleDropAddress } from '@my/wagmi'
+import { useQueryClient } from '@tanstack/react-query'
 import { IconDollar } from 'app/components/icons'
 import { assert } from 'app/utils/assert'
 import {
   type UseDistributionsResultData,
-  usePrepareSendMerkleDropClaimTrancheWrite,
+  useGenerateClaimUserOp,
   useSendMerkleDropIsClaimed,
   useSendMerkleDropTrancheActive,
+  useUserOpClaimMutation,
 } from 'app/utils/distributions'
 
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { throwIf } from 'app/utils/throwIf'
+import { useAccountNonce } from 'app/utils/userop'
+import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
+import { useUSDCFees } from 'app/utils/useUSDCFees'
+import { useEffect, useState } from 'react'
+import { type Hex, isAddress } from 'viem'
+import { useEstimateFeesPerGas } from 'wagmi'
 
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
 }
 export const DistributionClaimButton = ({ distribution }: DistributionsClaimButtonProps) => {
+  const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
+  const queryClient = useQueryClient()
   // Check if the user is eligible
   const share = distribution.distribution_shares?.[0]
   const isEligible = !!share && share.amount > 0
-  const isClaimActive = distribution.qualification_end < new Date()
+  const isClaimActive = true
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
-  // find out if the tranche is active using SendMerkleDrop.trancheActive(uint256 _tranche)
+  const [sentTxHash, setSentTxHash] = useState<Hex>()
+  const [error, setError] = useState<Error>()
+  const toast = useToastController()
+
+  const { balances, isLoading: isBalanceLoading } = useSendAccountBalances()
+  const usdcBalance = balances?.USDC
+
+  // find out if the tranche is active uasing SendMerkleDrop.trancheActive(uint256 _tranche)
   const {
     data: isTrancheActive,
     isLoading: isTrancheActiveLoading,
@@ -43,29 +68,130 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   })
 
   const {
-    data: claimWriteConfig,
-    error: claimWriteConfigError,
-    isPending: isClaimWritePending,
-  } = usePrepareSendMerkleDropClaimTrancheWrite({
+    data: nonce,
+    error: nonceError,
+    isLoading: isNonceLoading,
+  } = useAccountNonce({
+    sender: sendAccount?.address,
+  })
+
+  const webauthnCreds =
+    sendAccount?.send_account_credentials
+      .filter((c) => !!c.webauthn_credentials)
+      .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
+
+  const { data: userOp } = useGenerateClaimUserOp({
     distribution,
     share,
+    nonce,
   })
 
   const {
-    data: claimWriteHash,
-    writeContract: writeClaim,
-    isPending: isClaimWriteSubmitted,
-    error: writeClaimError,
-  } = useWriteContract()
+    data: usdcFees,
+    isLoading: isFeesLoading,
+    error: usdcFeesError,
+  } = useUSDCFees({
+    userOp,
+  })
 
-  const { isSuccess: claimReceiptSuccess, error: claimReceiptError } = useWaitForTransactionReceipt(
-    {
-      hash: claimWriteHash,
-      query: {
-        enabled: !!claimWriteHash,
-      },
+  const {
+    data: feesPerGas,
+    isLoading: isGasLoading,
+    error: feesPerGasError,
+  } = useEstimateFeesPerGas({
+    chainId: baseMainnet.id,
+  })
+
+  const {
+    mutateAsync: sendUserOp,
+    isPending: isClaimPending,
+    isError: isClaimError,
+    error: claimError,
+  } = useUserOpClaimMutation()
+
+  const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
+
+  const canClaim = isTrancheActive && isClaimActive && isEligible && hasEnoughGas
+  useEffect(() => {
+    if (usdcFeesError) {
+      setError(usdcFeesError)
     }
-  )
+    if (feesPerGasError) {
+      setError(feesPerGasError)
+    }
+    if (isClaimError) {
+      setError(claimError)
+    }
+    if (nonceError) {
+      setError(nonceError)
+    }
+    if (isTrancheActiveError) {
+      setError(isTrancheActiveError)
+    }
+    if (isClaimedError) {
+      setError(isClaimedError)
+    }
+  }, [
+    usdcFeesError,
+    feesPerGasError,
+    claimError,
+    nonceError,
+    isTrancheActiveError,
+    isClaimedError,
+    isClaimError,
+  ])
+
+  useEffect(() => {
+    if (error) {
+      console.log(error)
+      if (!error.message) {
+        toast.show(error.name, {
+          preset: 'error',
+          isUrgent: true,
+          duration: 10000000,
+        })
+      } else {
+        toast.show(error.message.split('.').at(0) ?? error.name, {
+          preset: 'error',
+          isUrgent: true,
+          duration: 10000000,
+        })
+      }
+    }
+  }, [error, toast])
+
+  async function onSubmit() {
+    try {
+      assert(!!userOp, 'User op is required')
+      assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
+      assert(nonce !== undefined, 'Nonce is not available')
+      throwIf(feesPerGasError)
+      assert(!!feesPerGas, 'Fees per gas is not available')
+
+      const sender = sendAccount?.address as `0x${string}`
+      assert(isAddress(sender), 'No sender address')
+      const _userOp = {
+        ...userOp,
+        maxFeePerGas: feesPerGas.maxFeePerGas,
+        maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
+      }
+
+      console.log('gasEstimate', usdcFees)
+      console.log('feesPerGas', feesPerGas)
+      console.log('userOp', _userOp)
+      const receipt = await sendUserOp({
+        userOp: _userOp,
+        webauthnCreds,
+      })
+      assert(receipt.success, 'Failed to send user op')
+      setSentTxHash(receipt.receipt.transactionHash)
+      refetchIsClaimed()
+    } catch (e) {
+      console.error(e)
+      setError(e)
+      await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+    }
+  }
 
   if (!isClaimActive) return null
 
@@ -74,105 +200,91 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   // If the user is eligible but has already claimed, show the claim button disabled
   if (isClaimed) {
     return (
-      <Paragraph size="$1" theme="alt2" mx="auto">
+      <Paragraph size="$1" color="$color12" mx="auto">
         Claimed
       </Paragraph>
     )
   }
-
-  if (isTrancheActiveLoading || isClaimedLoading) {
-    return (
-      <Stack>
-        <Spinner size="small" />
-      </Stack>
-    )
-  }
-
-  if (isTrancheActiveError || isClaimedError) {
-    return (
-      <>
-        <Button disabled f={1}>
-          <ButtonOg.Icon>
-            <IconDollar size={'$2.5'} />
-          </ButtonOg.Icon>
-          <ButtonOg.Text>Claim Reward</ButtonOg.Text>
-        </Button>
-        <ErrorMessage
-          error={`Error checking eligibility. Please try again later. ${isTrancheActiveError?.message} ${isClaimedError?.message}`}
-        />
-      </>
-    )
-  }
-
-  // If the user is eligible but the tranche is inactive, show the claim button disabled
-  if (!isTrancheActive)
-    return (
-      <Stack>
-        <Button bc="$color5" opacity={0.5} disabled>
-          Not yet claimable
-        </Button>
-      </Stack>
-    )
-
-  if (claimWriteConfigError) {
-    return (
-      <>
-        <Button disabled>Claim Reward</Button>
-        <ErrorMessage
-          error={`Error preparing claim. Please try again later. ${claimWriteConfigError}`}
-        />
-      </>
-    )
-  }
-
   // If the user is eligible and the tranche is active, show the claim button
   return (
-    <>
+    <YStack>
       <Button
+        theme={canClaim ? 'green' : 'red_alt1'}
+        onPress={onSubmit}
+        br={12}
+        disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={
-          !writeClaim ||
-          isClaimWritePending ||
-          isClaimWriteSubmitted ||
-          claimReceiptSuccess ||
-          !!claimWriteHash
+          !canClaim || isClaimPending || !!sentTxHash || !!feesPerGasError || !!usdcFeesError
         }
-        onPress={() => {
-          assert(!!writeClaim, 'No writeClaim found')
-          assert(!!claimWriteConfig, 'No claimWriteConfig found')
-          assert(!!refetchIsClaimed, 'No refetchIsClaimed found')
-          writeClaim(claimWriteConfig.request)
-          refetchIsClaimed()
-        }}
-        theme={'green'}
+        gap={4}
+        maw={194}
+        width={'100%'}
       >
-        {isClaimWriteSubmitted || claimWriteHash ? 'Claiming...' : 'Claim Reward'}
+        {(() => {
+          switch (true) {
+            case isTrancheActiveLoading ||
+              isClaimedLoading ||
+              isFeesLoading ||
+              isBalanceLoading ||
+              isNonceLoading ||
+              isClaimPending ||
+              isLoadingSendAccount ||
+              isGasLoading:
+              return (
+                <ButtonOg.Icon>
+                  <Spinner size="small" color="$color12" />
+                </ButtonOg.Icon>
+              )
+            case !isTrancheActive:
+              return (
+                <ButtonOg.Text bc="$color5" opacity={0.5} disabled>
+                  Not yet claimable
+                </ButtonOg.Text>
+              )
+            case !!isTrancheActiveError || !!isClaimedError || !!nonceError:
+              return (
+                <>
+                  <ButtonOg.Text bc="$color5" opacity={0.5}>
+                    Error
+                  </ButtonOg.Text>
+                </>
+              )
+            case !!feesPerGasError || !!usdcFeesError:
+              return (
+                <>
+                  <ButtonOg.Icon>
+                    <IconDollar size={'$2.5'} />
+                  </ButtonOg.Icon>
+                  <ButtonOg.Text>Claim Reward</ButtonOg.Text>
+                </>
+              )
+            case isClaimPending && !isClaimError:
+              return (
+                <>
+                  <ButtonOg.Icon>
+                    <Spinner size="small" color="$black" />
+                  </ButtonOg.Icon>
+                  <ButtonOg.Text>Claiming...</ButtonOg.Text>
+                </>
+              )
+            case !hasEnoughGas:
+              return <ButtonOg.Text>Insufficient Gas</ButtonOg.Text>
+            default:
+              return (
+                <>
+                  <ButtonOg.Icon>
+                    <IconDollar color="$black" size={'$1'} />
+                  </ButtonOg.Icon>
+                  <ButtonOg.Text fontWeight={'500'}>Claim Reward</ButtonOg.Text>
+                </>
+              )
+          }
+        })()}
       </Button>
-      {claimReceiptError && (
-        <ErrorMessage
-          error={`Error claiming. Please try again later. ${claimReceiptError.message}`}
-        />
-      )}
-
-      {writeClaimError && (
-        <ErrorMessage
-          error={`Error claiming. Please try again later. ${writeClaimError.message}`}
-        />
-      )}
-    </>
+    </YStack>
   )
 }
 
 function Button(props: ButtonProps) {
-  return <ButtonOg py="$3.5" w="100%" br={12} bc="$green12Dark" {...props} />
-}
-
-function ErrorMessage({ error }: { error?: string }) {
-  if (!error) return null
-  return (
-    <ScrollView pos="absolute" $gtLg={{ bottom: '$-12' }} bottom="$-10" height="$4">
-      <Paragraph size="$1" w="$20" col={'$red500'} ta="center">
-        {error.split('.').at(0)}
-      </Paragraph>
-    </ScrollView>
-  )
+  return <ButtonOg py="$3.5" w={190} br={12} {...props} />
 }
