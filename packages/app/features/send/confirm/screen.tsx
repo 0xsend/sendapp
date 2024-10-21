@@ -119,7 +119,11 @@ export function SendConfirm() {
     userOp,
   })
 
-  const { data: feesPerGas, error: feesPerGasError } = useEstimateFeesPerGas({
+  const {
+    data: feesPerGas,
+    isLoading: isGasLoading,
+    error: feesPerGasError,
+  } = useEstimateFeesPerGas({
     chainId: baseMainnet.id,
   })
   const {
@@ -310,7 +314,7 @@ export function SendConfirm() {
         >
           {(() => {
             switch (true) {
-              case isBalanceLoading || isFeesLoading:
+              case isBalanceLoading || isFeesLoading || isGasLoading:
                 return (
                   <Button.Icon>
                     <Spinner size="small" color="$color" />

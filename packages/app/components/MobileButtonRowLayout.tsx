@@ -34,6 +34,7 @@ const Row = styled(XStack, {
   $gtLg: {
     pt: '$4',
   },
+  pointerEvents: 'auto',
 })
 
 export const Home = ({ children, ...props }: XStackProps) => {
