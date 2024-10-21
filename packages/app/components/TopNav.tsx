@@ -51,6 +51,11 @@ interface TopNavProps {
    * @default false
    */
   noSubroute?: boolean
+  /**
+   * Whether the back arrow navigates to the base path
+   * @default true
+   */
+  backToBasePath?: boolean
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
@@ -91,6 +96,7 @@ export function TopNav({
   showReferral = false,
   button,
   noSubroute = false,
+  backToBasePath = true,
 }: TopNavProps) {
   const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
@@ -118,7 +124,11 @@ export function TopNav({
       setRootParams({ ...queryParams, token: undefined })
       return
     }
-    const newPath = parts.length > 1 ? parts.slice(0, 1).join('/') : '/'
+    const newPath =
+      backToBasePath && parts.length > 1
+        ? parts.slice(0, 1).join('/')
+        : parts.slice(0, parts.length - 1).join('/')
+
     if (path.includes('/settings')) {
       push(`/${newPath}?nav=settings`)
       return
@@ -128,7 +138,10 @@ export function TopNav({
   }
   //@todo Refactor this so we can put back arrows on screens that need it
   const isSubRoute =
-    (!noSubroute && parts.length > 1) || path.includes('/secret-shop') || path.includes('/deposit')
+    (!noSubroute && parts.length > 1) ||
+    path.includes('/secret-shop') ||
+    path.includes('/deposit') ||
+    path.includes('/leaderboard')
 
   const renderButton = () => {
     switch (true) {

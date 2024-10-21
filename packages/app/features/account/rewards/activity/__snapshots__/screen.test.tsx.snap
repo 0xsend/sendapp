@@ -184,13 +184,14 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
             "marginLeft": 0,
             "marginRight": 0,
             "marginTop": 0,
+            "paddingRight": 7,
             "textTransform": "none",
             "userSelect": "auto",
           }
         }
         suppressHighlighting={true}
       >
-        1,721,001,600,000 Rewards
+        July Rewards
       </Text>
       <View
         aria-autocomplete="none"
@@ -264,7 +265,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           suppressHighlighting={true}
           testID="SelectDistributionDateValue"
         >
-          1,721,001,600,000 1,721,001,600,000
+          July 2024
         </Text>
         <View
           pointerEvents="none"
@@ -859,7 +860,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
           }
           suppressHighlighting={true}
         >
-          Estimated 1,721,001,600,000 Rewards
+          Estimated July
         </Text>
         <View
           style={
@@ -1229,7 +1230,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    1,721,001,600,000 1,721,001,600,000
+                    July 2024
                   </Text>
                   <RNSVGSvgView
                     align="xMidYMid"

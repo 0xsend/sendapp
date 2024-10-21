@@ -46,14 +46,6 @@ export function ActivityRewardsScreen() {
 
   const selectTriggerRef = useRef<HTMLSelectElement>(null)
 
-  const initialDistributionIndex = distributions?.findIndex(
-    (d) => d.number === queryParams.distribution
-  )
-
-  const [selectedDistributionIndex, setSelectedDistributionIndex] = useState(
-    !initialDistributionIndex || initialDistributionIndex === -1 ? 0 : initialDistributionIndex
-  )
-
   if (isLoading)
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
@@ -63,7 +55,7 @@ export function ActivityRewardsScreen() {
         </Stack>
       </YStack>
     )
-  if (!distributions || !distributions[selectedDistributionIndex])
+  if (!distributions)
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Header />
@@ -75,15 +67,19 @@ export function ActivityRewardsScreen() {
       </YStack>
     )
 
+  const selectedDistributionIndex =
+    queryParams.distribution === undefined || distributions.length > queryParams.distribution
+      ? 0
+      : distributions.findIndex((d) => d.number === queryParams.distribution)
+
   const distributionDates = distributions.map(
     (d) =>
-      `${d.qualification_end.toLocaleString('default', {
+      `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
         month: 'long',
-      })} ${d.qualification_end.toLocaleString('default', { year: 'numeric' })}`
+      })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
   )
 
   const onValueChange = (value: string) => {
-    setSelectedDistributionIndex(Number(value))
     setRewardsScreenParams(
       { distribution: distributions[Number(value)]?.number },
       { webBehavior: 'replace' }
@@ -94,134 +90,181 @@ export function ActivityRewardsScreen() {
     <YStack f={1} pb={'$12'} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
       <Header />
       <XStack w={'100%'} jc={'space-between'} ai={'center'}>
-        <H3 fontWeight={'600'} color={'$color12'}>
-          {`${distributionDates[selectedDistributionIndex]?.split(' ')[0]} Rewards`}
+        <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
+          {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
         </H3>
-        <Select
-          native={false}
-          id={id}
-          value={queryParams.distribution?.toString() ?? '0'}
-          onValueChange={onValueChange}
-          onOpenChange={setIsOpen}
-          defaultValue="0"
-          open={isOpen}
-        >
-          <Select.Trigger
-            ref={selectTriggerRef}
-            testID={'SelectDistributionDate'}
-            br="$3"
-            w={'fit-content'}
-            borderWidth={1.5}
-            $theme-light={{
-              boc: isOpen ? '$color1' : '$transparent',
-              bc: isOpen ? '$color1' : '$primary',
-            }}
-            $theme-dark={{
-              boc: isOpen ? '$color1' : '$transparent',
-              bc: isOpen ? '$color1' : '$primary',
-              hoverStyle: { bc: '$primary' },
-            }}
-            iconAfter={
-              isOpen ? (
-                <ChevronUp
-                  $theme-dark={{
-                    color: isOpen ? '$color12' : '$black',
-                  }}
-                  color={'$color11'}
-                />
-              ) : (
-                <ChevronDown
-                  $theme-dark={{
-                    color: isOpen ? '$color12' : '$black',
-                    hoverStyle: { color: '$color12' },
-                  }}
-                  color="$black"
-                />
-              )
-            }
+        {distributions.length > 1 && (
+          <Select
+            native={false}
+            id={id}
+            value={selectedDistributionIndex.toString() ?? '0'}
+            onValueChange={onValueChange}
+            onOpenChange={setIsOpen}
+            defaultValue="0"
+            open={isOpen}
           >
-            <Select.Value
-              testID={'SelectDistributionDateValue'}
-              fontWeight={'bold'}
-              color={isOpen ? '$color12' : '$black'}
+            <Select.Trigger
+              ref={selectTriggerRef}
+              testID={'SelectDistributionDate'}
+              br="$3"
+              w={'fit-content'}
+              borderWidth={1.5}
+              $theme-light={{
+                boc: isOpen ? '$color1' : '$transparent',
+                bc: isOpen ? '$color1' : '$primary',
+              }}
               $theme-dark={{
-                color: isOpen ? '$color12' : '$black',
+                boc: isOpen ? '$color1' : '$transparent',
+                bc: isOpen ? '$color1' : '$primary',
+                hoverStyle: { bc: '$primary' },
               }}
-              placeholder={distributions[selectedDistributionIndex]?.number}
-            />
-          </Select.Trigger>
-
-          <Adapt when="sm" platform="touch">
-            <Sheet
-              native
-              modal
-              dismissOnSnapToBottom
-              snapPoints={[30]}
-              animation={'quick'}
-              disableDrag
+              iconAfter={
+                isOpen ? (
+                  <ChevronUp
+                    $theme-dark={{
+                      color: isOpen ? '$color12' : '$black',
+                    }}
+                    color={'$color11'}
+                  />
+                ) : (
+                  <ChevronDown
+                    $theme-dark={{
+                      color: isOpen ? '$color12' : '$black',
+                      hoverStyle: { color: '$color12' },
+                    }}
+                    color="$black"
+                  />
+                )
+              }
             >
-              <Sheet.Frame maw={738} bc={'$color1'}>
-                <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
-                  <XStack ai="center" jc="space-between" w="100%" px="$4">
-                    <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                      Select Month
-                    </Paragraph>
-                    <Button
-                      chromeless
-                      unstyled
-                      icon={<IconX color={'$color12'} size={'$1.5'} />}
-                      onPress={() => setIsOpen(false)}
-                    />
-                  </XStack>
-                </Sheet.Handle>
-                <Sheet.ScrollView>
-                  <Adapt.Contents />
-                </Sheet.ScrollView>
-              </Sheet.Frame>
-              <Sheet.Overlay />
-            </Sheet>
-          </Adapt>
+              <Select.Value
+                testID={'SelectDistributionDateValue'}
+                fontWeight={'bold'}
+                color={isOpen ? '$color12' : '$black'}
+                $theme-dark={{
+                  color: isOpen ? '$color12' : '$black',
+                }}
+                placeholder={distributions[selectedDistributionIndex]?.number}
+              />
+            </Select.Trigger>
 
-          <Select.Content zIndex={200000}>
-            <Select.Viewport
-              br={'$3'}
-              style={{
-                left: '66%',
-              }}
-              w={320}
-              btrr={0}
-              boc="transparent"
-              bc={'$color1'}
-              pt={'$5'}
-            >
-              <Select.Group>
-                {distributions.toReversed().map((distribution, i) => (
-                  <DistributionItem
-                    isActive={
-                      distribution.number === distributions[selectedDistributionIndex]?.number
-                    }
-                    value={i.toString()}
-                    index={i}
-                    key={distribution?.number}
+            <Adapt when="sm" platform="touch">
+              <Sheet
+                native
+                modal
+                dismissOnSnapToBottom
+                snapPoints={[30]}
+                animation={'quick'}
+                disableDrag
+              >
+                <Sheet.Frame maw={738} bc={'$color1'}>
+                  <Sheet.Handle
+                    py="$5"
+                    f={1}
+                    bc="transparent"
+                    jc={'space-between'}
+                    opacity={1}
+                    m={0}
                   >
-                    {distributionDates[i]}
-                  </DistributionItem>
-                ))}
-              </Select.Group>
-            </Select.Viewport>
-          </Select.Content>
-        </Select>
+                    <XStack ai="center" jc="space-between" w="100%" px="$4">
+                      <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                        Select Month
+                      </Paragraph>
+                      <Button
+                        chromeless
+                        unstyled
+                        icon={<IconX color={'$color12'} size={'$1.5'} />}
+                        onPress={() => setIsOpen(false)}
+                      />
+                    </XStack>
+                  </Sheet.Handle>
+                  <Sheet.ScrollView>
+                    <Adapt.Contents />
+                  </Sheet.ScrollView>
+                </Sheet.Frame>
+                <Sheet.Overlay />
+              </Sheet>
+            </Adapt>
+
+            <Select.Content zIndex={200000}>
+              <Select.Viewport
+                br={'$3'}
+                style={{
+                  left: '66%',
+                }}
+                w={320}
+                btrr={0}
+                boc="transparent"
+                bc={'$color1'}
+                pt={'$5'}
+              >
+                <Select.Group>
+                  {distributions.map((distribution, i) => (
+                    <DistributionItem
+                      isActive={
+                        distribution.number === distributions[selectedDistributionIndex]?.number
+                      }
+                      value={i.toString()}
+                      index={i}
+                      key={distribution?.number}
+                    >
+                      {distributionDates[i]}
+                    </DistributionItem>
+                  ))}
+                </Select.Group>
+              </Select.Viewport>
+            </Select.Content>
+          </Select>
+        )}
       </XStack>
-      <YStack f={1} w={'100%'} gap={'$7'}>
-        <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
-        <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
-        <MultiplierCards
-          distribution={distributions[selectedDistributionIndex]}
-          distributionDate={distributionDates[selectedDistributionIndex]}
-        />
-        <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
-      </YStack>
+      {!distributions[selectedDistributionIndex] ? (
+        <YStack f={1} w={'100%'} gap={'$7'}>
+          <Paragraph color={'$color10'} size={'$5'}>
+            No rewards available
+          </Paragraph>
+        </YStack>
+      ) : (
+        <YStack f={1} w={'100%'} gap={'$7'}>
+          <DistributionRequirementsCard distribution={distributions[selectedDistributionIndex]} />
+          <SendPerksCards distribution={distributions[selectedDistributionIndex]} />
+          <MultiplierCards distribution={distributions[selectedDistributionIndex]} />
+          <ClaimableRewardsCard distribution={distributions[selectedDistributionIndex]} />
+        </YStack>
+      )}
     </YStack>
+  )
+}
+
+const DistributionItem = ({
+  isActive,
+  value,
+  index,
+  children,
+  ...props
+}: {
+  isActive: boolean
+} & SelectItemProps) => {
+  return (
+    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
+      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
+        <Select.ItemText
+          display="flex"
+          fontSize={'$5'}
+          fontWeight={'500'}
+          textTransform={'uppercase'}
+          color={'$color12'}
+          jc={'center'}
+          ai={'center'}
+        >
+          {children}
+        </Select.ItemText>
+        {isActive && (
+          <Theme name="green_active">
+            <Dot size={'$3'} />
+          </Theme>
+        )}
+      </XStack>
+    </Select.Item>
   )
 }
 
@@ -443,12 +486,16 @@ const PerkCard = ({
 
 const MultiplierCards = ({
   distribution,
-  distributionDate,
 }: {
   distribution: UseDistributionsResultData[number]
-  distributionDate?: string
 }) => {
   const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+  const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
+    'default',
+    {
+      month: 'long',
+    }
+  )
 
   return (
     <YStack f={1} w={'100%'} gap="$5">
@@ -460,12 +507,10 @@ const MultiplierCards = ({
           .filter(([verificationType]) => multipliers?.[verificationType].multiplier_step > 0)
           .map(([verificationType, title]) => (
             <MultiplierCard key={verificationType}>
-              <XStack ai="center" gap="$2">
+              <XStack ai="center" gap="$2" jc="center">
                 <IconAccount size={'2'} color={'$color10'} />
                 <H3 fontWeight={'500'} color={'$color10'}>
-                  {verificationType === 'tag_referral'
-                    ? distributionDate?.split(' ')[0] ?? 'Monthly'
-                    : ''}{' '}
+                  {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
                   {title}
                 </H3>
               </XStack>
@@ -474,6 +519,7 @@ const MultiplierCards = ({
                 $sm={{ fontSize: '$8' }}
                 fontWeight={'600'}
                 color={'$color12'}
+                mx="auto"
               >
                 X {multipliers?.[verificationType].value ?? 1}
               </Paragraph>
@@ -495,7 +541,14 @@ const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
       mih={112}
       w={'fit-content'}
     >
-      <XStack ai="center" w={'100%'} jc="space-between" $gtXs={{ gap: '$7' }} gap={'$5'}>
+      <XStack
+        ai="center"
+        w={'100%'}
+        jc="space-between"
+        $gtXs={{ gap: '$7' }}
+        gap={'$5'}
+        flexWrap="wrap"
+      >
         {children}
       </XStack>
     </Card>
@@ -510,16 +563,17 @@ const ClaimableRewardsCard = ({
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
-  const distributionMonth = distribution.qualification_end.toLocaleString('default', {
-    month: 'long',
-  })
+  const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
+    'default',
+    {
+      month: 'long',
+    }
+  )
 
   return (
-    <YStack f={1} w={'100%'} gap="$5" $lg={{ display: 'none' }}>
+    <YStack f={1} w={'100%'} gap="$5" $sm={{ display: 'none' }}>
       <H3 fontWeight={'600'} color={'$color12'}>
-        {isQualificationOver
-          ? `Total ${distributionMonth} Rewards`
-          : `Estimated ${distributionMonth} Rewards`}
+        {isQualificationOver ? `Total ${distributionMonth}` : `Estimated ${distributionMonth}`}
       </H3>
       <Card br={'$6'} p="$7" ai={'center'} w={'100%'}>
         <Stack ai="center" jc="space-between" fd="row" w="100%">
@@ -536,38 +590,5 @@ const ClaimableRewardsCard = ({
         </Stack>
       </Card>
     </YStack>
-  )
-}
-
-const DistributionItem = ({
-  isActive,
-  value,
-  index,
-  children,
-  ...props
-}: {
-  isActive: boolean
-} & SelectItemProps) => {
-  return (
-    <Select.Item index={index} value={value} bc="transparent" f={1} w="100%" {...props}>
-      <XStack gap={'$1'} $gtLg={{ gap: '$3.5' }} f={1} ai={'center'} jc={'center'}>
-        <Select.ItemText
-          display="flex"
-          fontSize={'$5'}
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          color={'$color12'}
-          jc={'center'}
-          ai={'center'}
-        >
-          {children}
-        </Select.ItemText>
-        {isActive && (
-          <Theme name="green_active">
-            <Dot size={'$3'} />
-          </Theme>
-        )}
-      </XStack>
-    </Select.Item>
   )
 }
