@@ -15,6 +15,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useBalance, useSimulateContract } from 'wagmi'
 import { api } from './api'
 import { useSendAccount } from './send-accounts'
+import { adjustUTCDateForTimezone } from './dateHelper'
 
 export const DISTRIBUTION_INITIAL_POOL_AMOUNT = BigInt(20e9)
 
@@ -25,6 +26,7 @@ type UseDistributionResultDistribution = Omit<
 
 export type UseDistributionsResultData = (UseDistributionResultDistribution & {
   qualification_end: Date
+  timezone_adjusted_qualification_end: Date
   qualification_start: Date
   claim_end: Date
   distribution_shares: Tables<'distribution_shares'>[]
@@ -48,6 +50,9 @@ export const useDistributions = (): UseQueryResult<UseDistributionsResultData, P
       return data.map((distribution) => ({
         ...distribution,
         qualification_end: new Date(distribution.qualification_end),
+        timezone_adjusted_qualification_end: adjustUTCDateForTimezone(
+          new Date(distribution.qualification_end)
+        ),
         qualification_start: new Date(distribution.qualification_start),
         claim_end: new Date(distribution.claim_end),
       }))
@@ -80,6 +85,9 @@ export const useMonthlyDistributions = () => {
       return data.map((distribution) => ({
         ...distribution,
         qualification_end: new Date(distribution.qualification_end),
+        timezone_adjusted_qualification_end: adjustUTCDateForTimezone(
+          new Date(distribution.qualification_end)
+        ),
         qualification_start: new Date(distribution.qualification_start),
         claim_end: new Date(distribution.claim_end),
       }))

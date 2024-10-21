@@ -8,7 +8,8 @@ jest.mock('app/utils/distributions', () => ({
       {
         number: 7,
         chain_id: 845337,
-        qualification_end: Date.UTC(2024, 6, 15),
+        qualification_end: new Date(Date.UTC(2024, 6, 30, 11, 59, 59)),
+        timezone_adjusted_qualification_end: new Date(Date.UTC(2024, 6, 30, 11, 59, 59)),
         distribution_shares: [
           {
             amount: 1,

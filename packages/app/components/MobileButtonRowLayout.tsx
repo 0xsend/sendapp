@@ -171,9 +171,12 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
   const { direction } = useScrollDirection()
 
   const isVisible = distribution !== undefined && shareAmount !== undefined && shareAmount > 0
-  const distributionMonth = distribution?.qualification_end.toLocaleString('default', {
-    month: 'long',
-  })
+  const distributionMonth = distribution?.timezone_adjusted_qualification_end.toLocaleString(
+    'default',
+    {
+      month: 'long',
+    }
+  )
 
   const now = new Date()
   const isQualificationOver =
