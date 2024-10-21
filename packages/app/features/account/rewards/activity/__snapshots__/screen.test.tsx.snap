@@ -906,23 +906,6 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
             >
               1 SEND
             </Text>
-            <Text
-              style={
-                {
-                  "color": "#FFFFFF",
-                  "fontFamily": "System",
-                  "fontSize": 15.6,
-                  "fontWeight": "300",
-                  "lineHeight": 18,
-                  "marginLeft": "auto",
-                  "marginRight": "auto",
-                  "userSelect": "auto",
-                }
-              }
-              suppressHighlighting={true}
-            >
-              Claimed
-            </Text>
           </View>
         </View>
       </View>

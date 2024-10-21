@@ -36,7 +36,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   // Check if the user is eligible
   const share = distribution.distribution_shares?.[0]
   const isEligible = !!share && share.amount > 0
-  const isClaimActive = true
+  const isClaimActive = distribution.qualification_end < new Date()
   const trancheId = BigInt(distribution.number - 1) // tranches are 0-indexed
   const chainId = distribution.chain_id as keyof typeof sendMerkleDropAddress
   const [sentTxHash, setSentTxHash] = useState<Hex>()
