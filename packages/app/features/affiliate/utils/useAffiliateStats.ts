@@ -1,19 +1,26 @@
-import type { Tables } from '@my/supabase/database-generated.types'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { api } from 'app/utils/api'
 
-export const useAffiliateStats = (): UseQueryResult<Tables<'affiliate_stats'>, PostgrestError> => {
-  const supabase = useSupabase()
+export const useAffiliateStats = (): UseQueryResult<
+  {
+    created_at: string
+    id: string
+    paymaster_tx_count: number
+    updated_at: string
+    user_id: string | null
+    referredPaymasterTxCount: number
+    referralsCount: number
+  },
+  PostgrestError
+> => {
   return useQuery({
     queryKey: ['affiliate_stats'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('affiliate_stats').select('*').single()
+      const { data, error } = await api.affiliate.getStats.useQuery()
+      console.log('error: ', error)
+      console.log('data: ', data)
       if (error) {
-        // no rows in receipts table
-        if (error.code === 'PGRST116') {
-          return []
-        }
         throw new Error(error.message)
       }
       return data
