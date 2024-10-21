@@ -1,11 +1,4 @@
-import {
-  Button as ButtonOg,
-  Paragraph,
-  Spinner,
-  type ButtonProps,
-  YStack,
-  useToastController,
-} from '@my/ui'
+import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useToastController } from '@my/ui'
 import { baseMainnet, type sendMerkleDropAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconDollar } from 'app/components/icons'
@@ -197,24 +190,21 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
 
   if (!isEligible) return null
 
-  // If the user is eligible but has already claimed, show the claim button disabled
-  if (isClaimed) {
-    return (
-      <Paragraph size="$3" color="$color12" mx="auto">
-        Claimed
-      </Paragraph>
-    )
-  }
   // If the user is eligible and the tranche is active, show the claim button
   return (
     <YStack>
       <Button
-        theme={canClaim ? 'green' : error || hasEnoughGas ? 'red_active' : undefined}
+        theme={canClaim || isClaimed ? 'green' : error || !hasEnoughGas ? 'red_active' : 'alt1'}
         onPress={onSubmit}
         br={12}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
         disabled={
-          !canClaim || isClaimPending || !!sentTxHash || !!feesPerGasError || !!usdcFeesError
+          !canClaim ||
+          isClaimPending ||
+          !!sentTxHash ||
+          !!feesPerGasError ||
+          !!usdcFeesError ||
+          isClaimed
         }
         gap={4}
         maw={194}
@@ -235,27 +225,27 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
                   <Spinner size="small" color="$color12" />
                 </ButtonOg.Icon>
               )
+            case isClaimed:
+              return (
+                <>
+                  <ButtonOg.Icon>
+                    <IconDollar color="$black" size={'$1.5'} />
+                  </ButtonOg.Icon>
+                  <ButtonOg.Text>Claimed</ButtonOg.Text>
+                </>
+              )
             case !isTrancheActive:
               return (
                 <ButtonOg.Text opacity={0.5} disabled>
                   Not yet claimable
                 </ButtonOg.Text>
               )
-            case !!isTrancheActiveError || !!isClaimedError || !!nonceError:
-              return (
-                <>
-                  <ButtonOg.Text opacity={0.5}>Error</ButtonOg.Text>
-                </>
-              )
-            case !!feesPerGasError || !!usdcFeesError:
-              return (
-                <>
-                  <ButtonOg.Icon>
-                    <IconDollar size={'$2.5'} />
-                  </ButtonOg.Icon>
-                  <ButtonOg.Text>Claim Reward</ButtonOg.Text>
-                </>
-              )
+            case !!isTrancheActiveError ||
+              !!isClaimedError ||
+              !!nonceError ||
+              !!feesPerGasError ||
+              !!usdcFeesError:
+              return <ButtonOg.Text opacity={0.5}>Error</ButtonOg.Text>
             case isClaimPending && !isClaimError:
               return (
                 <>
