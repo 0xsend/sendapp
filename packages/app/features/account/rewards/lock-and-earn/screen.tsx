@@ -376,7 +376,7 @@ const OpenPosition = () => {
     >
       <YStack jc={'space-between'} h={'100%'}>
         <LinkableButton
-          href="/"
+          href="/account/rewards/lock-and-earn/open-position"
           theme={'green'}
           variant="outlined"
           $theme-light={{ borderColor: '$color12' }}
