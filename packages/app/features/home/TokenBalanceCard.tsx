@@ -42,7 +42,7 @@ export const TokenBalanceCard = () => {
   return (
     <XStack w={'100%'} zIndex={4}>
       <YStack jc={'center'} gap={'$4'} w={'100%'}>
-        <XStack ai={'center'} gap="$2.5" width={'100%'}>
+        <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={toggleIsPriceHidden}>
           <XStack ai={'center'} gap="$2.5">
             <AnimatePresence exitBeforeEnter>
               {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
@@ -58,20 +58,11 @@ export const TokenBalanceCard = () => {
               Total Balance
             </Label>
           </XStack>
-          <Button
-            onPress={toggleIsPriceHidden}
-            p={'$2'}
-            size={'$3'}
-            circular={true}
-            chromeless
-            iconAfter={
-              isPriceHidden ? (
-                <EyeOff color={'$color9'} size={'$2'} />
-              ) : (
-                <Eye color={'$color11'} size={'$2'} />
-              )
-            }
-          />
+          {isPriceHidden ? (
+            <EyeOff color={'$color9'} size={'$1'} />
+          ) : (
+            <Eye color={'$color11'} size={'$1'} />
+          )}
         </XStack>
         <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
           {(() => {
