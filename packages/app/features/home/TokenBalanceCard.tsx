@@ -7,7 +7,6 @@ import {
   Stack,
   BigHeading,
   styled,
-  Button,
   AnimatePresence,
 } from '@my/ui'
 import { EyeOff, Eye } from '@tamagui/lucide-icons'
@@ -33,7 +32,7 @@ const HiddenSquare = styled(Stack, {
 
 export const TokenBalanceCard = () => {
   // @todo add an enabled flag for when hidden
-  const { totalBalance, isLoading } = useSendAccountBalances()
+  const { totalBalance, isLoadingTotalBalance } = useSendAccountBalances()
 
   const formattedBalance = formatAmount(totalBalance, 9, 0)
 
@@ -67,8 +66,6 @@ export const TokenBalanceCard = () => {
         <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
           {(() => {
             switch (true) {
-              case isLoading:
-                return <Spinner size={'large'} />
               case isPriceHidden:
                 return (
                   <BigHeading
@@ -82,6 +79,8 @@ export const TokenBalanceCard = () => {
                     {'//////'}
                   </BigHeading>
                 )
+              case isLoadingTotalBalance || !totalBalance:
+                return <Spinner size={'large'} />
               default:
                 return (
                   <>
@@ -121,12 +120,15 @@ export const TokenBalanceCard = () => {
 }
 
 const useIsPriceHidden = () => {
-  const [isPriceHidden, setIsPriceHidden] = useState<boolean>(false)
+  const [isPriceHidden, setIsPriceHidden] = useState<boolean>(true)
 
   useEffect(() => {
     const getIsPriceHidden = async () => {
       try {
         const savedIsPriceHidden = await AsyncStorage.getItem('isPriceHidden')
+        if (savedIsPriceHidden === null) {
+          setIsPriceHidden(false)
+        }
         if (savedIsPriceHidden !== null) {
           setIsPriceHidden(JSON.parse(savedIsPriceHidden))
         }
