@@ -15,7 +15,7 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
 
-const GreenSquare = styled(Stack, {
+export const GreenSquare = styled(Stack, {
   name: 'Surface',
   w: 11,
   h: 11,
