@@ -7190,6 +7190,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-async-storage/async-storage@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@react-native-async-storage/async-storage@npm:2.0.0"
+  dependencies:
+    merge-options: "npm:^3.0.4"
+  peerDependencies:
+    react-native: ^0.0.0-0 || >=0.65 <1.0
+  checksum: 10/cd00a7fac584bfce350c0ad56a542e19c5aa77bec41a211f004c87343e971819d38c5483470fd11116e0271a5e1321ce656cc0bb66d2aa0852f74bc23be61a77
+  languageName: node
+  linkType: hard
+
 "@react-native-community/cli-clean@npm:13.6.6":
   version: 13.6.6
   resolution: "@react-native-community/cli-clean@npm:13.6.6"
@@ -14180,7 +14191,7 @@ __metadata:
     "@my/wagmi": "workspace:*"
     "@noble/curves": "npm:^1.2.0"
     "@openzeppelin/merkle-tree": "npm:1.0.5"
-    "@react-native-async-storage/async-storage": "npm:1.21.0"
+    "@react-native-async-storage/async-storage": "npm:^2.0.0"
     "@scure/base": "npm:^1.1.5"
     "@supabase/auth-helpers-nextjs": "npm:0.10.0"
     "@supabase/auth-helpers-react": "npm:0.5.0"
