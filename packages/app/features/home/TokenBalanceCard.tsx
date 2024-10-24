@@ -76,6 +76,8 @@ export const TokenBalanceCard = () => {
         <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
           {(() => {
             switch (true) {
+              case isLoading:
+                return <Spinner size={'large'} />
               case isPriceHidden:
                 return (
                   <BigHeading
@@ -89,8 +91,6 @@ export const TokenBalanceCard = () => {
                     {'//////'}
                   </BigHeading>
                 )
-              case isLoading:
-                return <Spinner size={'large'} />
               default:
                 return (
                   <>
