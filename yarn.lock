@@ -14230,6 +14230,7 @@ __metadata:
     react-native-safe-area-context: "npm:4.8.2"
     react-native-svg: "npm:15.2.0"
     react-test-renderer: "npm:^18.3.1"
+    react-use-precision-timer: "npm:^3.5.5"
     solito: "npm:^4.0.1"
     superjson: "npm:^1.13.1"
     typescript: "npm:^5.5.3"
@@ -30129,6 +30130,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-sub-unsub@npm:^2.2.2":
+  version: 2.2.7
+  resolution: "react-sub-unsub@npm:2.2.7"
+  peerDependencies:
+    react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0
+    react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0
+  checksum: 10/684f9ec88af0be9e27c3112480e47ef54060af13e5adb0cf7988ac2599bf29e12fcbeca3e8067270216b1add805a063cbd6abae20f1dd0b65b5d689afd3b66d7
+  languageName: node
+  linkType: hard
+
 "react-test-renderer@npm:18.2.0":
   version: 18.2.0
   resolution: "react-test-renderer@npm:18.2.0"
@@ -30152,6 +30163,18 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 10/d53137315c677bdfba702a7179a69828233fc7635ae1e0c03b203923d643400ace72b343cb3dd3dafba8911c20bef53f55bff7aa2e4ddff3ccc423fdd9deeee2
+  languageName: node
+  linkType: hard
+
+"react-use-precision-timer@npm:^3.5.5":
+  version: 3.5.5
+  resolution: "react-use-precision-timer@npm:3.5.5"
+  dependencies:
+    react-sub-unsub: "npm:^2.2.2"
+  peerDependencies:
+    react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0
+    react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0
+  checksum: 10/e0abf3fc915207ac57b58b7eb2df0ed178b399dc8b082443cbb44177756e2d480193d07c99bc2fe1de6d254deb68d9f08e940f2473069f233b6ac08653041451
   languageName: node
   linkType: hard
 

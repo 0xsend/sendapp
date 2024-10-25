@@ -8,7 +8,6 @@ import {
   BigHeading,
   styled,
   AnimatePresence,
-  View,
   type XStackProps,
 } from '@my/ui'
 import { EyeOff, Eye } from '@tamagui/lucide-icons'
@@ -16,6 +15,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
+import { type Timer, useStopwatch } from 'react-use-precision-timer'
 
 const GreenSquare = styled(Stack, {
   name: 'Surface',
@@ -39,7 +39,8 @@ export const TokenBalanceCard = () => {
   const formattedBalance = formatAmount(totalBalance, 9, 0)
 
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
-  const { isGameVisible, presses, increaseScore, time } = useShowHideGame()
+  const timer = useStopwatch()
+  const { isGameVisible, presses, increaseScore } = useShowHideGame(timer)
 
   const onShowHidePress = () => {
     toggleIsPriceHidden()
@@ -77,7 +78,7 @@ export const TokenBalanceCard = () => {
               <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
                 {presses}
               </Paragraph>
-              <ShowHideGameStopwatch time={time} />
+              <ShowHideGameStopwatch timer={timer} />
             </XStack>
           )}
         </YStack>
@@ -171,47 +172,35 @@ const useIsPriceHidden = () => {
   return { isPriceHidden, toggleIsPriceHidden }
 }
 
-const useShowHideGame = () => {
+const useShowHideGame = (timer: Timer) => {
   const countToStop = 100
   const countToVisible = 10
 
   const [isGameVisible, setIsGameVisible] = useState<boolean>(false)
   const [presses, setPresses] = useState<number>(0)
 
-  const [isPaused, setIsPaused] = useState(false)
-  const [time, setTime] = useState(0)
+  const onPress = () => {
+    if (!timer.isRunning() && presses < countToStop) {
+      timer.start()
+      setPresses(presses + 1)
+      return
+    }
 
-  useEffect(() => {
-    if (presses >= countToVisible) {
+    if (presses >= countToStop) {
+      timer.pause()
+      return
+    }
+    if (presses >= countToVisible && !isGameVisible) {
       setIsGameVisible(true)
     }
-    if (presses >= countToStop) {
-      setIsPaused(true)
-    }
-
-    let interval: NodeJS.Timeout | undefined = undefined
-    if (isPaused === false) {
-      interval = setInterval(() => {
-        setTime((time) => time + 10)
-      }, 10)
-    } else {
-      clearInterval(interval)
-    }
-    return () => {
-      clearInterval(interval)
-    }
-  }, [presses, isPaused])
-
-  const onPress = () => {
-    if (isPaused === false) {
-      setPresses(presses + 1)
-    }
+    setPresses(presses + 1)
   }
 
-  return { isGameVisible, presses, increaseScore: onPress, time }
+  return { isGameVisible, presses, increaseScore: onPress }
 }
 
-const ShowHideGameStopwatch = ({ time, ...props }: XStackProps & { time: number }) => {
+const ShowHideGameStopwatch = ({ timer, ...props }: XStackProps & { timer: Timer }) => {
+  const time = timer.getElapsedRunningTime()
   return (
     <XStack {...props}>
       <Paragraph
