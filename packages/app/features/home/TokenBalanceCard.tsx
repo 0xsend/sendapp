@@ -8,6 +8,8 @@ import {
   BigHeading,
   styled,
   AnimatePresence,
+  View,
+  type XStackProps,
 } from '@my/ui'
 import { EyeOff, Eye } from '@tamagui/lucide-icons'
 import formatAmount from 'app/utils/formatAmount'
@@ -37,32 +39,48 @@ export const TokenBalanceCard = () => {
   const formattedBalance = formatAmount(totalBalance, 9, 0)
 
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
+  const { isGameVisible, presses, increaseScore, time } = useShowHideGame()
+
+  const onShowHidePress = () => {
+    toggleIsPriceHidden()
+    increaseScore()
+  }
 
   return (
     <XStack w={'100%'} zIndex={4}>
       <YStack jc={'center'} gap={'$4'} w={'100%'}>
-        <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={toggleIsPriceHidden}>
-          <XStack ai={'center'} gap="$2.5">
-            <AnimatePresence exitBeforeEnter>
-              {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
-            </AnimatePresence>
-            <Label
-              fontSize={'$4'}
-              zIndex={1}
-              fontWeight={'500'}
-              textTransform={'uppercase'}
-              lineHeight={0}
-              col={'$color10'}
-            >
-              Total Balance
-            </Label>
+        <YStack w="fit-content" gap={'$2.5'}>
+          <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={onShowHidePress}>
+            <XStack ai={'center'} gap="$2.5">
+              <AnimatePresence exitBeforeEnter>
+                {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
+              </AnimatePresence>
+              <Label
+                fontSize={'$4'}
+                zIndex={1}
+                fontWeight={'500'}
+                textTransform={'uppercase'}
+                lineHeight={0}
+                col={'$color10'}
+              >
+                Total Balance
+              </Label>
+            </XStack>
+            {isPriceHidden ? (
+              <EyeOff color={'$color9'} size={'$1'} />
+            ) : (
+              <Eye color={'$color11'} size={'$1'} />
+            )}
           </XStack>
-          {isPriceHidden ? (
-            <EyeOff color={'$color9'} size={'$1'} />
-          ) : (
-            <Eye color={'$color11'} size={'$1'} />
+          {isGameVisible && (
+            <XStack w="100%" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
+              <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
+                {presses}
+              </Paragraph>
+              <ShowHideGameStopwatch time={time} />
+            </XStack>
           )}
-        </XStack>
+        </YStack>
         <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
           {(() => {
             switch (true) {
@@ -151,4 +169,81 @@ const useIsPriceHidden = () => {
   }
 
   return { isPriceHidden, toggleIsPriceHidden }
+}
+
+const useShowHideGame = () => {
+  const countToStop = 100
+  const countToVisible = 10
+
+  const [isGameVisible, setIsGameVisible] = useState<boolean>(false)
+  const [presses, setPresses] = useState<number>(0)
+
+  const [isPaused, setIsPaused] = useState(false)
+  const [time, setTime] = useState(0)
+
+  useEffect(() => {
+    if (presses >= countToVisible) {
+      setIsGameVisible(true)
+    }
+    if (presses >= countToStop) {
+      setIsPaused(true)
+    }
+
+    let interval: NodeJS.Timeout | undefined = undefined
+    if (isPaused === false) {
+      interval = setInterval(() => {
+        setTime((time) => time + 10)
+      }, 10)
+    } else {
+      clearInterval(interval)
+    }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [presses, isPaused])
+
+  const onPress = () => {
+    if (isPaused === false) {
+      setPresses(presses + 1)
+    }
+  }
+
+  return { isGameVisible, presses, increaseScore: onPress, time }
+}
+
+const ShowHideGameStopwatch = ({ time, ...props }: XStackProps & { time: number }) => {
+  return (
+    <XStack {...props}>
+      <Paragraph
+        fontSize={'$4'}
+        zIndex={1}
+        fontWeight={'500'}
+        textTransform={'uppercase'}
+        lineHeight={0}
+        col={'$color10'}
+      >
+        {`0 + ${Math.floor((time / 60000) % 60)}`.slice(-2)}:
+      </Paragraph>
+      <Paragraph
+        fontSize={'$4'}
+        zIndex={1}
+        fontWeight={'500'}
+        textTransform={'uppercase'}
+        lineHeight={0}
+        col={'$color10'}
+      >
+        {`0 + ${Math.floor((time / 1000) % 60)}`.slice(-2)}.
+      </Paragraph>
+      <Paragraph
+        fontSize={'$4'}
+        zIndex={1}
+        fontWeight={'500'}
+        textTransform={'uppercase'}
+        lineHeight={0}
+        col={'$color10'}
+      >
+        {`0 + ${Math.floor((time / 10) % 100)}`.slice(-2)}
+      </Paragraph>
+    </XStack>
+  )
 }
