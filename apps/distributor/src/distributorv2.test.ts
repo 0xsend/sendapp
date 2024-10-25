@@ -112,6 +112,7 @@ describe('Distributor V2 Worker', () => {
           multiplier_max: 2.5,
           multiplier_step: 0.1,
           distribution_id: 4,
+          mode: 'sequential',
         },
         {
           type: 'total_tag_referrals',
@@ -120,6 +121,9 @@ describe('Distributor V2 Worker', () => {
           multiplier_min: 1.0,
           multiplier_max: 2.0,
           multiplier_step: 0.01,
+          mode: 'cumulative',
+          created_at: '2024-04-06T16:49:02.569245+00:00',
+          updated_at: '2024-04-06T16:49:02.569245+00:00',
           distribution_id: 4,
         },
         {
@@ -127,6 +131,7 @@ describe('Distributor V2 Worker', () => {
           fixed_value: 200,
           bips_value: 0,
           distribution_id: 4,
+          mode: 'sequential',
         },
         {
           type: 'tag_registration',
@@ -135,6 +140,7 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'sequential',
         },
         {
           type: 'send_ten',
@@ -143,6 +149,7 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'sequential',
         },
         {
           type: 'send_one_hundred',
@@ -151,6 +158,7 @@ describe('Distributor V2 Worker', () => {
           distribution_id: 4,
           created_at: '2024-04-06T16:49:02.569245+00:00',
           updated_at: '2024-04-06T16:49:02.569245+00:00',
+          mode: 'sequential',
         },
       ],
     } as Tables<'distributions'> & {
