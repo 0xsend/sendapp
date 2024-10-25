@@ -20,7 +20,6 @@ import {
   IconShare,
   IconBadgeCheck,
   IconArrowRight,
-  IconQRFull,
   IconLeaderboard,
 } from 'app/components/icons'
 import { getReferralHref } from 'app/utils/getReferralLink'

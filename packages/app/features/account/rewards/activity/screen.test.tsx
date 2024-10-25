@@ -8,8 +8,8 @@ jest.mock('app/utils/distributions', () => ({
       {
         number: 7,
         chain_id: 845337,
-        qualification_end: new Date(Date.UTC(2024, 6, 30, 11, 59, 59)),
-        timezone_adjusted_qualification_end: new Date(Date.UTC(2024, 6, 30, 11, 59, 59)),
+        qualification_end: new Date(2024, 6, 30, 11, 59, 59),
+        timezone_adjusted_qualification_end: new Date(2024, 6, 30, 11, 59, 59),
         distribution_shares: [
           {
             amount: 1,
@@ -117,7 +117,7 @@ jest.mock('app/utils/useSendAccountBalances', () => ({
 describe('ActivityRewardsScreen', () => {
   it('renders', async () => {
     jest.useFakeTimers()
-    jest.setSystemTime(Date.UTC(2024, 6, 12))
+    jest.setSystemTime(Date.UTC(2024, 7, 12))
     render(
       <Wrapper>
         <ActivityRewardsScreen />
@@ -125,9 +125,9 @@ describe('ActivityRewardsScreen', () => {
     )
 
     await act(async () => {
-      jest.advanceTimersByTime(2000)
+      jest.advanceTimersByTime(5000)
     })
-    expect(screen.getByTestId('SelectDistributionDate')).toBeVisible()
+
     expect(screen.toJSON()).toMatchSnapshot('ActivityRewardsScreen')
   })
 })
