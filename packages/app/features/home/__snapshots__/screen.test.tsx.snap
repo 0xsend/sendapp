@@ -96,35 +96,24 @@ exports[`HomeScreen 1`] = `
                   "flexDirection": "column",
                   "gap": 18,
                   "justifyContent": "center",
+                  "width": "100%",
                 }
               }
             >
               <View
                 style={
                   {
-                    "alignItems": "center",
-                    "flexDirection": "row",
+                    "flexDirection": "column",
                     "gap": 10,
+                    "width": "fit-content",
                   }
                 }
               >
                 <View
-                  style={
-                    {
-                      "backgroundColor": "#40FB50",
-                      "height": 11,
-                      "width": 11,
-                    }
-                  }
-                />
-                <Text
                   cancelable={true}
                   disabled={false}
                   focusable={true}
-                  id=":r1:"
                   minPressDuration={0}
-                  onBlur={[Function]}
-                  onFocus={[Function]}
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onPress={[Function]}
@@ -133,22 +122,164 @@ exports[`HomeScreen 1`] = `
                   style={
                     {
                       "alignItems": "center",
-                      "backgroundColor": "transparent",
-                      "color": "#B2B2B2",
-                      "display": "flex",
-                      "fontFamily": "System",
-                      "fontSize": 16.8,
-                      "fontWeight": "500",
-                      "lineHeight": 0,
-                      "textTransform": "uppercase",
-                      "userSelect": "none",
-                      "zIndex": 1,
+                      "flexDirection": "row",
+                      "gap": 10,
+                      "width": "100%",
                     }
                   }
-                  suppressHighlighting={true}
                 >
-                  Total Balance
-                </Text>
+                  <View
+                    style={
+                      {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "gap": 10,
+                      }
+                    }
+                  >
+                    <View
+                      style={
+                        {
+                          "backgroundColor": "#40FB50",
+                          "height": 11,
+                          "width": 11,
+                        }
+                      }
+                    />
+                    <Text
+                      cancelable={true}
+                      disabled={false}
+                      focusable={true}
+                      id=":r2:"
+                      minPressDuration={0}
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      onMouseEnter={[Function]}
+                      onMouseLeave={[Function]}
+                      onPress={[Function]}
+                      onPressIn={[Function]}
+                      onPressOut={[Function]}
+                      style={
+                        {
+                          "alignItems": "center",
+                          "backgroundColor": "transparent",
+                          "color": "#B2B2B2",
+                          "display": "flex",
+                          "fontFamily": "System",
+                          "fontSize": 16.8,
+                          "fontWeight": "500",
+                          "lineHeight": 0,
+                          "textTransform": "uppercase",
+                          "userSelect": "none",
+                          "zIndex": 1,
+                        }
+                      }
+                      suppressHighlighting={true}
+                    >
+                      Total Balance
+                    </Text>
+                  </View>
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight={20}
+                    bbWidth={20}
+                    fill="none"
+                    focusable={false}
+                    height={20}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    stroke="#FFFFFF"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "color": "#FFFFFF",
+                        },
+                        {
+                          "flex": 0,
+                          "height": 20,
+                          "width": 20,
+                        },
+                      ]
+                    }
+                    tintColor="#FFFFFF"
+                    vbHeight={24}
+                    vbWidth={24}
+                    width={20}
+                  >
+                    <RNSVGGroup
+                      fill={null}
+                      propList={
+                        [
+                          "fill",
+                          "stroke",
+                          "strokeWidth",
+                          "strokeLinecap",
+                          "strokeLinejoin",
+                        ]
+                      }
+                      stroke={
+                        {
+                          "payload": 4294967295,
+                          "type": 0,
+                        }
+                      }
+                      strokeLinecap={1}
+                      strokeLinejoin={1}
+                      strokeWidth="2"
+                    >
+                      <RNSVGPath
+                        d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        propList={
+                          [
+                            "stroke",
+                          ]
+                        }
+                        stroke={
+                          {
+                            "payload": 4294967295,
+                            "type": 0,
+                          }
+                        }
+                      />
+                      <RNSVGCircle
+                        cx="12"
+                        cy="12"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        propList={
+                          [
+                            "stroke",
+                          ]
+                        }
+                        r="3"
+                        stroke={
+                          {
+                            "payload": 4294967295,
+                            "type": 0,
+                          }
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
               </View>
               <View
                 style={
