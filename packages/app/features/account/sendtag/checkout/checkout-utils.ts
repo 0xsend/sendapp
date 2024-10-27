@@ -8,6 +8,7 @@ import {
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { reward, total } from 'app/data/sendtags'
+import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
@@ -45,7 +46,6 @@ export function useReferralCode() {
     queryFn: () => getCookie(REFERRAL_COOKIE_NAME) || null,
   })
 }
-
 /**
  * Fetches the referrer profile by referral code or tag.
  * If the referrer is the same as the profile, returns null. The referrer should also have a send account and sendtag.
@@ -182,10 +182,13 @@ export function useSendtagCheckout() {
   const pendingTags = usePendingTags() ?? []
   const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { data: referrer } = useReferrer()
+  const { data: referred } = api.referrals.getReferred.useQuery()
   const { data: reward } = useReferralReward({ tags: pendingTags })
+  const referrerAddress = referred?.referrerSendAccount?.address ?? referrer?.address ?? zeroAddress
+
   const checkoutArgs = useMemo(
-    () => [amountDue, referrer?.address ?? zeroAddress, reward ?? 0n] as const,
-    [amountDue, referrer, reward]
+    () => [amountDue, referrerAddress ?? zeroAddress, reward ?? 0n] as const,
+    [amountDue, referrerAddress, reward]
   )
   const calls = useMemo(
     () => [

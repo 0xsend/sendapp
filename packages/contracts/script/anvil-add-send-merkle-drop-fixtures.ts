@@ -84,7 +84,6 @@ void (async function main() {
   // process.exit(1)
   // return
 
-  // biome-ignore lint/correctness/noUnreachable: still cooking
   console.log(chalk.blue('Geting distribution merkle root from API'))
   const { root, total } = await fetch('http://localhost:3050/distributor/merkle', {
     method: 'POST',

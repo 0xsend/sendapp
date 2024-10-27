@@ -429,7 +429,7 @@ export type Database = {
           {
             foreignKeyName: "referrals_referred_id_fkey"
             columns: ["referred_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
