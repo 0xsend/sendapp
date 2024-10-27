@@ -29,7 +29,7 @@ $.verbose = true
  * This script is used to deploy the SendMerkleDrop contract and add a tranche to the airdrop. It should be adapted as things are deployed to mainnet.
  */
 
-const AIRDROP_MULTISIG_SAFE = '0x077c4E5983e5c495599C1Eb5c1511A52C538eB50'
+const AIRDROP_MULTISIG_SAFE = '0xD3DCFf1823714a4399AD2927A3800686D4CEB53A'
 
 void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))
@@ -80,9 +80,9 @@ void (async function main() {
     throw distributionError
   }
 
-  console.log(chalk.red('TODO(@0xBigBoss) move this to the trpc API'))
-  process.exit(1)
-  return
+  // console.log(chalk.red('TODO(@0xBigBoss) move this to the trpc API'))
+  // process.exit(1)
+  // return
 
   // biome-ignore lint/correctness/noUnreachable: still cooking
   console.log(chalk.blue('Geting distribution merkle root from API'))
