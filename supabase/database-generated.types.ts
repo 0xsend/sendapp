@@ -196,6 +196,7 @@ export type Database = {
           created_at: string
           distribution_id: number
           fixed_value: number
+          mode: Database["public"]["Enums"]["verification_value_mode"]
           multiplier_max: number
           multiplier_min: number
           multiplier_step: number
@@ -207,6 +208,7 @@ export type Database = {
           created_at?: string
           distribution_id: number
           fixed_value: number
+          mode?: Database["public"]["Enums"]["verification_value_mode"]
           multiplier_max?: number
           multiplier_min?: number
           multiplier_step?: number
@@ -218,6 +220,7 @@ export type Database = {
           created_at?: string
           distribution_id?: number
           fixed_value?: number
+          mode?: Database["public"]["Enums"]["verification_value_mode"]
           multiplier_max?: number
           multiplier_min?: number
           multiplier_step?: number
@@ -426,7 +429,7 @@ export type Database = {
           {
             foreignKeyName: "referrals_referred_id_fkey"
             columns: ["referred_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1116,6 +1119,7 @@ export type Database = {
         Row: {
           distribution_id: number | null
           multipliers: Json | null
+          send_streak: number | null
           tag_referrals: number | null
           tag_registrations: number | null
           total_tag_referrals: number | null
@@ -1124,17 +1128,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "distribution_verifications_distribution_id_fkey"
+            foreignKeyName: "distribution_verification_values_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
             referencedRelation: "distributions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "distribution_verifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -1323,6 +1320,8 @@ export type Database = {
         | "send_ten"
         | "send_one_hundred"
         | "total_tag_referrals"
+        | "send_streak"
+      verification_value_mode: "individual" | "aggregate"
     }
     CompositeTypes: {
       activity_feed_user: {
