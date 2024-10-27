@@ -36,6 +36,7 @@ const verificationTypesAndTitles = [
   ['send_one_hundred', '100+ Sends'],
   ['tag_referral', 'Referrals'],
   ['total_tag_referrals', 'Total Referrals'],
+  ['send_streak', 'Send Streak', '(per day)'],
 ] as const
 
 export function ActivityRewardsScreen() {
@@ -411,6 +412,7 @@ const DistributionRequirementsCard = ({
 const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResultData[number] }) => {
   const verificationValues =
     distribution.distribution_verifications_summary.at(0)?.verification_values
+  console.log('verificationValues: ', verificationValues)
 
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
@@ -424,8 +426,11 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
         {verificationTypesAndTitles
           .filter(
             ([verificationType]) =>
-              (verificationValues?.[verificationType].fixed_value > 0 && !isQualificationOver) ||
+              (verificationValues?.[verificationType] &&
+                verificationValues?.[verificationType].fixed_value > 0 &&
+                !isQualificationOver) ||
               (isQualificationOver &&
+                verificationValues?.[verificationType] &&
                 verificationValues?.[verificationType].count !== 0 &&
                 verificationValues?.[verificationType].fixed_value > 0)
           )
@@ -490,6 +495,7 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
 }) => {
   const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+  console.log('multipliers: ', multipliers)
   const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
     'default',
     {
@@ -504,7 +510,10 @@ const MultiplierCards = ({
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
         {verificationTypesAndTitles
-          .filter(([verificationType]) => multipliers?.[verificationType].multiplier_step > 0)
+          .filter(
+            ([verificationType]) =>
+              multipliers?.[verificationType] && multipliers?.[verificationType].multiplier_step > 0
+          )
           .map(([verificationType, title]) => (
             <MultiplierCard key={verificationType}>
               <XStack ai="center" gap="$2" jc="center">
