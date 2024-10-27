@@ -1119,6 +1119,7 @@ export type Database = {
         Row: {
           distribution_id: number | null
           multipliers: Json | null
+          send_streak: number | null
           tag_referrals: number | null
           tag_registrations: number | null
           total_tag_referrals: number | null
