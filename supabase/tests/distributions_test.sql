@@ -1,47 +1,48 @@
 BEGIN;
-
-SELECT plan(18);
-
+SELECT
+    plan(20);
 CREATE EXTENSION "basejump-supabase_test_helpers";
-
-
-SELECT set_config('role', 'service_role', true);
-
+SELECT
+    set_config('role', 'service_role', TRUE);
 -- create test data
-SELECT tests.create_supabase_user('bob');
-SELECT tests.create_supabase_user('alice');
-
-
-INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+SELECT
+    tests.create_supabase_user('bob');
+SELECT
+    tests.create_supabase_user('alice');
+INSERT INTO send_accounts(
+    user_id,
+    address,
+    chain_id,
+    init_code)
 VALUES (
-    tests.get_supabase_uid('bob'),
+    tests.get_supabase_uid(
+        'bob'),
     '0xb0b0000000000000000000000000000000000000', -- matches sender
     1,
-    '\\x00112233445566778899AABBCCDDEEFF'
-),
+    '\\x00112233445566778899AABBCCDDEEFF'),
 (
-    tests.get_supabase_uid('alice'),
+    tests.get_supabase_uid(
+        'alice'),
     '0xa71ce00000000000000000000000000000000000', -- matches sender
     1,
-    '\\x00112233445566778899AABBCCDDEEFF'
-);
-
+    '\\x00112233445566778899AABBCCDDEEFF');
 -- bob can register and confirm tags with valid receipts
-SELECT tests.authenticate_as('bob');
-
+SELECT
+    tests.authenticate_as('bob');
 -- Inserting a tag for test user
-INSERT INTO tags (name, user_id)
+INSERT INTO tags(
+    name,
+    user_id)
 VALUES (
     'bob',
-    tests.get_supabase_uid('bob')
-);
-
+    tests.get_supabase_uid(
+        'bob'));
 -- Confirm tags with the service role
-SELECT tests.clear_authentication();
-
-SELECT set_config('role', 'service_role', true);
-
-INSERT INTO distributions (
+SELECT
+    tests.clear_authentication();
+SELECT
+    set_config('role', 'service_role', TRUE);
+INSERT INTO distributions(
     number,
     name,
     description,
@@ -53,8 +54,7 @@ INSERT INTO distributions (
     qualification_end,
     hodler_min_balance,
     claim_end,
-    chain_id
-)
+    chain_id)
 VALUES (
     123,
     'distribution #123',
@@ -62,430 +62,255 @@ VALUES (
     100000,
     1000000,
     1000000,
-    1000000,
-    (
-        SELECT now() - interval '1 day'
-    ),
-    (
-        SELECT now() + interval '1 day'
-    ),
-    1e6::bigint,
-    (
-        SELECT now() + interval '2 day'
-    ),
-    8453
-);
-
-INSERT INTO public.distribution_verification_values (
+    1000000,(
+        SELECT
+            now() - interval '1 day'),
+(
+        SELECT
+            now() + interval '1 day'),
+        1e6::bigint,
+(
+            SELECT
+                now() + interval '2 day'),
+            8453);
+INSERT INTO public.distribution_verification_values(
     type,
     fixed_value,
     bips_value,
-    distribution_id
-)
+    distribution_id)
 VALUES (
     'tag_referral',
     0,
-    500,
-    (
-        SELECT id
+    500,(
+        SELECT
+            id
         FROM distributions
-        WHERE number = 123
-    )
-);
-
-INSERT INTO public.distribution_verification_values (
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
     type,
     fixed_value,
     bips_value,
-    distribution_id
-)
+    distribution_id)
 VALUES (
     'tag_registration',
     10000,
     0,
-    (
-        SELECT id
-        FROM distributions
-        WHERE number = 123
-    )
-);
-
-SELECT results_eq(
-    'SELECT COUNT(*)::integer FROM distributions WHERE number = 123',
-    $$VALUES (1) $$,
-    'Service role should be able to create distributions'
-);
-
-SELECT tests.clear_authentication();
-
-SELECT is_empty(
-    'SELECT * FROM distributions WHERE number = 123',
-    'Anon cannot read the distributions.'
-);
-
-SELECT throws_ok(
-    $$
-        INSERT INTO distributions (
-                number,
-                name,
-                description,
-                amount,
-                hodler_pool_bips,
-                bonus_pool_bips,
-                fixed_pool_bips,
-                qualification_start,
-                qualification_end,
-                claim_end,
-                chain_id
-            )
-        VALUES(
-                1234,
-                'distribution #1234',
-                'Description',
-                100000,
-                1000000,
-                1000000,
-                1000000,
-                '2023-01-01T00:00:00.000Z',
-                '2023-01-31T00:00:00.000Z',
-                '2023-02-28T00:00:00.000Z',
-                8453
-            );
-
+(
+        SELECT
+            id
+        FROM
+            distributions
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    multiplier_max,
+    multiplier_step,
+    mode,
+    distribution_id)
+VALUES (
+    'total_tag_referrals' ::public.verification_type,
+    0,
+    0,
+    2.0,
+    0.02,
+    'aggregate',
+(
+        SELECT
+            id
+        FROM
+            distributions
+        WHERE
+            "number" = 123
+        LIMIT 1));
+SELECT
+    results_eq('SELECT COUNT(*)::integer FROM distributions WHERE number = 123', $$
+    VALUES (1) $$, 'Service role should be able to create distributions');
+SELECT
+    tests.clear_authentication();
+SELECT
+    is_empty('SELECT * FROM distributions WHERE number = 123', 'Anon cannot read the distributions.');
+SELECT
+    throws_ok($$ INSERT INTO distributions(
+            number, name, description, amount, hodler_pool_bips, bonus_pool_bips, fixed_pool_bips, qualification_start, qualification_end, claim_end, chain_id)
+        VALUES (
+            1234, 'distribution #1234', 'Description', 100000, 1000000, 1000000, 1000000, '2023-01-01T00:00:00.000Z', '2023-01-31T00:00:00.000Z', '2023-02-28T00:00:00.000Z', 8453);
 $$,
-    'new row violates row-level security policy for table "distributions"',
-    'Only the service role can insert records.'
-);
-
-SELECT tests.authenticate_as('bob');
-
-SELECT throws_ok(
-    $$
-        INSERT INTO distributions (
-                number,
-                name,
-                description,
-                amount,
-                hodler_pool_bips,
-                bonus_pool_bips,
-                fixed_pool_bips,
-                qualification_start,
-                qualification_end,
-                claim_end,
-                chain_id
-            )
-        VALUES(
-                1234,
-                'distribution #1234',
-                'Description',
-                100000,
-                1000000,
-                1000000,
-                1000000,
-                '2023-01-01T00:00:00.000Z',
-                '2023-01-31T00:00:00.000Z',
-                '2023-02-28T00:00:00.000Z',
-                8453
-            );
-
+'new row violates row-level security policy for table "distributions"',
+'Only the service role can insert records.');
+SELECT
+    tests.authenticate_as('bob');
+SELECT
+    throws_ok($$ INSERT INTO distributions(
+            number, name, description, amount, hodler_pool_bips, bonus_pool_bips, fixed_pool_bips, qualification_start, qualification_end, claim_end, chain_id)
+        VALUES (
+            1234, 'distribution #1234', 'Description', 100000, 1000000, 1000000, 1000000, '2023-01-01T00:00:00.000Z', '2023-01-31T00:00:00.000Z', '2023-02-28T00:00:00.000Z', 8453);
 $$,
-    'new row violates row-level security policy for table "distributions"',
-    'Only the service role can insert records.'
-);
-
-SELECT isnt_empty(
-    'SELECT * FROM distribution_verification_values WHERE distribution_id = (SELECT id FROM distributions WHERE number = 123)',
-    'Any other role can read the distribution_verification_values.'
-);
-
-SELECT tests.clear_authentication();
-
-SELECT throws_ok(
-    $$
-        INSERT INTO distribution_verification_values (distribution_id, type, fixed_value, bips_value)
-        VALUES(
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                'tag_referral',
-                100000,
-                100000
-            );
-
-$$,
-    'new row violates row-level security policy for table "distribution_verification_values"',
-    'Only the service role can insert records.'
-);
-
-SELECT is_empty(
-    'SELECT * FROM distribution_verification_values WHERE distribution_id = (
-    SELECT id
-    FROM distributions
-    WHERE number = 123
-)',
-    'Any other role can read the distribution_verification_values.'
-);
-
-SELECT tests.authenticate_as('bob');
-
-SELECT throws_ok(
-    $$
-        INSERT INTO distribution_verification_values (distribution_id, type, fixed_value, bips_value)
-        VALUES(
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                'tag_referral',
-                100000,
-                100000
-            );
-
-$$,
-    'new row violates row-level security policy for table "distribution_verification_values"',
-    'Only the service role can insert records.'
-);
-
--- only service role can update distribution shares
-SELECT throws_ok(
-    $$
-        select "public"."update_distribution_shares"(
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                ARRAY [
-                (
-                    null,
-                    (
-                        SELECT id
-                        FROM distributions
-                        WHERE number = 123
-                    ),
-                    tests.get_supabase_uid('bob'),
-                    '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                    100000,
-                    10000,
-                    5000,
-                    2000,
-                    null,
-                    null,
-                    null
-                )::distribution_shares,
-                (
-                    null,
-                    (
-                        SELECT id
-                        FROM distributions
-                        WHERE number = 123
-                    ),
-                    tests.get_supabase_uid('alice'),
-                    '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                    100000,
-                    10000,
-                    5000,
-                    2000,
-                    null,
-                    null,
-                    null
-                )::distribution_shares
-            ]
-            );
-
-$$,
-    'permission denied for function update_distribution_shares',
-    'Only the service role can update distribution shares.'
-);
-
-SELECT tests.clear_authentication();
-
-SELECT throws_ok(
-    $$
-        select "public"."update_distribution_shares"(
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                ARRAY [
-                (
-                    null,
-                    (
-                        SELECT id
-                        FROM distributions
-                        WHERE number = 123
-                    ),
-                    tests.get_supabase_uid('bob'),
-                    '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                    100000,
-                    10000,
-                    5000,
-                    2000,
-                    null,
-                    null,
-                    null
-                )::distribution_shares,
-                (
-                    null,
-                    (
-                        SELECT id
-                        FROM distributions
-                        WHERE number = 123
-                    ),
-                    tests.get_supabase_uid('alice'),
-                    '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                    100000,
-                    10000,
-                    5000,
-                    2000,
-                    null,
-                    null,
-                    null
-                )::distribution_shares
-            ]
-            );
-
-$$,
-    'permission denied for function update_distribution_shares',
-    'Only the service role can update distribution shares.'
-);
-
--- verify distribution_shares
-SELECT set_config('role', 'service_role', true);
-
-
-select public.update_distribution_shares(
-        (
-            SELECT id
+'new row violates row-level security policy for table "distributions"',
+'Only the service role can insert records.');
+SELECT
+    isnt_empty('SELECT * FROM distribution_verification_values WHERE distribution_id = (SELECT id FROM distributions WHERE number = 123)', 'Any other role can read the distribution_verification_values.');
+SELECT
+    tests.clear_authentication();
+SELECT
+    throws_ok($$ INSERT INTO distribution_verification_values(
+            distribution_id, type, fixed_value, bips_value)
+        VALUES ((
+            SELECT
+                id
             FROM distributions
-            WHERE number = 123
-        ),
-        ARRAY[
-            (
-                null,
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                tests.get_supabase_uid('bob'),
-                '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                100000,
-                10000,
-                5000,
-                2000,
-                null,
-                null,
-                null
-            )::distribution_shares,
-            (
-                null,
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                tests.get_supabase_uid('alice'),
-                '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                100000,
-                10000,
-                5000,
-                2000,
-                null,
-                null,
-                null
-            )::distribution_shares
-        ]
-    );
-
-
--- Check insert by service_role
-SELECT results_eq(
-    'SELECT COUNT(*)::integer FROM distribution_shares WHERE distribution_id = (
-    SELECT id
-    FROM distributions
-    WHERE number = 123
-)',
-    $$VALUES (2) $$,
-    'Service role should be able to create distribution shares'
-);
-
--- Check read access for other roles
-SELECT tests.clear_authentication();
-
-SELECT results_eq(
-    $$
-    SELECT COUNT(*)::integer FROM distribution_shares WHERE distribution_id = (
-    SELECT id
-    FROM distributions
-    WHERE number = 123
-    )
-    $$,
-    $$VALUES (0) $$,
-    'Anonymous role should not be able to read distribution shares'
-);
-
--- Check read access for the bob
-SELECT tests.authenticate_as('bob');
-
-SELECT results_eq(
-    'SELECT COUNT(*)::integer FROM distribution_shares',
-    $$VALUES (1) $$,
-    'Authenticated user should be able to read their own shares'
-);
-
--- Check insert violation by other roles
-SELECT throws_ok(
-    $$
-        INSERT INTO distribution_shares (
-                distribution_id,
-                user_id,
-                address,
-                amount,
-                hodler_pool_amount,
-                bonus_pool_amount,
-                fixed_pool_amount
-            )
-        VALUES(
-                (
-                    SELECT id
-                    FROM distributions
-                    WHERE number = 123
-                ),
-                tests.get_supabase_uid('bob'),
-                '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f',
-                100000,
-                10000,
-                5000,
-                2000
-            );
-
+            WHERE
+                number = 123), 'tag_referral', 100000, 100000);
 $$,
-    'new row violates row-level security policy for table "distribution_shares"',
-    'Only the service role can insert records.'
-);
-
+'new row violates row-level security policy for table "distribution_verification_values"',
+'Only the service role can insert records.');
+SELECT
+    is_empty('SELECT * FROM distribution_verification_values WHERE distribution_id = (
+    SELECT id
+    FROM distributions
+    WHERE number = 123
+)', 'Any other role can read the distribution_verification_values.');
+SELECT
+    tests.authenticate_as('bob');
+SELECT
+    throws_ok($$ INSERT INTO distribution_verification_values(
+            distribution_id, type, fixed_value, bips_value)
+        VALUES ((
+            SELECT
+                id
+            FROM distributions
+            WHERE
+                number = 123), 'tag_referral', 100000, 100000);
+$$,
+'new row violates row-level security policy for table "distribution_verification_values"',
+'Only the service role can insert records.');
+-- only service role can update distribution shares
+SELECT
+    throws_ok($$
+        SELECT
+            "public"."update_distribution_shares"((
+                SELECT
+                    id
+                FROM distributions
+                WHERE
+                    number = 123), ARRAY[(NULL,(
+                    SELECT
+                        id
+                    FROM distributions
+                    WHERE
+                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares,(NULL,(
+                    SELECT
+                        id
+                    FROM distributions
+                    WHERE
+                        number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares]);
+$$,
+'permission denied for function update_distribution_shares',
+'Only the service role can update distribution shares.');
+SELECT
+    tests.clear_authentication();
+SELECT
+    throws_ok($$
+        SELECT
+            "public"."update_distribution_shares"((
+                SELECT
+                    id
+                FROM distributions
+                WHERE
+                    number = 123), ARRAY[(NULL,(
+                    SELECT
+                        id
+                    FROM distributions
+                    WHERE
+                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares,(NULL,(
+                    SELECT
+                        id
+                    FROM distributions
+                    WHERE
+                        number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares]);
+$$,
+'permission denied for function update_distribution_shares',
+'Only the service role can update distribution shares.');
+-- verify distribution_shares
+SELECT
+    set_config('role', 'service_role', TRUE);
+SELECT
+    public.update_distribution_shares((
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123), ARRAY[(NULL,(
+            SELECT
+                id
+            FROM distributions
+            WHERE
+                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares,(NULL,(
+            SELECT
+                id
+            FROM distributions
+            WHERE
+                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000, NULL, NULL, NULL)::distribution_shares]);
+-- Check insert by service_role
+SELECT
+    results_eq('SELECT COUNT(*)::integer FROM distribution_shares WHERE distribution_id = (
+    SELECT id
+    FROM distributions
+    WHERE number = 123
+)', $$
+    VALUES (2) $$, 'Service role should be able to create distribution shares');
+-- Check read access for other roles
+SELECT
+    tests.clear_authentication();
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_shares
+            WHERE
+                distribution_id =(
+                    SELECT
+                        id
+                    FROM distributions
+                    WHERE
+                        number = 123) $$, $$
+            VALUES (0) $$, 'Anonymous role should not be able to read distribution shares');
+-- Check read access for the bob
+SELECT
+    tests.authenticate_as('bob');
+SELECT
+    results_eq('SELECT COUNT(*)::integer FROM distribution_shares', $$
+    VALUES (1) $$, 'Authenticated user should be able to read their own shares');
+-- Check insert violation by other roles
+SELECT
+    throws_ok($$ INSERT INTO distribution_shares(
+            distribution_id, user_id, address, amount, hodler_pool_amount, bonus_pool_amount, fixed_pool_amount)
+        VALUES ((
+            SELECT
+                id
+            FROM distributions
+            WHERE
+                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 100000, 10000, 5000, 2000);
+$$,
+'new row violates row-level security policy for table "distribution_shares"',
+'Only the service role can insert records.');
 -- Test for tag_registration verification
-
-SELECT results_eq(
-    $$SELECT COUNT(*)::integer
-        FROM distribution_verifications
-        WHERE user_id = tests.get_supabase_uid('bob')
-            AND type = 'tag_registration' $$,
-    $$VALUES (0) $$,
-    'Verification for tag registration should be empty when no tags are confirmed'
-);
-
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'tag_registration' $$, $$
+            VALUES (0) $$, 'Verification for tag registration should be empty when no tags are confirmed');
 -- Confirm tags with the service role
-SELECT tests.clear_authentication();
-
-SELECT set_config('role', 'service_role', true);
-
-INSERT INTO sendtag_checkout_receipts (
+SELECT
+    tests.clear_authentication();
+SELECT
+    set_config('role', 'service_role', TRUE);
+INSERT INTO sendtag_checkout_receipts(
     chain_id,
     log_addr,
     tx_hash,
@@ -499,8 +324,7 @@ INSERT INTO sendtag_checkout_receipts (
     sender,
     amount,
     referrer,
-    reward
-)
+    reward)
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
@@ -515,54 +339,57 @@ VALUES (
     '\xb0b0000000000000000000000000000000000000',
     1,
     '\x0000000000000000000000000000000000000000',
-    0
-);
-
-SELECT confirm_tags( -- bob confirms tags
-    '{bob}',
-    (
-        SELECT event_id
-        FROM sendtag_checkout_receipts
-        WHERE sender = '\xb0b0000000000000000000000000000000000000'
-    ),
-    null
-);
-
-SELECT results_eq(
-    $$SELECT COUNT(*)::integer
-        FROM distribution_verifications
-        WHERE user_id = tests.get_supabase_uid('bob')
-            AND type = 'tag_registration' $$,
-    $$VALUES (1) $$,
-    'Verification for tag registration should be inserted'
-);
-
--- Test for tag_referral verification
-SELECT tests.create_supabase_user('alice');
-
-SELECT tests.authenticate_as('alice');
-
+    0);
+SELECT
+    confirm_tags( -- bob confirms tags
+        '{bob}',(
+            SELECT
+                event_id
+            FROM sendtag_checkout_receipts
+            WHERE
+                sender = '\xb0b0000000000000000000000000000000000000'), NULL);
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'tag_registration' $$, $$
+            VALUES (1) $$, 'Verification for tag registration should be inserted');
+-- Test for tag_referral and total_tag_referrals verifications
+SELECT
+    tests.create_supabase_user('alice');
+SELECT
+    tests.authenticate_as('alice');
 -- can create a free common tag without receipt
-INSERT INTO tags (name, user_id)
+INSERT INTO tags(
+    name,
+    user_id)
 VALUES (
     'alice',
-    tests.get_supabase_uid('alice')
-);
-
-SELECT results_eq(
-    $$SELECT COUNT(*)::integer
-        FROM distribution_verifications
-        WHERE user_id = tests.get_supabase_uid('bob')
-            AND type = 'tag_referral' $$,
-    $$VALUES (0) $$,
-    'Verification for user referral should be inserted'
-);
-
-SELECT tests.clear_authentication();
-
-SELECT set_config('role', 'service_role', true);
-
-INSERT INTO sendtag_checkout_receipts (
+    tests.get_supabase_uid(
+        'alice'));
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'tag_referral' $$, $$
+            VALUES (0) $$, 'Verification for user referral should not be inserted');
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'total_tag_referrals' $$, $$
+            VALUES (0) $$, 'Verification for total tag referral should not be inserted');
+SELECT
+    tests.clear_authentication();
+SELECT
+    set_config('role', 'service_role', TRUE);
+INSERT INTO sendtag_checkout_receipts(
     chain_id,
     log_addr,
     tx_hash,
@@ -576,8 +403,7 @@ INSERT INTO sendtag_checkout_receipts (
     sender,
     amount,
     referrer,
-    reward
-)
+    reward)
 VALUES (
     8453,
     '\x5afe000000000000000000000000000000000000',
@@ -592,32 +418,36 @@ VALUES (
     '\xa71ce00000000000000000000000000000000000',
     1,
     '\x0000000000000000000000000000000000000000',
-    0
-);
-
-SELECT confirm_tags(
-    '{alice}',
-    (
-        SELECT event_id
-        FROM sendtag_checkout_receipts
-        WHERE sender = '\xa71ce00000000000000000000000000000000000'
-    ),
-    (
-        SELECT referral_code
-        FROM public.profiles
-        WHERE id = tests.get_supabase_uid('bob')
-    )
-);
-
-SELECT results_eq(
-    $$SELECT COUNT(*)::integer
-        FROM distribution_verifications
-        WHERE user_id = tests.get_supabase_uid('bob')
-            AND type = 'tag_referral' $$,
-    $$VALUES (1) $$,
-    'Verification for user referral should be inserted'
-);
-
-SELECT finish();
-
+    0);
+SELECT
+    confirm_tags('{alice}',(
+            SELECT
+                event_id
+            FROM sendtag_checkout_receipts
+            WHERE
+                sender = '\xa71ce00000000000000000000000000000000000'),(
+            SELECT
+                referral_code
+            FROM public.profiles
+            WHERE
+                id = tests.get_supabase_uid('bob')));
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'tag_referral' $$, $$
+            VALUES (1) $$, 'Verification for user referral should be inserted');
+SELECT
+    results_eq($$
+        SELECT
+            (weight)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'total_tag_referrals' $$, $$
+            VALUES (1) $$, 'Verification for total tag referral should be inserted');
+SELECT
+    finish();
 ROLLBACK;
+
