@@ -29,15 +29,15 @@ import { type PropsWithChildren, useRef, useId, useState } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 
 //@todo get this from the db
-const verificationTypesAndTitles = [
-  ['create_passkey', 'Create a Passkey'],
-  ['tag_registration', 'Register a Sendtag', '(per tag)'],
-  ['send_ten', '10+ Sends'],
-  ['send_one_hundred', '100+ Sends'],
-  ['tag_referral', 'Referrals'],
-  ['total_tag_referrals', 'Total Referrals'],
-  ['send_streak', 'Send Streak', '(per day)'],
-] as const
+const verificationTypesAndTitles = {
+  create_passkey: { title: 'Create a Passkey' },
+  tag_registration: { title: 'Register a Sendtag', details: '(per tag)' },
+  send_ten: { title: '10+ Sends' },
+  send_one_hundred: { title: '100+ Sends' },
+  tag_referral: { title: 'Referrals' },
+  total_tag_referrals: { title: 'Total Referrals' },
+  send_streak: { title: 'Send Streak', details: '(per day)' },
+} as const
 
 export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -412,7 +412,6 @@ const DistributionRequirementsCard = ({
 const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResultData[number] }) => {
   const verificationValues =
     distribution.distribution_verifications_summary.at(0)?.verification_values
-  console.log('verificationValues: ', verificationValues)
 
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
@@ -423,29 +422,21 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
         Perks
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {verificationTypesAndTitles
-          .filter(
-            ([verificationType]) =>
-              (verificationValues?.[verificationType] &&
-                verificationValues?.[verificationType].fixed_value > 0 &&
-                !isQualificationOver) ||
-              (isQualificationOver &&
-                verificationValues?.[verificationType] &&
-                verificationValues?.[verificationType].count !== 0 &&
-                verificationValues?.[verificationType].fixed_value > 0)
+        {verificationValues
+          ?.filter(
+            ({ fixed_value, count }) =>
+              (fixed_value > 0 && !isQualificationOver) ||
+              (isQualificationOver && count !== 0 && fixed_value > 0)
           )
-          .map(([verificationType, title, details]) => (
-            <PerkCard
-              key={verificationType}
-              isCompleted={Boolean(verificationValues?.[verificationType].count)}
-            >
+          .map(({ type: verificationType, fixed_value, count }) => (
+            <PerkCard key={verificationType} isCompleted={Boolean(count)}>
               <YStack gap="$2">
                 <H3 fontWeight={'600'} color={'$color12'}>
-                  {title}
+                  {verificationTypesAndTitles[verificationType]?.title}
                 </H3>
                 <Paragraph fontSize={'$6'} fontWeight={'400'} color={'$color10'}>
-                  + {verificationValues?.[verificationType]?.fixed_value.toLocaleString() ?? 0} SEND{' '}
-                  {details ?? ''}
+                  + {fixed_value.toLocaleString() ?? 0} SEND{' '}
+                  {verificationTypesAndTitles[verificationType]?.details ?? ''}
                 </Paragraph>
               </YStack>
             </PerkCard>
@@ -495,7 +486,6 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
 }) => {
   const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
-  console.log('multipliers: ', multipliers)
   const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
     'default',
     {
@@ -509,18 +499,15 @@ const MultiplierCards = ({
         Multiplier
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {verificationTypesAndTitles
-          .filter(
-            ([verificationType]) =>
-              multipliers?.[verificationType] && multipliers?.[verificationType].multiplier_step > 0
-          )
-          .map(([verificationType, title]) => (
+        {multipliers
+          ?.filter(({ value }) => Boolean(value))
+          .map(({ type: verificationType, value }) => (
             <MultiplierCard key={verificationType}>
               <XStack ai="center" gap="$2" jc="center">
                 <IconAccount size={'2'} color={'$color10'} />
                 <H3 fontWeight={'500'} color={'$color10'}>
                   {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
-                  {title}
+                  {verificationTypesAndTitles[verificationType]?.title}
                 </H3>
               </XStack>
               <Paragraph
@@ -530,7 +517,7 @@ const MultiplierCards = ({
                 color={'$color12'}
                 mx="auto"
               >
-                X {multipliers?.[verificationType].value ?? 1}
+                X {value ?? 1}
               </Paragraph>
             </MultiplierCard>
           ))}

@@ -1124,10 +1124,6 @@ export type Database = {
           multipliers:
             | Database["public"]["CompositeTypes"]["multiplier_info"][]
             | null
-          send_streak: number | null
-          tag_referrals: number | null
-          tag_registrations: number | null
-          total_tag_referrals: number | null
           user_id: string | null
           verification_values:
             | Database["public"]["CompositeTypes"]["verification_value_info"][]
@@ -1344,6 +1340,7 @@ export type Database = {
         multiplier_min: number
         multiplier_max: number
         multiplier_step: number
+        metadata: Json
       }
       tag_search_result: {
         avatar_url: string
@@ -1353,9 +1350,10 @@ export type Database = {
       }
       verification_value_info: {
         type: string
-        count: number
+        weight: number
         fixed_value: number
         bips_value: number
+        metadata: Json
       }
     }
   }
