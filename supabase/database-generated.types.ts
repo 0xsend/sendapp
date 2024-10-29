@@ -1121,13 +1121,13 @@ export type Database = {
       distribution_verifications_summary: {
         Row: {
           distribution_id: number | null
-          multipliers: Json | null
-          send_streak: number | null
-          tag_referrals: number | null
-          tag_registrations: number | null
-          total_tag_referrals: number | null
+          multipliers:
+            | Database["public"]["CompositeTypes"]["multiplier_info"][]
+            | null
           user_id: string | null
-          verification_values: Json | null
+          verification_values:
+            | Database["public"]["CompositeTypes"]["verification_value_info"][]
+            | null
         }
         Relationships: [
           {
@@ -1334,11 +1334,26 @@ export type Database = {
         send_id: number
         tags: unknown
       }
+      multiplier_info: {
+        type: string
+        value: number
+        multiplier_min: number
+        multiplier_max: number
+        multiplier_step: number
+        metadata: Json
+      }
       tag_search_result: {
         avatar_url: string
         tag_name: string
         send_id: number
         phone: string
+      }
+      verification_value_info: {
+        type: string
+        weight: number
+        fixed_value: number
+        bips_value: number
+        metadata: Json
       }
     }
   }
