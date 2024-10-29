@@ -315,7 +315,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              Min. Balance 
+              Sendtag Registered
             </Text>
             <RNSVGSvgView
               align="xMidYMid"
@@ -457,7 +457,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              Sendtag Registered
+              Min. Balance 
             </Text>
             <RNSVGSvgView
               align="xMidYMid"
@@ -610,47 +610,6 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
         suppressHighlighting={true}
       >
         Perks
-      </Text>
-      <View
-        style={
-          {
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "gap": 24,
-          }
-        }
-      />
-    </View>
-    <View
-      style={
-        {
-          "flex": 1,
-          "flexDirection": "column",
-          "gap": 24,
-          "width": "100%",
-        }
-      }
-    >
-      <Text
-        accessibilityRole="header"
-        style={
-          {
-            "color": "#FFFFFF",
-            "fontFamily": "System",
-            "fontSize": 23,
-            "fontWeight": "600",
-            "lineHeight": 27,
-            "marginBottom": 0,
-            "marginLeft": 0,
-            "marginRight": 0,
-            "marginTop": 0,
-            "textTransform": "none",
-            "userSelect": "auto",
-          }
-        }
-        suppressHighlighting={true}
-      >
-        Multiplier
       </Text>
       <View
         style={
