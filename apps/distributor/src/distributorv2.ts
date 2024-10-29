@@ -488,7 +488,7 @@ export class DistributorV2Worker {
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
       }
-      await sleep(60_000)
+      await sleep(21_600_000)
     }
 
     this.log.info('Distributor stopped.')
