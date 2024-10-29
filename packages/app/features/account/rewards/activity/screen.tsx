@@ -431,6 +431,7 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
           .map(({ type: verificationType, fixed_value, weight, metadata }) => (
             <PerkCard
               key={verificationType}
+              type={verificationType}
               isCompleted={Boolean(weight)}
               weight={
                 ['send_ten', 'send_one_hundred'].includes(verificationType)
@@ -455,11 +456,11 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
 }
 
 const PerkCard = ({
-  key,
+  type,
   isCompleted,
   weight,
   children,
-}: PropsWithChildren<CardProps> & { key: string; isCompleted: boolean; weight?: number }) => {
+}: PropsWithChildren<CardProps> & { type: string; isCompleted: boolean; weight?: number }) => {
   return (
     <Card br={12} gap="$4" p="$7" jc={'space-between'} mih={208} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
@@ -469,7 +470,7 @@ const PerkCard = ({
               <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
               <Paragraph color="$color11">Completed</Paragraph>
             </XStack>
-            {(key === 'send_streak' || key === 'tag_registration') && (
+            {(type === 'send_streak' || type === 'tag_registration') && (
               <Paragraph
                 ff={'$mono'}
                 py={'$size.0.5'}
@@ -516,11 +517,13 @@ const MultiplierCards = ({
 }: {
   distribution: UseDistributionsResultData[number]
 }) => {
+  const now = new Date()
+  const isQualificationOver = distribution.qualification_end < now
   const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
   const activeMultipliers = multipliers?.filter(
     ({ value, multiplier_step, multiplier_max }) =>
       (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
-      (isQualificationOver && Boolean(value) && multiplier_step > 0.0 && multiplier_max > 1.0)
+      (isQualificationOver && Boolean(value) && value > 1.0)
   )
 
   const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
@@ -529,8 +532,6 @@ const MultiplierCards = ({
       month: 'long',
     }
   )
-  const now = new Date()
-  const isQualificationOver = distribution.qualification_end < now
 
   if (!activeMultipliers || activeMultipliers.length === 0) return null
 
