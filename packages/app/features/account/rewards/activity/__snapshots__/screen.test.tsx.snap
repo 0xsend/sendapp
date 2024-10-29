@@ -315,7 +315,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              Min. Balance 
+              Sendtag Registered
             </Text>
             <RNSVGSvgView
               align="xMidYMid"
@@ -457,7 +457,7 @@ exports[`ActivityRewardsScreen renders: ActivityRewardsScreen 1`] = `
               }
               suppressHighlighting={true}
             >
-              Sendtag Registered
+              Min. Balance 
             </Text>
             <RNSVGSvgView
               align="xMidYMid"
