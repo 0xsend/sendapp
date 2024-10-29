@@ -428,55 +428,61 @@ const SendPerksCards = ({ distribution }: { distribution: UseDistributionsResult
               (fixed_value > 0 && !isQualificationOver) ||
               (isQualificationOver && weight !== 0 && fixed_value > 0)
           )
-          .map(({ type: verificationType, fixed_value, weight, metadata }) =>
-            ['send_ten', 'send_one_hundred'].includes(verificationType) ? (
-              <PerkCard
-                key={verificationType}
-                isCompleted={Boolean(weight)}
-                weight={metadata?.[0]?.value ?? 0}
-              >
-                <YStack gap="$2">
-                  <H3 fontWeight={'600'} color={'$color12'}>
-                    {verificationTypesAndTitles[verificationType]?.title}
-                  </H3>
-                  <Paragraph fontSize={'$6'} fontWeight={'400'} color={'$color10'}>
-                    + {fixed_value.toLocaleString() ?? 0} SEND{' '}
-                    {verificationTypesAndTitles[verificationType]?.details ?? ''}
-                  </Paragraph>
-                </YStack>
-              </PerkCard>
-            ) : (
-              <PerkCard key={verificationType} isCompleted={Boolean(weight)} weight={weight}>
-                <YStack gap="$2">
-                  <H3 fontWeight={'600'} color={'$color12'}>
-                    {verificationTypesAndTitles[verificationType]?.title}
-                  </H3>
-                  <Paragraph fontSize={'$6'} fontWeight={'400'} color={'$color10'}>
-                    + {fixed_value.toLocaleString() ?? 0} SEND{' '}
-                    {verificationTypesAndTitles[verificationType]?.details ?? ''}
-                  </Paragraph>
-                </YStack>
-              </PerkCard>
-            )
-          )}
+          .map(({ type: verificationType, fixed_value, weight, metadata }) => (
+            <PerkCard
+              key={verificationType}
+              isCompleted={Boolean(weight)}
+              weight={
+                ['send_ten', 'send_one_hundred'].includes(verificationType)
+                  ? metadata?.[0]?.value ?? 0
+                  : weight
+              }
+            >
+              <YStack gap="$2">
+                <H3 fontWeight={'600'} color={'$color12'}>
+                  {verificationTypesAndTitles[verificationType]?.title}
+                </H3>
+                <Paragraph fontSize={'$6'} fontWeight={'400'} color={'$color10'}>
+                  + {fixed_value.toLocaleString() ?? 0} SEND{' '}
+                  {verificationTypesAndTitles[verificationType]?.details ?? ''}
+                </Paragraph>
+              </YStack>
+            </PerkCard>
+          ))}
       </Stack>
     </YStack>
   )
 }
 
 const PerkCard = ({
+  key,
   isCompleted,
   weight,
   children,
-}: PropsWithChildren<CardProps> & { isCompleted: boolean; weight?: number }) => {
+}: PropsWithChildren<CardProps> & { key: string; isCompleted: boolean; weight?: number }) => {
   return (
     <Card br={12} gap="$4" p="$7" jc={'space-between'} mih={208} $gtSm={{ maw: 331 }} w={'100%'}>
       <XStack ai={'center'} jc="space-between">
         {isCompleted ? (
-          <XStack ai="center" gap="$2">
-            <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
-            <Paragraph color="$color11">Completed</Paragraph>
-          </XStack>
+          <>
+            <XStack ai="center" gap="$2">
+              <CheckCircle2 $theme-light={{ color: '$color12' }} color="$primary" size={'$1.5'} />
+              <Paragraph color="$color11">Completed</Paragraph>
+            </XStack>
+            {(key === 'send_streak' || key === 'tag_registration') && (
+              <Paragraph
+                ff={'$mono'}
+                py={'$size.0.5'}
+                px={'$size.0.9'}
+                borderWidth={1}
+                borderColor={'$primary'}
+                $theme-light={{ borderColor: '$color12' }}
+                borderRadius={'$4'}
+              >
+                {weight ?? 0}
+              </Paragraph>
+            )}
+          </>
         ) : (
           <>
             <XStack ai="center" gap="$2">
@@ -499,7 +505,6 @@ const PerkCard = ({
           </>
         )}
       </XStack>
-
       {children}
       <Card.Footer />
     </Card>
@@ -512,6 +517,11 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
 }) => {
   const multipliers = distribution.distribution_verifications_summary[0]?.multipliers
+  const activeMultipliers = multipliers?.filter(
+    ({ value, multiplier_step, multiplier_max }) =>
+      (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
+      (isQualificationOver && Boolean(value) && multiplier_step > 0.0 && multiplier_max > 1.0)
+  )
 
   const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
     'default',
@@ -522,41 +532,34 @@ const MultiplierCards = ({
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
+  if (!activeMultipliers || activeMultipliers.length === 0) return null
+
   return (
     <YStack f={1} w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         Multiplier
       </H3>
       <Stack flexWrap="wrap" gap="$5" $gtXs={{ fd: 'row' }}>
-        {multipliers
-          ?.filter(
-            ({ value, multiplier_step, multiplier_max }) =>
-              (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
-              (isQualificationOver &&
-                Boolean(value) &&
-                multiplier_step > 0.0 &&
-                multiplier_max > 1.0)
-          )
-          .map(({ type: verificationType, value }) => (
-            <MultiplierCard key={verificationType}>
-              <XStack ai="center" gap="$2" jc="center">
-                <IconAccount size={'2'} color={'$color10'} />
-                <H3 fontWeight={'500'} color={'$color10'}>
-                  {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
-                  {verificationTypesAndTitles[verificationType]?.title}
-                </H3>
-              </XStack>
-              <Paragraph
-                fontSize={'$9'}
-                $sm={{ fontSize: '$8' }}
-                fontWeight={'600'}
-                color={'$color12'}
-                mx="auto"
-              >
-                X {value ?? 1}
-              </Paragraph>
-            </MultiplierCard>
-          ))}
+        {activeMultipliers.map(({ type: verificationType, value }) => (
+          <MultiplierCard key={verificationType}>
+            <XStack ai="center" gap="$2" jc="center">
+              <IconAccount size={'2'} color={'$color10'} />
+              <H3 fontWeight={'500'} color={'$color10'}>
+                {verificationType === 'tag_referral' ? distributionMonth ?? 'Monthly' : ''}{' '}
+                {verificationTypesAndTitles[verificationType]?.title}
+              </H3>
+            </XStack>
+            <Paragraph
+              fontSize={'$9'}
+              $sm={{ fontSize: '$8' }}
+              fontWeight={'600'}
+              color={'$color12'}
+              mx="auto"
+            >
+              X {value ?? 1}
+            </Paragraph>
+          </MultiplierCard>
+        ))}
       </Stack>
     </YStack>
   )
