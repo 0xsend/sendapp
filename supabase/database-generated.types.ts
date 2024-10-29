@@ -245,6 +245,7 @@ export type Database = {
           metadata: Json | null
           type: Database["public"]["Enums"]["verification_type"]
           user_id: string
+          weight: number
         }
         Insert: {
           created_at?: string
@@ -253,6 +254,7 @@ export type Database = {
           metadata?: Json | null
           type: Database["public"]["Enums"]["verification_type"]
           user_id: string
+          weight?: number
         }
         Update: {
           created_at?: string
@@ -261,6 +263,7 @@ export type Database = {
           metadata?: Json | null
           type?: Database["public"]["Enums"]["verification_type"]
           user_id?: string
+          weight?: number
         }
         Relationships: [
           {
