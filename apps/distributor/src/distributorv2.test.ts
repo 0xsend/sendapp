@@ -214,19 +214,23 @@ describe('Distributor V2 Worker', () => {
             {
               user_id,
               type: 'tag_referral',
+              weight: 1,
             },
 
             {
               user_id,
               type: 'tag_registration',
+              weight: 1,
             },
             {
               user_id,
               type: 'send_ten',
+              weight: 1,
             },
             {
               user_id,
               type: 'send_one_hundred',
+              weight: 1,
             },
             {
               user_id,
@@ -234,6 +238,7 @@ describe('Distributor V2 Worker', () => {
               metadata: {
                 value: 2,
               },
+              weight: 2,
             },
             {
               user_id: user_id,
@@ -241,15 +246,18 @@ describe('Distributor V2 Worker', () => {
               metadata: {
                 value: 5,
               },
+              weight: 5,
             },
             // alice only has tag_registration
             {
               user_id: user_id2,
               type: 'tag_registration',
+              weight: 1,
             },
             {
               user_id: user_id2,
               type: 'send_ten',
+              weight: 1,
             },
             {
               user_id: user_id2,
@@ -257,6 +265,7 @@ describe('Distributor V2 Worker', () => {
               metadata: {
                 value: 5,
               },
+              weight: 5,
             },
           ],
           count: 10,

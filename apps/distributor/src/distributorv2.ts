@@ -303,10 +303,11 @@ export class DistributorV2Worker {
       for (const verification of verifications) {
         const verificationValue = verificationValues[verification.type]
         if (!verificationValue) continue
+
         // Initialize or update multiplier info
         if (
           !multipliers[verification.type] &&
-          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_min > 0)
+          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_min > 0) //@todo: should have a better way to tell if multipliers are enabled
         ) {
           multipliers[verification.type] = {
             value: undefined,
@@ -317,50 +318,33 @@ export class DistributorV2Worker {
         }
         const multiplierInfo = multipliers[verification.type]
 
-        switch (verificationValue.mode) {
-          case 'individual':
-            // Calculate fixed amount
-            if (verificationValue.fixedValue) {
-              userFixedAmount += verificationValue.fixedValue
-            }
-            if (!multiplierInfo) {
-              break
-            }
-            if (multiplierInfo.value === undefined) {
-              multiplierInfo.value = multiplierInfo.min
-              break
-            }
-            if (multiplierInfo.value > multiplierInfo.max) {
-              multiplierInfo.value = multiplierInfo.max
-              break
-            }
-            if (multiplierInfo.value < multiplierInfo.max) {
-              multiplierInfo.value += multiplierInfo.step
-            }
-            break
-          case 'aggregate': {
-            // @ts-expect-error this is json
-            const value = verification.metadata?.value ?? 0
-            if (verificationValue.fixedValue) {
-              userFixedAmount += verificationValue.fixedValue * BigInt(value)
-            }
+        const weight = verification.weight
 
-            if (!multiplierInfo) {
-              break
-            }
-            // Minus 1 from the value so 1 = multiplier min
-            if (value > 0) {
-              multiplierInfo.value = Math.min(
-                multiplierInfo.min + (value - 1) * multiplierInfo.step,
-                multiplierInfo.max
-              )
-            } else {
-              multiplierInfo.value = 1.0
-            }
-            break
+        // Calculate fixed amount
+        if (verificationValue.fixedValue) {
+          userFixedAmount += verificationValue.fixedValue * BigInt(weight)
+        }
+
+        if (!multiplierInfo) {
+          continue
+        }
+
+        if (weight === 1) {
+          // Individual behavior
+          if (multiplierInfo.value === undefined) {
+            multiplierInfo.value = multiplierInfo.min
+          } else if (multiplierInfo.value < multiplierInfo.max) {
+            multiplierInfo.value = Math.min(
+              multiplierInfo.value + multiplierInfo.step,
+              multiplierInfo.max
+            )
           }
-          default:
-            throw new Error(`Unknown verification value mode: ${verificationValue.mode}`)
+        } else {
+          // Aggregate behavior
+          multiplierInfo.value = Math.min(
+            multiplierInfo.min + (weight - 1) * multiplierInfo.step,
+            multiplierInfo.max
+          )
         }
       }
 
