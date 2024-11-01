@@ -307,7 +307,7 @@ export class DistributorV2Worker {
         // Initialize or update multiplier info
         if (
           !multipliers[verification.type] &&
-          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_min > 0) //@todo: should have a better way to tell if multipliers are enabled
+          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_max > 1) //@todo: should have a better way to tell if multipliers are enabled
         ) {
           multipliers[verification.type] = {
             value: undefined,
@@ -488,7 +488,7 @@ export class DistributorV2Worker {
       } catch (error) {
         this.log.error(error, `Error processing block. ${(error as Error).message}`)
       }
-      await sleep(21_600_000)
+      await sleep(process.env.NODE_ENV !== 'production' ? 10_000 : 21_600_000)
     }
 
     this.log.info('Distributor stopped.')
