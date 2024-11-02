@@ -23,6 +23,7 @@ import { useProfileScreenParams, useRewardsScreenParams } from 'app/routers/para
 import { useMonthlyDistributions } from 'app/utils/distributions'
 import { DistributionClaimButton } from 'app/features/account/rewards/components/DistributionClaimButton'
 import formatAmount from 'app/utils/formatAmount'
+import { LockAndEarnButtons } from 'app/features/account/rewards/lock-and-earn/LockAndEarnButtons'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -243,8 +244,60 @@ export const ActivityRewards = ({ children, ...props }: XStackProps) => {
   )
 }
 
+export const LockAndEarn = ({ children, ...props }: XStackProps) => {
+  const isPwa = usePwa()
+  const { isLoading } = useUser()
+
+  const { direction } = useScrollDirection()
+
+  return (
+    <>
+      {children}
+      <AnimatePresence>
+        {!isLoading && direction !== 'down' && (
+          <Stack
+            w={'100%'}
+            pb={isPwa ? '$1' : '$5'}
+            px="$4"
+            $platform-web={{
+              position: 'fixed',
+              bottom: 0,
+            }}
+            $gtLg={{
+              display: 'none',
+            }}
+            animation="200ms"
+            opacity={1}
+            animateOnly={['scale', 'transform', 'opacity']}
+            enterStyle={{ opacity: 0, scale: 0.9 }}
+            exitStyle={{ opacity: 0, scale: 0.95 }}
+            pointerEvents="none"
+          >
+            <LinearGradient
+              h={'150%'}
+              top={'-50%'}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 0, y: 0 }}
+              locations={[0, 0.33]}
+              fullscreen
+              colors={['transparent', '$background']}
+              $gtLg={{ display: 'none' }}
+            />
+            <Row {...props}>
+              <Stack w={200}>
+                <LockAndEarnButtons.OpenButton />
+              </Stack>
+            </Row>
+          </Stack>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
 export const MobileButtonRowLayout = {
   Home: Home,
   Profile: Profile,
   ActivityRewards: ActivityRewards,
+  LockAndEarn: LockAndEarn,
 }
