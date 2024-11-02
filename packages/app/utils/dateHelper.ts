@@ -16,12 +16,19 @@ export const CommentsTime = (dateString: string) => {
   if (monthsAgo > 0) {
     return `${monthsAgo} mon ago`
   }
+  if (daysAgo > 1) {
+    return `${daysAgo} days ago`
+  }
   if (daysAgo > 0) {
     return `${daysAgo} day ago`
+  }
+  if (hoursAgo > 1) {
+    return `${hoursAgo} hours ago`
   }
   if (hoursAgo > 0) {
     return `${hoursAgo} hour ago`
   }
+
   if (minutesAgo > 0) {
     return `${minutesAgo} min ago`
   }

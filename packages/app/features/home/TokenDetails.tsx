@@ -1,17 +1,15 @@
 import {
   AnimatePresence,
-  BigHeading,
+  Button,
+  Card,
   H4,
-  Label,
   Paragraph,
   Separator,
   Spinner,
   Stack,
   Theme,
-  Tooltip,
   XStack,
   YStack,
-  useMedia,
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import type { coins } from 'app/data/coins'
@@ -26,6 +24,7 @@ import type { PropsWithChildren } from 'react'
 import { TokenDetailsHistory } from './TokenDetailsHistory'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 export function AnimateEnter({ children }: { children: React.ReactNode }) {
   return (
@@ -44,7 +43,6 @@ export function AnimateEnter({ children }: { children: React.ReactNode }) {
   )
 }
 export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
-  const media = useMedia()
   const { data: sendAccount } = useSendAccount()
   const balance = useBalance({
     address: sendAccount?.address,
@@ -54,27 +52,61 @@ export const TokenDetails = ({ coin }: { coin: coins[number] }) => {
   })
 
   return (
-    <YStack f={1}>
-      {media.gtLg && (
-        <XStack w={'100%'} ai={'center'} jc={'space-between'}>
-          <Separator boc="$decay" my={coin.label === 'USDC' ? '$3.5' : '$0'} />
-          {coin.label !== 'USDC' && (
-            <Stack bw={1} br={'$2'} boc="$decay" p={'$1.5'} jc="center" miw="$18">
-              <TokenDetailsMarketData coin={coin} />
-            </Stack>
-          )}
-        </XStack>
-      )}
-      <YStack mt={'$4'}>
-        <Label fontSize={'$5'} fontWeight={'500'} textTransform={'uppercase'}>
-          {`${coin.label} BALANCE`}
-        </Label>
-        <TokenDetailsBalance balance={balance} coin={coin} />
+    <YStack f={1} gap="$5" $gtLg={{ w: '45%', pb: '$0' }} pb="$5">
+      <YStack gap="$5">
+        <Card p="$4.5" w={'100%'} jc={'space-between'} $gtLg={{ h: 244, p: '$6' }}>
+          <YStack gap="$4">
+            <Button
+              disabled
+              icon={<IconCoin coin={coin} />}
+              bc="transparent"
+              chromeless
+              jc={'flex-start'}
+              ai={'center'}
+              gap="$2"
+              p={0}
+            >
+              <Button.Text
+                size={'$7'}
+                fontFamily={'$mono'}
+                col={'$color12'}
+                textTransform="uppercase"
+                fontWeight={'700'}
+              >
+                {coin.label}
+              </Button.Text>
+            </Button>
+            <YStack gap={'$4'}>
+              <TokenDetailsBalance balance={balance} coin={coin} />
+              {coin.symbol !== 'USDC' && (
+                <>
+                  <Stack w={'100%'}>
+                    <Separator bc={'$color10'} />
+                  </Stack>
+                  <TokenDetailsMarketData coin={coin} />
+                </>
+              )}
+            </YStack>
+          </YStack>
+        </Card>
+        {/* <XStack w={'100%'}>
+          <LinkableButton href="/deposit" p="$7" mih={88} w="30%">
+            <YStack gap="$2" jc={'space-between'} ai="center">
+              <Theme name="green">
+                <IconPlus
+                  size={'$1.5'}
+                  $theme-dark={{ color: '$color4' }}
+                  $theme-light={{ color: '$color12' }}
+                />
+              </Theme>
+              <Button.Text fontSize={'$4'} px="$2">
+                Deposit
+              </Button.Text>
+            </YStack>
+          </LinkableButton>
+        </XStack> */}
       </YStack>
-      <Stack w={'100%'} py={'$4'}>
-        <Separator />
-      </Stack>
-      <YStack>
+      <YStack gap={'$3'}>
         <TokenDetailsHistory coin={coin} />
       </YStack>
     </YStack>
@@ -88,11 +120,11 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
 
   const changePercent24h = tokenMarketData?.at(0)?.price_change_percentage_24h
 
-  if (status === 'pending') return <Spinner size="small" />
+  if (status === 'pending') return <Spinner size="small" color="$color12" />
   if (status === 'error' || price === undefined || changePercent24h === undefined)
     return (
-      <XStack gap="$2" ai="center" jc={'center'}>
-        <Paragraph>Failed to load market data</Paragraph>
+      <XStack gap="$2" ai="center">
+        <Paragraph color="$color10">Failed to load market data</Paragraph>
         <IconError size="$1.75" color={'$redVibrant'} />
       </XStack>
     )
@@ -121,7 +153,7 @@ export const TokenDetailsMarketData = ({ coin }: { coin: coins[number] }) => {
   }
 
   return (
-    <XStack gap="$2" ai="center" jc={'space-around'}>
+    <XStack gap="$3">
       <Paragraph
         fontSize={14}
         fontWeight="500"
@@ -146,7 +178,7 @@ const TokenDetailsBalance = ({
     return <>---</>
   }
   if (balance?.isFetching && balance?.isPending) {
-    return <Spinner size={'small'} />
+    return <Spinner size={'small'} color="$color12" />
   }
   if (balance?.data?.value === undefined) {
     return <></>
@@ -163,39 +195,17 @@ const TokenDetailsBalance = ({
 
   return (
     <XStack ai="flex-end" gap="$2">
-      <Tooltip placement="bottom">
-        <Tooltip.Trigger $platform-web={{ width: 'fit-content' }}>
-          <BigHeading
-            $platform-web={{ width: 'fit-content' }}
-            $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68, lineHeight: 38 }}
-            color={'$color12'}
-          >
-            {formatAmount(balanceWithDecimals.toString(), 10, 5)}
-          </BigHeading>
-        </Tooltip.Trigger>
-        <Tooltip.Content
-          enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
-          scale={1}
-          x={0}
-          y={0}
-          opacity={1}
-          animation={[
-            'quick',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-        >
-          <Tooltip.Arrow />
+      <Paragraph
+        $platform-web={{ width: 'fit-content' }}
+        $sm={{ fontSize: balanceWithDecimalsLength ? '$10' : 68, lineHeight: 38 }}
+        fontSize={60}
+        fontWeight={'900'}
+        lineHeight={57}
+        color={'$color12'}
+      >
+        {formatAmount(balanceWithDecimals.toString(), 10, 5)}
+      </Paragraph>
 
-          <Paragraph fontSize={'$6'} fontWeight={'500'}>
-            {`${balanceWithDecimals.toLocaleString()} ${coin.symbol}`}
-          </Paragraph>
-        </Tooltip.Content>
-      </Tooltip>
       <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
         {isLoadingTokenPrices || balanceInUSD ? `($${formatAmount(balanceInUSD, 4, 2)})` : ''}
       </Paragraph>
@@ -207,12 +217,11 @@ export function RowLabel({ children }: PropsWithChildren) {
   return (
     <H4
       // @TODO: Update with theme color variable
-      color="hsl(0, 0%, 42.5%)"
+      color="$color12"
       fontFamily={'$mono'}
       fontWeight={'500'}
       size={'$5'}
       mt="$3"
-      display="none"
       $gtMd={{ display: 'inline' }}
     >
       {children}

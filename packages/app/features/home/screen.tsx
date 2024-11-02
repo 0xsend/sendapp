@@ -68,13 +68,13 @@ function HomeBody(props: XStackProps) {
     )
 
   return (
-    <XStack w={'100%'} jc={'space-between'} $gtLg={{ gap: '$11' }} $lg={{ f: 1 }} {...props}>
+    <XStack w={'100%'} $gtLg={{ gap: '$5' }} $lg={{ f: 1, pt: '$3' }} {...props}>
       <YStack
-        $gtLg={{ width: 455, display: 'flex' }}
+        $gtLg={{ display: 'flex', w: '45%', gap: '$5' }}
         display={!selectedCoin ? 'flex' : 'none'}
         width="100%"
+        gap="$5"
         ai={'center'}
-        gap="$6"
       >
         {!canSend ? (
           <>
@@ -102,28 +102,25 @@ function HomeBody(props: XStackProps) {
             </Card>
           </>
         ) : (
-          <Card p={'$5'} w={'100%'} jc="space-between" br={12} gap="$6">
-            <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
-              <TokenBalanceCard />
-            </XStack>
-            <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'}>
-              <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-                <HomeButtons.GhostDepositButton />
-              </Stack>
-              {canSend && (
-                <Stack f={1} w="50%" jc={'center'} maw={350}>
-                  <HomeButtons.SendButton />
-                </Stack>
-              )}
-            </XStack>
-          </Card>
+          <TokenBalanceCard />
         )}
         <YStack w={'100%'} ai={'center'}>
           <YStack width="100%">
             <TokenBalanceList coins={coins} />
           </YStack>
         </YStack>
+        {canSend && (
+          <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'} w="100%">
+            <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
+              <HomeButtons.GhostDepositButton />
+            </Stack>
+            <Stack f={1} w="50%" jc={'center'} maw={350}>
+              <HomeButtons.SendButton />
+            </Stack>
+          </XStack>
+        )}
       </YStack>
+
       {selectedCoin !== undefined && <TokenDetails coin={selectedCoin} />}
     </XStack>
   )

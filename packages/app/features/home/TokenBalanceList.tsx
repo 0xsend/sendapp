@@ -28,6 +28,7 @@ export const TokenBalanceList = ({ coins }: { coins: coins }) => {
         jc={'space-between'}
         ai={'center'}
         py={'$3.5'}
+        px={'$3'}
         disabled={tokenParam !== undefined && tokenParam !== coin.token}
         disabledStyle={{ opacity: 0.5 }}
         href={{
