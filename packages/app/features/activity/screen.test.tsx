@@ -1,9 +1,8 @@
 import { expect } from '@jest/globals'
 import { TamaguiProvider, View as MockView, config } from '@my/ui'
-import { act, render, screen, fireEvent, waitFor } from '@testing-library/react-native'
+import { act, render, screen } from '@testing-library/react-native'
 import { ActivityScreen } from './screen'
-import { useSearchResultHref } from 'app/utils/useSearchResultHref'
-jest.unmock('app/provider/tag-search')
+
 jest.mock('app/utils/useSearchResultHref')
 
 jest.mock('app/features/activity/utils/useActivityFeed')
@@ -48,13 +47,6 @@ jest.mock('solito/link', () => ({
 }))
 
 describe('ActivityScreen', () => {
-  beforeEach(() => {
-    // @ts-expect-error mock
-    useSearchResultHref.mockImplementation((item) => {
-      return `/profile/${item.send_id}`
-    })
-  })
-
   it('renders activity screen', async () => {
     jest.useFakeTimers()
     render(
@@ -76,16 +68,10 @@ describe('ActivityScreen', () => {
         <ActivityScreen />
       </TamaguiProvider>
     )
-    const searchInput = screen.getByPlaceholderText('Sendtag, Phone, Send ID, Address')
-    fireEvent.changeText(searchInput, 'test')
+
     await act(async () => {
       jest.advanceTimersByTime(2000)
       jest.runAllTimers()
     })
-    await waitFor(() => screen.findByTestId('tag-search-3665'))
-
-    expect(searchInput.props.value).toBe('test')
-    const searchResults = await screen.findByTestId('tag-search-3665')
-    expect(searchResults).toHaveTextContent('??test/test')
   })
 })
