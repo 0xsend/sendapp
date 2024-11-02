@@ -9,8 +9,9 @@ import {
   H4,
   useMedia,
   type XStackProps,
+  H1,
+  Theme,
 } from '@my/ui'
-import { IconError } from 'app/components/icons'
 import { coins, coinsDict } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -24,7 +25,8 @@ import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
 import { parseUnits } from 'viem'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { DepositButton, SendButton } from './HomeButtons'
+import { HomeButtons } from './HomeButtons'
+import { AlertCircle } from '@tamagui/lucide-icons'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -52,14 +54,11 @@ function HomeBody(props: XStackProps) {
   const selectedCoin = useCoinFromTokenParam()
   const { balances, isLoading: balancesIsLoading } = useSendAccountBalances()
 
-  const [usdcBalance, sendBalance, ethBalance] = [balances?.USDC, balances?.SEND, balances?.ETH]
+  const usdcBalance = balances?.USDC
 
   const canSend =
     usdcBalance !== undefined &&
-    usdcBalance >= parseUnits('.20', coinsDict[usdcAddress[baseMainnet.id]].decimals)
-
-  const transfersUnavailable =
-    !canSend && ((sendBalance && sendBalance > 0n) || (ethBalance && ethBalance > 0n))
+    usdcBalance >= parseUnits('.05', coinsDict[usdcAddress[baseMainnet.id]].decimals)
 
   if (balancesIsLoading || isSendAccountLoading)
     return (
@@ -75,59 +74,45 @@ function HomeBody(props: XStackProps) {
         display={!selectedCoin ? 'flex' : 'none'}
         width="100%"
         ai={'center'}
+        gap="$6"
       >
         {!canSend ? (
           <>
-            <Card
-              p={36}
-              ai={'center'}
-              gap="$5"
-              jc="space-around"
-              w={'100%'}
-              $lg={{ bc: '$backgroundTransparent' }}
-            >
-              <YStack gap="$5" $lg={{ display: 'none' }}>
+            <Card p={'$4.5'} ai={'center'} gap="$5" jc="space-around" w={'100%'}>
+              <YStack gap="$6" jc="center" ai="center">
+                <Theme name="red_active">
+                  <AlertCircle size={'$3'} />
+                </Theme>
+                <YStack ai="center" gap="$2">
+                  <H1 tt="uppercase" fontWeight={'800'}>
+                    ADD FUNDS
+                  </H1>
+                  <Paragraph color="$color10" $gtMd={{ fontSize: '$6' }} ta="center">
+                    Deposit at least .05 USDC to unlock sending
+                  </Paragraph>
+                </YStack>
                 <XStack w="100%">
-                  <DepositButton />
+                  <HomeButtons.DepositButton mah={40} />
                 </XStack>
-                <XStack ai="center">
-                  <Paragraph fontWeight={'500'}>Or direct deposit on Base</Paragraph>
+                <YStack ai="center">
+                  <Paragraph color="$color10">Or direct deposit on Base</Paragraph>
                   <DepositAddress address={sendAccount?.address} />
-                </XStack>
+                </YStack>
               </YStack>
-              {transfersUnavailable && (
-                <>
-                  <XStack w="100%" theme="yellow_active" gap="$3" ai="center">
-                    <IconError size={'$3'} />
-                    <Paragraph $gtMd={{ fontSize: '$6', fontWeight: '500' }}>
-                      A minimum of .20 USDC is required to unlock sending
-                    </Paragraph>
-                  </XStack>
-                </>
-              )}
             </Card>
           </>
         ) : (
-          <Card
-            $gtLg={{ p: 36 }}
-            $lg={{ bc: 'transparent' }}
-            py={'$6'}
-            px={'$2'}
-            w={'100%'}
-            jc="space-between"
-            br={12}
-            gap="$6"
-          >
+          <Card p={'$5'} w={'100%'} jc="space-between" br={12} gap="$6">
             <XStack w={'100%'} jc={'center'} ai="center" $lg={{ f: 1 }}>
               <TokenBalanceCard />
             </XStack>
             <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'}>
               <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-                <DepositButton />
+                <HomeButtons.GhostDepositButton />
               </Stack>
               {canSend && (
                 <Stack f={1} w="50%" jc={'center'} maw={350}>
-                  <SendButton />
+                  <HomeButtons.SendButton />
                 </Stack>
               )}
             </XStack>

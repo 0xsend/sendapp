@@ -108,17 +108,10 @@ export function DepositAddress({ address, ...props }: { address?: Address } & Bu
         }}
         {...props}
       >
-        <Theme name="green">
-          <Button.Text
-            fontSize={'$4'}
-            fontWeight={'500'}
-            fontFamily={'$mono'}
-            px="$2"
-            bc="$background"
-          >
-            {shorten(address, 5, 4)}
-          </Button.Text>
-        </Theme>
+        <Button.Text fontSize={'$4'} fontWeight={'500'} px="$2">
+          {shorten(address, 6, 5)}
+        </Button.Text>
+
         <Button.Icon>
           <AnimatePresence exitBeforeEnter>
             {hasCopied ? (

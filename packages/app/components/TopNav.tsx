@@ -288,7 +288,7 @@ export function TopNav({
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
         </Container>
       )}
-      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} mt="$2" />
+      <Stack mt="$2" />
       {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
         <Container pos="relative">
           <View
