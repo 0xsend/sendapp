@@ -338,7 +338,7 @@ function AuthButtons() {
         {(() => {
           switch (true) {
             case isLoadingChallenge:
-              return <Spinner size="small" color={'$color11'} />
+              return <Spinner size="small" color={'$black'} />
             default:
               return <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
           }

@@ -49,7 +49,7 @@ export const TokenBalanceCard = () => {
 
   return (
     <XStack w={'100%'} zIndex={4}>
-      <YStack jc={'center'} gap={'$4'} w={'100%'}>
+      <YStack jc={'center'} gap={'$2'} w={'100%'}>
         <YStack w="fit-content" gap={'$2.5'}>
           <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={onShowHidePress}>
             <XStack ai={'center'} gap="$2.5">

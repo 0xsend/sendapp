@@ -83,16 +83,17 @@ export const Home = ({ children, ...props }: XStackProps) => {
               $gtLg={{ display: 'none' }}
               pointerEvents="none"
             />
-            <Row {...props}>
-              <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-                <HomeButtons.DepositButton />
-              </Stack>
-              {canSend && (
+            {canSend && (
+              <Row {...props}>
+                <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
+                  <HomeButtons.GhostDepositButton />
+                </Stack>
+
                 <Stack f={1} w="50%" jc={'center'} maw={350}>
                   <HomeButtons.SendButton />
                 </Stack>
-              )}
-            </Row>
+              </Row>
+            )}
           </Stack>
         )}
       </AnimatePresence>
