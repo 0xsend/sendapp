@@ -1,7 +1,6 @@
 import {
   Link,
   Paragraph,
-  Separator,
   Spinner,
   Theme,
   Tooltip,
@@ -22,13 +21,14 @@ import { useBalance, type UseBalanceReturnType } from 'wagmi'
 export const TokenBalanceList = ({ coins }: { coins: coins }) => {
   const [{ token: tokenParam }] = useRootScreenParams()
 
-  return coins.map((coin, index) => (
+  return coins.map((coin) => (
     <Fragment key={`token-balance-list-${coin.label}`}>
       <TokenBalanceItem
         coin={coin}
         jc={'space-between'}
         ai={'center'}
         py={'$3.5'}
+        px={'$3'}
         disabled={tokenParam !== undefined && tokenParam !== coin.token}
         disabledStyle={{ opacity: 0.5 }}
         href={{
@@ -36,7 +36,6 @@ export const TokenBalanceList = ({ coins }: { coins: coins }) => {
           query: { token: coin.token },
         }}
       />
-      {index !== coins.length - 1 && <Separator />}
     </Fragment>
   ))
 }

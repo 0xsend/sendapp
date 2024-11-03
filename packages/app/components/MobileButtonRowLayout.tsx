@@ -23,6 +23,7 @@ import { useProfileScreenParams, useRewardsScreenParams } from 'app/routers/para
 import { useMonthlyDistributions } from 'app/utils/distributions'
 import { DistributionClaimButton } from 'app/features/account/rewards/components/DistributionClaimButton'
 import formatAmount from 'app/utils/formatAmount'
+import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -41,6 +42,7 @@ export const Home = ({ children, ...props }: XStackProps) => {
   const isPwa = usePwa()
   const { isLoading: isLoadingSendAccount } = useSendAccount()
   const { balances, isLoading: isLoadingBalances } = useSendAccountBalances()
+  const selectedCoin = useCoinFromTokenParam()
   const usdcBalance = balances?.USDC
   const canSend =
     usdcBalance !== undefined &&
@@ -84,14 +86,30 @@ export const Home = ({ children, ...props }: XStackProps) => {
               pointerEvents="none"
             />
             <Row {...props}>
-              <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
-                <HomeButtons.DepositButton />
-              </Stack>
-              {canSend && (
-                <Stack f={1} w="50%" jc={'center'} maw={350}>
-                  <HomeButtons.SendButton />
-                </Stack>
-              )}
+              {(() => {
+                switch (true) {
+                  case !canSend:
+                    return null
+                  case selectedCoin !== undefined:
+                    return (
+                      <Stack f={1} $gtSm={{ w: '50%' }} flexDirection="row-reverse" maw={350}>
+                        <HomeButtons.SendButton />
+                      </Stack>
+                    )
+                  default:
+                    return (
+                      <>
+                        <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
+                          <HomeButtons.GhostDepositButton />
+                        </Stack>
+
+                        <Stack f={1} w="50%" jc={'center'} maw={350}>
+                          <HomeButtons.SendButton />
+                        </Stack>
+                      </>
+                    )
+                }
+              })()}
             </Row>
           </Stack>
         )}

@@ -22,10 +22,7 @@ import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
 import { SettingsBottomSheet } from 'app/features/account/settings/SettingsBottomSheet'
-import { TokenDetailsMarketData } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from '../utils/useCoinFromTokenParam'
-import { ReferralLink } from './ReferralLink'
-import { IconCoin } from './icons/IconCoin'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
 import type { Tables } from '@my/supabase/database-generated.types'
@@ -41,7 +38,6 @@ interface TopNavProps {
   header?: string
   subheader?: string
   showLogo?: boolean
-  showReferral?: boolean
   /**
    * Customize the button on the right side of the top nav.
    */
@@ -93,7 +89,6 @@ export function TopNav({
   header = '',
   subheader,
   showLogo = false,
-  showReferral = false,
   button,
   noSubroute = false,
   backToBasePath = true,
@@ -115,7 +110,7 @@ export function TopNav({
     )
   }
 
-  const hasSelectedCoin = selectedCoin !== undefined
+  const hasSelectedCoin = Boolean(selectedCoin)
 
   const handleBack = () => {
     // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
@@ -147,29 +142,6 @@ export function TopNav({
     switch (true) {
       case button === undefined:
         return <Button opacity={0} disabled $gtMd={{ display: 'none' }} />
-      case selectedCoin !== undefined:
-        return (
-          <ButtonOg
-            disabled
-            $gtLg={{ display: 'none' }}
-            icon={<IconCoin coin={selectedCoin} />}
-            bc="transparent"
-            chromeless
-            jc={'flex-end'}
-            ai={'center'}
-            gap="$2"
-          >
-            <ButtonText
-              size={'$9'}
-              fontFamily={'$mono'}
-              col={'$color12'}
-              textTransform="uppercase"
-              fontWeight={'700'}
-            >
-              {selectedCoin.label}
-            </ButtonText>
-          </ButtonOg>
-        )
       case button === ButtonOption.QR:
         return (
           <Button
@@ -207,65 +179,85 @@ export function TopNav({
       >
         {(() => {
           switch (true) {
-            case media.lg:
+            case media.gtLg && isSubRoute:
+              return (
+                <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                  {header}
+                </H2>
+              )
+            case media.gtLg:
+              return null
+            case hasSelectedCoin:
+              return (
+                <XStack ai="center" f={1}>
+                  <Button
+                    onPress={handleBack}
+                    icon={
+                      <IconArrowLeft
+                        size={'$1.5'}
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      />
+                    }
+                  />
+                  <Paragraph size={'$8'} col={'$color10'}>
+                    Balance
+                  </Paragraph>
+                </XStack>
+              )
+            case !isSubRoute:
+              return showLogo ? (
+                <XStack>
+                  <Link href="/">
+                    <IconSendLogo size={'$2.5'} color={'$color12'} />
+                  </Link>
+                </XStack>
+              ) : (
+                <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                  {header}
+                </H2>
+              )
+            case showLogo:
               return (
                 <>
-                  {isSubRoute || hasSelectedCoin ? (
-                    <Button
-                      onPress={handleBack}
-                      icon={
-                        <IconArrowLeft
-                          size={'$2.5'}
-                          color={'$primary'}
-                          $theme-light={{ color: '$color12' }}
-                        />
-                      }
-                    />
-                  ) : null}
-                  {showLogo ? (
-                    <XStack>
-                      <Link href="/send">
-                        <IconSendLogo
-                          size={'$2.5'}
-                          color={'$color12'}
-                          display={selectedCoin && !media.gtLg ? 'none' : 'flex'}
-                        />
-                      </Link>
-                    </XStack>
-                  ) : (
-                    <H2
-                      fontWeight={'300'}
-                      col="$color10"
-                      lineHeight={32}
-                      display={selectedCoin ? 'none' : 'flex'}
-                      als={'center'}
-                    >
-                      {header}
-                    </H2>
-                  )}
+                  <Button
+                    onPress={handleBack}
+                    icon={
+                      <IconArrowLeft
+                        size={'$1.5'}
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      />
+                    }
+                  />
+                  <XStack>
+                    <Link href="/send">
+                      <IconSendLogo size={'$2.5'} color={'$color12'} />
+                    </Link>
+                  </XStack>
                 </>
               )
             default:
               return (
-                <H2
-                  fontWeight={'300'}
-                  col="$color10"
-                  lineHeight={32}
-                  //ml= {isSubRoute ? '$4' : '$0' }
-                  display={isSubRoute ? 'flex' : 'none'}
-                  als={'center'}
-                >
-                  {header}
-                </H2>
+                <>
+                  <Button
+                    onPress={handleBack}
+                    icon={
+                      <IconArrowLeft
+                        size={'$1.5'}
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      />
+                    }
+                  />
+
+                  <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                    {header}
+                  </H2>
+                </>
               )
           }
         })()}
-
-        {showReferral && media.gtLg && (
-          <XStack jc={'center'} ai={'center'} ml="auto">
-            <Paragraph>Referral Link</Paragraph> <ReferralLink />
-          </XStack>
-        )}
 
         <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
           {renderButton()}
@@ -286,24 +278,6 @@ export function TopNav({
             {subheader}
           </Paragraph>
           <Separator w={'100%'} borderColor="$jet" $lg={{ display: 'none' }} />
-        </Container>
-      )}
-      <Separator w={'100%'} borderColor="$decay" $gtLg={{ display: 'none' }} mt="$2" />
-      {!media.gtLg && selectedCoin && selectedCoin.label !== 'USDC' && (
-        <Container pos="relative">
-          <View
-            position="absolute"
-            $lg={{ right: '$6' }}
-            $md={{ right: 0 }}
-            right={0}
-            bottom={0}
-            top={0}
-            justifyContent="center"
-          >
-            <View bw={1} br={'$2'} boc="$decay" py={'$1.5'} px={'$2'} miw="$18" bc="$background">
-              <TokenDetailsMarketData coin={selectedCoin} />
-            </View>
-          </View>
         </Container>
       )}
       <SettingsBottomSheet />

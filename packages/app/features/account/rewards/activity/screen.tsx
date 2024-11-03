@@ -109,29 +109,29 @@ export function ActivityRewardsScreen() {
               testID={'SelectDistributionDate'}
               br="$3"
               w={'fit-content'}
-              borderWidth={1.5}
+              bw={'$1'}
               $theme-light={{
-                boc: isOpen ? '$color1' : '$transparent',
-                bc: isOpen ? '$color1' : '$primary',
+                boc: isOpen ? '$color1' : '$black',
+                bc: isOpen ? '$color1' : '$transparent',
               }}
               $theme-dark={{
-                boc: isOpen ? '$color1' : '$transparent',
-                bc: isOpen ? '$color1' : '$primary',
-                hoverStyle: { bc: '$primary' },
+                boc: isOpen ? '$color1' : '$primary',
+                bc: isOpen ? '$color1' : '$transparent',
+                hoverStyle: { bc: '$color1' },
               }}
               iconAfter={
                 isOpen ? (
                   <ChevronUp
                     $theme-dark={{
-                      color: isOpen ? '$color12' : '$black',
+                      color: '$color12',
                     }}
                     color={'$color11'}
                   />
                 ) : (
                   <ChevronDown
                     $theme-dark={{
-                      color: isOpen ? '$color12' : '$black',
-                      hoverStyle: { color: '$color12' },
+                      color: '$primary',
+                      hoverStyle: { color: '$color0' },
                     }}
                     color="$black"
                   />
@@ -140,11 +140,8 @@ export function ActivityRewardsScreen() {
             >
               <Select.Value
                 testID={'SelectDistributionDateValue'}
-                fontWeight={'bold'}
-                color={isOpen ? '$color12' : '$black'}
-                $theme-dark={{
-                  color: isOpen ? '$color12' : '$black',
-                }}
+                color={'$color12'}
+                hoverStyle={{ color: '$color0' }}
                 placeholder={distributions[selectedDistributionIndex]?.number}
               />
             </Select.Trigger>

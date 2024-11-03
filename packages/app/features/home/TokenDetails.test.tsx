@@ -29,7 +29,7 @@ test('TokenDetails', async () => {
 
   expect(screen.toJSON()).toMatchSnapshot()
 
-  expect(screen.getByText('Sent')).toBeOnTheScreen()
+  expect(screen.getByText('Withdraw')).toBeOnTheScreen()
   expect(screen.getByText('Deposit')).toBeOnTheScreen()
   expect(screen.getByText('Received')).toBeOnTheScreen()
   expect(screen.getByText('/alice')).toBeOnTheScreen()

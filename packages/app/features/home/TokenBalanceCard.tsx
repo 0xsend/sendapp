@@ -9,6 +9,7 @@ import {
   styled,
   AnimatePresence,
   type XStackProps,
+  Card,
 } from '@my/ui'
 import { EyeOff, Eye } from '@tamagui/lucide-icons'
 import formatAmount from 'app/utils/formatAmount'
@@ -48,93 +49,94 @@ export const TokenBalanceCard = () => {
   }
 
   return (
-    <XStack w={'100%'} zIndex={4}>
-      <YStack jc={'center'} gap={'$4'} w={'100%'}>
-        <YStack w="fit-content" gap={'$2.5'}>
-          <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={onShowHidePress}>
-            <XStack ai={'center'} gap="$2.5">
-              <AnimatePresence exitBeforeEnter>
-                {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
-              </AnimatePresence>
-              <Label
-                fontSize={'$4'}
-                zIndex={1}
-                fontWeight={'500'}
-                textTransform={'uppercase'}
-                lineHeight={0}
-                col={'$color10'}
-              >
-                Total Balance
-              </Label>
+    <Card p={'$5'} w={'100%'} jc="space-between" $gtLg={{ p: '$6', h: 244, mih: 244 }} mih={184}>
+      <XStack w={'100%'} zIndex={4} h="100%">
+        <YStack jc={'center'} gap={'$2'} w={'100%'}>
+          <YStack w="fit-content" gap={'$2.5'} jc="space-between">
+            <XStack ai={'center'} gap="$2.5" width={'100%'} onPress={onShowHidePress}>
+              <XStack ai={'center'} gap="$2.5">
+                <AnimatePresence exitBeforeEnter>
+                  {isPriceHidden ? <HiddenSquare /> : <GreenSquare />}
+                </AnimatePresence>
+                <Label
+                  fontSize={'$4'}
+                  zIndex={1}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  lineHeight={0}
+                  col={'$color10'}
+                >
+                  Total Balance
+                </Label>
+              </XStack>
+              {isPriceHidden ? (
+                <EyeOff color={'$color9'} size={'$1'} />
+              ) : (
+                <Eye color={'$color11'} size={'$1'} />
+              )}
             </XStack>
-            {isPriceHidden ? (
-              <EyeOff color={'$color9'} size={'$1'} />
-            ) : (
-              <Eye color={'$color11'} size={'$1'} />
+            {isGameVisible && (
+              <XStack w="100%" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
+                <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
+                  {presses}
+                </Paragraph>
+                <ShowHideGameStopwatch timer={timer} />
+              </XStack>
             )}
-          </XStack>
-          {isGameVisible && (
-            <XStack w="100%" gap={'$2'} jc={'space-between'} ai={'center'} my="auto">
-              <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} color={'$color10'}>
-                {presses}
-              </Paragraph>
-              <ShowHideGameStopwatch timer={timer} />
-            </XStack>
-          )}
-        </YStack>
-        <XStack style={{ color: 'white' }} gap={'$2.5'} mt={'$3'}>
-          {(() => {
-            switch (true) {
-              case isPriceHidden:
-                return (
-                  <BigHeading
-                    $platform-web={{ width: 'fit-content' }}
-                    fontSize={96}
-                    lineHeight={'$15'}
-                    fontWeight={'500'}
-                    color={'$color12'}
-                    zIndex={1}
-                  >
-                    {'//////'}
-                  </BigHeading>
-                )
-              case isLoadingTotalBalance || !totalBalance:
-                return <Spinner size={'large'} />
-              default:
-                return (
-                  <>
+          </YStack>
+          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto">
+            {(() => {
+              switch (true) {
+                case isPriceHidden:
+                  return (
                     <BigHeading
                       $platform-web={{ width: 'fit-content' }}
-                      $sm={{
-                        fontSize: (() => {
-                          switch (true) {
-                            case formattedBalance.length > 8:
-                              return '$11'
-                            case formattedBalance.length > 5:
-                              return '$12'
-                            default:
-                              return 96
-                          }
-                        })(),
-                      }}
                       fontSize={96}
                       lineHeight={'$15'}
-                      fontWeight={'500'}
+                      fontWeight={'600'}
                       color={'$color12'}
                       zIndex={1}
                     >
-                      {formattedBalance}
+                      {'//////'}
                     </BigHeading>
-                    <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1}>
-                      {'USD'}
-                    </Paragraph>
-                  </>
-                )
-            }
-          })()}
-        </XStack>
-      </YStack>
-    </XStack>
+                  )
+                case isLoadingTotalBalance || !totalBalance:
+                  return <Spinner size={'large'} />
+                default:
+                  return (
+                    <>
+                      <BigHeading
+                        $platform-web={{ width: 'fit-content' }}
+                        $sm={{
+                          fontSize: (() => {
+                            switch (true) {
+                              case formattedBalance.length > 8:
+                                return '$10'
+                              case formattedBalance.length > 5:
+                                return '$11'
+                              default:
+                                return 86
+                            }
+                          })(),
+                        }}
+                        fontSize={96}
+                        lineHeight={'$15'}
+                        color={'$color12'}
+                        zIndex={1}
+                      >
+                        {formattedBalance}
+                      </BigHeading>
+                      <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1}>
+                        {'USD'}
+                      </Paragraph>
+                    </>
+                  )
+              }
+            })()}
+          </XStack>
+        </YStack>
+      </XStack>
+    </Card>
   )
 }
 
