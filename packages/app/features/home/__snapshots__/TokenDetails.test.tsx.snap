@@ -594,7 +594,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a
+                  0x93F...761a
                 </Text>
                 <Text
                   style={
@@ -860,7 +860,7 @@ exports[`TokenDetails 1`] = `
                   }
                   suppressHighlighting={true}
                 >
-                  0xa71CE00000000000000000000000000000000000
+                  0xa71...0000
                 </Text>
                 <Text
                   style={
