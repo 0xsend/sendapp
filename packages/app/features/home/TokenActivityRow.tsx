@@ -11,12 +11,13 @@ import { Link } from 'solito/link'
 
 import { useUser } from 'app/utils/useUser'
 import { shorten } from 'app/utils/strings'
+import { isAddress } from 'viem'
 
 export function TokenActivityRow({ activity }: { activity: Activity }) {
   const { profile } = useUser()
   const { created_at, from_user, to_user } = activity
   const amount = amountFromActivity(activity)
-  const date = new Date(created_at).toLocaleString()
+  const date = new Date(created_at)
   const eventName = eventNameFromActivity(activity)
   const subtext = subtextFromActivity(activity)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
@@ -67,7 +68,7 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
                   fontSize="$4"
                   textDecorationLine="underline"
                 >
-                  {shorten(subtext ?? '', 5, 4)}
+                  {subtext}
                 </Paragraph>
               </Link>
             ) : (
@@ -78,7 +79,7 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
                 overflow={'hidden'}
                 fontSize="$4"
               >
-                {subtext}
+                {isAddress(subtext ?? '') ? shorten(subtext ?? '', 5, 4) : subtext}
               </Paragraph>
             )}
             <Paragraph color="$color10" size={'$3'}>

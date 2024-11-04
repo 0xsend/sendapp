@@ -118,7 +118,7 @@ export function AccountScreen() {
       gap={'$size.1.5'}
       width={'100%'}
       pb={'$size.1.5'}
-      pt={'$size.3.5'}
+      pt={'$3'}
       $gtMd={{ flexDirection: 'row', ai: 'stretch', alignSelf: 'flex-start' }}
       $gtLg={{ pt: 0 }}
       ai="center"
@@ -129,7 +129,7 @@ export function AccountScreen() {
             <Avatar size={avatarWidth} btlr={'$6'} btrr={'$6'} bc="$color2">
               <Avatar.Image accessibilityLabel="" src={avatar_url ?? ''} />
               <Avatar.Fallback f={1} ai={'center'} theme="green_active">
-                <IconAccount size={avatarWidth * 0.9} c$theme-light={{ color: '$color12' }} />
+                <IconAccount size={avatarWidth * 0.9} $theme-light={{ color: '$color12' }} />
               </Avatar.Fallback>
             </Avatar>
             <LinearGradient

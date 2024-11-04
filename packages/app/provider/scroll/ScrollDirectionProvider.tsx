@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react'
+import { usePathname } from 'app/utils/usePathname'
+import { createContext, useContext, useEffect, useState } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 export type ScrollDirectionContextValue = {
@@ -13,6 +14,15 @@ const ScrollDirection = createContext<ScrollDirectionContextValue>(
 export const ScrollDirectionProvider = ({ children }: { children: React.ReactNode }) => {
   const [direction, setDirection] = useState<'up' | 'down'>()
   const [, setScrollY] = useState(0)
+  const pathName = usePathname()
+  const [, setPreviousPath] = useState('')
+
+  useEffect(() => {
+    setPreviousPath((previousPath) => {
+      previousPath !== pathName && setDirection(undefined)
+      return pathName
+    })
+  }, [pathName])
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent

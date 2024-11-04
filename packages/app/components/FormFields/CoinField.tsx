@@ -79,8 +79,15 @@ export const CoinField = ({
             </Select.Trigger>
 
             <Adapt when="sm" platform="touch">
-              <Sheet native modal dismissOnSnapToBottom snapPoints={[30]} animation={'quick'}>
-                <Sheet.Frame maw={738} bc={'$color2'}>
+              <Sheet
+                native
+                modal
+                dismissOnSnapToBottom
+                snapPoints={['fit']}
+                snapPointsMode="fit"
+                animation={'quick'}
+              >
+                <Sheet.Frame maw={738} bc={'$color1'}>
                   <Sheet.Handle
                     py="$5"
                     f={1}
