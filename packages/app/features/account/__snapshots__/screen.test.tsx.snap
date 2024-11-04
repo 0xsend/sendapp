@@ -8,7 +8,7 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
       "flexDirection": "column",
       "gap": 24,
       "paddingBottom": 24,
-      "paddingTop": 40,
+      "paddingTop": 13,
       "width": "100%",
     }
   }
@@ -113,11 +113,6 @@ exports[`AccountScreen renders the account screen: AccountScreen 1`] = `
               align="xMidYMid"
               bbHeight={360}
               bbWidth={360}
-              c$theme-light={
-                {
-                  "color": "$color12",
-                }
-              }
               color="#40FB50"
               fill="none"
               focusable={false}
