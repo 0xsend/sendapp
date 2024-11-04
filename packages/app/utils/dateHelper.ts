@@ -1,5 +1,4 @@
-export const CommentsTime = (dateString: string) => {
-  const date: Date = new Date(dateString)
+export const CommentsTime = (date: Date) => {
   const currentDate: Date = new Date()
   // @ts-expect-error -> TS doesn't allow arithematic operation on 'date' type
   const timeDifference = currentDate - date
