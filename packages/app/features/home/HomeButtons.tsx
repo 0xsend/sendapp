@@ -18,11 +18,7 @@ export const DepositButton = (props: Omit<LinkableButtonProps, 'href' | 'childre
         <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
           <IconPlus size={'$1.5'} $theme-dark={{ color: '$color0' }} />
         </XStack>
-        <LinkableButton.Text
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          $theme-dark={{ col: '$color0' }}
-        >
+        <LinkableButton.Text fontWeight={'500'} tt={'uppercase'} $theme-dark={{ col: '$color0' }}>
           Deposit
         </LinkableButton.Text>
       </XStack>
@@ -54,13 +50,7 @@ export const GhostDepositButton = (props: Omit<LinkableButtonProps, 'href' | 'ch
             $theme-light={{ color: '$color12' }}
           />
         </XStack>
-        <LinkableButton.Text
-          fontWeight={'400'}
-          textTransform={'uppercase'}
-          col={'$color12'}
-          tt="uppercase"
-          size={'$5'}
-        >
+        <LinkableButton.Text fontWeight={'400'} col={'$color12'} tt="uppercase" size={'$5'}>
           Deposit
         </LinkableButton.Text>
       </XStack>
@@ -85,9 +75,10 @@ export const SendButton = (props: Omit<LinkableButtonProps, 'href' | 'children'>
     >
       <XStack w={'100%'} ai={'center'} jc="center" h="100%">
         <LinkableButton.Text
-          fontWeight={'500'}
-          textTransform={'uppercase'}
+          fontWeight={'400'}
           $theme-dark={{ col: '$color0' }}
+          tt="uppercase"
+          size={'$5'}
         >
           Send
         </LinkableButton.Text>
