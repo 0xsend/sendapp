@@ -17,9 +17,16 @@ import { useStringFieldInfo, useTsController } from '@ts-react/form'
 import { useId } from 'react'
 
 import { AlertTriangle } from '@tamagui/lucide-icons'
+import type { IconProps } from '@tamagui/helpers-icon'
 
 export const TextField = (
-  props: InputProps & { fieldsetProps?: FieldsetProps } & { labelProps?: LabelProps }
+  props: InputProps & {
+    fieldsetProps?: FieldsetProps
+    labelProps?: LabelProps
+    iconBefore?: React.ReactNode
+    iconAfter?: React.ReactNode
+    iconProps?: IconProps
+  }
 ) => {
   const media = useMedia()
   const {
@@ -90,36 +97,62 @@ export const TextField = (
               </Paragraph>
             </Tooltip.Content>
             <Tooltip.Trigger>
-              <Input
-                aria-label={label ?? field.name}
-                disabled={disabled}
-                maxLength={maxLength}
-                borderWidth={0}
-                borderRadius={'$4'}
-                fontSize={'$5'}
-                fontStyle={field.value ? 'normal' : 'italic'}
-                fontWeight={field.value ? 'bold' : 'normal'}
-                $theme-dark={{
-                  ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
-                }}
-                $theme-light={{
-                  ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
-                }}
-                spellCheck={isEmail ? false : undefined}
-                autoCapitalize={isEmail ? 'none' : undefined}
-                keyboardType={isEmail ? 'email-address' : undefined}
-                value={field.value ?? ''}
-                onChangeText={(text) => field.onChange(text)}
-                onBlur={field.onBlur}
-                ref={field.ref}
-                placeholder={placeholder}
-                id={id}
-                focusStyle={{
-                  borderColor: '$color12',
-                }}
-                position="relative"
-                {...props}
-              />
+              <Stack pos="relative">
+                {props.iconBefore && (
+                  <Stack
+                    pos={'absolute'}
+                    top="50%"
+                    p={'$3'}
+                    left={2}
+                    transform={'translateY(-50%)'}
+                    zIndex={1}
+                  >
+                    {props.iconBefore}
+                  </Stack>
+                )}
+                <Input
+                  aria-label={label ?? field.name}
+                  disabled={disabled}
+                  maxLength={maxLength}
+                  borderWidth={0}
+                  borderRadius={'$4'}
+                  fontSize={'$5'}
+                  fontStyle={field.value ? 'normal' : 'italic'}
+                  fontWeight={field.value ? 'bold' : 'normal'}
+                  $theme-dark={{
+                    ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
+                  }}
+                  $theme-light={{
+                    ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
+                  }}
+                  spellCheck={isEmail ? false : undefined}
+                  autoCapitalize={isEmail ? 'none' : undefined}
+                  keyboardType={isEmail ? 'email-address' : undefined}
+                  value={field.value ?? ''}
+                  onChangeText={(text) => field.onChange(text)}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                  placeholder={placeholder}
+                  id={id}
+                  focusStyle={{
+                    borderColor: '$color12',
+                  }}
+                  position="relative"
+                  {...props}
+                />
+                {props.iconAfter && (
+                  <Stack
+                    pos={'absolute'}
+                    top="50%"
+                    p={'$3'}
+                    right={2}
+                    transform={'translateY(-50%)'}
+                    zIndex={1}
+                  >
+                    {props.iconAfter}
+                  </Stack>
+                )}
+              </Stack>
             </Tooltip.Trigger>
           </Tooltip>
         </Shake>

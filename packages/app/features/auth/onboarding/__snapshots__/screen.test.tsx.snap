@@ -122,172 +122,180 @@ exports[`OnboardingScreen 1`] = `
                 }
               }
             >
-              <TextInput
-                aria-label="Account name"
-                autoFocus={true}
-                control={
-                  {
-                    "_defaultValues": {
-                      "accountName": "mock",
-                    },
-                    "_disableForm": [Function],
-                    "_executeSchema": [Function],
-                    "_fields": {
-                      "accountName": {
-                        "_f": {
-                          "mount": true,
-                          "name": "accountName",
-                          "ref": {
-                            "name": "accountName",
-                          },
-                          "value": "mock",
-                        },
-                      },
-                    },
-                    "_formState": {
-                      "dirtyFields": {},
-                      "disabled": false,
-                      "errors": {},
-                      "isDirty": false,
-                      "isLoading": false,
-                      "isSubmitSuccessful": false,
-                      "isSubmitted": false,
-                      "isSubmitting": false,
-                      "isValid": true,
-                      "isValidating": false,
-                      "submitCount": 0,
-                      "touchedFields": {},
-                    },
-                    "_formValues": {
-                      "accountName": "mock",
-                    },
-                    "_getDirty": [Function],
-                    "_getFieldArray": [Function],
-                    "_getWatch": [Function],
-                    "_names": {
-                      "array": Set {},
-                      "focus": "",
-                      "mount": Set {
-                        "accountName",
-                      },
-                      "unMount": Set {},
-                      "watch": Set {},
-                      "watchAll": false,
-                    },
-                    "_options": {
-                      "mode": "onSubmit",
-                      "reValidateMode": "onChange",
-                      "shouldFocusError": true,
-                    },
-                    "_proxyFormState": {
-                      "dirtyFields": false,
-                      "disabled": true,
-                      "errors": true,
-                      "isDirty": false,
-                      "isSubmitting": true,
-                      "isValid": true,
-                      "isValidating": false,
-                      "touchedFields": false,
-                    },
-                    "_removeUnmounted": [Function],
-                    "_reset": [Function],
-                    "_resetDefaultValues": [Function],
-                    "_state": {
-                      "action": false,
-                      "mount": true,
-                      "watch": false,
-                    },
-                    "_subjects": {
-                      "array": {
-                        "next": [Function],
-                        "observers": [],
-                        "subscribe": [Function],
-                        "unsubscribe": [Function],
-                      },
-                      "state": {
-                        "next": [Function],
-                        "observers": [
-                          {
-                            "next": [Function],
-                          },
-                          {
-                            "next": [Function],
-                          },
-                          {
-                            "next": [Function],
-                          },
-                        ],
-                        "subscribe": [Function],
-                        "unsubscribe": [Function],
-                      },
-                      "values": {
-                        "next": [Function],
-                        "observers": [
-                          {
-                            "next": [Function],
-                          },
-                        ],
-                        "subscribe": [Function],
-                        "unsubscribe": [Function],
-                      },
-                    },
-                    "_updateDisabledField": [Function],
-                    "_updateFieldArray": [Function],
-                    "_updateFormState": [Function],
-                    "_updateValid": [Function],
-                    "getFieldState": [Function],
-                    "handleSubmit": [Function],
-                    "register": [Function],
-                    "setError": [Function],
-                    "unregister": [Function],
-                  }
-                }
-                focusVisibleStyle={{}}
-                focusable={true}
-                fontVariant={
-                  [
-                    "tabular-nums",
-                  ]
-                }
-                id=":r0:"
-                name="accountName"
-                onBlur={[Function]}
-                onChangeText={[Function]}
-                onFocus={[Function]}
-                placeholder="My Send Account"
-                placeholderTextColor="#081619"
-                readOnly={false}
+              <View
                 style={
                   {
-                    "backgroundColor": "transparent",
-                    "borderBottomColor": "#40FB50",
-                    "borderBottomLeftRadius": 0,
-                    "borderBottomRightRadius": 0,
-                    "borderBottomWidth": 2,
-                    "borderLeftColor": "#111f22",
-                    "borderLeftWidth": 0,
-                    "borderRightColor": "#111f22",
-                    "borderRightWidth": 0,
-                    "borderStyle": "solid",
-                    "borderTopColor": "#111f22",
-                    "borderTopLeftRadius": 0,
-                    "borderTopRightRadius": 0,
-                    "borderTopWidth": 0,
-                    "color": "#FFFFFF",
-                    "fontFamily": "System",
-                    "fontSize": 20,
-                    "fontStyle": "normal",
-                    "fontWeight": "400",
-                    "height": 44,
-                    "minWidth": 0,
-                    "paddingLeft": 16,
-                    "paddingRight": 16,
                     "position": "relative",
-                    "width": "100%",
                   }
                 }
-                value="mock"
-              />
+              >
+                <TextInput
+                  aria-label="Account name"
+                  autoFocus={true}
+                  control={
+                    {
+                      "_defaultValues": {
+                        "accountName": "mock",
+                      },
+                      "_disableForm": [Function],
+                      "_executeSchema": [Function],
+                      "_fields": {
+                        "accountName": {
+                          "_f": {
+                            "mount": true,
+                            "name": "accountName",
+                            "ref": {
+                              "name": "accountName",
+                            },
+                            "value": "mock",
+                          },
+                        },
+                      },
+                      "_formState": {
+                        "dirtyFields": {},
+                        "disabled": false,
+                        "errors": {},
+                        "isDirty": false,
+                        "isLoading": false,
+                        "isSubmitSuccessful": false,
+                        "isSubmitted": false,
+                        "isSubmitting": false,
+                        "isValid": true,
+                        "isValidating": false,
+                        "submitCount": 0,
+                        "touchedFields": {},
+                      },
+                      "_formValues": {
+                        "accountName": "mock",
+                      },
+                      "_getDirty": [Function],
+                      "_getFieldArray": [Function],
+                      "_getWatch": [Function],
+                      "_names": {
+                        "array": Set {},
+                        "focus": "",
+                        "mount": Set {
+                          "accountName",
+                        },
+                        "unMount": Set {},
+                        "watch": Set {},
+                        "watchAll": false,
+                      },
+                      "_options": {
+                        "mode": "onSubmit",
+                        "reValidateMode": "onChange",
+                        "shouldFocusError": true,
+                      },
+                      "_proxyFormState": {
+                        "dirtyFields": false,
+                        "disabled": true,
+                        "errors": true,
+                        "isDirty": false,
+                        "isSubmitting": true,
+                        "isValid": true,
+                        "isValidating": false,
+                        "touchedFields": false,
+                      },
+                      "_removeUnmounted": [Function],
+                      "_reset": [Function],
+                      "_resetDefaultValues": [Function],
+                      "_state": {
+                        "action": false,
+                        "mount": true,
+                        "watch": false,
+                      },
+                      "_subjects": {
+                        "array": {
+                          "next": [Function],
+                          "observers": [],
+                          "subscribe": [Function],
+                          "unsubscribe": [Function],
+                        },
+                        "state": {
+                          "next": [Function],
+                          "observers": [
+                            {
+                              "next": [Function],
+                            },
+                            {
+                              "next": [Function],
+                            },
+                            {
+                              "next": [Function],
+                            },
+                          ],
+                          "subscribe": [Function],
+                          "unsubscribe": [Function],
+                        },
+                        "values": {
+                          "next": [Function],
+                          "observers": [
+                            {
+                              "next": [Function],
+                            },
+                          ],
+                          "subscribe": [Function],
+                          "unsubscribe": [Function],
+                        },
+                      },
+                      "_updateDisabledField": [Function],
+                      "_updateFieldArray": [Function],
+                      "_updateFormState": [Function],
+                      "_updateValid": [Function],
+                      "getFieldState": [Function],
+                      "handleSubmit": [Function],
+                      "register": [Function],
+                      "setError": [Function],
+                      "unregister": [Function],
+                    }
+                  }
+                  focusVisibleStyle={{}}
+                  focusable={true}
+                  fontVariant={
+                    [
+                      "tabular-nums",
+                    ]
+                  }
+                  id=":r0:"
+                  name="accountName"
+                  onBlur={[Function]}
+                  onChangeText={[Function]}
+                  onFocus={[Function]}
+                  placeholder="My Send Account"
+                  placeholderTextColor="#081619"
+                  readOnly={false}
+                  style={
+                    {
+                      "backgroundColor": "transparent",
+                      "borderBottomColor": "#40FB50",
+                      "borderBottomLeftRadius": 0,
+                      "borderBottomRightRadius": 0,
+                      "borderBottomWidth": 2,
+                      "borderLeftColor": "#111f22",
+                      "borderLeftWidth": 0,
+                      "borderRightColor": "#111f22",
+                      "borderRightWidth": 0,
+                      "borderStyle": "solid",
+                      "borderTopColor": "#111f22",
+                      "borderTopLeftRadius": 0,
+                      "borderTopRightRadius": 0,
+                      "borderTopWidth": 0,
+                      "color": "#FFFFFF",
+                      "fontFamily": "System",
+                      "fontSize": 20,
+                      "fontStyle": "normal",
+                      "fontWeight": "400",
+                      "height": 44,
+                      "minWidth": 0,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "position": "relative",
+                      "width": "100%",
+                    }
+                  }
+                  value="mock"
+                />
+              </View>
             </View>
             <View
               style={

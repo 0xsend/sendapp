@@ -7,10 +7,12 @@ import {
   Paragraph,
   ScrollView,
   Spinner,
+  Text,
   XStack,
   YStack,
 } from '@my/ui'
-
+import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
+import Search from '../../components/SearchBar'
 import { RecentActivity } from './RecentActivity'
 
 const suggestions = [
@@ -25,33 +27,52 @@ const suggestions = [
 
 export function ActivityScreen() {
   return (
-    <YStack f={1} width={'100%'} pb="$3">
-      <ActivityBody />
-    </YStack>
+    <TagSearchProvider>
+      <YStack f={1} width={'100%'} pb="$3" $lg={{ pt: '$3' }}>
+        <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
+          <Search />
+        </YStack>
+        <ActivityBody />
+      </YStack>
+    </TagSearchProvider>
   )
 }
 
 function ActivityBody() {
+  const { isLoading, results, error } = useTagSearch()
+
   return (
     <AnimatePresence>
-      <YStack
-        key="suggestions"
-        animation="quick"
-        gap="$size.1.5"
-        mb="$4"
-        mt="$6"
-        $gtSm={{ gap: '$size.2.5' }}
-        exitStyle={{
-          opacity: 0,
-          y: 10,
-        }}
-      >
-        {/*
+      {error && (
+        <YStack key="red" gap="$4" mb="$4">
+          <H4 theme={'alt2'}>Error</H4>
+          <Text>{error.message.split('.').at(0)}</Text>
+        </YStack>
+      )}
+
+      <Search.Results />
+
+      {results === null && !isLoading && !error && (
+        <YStack
+          key="suggestions"
+          animation="quick"
+          gap="$size.1.5"
+          mb="$4"
+          mt="$6"
+          $gtSm={{ gap: '$size.2.5' }}
+          exitStyle={{
+            opacity: 0,
+            y: 10,
+          }}
+        >
+          {/*
             <Separator $gtMd={{ display: 'none' }} />
             <Suggestions />
           */}
-        <RecentActivity />
-      </YStack>
+
+          <RecentActivity />
+        </YStack>
+      )}
     </AnimatePresence>
   )
 }
