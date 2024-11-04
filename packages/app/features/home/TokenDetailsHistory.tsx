@@ -21,6 +21,7 @@ export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
     hasNextPage,
   } = result
   const { pages } = data ?? {}
+  if (isLoadingActivities) return <Spinner size="small" />
   return (
     <>
       <Label fontSize={'$6'} fontWeight={'500'} color="$color12">
@@ -28,8 +29,6 @@ export const TokenDetailsHistory = ({ coin }: { coin: coins[number] }) => {
       </Label>
       {(() => {
         switch (true) {
-          case isLoadingActivities:
-            return <Spinner size="small" />
           case activitiesError !== null:
             return (
               <Paragraph maxWidth={'600'} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
