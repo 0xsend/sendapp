@@ -9,11 +9,6 @@ import {
   Paragraph,
   H3,
 } from '@my/ui'
-import { useSendAccount } from 'app/utils/send-accounts'
-import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import { parseUnits } from 'viem'
-import { coinsDict } from 'app/data/coins'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { HomeButtons } from '../features/home/HomeButtons'
 import { useScrollDirection } from '../provider/scroll'
 import { ProfileButtons } from 'app/features/profile/ProfileButtons'
@@ -24,6 +19,7 @@ import { useMonthlyDistributions } from 'app/utils/distributions'
 import { DistributionClaimButton } from 'app/features/account/rewards/components/DistributionClaimButton'
 import formatAmount from 'app/utils/formatAmount'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 
 const Row = styled(XStack, {
   w: '100%',
@@ -85,15 +81,8 @@ const MobileButtonRow = ({
 }
 
 const Home = ({ children, ...props }: XStackProps) => {
-  const { isLoading: isLoadingSendAccount } = useSendAccount()
-  const { balances, isLoading: isLoadingBalances } = useSendAccountBalances()
   const selectedCoin = useCoinFromTokenParam()
-  const usdcBalance = balances?.USDC
-  const canSend =
-    usdcBalance !== undefined &&
-    usdcBalance >= parseUnits('.20', coinsDict[usdcAddress[baseMainnet.id]].decimals)
-
-  const isLoading = isLoadingSendAccount || isLoadingBalances
+  const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
   return (
     <>
@@ -102,7 +91,7 @@ const Home = ({ children, ...props }: XStackProps) => {
         <Row {...props}>
           {(() => {
             switch (true) {
-              case !canSend:
+              case !isSendingUnlocked:
                 return null
               case selectedCoin !== undefined:
                 return (
