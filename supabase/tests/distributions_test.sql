@@ -1,6 +1,8 @@
+SET client_min_messages TO NOTICE;
+
 BEGIN;
 SELECT
-    plan(20);
+    plan(26);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -9,6 +11,143 @@ SELECT
     tests.create_supabase_user('bob');
 SELECT
     tests.create_supabase_user('alice');
+SELECT
+    tests.create_supabase_user('recipient1');
+SELECT
+    tests.create_supabase_user('recipient2');
+SELECT
+    tests.create_supabase_user('recipient3');
+SELECT
+    tests.create_supabase_user('recipient4');
+SELECT
+    tests.create_supabase_user('recipient5');
+SELECT
+    tests.create_supabase_user('recipient6');
+SELECT
+    tests.create_supabase_user('recipient7');
+-- First set up the send_account_created entries for all addresses
+INSERT INTO send_account_created(
+    chain_id,
+    log_addr,
+    block_time,
+    user_op_hash,
+    tx_hash,
+    account,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx)
+VALUES (
+    -- For bob
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xB0B0000000000000000000000000000000000000',
+    'send_account_created',
+    'send_account_created',
+    1,
+    0,
+    0),
+-- For alice
+(
+    8453, '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')), '\x1234', '\x1234', '\xa71ce00000000000000000000000000000000000', 'send_account_created', 'send_account_created', 2, 0, 0),
+-- For recipient1-4
+(
+    8453, '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')), '\x1234', '\x1234', '\xa71ce00000000000000000000000000000000001', 'send_account_created', 'send_account_created', 3, 1, 0),
+(
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xa71ce00000000000000000000000000000000002',
+    'send_account_created',
+    'send_account_created',
+    4,
+    2,
+    0),
+(
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xa71ce00000000000000000000000000000000003',
+    'send_account_created',
+    'send_account_created',
+    5,
+    3,
+    0),
+(
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xa71ce00000000000000000000000000000000004',
+    'send_account_created',
+    'send_account_created',
+    6,
+    4,
+    0),
+(
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xa71ce00000000000000000000000000000000005',
+    'send_account_created',
+    'send_account_created',
+    7,
+    4,
+    0),
+(
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xa71ce00000000000000000000000000000000006',
+    'send_account_created',
+    'send_account_created',
+    8,
+    4,
+    0),
+(
+    8453,
+    '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    floor(
+        extract(
+            EPOCH FROM timestamptz '2013-07-01 12:00:00')),
+    '\x1234',
+    '\x1234',
+    '\xa71ce00000000000000000000000000000000007',
+    'send_account_created',
+    'send_account_created',
+    9,
+    4,
+    0);
+-- Create send accounts
 INSERT INTO send_accounts(
     user_id,
     address,
@@ -17,13 +156,55 @@ INSERT INTO send_accounts(
 VALUES (
     tests.get_supabase_uid(
         'bob'),
-    '0xb0b0000000000000000000000000000000000000', -- matches sender
+    '0xB0B0000000000000000000000000000000000000',
     1,
     '\\x00112233445566778899AABBCCDDEEFF'),
 (
     tests.get_supabase_uid(
         'alice'),
-    '0xa71ce00000000000000000000000000000000000', -- matches sender
+    '0xa71ce00000000000000000000000000000000000',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient1'),
+    '0xa71ce00000000000000000000000000000000001',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient2'),
+    '0xa71ce00000000000000000000000000000000002',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient3'),
+    '0xa71ce00000000000000000000000000000000003',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient4'),
+    '0xa71ce00000000000000000000000000000000004',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient5'),
+    '0xa71ce00000000000000000000000000000000005',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient6'),
+    '0xa71ce00000000000000000000000000000000006',
+    1,
+    '\\x00112233445566778899AABBCCDDEEFF'),
+(
+    tests.get_supabase_uid(
+        'recipient7'),
+    '0xa71ce00000000000000000000000000000000007',
     1,
     '\\x00112233445566778899AABBCCDDEEFF');
 -- bob can register and confirm tags with valid receipts
@@ -64,14 +245,14 @@ VALUES (
     1000000,
     1000000,(
         SELECT
-            now() - interval '1 day'),
+            CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '1 hour'),
 (
         SELECT
-            now() + interval '1 day'),
+            CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '10 days'),
         1e6::bigint,
 (
             SELECT
-                now() + interval '2 day'),
+                CURRENT_TIMESTAMP AT TIME ZONE 'UTC' + interval '11 days'),
             8453);
 INSERT INTO public.distribution_verification_values(
     type,
@@ -109,7 +290,6 @@ INSERT INTO public.distribution_verification_values(
     bips_value,
     multiplier_max,
     multiplier_step,
-    mode,
     distribution_id)
 VALUES (
     'total_tag_referrals' ::public.verification_type,
@@ -117,7 +297,6 @@ VALUES (
     0,
     2.0,
     0.02,
-    'aggregate',
 (
         SELECT
             id
@@ -126,6 +305,34 @@ VALUES (
         WHERE
             "number" = 123
         LIMIT 1));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_streak',
+    0,
+    500,(
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123));
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    distribution_id)
+VALUES (
+    'send_ten',
+    0,
+    500,(
+        SELECT
+            id
+        FROM distributions
+        WHERE
+            number = 123));
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distributions WHERE number = 123', $$
     VALUES (1) $$, 'Service role should be able to create distributions');
@@ -336,7 +543,7 @@ VALUES (
     0,
     1234567890,
     0,
-    '\xb0b0000000000000000000000000000000000000',
+    '\xB0B0000000000000000000000000000000000000', -- Fixed: Changed to match Bob's address case
     1,
     '\x0000000000000000000000000000000000000000',
     0);
@@ -347,7 +554,7 @@ SELECT
                 event_id
             FROM sendtag_checkout_receipts
             WHERE
-                sender = '\xb0b0000000000000000000000000000000000000'), NULL);
+                sender = '\xB0B0000000000000000000000000000000000000'), NULL);
 SELECT
     results_eq($$
         SELECT
@@ -447,7 +654,289 @@ SELECT
                 user_id = tests.get_supabase_uid('bob')
                 AND type = 'total_tag_referrals' $$, $$
             VALUES (1) $$, 'Verification for total tag referral should be inserted');
+-- Test streak verification
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'send_streak' $$, $$
+            VALUES (0) $$, 'No streak verification should exist initially');
+-- Test send_ten verification
+SELECT
+    results_eq($$
+        SELECT
+            COUNT(*)::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'send_ten' $$, $$
+            VALUES (0) $$, 'No send ten verification should exist initially');
+-- Insert 3-day streak transfers (with unique recipients)
+INSERT INTO send_account_transfers(
+    f,
+    t,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    v,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000' ::bytea,
+    '\xa71ce00000000000000000000000000000000000' ::bytea,
+    EXTRACT(
+        EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901236'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    1,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea),
+('\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000001'::bytea,
+    EXTRACT(EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '25 hours')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901237'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    2,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea),
+('\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000002'::bytea,
+    EXTRACT(EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '49 hours')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901238'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    3,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea);
+SELECT
+    results_eq($$
+        SELECT
+            weight::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'send_streak' $$, $$
+            VALUES (3) $$, 'Streak verification should show 3-day streak');
+-- Insert broken streak transfer (with unique recipient)
+INSERT INTO send_account_transfers(
+    f,
+    t,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    v,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000' ::bytea,
+    '\xa71ce00000000000000000000000000000000003' ::bytea,
+    EXTRACT(
+        EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '120 hours')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901239'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    4,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea);
+SELECT
+    results_eq($$
+        SELECT
+            weight::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'send_streak' $$, $$
+            VALUES (3) $$, 'Broken send streak should not increase it');
+-- Insert same-day transfers
+INSERT INTO send_account_transfers(
+    f,
+    t,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    v,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000' ::bytea,
+    '\xa71ce00000000000000000000000000000000004' ::bytea,
+    EXTRACT(
+        EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x123456789012345678901234567890123456789012345678901234567890123a'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    5,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea),
+('\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000005'::bytea,
+    EXTRACT(EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x123456789012345678901234567890123456789012345678901234567890123b'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    6,
+    1,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea);
+SELECT
+    results_eq($$
+        SELECT
+            weight::integer FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'send_streak' $$, $$
+            VALUES (3) $$, 'Multiple transfers to different recipients in same day should not increase streak');
+-- Insert set of transfers - one with send account, one without, one with same send account
+INSERT INTO send_account_transfers(
+    f,
+    t,
+    block_time,
+    chain_id,
+    tx_hash,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx,
+    v,
+    log_addr)
+VALUES (
+    '\xB0B0000000000000000000000000000000000000' ::bytea,
+    '\xa71ce00000000000000000000000000000000006' ::bytea,
+    EXTRACT(
+        EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901234'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    7,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea),
+('\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000069'::bytea,
+    EXTRACT(EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x123456789012345678901234567890123456789012345678901234567890123a'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    8,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea),
+('\xB0B0000000000000000000000000000000000000'::bytea,
+    '\xa71ce00000000000000000000000000000000006'::bytea,
+    EXTRACT(EPOCH FROM ((
+            SELECT
+                qualification_start
+            FROM distributions
+            WHERE
+                number = 123) + interval '1 hour')),
+    8453,
+    '\x1234567890123456789012345678901234567890123456789012345678901234'::bytea,
+    'send_account_transfers',
+    'send_account_transfers',
+    9,
+    0,
+    0,
+    0,
+    1000000000000000000,
+    '\x5afe000000000000000000000000000000000000'::bytea);
+SELECT
+    results_eq($$
+        SELECT
+            metadata ->> 'value' FROM distribution_verifications
+            WHERE
+                user_id = tests.get_supabase_uid('bob')
+                AND type = 'send_ten' $$, $$
+            VALUES ('8') $$, 'Should only count the recipient with a send account');
 SELECT
     finish();
 ROLLBACK;
+
+RESET client_min_messages;
 
