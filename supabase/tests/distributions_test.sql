@@ -290,7 +290,6 @@ INSERT INTO public.distribution_verification_values(
     bips_value,
     multiplier_max,
     multiplier_step,
-    mode,
     distribution_id)
 VALUES (
     'total_tag_referrals' ::public.verification_type,
@@ -298,7 +297,6 @@ VALUES (
     0,
     2.0,
     0.02,
-    'aggregate',
 (
         SELECT
             id
