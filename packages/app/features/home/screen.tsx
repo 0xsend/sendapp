@@ -12,21 +12,19 @@ import {
   H1,
   Theme,
 } from '@my/ui'
-import { coins, coinsDict } from 'app/data/coins'
+import { coins } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { TokenBalanceCard } from './TokenBalanceCard'
 import { TokenBalanceList } from './TokenBalanceList'
 import { TokenDetails } from './TokenDetails'
-import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import Search from 'app/components/SearchBar'
 import { useTagSearch } from 'app/provider/tag-search'
 import { DepositAddress } from 'app/components/DepositAddress'
 import { useRootScreenParams } from 'app/routers/params'
-import { parseUnits } from 'viem'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { HomeButtons } from './HomeButtons'
 import { AlertCircle } from '@tamagui/lucide-icons'
+import { useIsSendingUnlocked } from 'app/utils/useIsSendingUnlocked'
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
@@ -50,17 +48,11 @@ function SendSearchBody() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
+  const { data: sendAccount } = useSendAccount()
   const selectedCoin = useCoinFromTokenParam()
-  const { balances, isLoading: balancesIsLoading } = useSendAccountBalances()
+  const { isSendingUnlocked, isLoading } = useIsSendingUnlocked()
 
-  const usdcBalance = balances?.USDC
-
-  const canSend =
-    usdcBalance !== undefined &&
-    usdcBalance >= parseUnits('.05', coinsDict[usdcAddress[baseMainnet.id]].decimals)
-
-  if (balancesIsLoading || isSendAccountLoading)
+  if (isLoading)
     return (
       <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
         <Spinner size="large" />
@@ -76,7 +68,7 @@ function HomeBody(props: XStackProps) {
         gap="$5"
         ai={'center'}
       >
-        {!canSend ? (
+        {!isSendingUnlocked ? (
           <>
             <Card p={'$4.5'} ai={'center'} gap="$5" jc="space-around" w={'100%'}>
               <YStack gap="$6" jc="center" ai="center">
@@ -109,7 +101,7 @@ function HomeBody(props: XStackProps) {
             <TokenBalanceList coins={coins} />
           </YStack>
         </YStack>
-        {canSend && (
+        {isSendingUnlocked && (
           <XStack $lg={{ display: 'none' }} pt={'$4'} jc={'center'} gap={'$4'} w="100%">
             <Stack f={1} w="50%" flexDirection="row-reverse" maw={350}>
               <HomeButtons.GhostDepositButton />
