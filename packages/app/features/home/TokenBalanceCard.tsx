@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
 import { type Timer, useStopwatch } from 'react-use-precision-timer'
 
-const GreenSquare = styled(Stack, {
+export const GreenSquare = styled(Stack, {
   name: 'Surface',
   w: 11,
   h: 11,
