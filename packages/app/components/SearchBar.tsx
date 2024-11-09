@@ -453,7 +453,13 @@ function Search({ label, placeholder = 'Sendtag, Phone, Send ID, Address' }: Sea
   return (
     <>
       {label !== undefined && (
-        <H4 color="$gray11Light" fontFamily={'$mono'} fontWeight={'500'} size={'$5'}>
+        <H4
+          color="$gray11Light"
+          fontFamily={'$mono'}
+          fontWeight={'500'}
+          size={'$5'}
+          tt={'uppercase'}
+        >
           {label}
         </H4>
       )}

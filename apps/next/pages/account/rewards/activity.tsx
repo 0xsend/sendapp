@@ -21,7 +21,7 @@ export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
   <MobileButtonRowLayout.ActivityRewards>
-    <HomeLayout TopNav={<TopNav header="Activity Rewards" backToBasePath={false} />}>
+    <HomeLayout TopNav={<TopNav header="Activity Rewards" backFunction={'pop'} />}>
       {children}
     </HomeLayout>
   </MobileButtonRowLayout.ActivityRewards>

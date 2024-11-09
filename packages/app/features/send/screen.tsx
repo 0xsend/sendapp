@@ -32,9 +32,9 @@ export const SendScreen = () => {
   if (!profile)
     return (
       <TagSearchProvider>
-        <YStack f={1} width={'100%'} pb="$4" gap="$6">
+        <YStack f={1} width={'100%'} pb="$4" gap="$6" $lg={{ pt: '$3' }}>
           <YStack width={'100%'} gap="$size.1.5" $gtSm={{ gap: '$size.2.5' }}>
-            <Search label="SEARCH BY" />
+            <Search />
           </YStack>
           <SendSearchBody />
         </YStack>
@@ -45,12 +45,7 @@ export const SendScreen = () => {
     // handle when user has no send account
     return <NoSendAccount profile={profile} />
 
-  return (
-    <SendAmountForm />
-    // <Container $gtLg={{ jc: 'flex-start' }} flexDirection="column" jc="center" ai="center" f={1}>
-    //   <SendAmountForm />
-    // </Container>
-  )
+  return <SendAmountForm />
 }
 
 function SendSearchBody() {

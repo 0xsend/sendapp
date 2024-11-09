@@ -3,8 +3,9 @@ import {
   Container,
   H2,
   Header,
+  Paragraph,
   Stack,
-  useSafeAreaInsets,
+  usePwa,
   XStack,
   type ButtonProps,
 } from '@my/ui'
@@ -15,47 +16,66 @@ import { useRouter } from 'solito/router'
 
 export function SendTopNav() {
   const [sendParams] = useSendScreenParams()
-  const { push } = useRouter()
+  const { back } = useRouter()
   const path = usePathname()
-  const parts = path.split('/').filter(Boolean)
-  const { sat } = useSafeAreaInsets()
 
-  const handleBack = () => {
-    // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
-    // else, go to home page
-    const newPath = parts.slice(0, -1).join('/')
-    push(`/${newPath}`)
-  }
+  const isPwa = usePwa()
 
   return (
-    <Header w="100%" pb="$6">
+    <Header w="100%">
       <Container
         $gtLg={{ jc: 'flex-start', pb: '$2', ai: 'flex-start' }}
         ai="center"
         jc="space-between"
-        safeAreaPadding={'t'}
-        $lg={{ pt: sat === '0px' && '$5', pb: '$5' }}
+        safeAreaPadding={isPwa && 't'}
+        $lg={{ pt: !isPwa && '$5', pb: '$3' }}
       >
-        <Button
-          onPress={handleBack}
-          $gtLg={{ display: 'none' }}
-          icon={
-            <IconArrowLeft size={'$2.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-          }
-        />
-        <Stack $lg={{ f: 1 }}>
+        <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
+          <Button
+            onPress={back}
+            icon={
+              <IconArrowLeft
+                size={'$1.5'}
+                color={'$primary'}
+                $theme-light={{ color: '$color12' }}
+              />
+            }
+          />
+          <Paragraph size={'$8'} col={'$color10'}>
+            {(() => {
+              switch (true) {
+                case path.includes('/confirm'):
+                  return 'Preview And Send'
+                case Boolean(sendParams.recipient):
+                  return 'Enter Amount'
+                default:
+                  return 'Select Recipient'
+              }
+            })()}
+          </Paragraph>
+        </XStack>
+        <Stack $lg={{ display: 'none' }} jc="center">
           <H2
             fontWeight={'300'}
             $theme-light={{ col: '$gray10Light' }}
             $theme-dark={{ col: '$gray8Light' }}
             lineHeight={32}
             display={'flex'}
-            als={'center'}
+            $lg={{ als: 'flex-end' }}
           >
-            {sendParams.recipient ? 'Enter Amount' : 'Select Recipient'}
+            {' '}
+            {(() => {
+              switch (true) {
+                case path.includes('/confirm'):
+                  return 'Preview And Send'
+                case Boolean(sendParams.recipient):
+                  return 'Enter Amount'
+                default:
+                  return ''
+              }
+            })()}
           </H2>
         </Stack>
-        <XStack w={0} h={0} $lg={{ f: 1 }} />
       </Container>
     </Header>
   )

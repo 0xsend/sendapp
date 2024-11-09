@@ -96,7 +96,6 @@ describe('SendScreen', () => {
 
     expect(tree).toMatchSnapshot('render')
 
-    expect(await screen.findByText('SEARCH BY')).toBeOnTheScreen()
     expect(params.useRootScreenParams).toHaveBeenCalled()
 
     const searchBy = await screen.findByRole('search', { name: 'query' })
