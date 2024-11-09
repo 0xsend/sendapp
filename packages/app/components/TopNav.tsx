@@ -11,8 +11,6 @@ import {
   Separator,
   useToastController,
   type ButtonProps,
-  ButtonText,
-  View,
   usePwa,
   Avatar,
 } from '@my/ui'
@@ -49,9 +47,9 @@ interface TopNavProps {
   noSubroute?: boolean
   /**
    * Whether the back arrow navigates to the base path
-   * @default true
+   * @default "root"
    */
-  backToBasePath?: boolean
+  backFunction?: 'root' | 'pop' | 'router' | 'home'
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
@@ -91,12 +89,12 @@ export function TopNav({
   showLogo = false,
   button,
   noSubroute = false,
-  backToBasePath = true,
+  backFunction = 'root',
 }: TopNavProps) {
   const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
-  const { push } = useRouter()
+  const { push, back } = useRouter()
   const media = useMedia()
   const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
@@ -119,17 +117,29 @@ export function TopNav({
       setRootParams({ ...queryParams, token: undefined })
       return
     }
-    const newPath =
-      backToBasePath && parts.length > 1
-        ? parts.slice(0, 1).join('/')
-        : parts.slice(0, parts.length - 1).join('/')
+    if (backFunction === 'router') {
+      return back()
+    }
+
+    const newPath = () => {
+      switch (backFunction) {
+        case 'home':
+          return '/'
+        case 'root':
+          return parts.slice(0, 1).join('/')
+        case 'pop':
+          return parts.slice(0, parts.length - 1).join('/')
+        default:
+          return parts.slice(0, parts.length - 1).join('/')
+      }
+    }
 
     if (path.includes('/settings')) {
-      push(`/${newPath}?nav=settings`)
+      push(`/${newPath()}?nav=settings`)
       return
     }
 
-    push(`/${newPath}`)
+    push(`/${newPath()}`)
   }
   //@todo Refactor this so we can put back arrows on screens that need it
   const isSubRoute =

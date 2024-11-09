@@ -9,7 +9,7 @@ import { userOnboarded } from 'utils/userOnboarded'
 import { CheckoutTagSchema } from 'app/features/account/sendtag/checkout/CheckoutTagSchema'
 import { assert } from 'app/utils/assert'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { TopNav } from 'app/components/TopNav'
 import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 
 export const Page: NextPageWithLayout<{ sendid: number | null }> = ({ sendid }) => {
@@ -84,9 +84,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
 Page.getLayout = (children) => (
   <MobileButtonRowLayout.Profile>
-    <HomeLayout TopNav={<TopNav header="Profile" noSubroute button={ButtonOption.PROFILE} />}>
-      {children}
-    </HomeLayout>
+    <HomeLayout TopNav={<TopNav header="Profile" backFunction="router" />}>{children}</HomeLayout>
   </MobileButtonRowLayout.Profile>
 )
 

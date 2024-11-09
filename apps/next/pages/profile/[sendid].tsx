@@ -7,7 +7,7 @@ import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { supabaseAdmin } from 'app/utils/supabase/admin'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { TopNav } from 'app/components/TopNav'
 import { MobileButtonRowLayout } from 'app/components/MobileButtonRowLayout'
 
 export const Page: NextPageWithLayout = () => {
@@ -69,9 +69,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
 Page.getLayout = (children) => (
   <MobileButtonRowLayout.Profile>
-    <HomeLayout TopNav={<TopNav header="Profile" noSubroute button={ButtonOption.PROFILE} />}>
-      {children}
-    </HomeLayout>
+    <HomeLayout TopNav={<TopNav header="Profile" backFunction="router" />}>{children}</HomeLayout>
   </MobileButtonRowLayout.Profile>
 )
 
