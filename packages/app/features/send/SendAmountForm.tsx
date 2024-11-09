@@ -103,9 +103,9 @@ export function SendAmountForm() {
                 switch (true) {
                   case formAmount === undefined:
                     return '$14'
-                  case formAmount.length > 9:
-                    return '$11'
                   case formAmount.length > 6:
+                    return '$11'
+                  case formAmount.length > 9:
                     return '$9'
                   default:
                     return '$14'
