@@ -57,6 +57,7 @@ export function SendAmountForm() {
 
   const sendToken = sendParams.sendToken ?? usdcAddress[baseMainnet.id]
   const parsedAmount = BigInt(sendParams.amount ?? '0')
+  const formAmount = form.watch('amount')
 
   const canSubmit =
     !balanceIsLoading &&
@@ -98,10 +99,33 @@ export function SendAmountForm() {
             $sm: {
               bc: 'transparent',
               w: '100%',
-              ta: 'center',
+              fontSize: (() => {
+                switch (true) {
+                  case formAmount === undefined:
+                    return '$14'
+                  case formAmount.length > 9:
+                    return '$11'
+                  case formAmount.length > 6:
+                    return '$9'
+                  default:
+                    return '$14'
+                }
+              })(),
             },
             color: '$color12',
-            fontSize: 112,
+            fontSize: (() => {
+              switch (true) {
+                case formAmount === undefined:
+                  return 112
+                case formAmount.length > 9:
+                  return '$12'
+
+                case formAmount.length > 6:
+                  return '$13'
+                default:
+                  return 112
+              }
+            })(),
             fontWeight: '400',
             lineHeight: '$1',
             autoFocus: true,
