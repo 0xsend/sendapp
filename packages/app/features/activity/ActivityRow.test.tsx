@@ -38,7 +38,7 @@ describe('ActivityRow', () => {
     )
     expect(screen.getByText('Deposit')).toBeOnTheScreen()
     expect(screen.getByText('0.019032 USDC')).toBeOnTheScreen()
-    expect(screen.getByText('0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf')).toBeOnTheScreen() // show senders address if not a send app user
+    expect(screen.getByText('0x760...27cf')).toBeOnTheScreen() // show senders address if not a send app user
   })
 
   it('should render send account transfers event when sent and receiver is a send app user', () => {

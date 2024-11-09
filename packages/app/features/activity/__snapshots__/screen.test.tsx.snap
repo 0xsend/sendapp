@@ -1043,7 +1043,7 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
                     }
                     suppressHighlighting={true}
                   >
-                    0x760E2928C3aa3aF87897bE52eb4833d42bbB27cf
+                    0x760...27cf
                   </Text>
                   <Text
                     style={
