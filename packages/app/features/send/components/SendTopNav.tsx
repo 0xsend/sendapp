@@ -33,6 +33,7 @@ export function SendTopNav() {
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
           <Button
             onPress={back}
+            jc="flex-start"
             icon={
               <IconArrowLeft
                 size={'$1.5'}

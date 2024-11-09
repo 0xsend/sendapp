@@ -97,7 +97,8 @@ export function TopNav({
       return
     }
     if (backFunction === 'router') {
-      return back()
+      back()
+      return
     }
 
     const newPath = () => {
@@ -150,6 +151,7 @@ export function TopNav({
               return (
                 <XStack ai="center" f={1}>
                   <Button
+                    jc="flex-start"
                     onPress={handleBack}
                     icon={
                       <IconArrowLeft
@@ -187,6 +189,7 @@ export function TopNav({
               return (
                 <>
                   <Button
+                    jc="flex-start"
                     onPress={handleBack}
                     icon={
                       <IconArrowLeft
