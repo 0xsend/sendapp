@@ -137,6 +137,7 @@ export type Database = {
         Row: {
           address: string
           amount: number
+          amount_after_slash: number
           bonus_pool_amount: number
           created_at: string
           distribution_id: number
@@ -150,6 +151,7 @@ export type Database = {
         Insert: {
           address: string
           amount: number
+          amount_after_slash: number
           bonus_pool_amount: number
           created_at?: string
           distribution_id: number
@@ -163,6 +165,7 @@ export type Database = {
         Update: {
           address?: string
           amount?: number
+          amount_after_slash?: number
           bonus_pool_amount?: number
           created_at?: string
           distribution_id?: number
@@ -856,6 +859,32 @@ export type Database = {
         }
         Relationships: []
       }
+      send_slash: {
+        Row: {
+          distribution_number: number
+          minimum_sends: number
+          scaling_divisor: number
+        }
+        Insert: {
+          distribution_number: number
+          minimum_sends?: number
+          scaling_divisor?: number
+        }
+        Update: {
+          distribution_number?: number
+          minimum_sends?: number
+          scaling_divisor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "send_slash_distribution_number_fkey"
+            columns: ["distribution_number"]
+            isOneToOne: true
+            referencedRelation: "distributions"
+            referencedColumns: ["number"]
+          },
+        ]
+      }
       send_token_transfers: {
         Row: {
           abi_idx: number
@@ -1138,6 +1167,12 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_and_insert_send_ceiling_verification: {
+        Args: {
+          distribution_number: number
+        }
+        Returns: undefined
+      }
       citext:
         | {
             Args: {
@@ -1244,10 +1279,7 @@ export type Database = {
           id: string
           created_at: string
           user_id: string
-          send_plus_minus: number
           referral_count: number
-          network_plus_minus: number
-          affiliate_send_score: number
         }[]
       }
       insert_challenge: {
@@ -1307,6 +1339,17 @@ export type Database = {
           user_id: string
         }
       }
+      sum_qualification_sends: {
+        Args: {
+          distribution_number: number
+          send_ceiling: number
+        }
+        Returns: {
+          user_id: string
+          amount: number
+          sent_to: string[]
+        }[]
+      }
       tag_search: {
         Args: {
           query: string
@@ -1343,6 +1386,7 @@ export type Database = {
         | "send_one_hundred"
         | "total_tag_referrals"
         | "send_streak"
+        | "send_ceiling"
       verification_value_mode: "individual" | "aggregate"
     }
     CompositeTypes: {
