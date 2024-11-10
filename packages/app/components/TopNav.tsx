@@ -9,15 +9,12 @@ import {
   Button as ButtonOg,
   Container,
   Separator,
-  useToastController,
   type ButtonProps,
-  ButtonText,
-  View,
   usePwa,
   Avatar,
 } from '@my/ui'
 import { useRootScreenParams } from 'app/routers/params'
-import { IconAccount, IconArrowLeft, IconGear, IconQr, IconSendLogo } from 'app/components/icons'
+import { IconAccount, IconArrowLeft, IconSendLogo } from 'app/components/icons'
 import { usePathname } from 'app/utils/usePathname'
 import { useRouter } from 'solito/router'
 
@@ -27,31 +24,20 @@ import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
 import type { Tables } from '@my/supabase/database-generated.types'
 
-export enum ButtonOption {
-  PROFILE = 'PROFILE',
-  QR = 'QR',
-  SETTINGS = 'SETTINGS',
-  REFERRAL = 'REFERRAL',
-}
-
 interface TopNavProps {
   header?: string
   subheader?: string
   showLogo?: boolean
-  /**
-   * Customize the button on the right side of the top nav.
-   */
-  button?: ButtonOption
   /**
    * Hide the subroute button
    * @default false
    */
   noSubroute?: boolean
   /**
-   * Whether the back arrow navigates to the base path
-   * @default true
+   * Whether the back arrow navigates to the root path
+   * @default "root"
    */
-  backToBasePath?: boolean
+  backFunction?: 'root' | 'pop' | 'router' | 'home'
 }
 
 export function AvatarMenuButton({ profile }: { profile?: Tables<'profiles'> | null }) {
@@ -89,26 +75,17 @@ export function TopNav({
   header = '',
   subheader,
   showLogo = false,
-  button,
   noSubroute = false,
-  backToBasePath = true,
+  backFunction = 'root',
 }: TopNavProps) {
   const [queryParams, setRootParams] = useRootScreenParams()
   const path = usePathname()
   const parts = path.split('/').filter(Boolean)
-  const { push } = useRouter()
+  const { push, back } = useRouter()
   const media = useMedia()
-  const toast = useToastController()
   const selectedCoin = useCoinFromTokenParam()
   const isPwa = usePwa()
   const { profile } = useUser()
-
-  const handleSettingsBottomSheet = () => {
-    setRootParams(
-      { ...queryParams, nav: queryParams.nav ? undefined : 'settings' },
-      { webBehavior: 'replace' }
-    )
-  }
 
   const hasSelectedCoin = Boolean(selectedCoin)
 
@@ -119,17 +96,30 @@ export function TopNav({
       setRootParams({ ...queryParams, token: undefined })
       return
     }
-    const newPath =
-      backToBasePath && parts.length > 1
-        ? parts.slice(0, 1).join('/')
-        : parts.slice(0, parts.length - 1).join('/')
-
-    if (path.includes('/settings')) {
-      push(`/${newPath}?nav=settings`)
+    if (backFunction === 'router') {
+      back()
       return
     }
 
-    push(`/${newPath}`)
+    const newPath = () => {
+      switch (backFunction) {
+        case 'home':
+          return '/'
+        case 'root':
+          return parts.slice(0, 1).join('/')
+        case 'pop':
+          return parts.slice(0, parts.length - 1).join('/')
+        default:
+          return parts.slice(0, parts.length - 1).join('/')
+      }
+    }
+
+    if (path.includes('/settings')) {
+      push(`/${newPath()}?nav=settings`)
+      return
+    }
+
+    push(`/${newPath()}`)
   }
   //@todo Refactor this so we can put back arrows on screens that need it
   const isSubRoute =
@@ -137,36 +127,6 @@ export function TopNav({
     path.includes('/secret-shop') ||
     path.includes('/deposit') ||
     path.includes('/leaderboard')
-
-  const renderButton = () => {
-    switch (true) {
-      case button === undefined:
-        return <Button opacity={0} disabled $gtMd={{ display: 'none' }} />
-      case button === ButtonOption.QR:
-        return (
-          <Button
-            $gtLg={{ display: 'none' }}
-            icon={<IconQr size={'$2.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />}
-            onPress={() => toast.show('Coming Soon')}
-          />
-        )
-      case button === ButtonOption.SETTINGS:
-        return (
-          <Button
-            $gtLg={{ display: 'none' }}
-            icon={
-              <IconGear size={'$2.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-            }
-            onPress={handleSettingsBottomSheet}
-          />
-        )
-      case button === ButtonOption.PROFILE:
-        return profile ? <AvatarMenuButton profile={profile} /> : null
-      default:
-        if (__DEV__) throw new Error(`Unknown button option: ${button}`)
-        return null
-    }
-  }
 
   return (
     <Header w="100%">
@@ -191,6 +151,7 @@ export function TopNav({
               return (
                 <XStack ai="center" f={1}>
                   <Button
+                    jc="flex-start"
                     onPress={handleBack}
                     icon={
                       <IconArrowLeft
@@ -206,21 +167,29 @@ export function TopNav({
                 </XStack>
               )
             case !isSubRoute:
-              return showLogo ? (
-                <XStack>
-                  <Link href="/">
-                    <IconSendLogo size={'$2.5'} color={'$color12'} />
-                  </Link>
-                </XStack>
-              ) : (
-                <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
-                  {header}
-                </H2>
+              return (
+                <>
+                  {showLogo ? (
+                    <XStack>
+                      <Link href="/">
+                        <IconSendLogo size={'$2.5'} color={'$color12'} />
+                      </Link>
+                    </XStack>
+                  ) : (
+                    <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                      {header}
+                    </H2>
+                  )}
+                  <Stack jc="center" $gtLg={{ fd: 'row' }}>
+                    {profile ? <AvatarMenuButton profile={profile} /> : null}
+                  </Stack>
+                </>
               )
             case showLogo:
               return (
                 <>
                   <Button
+                    jc="flex-start"
                     onPress={handleBack}
                     icon={
                       <IconArrowLeft
@@ -239,8 +208,9 @@ export function TopNav({
               )
             default:
               return (
-                <>
+                <XStack ai="center" f={1}>
                   <Button
+                    jc="flex-start"
                     onPress={handleBack}
                     icon={
                       <IconArrowLeft
@@ -250,18 +220,13 @@ export function TopNav({
                       />
                     }
                   />
-
-                  <H2 fontWeight={'300'} col="$color10" lineHeight={32} als={'center'}>
+                  <Paragraph size={'$8'} col={'$color10'}>
                     {header}
-                  </H2>
-                </>
+                  </Paragraph>
+                </XStack>
               )
           }
         })()}
-
-        <Stack display={isSubRoute || media.lg ? 'flex' : 'none'} jc="center" $gtLg={{ fd: 'row' }}>
-          {renderButton()}
-        </Stack>
       </Container>
       {subheader && (
         <Container fd="column">

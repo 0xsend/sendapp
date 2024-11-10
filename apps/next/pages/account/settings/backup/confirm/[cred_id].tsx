@@ -4,7 +4,7 @@ import { ConfirmPasskeyScreen } from 'app/features/account/settings/backup/confi
 import Head from 'next/head'
 import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../../../_app'
-import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { TopNav } from 'app/components/TopNav'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Settings" button={ButtonOption.SETTINGS} />}>
+  <HomeLayout TopNav={<TopNav header="Settings" />}>
     <SettingsLayout>{children}</SettingsLayout>
   </HomeLayout>
 )

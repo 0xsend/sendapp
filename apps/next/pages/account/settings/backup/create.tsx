@@ -1,4 +1,4 @@
-import { ButtonOption, TopNav } from 'app/components/TopNav'
+import { TopNav } from 'app/components/TopNav'
 import { CreatePasskeyScreen } from 'app/features/account/settings/backup/create'
 import { SettingsLayout } from 'app/features/account/settings/layout.web'
 import { HomeLayout } from 'app/features/home/layout.web'
@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout = () => {
 export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Settings" button={ButtonOption.SETTINGS} />}>
+  <HomeLayout TopNav={<TopNav header="Settings" />}>
     <SettingsLayout>{children}</SettingsLayout>
   </HomeLayout>
 )

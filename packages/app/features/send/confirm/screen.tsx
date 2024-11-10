@@ -15,9 +15,9 @@ import {
 } from '@my/ui'
 import { baseMainnet } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { IconAccount, IconUSDC } from 'app/components/icons'
+import { IconAccount } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { coins, coinsDict } from 'app/data/coins'
+import { coinsDict } from 'app/data/coins'
 import { useTokenActivityFeed } from 'app/features/home/utils/useTokenActivityFeed'
 import { useSendScreenParams } from 'app/routers/params'
 import { assert } from 'app/utils/assert'
@@ -42,8 +42,9 @@ import {
 } from 'app/utils/zod/activity'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress, parseUnits, type Hex } from 'viem'
+import { formatUnits, isAddress, type Hex } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
+import { localizeAmount } from 'app/utils/formatAmount'
 
 export function SendConfirmScreen() {
   const [queryParams] = useSendScreenParams()
@@ -72,7 +73,7 @@ export function SendConfirmScreen() {
 
 export function SendConfirm() {
   const [queryParams] = useSendScreenParams()
-  const { sendToken, recipient, idType } = queryParams
+  const { sendToken, recipient, idType, amount } = queryParams
 
   const queryClient = useQueryClient()
   const { data: sendAccount } = useSendAccount()
@@ -94,7 +95,6 @@ export function SendConfirm() {
 
   const router = useRouter()
 
-  const amount = parseUnits((queryParams.amount ?? '0').toString(), tokenDecimals ?? 0)
   const {
     data: nonce,
     error: nonceError,
@@ -107,7 +107,7 @@ export function SendConfirm() {
     // @ts-expect-error some work to` do here
     to: profile?.address ?? recipient,
     token: sendToken === 'eth' ? undefined : sendToken,
-    amount: BigInt(amount),
+    amount: BigInt(queryParams.amount ?? '0'),
     nonce: nonce ?? 0n,
   })
 
@@ -148,10 +148,10 @@ export function SendConfirm() {
 
   const hasEnoughGas = usdcFees && (usdcBalance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
 
-  const hasEnoughBalance = tokenBalance && tokenBalance >= amount
+  const hasEnoughBalance = tokenBalance && tokenBalance >= BigInt(amount ?? '0')
 
   const canSubmit =
-    Number(queryParams.amount) > 0 &&
+    BigInt(queryParams.amount ?? '0') > 0 &&
     coinsDict[queryParams.sendToken] &&
     hasEnoughGas &&
     hasEnoughBalance
@@ -165,7 +165,7 @@ export function SendConfirm() {
       throwIf(feesPerGasError)
       assert(!!feesPerGas, 'Fees per gas is not available')
 
-      assert(tokenBalance >= amount, 'Insufficient balance')
+      assert(tokenBalance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
       const _userOp = {
@@ -448,6 +448,9 @@ const SendAmount = () => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, recipient, idType, amount } = queryParams
   const router = useRouter()
+  const localizedAmount = localizeAmount(
+    formatUnits(BigInt(queryParams.amount ?? ''), coinsDict[queryParams.sendToken].decimals)
+  )
   return (
     <YStack gap="$2.5" f={1} $gtLg={{ maw: 350 }} jc="space-between">
       <XStack jc="space-between" ai="center" gap="$3">
@@ -490,7 +493,7 @@ const SendAmount = () => {
         f={1}
       >
         <Paragraph fontSize="$9" fontWeight="600" color="$color12">
-          {queryParams.amount}
+          {localizedAmount}
         </Paragraph>
         <IconCoin coin={coinsDict[queryParams.sendToken]} />
       </XStack>

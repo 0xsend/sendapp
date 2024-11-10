@@ -114,6 +114,13 @@ jest.mock('app/utils/send-accounts', () => ({
   }),
 }))
 
+jest.mock('app/utils/useIsSendingUnlocked', () => ({
+  useIsSendingUnlocked: jest.fn().mockReturnValue({
+    isSendingUnlocked: true,
+    isLoading: false,
+  }),
+}))
+
 import { usePathname } from 'expo-router'
 // @ts-expect-error mock
 usePathname.mockReturnValue('/')

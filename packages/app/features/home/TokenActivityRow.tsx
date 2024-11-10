@@ -10,14 +10,12 @@ import { CommentsTime } from 'app/utils/dateHelper'
 import { Link } from 'solito/link'
 
 import { useUser } from 'app/utils/useUser'
-import { shorten } from 'app/utils/strings'
-import { isAddress } from 'viem'
 
 export function TokenActivityRow({ activity }: { activity: Activity }) {
   const { profile } = useUser()
   const { created_at, from_user, to_user } = activity
   const amount = amountFromActivity(activity)
-  const date = new Date(created_at)
+  const date = CommentsTime(new Date(created_at))
   const eventName = eventNameFromActivity(activity)
   const subtext = subtextFromActivity(activity)
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
@@ -29,18 +27,10 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
         <ActivityAvatar activity={activity} />
         <YStack gap="$1.5" width={'100%'} f={1} overflow="hidden">
           <XStack fd="row" jc="space-between" gap="$1.5" f={1} width={'100%'}>
-            <Text color="$color12" fontSize="$7" $gtMd={{ fontSize: '$5' }}>
-              {(() => {
-                switch (true) {
-                  case activity.event_name === 'send_account_transfers' &&
-                    to_user?.send_id === undefined:
-                    return 'Withdraw'
-                  default:
-                    return eventName
-                }
-              })()}
+            <Text color="$color12" fontSize="$6" $gtMd={{ fontSize: '$5' }}>
+              {eventName}
             </Text>
-            <Text color="$color12" fontSize="$5">
+            <Text color="$color12" fontSize="$5" ta="right">
               {amount}
             </Text>
           </XStack>
@@ -79,11 +69,11 @@ export function TokenActivityRow({ activity }: { activity: Activity }) {
                 overflow={'hidden'}
                 fontSize="$4"
               >
-                {isAddress(subtext ?? '') ? shorten(subtext ?? '', 5, 4) : subtext}
+                {subtext}
               </Paragraph>
             )}
             <Paragraph color="$color10" size={'$3'}>
-              {CommentsTime(date)}
+              {date}
             </Paragraph>
           </XStack>
         </YStack>

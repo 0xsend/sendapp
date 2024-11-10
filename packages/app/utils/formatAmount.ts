@@ -1,5 +1,6 @@
 import { floor } from './math'
 const defaultSymbols = ['', 'K', 'M', 'B', 'T', 'P', 'E']
+import { parseUnits } from 'viem'
 
 interface AbbreviateOptions {
   padding?: boolean
@@ -125,4 +126,42 @@ export default function formatAmount(
       maximumFractionDigits: maxDecimals,
     })
   )
+}
+
+export const removeDuplicateInString = (text: string, substring: string) => {
+  const [first, ...after] = text.split(substring)
+  return first + (after.length ? `${substring}${after.join('')}` : '')
+}
+
+export const localizeAmount = (amount?: string) => {
+  if (!amount) return ''
+  //remove duplicate "." then filter out any letters
+  let formattedAmount = removeDuplicateInString(amount, '.').replace(/[^0-9.]/g, '')
+
+  // Add leading 0 if amount starts with decimal
+  if (formattedAmount.startsWith('.')) {
+    formattedAmount = `0${formattedAmount}`
+  }
+
+  // Split number into integer and decimal parts
+  const parts = formattedAmount.split('.')
+  const integerPart = parts[0]
+  const decimalPart = parts[1] || ''
+
+  // Format integer part with commas, but only if it's not zero
+  const formattedInteger =
+    integerPart === '0' || integerPart === '' ? '0' : Number(integerPart).toLocaleString()
+
+  // Always add decimal point if it exists in input
+  const finalAmount = formattedAmount.includes('.')
+    ? `${formattedInteger}.${decimalPart}`
+    : formattedInteger
+
+  return finalAmount
+}
+
+export const sanitizeAmount = (amount?: string, decimals?: number) => {
+  if (!amount) return ''
+  const formattedAmount = removeDuplicateInString(amount, '.').replace(/[^0-9.]/g, '') //remove duplicate "." then filter out any letters
+  return parseUnits(formattedAmount, decimals ?? 18)
 }
