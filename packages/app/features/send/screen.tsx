@@ -23,7 +23,7 @@ import { type Address, isAddress } from 'viem'
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  if (isLoading) return <Spinner size="large" />
+  if (isLoading) return <Spinner size="large" color={'$color12'} />
   if (error) throw new Error(error.message)
 
   if (idType === 'address' && isAddress(recipient as Address)) {

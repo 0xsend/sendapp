@@ -154,7 +154,6 @@ export function SendAmountForm() {
           testID: 'SendForm',
           $gtSm: { maxWidth: '100%' },
           jc: 'flex-start',
-          als: 'flex-start',
           f: 1,
           height: '100%',
         }}

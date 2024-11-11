@@ -1140,7 +1140,6 @@ exports[`SendScreen should render with search when on /send and no recipient in 
       [
         {
           "gap": 32,
-          "marginTop": 40,
         },
         {
           "initial": {

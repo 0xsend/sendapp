@@ -25,7 +25,7 @@ const MainLayout = ({
                   <Avatar.Image src={avatar_url} width={48} height={48} />
                 ) : (
                   <Avatar.Fallback jc={'center'}>
-                    <Spinner size="large" color="$color" />
+                    <Spinner size="large" color="$color12" />
                   </Avatar.Fallback>
                 )}
               </LinkableAvatar>

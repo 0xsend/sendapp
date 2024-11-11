@@ -150,17 +150,15 @@ export function TopNav({
             case hasSelectedCoin:
               return (
                 <XStack ai="center" f={1}>
-                  <Button
-                    jc="flex-start"
-                    onPress={handleBack}
-                    icon={
+                  <Button onPress={handleBack}>
+                    <ButtonOg.Icon>
                       <IconArrowLeft
                         size={'$1.5'}
-                        color={'$primary'}
+                        $theme-dark={{ color: '$primary' }}
                         $theme-light={{ color: '$color12' }}
                       />
-                    }
-                  />
+                    </ButtonOg.Icon>
+                  </Button>
                   <Paragraph size={'$8'} col={'$color10'}>
                     Balance
                   </Paragraph>
@@ -188,17 +186,15 @@ export function TopNav({
             case showLogo:
               return (
                 <>
-                  <Button
-                    jc="flex-start"
-                    onPress={handleBack}
-                    icon={
+                  <Button onPress={handleBack}>
+                    <ButtonOg.Icon>
                       <IconArrowLeft
                         size={'$1.5'}
-                        color={'$primary'}
+                        $theme-dark={{ color: '$primary' }}
                         $theme-light={{ color: '$color12' }}
                       />
-                    }
-                  />
+                    </ButtonOg.Icon>
+                  </Button>
                   <XStack>
                     <Link href="/send">
                       <IconSendLogo size={'$2.5'} color={'$color12'} />
@@ -209,17 +205,15 @@ export function TopNav({
             default:
               return (
                 <XStack ai="center" f={1}>
-                  <Button
-                    jc="flex-start"
-                    onPress={handleBack}
-                    icon={
+                  <Button onPress={handleBack}>
+                    <ButtonOg.Icon>
                       <IconArrowLeft
                         size={'$1.5'}
-                        color={'$primary'}
+                        $theme-dark={{ color: '$primary' }}
                         $theme-light={{ color: '$color12' }}
                       />
-                    }
-                  />
+                    </ButtonOg.Icon>
+                  </Button>
                   <Paragraph size={'$8'} col={'$color10'}>
                     {header}
                   </Paragraph>
@@ -256,11 +250,11 @@ function Button(props: ButtonProps) {
       bc="transparent"
       chromeless
       circular
-      jc={'center'}
+      jc={'flex-start'}
       ai={'center'}
+      bw={0}
       hoverStyle={{
         backgroundColor: 'transparent',
-        borderColor: '$background',
       }}
       pressStyle={{
         backgroundColor: 'transparent',

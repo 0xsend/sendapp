@@ -90,7 +90,7 @@ function ActivityFeed(
                   fetchNextPage()
                 }}
                 disabled={isFetchingNextPageActivities || isFetchingActivities}
-                color="$color"
+                color="$color10"
                 width={200}
                 mx="auto"
               >

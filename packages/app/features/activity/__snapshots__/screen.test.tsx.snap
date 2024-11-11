@@ -340,7 +340,6 @@ exports[`ActivityScreen renders activity screen: ActivityScreen 1`] = `
       [
         {
           "gap": 32,
-          "marginTop": 40,
         },
         {
           "initial": {

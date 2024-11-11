@@ -104,7 +104,6 @@ function SearchResults() {
       key="searchResults"
       animation="quick"
       gap="$size.2.5"
-      mt="$size.3.5"
       width="100%"
       enterStyle={{
         opacity: 0,
