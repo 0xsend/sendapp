@@ -25,7 +25,7 @@ export enum Mode {
   Exponential = 'exponential',
 }
 
-export const PERC_DENOM = 10000n
+export const PERC_DENOM = 10000000n
 
 export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   const bps = bips * PERC_DENOM
@@ -33,56 +33,107 @@ export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   return percentage / PERC_DENOM
 }
 
+const calculateSlashPercentage = (
+  weight: bigint,
+  scaledPreviousReward: bigint,
+  percDenom: bigint = PERC_DENOM
+): bigint => {
+  return (weight * percDenom) / scaledPreviousReward > percDenom
+    ? percDenom
+    : (weight * percDenom) / scaledPreviousReward
+}
+
 /**
  * Given a list of balances and a distribution amount, calculate the distribution weights and share amounts.
  */
 export function calculateWeights(
-  balances: readonly { address: `0x${string}`; balance: string }[],
+  balances: readonly {
+    address: `0x${string}`
+    balance: string
+    balanceAfterSlash: string
+  }[],
   amount: bigint,
+  timeAdjustedAmount: bigint,
   mode: Mode = Mode.Linear
-): Weights {
+): {
+  weightedShares: Record<string, WeightedShare>
+  weightedSharesAfterSlash: Record<string, WeightedShare>
+} {
   const poolWeights: Record<`0x${string}`, bigint> = {}
-  const totalBalance = balances.reduce((acc, { balance }) => acc + BigInt(balance), 0n)
+  const poolWeightsAfterSlash: Record<`0x${string}`, bigint> = {}
 
-  for (const { address, balance } of balances) {
-    const weight = calculateWeightByMode(BigInt(balance), totalBalance, balances.length, mode)
-    if (poolWeights[address] === undefined) {
-      poolWeights[address] = 0n
-    }
-    poolWeights[address] += weight
+  // First calculate all slashed weights
+  const totalBalanceAfterSlash = balances.reduce(
+    (acc, { balanceAfterSlash }) => acc + BigInt(balanceAfterSlash),
+    0n
+  )
+
+  for (const { address, balanceAfterSlash } of balances) {
+    poolWeightsAfterSlash[address] = calculateWeightByMode(
+      BigInt(balanceAfterSlash),
+      totalBalanceAfterSlash,
+      balances.length,
+      mode
+    )
   }
 
-  const totalWeight = Object.values(poolWeights).reduce((acc, weight) => acc + weight, 0n)
-  const weightPerSend = (totalWeight * PERC_DENOM) / amount
+  // Now calculate potential weights using slashed weights for all except current
+  for (const current of balances) {
+    const totalWeight =
+      totalBalanceAfterSlash - BigInt(current.balanceAfterSlash) + BigInt(current.balance)
+    poolWeights[current.address] = calculateWeightByMode(
+      BigInt(current.balance),
+      totalWeight,
+      balances.length,
+      mode
+    )
+  }
 
+  // Calculate shares using the two sets of weights
   const weightedShares: Record<string, WeightedShare> = {}
-  for (const [address, weight] of Object.entries(poolWeights)) {
-    const amount = (weight * PERC_DENOM) / weightPerSend
-    if (amount > 0n) {
+  const weightedSharesAfterSlash: Record<string, WeightedShare> = {}
+
+  const totalWeightAfterSlash = Object.values(poolWeightsAfterSlash).reduce((acc, w) => acc + w, 0n)
+
+  for (const { address } of balances) {
+    const poolWeight = poolWeights[address] ?? 0n
+    const poolWeightAfterSlash = poolWeightsAfterSlash[address] ?? 0n
+    const totalWeight = totalWeightAfterSlash - poolWeightAfterSlash + poolWeight
+    const potentialAmount = (poolWeight * amount) / totalWeight
+    const slashedAmount = (poolWeightAfterSlash * timeAdjustedAmount) / totalWeightAfterSlash
+
+    if (potentialAmount > 0n) {
       weightedShares[address] = {
-        amount,
-        address: address as `0x${string}`,
+        amount: potentialAmount > amount ? amount : potentialAmount,
+        address,
+      }
+    }
+
+    if (slashedAmount > 0n) {
+      weightedSharesAfterSlash[address] = {
+        amount: slashedAmount,
+        address,
       }
     }
   }
 
-  //@todo: this is a hack to ensure the total distributed amount is equal to the amount
-  // We really should handle these rounding errors instead
+  handleRoundingErrors(weightedSharesAfterSlash, timeAdjustedAmount)
+
+  return { weightedShares, weightedSharesAfterSlash }
+}
+
+// Helper function to handle rounding errors
+function handleRoundingErrors(shares: Record<string, WeightedShare>, targetAmount: bigint) {
   let totalDistributed = 0n
-  for (const share of Object.values(weightedShares)) {
+  for (const share of Object.values(shares)) {
     totalDistributed += share.amount
   }
 
-  if (totalDistributed !== amount) {
-    const difference = amount - totalDistributed
-    // Add or subtract the difference from the largest share
-    const largestShare = Object.values(weightedShares).reduce((a, b) =>
-      a.amount > b.amount ? a : b
-    )
+  if (totalDistributed > targetAmount) {
+    const difference = targetAmount - totalDistributed
+    const largestShare = Object.values(shares).reduce((a, b) => (a.amount > b.amount ? a : b))
     largestShare.amount += difference
   }
-
-  return { totalWeight, weightPerSend, poolWeights, weightedShares }
 }
 
 function calculateWeightByMode(
