@@ -150,7 +150,7 @@ export const localizeAmount = (amount?: string) => {
 
   // Format integer part with commas, but only if it's not zero
   const formattedInteger =
-    integerPart === '0' || integerPart === '' ? '0' : Number(integerPart).toLocaleString()
+    integerPart === '0' || integerPart === '' ? '0' : Number(integerPart).toLocaleString('en-US')
 
   // Always add decimal point if it exists in input
   const finalAmount = formattedAmount.includes('.')
